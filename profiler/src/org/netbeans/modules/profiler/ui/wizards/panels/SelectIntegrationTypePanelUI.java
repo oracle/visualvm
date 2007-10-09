@@ -55,7 +55,7 @@ public class SelectIntegrationTypePanelUI extends javax.swing.JPanel {
   /**
    * Creates new form SelectIntegrationTypePanelUI
    */
-  public SelectIntegrationTypePanelUI(SelectIntegrationTypePanel.Model model) {
+  SelectIntegrationTypePanelUI(SelectIntegrationTypePanel.Model model) {
     this.model = model;
     initComponents();
     loadModel();

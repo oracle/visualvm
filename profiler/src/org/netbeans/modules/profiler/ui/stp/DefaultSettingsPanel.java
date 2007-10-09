@@ -137,7 +137,7 @@ public class DefaultSettingsPanel extends JPanel implements Scrollable {
         changeListeners.remove(listener);
     }
 
-    protected SettingsChangeListener getSettingsChangeListener() {
+    SettingsChangeListener getSettingsChangeListener() {
         return settingsChangeListener;
     }
 

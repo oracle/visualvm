@@ -54,7 +54,7 @@ public class PerformIntegrationPanelUI extends javax.swing.JPanel {
   private PerformIntegrationPanel.Model model;
 
   /** Creates new form ManualIntegrationStepsPanelUI */
-  public PerformIntegrationPanelUI(PerformIntegrationPanel.Model model) {
+  PerformIntegrationPanelUI(PerformIntegrationPanel.Model model) {
     this.model = model;
     initComponents();
   }

@@ -64,7 +64,7 @@ public class ManualIntegrationPanelUI extends javax.swing.JPanel implements List
   /**
    * Creates new form ManualIntegrationPanelUI
    */
-  public ManualIntegrationPanelUI(ManualIntegrationPanel.Model model) {
+  ManualIntegrationPanelUI(ManualIntegrationPanel.Model model) {
     this.model = model;
     initComponents();
   }

@@ -54,7 +54,7 @@ public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
   /**
    * Creates new form ReviewAdditionalStepsPanelUI
    */
-  public ReviewAdditionalStepsPanelUI(ReviewAdditionalStepsPanel.Model model) {
+  ReviewAdditionalStepsPanelUI(ReviewAdditionalStepsPanel.Model model) {
     this.model = model;
     initComponents();
   }
