@@ -52,8 +52,9 @@ made subject to such option by the copyright holder.
                 <tocitem text="Selecting a Profiling Task" target="profile_tasks_overview" />
                 <tocitem text="Profiling Tasks: Quick Reference" target="profile_quickref" />
                 <tocitem text="Profiling Windows" target="profile_windows" />
-                <tocitem text="Profiling a Local Running Application" target="profile_running" />
-                <tocitem text="Profiling a Remote Application" target="profile_remote" />
+                <tocitem text="Profiling Using Attach Mode" target="profile_attach" />
+                <tocitem text="Attaching to a Local Application" target="profile_running" />
+                <tocitem text="Attaching to a Remote Application" target="profile_remote" />
                 <tocitem text="Profiling a Free-Form Project" target="profile_freeform" />
                 <tocitem text="Calibrating the Profiler" target="calibrating" />
                 <tocitem text="Taking a Snapshot" target="snap_taking" />

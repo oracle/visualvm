@@ -45,11 +45,11 @@ made subject to such option by the copyright holder.
                      "http://java.sun.com/products/javahelp/map_1_0.dtd">
 
 <map version="1.0">
-	<mapID target="profile_running" url="helppages/profile_running.html"/>
         <mapID target="calibrating" url="helppages/calibrating.html"/>
 	<mapID target="custom_filtersets" url="helppages/custom_filtersets.html"/>
         <mapID target="heap_taking" url="helppages/heap_taking.html"/>
         <mapID target="heapwalking" url="helppages/heapwalker.html"/>
+        <mapID target="profile_attach" url="helppages/profile_attach.html"/>
 	<mapID target="profile_analyze_short" url="helppages/profile_analyze_short.html"/>
         <mapID target="profile_freeform" url="helppages/profile_freeform.html"/>
 	<mapID target="profile_memory_short" url="helppages/profile_memory_short.html"/>
@@ -59,6 +59,7 @@ made subject to such option by the copyright holder.
         <mapID target="profile_remote" url="helppages/profile_remote.html"/>
 	<mapID target="profile_results" url="helppages/profile_results.html"/>
 	<mapID target="profile_rootmethod" url="helppages/profile_rootmethod.html"/>
+        <mapID target="profile_running" url="helppages/profile_running.html"/>
         <mapID target="profile_startlocal" url="helppages/profile_startlocal.html"/>
 	<mapID target="profile_tasks_overview" url="helppages/profile_tasks_overview.html"/>
 	<mapID target="profile_threads" url="helppages/profile_threads.html"/>

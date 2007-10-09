@@ -11,16 +11,21 @@
     <body>
         <h2>Profiling Using Attach Mode</h2>
         <p><small><a href="#seealso">See Also</a></small></p>
-        <p>You generally use the attach mode to profile an application that you want or need to start outside of the IDE.
+        <p>The easiest way to profile your application is to use the Profile Main Project command.
+        However, if you want or need to start your application outside of the IDE
+        you can use the attach mode to profile an application.
         For example, you may want to use the attach mode in the following cases:</p>
         <ul>
             <li>Your application needs to be started from the command line or uses a complex launch script</li>
             <li>You want to obtain profiling data on the startup of the appliction or target JVM</li>
             <li>You want to profile the application without restarting the application</li>
         </ul>
-        
-        <p>If these cases do not apply, 
-        it is easier to use the Profile Main Project command.</p>
+        <p>You must use the attach mode in the following cases:</p>
+        <ul>
+            <li>You want to profile an application running on a remote JVM, such as a remote application server</li>
+            <li>You want to profile a Java EE or web application and the target server is not Tomcat, 
+        Sun Java System Application Server/GlassFish or JBoss</li>
+        </ul>
         
         <p>The Attach mode enables you to attach the profiling tool to an application that is already running,
         or just about to start on a local or remote machine. 
@@ -36,8 +41,9 @@
         The attachment settings are associated with the project. 
         You can go through the Attach Wizard at any time to change any of the attachment settings.</p> 
 
-        <p>You use the Attach Wizard to specify the attachment settings that are specific to your configuration.
-        In the Attach Wizard you specify the type of application and the location.
+        <p>You use the Attach Wizard to specify the attachment settings for a project.
+        The attachment settings are project specific, which means that each project has its own attach settings.
+            In the Attach Wizard you specify the type of application and the location.
         Based on the details that you provide, the Attach Wizard provides you with a set of instructions on how to 
         configure the application or server so that you can attach the profiler.</p>
 

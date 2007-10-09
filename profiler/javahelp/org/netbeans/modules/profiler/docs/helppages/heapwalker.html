@@ -24,16 +24,46 @@
                 <param name="textFontWeight" value="bold">
                 <param name="textColor" value="blue">
         </object> captures profiling data at a specific point in time.
-        <!--The data captured in a snapshot depends on the type of profiling session in progress when the snapshot is taken.
-    
-        You can save snapshots
-        You can explore snapshots
-        You can open a snapshot at any time
-    </p>
-            <li>Snapshots contain a more detailed record of profiling data than live results.</li>
-            <li>Snapshots can be easily compared (memory snapshots).</li>
-        </ul>
+        
+        You can load and browse any heap dump saved on your local system.
+        You do not need to be running a profiling session to load and browse a heap dump.</p>
+        <ol>
+            <li>Choose Profile &gt; Load Heap Dump in the main menu.</li>
+            <li>Locate the heap dump on your system and click Open.</li>
+        </ol>    
+        <p>When you load a heap dump, the heap dump opens in the HeapWalker in the Heap window.</p>
 
+        <p>The HeapWalker enables you to evaluate Java heap contents and search for memory leaks. 
+        You can view the following:</p>
+        <ul>
+            <li>List of classes present on the heap. For each class you can see the number of instances of that class and total size of all instances.</li>
+            <li>List of instances of each class. You can see individual instances and their size (size of instances of the same class varies only for arrays).</li>
+            <li>Fields of each instance or class. You can browse (static) fields to identify individual instances by field values and determine dependencies among them.</li>
+            <li>References to each instance. You can browse instances or classes holding reference to a particular instance to find unnecessary references and discover memory leaks.</li>
+        </ul>
+        
+        <h3>Browse Heap Dump</h3>
+        
+        <p>When the heap dump is loaded and open in the Heap window, use the following tabs to view information about the heap dump:</p>
+
+        <ul>
+            <li><b>Summary.</b> This tab displays general information about the heap dump such as total numbers of classes, instances.
+            The Summary tab also provides you with information about the environment and system properties of the machine where the heap dump was taken.</li>
+            <li><b>Classes.</b> This tab displays a list of classes with information about the number of instances of the class and total size of the instances.
+            You can also open the Static Fields browser to browse the static fields of each class. 
+            To open the Static Fields browser, click the Static Fields button in the HeapWalker toolbar.
+            <p>You can double-click any class in the classes list to view the instances of that class in the Instances tab.
+            Alternatively, you can right-click a class and choose Show in Instances View.</li>
+            <li><b>Instances.</b> This tab displays the instances for a class that you select in the Classes tab. 
+            For each instance, you can do the following:
+            <ul>
+                <li>Select an instance to browse the fields of the instance in the the Field Browser.</li> 
+                <li>Select an instance to browse the references to the instance in the Reference Browser.</li>
+            </ul>
+            <p>You can hide or reveal the individual windows by using the Instances button, the Fields button and 
+            the References button in the toolbar.</p></li>
+        </ul>
+        <!--
 
 
         <h3>Using the Snapshot Toolbar</h3>
@@ -100,7 +130,7 @@
                 
         <dl>
             <dt><a name="seealso">See Also</a></dt>
-            <dd><a href="profile_profilepoints.html">Setting Profiling Points</a></dd>
+            <dd><a href="heap_taking.html">Taking a Heap Dump</a></dd>
             <dd><a href="results_liveresults.html">Working with Live Profiling Results</a></dd>
             
         </dl>
