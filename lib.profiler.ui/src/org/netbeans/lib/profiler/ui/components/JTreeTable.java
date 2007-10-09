@@ -398,7 +398,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     /**
      * A subclass of JTree.
      */
-    protected TreeTableCellRenderer tree;
+    TreeTableCellRenderer tree;
     protected int lastColumn = -1;
     protected int lastRow = -1;
     private AbstractTreeTableModel treeTableModel;
