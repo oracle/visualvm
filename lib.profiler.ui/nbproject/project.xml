@@ -72,6 +72,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.ui.graphs</package>
                 <package>org.netbeans.lib.profiler.ui.memory</package>
                 <package>org.netbeans.lib.profiler.ui.monitor</package>
+                <package>org.netbeans.lib.profiler.ui.resources</package>
                 <package>org.netbeans.lib.profiler.ui.threads</package>
             </friend-packages>
         </data>
