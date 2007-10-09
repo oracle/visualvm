@@ -450,79 +450,21 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         ControlsPanel() {
-            setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-            setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+            setLayout(new BorderLayout());
 
-            final Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY,
-                                                                                                        Color.LIGHT_GRAY),
-                                                               new FlatToolBar.FlatMarginBorder());
-
-            JButton rerunButton = new JButton(SystemAction.get(RerunAction.class));
-            rerunButton.setText(null);
-            UIUtils.fixButtonUI(rerunButton);
-            rerunButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) rerunButton
-                                                                                                          .getIcon()).getImage()))));
-            rerunButton.setContentAreaFilled(false);
-            rerunButton.setMargin(new Insets(3, 3, 3, 3));
-            rerunButton.setRolloverEnabled(true);
-            rerunButton.setBorder(myRolloverBorder);
-            add(rerunButton);
-
-            JButton stopButton = new JButton(new StopAction());
-            stopButton.setText(null);
-            UIUtils.fixButtonUI(stopButton);
-            stopButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) stopButton
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           .getIcon())
-                                                                                                        .getImage()))));
-            stopButton.setContentAreaFilled(false);
-            stopButton.setMargin(new Insets(3, 3, 3, 3));
-            stopButton.setRolloverEnabled(true);
-            stopButton.setBorder(myRolloverBorder);
-            add(stopButton);
-
-            JButton resetButton = new JButton(new ResetResultsAction());
-            resetButton.setText(null);
-            UIUtils.fixButtonUI(resetButton);
-            resetButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) resetButton
-                                                                                                          .getIcon()).getImage()))));
-            resetButton.setContentAreaFilled(false);
-            resetButton.setMargin(new Insets(3, 3, 3, 3));
-            resetButton.setRolloverEnabled(true);
-            resetButton.setBorder(myRolloverBorder);
-            add(resetButton);
-
-            JButton rungcButton = new JButton(SystemAction.get(RunGCAction.class));
-            rungcButton.setText(null);
-            UIUtils.fixButtonUI(rungcButton);
-            rungcButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) rungcButton
-                                                                                                          .getIcon()).getImage()))));
-            rungcButton.setContentAreaFilled(false);
-            rungcButton.setMargin(new Insets(3, 3, 3, 3));
-            rungcButton.setRolloverEnabled(true);
-            rungcButton.setBorder(myRolloverBorder);
-            add(rungcButton);
-
-            JButton modifyButton = new JButton(SystemAction.get(ModifyProfilingAction.class));
-            modifyButton.setText(null);
-            UIUtils.fixButtonUI(modifyButton);
-            modifyButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) modifyButton
-                                                                                                           .getIcon()).getImage()))));
-            modifyButton.setContentAreaFilled(false);
-            modifyButton.setMargin(new Insets(3, 3, 3, 3));
-            modifyButton.setRolloverEnabled(true);
-            modifyButton.setBorder(myRolloverBorder);
-            add(modifyButton);
-
-            JButton telemetryButton = new JButton(new TelemetryOverviewAction());
-            telemetryButton.setText(null);
-            UIUtils.fixButtonUI(telemetryButton);
-            telemetryButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) telemetryButton
-                                                                                                              .getIcon()).getImage()))));
-            telemetryButton.setContentAreaFilled(false);
-            telemetryButton.setMargin(new Insets(3, 3, 3, 3));
-            telemetryButton.setRolloverEnabled(true);
-            telemetryButton.setBorder(myRolloverBorder);
-            add(telemetryButton);
+            final JToolBar toolBar = new FlatToolBar() {
+                public Component add(Component comp) {
+                    if (comp instanceof JButton) UIUtils.fixButtonUI((JButton)comp);
+                    return super.add(comp);
+                }
+             };
+             toolBar.add(((Presenter.Toolbar) SystemAction.get(RerunAction.class)).getToolbarPresenter());
+             toolBar.add(new StopAction());
+             toolBar.add(new ResetResultsAction());
+             toolBar.add(((Presenter.Toolbar) SystemAction.get(RunGCAction.class)).getToolbarPresenter());
+             toolBar.add(((Presenter.Toolbar) SystemAction.get(ModifyProfilingAction.class)).getToolbarPresenter());
+             toolBar.add(new TelemetryOverviewAction());
+             add(toolBar, BorderLayout.NORTH);
         }
     }
 
