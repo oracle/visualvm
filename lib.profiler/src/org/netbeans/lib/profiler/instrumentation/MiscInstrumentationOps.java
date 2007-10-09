@@ -108,7 +108,7 @@ public class MiscInstrumentationOps extends ClassManager {
         return createInstrumentedMethodPack();
     }
 
-    public Object[] getOrigCodeForSingleInstrumentedMethod(RootMethods rootMethods) {
+    Object[] getOrigCodeForSingleInstrumentedMethod(RootMethods rootMethods) {
         String className = rootMethods.classNames[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];
         String methodName = rootMethods.methodNames[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];
         String methodSignature = rootMethods.methodSignatures[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];

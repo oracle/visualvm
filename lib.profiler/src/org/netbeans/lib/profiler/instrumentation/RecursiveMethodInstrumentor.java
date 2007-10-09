@@ -154,7 +154,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
      * This method should initialize instrumentation-related data structures, register given classes as loaded, and return
      * the initial set of methods to instrument in the format given by createInstrumentedMethodPack().
      */
-    public abstract Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
+    abstract Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
                                                            byte[][] cachedClassFileBytes, RootMethods rootMethods);
 
     public abstract Object[] getMethodsToInstrumentUponClassLoad(String className, int classLoaderId, boolean threadInCallGraph);

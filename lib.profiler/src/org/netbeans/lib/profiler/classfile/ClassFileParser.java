@@ -59,7 +59,7 @@ public class ClassFileParser implements JavaClassConstants {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ClassFileReadException(ClassFileReadRuntimeException e) {
+        private ClassFileReadException(ClassFileReadRuntimeException e) {
             this.e = e;
         }
 

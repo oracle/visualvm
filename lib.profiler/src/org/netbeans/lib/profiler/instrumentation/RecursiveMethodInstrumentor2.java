@@ -89,7 +89,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
+    Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
                                                   byte[][] cachedClassFileBytes, RootMethods roots) {
         DynamicClassInfo[] loadedClassInfos = preGetInitialMethodsToInstrument(loadedClasses, loadedClassLoaderIds,
                                                                                cachedClassFileBytes);
