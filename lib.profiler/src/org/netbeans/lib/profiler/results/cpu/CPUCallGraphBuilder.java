@@ -892,7 +892,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
      * doubles.
      * NOTE THAT setMethodEntryExitTimesGivenCollectedTimeStampsKinds() SHOULD BE CALLED ONCE BEFORE CALLING THIS METHOD!
      */
-    protected double[] calculateThreadActiveTimes(ThreadInfo ti) {
+    double[] calculateThreadActiveTimes(ThreadInfo ti) {
         TimedCPUCCTNode rootNode = ti.stack[0];
 
         if (rootNode == null) {
