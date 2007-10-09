@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Set Quick Filter Dialog Box</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Set Quick Filter Dialog Box</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>You use the Set Quick Filter dialog box to specify classes or packages that you want to exclude or include when analyzing application performance.
+        Unlike global filters or custom filter sets, a quick filter can be applied only to the current application.</p>
+        
+        <p>You can access this window by selecting Quick Filter from the filter drop-down list in the Select Profiling Task dialog box.</p> 
+        <p>You can set the following properties in the dialog box:</p>
+
+        <ul>
+            <li><b>Filter Type.</b> Select Exclusive or Inclusive to specify if the methods are excluded or included.
+            If Exclude is selected, none of the listed methods are profiled. If Include is selected, only the listed methods
+            are profiled.</li>
+            <li><b>Filter Value.</b> This text area lists the classes and packages that you want to include or exclude.
+            You can type the name in the text area in the following formats:<br>
+<pre>java.*
+javax.swing.
+javax.xml.parsers.SAXParser</pre>
+            <p>You can quickly add classes in your project to the Quick Filter by doing the following:</p>
+            <ol>
+                <li>Select the Profile Only Project Classes Filter in the Select Profiling Task dialog box.</li>
+                <li>Click Show Filter Value to open the Profile Only Project Classes dialog box.</li>
+                <li>Click To Quickfilter.</li>
+            </ol>
+            When you click To Quickfilter, the Set Quick Filter dialog box opens and the project classes are listed 
+            in the Filter Value text box. You can delete or add classes by typing in the text box.</li>
+            
+        </ul>
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../custom_filtersets.html">Setting Filters</a></dd>
+            <dd><a href="../profile_analyze_short.html">Analyzing Application Performance</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal
+Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Monitoring an Application</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Monitoring an Application</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When you choose Monitor Application in the Select Profiling Task dialog box, 
+        the target application is run without any instrumentation. 
+        The results show only high-level information about some properties of the target JVM, 
+        including thread activity and memory allocations. </p>
+        
+        <p><b>To monitor an application:</b></p>
+        <ol>
+            <li>Choose Profile &gt; Profile Main Project from the main menu.</li>
+            <li>Click Monitor Application.</li>
+            <li>Select Enable Threads Monitoring (optional).<br>
+            Select this option to monitor threads from application startup.</li>
+            <li>Click Run.</li>
+        </ol>
+        
+        <p>When you click Run, the target application launches and the profiling task starts.
+        Click the Telemetry button or the Threads button in the Profiler window to view the results.</p>
+       
+        <p><b>Monitoring thread activity</b></p>
+        <p>By default, application thread activity is not monitored.
+        You can start monitoring thread activity at any time during a profiling session by opening the Threads tab and 
+        clicking the Threads button.</p>
+        <ul class="note">
+            <li>If you want to monitor threads from application startup, select Enable Threads Monitoring when you start the 
+            profiling session.</li>
+        </ul>
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+            <dd><a href="profile_results.html">About Profiling Results</a></dd>
+            <dd><a href="results_telemetry.html">Viewing VM Telemetry Results</a></dd>
+            <dd><a href="profile_threads.html">Viewing Thread Activity</a></dd>
+        </dl>
+
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

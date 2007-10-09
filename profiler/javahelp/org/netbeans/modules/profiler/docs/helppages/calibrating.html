@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright � 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Calibrating the Profiler</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>Calibrating the Profiler</h2>
+            <p><small><a href="#seealso">See Also</a></small></p>
+            <p>You need to calibrate the IDE before you can use the IDE to profile an application. 
+            You need to run the calibration process for each JDK you will use for profiling.
+            You do this because instrumenting the bytecode of the application imposes some overhead, and
+            the time spent in code instrumentation needs to be "factored out" in order to achieve more accurate results.</p>
+                            
+            <p><b>To calibrate the IDE to the local system:</b></p>
+            <ol>
+                <li>Close any other programs that are running. 
+                    <ul class="note">
+                        <li>The IDE will run the calibration if other applications are running, 
+                            but running any CPU-intensive programs when performing the calibration may affect the 
+                        accuracy of profiling results.</li>
+                    </ul></li>
+                <li>Choose Profile &gt; Advanced &gt; Run Profiler Calibration from the main menu.</li>
+                <li>Choose the Java Platform that will be used for profiling and click OK.</li> 
+            </ol>
+            <p>When you click OK, the IDE will collect calibration data on the selected Java platform.
+            When the calibration process is complete you can start using the IDE to profile your applications.</p>
+            <p>You should not share calibration data between various computers or systems.</p>
+
+            <p><b>To calibrate the IDE to a remote system:</b><br>
+            To calibrate the IDE to a remote system, see the following NetBeans FAQ:
+            <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerCalibration">
+                <param name="text" value="<html><u>How do I run the calibration process on a remote machine?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+            </object>
+            </p>
+            
+            <h3>Calibrating the system again</h3>
+            <p>You only need to calibrate the IDE once for each JDK you will use.
+            However, you should run the calibration process again when anything changes on your local or remote configuration that could affect
+            system performance. The following could affect system performance:</p>
+            <ul>
+                <li>Any hardware upgrade</li>
+                <li>Any significant change or upgrade of the operating system</li>
+                <li>An upgrade of the Java platform used for profiling</li>
+            </ul>
+
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

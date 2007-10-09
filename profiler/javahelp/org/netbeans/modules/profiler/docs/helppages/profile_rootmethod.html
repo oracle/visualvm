@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Specifying a Root Method</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>Specifying a Root Method</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When analyzing application performance, you can choose to limit the source code that is instrumented by 
+        specifying a root method. When you profile an application by instrumenting a root method, profiling data 
+        is collected when one of the application's threads enters and leaves the root method.</p>
+                
+        <p>When you specify a root method, the method is added to the list of selected root methods which you can choose to
+            instrument when profiling application performance.
+        The selected root methods are listed in the Specify Root Methods dialog box.
+        Each profile application performance configuration is associated with a specific set of selected root methods.
+        </p>
+        
+        <!--To open the dialog box, click Select next to the Part of Application option for the 
+        Analyze Performance profiling task. You can also open this dialog box from the Custom 
+        Profiling dialog box when editing or creating a custom CPU profiling configuration.</p>
+        <p>Threads emit a "method entry" event when entering a method and generate 
+        a corresponding "method exit" event when exiting the method. 
+        Both of these events contain timestamps. When you instrument a method, 
+        Profiler processes this timestamp data. </p>-->
+
+        
+        
+        <p><b>To specify a single root method in a class:</b></p>                
+        <ol>
+            <li>Locate the class containing the method you want to add and open the class in the Source Editor.</li>
+            <li>In the Source Editor, right-click in the method you want to add and choose 
+            Profiling &gt; Add as Profiling Root Method.</li>
+            <li>Select a profiling configuration and click OK.</li>
+        </ol>
+        <p>When you click OK, the method is added to the root methods that are associated with that profiling configuration.</p>
+
+        
+        <p><b>To specify multiple root methods in a class:</b></p>                
+        <ol>
+            <li>Locate the class containing the method you want to add and open the class in the Source Editor.</li>
+            <li>In the Source Editor, right-click in the source code and choose 
+            Profiling &gt; Select Profiling Root Methods.</li>
+            <li>Select a profiling configuration and click OK to open the Select Root Methods dialog box.</li>
+            <li>Expand the package and method nodes, select the methods you want to add as root methods and click OK.</li>
+        </ol>
+        <p>When you click OK, the selected methods are added to the root methods that are associated with that profiling configuration.</p>
+        <p><b>Note:</b> If you right-click in an object that is part of another class, the Select Root Methods dialog box will
+        allow you to select root methods in that class.</p>
+
+        <p><b>Notes:</b></p>
+        <ul class="note">
+            <li>You may need to first mount the file system or a JAR file that contains your root
+            method's class, e.g. if this class does not belong to your application's
+            classpath. That is the case, for example, when profiling code running on
+            top of a Web/J2EE server.</li>
+            <li>If you choose a given method as a root when a thread is already 
+            executing it, profiling will not start. To begin profiling, a "fresh" call 
+            to the root method is required.
+            Once partial application profiling is initiated, profiling data 
+            is not collected until one of the application's threads enters the profiling root method.</li>
+        </ul>
+        
+        <p>For more, see the following NetBeans FAQ:
+            <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerProfilingRootMethods">
+                <param name="text" value="<html><u>How does profiling via root methods work?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+            </object>
+        </p>
+        
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_analyze_short.html">Analyzing Application Performance</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Analyze Memory: Basic Options</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>	
+        <h2>Analyze Memory: Basic Options</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When analyzing memory usage, you can configure basic and advanced options for the profiling session.
+        The following basic options are available when analyzing the lifecycle of objects.
+        If you are configuring a custom configuration, click Advanced Settings to specify <a href="csh_memory_options_adv.html">advanced options</a></p>
+        <p>When analyzing memory usage, you specify one of the following options:</p>
+        <ul>
+            <li><b>Record object creation only<!-- (Object Allocation Profiling)-->.</b> 
+            When selected, profiling the application gives you information about the number, type, and 
+            location of objects that have been allocated. When this option is selected, 
+            all classes currently loaded by the target JVM (and each new class as it is loaded) are instrumented 
+            to produce information about object allocations.
+            This profiling mode is a functional subset of recording both object creation and garbage collection and
+            has a smaller performance and memory overhead.</li>
+            <li><b>Record both object creation and garbage collection<!-- (Object Liveness Profiling)-->.</b> 
+            When selected, profiling the application gives you information on object liveness
+            such as about how many objects of each type are still alive, as well as data on live objects.
+            This options incurs a greater profiling overhead than selecting object creation only.</li>
+        </ul>
+        
+        <p>Additionally, you can set the following options:</p>
+        <ul>
+        <li><b>Track every X allocations.</b> Sets the interval /proportion 
+            for stack sampling, e.g., if set to 10, this means that 
+            for each class only every 10<SUP>th</SUP> object allocation will be recorded 
+            completely.<br>
+            (This only applies to stack sampling 
+            and tracking the object. The total number of 
+            object allocations is recorded separately, and includes all allocations.)
+            To record all information for each object, set this number to 1. However, doing this may substantially 
+            affect the profiling overhead when profiling allocation-intensive applications. For 
+            server-side applications under real-life workload conditions, setting this
+            number to 20 or more should be sufficient to minimise the overhead, 
+            and still obtain sufficient information for practical purposes.</li>
+        
+            <li><b>Record Stack Traces for Allocation.</b>
+            When selected, the full call stack is recorded.
+            Selecting this option enables you to view the reverse call tree for method calls when viewing a memory snapshot.</li>
+            <li><b>Use defined Profiling Points.</b> When selected, any actions that are initiated by enabled profiling points 
+            in the project are performed. Disabled profiling points are ignored. When deselected, all profiling points in the project
+            are ignored.</li>
+        </ul>
+        
+        <p>The Overhead bar graph provides you with a rough indication of the overhead that will
+        be incurred when you profile the application with the current settings.</p>  
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="csh_memory_options_adv.html">Analyze Memory: Advanced Options</a></dd>
+            <dd><a href="../profile_memory_short.html">Analyzing Application Memory Usage</a></dd>
+            <dd><a href="../profile_tasks_overview.html">Profiling a Project or Class</a></dd>
+            <dd><a href="../profile_profilepoints.html">Setting Profiling Points</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

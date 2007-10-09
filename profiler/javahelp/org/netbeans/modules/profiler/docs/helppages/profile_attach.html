@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Profiling Using Attach Mode</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Profiling Using Attach Mode</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>You generally use the attach mode to profile an application that you want or need to start outside of the IDE.
+        For example, you may want to use the attach mode in the following cases:</p>
+        <ul>
+            <li>Your application needs to be started from the command line or uses a complex launch script</li>
+            <li>You want to obtain profiling data on the startup of the appliction or target JVM</li>
+            <li>You want to profile the application without restarting the application</li>
+        </ul>
+        
+        <p>If these cases do not apply, 
+        it is easier to use the Profile Main Project command.</p>
+        
+        <p>The Attach mode enables you to attach the profiling tool to an application that is already running,
+        or just about to start on a local or remote machine. 
+        Using the attach mode is useful for profiling long-running applications, 
+        and in particular for profiling web or enterprise applications 
+        running on top of an application server. 
+        You can also use the attach mode to profile the code of the application server itself.</p>
+
+        <h3>Using the Attach Wizard</h3>        
+        <p>Before you can attach to an application, the startup options for the target application or server need to be configured.
+        The Attach wizard can provide you with instructions for configuring the application or server according to the attach mode.
+        You only need to configure the attach mode once. 
+        The attachment settings are associated with the project. 
+        You can go through the Attach Wizard at any time to change any of the attachment settings.</p> 
+
+        <p>You use the Attach Wizard to specify the attachment settings that are specific to your configuration.
+        In the Attach Wizard you specify the type of application and the location.
+        Based on the details that you provide, the Attach Wizard provides you with a set of instructions on how to 
+        configure the application or server so that you can attach the profiler.</p>
+
+        <h3>Attach Modes</h3>
+        <p>The attach mode you choose depends on the type of profiling data you want to obtain and
+        the details of the target JVM platform.
+        The following table provides an overview of the attach modes:</p>
+        
+          <table border="1" cellpadding="5" cellspacing="0">
+          <tr> 
+            <th align="left" scope="col"><b>Attach Mode</b></th>
+            <th align="left" scope="col" valign="top"><b>Description</b></th>
+          </tr>
+          <tr> 
+            <td valign="top"><b>Local Direct</b></td>
+            <td valign="top">Use this mode if you want to obtain profiling data on the startup of a local application.
+            
+            <p>When you use this mode, the target JVM and application wait until you attach the profiler before starting.
+            After you detach from the application, you need to restart the application to start another profiling session.</p></td>
+          </tr>
+          
+          <tr> 
+            <td valign="top"><b>Local Dynamic</b><br>(requires JDK 1.6)</td>
+            <td valign="top">Use this mode if you want to obtain profiling data 
+            on a <a href="profile_running.html">local running application</a>.
+            To use this mode, the application needs to be running on JDK 1.6.
+            
+            <p>When you use this mode, you can attach to and detach from the
+            application without restarting application.</td>
+          </tr>
+          
+          <tr> 
+              <td valign="top"><b>Remote Direct</b></td>
+            <td valign="top">Use this mode if you want to obtain profiling data 
+            on an <a href="profile_remote.html">application running on a remote JVM</a>.
+            To use this mode, you need to install the Profiler Remote Pack on the target machine.
+            You can download the Profiler Remote Pack at the following URL:
+            <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://profiler.netbeans.org/">
+                <param name="text" value="<html><u>http://profiler.netbeans.org/</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+            </object>
+            </p>
+            <p>When you use this mode, the remote application starts after the profiler is attached.
+            This mode enables you to obtain profiling data on the startup of the target JVM.</p></td>
+            </tr>
+          </table>
+
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_running.html">Profiling a Running Application</a></dd>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+        
+    </body>
+</html>

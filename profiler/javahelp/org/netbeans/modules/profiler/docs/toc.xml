@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
+
+The contents of this file are subject to the terms of either the GNU
+General Public License Version 2 only ("GPL") or the Common
+Development and Distribution License("CDDL") (collectively, the
+"License"). You may not use this file except in compliance with the
+License. You can obtain a copy of the License at
+http://www.netbeans.org/cddl-gplv2.html
+or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+specific language governing permissions and limitations under the
+License.  When distributing the software, include this License Header
+Notice in each file and include the License file at
+nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+particular file as subject to the "Classpath" exception as provided
+by Sun in the GPL Version 2 section of the License file that
+accompanied this code. If applicable, add the following below the
+License Header, with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+Contributor(s):
+
+The Original Software is NetBeans. The Initial Developer of the Original
+Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+Microsystems, Inc. All Rights Reserved.
+
+If you wish your version of this file to be governed by only the CDDL
+or only the GPL Version 2, indicate your decision by adding
+"[Contributor] elects to include this software in this distribution
+under the [CDDL or GPL Version 2] license." If you do not indicate a
+single choice of license, a recipient has the option to distribute
+your version of this file under either the CDDL, the GPL Version 2 or
+to extend the choice of license to its licensees as provided above.
+However, if you add GPL Version 2 code and therefore, elected the GPL
+Version 2 license, then the option applies only if the new code is
+made subject to such option by the copyright holder.
+-->
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
+                     "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+
+<toc version="2.0">
+    <tocitem text="Java Applications">
+	<tocitem text="Profiling Java Applications">
+            <tocitem text="Getting Started">
+                <tocitem text="Starting a Profiling Session" target="profile_startlocal" />
+                <tocitem text="Selecting a Profiling Task" target="profile_tasks_overview" />
+                <tocitem text="Profiling Tasks: Quick Reference" target="profile_quickref" />
+                <tocitem text="Profiling Windows" target="profile_windows" />
+                <tocitem text="Profiling a Local Running Application" target="profile_running" />
+                <tocitem text="Profiling a Remote Application" target="profile_remote" />
+                <tocitem text="Profiling a Free-Form Project" target="profile_freeform" />
+                <tocitem text="Calibrating the Profiler" target="calibrating" />
+                <tocitem text="Taking a Snapshot" target="snap_taking" />
+                <tocitem text="Taking a Heap Dump" target="heap_taking" />
+            </tocitem>
+            <tocitem text="Profiling Task: Monitor">
+                <tocitem text="Monitoring an Application" target="profile_monitor" />
+            </tocitem>
+            <tocitem text="Profiling Task: CPU">
+                <tocitem text="Analyzing CPU Performance" target="profile_analyze_short" />
+                <tocitem text="Specifying a Root Method" target="profile_rootmethod" />
+                <tocitem text="Setting Profiling Filters" target="custom_filtersets" />
+                <tocitem text="Setting Profiling Points" target="profile_points" />
+            </tocitem>
+                
+            <tocitem text="Profiling Task: Memory">
+                <tocitem text="Analyzing Application Memory Usage" target="profile_memory_short" />
+                <tocitem text="Setting Profiling Points" target="profile_points" />
+            </tocitem>
+            <tocitem text="Working with Results">
+                <tocitem text="About Profiling Results" target="profile_results" />
+                <tocitem text="Working with Live Profiling Results" target="results_liveresults" />
+                <tocitem text="Filtering Profiling Results" target="results_livefiltering" />
+                <tocitem text="Exploring Snapshots" target="snapshots" />
+                <tocitem text="Browsing a Heap Dump" target="heapwalking" />
+                <tocitem text="Viewing Thread Activity" target="profile_threads" />
+                <tocitem text="Viewing VM Telemetry Results" target="results_telemetry" />
+            </tocitem>
+	</tocitem>
+        </tocitem>
+</toc>

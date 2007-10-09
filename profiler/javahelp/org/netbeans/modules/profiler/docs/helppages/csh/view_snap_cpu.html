@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>CPU Snapshot</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>CPU Snapshot</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>A CPU snapshot captures data on method call chains, times and invocations.
+        You can take a CPU snapshot when you are analyzing application performance.
+        The snapshot is displayed in the main editor window.</p>
+        
+        <p>You can use the dropdown list in the toolbar to change the granularity of the displayed results.</p>
+       <ul>
+            <li>Method Level View (default) - Results are displayed according to the fully-qualified method names.</li>
+            <li>Class Level View - results for all methods of the same class are aggregated in a single entry.</li>
+            <li>Package Level View - all methods of classes that belong to the same package are aggregated. </li>
+        </ul>
+        
+        <p>The snapshot contains the following tabs:</p>
+        <ul>
+            <li><b>Call Tree.</b> This tab displays a call tree showing the method call chain and the time/number
+            of invocations for executing threads and methods in each context. (A context is a unique
+            chain of method calls leading to the method's invocation.)</li>
+            <li><b>Hot Spots.</b> This tab shows the total execution time and number of
+            invocations for each method, irrespective of the context.</li>
+            <li><b>Combined.</b> This tab displays the Call Tree information in the upper
+            part of the window and the Hot Spot data in the lower part. </li>
+            <li><b>Info.</b> This tab displays data on when the snapshot was taken, where it is saved, and the
+            configuration of the profiling session.</li>
+        </ul>
+
+        <h3>Exploring the results</h3>
+        <p>Depending on the currently selected view, you can right-click a profiling
+        result to access the following commands:</p>
+        <ul>
+            <li><b>Go To Source.</b> Select this to load the source <tt>.java</tt> file containing the class or method.</li>
+            <li><b>Show Subtree.</b> Select this to display the subtree for the selected method.</li>
+            <li><b>Show Back Traces.</b> Select this to display the back traces for the selected method.</li>
+            <li><b>Find in Hot Spots.</b> Select this to display the selected class or method in the Hot Spots tab.</li>
+            <li><b>Find in Call Tree.</b> Select this to display the selected class or method in the Call Tree tab.</li>
+            <li><b>Add to Instrumentation Roots.</b> Select this to add the selected method to the list of roots available 
+            when analyzing application performance. 
+            This command is only available when viewing results in method view.</li>
+        </ul>
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../snap_taking.html">Taking a Snapshot</a></dd>
+            <dd><a href="../snapshots.html">Snapshots</a></dd>
+            <dd><a href="../profile_analyze_short.html">Analyzing Performance</a></dd>
+            <dd><a href="../profile_results.html">Viewing Profiling Results</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal
+Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

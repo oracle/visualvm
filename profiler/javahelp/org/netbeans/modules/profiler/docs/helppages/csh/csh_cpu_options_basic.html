@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Analyze Performance: Basic Options</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>	
+        <h2>Analyze Performance: Basic Options</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When analyzing application performance, you can configure basic and advanced options for the profiling session.
+        The following basic options are available for analyzing object lifecycle.
+        If you are configuring a custom configuration, click Advanced Settings to specify <a href="csh_cpu_options_adv.html">advanced options</a>.</p>
+        
+        <p>When analyzing application performance, you specify one of the following options:</p>
+        <ul>
+            <li><b>Entire Application.</b> 
+            When selected, all of the methods of the profiled application are instrumented. 
+            <p>When entering a method, threads generate a "method entry" event. 
+            Threads generate a corresponding "method exit" event when exiting the method. 
+            The timestamps for both of these events are recorded. 
+            This data is processed in real time.</p></li>
+            <li><b>Part of Application.</b> 
+            When selected, a limited part of the application's code is instrumented.
+            The part that is instrumented is determined by the defined root methods.
+            Profiling data is not collected until one of the application's threads enters the root method. 
+            This option can greatly reduce the profiling overhead.
+            <p>To use this option, you need to specify a root method using the popup menu in the source code
+            or by clicking define to open the Specify Root Method dialog box.</p></li>
+        </ul>
+        
+        <p>Additionally, you can set the following options:</p>
+        <ul>
+        <li><b>Filter.</b> You can use a filter to limit the classes that are profiled and control the overhead. 
+        The following default filters are available.
+        <ul>
+            <li>Profile All Classes</li>
+            <li>Profile Only Project Classes</li>
+            <li>Profile Project &amp; Subprojects Classes</li>
+            <li>Quick Filter</li>
+            <li>Exclude Java Core Classes.</li>
+        </ul>
+        If you select Profile Only Project Classes or Profile Project &amp; Subprojects Classes
+        you can click Show Filter Value to see the the classes that will be profiled.
+        If you select Quick Filter, you can click Edit Filter Value to see and modify the filter criteria.
+        You can create your own filter by clicking Edit Filter Sets.</li>
+        
+        <li><b>Use Defined Profiling Points.</b> When selected, any actions that are initiated by enabled profiling points 
+            in the project are performed. Disabled profiling points are ignored. When deselected, all profiling points in the project
+            are ignored.</li>
+        </ul>
+
+        <p>The Overhead bar graph provides you with a rough indication of the overhead that will
+        be incurred when you profile the application with the current settings.</p>        
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="csh_cpu_options_adv.html">Analyze Performance: Advanced Options</a></dd>
+            <dd><a href="../profile_memory_short.html">Analyzing Application Memory Usage</a></dd>
+            <dd><a href="../profile_tasks_overview.html">Profiling a Project or Class</a></dd>
+            <dd><a href="../profile_profilepoints.html">Setting Profiling Points</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

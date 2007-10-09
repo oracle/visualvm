@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ * Copyright © 2007 Sun Microsystems, Inc.
+ * All rights reserved. 
+ * Use is subject to license terms.
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Profiling Tasks: Quick Reference</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+
+<body>
+<h2>Profiling Tasks: Quick Reference</h2>
+<p>This topic describes common profiling tasks. For more 
+  detailed information, click the links in the right column. </p>
+
+<table border="1" cellpadding="5" cellspacing="0" summary="The left column lists the
+   task name. The right column lists the steps to perform.">
+  <tr valign="top"> 
+    <th scope="col" align="left">To perform this task</th>
+    <th scope="col" align="left">Follow these steps</th>
+  </tr>
+  <tr valign="top"> 
+    <td>Calibrate the profiler.</td>
+    <td>You need to <a href=calibrating.html">calibrate the profiler</a> the first time you use
+    your local JDK or a remote JDK for profiling.
+      </td>
+  </tr>
+  <tr valign="top"> 
+      <td>Start profiling a local application.</td>
+    <td>
+        <ol>
+            <li>Do one of the following:
+            <ul>
+                <li>To profile the main project, choose Profile &gt; Profile Main Project.</li>
+                <li>To profile any individual project, right-click the project and choose 
+                Profile Project.</li>
+            </ul>
+            </li>
+            <li><a href="profile_tasks_overview.html">Select a profiling task</a>.</li>
+            <li>Click Run.</li>
+        </ol>
+      </td>
+  </tr>
+  <tr valign="top"> 
+  <td>Start profiling a remote application.</td>
+      <td>
+      <ol>
+      <li>Choose Profile &gt; Attach Profiler from the main menu.</li>
+      <li>Select the Project from the dropdown list at the top of the Select Profiling Task dialog box.</li>
+      <li><a href="profile_remote.html">Configure the attach mode</a>.</li>
+      <li>Configure the remote location to support profiling.</li>
+      <li><a href="profile_tasks_overview.html">Select a profiling task</a>.</li>
+      <li>Click Attach.</li>
+  </ol>
+</td>
+  </tr>
+  
+  <tr valign="top"> 
+    <td>Modify a running profiling session.</td>
+    <td> 
+      <ol>
+        <li>While a profiling session is in progress, choose Profile &gt; Modify Profiling Session from the main menu. 
+        Alternatively, click Modify Profiling Session in the Profiler window.</li>
+        <li><a href="profile_tasks_overview.html">Select a Profiling Task</a>.</li>
+        <li>Click OK.</li>
+      </ol>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td>Profile a running application.</td>
+    <td> 
+      <ol>
+        <li>Configure the target JVM to support profiling.</li>
+        <li>Start the application on the target JVM.</li>
+        <li>Choose Profile &gt; Attach Profiler from the main menu.</li>
+        <li>Select the project.</li>
+        <li><a href="profile_remote.html">Configure the attach mode</a>.</li>
+        <li>Click Attach.</li>
+      </ol>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td>Stop a profiling session.</td>
+    <td> 
+      <ul>
+        <li>Choose Profile  &gt; Stop Profiling Session from the main menu.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td>Take a snapshot of profiling results.</td>
+    <td> 
+      <ul>
+        <li>While a profiling session is in progress,
+        choose Profile &gt; Take Snaphot of Collected Results from the main menu.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td>Take a heap dump.</td>
+    <td> 
+      <ul>
+        <li>While a profiling session is in progress,
+        choose Profile &gt; Take Heap Dump from the main menu.</li>
+      </ul>
+    </td>
+  </tr>
+  
+</table>
+<hr>
+<small><a href="../credits.html">Legal Notices</a></small> 
+</body>
+</html>

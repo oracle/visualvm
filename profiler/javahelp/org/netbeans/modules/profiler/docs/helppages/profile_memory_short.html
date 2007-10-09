@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Analyzing Application Memory Usage</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>	
+        <h2>Analyzing Application Memory Usage</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>The Analyze Memory Usage task gives you data on objects that have been allocated in the target application.
+        When you analyze memory usage, you can use the default configuration settings or create a custom configuration for the task.</p>
+                
+        <p><b>To analyze memory usage:</b></p>
+        <ol>
+            <li>Choose Profile &gt; Profile Main Project from the main menu.</li>
+            <li>Click Memory in the left pane of the Select Profiling Task window to expand the button.<br> 
+            You can use the default configuration, create a new custom configuration
+            or use an existing custom configuration.</li>
+            <li>Select one of the following profiling options:
+                <ul><li>Record object creation only</li>
+                    <li>Record both object creation and garbage collection</li>
+                </ul>
+            </li>
+            <li>Select Record Stack Traces (optional).</li>
+            <li>Click Run.</li>
+        </ol>
+        <p>When you click Run, the target application launches and the profiling session starts.</p>
+        
+        <h3>Custom Configurations</h3>
+        <p>When you create a custom configuration you have complete control 
+        over all of the available internal settings for that profiling task.
+        You can create, store, and assign names to separate sets of custom profiling settings.
+        The custom configuration is associated with a specific project and is listed in the Select Profiling Task window when you profile the project. 
+        You can modify the custom configurations in the Select Profiling Task dialog box.
+        Custom configurations are automatically saved between IDE work sessions so that they can be reused and 
+        modified.</p>
+        
+        <p><b>To create a custom configuration:</b></p>
+        <ol>
+            <li>Choose Profile &gt; Profile Main Project from the main menu.</li>
+            <li>Click Memory in the left pane of the Select Task window to expand the button.</li>
+            <li>Click Create Custom.</li>
+            <li>Type a name for the configuration.</li>
+            <li>Select the initial settings for the configuration and click OK. 
+            You then modify the initial settings when you customize the configuration.</li>
+            <li>Select one of the following profiling options:
+                <ul>
+                    <li>Record object creation only</li>
+                    <li>Record both object creation and garbage collection</li>
+                </ul>
+            <li>Select Record Stack Traces (optional).</li>
+            <li>Click Advanced Settings and modify any of the advanced settings.</li>
+            <li>Click Run.</li>
+        </ol>
+        <p>When you click Run, the target application launches and the profiling task starts.</p>
+        
+ 
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="csh/csh_memory_options_basic.html">Analyze Memory: Basic Options</a></dd>
+            <dd><a href="csh/csh_memory_options_adv.html">Analyze Memory: Advanced Options</a></dd>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+            <dd><a href="profile_profilepoints.html">Setting Profiling Points</a></dd>
+            <dd><a href="profile_results.html">About Profiling Results</a></dd>
+            </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

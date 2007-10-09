@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Edit Global Filters Dialog Box</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Edit Global Filters Dialog Box</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When profiling an application, you use this dialog box to edit, delete or modify global filters that are used in filter sets.
+        You use filter sets to limit the classes that are profiled when analyzing application performance.</p>
+        
+        <p>You can access this window by clicking Edit Global Filters in the Customize Filter Sets dialog box.</p> 
+
+        <p>The dialog box lists the names and values of the defined global filters.
+        You can manage the filters using the buttons to the right of the list of filters.</p> 
+        <ul>
+            <li><b>New.</b> Click New to create a new row in the list and type the new name and values directly in the fields in the list.</li>
+            <li><b>Edit.</b> Select a filter from the list and click Edit to modify the filter. 
+            Type directly in the field in the list to edit the name or value. 
+            You can also edit a field by double-clicking in the field.</li>
+            <li><b>Delete.</b> Select a filter from the list and click Delete to remove the filter from the list.</li>
+            <li><b>Move Up</b> and <b>Move Down.</b> Select a filter from the list and use the Move Up and Move Down buttons to change the list order.
+        The new order is also displayed in the Customize Filter Sets dialog box.</li>
+        </ul>
+       
+        
+        <p>Each global filter represents groups of patterns that are typically related to one application. 
+        For example, <tt>org.netbeans</tt> is a pattern.
+        A filter can contain more than one pattern. Patterns can be separated by a comma and/or space.</p>
+        <p>Filters are applied in a "starts with" manner. 
+        For example, if the filter contains <tt>org.netbeans</tt>, classes in the package <tt>org.netbeans.modules.classfile.Annotation</tt> would be matched by the filter.<p>
+        <ul class="note">
+            <li>Using <tt>*</tt> in the pattern has no impact on filter behavior.</li>
+        </ul> 
+        
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="csh_filters_custom.html">Customize Filter Sets Dialog Box</a></dd>
+            <dd><a href="../custom_filtersets.html">Setting Filters</a></dd>
+            <dd><a href="../profile_analyze_short.html">Analyzing CPU Performance</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

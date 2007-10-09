@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Taking a Snapshot</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>Taking a Snapshot</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>You can use a <object classid="java:com.sun.java.help.impl.JHSecondaryViewer">
+                <param name="content" value="glossary/resultssnapshot.html">
+                <param name="viewerActivator" value="javax.help.LinkLabel">
+                <param name="viewerStyle" value="javax.help.Popup">
+                <param name="viewerSize" value="400,220">
+                <param name="text" value="results snapshot">
+                <param name="textFontSize" value="medium">
+                <param name="textFontFamily" value="SansSerif">
+                <param name="textFontStyle" value="italic">
+                <param name="textFontWeight" value="bold">
+                <param name="textColor" value="blue">
+        </object> to capture profiling data at a specific point in time.
+        The data captured in a snapshot depends on the type of profiling session in progress when the snapshot is taken.</p>
+        <p>A snapshot differs from live profiling results in the following ways:</p>
+        <ul>
+            <li>Snapshots can be examined when no profiling session is running.</li>
+            <li>Snapshots contain a more detailed record of profiling data than live results.</li>
+            <li>Snapshots can be easily compared (memory snapshots).</li>
+        </ul>
+
+        <h3>Taking Snapshots</h3>
+        <p>You can only take a snapshot while a profiling session is in progress.
+        You can take a snapshot manually or set a profiling point to take a snapshot automatically at a precise point in your application.
+        When you use a profiling point to take a snapshot, you locate the point in your source code where you want 
+        to take a snapshot. For example, you may want to take a snapshot when a thread enters a specific method.</p>
+        
+        <p><b>To take a snapshot manually</b></p>
+        
+        <ol>
+            <li>Start a profiling session</li>
+            <li>Do one of the following:
+                <ul>
+                <li>Click Take Snapshot in the Profiler window.</li>
+                <li>Click Live Results to open Live Profiling Results and 
+                then click Take Snapshot of Collected Results in the toolbar.</li>
+                </ul>
+            </li>
+        </ol>
+        <p>When you take a snapshot, the snapshot opens in the main editor window.
+        You can then save the snapshot to your project.</p>
+        
+
+        <p><b>To take a snapshot using a profiling point</b></p>
+        <ol>
+            <li>Open the source file containing the method where you want to place the profiling point.</li>
+            <li>Right-click in the line of code containing the method and choose Insert Profiling Point.</li>
+            <li>Select Snapshot in the Profiling Point wizard and click Next.</li>
+            <li>Modify any of the profiling point properties and click Finish.</li>
+        </ol>
+        <p>When you run the profiling session, the IDE takes a snapshot every time a thread enters the line 
+        of code containing the profiling point.</p>
+        
+        <h3>Saving Snapshots</h3>
+        <p>You can save a snapshot to your project or you can save the snapshot to a location on your local file system.
+        When you save a snapshot to your project, the snapshot is listed under Saved Snapshots in the Profiler window.
+        You can save a snapshot by clicking the Save to Project button in the snapshot toolbar.
+        Alternatively, you can use the Options window to configure the IDE behaviour when taking a snapshot.</p>
+
+                
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+            <dd><a href="profile_profilepoints.html">Setting Profiling Points</a></dd>
+            <dd><a href="snapshots.html">Exploring Snapshots</a></dd>
+            <dd><a href="results_liveresults.html">Working with Live Profiling Results</a></dd>
+            
+        </dl>
+                
+
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

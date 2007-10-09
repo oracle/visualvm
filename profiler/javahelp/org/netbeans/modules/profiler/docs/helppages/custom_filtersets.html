@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Setting Profiling Filters</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>Setting Profiling Filters</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When you analyze application performance, you can use filters to specify the classes that you want to include or exclude in the instrumentation. 
+        When you use a filter you limit the number of instrumented classes and reduce the profiling overhead.</p>
+        
+        <p>You choose a filter by selecting a filter from the Filter dropdown list when you configure the profiling session.
+        The dropdown list contains the following filters and also any custom filters you create.</p>
+        <ul>
+            <li><b>Profile All Classes.</b> When selected, all classes on the classpath are instrumented.
+            This imposes a high profiling overhead.</li>
+            <li><b>Profile Only Project Classes.</b> When selected, only the classes in the selected project are instrumented.
+            To see the classes that will be instrumented, select the filter and click Show Filter Value.
+            You can add the listed classes to the Quick Filter by clicking To Quick Filter in the Show Filter Value dialog box.</li>
+            <li><b>Quick Filter.</b> When selected, only the classes specified by the Quick Filter are instrumented. 
+            You use the Quick Filter to rapidly create a filter for use during a single profiling session.</li>  
+            <li><b>Exclude Java Core Classes.</b> When selected, only the classes specified by the Java Core Classes filter set are instrumented.
+            The Java Core Classes is a filter set that is created by default.
+            You can modify the Java Core Classes filter set or create a custom filter set by clicking Edit Filter Sets.</li>
+        </ul>
+        
+        <p><b>To modify the Quick Filter settings, do the following:</b></p>
+        <ol>
+            <li>Open the Set Quick Filter dialog box by selecting Quick Filter in the dropdown list and then clicking Edit Filter Value.</li>
+            <li>Select either Exclusive or Inclusive as the filter type.</li>
+            <li>Type or modify the filter values and click OK.</li>
+        </ol>
+        <p>If you want to use a filter more than once, you can create a custom filter set.</p>
+        
+        <p><b>To modify or create a custom filter set:</b></p>
+        <ol>
+            <li>Open the Customize Filter Sets dialog box by choosing CPU in the Select Profiling Task dialog box and clicking Edit Filter Sets.</li>
+            <li>Select an existing filter set or click Add and type a name for the new filter set.</li>
+            <li>Specify the Filter Set Type: inclusive or exclusive.</li>
+            <li>In the Global Filters list, activate the global filters you wish to be part of the filter set by selecting the checkbox for that filter.<br>
+                <b>Note: </b>You can place your cursor over the values to see all the patterns included in that filter.</li>
+            <li>Click OK to save the new custom filter set.</li>
+        </ol>
+        
+        <p>After you create a new filter set, you can choose the filter in the Filter drop-down list.
+        You can use the new filter when analyzing the performance of any project. </p>
+        
+        <ul class="note">
+            <li>You can create and edit the global filters by clicking Edit Global Filters.</li>
+        </ul>        
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_analyze_short.html">Analyzing Application Performance</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

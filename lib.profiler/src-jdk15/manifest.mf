@@ -1,0 +1,4 @@
+Premain-Class: org.netbeans.lib.profiler.server.ProfilerActivate15
+Agent-Class: org.netbeans.lib.profiler.server.ProfilerActivate15
+Can-Redefine-Classes: true
+Boot-Class-Path: jfluid-server.jar jfluid-server-15.jar

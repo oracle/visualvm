@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Analyze Memory: Advanced Options</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>	
+        <h2>Analyze Memory: Advanced Options</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When profiling memory usage, you can create a custom configuration and set more advanced profiling options.</p>
+        <p>You set the advanced options by clicking Advanced Settings in the configuration pane for your custom configuration.
+         Click Basic Settings to set the configuration options in the <a href="csh_memory_options_basic.html">Basic Options pane</a>.</p>
+        
+        <p>The Advanced Settings pane enables you to set the following options:</p>
+        
+        <h3>Settings</h3>
+        <p><b>Record Stack Trace for Allocations.</b> This setting can be modified when you select Record Stack Traces for Allocation 
+        in the Basic Settings.</p> 
+        <p>When recording object creation, the call stack at that moment is also recorded.
+        By default, the <b>full stack depth</b> is recorded.
+        You can limit the maximum depth of the recorded call stack 
+        by entering a positive integer (e.g. 3) to <b>limit the number of frames</b> from the top of the stack that are recorded. 
+        This can substantially reduce the profiling overhead.</p>
+        <p>For more about how the call stack is recorded, see the following NetBeans FAQ:</p>
+        <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+        <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerObjectAllocationData">
+        <param name="text" value="<html><u>How is object allocation data collected?</u></html>">
+        <param name="textFontSize" value="medium">
+        <param name="textColor" value="blue">
+        </object></p>
+        <p><b>Run garbage collection when getting memory results.</b> When selected, 
+            full garbage collection is invoked in the target JVM each time you choose Profile &gt; Run GC from the main menu. 
+            This option may help you obtain a more realistic picture of object liveness, but it also increases overhead. 
+            Running GC may help you to obtain a more realistic picture of object liveness because dead objects will be garbage collected and thus not reported as live. 
+            Use caution when selecting this option because full GC may be expensive, especially for large applications (where it may take from several to several tens of seconds).</p>
+        
+        <h3>Threads</h3>
+        <p><b>Enable Threads Monitoring.</b> When selected, application threads are monitored from application startup.
+        When deselected (default), thread monitoring does not begin until you click the Threads button in the Threads window.</p>
+    
+    
+        <h3>Global Settings</h3>
+        <p><b>Override Global Settings</b> When selected, you can override the global settings and specify the following options when profiling the application:</p>
+        <ul>
+            <li><b>Working Directory.</b> Use this option to specify the directory that will become current for your application when it starts. 
+            For example, you may need to specify a specific working directory when <a href="../profile_running.html">profiling a running application</a>.</li>
+            <li><b>Java Platform.</b> Use this option to specify a target JVM other than the default JVM the IDE is running on. 
+            You can choose any Java platforms registered in the Java Platform Manager.</li>                    
+            <li><b>JVM Arguments.</b> Specify any arguments to pass on to the JVM, for example, the default maximum heap size.</li>
+        </ul>
+        
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="csh_memory_options_basic.html">Analyze Memory: Basic Options</a></dd>
+            <dd><a href="../profile_memory_short.html">Analyzing Application Memory Usage</a></dd>
+            <dd><a href="../profile_tasks_overview.html">Profiling a Project or Class</a></dd>
+            <dd><a href="../profile_profilepoints.html">Setting Profiling Points</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

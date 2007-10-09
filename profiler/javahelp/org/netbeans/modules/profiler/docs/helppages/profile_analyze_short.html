@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2004 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Analyzing CPU Performance</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>Analyzing CPU Performance</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>This task analyzes the performance of the target application.
+        You can choose to profile the entire application or limit the code that is instrumented by specifying a 
+        <object classid="java:com.sun.java.help.impl.JHSecondaryViewer">
+                <param name="content" value="glossary/rootmethod.html">
+                <param name="viewerActivator" value="javax.help.LinkLabel">
+                <param name="viewerStyle" value="javax.help.Popup">
+                <param name="viewerSize" value="400,220">
+                <param name="text" value="root method">
+                <param name="textFontSize" value="medium">
+                <param name="textFontFamily" value="SansSerif">
+                <param name="textFontStyle" value="italic">
+                <param name="textFontWeight" value="bold">
+                <param name="textColor" value="blue">
+        </object> or use filters to control the classes that are profiled.</p> 
+        <p>When you run this profiling task you receive the following profiling results:</p>
+        <ul>
+            <li>Time in percentage and real time for executing methods in context</li>
+            <li>Number of times each method is invoked in context</li>
+            <li>Chains of method calls leading to method invocation</li>
+            <li>Time / number for executing methods in context</li>
+        </ul>
+        
+        <p><b>To analyze performance of the application:</b></p>
+        <ol>
+            <li>Choose Profile &gt; Profile Main Project from the main menu.</li>
+            <li>Click CPU in the left pane of the Select Profiling Task window.
+                <p>When you click CPU, the button expands
+                to give you the option of using the default configuration, creating a new custom configuration
+                or using an existing custom configuration.</p></li>
+            <li>Select one of the profiling options:
+                <ul><li>Entire Application</li>
+                    <li>Part of Application</li>
+                </ul>
+                If you select Part of Application, you also need to <a href="profile_rootmethod.html">specify the root methods to instrument</a>.</li>
+            <li><a href="custom_filtersets.html">Specify a filter</a>.</li>
+            <li>If desired, you can use <a href="profile_profilepoints.html">profiling points</a> to control profiler actions.</li>
+            <li>Click Run.</li>
+        </ol>
+        <p>When you click Run, the target application launches and the profiling session starts.</p>
+
+        <h3>Custom Configurations</h3>
+        <p>When you create a custom configuration you have complete control 
+        over all of the available internal settings for that profiling task.
+        You can create, store, and assign names to separate sets of custom profiling settings.
+        The custom configuration is associated with a specific project and is listed in the Select Profiling Task window when you profile the project.</p> 
+        <p>You can modify the custom configurations in the Select Profiling Task dialog box.
+        You can also set more advanced profiling options by clicking Advanced Settings.
+        Custom configurations are automatically saved between IDE work sessions so that they can be reused and modified.</p>
+        
+        <p><b>To create a custom configuration:</b></p>
+        <ol>
+            <li>Choose Profile &gt; Profile Main Project from the main menu.</li>
+            <li>Click CPU in the left pane of the Select Task window to expand the button.</li>
+            <li>Click Create Custom.</li>
+            <li>Type a name for the configuration.</li>
+            <li>Select the initial settings for the configuration and click OK. 
+            You then modify the initial settings when you customize the configuration.</li>
+            <li>Select one of the following profiling options:
+                <ul><li>Entire Application</li>
+                    <li>Part of Application</li>
+                </ul>
+            If you select Part of Application, you also need to <a href="profile_rootmethod.html">specify the root methods to instrument</a>.</li>
+            <li><a href="custom_filtersets.html">Specify a filter</a>.</li>
+            <li>If desired, you can use <a href="profile_profilepoints.html">profiling points</a> to control profiler actions.</li>
+            <li>Click Advanced Settings to set more advanced profiling options.</li>
+            <li>Click Run to start the profiling session.</li>
+        </ol>
+        <p>When you click Run, the target application launches and the profiling task starts.</p>
+
+        
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+            <dd><a href="custom_filtersets.html">Setting Filters</a></dd>
+            <dd><a href="profile_rootmethod.html">Specifying a Root Method</a></dd>
+            <dd><a href="profile_profilepoints.html">Setting Profiling Points</a></dd>
+            <dd><a href="profile_results.html">About Profiling Results</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

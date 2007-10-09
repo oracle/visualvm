@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
+
+The contents of this file are subject to the terms of either the GNU
+General Public License Version 2 only ("GPL") or the Common
+Development and Distribution License("CDDL") (collectively, the
+"License"). You may not use this file except in compliance with the
+License. You can obtain a copy of the License at
+http://www.netbeans.org/cddl-gplv2.html
+or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+specific language governing permissions and limitations under the
+License.  When distributing the software, include this License Header
+Notice in each file and include the License file at
+nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+particular file as subject to the "Classpath" exception as provided
+by Sun in the GPL Version 2 section of the License file that
+accompanied this code. If applicable, add the following below the
+License Header, with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+Contributor(s):
+
+The Original Software is NetBeans. The Initial Developer of the Original
+Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+Microsystems, Inc. All Rights Reserved.
+
+If you wish your version of this file to be governed by only the CDDL
+or only the GPL Version 2, indicate your decision by adding
+"[Contributor] elects to include this software in this distribution
+under the [CDDL or GPL Version 2] license." If you do not indicate a
+single choice of license, a recipient has the option to distribute
+your version of this file under either the CDDL, the GPL Version 2 or
+to extend the choice of license to its licensees as provided above.
+However, if you add GPL Version 2 code and therefore, elected the GPL
+Version 2 license, then the option applies only if the new code is
+made subject to such option by the copyright holder.
+-->
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+  <folder name="OptionsDialog">
+    <folder name="Advanced">
+      <file name="ProfilerOptionsCategory.instance">
+        <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.options.ProfilerOptionsCategory"/>
+      </file>
+     </folder>
+    </folder>
+
+  <folder name="Projects">
+    <folder name="Profiler_Actions_temporary">
+      <file name="org-netbeans-modules-profiler-actions-ProfileProjectActionPopup.instance">
+        <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileProjectPopup"/>
+      </file>
+    </folder>
+  </folder>
+
+  <folder name="Loaders">
+    <folder name="text">
+      <folder name="x-java">
+        <folder name="Actions">
+          <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance">
+            <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSinglePopup"/>
+              <attr name="position" intvalue="1200"/>
+                    </file>
+          </folder>
+      </folder>
+      <folder name="x-jsp">
+        <folder name="Actions">
+          <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance">
+            <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSinglePopup"/>
+              <attr name="position" intvalue="800"/>
+                    </file>
+          </folder>
+      </folder>
+    </folder>
+  </folder>
+
+  <folder name="Menu">
+    <folder name="Window">
+      <folder name="Profile">
+        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/profiler/resources/ide/empty.gif"/>
+        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+        <attr name="position" intvalue="1500"/>
+                <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance">
+                    <attr name="position" intvalue="100"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance">
+                    <attr name="position" intvalue="200"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance">
+                    <attr name="position" intvalue="300"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance">
+                    <attr name="position" intvalue="400"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance">
+                    <attr name="position" intvalue="500"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow">
+          <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
+            <attr name="position" intvalue="600"/>
+                </file>
+      </folder>
+      </folder>
+
+    
+
+    <folder name="Profile">
+      <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+      <attr name="position" intvalue="850"/>
+            <file name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance">
+        <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileMainProject"/>
+          <attr name="position" intvalue="100"/>
+            </file>
+      <!--file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.shadow">
+        <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
+      </file-->
+      <file name="org-netbeans-modules-profiler-actions-AttachAction.instance">
+                <attr name="position" intvalue="200"/>
+            </file>
+      <file name="profiler-sep1.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>     <attr name="position" intvalue="400"/>
+            </file>
+      <file name="profiler-sep2.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>     <attr name="position" intvalue="800"/>
+            </file>
+      <file name="profiler-sep3.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>     <attr name="position" intvalue="1100"/>
+            </file>
+      <file name="profiler-sep4.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>     <attr name="position" intvalue="1700"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-RerunAction.instance">
+                <attr name="position" intvalue="500"/>
+            </file>
+<!--      <file name="org-netbeans-modules-profiler-actions-PauseAction.instance"/> -->
+      <file name="org-netbeans-modules-profiler-actions-StopAction.instance">
+                <attr name="position" intvalue="700"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance">
+                <attr name="position" intvalue="1000"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance">
+                <attr name="position" intvalue="1300"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance">
+                <attr name="position" intvalue="600"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance">
+                <attr name="position" intvalue="1200"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance">
+                <attr name="position" intvalue="900"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance">
+                <attr name="position" intvalue="1400"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance">
+                <attr name="position" intvalue="1600"/>
+            </file>
+      <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
+                <attr name="position" intvalue="1500"/>
+            </file>
+      <folder name="ProfileOther">
+        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+        <attr name="position" intvalue="300"/>
+        <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
+          <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSingle"/>
+            <attr name="position" intvalue="200"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-ProfileProjectAction.instance">
+          <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileProject"/>
+            <attr name="position" intvalue="100"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-ProfileTestAction.instance">
+          <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileTest"/>
+             <attr name="position" intvalue="300"/>
+       </file>
+        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfileProjectAction.instance"/>
+        </folder>
+      <!--folder name="View">
+        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+        <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance"/>
+        <attr name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance/org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance" boolvalue="true"/>
+        <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
+        <attr name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance/org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance" boolvalue="true"/>
+        <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance"/>
+        <attr name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance/org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance" boolvalue="true"/>
+        <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance"/>
+        <attr name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance/org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance" boolvalue="true"/>
+        <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
+        <attr name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance/org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow" boolvalue="true"/>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow">
+          <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
+        </file>
+      </folder-->
+      <folder name="Advanced">
+        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+        <attr name="position" intvalue="1800"/>
+                <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance">
+                    <attr name="position" intvalue="300"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance">
+                    <attr name="position" intvalue="100"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance">
+                    <attr name="position" intvalue="200"/>
+                </file>
+        <file name="profiler-advanced-sep1.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>     <attr name="position" intvalue="400"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.instance">
+          <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.unintegrateProfiler"/>
+            <attr name="position" intvalue="500"/>
+                </file>
+        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
+        </folder>
+      <!--folder name="Help">
+        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+        <file name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance"/>
+        <file name="profiler-website.url" url="nbresloc:/org/netbeans/modules/profiler/profiler-website.url">
+          <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+        </file>
+        <file name="org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance"/>
+        <file name="profiler-help-sep1.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/> </file>
+        <file name="profiler-help-sep2.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/> </file>
+        <file name="org-netbeans-modules-profiler-actions-AboutProfilerAction.instance"/>
+        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance"/>
+        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance/profiler-website.url"/>
+        <attr boolvalue="true" name="profiler-website.url/org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance"/>
+        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance/profiler-help-sep1.instance"/>
+        <attr boolvalue="true" name="profiler-help-sep1.instance/profiler-help-sep2.instance"/>
+        <attr boolvalue="true" name="profiler-help-sep2.instance/org-netbeans-modules-profiler-actions-AboutProfilerAction.instance"/>
+      </folder-->
+
+      <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance"/>
+      <!--attr boolvalue="true" name="profiler-sep5.instance/View"/>
+      <attr boolvalue="true" name="View/profiler-sep6.instance"/-->
+      <!--attr boolvalue="true" name="Advanced/profiler-sep7.instance"/>
+      <attr boolvalue="true" name="profiler-sep7.instance/Help"/-->
+    </folder>
+  </folder>
+
+  <folder name="Toolbars">
+      <folder name="Build">
+          <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+          <file name="org-netbeans-modules-profiler-actions-ProfilerToolbarDropdownAction.instance">
+            <attr name="position" intvalue="400"/>
+          </file>
+      </folder>
+    </folder>
+
+  <folder name="Shortcuts">
+    <file name="A-F2.instance"> <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileMainProject"/> </file>
+    <file name="S-F2.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.StopAction"/> </file>
+    <file name="C-F2.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.TakeSnapshotAction"/> </file>
+    <file name="CS-F2.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.RerunAction"/> </file>
+    <file name="AS-F2.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.ModifyProfilingAction"/> </file>
+    <file name="AC-F2.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.ResetResultsAction"/> </file>
+    <file name="S-F9.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction"/> </file>
+    <file name="C-U D.instance"> <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.LiveResultsWindow$ActivateDrillDownAction"/> </file>
+  </folder>
+
+  <folder name="Actions">
+    <folder name="Profile">
+      <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+      <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
+      <file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-SelectRootMethodsAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
+
+      <file name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance">
+        <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileMainProject"/>
+      </file>
+      <file name="org-netbeans-modules-profiler-actions-AttachAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-RerunAction.instance"/>
+<!--      <file name="org-netbeans-modules-profiler-actions-PauseAction.instance"/> -->
+      <file name="org-netbeans-modules-profiler-actions-StopAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-DetachAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
+        <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSingle"/>
+      </file>
+      <file name="org-netbeans-modules-profiler-actions-ProfileTestAction.instance">
+        <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileTest"/>
+      </file>
+      <file name="org-netbeans-modules-profiler-actions-ProfileProjectAction.instance">
+        <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileProject"/>
+      </file>
+      <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-GlobalSettingsAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance"/>
+      <file name="profiler-website.url" url="nbresloc:/org/netbeans/modules/profiler/profiler-website.url">
+        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+      </file>
+      <file name="org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance"/>
+      <file name="org-netbeans-modules-profiler-actions-AboutProfilerAction.instance"/>
+    </folder>
+  </folder>
+
+  <folder name="Services">
+    <folder name="JavaHelp">
+       <!-- Merge after Core IDE Help: -->
+       <file name="org-netbeans-modules-profiler-helpset.xml" url="helpset-decl.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+       <!-- Merge before 3rd party help: -->
+       </folder>
+  </folder>
+
+  <folder name="Editors"> 
+    <folder name="text">
+      <folder name="x-java">
+        <folder name="Popup">
+          <folder name="Profiling">
+            <attr name="position" intvalue="1920"/>
+                        <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.shadow">
+              <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
+                <attr name="position" intvalue="100"/>
+                        </file>
+            <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-AddRootMethodAction.shadow"/>
+            <file name="org-netbeans-modules-profiler-actions-SelectRootMethodsAction.shadow">
+              <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-SelectRootMethodsAction.instance"/>
+                <attr name="position" intvalue="200"/>
+                        </file>
+            <file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.shadow">
+              <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
+                <attr name="position" intvalue="300"/>
+                        </file>
+            </folder>
+          </folder>
+      </folder>
+    </folder>
+    <folder name="AnnotationTypes">
+      <file name="resetResultsProfilingPoint.xml" url="ppoints/ui/resources/resetResultsProfilingPoint.xml"/>
+      <file name="resetResultsProfilingPointD.xml" url="ppoints/ui/resources/resetResultsProfilingPointD.xml"/>
+      <file name="stopwatchProfilingPoint.xml" url="ppoints/ui/resources/stopwatchProfilingPoint.xml"/>
+      <file name="stopwatchProfilingPointD.xml" url="ppoints/ui/resources/stopwatchProfilingPointD.xml"/>
+      <file name="takeSnapshotProfilingPoint.xml" url="ppoints/ui/resources/takeSnapshotProfilingPoint.xml"/>
+      <file name="takeSnapshotProfilingPointD.xml" url="ppoints/ui/resources/takeSnapshotProfilingPointD.xml"/>
+      <file name="loadgenProfilingPoint.xml" url="ppoints/ui/resources/loadgenProfilingPoint.xml"/>
+      <file name="loadgenProfilingPointD.xml" url="ppoints/ui/resources/loadgenProfilingPointD.xml"/>
+      <folder name="SingleProfilePointActions">
+        <file name="org-netbeans-modules-profiler-ppoints-ui-EnableDisableProfilingPointAction.instance">
+                    <attr name="position" intvalue="100"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-CustomizeProfilingPointAction.instance">
+                    <attr name="position" intvalue="200"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-DeleteProfilingPointAction.instance">
+                    <attr name="position" intvalue="300"/>
+                </file>
+        </folder>
+      <folder name="PairedProfilePointActions">
+        <file name="org-netbeans-modules-profiler-ppoints-ui-EnableDisableProfilingPointAction.instance">
+                    <attr name="position" intvalue="100"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-CustomizeProfilingPointAction.instance">
+                    <attr name="position" intvalue="200"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-DeleteProfilingPointAction.instance">
+                    <attr name="position" intvalue="300"/>
+                </file>
+        <file name="profiler-ppoints-annotationpopup-separator.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>     <attr name="position" intvalue="400"/>
+                </file>
+        <file name="org-netbeans-modules-profiler-ppoints-ui-ShowOppositeProfilingPointAction.instance">
+                    <attr name="position" intvalue="500"/>
+                </file>
+        </folder>
+    </folder>
+  </folder>
+  
+  <folder name="Windows2">
+    <folder name="Groups">
+      <file name="LiveResultsGroup.wsgrp" url="LiveResultsGroupWsgrp.xml"/>
+      <folder name="LiveResultsGroup">
+        <file name="DrillDownWindow.wstcgrp" url="DrillDownWindowWstcgrp.xml"/>
+      </folder>
+    </folder>
+  </folder>
+    
+</filesystem>

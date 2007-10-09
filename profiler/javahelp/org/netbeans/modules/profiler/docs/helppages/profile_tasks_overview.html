@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Selecting a Profiling Task</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        
+        <h2>Selecting a Profiling Task</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When you start a profiling session, you first select and configure the profiling task.
+        You choose the profiling task according to the type of profiling results you want to obtain from the session.</p>
+        <p>Each profiling task has default settings that are sufficient in most situations. 
+        You can configure the basic settings of each profiling task to modify the profiling results that are returned.
+        For greater control, you can also modify the advanced settings for the task by creating a custom configuration of the task.</p>
+    
+        <p>The following table describes the profiling tasks and the profiling results obtained from running the task.</p>
+        <table border="1" cellpadding="3" cellspacing="0">
+            <tr align="left" valign="top">
+                <th scope="col">Profiling Task</th>
+                <th scope="col">Results</th>
+            </tr>
+            <tr>
+                <td>Monitor Application</td>
+                <td>Choose this to obtain high-level information about properties of the target JVM, including thread
+                activity and memory allocations.</td>
+            </tr>
+            <tr>
+                <td>Analyze CPU Performance</td>
+                <td>Choose this to obtain detailed data on application performance, including the time to execute methods and the number of 
+            times the method is invoked.</td>
+            </tr>
+            <tr>
+                <td>Analyze Memory Usage</td>
+                <td>Choose this to obtain detailed data on object allocation and garbage collection.</td>
+            </tr>
+        </table>
+        
+        <h3>Selecting a Profiling Task</h3>
+        <p>Each time you start or modify a profiling session, you first select a profiling task in the Select Profiling Task dialog box. </p>
+        
+        <ol>
+            <li>Choose Profile &gt; Profile Main Project from the main menu.
+                <p>Alternatively, choose Profile &gt; Attach Profiler or Profile &gt; Profile Other &gt; Profile Project "<i>projectname</i>" from the main menu.</p>
+            </li>
+            <li>Select a profiling task by clicking one of the tasks in the left pane of the Select Profiling Task dialog box.</li>
+            <li>Specify the options for the task in the right pane of the dialog box.</li>
+            <li>Click Run.</li>
+        </ol>
+
+        
+        
+		
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_monitor.html">Monitoring an Application</a></dd>
+            <dd><a href="profile_analyze_short.html">Analyzing CPU Performance</a></dd>
+            <dd><a href="profile_memory_short.html">Analyzing Application Memory Usage</a></dd>
+            <dd><a href="profile_results.html">About Profiling Results</a></dd>
+            <dd><a href="profile_running.html">Profiling a Running Application</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Starting a Profiling Session</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        
+    <h2>Starting a Profiling Session</h2>
+    <p><small><a href="#seealso">See Also</a></small></p>
+    <p>If you have a project that is targeted to run on your local machine,
+    you can profile the project without any additional configuration.
+    When you profile a local project, you launch the project and start the profiling session from within the IDE.</p>
+    <ul class="note">
+        <li>If you want to profile a local application but you cannot or do not want to start the application from the IDE,
+        you can profile the application by <a href="profile_attach.html">attaching the IDE to the application</a>.</li>
+    </ul>
+    <p>To profile a local project, the project must be open in the IDE.
+    Each of the following profiling commands in the Profile menu invoke a 
+    dialog box where you select the profiling task for the session. 
+    You can start the profiling session after you select the profiling task.</p>
+    
+    <table border="1" cellpadding="5" cellspacing="0">
+  <tr> 
+    <th align="left" scope="col"><b>Command</b></th>
+    <th align="left" scope="col" valign="top"><b>Description</b></th>
+  </tr>
+  <tr> 
+    <td valign="top">Profile &gt; Profile Main Project</td>
+    <td valign="top">Opens the Select Profiling Task dialog box. 
+    The selected task is run on the main project.</td>
+  </tr>
+  <tr> 
+    <td valign="top">Profile&nbsp;&gt; Attach Profiler</td>
+    <td valign="top">Opens the Attach Profiler dialog box.
+    In the Attach Profiler dialog box, you select the project, the profiling task 
+    and the mode for attaching to the application. 
+    Use this to profile remote applications, running local applications, or applications 
+    that you start outside the IDE.</td>
+  </tr>
+  <tr> 
+    <td valign="top">Profile&nbsp;&gt; Profile Other&nbsp;&gt; "<i>projectname</i>"</td>
+    <td valign="top">Opens the Select Profiling Task dialog box. 
+    The selected task is run on the selected project.</td>
+  </tr>
+</table>
+
+<p><b>Notes:</b></p>
+<ul>
+    <li>Before you can use the profiler in the IDE, you need to <a href="calibrating.html">calibrate the profiler</a>.
+    You only need to calibrate the profiler once.</li>
+    <li>The first time you profile a project, the IDE needs to modify the project build script to
+    integrate the profiler. 
+    The IDE creates a backup of your project build script before it performs the modifications.</li>
+</ul>
+
+<h3>To profile the Main Project</h3>
+    
+    <ol>
+        <li>Choose Profile &gt; Profile Main Project from the main menu.</li>
+        <li><a href="profile_tasks_overview.html">Select a profiling task</a> in the Select Profiling Task dialog box.</li>
+        <li>Specify any options for the task.</li>
+        <li>Click Run.</li>
+    </ol>
+    <p>When you click Run, the IDE launches the main project and opens the Profiler window.</p>                 
+
+<h3>To profile an individual project</h3>
+    <ol>
+        <li>Right-click a project in the Projects window and choose Profile Project.
+            <p>Alternatively, select a file in the project and
+        choose Profile &gt; Profile Other &gt; Profile Project "<i>projectname</i>" from the main menu.</p></li>
+        <li><a href="profile_tasks_overview.html">Select a profiling task</a> in the Select Profiling Task dialog box.</li>
+        <li>Specify any options for the task.</li>
+        <li>Click Run.</li>
+    </ol>
+        <!--
+    <ul class="note">
+        <li>If you want to profile an application that is already running on a local machine, you need to profile the application
+        in Attach mode. </li>
+    </ul>
+-->
+<h3>To profile a specific class:</h3>
+    <ol>
+        <li>In the Projects window, select the class you want to profile. 
+        (This class must contain a runnable method.)</li>
+        <li>Choose Profile &gt; Profile Other &gt; Profile "<i>filename</i>" from the main menu.</li>
+        <li><a href="profile_tasks_overview.html">Select a profiling task</a> in the Select Profiling Task dialog box.</li>
+        <li>Specify any options for the task.</li>
+        <li>Click Run.</li>
+    </ol>
+    <p>When you click Run, only the selected class is launched.</p>
+
+    <ul class="note">                
+        <li>To profile a project or file, the project build script needs to be modified to import a profiling build script.
+        If the build script does not contain the profiling import task, the IDE modifies the build script and creates a backup copy of the original build script.
+        You can revert the modifications and remove the profiling import task by choosing Profile &gt; Advanced Commands &gt; 
+        Unintegrate Profiler from <i>project-name</i>.</li>
+    </ul>
+
+
+    <dl>
+        <dt><a name="seealso">See Also</a></dt>
+        <dd><a href="profile_monitor.html">Monitoring an Application</a></dd>
+        <dd><a href="profile_analyze_short.html">Analyzing CPU Performance</a></dd>
+        <dd><a href="profile_memory_short.html">Analyzing Application Memory Usage</a></dd>
+        <dd><a href="profile_results.html">About Profiling Results</a></dd>
+        <dd><a href="profile_running.html">Profiling a Running Application</a></dd>
+    </dl>
+    <hr>
+    <small><a href="../credits.html">Legal Notices</a></small>
+    <table border="0" cellpadding="50">
+    <tr><td>&nbsp;</td></tr>
+    </table>
+</body>
+</html>

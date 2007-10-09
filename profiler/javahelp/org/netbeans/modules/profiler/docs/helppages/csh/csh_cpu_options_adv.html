@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Analyze Performance: Advanced Options</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>	
+        <h2>Analyze Performance: Advanced Options</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When analyzing application performance, you can create a custom configuration and set more advanced profiling options.</p>
+        <p>You set the advanced options by clicking Advanced Settings in the configuration pane for your custom configuration. 
+        Click Basic Settings to set the configuration options in the <a href="csh_cpu_options_basic.html">Basic Options pane</a>.</p>
+        
+        <p>The Advanced Settings pane enables you to set the following options:</p>
+        
+        <h3>Settings</h3>
+        <ul>
+            <li><b>Methods Tracking.</b> 
+                When tracking methods, a "method entry" call is injected at the beginning of each profiled method, 
+                and a "method exit" call before each <tt>return</tt>. 
+                You can choose the granularity of tracking by selecting one of the following options:
+                <ul>
+                    <li><b>Exact Call Tree and Timing.</b> 
+                    When selected, the time spent in the method is calculated as the difference between the timestamp 
+                    that is generated for each "method entry" and corresponding "method exit".</li>
+                    <li><b>Exact Call Tree, Sampled Timing.</b>
+                    When selected, you must specify a sampling interval.
+                    The time spent in the method is calculated as the difference between the timestamp that is generated 
+                    for the "method entry" and corresponding "method exit" that fall approximately at the end of each sampling interval.</li>
+                </ul>
+                <p>For more about which option to choose, see the following NetBeans FAQ:<p>
+                <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerSampledInstrumentation">
+                <param name="text" value="<html><u>Which method of tracking methods should I use, exact or sampled?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+                </object></p>
+            </li>
+            <li><b>Exclude time spent in Thread.sleep() and Object.wait().</b> When selected, these methods are not profiled.</li>
+            <li><b>Profile underlying framework setup.</b>When selected, startup of the application's target JVM
+            is also profiled.</li>
+            <li><b>Profile threads started after entering any root method.</b> When selected, instruments the code for 
+            any thread started after the application enters the root instrumentation method.
+            This is selected by default when profiling the entire application.</li>
+            <li><b>Limit number of profile threads.</b> When selected, every time a thread that has not been previously 
+            registered enters the instrumented code, this counter is decremented. When 
+            it reaches zero, registration of new threads is stopped. Profiling data 
+            is collected only for the registered threads.<br>
+            To reset the counter to this value, choose Profile &gt; Reset Collected Results from the
+            the main menu.
+            <p>For more about when to use these option, see the following NetBeans FAQ:</p>
+                <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerSingleAndMultiThreaded">
+                <param name="text" value="<html><u>How can I profile all threads in a multi-threaded application?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+                </object></p>
+            </li>
+            <li><b>Use thread CPU timer (Solaris only).</b>
+            <p>For more about using timers, see the following NetBeans FAQ:</p>
+                <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerUsingTimers">
+                <param name="text" value="<html><u> How do I use different timers when profiling an application?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+                </object></p>
+            </li>
+            <li><b>Instrumentation Scheme.</b> Select an instrumentation scheme 
+                to limit the number of instrumented methods. (Usually, it is best if 
+                the number of instrumented methods and the number of methods actually called 
+                by the application when it is profiled are the same or very close.)
+                <ul>
+                    <li>Total (default) - This scheme is more appropriate if you want to profile application startup, or an 
+                    entire application such as a short-running command line utility.</li>
+                    <li>"Lazy" - This scheme is usually the most appropriate when you 
+                    want to profile a subset of the application code (for example, just one 
+                    or more servlets running on top of an application server). Results in  
+                    the smallest number of methods being instrumented.</li>
+                    <li>Eager - This scheme is not recommended for long-running applications.
+                    Eager instrumentation is a compromise between the Total and Lazy schemes. </li>
+                </ul>
+                <p>For more about instrumentation schemes, see the following NetBeans FAQ:</p>
+                <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerInstrumentationSchemes">
+                <param name="text" value="<html><u>How do I select an instrumentation scheme?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+                </object></p>
+            </li>
+            <li><b>Instrument:</b> Method.invoke(), Getter/setter methods, empty methods. 
+            By default these types of methods are not instrumented.
+            <p>For more about instrumenting these methods, see the following NetBeans FAQ:</p>
+                <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerInstrumentSpecialJavaMethods">
+                <param name="text" value="<html><u> How do I instrument/not instrument special Java methods?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+                </object></p>
+            </li>
+        </ul>
+        
+        <h3>Threads</h3>
+        <p><b>Enable Threads Monitoring.</b> When selected, application threads are monitored from application startup.
+        When deselected (default), thread monitoring does not begin until you click the Threads button in the Threads window.</p>
+
+
+        <h3>Global Settings</h3>
+        <p><b>Override Global Settings</b> When selected, you can override the global settings and specify the following options when profiling the application:</p>
+        <ul>
+            <li><b>Working Directory.</b> Use this option to specify the directory that will become current for your application when it starts. 
+            For example, you may need to specify a specific working directory when <a href="../profile_running.html">profiling a running application</a>.</li>
+            <li><b>Java Platform.</b> Use this option to specify a target JVM other than the default JVM the IDE is running on. 
+            You can choose any Java platforms registered in the Java Platform Manager.</li>                    
+            <li><b>JVM Arguments.</b> Specify any arguments to pass on to the JVM, for example, the default maximum heap size.</li>
+        </ul>
+            
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="csh_cpu_options_basic.html">Analyze Performance: Basic Options</a></dd>
+            <dd><a href="../profile_analyze_short.html">Analyzing Application Performance</a></dd>
+            <dd><a href="../profile_tasks_overview.html">Profiling a Project or Class</a></dd>
+            <dd><a href="../profile_profilepoints.html">Setting Profiling Points</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>

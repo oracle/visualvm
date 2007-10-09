@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2004 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Viewing VM Telemetry Results</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+    <h2>Viewing VM Telemetry Results</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>You can view high-level data on thread activity and 
+        memory heap and garbage collection in the VM Telemetry window. 
+        The VM Telemetry window is typically visible in the main Editor window.</p>
+        
+        <p>To open the VM Telemetry window, do one of the following during a profiling session:</p>
+        <ul>
+            <li>Choose Window &gt; Profiling &gt; VM Telemetry from the main menu.</li>
+            <li>Click VM Telemetry (&nbsp;<img src="img/telemetryWindow.png" alt="Telemetry overview">&nbsp;) in the Profiler window.</li>
+        </ul>
+        
+        
+        <p>VM Telemetry results are displayed in the following tabs:</p>
+        <ul>
+            <li><b>Memory (Heap).</b> This tab displays the total size and used size of the heap.</li>
+            <li><b>Memory (GC).</b> This tab displays the relative time spent in garbage collection and the number of surviving generations.</li>
+            <li><b>Threads/Loaded Classes.</b> This tab displays the total 
+            number of threads in the profiled application JVM.</li>                    
+        </ul>
+        <p>In each of the tabs, you can place your cursor over the graph to invoke a tooltip that displays more detailed data.</p>
+        
+        <p>The toolbar of the VM Telemetry window contains the following items:</p>
+        <table border="1" cellpadding="0" cellspacing="0">
+            <tr align="left" valign="top">
+            <th scope="col">Button</th>
+            <th scope="col">Function</th>
+            </tr>
+            <tr valign="top"><td><img src="img/saveView.png"></td><td><b>Save Current View.</b> Click this to save an image of the current results as a <tt>.png</tt> file.</td></tr>                        
+            <tr valign="top"><td><img src="img/zoomIn.png"></td><td><b>Zoom In.</b> Click this to increase the detail of the graph.</td></tr>                        
+            <tr valign="top"><td><img src="img/zoomOut.png"></td><td><b>Zoom Out.</b> Click this to decreases the detail of the graph.</td></tr>
+            <tr valign="top"><td><img src="img/scaleToFit.png"></td><td><b>Scale-to-Fit.</b> Click this to modify the display of data so that the entire graph fits in the window.</td></tr>
+        </table>
+
+        <p>You can select a region of the graph with your mouse to see that region in greater detail.</p>
+	
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_monitor.html">Monitoring an Application</a></dd>
+            <dd><a href="profile_windows.html">Profiling Windows</a></dd>
+            <dd><a href="profile_results.html">About Profiling Results</a></dd>
+        </dl>
+        
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+</body>
+</html>

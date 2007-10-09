@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Options Window: Miscellaneous: Profiler</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Options Window: Miscellaneous: Profiler</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>You use this panel to configure settings that effect the behavior of the IDE when profiling applications.</p> 
+        <p>You can access this panel by choosing Tools &gt; Options from the main menu, clicking the Miscellaneous category and then clicking the Profiler tab.</p> 
+
+        <p>You can specify the following Profiler settings:</p>
+        <h3>General</h3>
+        <ul>
+            <li><b>Profiler Java Platform.</b> 
+            Choose a Java platform from the drop-down list to specify the target JVM to use when
+            profiling your application. The default JVM is the JVM the IDE is running on. The dropdown list
+            lists the available Java platforms. To add or remove a platform, click Manage Platforms to
+            open the Java Platform Manager.</li>
+            <li><b>Communication Port.</b> You can also change the communication port that the profiler listens to. 
+            The default port is 5140.</li>
+        </ul>
+        <h3>When Profiling Session Starts</h3>
+        <ul>
+            <li><b>Open Telemetry Overview.</b> 
+            Specify when the Telemetry Overview window opens by choosing an option from the drop-down list.</li>
+            <li><b>Open Threads View.</b> Specify when the Threads window opens by choosing an option from the drop-down list.
+            For example, if you want the Threads View to open every time you start a profiling session, 
+            select Always from the drop-down list.</li>
+            <li><b>Open Live Results For.</b> Select a profiling session type if you want the Live Results window to be automatically opened 
+            when the starting the selected type of profiling session.</li>
+        </ul>            
+        <h3>Miscellaneous</h3>
+            <ul>
+            <li><b>When Taking Snapshot.</b> 
+            Choose an option from the drop-down list to specify what the IDE does when you take a snapshot, either manually or using a profiling point. 
+            For example, if you select Save New Snapshot, when you click Take Snapshot the snapshot is saved 
+            and appears in the Snapshot list but does not open in the Profiling Results tab.</li>
+            <li><b>On OutOfMemoryError.</b>
+            Choose an option from the drop-down list to specify what the IDE does when an OutOfMemoryError is encountered. 
+            The default behaviour is to save the heap dump to the profiled project.</li>
+            <li><b>Heap Walker Settings.</b> When selected, enables automatic rule-based analysis of heap dump structures.</li>
+            <li><b>Profiler Dialogs Confirmations.</b> 
+            Clicking Reset automatically resets the Do Not Show This Message Again checkbox 
+            in all dialog boxes to the default state of unselected. This means that if you
+            want to stop a dialog window from appearing, you need to select the Do Not Show 
+            checkbox in that dialog window.</li> 
+        </ul>
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

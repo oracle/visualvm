@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Profiling a Remote Application</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Profiling a Remote Application</h2>
+        <p><small><a href="#seealso">See Also</a></small></p> 
+                <p>You can profile an application that is running on a remote system by attaching the profiler to the application.
+                To profile an application that is running on a remote system, the remote system needs to be configured to
+                support remote profiling. </p>
+                <p>You use the Attach Wizard to specify the attachment settings that are specific to your configuration.
+                In the Attach Wizard you specify the type of application and the remote location.
+                Based on the details that you provide, the Attach Wizard provides you with a set of instructions on how to 
+                configure the remote system to support profiling.</p>
+                 
+                <p>After configuring the remote system according to the instructions, you can attach the profiler to the remote location.
+                You only need to configure the attach mode once. The attachment settings are associated with that project. 
+                You can go through the Attach Wizard at any time to change any of the attachment settings.</p> 
+                
+                <p><b>To profile a remote application:</b></p>
+            <ol>
+                <li>Choose Profile &gt; Attach Profiler from the main menu.</li>
+                <li>Select the Project from the dropdown list at the top of the Select Profiling Task dialog box, if available.</li>
+                <li>In the bottom of the dialog box, click <b>define</b> to configure the attachment settings.</li>
+                <li>Select the type of application.</li>
+                <li>Select the server type, if necessary.</li>
+                <li>Select the Remote attach mode and click Next.</li>
+                <li>Complete the Attach wizard to specify the attachment settings according to the target application.</li>
+                <li>Click Finish to exit the Attach wizard.</li>
+                <li>Configure the target location and start the remote application according to the instructions provided in the Attach Wizard.
+                <p>When you start the remote application, the application will wait until the IDE is attached before starting.</p></li>
+                <li>Select a profiling task and any profiling options.</li>
+                <li>Click Attach.</li>
+            </ol>
+            
+            <p>When you click Attach, the IDE will attach to the remote JVM and the application will start.
+        You can view profiling data like you would for a local application.</p>
+            
+            <p>After the IDE is attached to the remote application you can do the following: </p>
+            <ul>
+                <li>Detach from the remote application.
+                <p>When you detach from the remote application, the remote application does not stop 
+                but you stop receiving profiling data about the remote application.
+            To attach to the remote application you need to use the startup options provided by the Attach wizard and 
+            start the remote application again.</p></li>
+                <li>Modify the profiling session.
+                <p>You can modify the profiling session without detaching from the remote application.
+            For example, you can change the profiling task to monitoring to reduce the profiling overhead, and then
+        modify the task again later. This way you do not need to reattach and restart the remote application.</p></li>
+            </ul>
+            
+            
+ <!-- TODO need to describe what happens here       
+ <p>When you click Run  </p>-->
+<!--
+                <li>In the Attach Wizard, select the type of application you want to profile.
+                <p>If you select J2EE Web/App Server, you also need to specify the type of server.</p></li>
+                <li>Select the Remote attach mode, an invocation type and click Next.</li>
+                <li>Supply the Hostname and Host OS of the remote location.</li>            
+            
+            The Attach Wizard enables you to configure how Profiler is attached to an application.
+    To attach Profiler to an application, you need to first specify the type of application details of the application.</p>	
+        
+        <p>The Attach Wizard is available when you choose 
+		Profiler &gt; Attach Profiler from the main menu. 
+		Before you open the wizard, ensure that your project is selected 
+		in the combo box at the top of the Select Profiling Task window.</p>
+		<p><b>To use the Attach Wizard:</b></p>
+		<ol>
+   			<li>Click Attach Wizard in the Select Profiling Task window.</li>
+   			<li>Select the target type (and server type if the target is a J2EE Web/App Server) and click Next.</li>
+ 			<li>Select the application or server location, do the following and click Next.
+				<ul>          
+				<li>If the location is remote, supply the Hostname and Host OS.</li>
+          			<li>If the location is local, select either Direct or Dynamic attachment. 
+					(If you select Dynamic attachment, you need to specify the working directory and 
+					how attachment is invoked in the next step.)</li>
+				</ul>
+        	</li>
+			<li>Review the attach settings and do one of the following:
+				<ul>          
+					<li>Click Next if you want to specify the integration type, 
+					the target JVM and view the integration steps. The integration 
+					steps provide detailed information on how to integrate the 
+					Profiler with the application. If this is the first time you have 
+					attached profiler to the application, it is recommended that you 
+					thoroughly review and understand the integration steps.</li>
+    				<li>Click Finish and exit the wizard if you do not need to specify 
+					or modify the integration type.</li>
+				</ul>
+			</li>
+		</ol>
+-->		
+
+
+
+
+
+
+<!--
+<p>When attaching Profiler to an application, the application needs to be running
+        on JDK 1.5.04 or on a customized JVM. The customized JVM 
+		is available as a separate download from the Profiler website.</p>
+        <p>The Profiler JVM is located in the directory 
+        <tt>userdir</tt> &gt; <tt>module</tt> &gt; <tt>profiler-ea-vm</tt>.</p>
+        <p>When you need to profile any code in the target application, you 
+        invoke a command in Profiler that sends an OS signal to this JVM that  
+        loads and activates the Profiler VM-side library.</p>
+        <p><b>To start the application on the modified JVM:</b></p>
+        <ol><li><b>Locate the customized Profiler JVM.</b> The Profiler JVM is 
+            located in the directory:<br><tt>userdir</tt>&nbsp; 
+            <img src="img/arrow.gif" width="5" height="11" alt="submenu">&nbsp; 
+            <tt>module</tt>&nbsp;
+            <img src="img/arrow.gif" width="5" height="11" alt="submenu">&nbsp; 
+            <tt>profiler-ea-vm</tt>.<br>
+            The directory path may look like this:<br>
+            <tt>/home/johnsmith/.netbeans/3.6/modules/profiler-ea-vm</tt><br>
+            (on UNIX&reg)<br>
+            or<br>
+            <tt>c:\Documents and Settings\JohnSmith\.netbeans\3.6\modules\profiler-ea-vm</tt><br>
+            (on Windows).<br>
+            (replace "<tt>johnsmith</tt>" with your login name in these examples)</li>
+            <li><b>Launch the target application on the modified JVM.</b> Launch the 
+            application as you usually do but specifying the path to the modified 
+            JVM's executable on the command line, which may look something like this:<br>
+            <tt>
+            C:\j2sdk1.4.2_06\demo\jfc\SwingSet2&gt;D:\userdir\modules\profiler-ea-vm\jre\bin\java -jar SwingSet2.jar</tt></li>
+        </ol>
+        <p>The application is now running on the modified JVM. Profiler can now be attached
+        to the running application. For more, see <a href="profile_running.html">Attaching Profiler to 
+        a Running Application</a>.</p>
+    
+-->
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="profile_running.html">Profiling a Running Application</a></dd>
+            <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+        
+    </body>
+</html>

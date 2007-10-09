@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Customize Filter Sets Dialog Box</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Customize Filter Sets Dialog Box</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When profiling an application, you use the Customize Filter Sets dialog box to customize existing filter sets and to create new custom filter sets.
+        You use a filter set to limit the classes that are instrumented when analyzing application performance.</p>
+        
+        <p>You can access this window by clicking Edit Filter Sets in the CPU Analysis configuration pane in the Select Profiling Task dialog box.</p> 
+        <p>The dialog box has the following sections:</p>
+        
+        <h3>Defined Filter Sets.</h3>
+        <p>This section displays the filter sets that are available when profiling an application.
+        You can use the buttons to the right of the list to add and remove filter sets and to change the order 
+        that the filter sets are displayed in the Filter drop-down list in the configuration pane.</p>
+        
+        <p>When you select a filter set in the list, the set name, type and global filters included in the filter set are  
+        displayed in the Filter Set Properties section. A filter set can include more than one global filter.</p>
+        
+        <h3>Filter Set Properties.</h3>
+            <p>This section displays the properties of the selected filter set. 
+        Filter sets have the following properties:</p>
+        
+        <p><b>Filter Set Name.</b>
+        This is the name used to identify the filter set in the Filter drop-down list in the configuration pane.</p>
+        
+        <p><b>Filter Set Type.</b>
+        The filter set can be one of the following two types.</p>
+        <ul>
+            <li><b>Exclusive.</b> When selected, classes meeting the criteria of the selected filters are excluded and not instrumented.
+            Profiling results for these classes do not appear in the collected results.</li>       
+            <li><b>Inclusive.</b> When selected, only the classes meeting the criteria of the selected filters are included in the instrumentation.
+            Profiling results are collected only for these classes.</li>
+        </ul>
+        <p><b>Global Filters.</b> Each global filter in the list represents groups of patterns that are typically 
+        related to one application. For example, <tt>org.netbeans</tt> is a pattern.
+        A filter can contain more than one pattern. Patterns can be separated by a comma and/or space.</p>
+        <p>When you create a filter set, you select the global filters that you want to exclude or include.
+        To modify or create global filters, click Edit Global Filters.</p>
+        
+       
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../custom_filtersets.html">Setting Filters</a></dd>
+            <dd><a href="../profile_analyze_short.html">Analyzing Application Performance</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal
+Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

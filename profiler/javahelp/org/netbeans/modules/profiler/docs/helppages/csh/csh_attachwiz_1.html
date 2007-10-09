@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Attach Wizard: Select Target Type</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Attach Wizard: Select Target Type</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>The Attach Wizard helps you configure the settings for profiling an application using the attach method.
+        In most cases you only need to use the Attach wizard to profile an application running on a remote JVM.
+        If your application is running on a local JVM and you can start the application from the IDE, 
+        you can use Profile Main Project.</p>
+        
+        <p>You use this page of the Attach wizard to specify the type of application you want to profile and how
+        you want to attach to the application. After specifying the attach settings, click Next to review the attach settings.</p>
+        
+        <p>In this page of the wizard you specify the following settings:</p>
+        <ul>
+            <li><b>Target Type.</b> Select the type of project that you want to profile.
+            You can select from following types:
+            <ul>
+                <li><b>Application.</b> Select this if your project is a standalone J2SE application.</li>
+                <li><b>Applet.</b> Select this if your project is an applet.</li>            
+                <li><b>Java EE Web/App Server.</b> Select this if you are profiling an enterprise application or web application deployed to a web or application server.</li>
+                
+            </ul>
+            <p>If you select Java EE Web/App Server, you also need to specify the following:</p>
+            <ul>
+                <li><b>Java EE Web/Application Server Type.</b> Select the deployment server for the application</li>
+            </ul>
+            </li>
+        
+        <li><b>Attach method.</b> Select an attach method according to the machine where the application is running.
+            <ul>
+                <li><b>Local.</b> Select Local if your application is running on the same machine as the IDE.</li>
+                <li><b>Remote.</b> Select Remote if the application is running on a remote machine.</li>
+            </ul></li>
+        
+            <li><b>Attach invocation.</b> Select the type of attach method.
+            <ul>
+                <li><b>Direct.</b> Select Direct if you want to profile application startup.
+                When you choose this option, the application startup is paused until the IDE is attached to the application/JVM. </li>
+                <li><b>Dynamic.</b> Select Dynamic if you want to attach and reattach the IDE.
+                When you choose this option, the application is started normally. You can then attach, detach and reattach to the
+                application without restarting the application.</li>
+            </ul>
+            <p><b>Notes:</b></p>
+            <ul class="note">
+                <li>The Dynamic attach method requires that the target application is running on JDK 1.6.</li>
+                <li>The Dynamic attach method is not available if you are profiling a remote application.</li>
+            </ul>
+            </li>
+        </ul>
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../profile_remote.html">Profiling a Remote Application</a></dd>
+            <dd><a href="../profile_running.html">Profiling a Local Running Application</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

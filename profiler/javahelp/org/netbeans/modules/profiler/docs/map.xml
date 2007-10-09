@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
+
+The contents of this file are subject to the terms of either the GNU
+General Public License Version 2 only ("GPL") or the Common
+Development and Distribution License("CDDL") (collectively, the
+"License"). You may not use this file except in compliance with the
+License. You can obtain a copy of the License at
+http://www.netbeans.org/cddl-gplv2.html
+or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+specific language governing permissions and limitations under the
+License.  When distributing the software, include this License Header
+Notice in each file and include the License file at
+nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+particular file as subject to the "Classpath" exception as provided
+by Sun in the GPL Version 2 section of the License file that
+accompanied this code. If applicable, add the following below the
+License Header, with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+Contributor(s):
+
+The Original Software is NetBeans. The Initial Developer of the Original
+Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+Microsystems, Inc. All Rights Reserved.
+
+If you wish your version of this file to be governed by only the CDDL
+or only the GPL Version 2, indicate your decision by adding
+"[Contributor] elects to include this software in this distribution
+under the [CDDL or GPL Version 2] license." If you do not indicate a
+single choice of license, a recipient has the option to distribute
+your version of this file under either the CDDL, the GPL Version 2 or
+to extend the choice of license to its licensees as provided above.
+However, if you add GPL Version 2 code and therefore, elected the GPL
+Version 2 license, then the option applies only if the new code is
+made subject to such option by the copyright holder.
+-->
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN"
+                     "http://java.sun.com/products/javahelp/map_1_0.dtd">
+
+<map version="1.0">
+	<mapID target="profile_running" url="helppages/profile_running.html"/>
+        <mapID target="calibrating" url="helppages/calibrating.html"/>
+	<mapID target="custom_filtersets" url="helppages/custom_filtersets.html"/>
+        <mapID target="heap_taking" url="helppages/heap_taking.html"/>
+        <mapID target="heapwalking" url="helppages/heapwalker.html"/>
+	<mapID target="profile_analyze_short" url="helppages/profile_analyze_short.html"/>
+        <mapID target="profile_freeform" url="helppages/profile_freeform.html"/>
+	<mapID target="profile_memory_short" url="helppages/profile_memory_short.html"/>
+	<mapID target="profile_monitor" url="helppages/profile_monitor.html"/>
+        <mapID target="profile_points" url="helppages/profile_profilepoints.html"/>
+        <mapID target="profile_quickref" url="helppages/profile_quickref.html"/>
+        <mapID target="profile_remote" url="helppages/profile_remote.html"/>
+	<mapID target="profile_results" url="helppages/profile_results.html"/>
+	<mapID target="profile_rootmethod" url="helppages/profile_rootmethod.html"/>
+        <mapID target="profile_startlocal" url="helppages/profile_startlocal.html"/>
+	<mapID target="profile_tasks_overview" url="helppages/profile_tasks_overview.html"/>
+	<mapID target="profile_threads" url="helppages/profile_threads.html"/>
+        <mapID target="profile_windows" url="helppages/profile_windows.html"/>
+        <mapID target="results_liveresults" url="helppages/results_liveresults.html"/>
+        <mapID target="results_livefiltering" url="helppages/results_livefiltering.html"/>
+        <mapID target="results_telemetry" url="helppages/results_telemetry.html"/>
+	<mapID target="snapshots" url="helppages/snapshots.html"/>
+        <mapID target="snap_taking" url="helppages/snap_taking.html"/>
+        
+        <!-- begin CSH topics -->
+        
+        <!-- CSH topics for select profiling task -->
+        <mapID target="CPUSettings.Basic.HelpCtx" url="helppages/csh/csh_cpu_options_basic.html"/>
+        <mapID target="CPUSettings.Advanced.HelpCtx" url="helppages/csh/csh_cpu_options_adv.html"/>
+        <mapID target="MonitorSettings.Basic.HelpCtx" url="helppages/csh/csh_monitor_options_basic.html"/>
+        <mapID target="MonitorSettings.Advanced.HelpCtx" url="helppages/csh/csh_monitor_options_adv.html"/>
+        <mapID target="MemorySettings.Basic.HelpCtx" url="helppages/csh/csh_memory_options_basic.html"/>
+        <mapID target="MemorySettings.Advanced.HelpCtx" url="helppages/csh/csh_memory_options_adv.html"/>
+
+        
+        <mapID target="FilterSetsPanel.HelpCtx" url="helppages/csh/csh_filters_custom.html"/>
+        <mapID target="GlobalFiltersPanel.HelpCtx" url="helppages/csh/csh_filters_global.html"/>
+        <mapID target="QuickFilterPanel.HelpCtx" url="helppages/csh/csh_filters_quick.html"/>
+        
+        <!-- CSH topics for Attach Wizard -->
+        <mapID target="AttachSettingsPanel.HelpCtx" url="helppages/csh/csh_attachwiz_1.html"/>
+        <mapID target="ReviewSettingsPanel.HelpCtx" url="helppages/csh/csh_attachwiz_2.html"/>
+        <mapID target="ManualIntegrationPanel.HelpCtx" url="helppages/csh/csh_attachwiz_3_manual.html"/>
+        <mapID target="SelectIntegrationTypePanel.HelpCtx" url="helppages/csh/csh_attachwiz_3_integration.html"/>
+        <mapID target="SunASIntegrationPanel.HelpCtx" url="helppages/csh/csh_attachwiz_4_location.html"/>
+        <mapID target="PerformIntegrationPanel.HelpCtx" url="helppages/csh/csh_attachwiz_5_performint.html"/>
+        <mapID target="ReviewAdditionalStepsPanel.HelpCtx" url="helppages/csh/csh_attachwiz_6_reviewadd.html"/>
+        <mapID target="RemoteAttachSettingsPanel.HelpCtx" url="helppages/csh/csh_attachwiz_2_remote.html"/>
+        
+        <!--CSH ID for Options | Misc | Profiler :-->
+        <mapID target="ProfilerOptions.Help" url="helppages/csh/options_profiler.html"/>
+    </map>

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Profiling a Free-form Project</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+   <h2>Profiling a Free-form Project</h2>
+      <p>In a free-form project, you have to write your own Ant target to be able to profile the project.
+      You generally want to write two targets in your freeform project's build script,
+      one for profiling a project and one for profiling individual files.
+      When you use the <tt>&quot;Profile Main Project&quot;</tt> or <tt>&quot;Profile File&quot;</tt> actions in
+      the IDE, for the first time for a given freeform project as the
+      main project, you will be asked to specify which Ant target to use.</p>
+    
+      <p>The targets would typically look similar to your existing <tt>&quot;run&quot;</tt> target, with some additional parameters,
+      so you may want to start with copying your <tt>&quot;run&quot;</tt> target into <tt>&quot;profile&quot;</tt> and
+      modify it per instructions below.</p>
+      
+      <p>You will need to make two changes in your <tt>profile</tt> target when you copy it from <tt>&quot;run&quot;</tt>:</p>
+      <ol>
+        <li>Add call to <tt>nbprofiledirect</tt> task at the beginning.</li>
+        <li>Add extra JVM argument to the task that starts the VM to run your application. 
+        You would typically add the argument by adding a sub-element to the <tt>java</tt> task.
+        For example:
+              <pre>
+  <tt>&lt;jvmarg value=&quot;${profiler.info.jvmargs.agent}&quot;/&gt;</tt>
+              </pre></li>
+      </ol>
+    
+    <h3>Profiling Freeform J2SE Projects</h3>
+    <p>The following is an example of basic &quot;profile&quot; and &quot;profile-single&quot; 
+    targets (JDK 5.0 or later) for use in a J2SE project.</p>
+    <pre>
+  &lt;target name=&quot;profile&quot; depends=&quot;jar&quot; description=&quot;Profile Project&quot;&gt;
+    &lt;fail unless=&quot;netbeans.home&quot;&gt;This target can only run inside the NetBeans IDE.&lt;/fail&gt;
+
+    &lt;nbprofiledirect&gt;
+        &lt;classpath&gt; &lt;pathelement location=&quot;<b>... specify ...</b>&quot;/&gt; &lt;/classpath&gt;
+    &lt;/nbprofiledirect&gt;
+
+    &lt;java <b>... use same attributes as with run ...</b>&gt;
+        &lt;jvmarg value=&quot;${profiler.info.jvmargs.agent}&quot;/&gt;
+    &lt;/java&gt;
+  &lt;/target&gt;
+    </pre>
+
+    <p>To start the profiler with a class selected in the explorer, you can add the same target, 
+    and use <tt>classname=&quot;${profile.class}&quot;</tt>. For example:</p>
+    <pre>
+  &lt;target name=&quot;profile-single&quot; depends=&quot;jar&quot; description=&quot;Profile File&quot;&gt;
+    &lt;fail unless=&quot;netbeans.home&quot;&gt;This target can only run inside the NetBeans IDE.&lt;/fail&gt;
+
+    &lt;nbprofiledirect&gt;
+        &lt;classpath&gt; &lt;pathelement location=&quot;<b>... specify ...</b>&quot;/&gt; &lt;/classpath&gt;
+    &lt;/nbprofiledirect&gt;
+
+    &lt;java classname=&quot;${profile.class}&quot; <b>... use same attributes as with run ...</b>&gt;
+        &lt;jvmarg value=&quot;${profiler.info.jvmargs.agent}&quot;/&gt;
+    &lt;/java&gt;
+  &lt;/target&gt;
+    </pre>
+
+    <h3>Profiling Freeform Web Projects</h3>
+    <p>Typically the server is started using a startup script, not the <tt>java</tt> command directly. 
+    Therefore you cannot use the <code>&lt;jvmarg .../&gt;</code> element to pass additional argument to it.
+    Instead, you have to modify the server startup script to configure it for profiling.</p>
+    
+    <p>The recommended approach is to create new script for starting the server for 
+    profiling and use it in the <code>profile</code> target. 
+    The Attach wizard can generate the necessary modified startup script. 
+    If your target server does not support automatic integration, you can 
+    create the script manually by following the manual integration steps described in the wizard. 
+    You always have to set up the integration for Local Direct attach.</p>
+    
+    <p>The other steps for profiling a free-form web project are the same as those above for profiling
+    a standard J2SE projects.</p>
+
+        
+    <p>For more about how to profile a free-form project and arguments you can use, see the following NetBeans FAQ:</p>
+    <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerProfileFreeForm">
+    <param name="text" value="<html><u>How do I profile a freeform project?</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+    </object></p>
+        
+        
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <!--<dd><a href="attach_jvm.html">About the Profiler Modified JVM</a></dd>-->
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal
+Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+        
+    </body>
+</html>

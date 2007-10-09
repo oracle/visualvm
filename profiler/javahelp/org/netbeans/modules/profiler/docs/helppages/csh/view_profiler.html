@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+*
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Profiler Window</title>
+<link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+
+<h2>Profiler Window</h2>
+<p><small><a href="#seealso">See Also</a></small></p>
+
+<p>The Profiler window is typically located in the left pane of the IDE and enables you to control the 
+profiling session and manage profiling results.
+You open the Profiler window by choosing Window &gt; Profiling &gt; Profiler Control Panel.</p>
+
+        <p>In the Profiler window you can do the following:</p>
+        <ul>
+            <li>Control the profiling task</li>
+            <li>View the status of the current profiling session</li>
+            <li>Open profiling results windows</li>
+            <li>Take and manage profiling snapshots</li>
+            <li>See basic telemetry statistics</li>
+        </ul>
+        <p>The Profiler window contains the following sections. 
+        You can click the section name or node to hide or reveal the section.</p>
+        
+        <h3>Controls</h3>
+        <p>This section contains the controls you can use to control the profiling session.
+        The following table shows the button and the profiling function it invokes.</p>
+            <table border="1" cellpadding="3" cellspacing="0">
+            <tr align="left" valign="top">
+                <th scope="col">Button</th>
+                <th scope="col">Function</th>
+            </tr>
+            <tr><td><img src="../img/rerun-icon.png"></td><td><b>Rerun Profiling Session</b> (Ctrl-Shift-F2)<br>Run the last profiling command again.</td></tr>
+            <tr><td><img src="../img/stop-icon.png"></td><td><b>Stop Profiling Session</b> <br> 
+            Stops the current profiling command. Also stops the target application if the application was started by Profiler.</td></tr>
+            <tr><td><img src="../img/resetResults.png"></td><td><b>Reset Collected Results</b><br>Discards the already accumulated profiling results.</td></tr>
+            <tr><td><img src="../img/trash-icon.png"></td><td><b>Run GC</b><br>Runs Garbage Collection.</td></tr>            
+            <tr><td><img src="../img/clock-icon.png"></td><td><b>Modify Profiling Session</b> (Alt+Shift+F2) <br>
+            Opens the Modify Profiling Task dialog box and allows you to run a new profiling command without stopping the target application.</td></tr>
+            <tr><td><img src="../img/telemetryOverviewWindow.png"></td><td><b>VM Telemetry</b><br> 
+            Opens the VM Telemetry Overview in the Output window of the IDE, displaying smaller
+             versions of the telemetry graphs.</td></tr>
+             <tr><td><img src="../img/detach.png"</td><td><b>Detach</b> Detaches the IDE from the profiled application.</td></tr>
+        </table>
+
+        <h3>Status</h3>
+        <p>This section displays the status and type of the current profiling task.</p>
+
+        <h3>Profiling Results</h3>
+        <p>This section contains the following buttons for displaying profiling results.</p>
+        <table border="1" cellpadding="3" cellspacing="0">
+            <tr align="left" valign="top">
+                <th scope="col">Button</th>
+                <th scope="col">Function</th>
+            </tr>
+            <tr valign="top">
+                <td><img src="../img/takeSnapshotMem.png" alt="Telemetry tab button"></td>
+                <td><b>Take Snapshot</b><br>
+                Takes a snapshot of the current profiling results and opens the snapshot in the main editor window.</td>
+            </tr>
+            <tr valign="top">
+                <td><img src="../img/liveResultsView.png" alt="Live Results button"></td>
+                <td><b>Live Results</b><br>
+                Opens the Live Profiling Results window.</td>
+            </tr>
+            <tr valign="top">
+                <td><img src="../img/resetResults.png"></td>
+                <td><b>Reset Collected Results</b><br>
+                Discards the already accumulated profiling results.</td>
+            </tr>
+        </table>
+
+        <h3>Saved Snapshots</h3>
+        <p>This section enables you to manage the <object classid="java:com.sun.java.help.impl.JHSecondaryViewer">
+		      <param name="content" value="../glossary/resultssnapshot.html">
+                      <param name="viewerActivator" value="javax.help.LinkLabel">
+                      <param name="viewerStyle" value="javax.help.Popup">
+                      <param name="viewerSize" value="400,220">
+                      <param name="text" value="profiling results snapshots">
+                      <param name="textFontSize" value="medium">
+                      <param name="textFontFamily" value="SansSerif">
+                      <param name="textFontStyle" value="italic">
+                      <param name="textFontWeight" value="bold">
+                      <param name="textColor" value="blue">
+                    </object> associated with your project.
+        When you select an open project in the drop-down list, the saved snapshots associated with that project are displayed.
+        Double-clicking the name of the snapshot opens the snapshot in the Source Editor window.</p>
+        
+        <p>The buttons to the right of the listed snapshots enable you to open and
+        delete your saved snapshots. The Save As button enables you to save the selected snapshot 
+        to a location outside your project. The Load button enables you to locate and open
+        snapshots saved outside your project.</p>
+        <p>Snapshots are listed according to when the snapshot was taken, with
+        the most recent at the bottom. To open a snapshot, select the snapshot from
+        the list and click Open, or double-click the name. Bold indicates that the snapshot tab
+        is already open in the Source Editor window. The snapshot icon identifies the type of snapshot.</p>
+
+                
+        <h3>View</h3>
+        <p>This section contains the following buttons for displaying the results of application monitoring:</p>
+
+        <table border="1" cellpadding="3" cellspacing="0">
+            <tr align="left" valign="top">
+                <th scope="col">Button</th>
+                <th scope="col">Function</th>
+            </tr>
+            <tr valign="top">
+                <td><img src="../img/vmTelemetryView.png" alt="Telemetry tab button"></td>
+                <td><b>VM Telemetry</b><br>
+                Opens the VM Telemetry window displaying data on thread activity and memory heap and garbage collection.</td>
+            </tr>
+            <tr valign="top">
+                <td><img src="../img/threadsView.png" alt="Threads tab button"></td>
+                <td><b>Threads</b><br>
+                Opens the Threads window displaying thread activity.</td>
+            </tr>
+        </table>
+
+        <h3>Basic Telemetry</h3>
+        <p>This section presents high-level information about the current profile task.
+        You can see the graphic presentation of this information by clicking VM Telemetry and Threads in the View section.</p>
+
+
+
+<dl>
+	<dt><a name="seealso">See Also</a></dt>
+	<dd><a href="../profile_windows.html">Profiling Windows</a></dd>
+        <dd><a href="../profile_tasks_overview.html">Profiling a Project or Class</a></dd>
+</dl>
+<hr>
+<small><a href="../../credits.html">Legal Notices</a></small>
+<table cellpadding="50" border="0">
+<tr>
+<td>&nbsp;</td>
+</tr>
+</table>
+</body>
+</html>

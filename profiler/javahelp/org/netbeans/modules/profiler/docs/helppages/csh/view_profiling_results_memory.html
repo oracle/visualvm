@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Live Profiling Results Window - Memory Usage</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+    <h2>Live Profiling Results Window - Memory Usage</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+                <p>The results that are displayed in the Live Profiling Results window depend upon which profiling task is in progress. 
+                When you analyse memory usage, the window displays data on object allocation and liveness. 
+                The profiling results displayed depend on which of the following options you choose.</p>
+
+                <h3>Record object creation only</h3>
+                <p>When you choose this option, the Profiling Results window displays a list of classes 
+                (including array classes), with the total size and number of instances that have 
+                been allocated since you issued the instrumentation command.
+                All classes currently loaded by the target JVM (and each new class as it is loaded) are instrumented.</p> 
+                <p>When you choose this option, the Live Profiling Results window displays the following information for each profiled class:</p>
+                <ul>
+                    <li><b>Bytes Allocated.</b> This is a graphical representation of the percentage of bytes allocated.</li>
+                    <li><b>Bytes Allocated.</b> This is the actual number of bytes allocated and the percentage of total bytes.</li>
+                    <li><b>Objects Allocated.</b> This is the number of live objects and the percentage of the total number of objects.</li>
+                </ul>
+                
+                <p>Right-click a class name to access the following popup menu commands.</p>
+                <ul>
+                    <li><b>Go To Source.</b> Select this to open the source <tt>.java</tt> file for the selected class in the Source Editor.</li>
+                    <li><b>Log Class History.</b> Select this to display the history for the selected instance. </li>
+                </ul>
+                
+                
+                <h3>Record both object allocation and garbage collection</h3>
+                <p>When you choose this option, the Live Profiling Results window displays the following information:</p>
+            
+                <ul>
+                    <li><b>Live bytes.</b> This is a graphical representation of live bytes.</li>
+                    <li><b>Live bytes.</b> This is the actual number of live bytes.</li>
+                    <li><b>Live Objects.</b> This is the size and number of live <object classid="java:com.sun.java.help.impl.JHSecondaryViewer">
+                        <param name="content" value="../glossary/trackedobjects.html">
+                        <param name="viewerActivator" value="javax.help.LinkLabel">
+                        <param name="viewerStyle" value="javax.help.Popup">
+                        <param name="viewerSize" value="400,220">
+                        <param name="text" value="tracked objects">
+                        <param name="textFontSize" value="medium">
+                        <param name="textFontFamily" value="SansSerif">
+                        <param name="textFontStyle" value="italic">
+                        <param name="textFontWeight" value="bold">
+                        <param name="textColor" value="blue">
+                        </object> for the given class at the moment. 
+                        You can set the proportion of objects that are tracked when you configure the profiling session.</li>
+                    <li><b>Allocated objects.</b> This number is the total number of tracked objects that have been allocated.</li>
+                    <li><b>Average object age.</b> This number is the average age for the live tracked objects of this class, 
+                    measured as the number of garbage collections that the object has survived.
+                    <ul class="note"><li>The IDE does not distinguish between 
+                    partial (young generation) and full garbage collections if a generational garbage collector is used.</li></ul></li>
+                    <li><b>Generations.</b> This is the number of survived generations and represents the total number of different object ages for objects of this class. </li> 
+                    <li><b>Total number of allocated objects.</b> This number is the total number of allocated objects for this class.</li>
+  
+                </ul>
+                
+            <p>The following popup menus are available when you right-click a class name.</p>
+            <ul>
+                <li><b>Go To Source.</b> Select this to open the source <tt>.java</tt> file for the selected class in the Source Editor.</li>
+                <li><b>Log Class History.</b> Select this to display the history for the selected instance. </li>
+                <li><b>Stop Profiling this Class.</b></li>
+                <li><b>Stop Profiling Classes Below this Line.</b></li>
+            </ul>
+            <p>Limiting the profiled classes to only those you are interested in can help reduce the profiling overhead.</p>
+            <p>The following popup menu item is also available when you select the Record Stack Traces option.</p>
+            <ul>
+                <li><b>Take Snapshot and Show Allocation Stack Traces.</b></li>
+            </ul>
+           <hr> 
+                
+            <p>For more on how object liveness data is tracked and collected, see the following NetBeans FAQs:</p>
+            <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerTrackObjectLiveness">
+                <param name="text" value="<html><u>How is object liveness tracked?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+            </object></p>
+            <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerObjectAllocationData">
+                <param name="text" value="<html><u>How is object allocation data collected?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+            </object></p>
+                
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../profile_memory_short.html">Analyzing Application Memory Usage</a></dd>
+            <dd><a href="../results_liveresults.html">Working with Live Profiling Results</a></dd>
+            <dd><a href="../profile_results.html">About Profiling Results</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal
+Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

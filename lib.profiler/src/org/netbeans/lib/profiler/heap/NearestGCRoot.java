@@ -1,0 +1,257 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
+ */
+
+package org.netbeans.lib.profiler.heap;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+
+/**
+ *
+ * @author Tomas Hurka
+ */
+class NearestGCRoot {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+
+    private static final int BUFFER_SIZE = (64 * 1024) / 8;
+
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+
+    private Field referentFiled;
+    private HprofHeap heap;
+    private LongBuffer readBuffer;
+    private LongBuffer writeBuffer;
+    private Set referenceClasses;
+    private boolean gcRootsComputed;
+
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+
+    NearestGCRoot(HprofHeap h) {
+        heap = h;
+    }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    synchronized Instance getNearestGCRootPointer(Instance instance) {
+        if (heap.getGCRoot(instance) != null) {
+            return instance;
+        }
+
+        long nextGCPathId = heap.idToOffsetMap.get(instance.getInstanceId()).getNearestGCRootPointer();
+
+        if (nextGCPathId == 0L) {
+            nextGCPathId = computeGCRootsFor(instance);
+        }
+
+        if (nextGCPathId != 0L) {
+            return heap.getInstanceByID(nextGCPathId);
+        }
+
+        return null;
+    }
+
+    private boolean isWeakOrSoftReference(FieldValue value, Instance instance) {
+        Field f = value.getField();
+
+        return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass()); // NOI18N
+    }
+
+    private long computeGCRootsFor(Instance instance) {
+        if (gcRootsComputed) {
+            return 0L;
+        }
+
+        JavaClass weakRef = heap.getJavaClassByName("java.lang.ref.WeakReference"); // NOI18N
+        JavaClass softRef = heap.getJavaClassByName("java.lang.ref.SoftReference"); // NOI18N
+        referenceClasses = new HashSet();
+        referenceClasses.add(weakRef);
+        referenceClasses.addAll(weakRef.getSubClasses());
+        referenceClasses.add(softRef);
+        referenceClasses.addAll(softRef.getSubClasses());
+        referentFiled = computeReferentFiled();
+
+        try {
+            createBuffers();
+            fillZeroLevel();
+
+            do {
+                switchBuffers();
+                computeOneLevel();
+            } while (hasMoreLevels());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        deleteBuffers();
+        gcRootsComputed = true;
+
+        return heap.idToOffsetMap.get(instance.getInstanceId()).getNearestGCRootPointer();
+    }
+
+    private void computeOneLevel() throws IOException {
+        for (;;) {
+            long instanceId = readLong();
+            Instance instance;
+            List fieldValues;
+            Iterator valuesIt;
+
+            if (instanceId == 0L) { // end of level
+
+                break;
+            }
+
+            instance = heap.getInstanceByID(instanceId);
+
+            if (instance instanceof ObjectArrayInstance) {
+                Iterator instanceIt = ((ObjectArrayInstance) instance).getValues().iterator();
+
+                while (instanceIt.hasNext()) {
+                    Instance refInstance = (Instance) instanceIt.next();
+                    writeConnection(instanceId, refInstance);
+                }
+
+                continue;
+            } else if (instance instanceof PrimitiveArrayInstance) {
+                continue;
+            } else if (instance instanceof ClassDumpInstance) {
+                ClassDump javaClass = ((ClassDumpInstance) instance).classDump;
+
+                fieldValues = javaClass.getStaticFieldValues();
+            } else if (instance instanceof InstanceDump) {
+                fieldValues = instance.getFieldValues();
+            } else {
+                if (instance == null) {
+                    System.err.println("HeapWalker Warning - null instance for " + instanceId); // NOI18N
+
+                    continue;
+                }
+
+                throw new IllegalArgumentException("Illegal type " + instance.getClass()); // NOI18N
+            }
+
+            valuesIt = fieldValues.iterator();
+
+            while (valuesIt.hasNext()) {
+                FieldValue val = (FieldValue) valuesIt.next();
+
+                if (val instanceof ObjectFieldValue) {
+                    if (!isWeakOrSoftReference(val, instance)) { // skip Soft and Weak References
+
+                        Instance refInstance = ((ObjectFieldValue) val).getInstance();
+                        writeConnection(instanceId, refInstance);
+                    }
+                }
+            }
+        }
+    }
+
+    private Field computeReferentFiled() {
+        JavaClass reference = heap.getJavaClassByName("java.lang.ref.Reference"); // NOI18N
+        Iterator fieldRef = reference.getFields().iterator();
+
+        while (fieldRef.hasNext()) {
+            Field f = (Field) fieldRef.next();
+
+            if (f.getName().equals("referent")) { // NOI18N
+
+                return f;
+            }
+        }
+
+        throw new IllegalArgumentException("reference field not found in " + reference.getName()); // NOI18N
+    }
+
+    private void createBuffers() {
+        readBuffer = new LongBuffer(BUFFER_SIZE);
+        writeBuffer = new LongBuffer(BUFFER_SIZE);
+    }
+
+    private void deleteBuffers() {
+        readBuffer.delete();
+        writeBuffer.delete();
+    }
+
+    private void fillZeroLevel() throws IOException {
+        Iterator gcIt = heap.getGCRoots().iterator();
+
+        while (gcIt.hasNext()) {
+            HprofGCRoot root = (HprofGCRoot) gcIt.next();
+
+            writeLong(root.getInstanceId());
+        }
+    }
+
+    private boolean hasMoreLevels() {
+        return writeBuffer.hasData();
+    }
+
+    private long readLong() throws IOException {
+        return readBuffer.readLong();
+    }
+
+    private void switchBuffers() {
+        LongBuffer b = readBuffer;
+        readBuffer = writeBuffer;
+        writeBuffer = b;
+        readBuffer.startReading();
+        writeBuffer.reset();
+    }
+
+    private void writeConnection(long instanceId, Instance refInstance)
+                          throws IOException {
+        if (refInstance != null) {
+            long refInstanceId = refInstance.getInstanceId();
+            LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
+
+            if (entry.getNearestGCRootPointer() == 0L) {
+                writeLong(refInstanceId);
+                entry.setNearestGCRootPointer(instanceId);
+            }
+        }
+    }
+
+    private void writeLong(long instanceId) throws IOException {
+        writeBuffer.writeLong(instanceId);
+    }
+}

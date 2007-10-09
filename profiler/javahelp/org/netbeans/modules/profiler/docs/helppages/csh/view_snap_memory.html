@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>Memory Snapshot</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+        <h2>Memory Snapshot</h2>
+                <p><small><a href="#seealso">See Also</a></small></p>
+                <p>A memory snapshot captures data on object allocation and liveness.
+                You can take a memory snapshot when you are analyzing memory usage.
+                The snapshot is displayed in the main editor window.</p>
+                <p>The snapshot contains the following tabs:</p>
+                <ul>
+                    <li><b>Memory Results.</b> This tab displays a list of classes
+                    (including array classes), with the total size and number of instances
+                    allocated at the time you took the snapshot. You display the stack traces for a specific class by
+                    right-clicking the name of the class and selecting Show Allocation Stack Traces.
+                    The stack traces are displayed in the Allocation Stack Traces tab.</li>
+                    <li><b>Info.</b> This tab displays data on when the snapshot was taken, where it is saved, and the
+                    configuration of the profiling session.</li>
+                    <li><b>Allocation Stack Traces.</b> This tab displays a reverse call graph with all call paths leading to object allocations for the given
+                    class.
+                    This tab is only available if Record Stack Trace for Allocations was
+                    selected as a profiling option.</li>
+                </ul>
+                <p>You can load the source <tt>.java</tt> file of a class by right-clicking any class in the Memory Results tab or the Allocation Stack Traces
+                tab and selecting Go To Source.</p>
+
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../snap_taking.html">Taking a Snapshot</a></dd>
+            <dd><a href="../snapshots.html">Exploring Snapshots</a></dd>
+            <dd><a href="../profile_analyze_short.html">Analyzing CPU Performance</a></dd>
+            <dd><a href="../profile_results.html">About Profiling Results</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../../credits.html">Legal
+Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+    </table>
+    </body>
+</html>

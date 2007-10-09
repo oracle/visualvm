@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 2007 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+    <head>
+        <title>About Profiling Results</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>About Profiling Results</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        
+                <p>The profiling results obtained from a profiling session depend upon the profiling task you select.
+                When a profiling session is in progress, you can see the live results of the profiling task.
+                At any point during the profiling session you can capture and save the results.</p>
+                
+                
+                <h3>Live Results</h3>
+                <p>The live results windows show the results of the profiling task over time while the profiling session is in progress.
+                The IDE displays live profiling results in the following windows.</p>
+                    <ul>
+                    <li><b>VM Telemetry.</b> The VM Telemetry window displays high-level data on thread activity and 
+                    memory heap and garbage collection in the VM.</li>
+                    <li><b>Threads.</b> The Threads window displays detailed information about application thread activity.</li>
+                    <li><b>Telemetry Overview.</b> The Telemetry Overview window displays smaller versions of the graphs that are presented in the
+                    VM Telemetry window.</li>
+                    <li><b>Live Profiling Results.</b> 
+                    The Live Profiling Results window displays the live data from the running profiling session.
+                    The live results displayed depend on the selected profiling task.
+                    <b>Note: </b>The Live Profiling Results view is not available when you are monitoring an application.</li>
+                </ul>
+                <p>You can open any of these windows by choosing Window &gt; Profiling &gt; <i>window name</i> from the main menu.</p>
+                
+                
+                <h3>Captured Results</h3>
+                <p>The captured results windows show profiling data at a certain point in time during the profiling session.
+                You can capture results at any time during a profiling session and save the results to your project or local system. 
+                You do not need to be running a profiling session to view saved captured results.</p>
+                <p>The IDE displays captured profiling results in the following windows.</p>
+
+                <ul>
+                    <li><b>Snapshot.</b> This view displays the captured results of a profiling session. 
+                    The data contained in the snapshot depends upon the profiling task that is running when the snapshot is taken.</li>
+                    <li><b>Heap.</b> This view displays a heap dump. In this view you can examine the contents of the heap.</li>
+                    <li><b>Save view as image.</b> You can save a <tt>.png</tt> image of the current view displayed in a results window by clicking 
+                    Save current view to image button (&nbsp;<img src="img/saveView.png">&nbsp;)in the toolbar</li>
+                </ul>
+
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="results_liveresults.html">Working with Live Profiling Results</a></dd>
+            <dd><a href="results_telemetry.html">Viewing VM Telemetry Results</a></dd>
+            <dd><a href="profile_threads.html">Viewing Thread Activity</a></dd>
+            <dd><a href="snapshots.html">Exploring Snapshots</a></dd>
+            <dd><a href="heapwalker.html">Browsing a Heap Dump</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>
