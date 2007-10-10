@@ -97,6 +97,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -142,7 +143,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         }
 
         public String getViewName() {
-            return "Empty live results";
+            return "Empty live results"; // NOI18N
         }
 
         public boolean fitsVisibleArea() {
@@ -209,35 +210,11 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
-            // since this is being performed over live results, we need to perform those steps:
-            // 1. apply this on lastProfilingSettings, so that reRun would pick the new root
-            // 2. apply this on the running application
-            // 3. find the corresponding original settings configuration (in project or global attach) by name
-            //    apply it there, and invoke its saving
-
-            // Step 1. Obtain the current profiling settings
-            // Commented out for now as this breaks consistency as long as Step 2. is commented out
-            // final ProfilingSettings lastProfilingSettings = Profiler.getDefault().getLastProfilingSettings();
-            // lastProfilingSettings.addRootMethod(className, methodName, methodSig);
-
-            // Step 2. Perform the instrumentation with new roots for profiling in progress
-            // Commented out for now, it breaks responsiveness and throws NPE, see Issue 68479 (http://www.netbeans.org/issues/show_bug.cgi?id=68479)
-            //      try {
-            //        Profiler.getDefault().instrumentSelectedRoots(
-            //            new ClientUtils.SourceCodeSelection[]{new ClientUtils.SourceCodeSelection(className, methodName, methodSig)}
-            //        );
-            //      } catch (Exception e) {
-            //        ErrorManager.getDefault()
-            //            .annotate(e, MessageFormat.format(ERROR_INSTRUMENTING_ROOT_METHOD_MSG, new Object[]{e.getMessage()}));
-            //        ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
-            //      }
-
-            // Step 3. Find the settings to store the new root methods into by the settings name
             Project project = ((NetBeansProfiler) Profiler.getDefault()).getProfiledProject();
 
             ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
                                                                           .getProfilingSettings();
-            List<ProfilingSettings> cpuSettings = new ArrayList();
+            List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
 
             for (ProfilingSettings settings : projectSettings) {
                 if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
@@ -259,7 +236,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
             ProfilingSettings settingsToModify = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
                                                                          cpuSettings.toArray(new ProfilingSettings[cpuSettings
-                                                                                                                                                                                                                                                                      .size()]),
+                                                                                                                                                                                                                                              .size()]),
                                                                          lastProfilingSettings);
 
             if (settingsToModify == null) {
@@ -320,12 +297,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
             setLayout(new BorderLayout());
 
-            //            final JToolBar toolBar = new JToolBar() {
-            //                public Component add(Component comp) {
-            //                    if (comp instanceof JButton) UIUtils.fixButtonUI((JButton)comp);
-            //                    return super.add(comp);
-            //                }
-            //            };
             final boolean scaleToFit = panel.getChart().isFitToWindow();
 
             zoomInButton = new JButton(zoomInIcon);
@@ -350,12 +321,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
                 zoomOutButton.setEnabled(false);
             }
 
-            //            toolBar.setFloatable(false);
-            //            toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-            //
-            //            toolBar.add(zoomInButton);
-            //            toolBar.add(zoomOutButton);
-            //            toolBar.add(scaleToFitButton);
             final JPanel graphPanel = new JPanel();
             graphPanel.setLayout(new BorderLayout());
             graphPanel.setBorder(new CompoundBorder(new EmptyBorder(new Insets(0, 0, 0, 0)), new BevelBorder(BevelBorder.LOWERED)));
@@ -541,7 +506,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     private static LiveResultsWindow defaultLiveInstance;
     private static final TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
     private static final Image liveWindowIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/liveResultsWindow.png"); // NOI18N
-    private static boolean paused = false;
+    private static final AtomicBoolean resultsDumpForced = new AtomicBoolean(false);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -565,16 +530,12 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     private MemoryResUserActionsHandler memoryActionsHandler;
     private boolean autoRefresh = true;
     private boolean drillDownGroupOpened;
-    private boolean emptyFlag = true; // indicates there are no results to be displayed
     private volatile boolean profilerRunning = false;
     private volatile boolean resultsAvailable = false;
-    private int currentMode = ProfilerEngineSettings.INSTR_NONE;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveResultsWindow() {
-        ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(NetBeansProfiler.getDefaultNB().getProfiledProject());
-
         setName(NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName")); // NOI18N
         setIcon(liveWindowIcon);
         getAccessibleContext().setAccessibleDescription(LIVE_RESULTS_ACCESS_DESCR);
@@ -604,7 +565,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         noResultsLabel.setEnabled(false);
         noResultsPanel.add(noResultsLabel, BorderLayout.NORTH);
 
-        currentMode = ProfilerEngineSettings.INSTR_NONE;
         currentDisplay = null;
         currentDisplayComponent = noResultsPanel;
         add(noResultsPanel, BorderLayout.CENTER);
@@ -678,7 +638,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     }
 
     public static void setPaused(boolean value) {
-        paused = value;
+        //        paused = value;
     }
 
     public static void closeIfOpened() {
@@ -946,6 +906,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
     // -- Private implementation -------------------------------------------------------------------------------------------
     private static boolean callForceObtainedResultsDump(final ProfilerClient client) {
+        resultsDumpForced.set(true);
+
         try {
             if (client.getCurrentInstrType() != ProfilerEngineSettings.INSTR_CODE_REGION) {
                 client.forceObtainedResultsDump(true);
@@ -961,168 +923,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         return runner.getProfilerClient().getCurrentInstrType() != ProfilerEngineSettings.INSTR_NONE;
     }
 
-    //  private void updateResultsDisplay(boolean async) {
-    //    if (paused) {
-    //      // we cannot update the results now
-    //
-    //      // -----------------------------------------------------------------------
-    //      // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
-    //      // TODO: move this code to a separate class performing the update if necessary
-    //      if (NetBeansProfiler.getDefaultNB().processesProfilingPoints()) callForceObtainedResultsDump(runner.getProfilerClient());
-    //      // -----------------------------------------------------------------------
-    //
-    //      return;
-    //    }
-    //
-    //    final ProfilerClient client = runner.getProfilerClient();
-    //    final int currentInstrType = client.getCurrentInstrType();
-    //
-    //    Runnable updateResultsDisplayRunnable = new Runnable() {
-    //      public void run() {
-    //
-    //        final boolean obtained = ((currentInstrType != ProfilerEngineSettings.INSTR_NONE) &&
-    //          callForceObtainedResultsDump(client) &&
-    //          checkIfResultsExist(client, currentInstrType));
-    //
-    //        IDEUtils.runInEventDispatchThread(
-    //          new Runnable() {
-    //          public void run() {
-    //            if (!resultsAvailable) return;
-    //
-    //            Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-    //
-    //            if (obtained || !client.getStatus().targetAppRunning) { // special handling for a shutdown refresh; in case of shutdown refresh data reagardless of results being obtained or not
-    //              // 1. check if the project has changed
-    //              boolean projectChange = false;
-    //              if (client.getStatus().targetAppRunning) { // do this check only for a running application
-    //                if (projectRef == null) {
-    //                  projectChange = true;
-    //                  projectRef = new WeakReference<Project>(NetBeansProfiler.getDefaultNB().getProfiledProject());
-    //                } else if (projectRef.get() == null) {
-    //                  if (NetBeansProfiler.getDefaultNB().getProfiledProject() != null) {
-    //                    projectChange = true;
-    //                    projectRef = new WeakReference<Project>(NetBeansProfiler.getDefaultNB().getProfiledProject());
-    //                  }
-    //                } else if (NetBeansProfiler.getDefaultNB().getProfiledProject() == null || !projectRef.get().equals(NetBeansProfiler.getDefaultNB().getProfiledProject())) {
-    //                  projectChange = true;
-    //                  projectRef = new WeakReference<Project>(NetBeansProfiler.getDefaultNB().getProfiledProject());
-    //                }
-    //              }
-    //
-    //              // 1. check if the instrumentation has changed
-    //              if ((projectChange || currentInstrType != currentMode || currentDisplay == null) && client.getStatus().targetAppRunning) {
-    //
-    //                dd = null;
-    //
-    //                currentMode = currentInstrType;
-    //                if (currentDisplayComponent instanceof LiveResultsPanel) {
-    //                  ((LiveResultsPanel)currentDisplayComponent).handleRemove();
-    //                }
-    //                remove(currentDisplayComponent);
-    //                switch (currentMode) {
-    //                  case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS:
-    //                    LiveAllocResultsPanel allocPanel = new LiveAllocResultsPanel(runner, memoryActionsHandler, History.getInstance());
-    //                    currentDisplayComponent = memoryTabPanel;
-    //                    currentDisplayComponent.setBorder(new EmptyBorder(5, 0, 0, 0));
-    //                    if (tabs.getComponentCount() > 0) {
-    //                      tabs.removeAll();
-    //                    }
-    //                    tabs.addTab(LIVE_RESULTS_TAB_NAME, allocPanel);
-    //                    tabs.addTab(HISTORY_TAB_NAME, graphTab);
-    //                    tabs.setEnabledAt(1, false);
-    //                    currentDisplay = allocPanel;
-    //                    break;
-    //                  case ProfilerEngineSettings.INSTR_OBJECT_LIVENESS:
-    //                    LiveLivenessResultsPanel livenessPanel = new LiveLivenessResultsPanel(
-    //                      runner, memoryActionsHandler, History.getInstance());
-    //                    currentDisplayComponent = memoryTabPanel;
-    //                    currentDisplayComponent.setBorder(new EmptyBorder(5, 0, 0, 0));
-    //                    if (tabs.getComponentCount() > 0) {
-    //                      tabs.removeAll();
-    //                    }
-    //                    tabs.addTab(LIVE_RESULTS_TAB_NAME, livenessPanel);
-    //                    tabs.addTab(HISTORY_TAB_NAME, graphTab);
-    //                    tabs.setEnabledAt(1, false);
-    //                    currentDisplay = livenessPanel;
-    //                    break;
-    //                  case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
-    //                  case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED:
-    ////                    if (NetBeansProfiler.getDefaultNB().getLastProfilingSettings().getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
-    //                    Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
-    //                    ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
-    //
-    //                    List additionalStats = new ArrayList();
-    //
-    //                    dd = new DrillDown(client, ptp.getMarkHierarchyRoot());
-    //
-    //                    client.getMarkFilter().addEvaluator(dd);
-    //                    dd.refresh();
-    ////                    additionalStats.add(new ForwardCategoryDistributionPanel());
-    //                    StatisticalModuleContainer container = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-    //                    additionalStats.addAll(container.getAllModules());
-    //                    final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler, additionalStats);
-    //                    dd.addListener(new DrillDownListener() {
-    //                      public void dataChanged() {
-    //                      }
-    //                      public void drillDownPathChanged(List list) {
-    //                        cpuPanel.updateLiveResults();
-    //                      }
-    //                    });
-    //
-    //                    DrillDownWindow.getDefault().setDrillDown(dd, additionalStats);
-    //
-    //                    currentDisplayComponent = cpuPanel;
-    //
-    //                    currentDisplayComponent.setBorder(new EmptyBorder(5, 5, 5, 5));
-    //                    currentDisplay = (LiveFlatProfilePanel)currentDisplayComponent;
-    //                    break;
-    //                  case ProfilerEngineSettings.INSTR_CODE_REGION:
-    //                    CodeRegionLivePanel regionPanel = new CodeRegionLivePanel(runner.getProfilerClient());
-    //                    currentDisplayComponent = regionPanel;
-    //                    currentDisplayComponent.setBorder(new EmptyBorder(5, 5, 5, 5));
-    //                    currentDisplay = regionPanel;
-    //                    break;
-    //                  case ProfilerEngineSettings.INSTR_NONE:
-    //                    throw new IllegalStateException(); // this cannot happen
-    //                }
-    //                add(currentDisplayComponent, BorderLayout.CENTER);
-    //                revalidate();
-    //                repaint();
-    //                updateGraphButtons();
-    //                // Commented-out to not collide with the workaround below
-    ////                SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus behavior
-    ////                  public void run() { currentDisplayComponent.requestFocus(); }
-    ////                });
-    //              }
-    //
-    ////              assert (currentDisplay != null);
-    //              // 2. update the panel with results
-    //              if (isShowing() && currentDisplay != null) currentDisplay.updateLiveResults();
-    //
-    //              // -----
-    //              // Ugly hack to workaround focus-related http://www.netbeans.org/issues/show_bug.cgi?id=98985
-    //              if (focusOwner != null) focusOwner.requestFocusInWindow();
-    //              // -----
-    //
-    //            } else { // no results are available
-    //              resetResultsDisplay();
-    //            }
-    //
-    //            updateDrillDown();
-    //
-    //          }
-    //        }
-    //        );
-    //      }
-    //    };
-    //
-    //    if (async) {
-    //      IDEUtils.runInProfilerRequestProcessor(updateResultsDisplayRunnable);
-    //    } else {
-    //      updateResultsDisplayRunnable.run();
-    //    }
-    //
-    //  }
     private static boolean checkIfResultsExist(final ProfilerClient client, final int currentInstrType) {
         switch (currentInstrType) {
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
@@ -1207,23 +1007,23 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         /*    toolBar.addSeparator();
         
-               valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
-                 public Dimension getMaximumSize() {
-                   return new Dimension(100, super.getMaximumSize().height);
-                 }
-               };
-               toolBar.add(valueSlider);
-               valueFilterComponent = valueSlider;
+                                     valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
+                                       public Dimension getMaximumSize() {
+                                         return new Dimension(100, super.getMaximumSize().height);
+                                       }
+                                     };
+                                     toolBar.add(valueSlider);
+                                     valueFilterComponent = valueSlider;
         
-               valueSlider.addChangeListener(new ChangeListener() {
+                                     valueSlider.addChangeListener(new ChangeListener() {
         
-                 public void stateChanged(ChangeEvent e) {
-                   // make cubic curve instead of linear
-                   double val = (double) valueSlider.getValue() / 10f;
-                   val = val * val;
-                   if (currentDisplay != null) currentDisplay.updateValueFilter(val);
-                 }
-               }); */
+                                       public void stateChanged(ChangeEvent e) {
+                                         // make cubic curve instead of linear
+                                         double val = (double) valueSlider.getValue() / 10f;
+                                         val = val * val;
+                                         if (currentDisplay != null) currentDisplay.updateValueFilter(val);
+                                       }
+                                     }); */
         return toolBar;
     }
 
@@ -1322,8 +1122,9 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
                 break;
             }
-            case ProfilerEngineSettings.INSTR_NONE:throw new IllegalStateException(); // this cannot happen
-                                                                                      //        break;
+            case ProfilerEngineSettings.INSTR_NONE:
+                throw new IllegalStateException(); // this cannot happen
+                                                   //        break;
         }
 
         return aPanel;
@@ -1429,9 +1230,11 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
     private void updateResultsDisplay() {
         if (!isOpened()) {
-            return; // do nothing if i'm closed
+            return; // do nothing if i'm closed 
         }
-
+        if (!resultsDumpForced.getAndSet(false) && !isAutoRefresh()) {
+            return; // process only forced results if autorefresh is off
+        }
         if (!resultsAvailable) {
             currentDisplay = noResultsPanel;
             currentDisplayComponent = null;
