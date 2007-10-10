@@ -115,9 +115,12 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
 
     private void updateAction() {
         if (lastProfilingState != Profiler.getDefault().getProfilingState()) {
-            firePropertyChange(PROP_ENABLED, null, null);
+            boolean shouldBeEnabled = isEnabled();
+            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
         } else if (lastInstrumentation != Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType()) { // for actions that require instrumentation we need to check if it has not changed
-            firePropertyChange(PROP_ENABLED, null, null);
+
+            boolean shouldBeEnabled = isEnabled();
+            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
         }
     }
 }

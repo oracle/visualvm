@@ -143,7 +143,8 @@ public final class RerunAction extends CallableSystemAction implements Profiling
 
     public void updateAction() {
         if (lastState != Profiler.getDefault().rerunAvaliable()) {
-            firePropertyChange(PROP_ENABLED, null, null);
+            boolean shouldBeEnabled = isEnabled();
+            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
         }
     }
 
