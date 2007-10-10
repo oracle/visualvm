@@ -248,7 +248,9 @@ public class ClassesListControllerUI extends JTitledPanel {
                                                                         "ClassesListControllerUI_SizeColumnDescr"); // NOI18N
     private static final String FITERING_PROGRESS_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                              "ClassesListControllerUI_FilteringProgressText"); // NOI18N
-                                                                                                                               // -----
+    private static final String RESULT_NOT_AVAILABLE_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
+                                                                                  "ClassesListControllerUI_ResultNotAvailableString"); // NOI18N
+                                                                                                                                       // -----
     private static ImageIcon ICON_CLASSES = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png")); // NOI18N
     private static String filterValue = ""; // NOI18N
     private static int filterType = CommonConstants.FILTER_CONTAINS;
@@ -777,10 +779,12 @@ public class ClassesListControllerUI extends JTitledPanel {
 
             displayCache[i][0] = jClass.getName();
             displayCache[i][1] = new Float((float) instancesCount / (float) totalLiveInstances * 100);
-            displayCache[i][2] = Integer.toString(instancesCount) + " ("
+            displayCache[i][2] = Integer.toString(instancesCount) + " (" // NOI18N
                                  + percentFormat.format((float) instancesCount / (float) totalLiveInstances) + ")"; // NOI18N
-            displayCache[i][3] = Integer.toString(allInstancesSize) + " ("
-                                 + percentFormat.format((float) allInstancesSize / (float) totalLiveBytes) + ")"; // NOI18N
+            displayCache[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
+                                                    : (Integer.toString(allInstancesSize) + " (" // NOI18N
+                                                    + percentFormat.format((float) allInstancesSize / (float) totalLiveBytes)
+                                                    + ")"); // NOI18N
             displayCache[i][4] = jClass;
         }
 
