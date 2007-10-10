@@ -36,14 +36,12 @@
 
         <h3>Using the Attach Wizard</h3>        
         <p>Before you can attach to an application, the startup options for the target application or server need to be configured.
-        The Attach wizard can provide you with instructions for configuring the application or server according to the attach mode.
-        You only need to configure the attach mode once. 
-        The attachment settings are associated with the project. 
-        You can go through the Attach Wizard at any time to change any of the attachment settings.</p> 
-
-        <p>You use the Attach Wizard to specify the attachment settings for a project.
-        The attachment settings are project specific, which means that each project has its own attach settings.
-            In the Attach Wizard you specify the type of application and the location.
+        You use the Attach Wizard to specify the attachment settings for a project.
+        You only need to configure the attachment settings once. 
+        The attachment settings are project specific, which means that each project has its own settings.
+        You can go through the Attach Wizard at any time if you want to modify any of the attachment settings.</p> 
+        
+        <p>In the Attach Wizard you specify the type of application and the location.
         Based on the details that you provide, the Attach Wizard provides you with a set of instructions on how to 
         configure the application or server so that you can attach the profiler.</p>
 
@@ -59,7 +57,7 @@
           </tr>
           <tr> 
             <td valign="top"><b>Local Direct</b></td>
-            <td valign="top">Use this mode if you want to obtain profiling data on the startup of a local application.
+            <td valign="top">Use this mode if you want to obtain profiling data on the startup of a <a href="profile_running.html">local application</a>.
             
             <p>When you use this mode, the target JVM and application wait until you attach the profiler before starting.
             After you detach from the application, you need to restart the application to start another profiling session.</p></td>
@@ -68,7 +66,7 @@
           <tr> 
             <td valign="top"><b>Local Dynamic</b><br>(requires JDK 1.6)</td>
             <td valign="top">Use this mode if you want to obtain profiling data 
-            on a <a href="profile_running.html">local running application</a>.
+            on a <a href="profile_running.html">local application</a>.
             To use this mode, the application needs to be running on JDK 1.6.
             
             <p>When you use this mode, you can attach to and detach from the

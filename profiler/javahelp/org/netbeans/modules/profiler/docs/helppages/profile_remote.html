@@ -13,12 +13,15 @@
         <p><small><a href="#seealso">See Also</a></small></p> 
                 <p>You can profile an application that is running on a remote system such as a web server 
                 by attaching the profiler to the application.
-                To profile an application on a remote system, the remote system needs to be 
-                started on the Profiler Remote Pack and configured to support remote profiling. </p>
+When you use this mode, the remote application starts after the profiler is attached. 
+                This mode enables you to obtain profiling data on the startup of the target JVM.</p>
+                <p>To profile an application on a remote system,  </p>
                 <ul class="note">
                     <li>To attach profiler to an application on a remote system,
                     you need to download and install the Profiler Remote Pack on the remote system. 
-                    <p>You can download the Profiler Remote Pack from the Profiler web site:<p>
+                    The remote system needs to be 
+                    started on the Profiler Remote Pack and configured to support remote profiling.
+                    <p>You can download the Profiler Remote Pack from the Profiler web site:</p>
                     <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
                     <param name="content" value="http://profiler.netbeans.org">
                     <param name="text" value="<html><u>http://profiler.netbeans.org</u></html>">
@@ -72,7 +75,8 @@
             	
         <dl>
             <dt><a name="seealso">See Also</a></dt>
-            <dd><a href="profile_running.html">Profiling a Running Application</a></dd>
+            <dd><a href="profile_attach.html">Profiling Using Attach Mode</a></dd>
+            <dd><a href="profile_running.html">Attaching to a Local Application</a></dd>
             <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
         </dl>
         <hr>
