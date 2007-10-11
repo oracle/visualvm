@@ -1446,16 +1446,9 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 InstrumentMethodGroupThread instrumentMethodGroupThread = new InstrumentMethodGroupThread((InstrumentMethodGroupCommand) cmd);
                 instrumentMethodGroupThread.start();
 
-                for (int i = 0; instrumentMethodGroupThread.isAlive(); i++) {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-
-                    if ((i % 10) == 0) {
-                        sendSimpleCmdToClient(Command.STILL_ALIVE);
-                    }
+                while(instrumentMethodGroupThread.isAlive()) {
+                    delay(2000);
+                    sendSimpleCmdToClient(Command.STILL_ALIVE);
                 }
 
                 if (instrumentMethodGroupThread.exceptionString != null) {

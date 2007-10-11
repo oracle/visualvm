@@ -1324,27 +1324,26 @@ public class ProfilerClient implements CommonConstants {
     }
 
     private synchronized Response getLastResponse() throws ClientUtils.TargetAppOrVMTerminated {
-        checkForTargetVMAlive();
-
         Response res;
-
+        
+        checkForTargetVMAlive();
         synchronized (responseLock) {
             while (lastResponse == null) {
+                long start = System.currentTimeMillis();
+                
                 try {
                     responseLock.wait(60000);
                 } catch (InterruptedException ex) {
                     MiscUtils.internalError("InterruptedException in ProfilerClient.getLastResponse()"); // NOI18N
                 }
-
+                
                 // If we have been waiting for above number of milliseconds and got no response, assume that we timed out
                 // and target JVM is dead
                 if (!targetVMAlive) {
                     status.targetAppRunning = false;
                     targetVMAlive = false;
                     throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
-                } else if (lastResponse == null) { // && !ignoreTimeOut) {
-                                                   // timed out
-
+                } else if (lastResponse == null && wireIO.wasAlive()<start) { // timed out
                     if (!appStatusHandler.confirmWaitForConnectionReply()) {
                         status.targetAppRunning = false;
                         targetVMAlive = false;
@@ -1352,7 +1351,6 @@ public class ProfilerClient implements CommonConstants {
                     }
                 }
             }
-
             res = lastResponse;
             lastResponse = null;
         }

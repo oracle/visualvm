@@ -70,6 +70,7 @@ public class WireIO {
 
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private long wasAlive;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -87,6 +88,7 @@ public class WireIO {
            if (DEBUG) System.out.println("WireIO.DEBUG: received end of stream code");
            return null; // end of stream, no more data
            }*/
+        wasAlive = System.currentTimeMillis();
         switch (code) {
             case IS_SIMPLE_COMMAND:
 
@@ -350,5 +352,9 @@ public class WireIO {
         }
 
         out.flush();
+    }
+
+    public long wasAlive() {
+        return wasAlive;
     }
 }
