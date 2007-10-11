@@ -68,7 +68,7 @@ made subject to such option by the copyright holder.
         <!-- Client side -->
         <jarwithmoduleattributes jarfile="${cluster}/${module.jar}" compress="${build.package.compress}" index="${build.package.index}" manifest="${manifest.mf}">
             <fileset dir="${build.classes.dir}">
-              <exclude name="com/sun/tools/profiler/server/**"/>
+              <exclude name="org/netbeans/lib/profiler/server/**"/>
             </fileset>
         </jarwithmoduleattributes>
         
