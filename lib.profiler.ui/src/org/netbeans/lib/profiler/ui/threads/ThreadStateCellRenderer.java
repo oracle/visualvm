@@ -82,7 +82,7 @@ public class ThreadStateCellRenderer extends JPanel implements TableCellRenderer
      */
     public void setBackground(Color c) {
         super.setBackground(c);
-        unselectedBackground = c;
+        unselectedBackground = UIUtils.getProfilerResultsBackground();
     }
 
     /**

@@ -212,6 +212,21 @@ public final class UIUtils {
         return unfocusedSelFg;
     }
 
+    
+    private static Color profilerResultsBackground;
+    
+    public static Color getProfilerResultsBackground() {
+        if (profilerResultsBackground == null) {
+            if (isGTKLookAndFeel()) {
+                profilerResultsBackground = UIManager.getColor("TextPane.background"); // NOI18N
+            } else {
+                profilerResultsBackground = UIManager.getColor("Table.background"); // NOI18N
+            }
+        }
+        
+        return profilerResultsBackground;
+    }
+
     /** Determines if current L&F is Windows Classic LookAndFeel */
     public static boolean isWindowsClassicLookAndFeel() {
         if (!isWindowsLookAndFeel()) {

@@ -275,7 +275,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             setOpaque(false);
             treeCellRenderer = new EnhancedTreeCellRenderer();
             setCellRenderer(treeCellRenderer);
-            unselectedBackground = UIManager.getColor("Table.background"); // NOI18N
+            unselectedBackground = UIUtils.getProfilerResultsBackground();
             darkerUnselectedBackground = UIUtils.getDarker(unselectedBackground);
         }
 
@@ -374,11 +374,11 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             if (selected) {
                 return focused ? JTreeTable.this.getSelectionBackground() : UIUtils.getUnfocusedSelectionBackground();
             } else {
+                Color backgroundColor = UIUtils.getProfilerResultsBackground();
                 if ((row & 0x1) == 0) { //even row
-
-                    return UIUtils.getDarker(JTreeTable.this.getBackground());
+                    return UIUtils.getDarker(backgroundColor);
                 } else {
-                    return JTreeTable.this.getBackground();
+                    return backgroundColor;
                 }
             }
         }

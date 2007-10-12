@@ -40,9 +40,11 @@
 
 package org.netbeans.lib.profiler.ui.components.tree;
 
+import java.awt.Color;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import java.awt.Component;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -66,11 +68,12 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
         renderer.setLeafIcon(getLeafIcon(value));
         renderer.setClosedIcon(getClosedIcon(value));
         renderer.setOpenIcon(getOpenIcon(value));
+        Color backgroundColor = UIUtils.getProfilerResultsBackground();
 
         if ((row & 0x1) == 0) { //even row
-            renderer.setBackgroundNonSelectionColor(org.netbeans.lib.profiler.ui.UIUtils.getDarker(tree.getBackground()));
+            renderer.setBackgroundNonSelectionColor(UIUtils.getDarker(backgroundColor));
         } else {
-            renderer.setBackgroundNonSelectionColor(tree.getBackground());
+            renderer.setBackgroundNonSelectionColor(backgroundColor);
         }
 
         return renderer.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);

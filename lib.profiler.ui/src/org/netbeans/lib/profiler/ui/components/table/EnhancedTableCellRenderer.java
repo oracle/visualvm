@@ -74,7 +74,7 @@ public abstract class EnhancedTableCellRenderer extends JPanel implements TableC
         setOpaque(true);
         supportsFocusBorder = false;
         horizontalAlignment = SwingConstants.LEADING;
-        unselectedBackground = UIManager.getColor("Table.background"); // NOI18N
+        unselectedBackground = UIUtils.getProfilerResultsBackground();
         darkerUnselectedBackground = UIUtils.getDarker(unselectedBackground);
     }
 
