@@ -107,7 +107,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         JLabel noContentIcon = new JLabel(new javax.swing.ImageIcon(getClass()
-                                                                        .getResource("/org/netbeans/modules/profiler/resources/takeSnapshotMem.png"))); // NOI18N
+                                                                        .getResource("/org/netbeans/lib/profiler/ui/resources/takeSnapshotMem.png"))); // NOI18N
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 5));
         noContentIcon.setVerticalAlignment(SwingConstants.TOP);
         noContentIcon.setEnabled(false);
