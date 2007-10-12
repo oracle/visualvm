@@ -506,13 +506,28 @@ public final class UIUtils {
         }
     }
 
-    private static BufferedImage createComponentScreenshot(Component component) {
-        if (component instanceof JTable
-                || (component instanceof JViewport && ((JViewport) component).getView() instanceof JTable)) {
-            return createTableScreenshot(component);
-        } else {
-            return createGeneralComponentScreenshot(component);
+    private static BufferedImage createComponentScreenshot(final Component component) {
+        final BufferedImage[] result = new BufferedImage[1];
+
+        final Runnable screenshotPerformer = new Runnable() {
+            public void run() {
+                if (component instanceof JTable
+                        || (component instanceof JViewport && ((JViewport) component).getView() instanceof JTable)) {
+                    result[0] = createTableScreenshot(component);
+                } else {
+                    result[0] = createGeneralComponentScreenshot(component);
+                }
+            }
+        };
+        
+        try {
+            if (SwingUtilities.isEventDispatchThread()) screenshotPerformer.run();
+            else SwingUtilities.invokeAndWait(screenshotPerformer);
+        } catch (Exception e) {
+            return null;
         }
+        
+        return result[0];
     }
 
     private static BufferedImage createGeneralComponentScreenshot(Component component) {
