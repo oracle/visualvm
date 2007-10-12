@@ -114,4 +114,8 @@ public class Utils {
     public static ImageIcon VARIABLE_PROTECTED_STATIC_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStProtected.png")); // NOI18N
     public static ImageIcon VARIABLE_PRIVATE_STATIC_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStPrivate.png")); // NOI18N
     public static ImageIcon VARIABLE_PACKAGE_STATIC_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStPackage.png")); // NOI18N
+    
+    
+    // find
+    public static ImageIcon FIND_ACTION_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/ide/find.gif")); // NOI18N
 }

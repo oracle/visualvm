@@ -67,6 +67,7 @@ import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.ui.Utils;
 
 
 /**
@@ -119,6 +120,8 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private static final String PANEL_TITLE = NbBundle.getMessage(MemorySnapshotPanel.class, "MemorySnapshotPanel_PanelTitle"); // NOI18N
     private static final String STRING_NOT_FOUND_MSG = NbBundle.getMessage(MemorySnapshotPanel.class,
                                                                            "MemorySnapshotPanel_StringNotFoundMsg"); // NOI18N
+    private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemorySnapshotPanel.class,
+                                                                           "MemorySnapshotPanel_FindActionTooltip"); // NOI18N
                                                                                                                      // -----
     private static final ImageIcon MEMORY_RESULTS_TAB_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/memoryResultsTab.png") // NOI18N
     );
@@ -129,7 +132,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Component findActionPresenter;
+    private JButton findActionPresenter;
     private JButton findNextPresenter;
     private JButton findPreviousPresenter;
     private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
@@ -202,11 +205,17 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         toolBar.add(new SaveViewAction(this));
 
         toolBar.addSeparator();
-
-        findActionPresenter = ((FindAction) SystemAction.get(FindAction.class)).getToolbarPresenter();
-        toolBar.add(findActionPresenter);
+        
+        findActionPresenter = toolBar.add(SystemAction.get(FindAction.class));
         findPreviousPresenter = toolBar.add(new FindPreviousAction(this));
         findNextPresenter = toolBar.add(new FindNextAction(this));
+        
+        if (findActionPresenter instanceof AbstractButton) {
+            AbstractButton ab = (AbstractButton)findActionPresenter;
+            ab.setIcon(Utils.FIND_ACTION_ICON);
+            ab.setText(""); // NOI18N
+            ab.setToolTipText(FIND_ACTION_TOOLTIP);
+        }
 
         toolBar.addSeparator();
         toolBar.add(new CompareSnapshotsAction(ls));

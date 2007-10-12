@@ -301,6 +301,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                                                                                  "CPUSnapshotPanel_ThreadsComboAccessDescr"); // NOI18N
     private static final String STRING_NOT_FOUND_MSG = NbBundle.getMessage(CPUSnapshotPanel.class,
                                                                            "CPUSnapshotPanel_StringNotFoundMsg"); // NOI18N
+    private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(CPUSnapshotPanel.class,
+                                                                           "CPUSnapshotPanel_FindActionTooltip"); // NOI18N
     private static final String FIND_IN_HOTSPOTS_STRING = MessageFormat.format(FIND_IN_STATEMENT, new Object[] { HOTSPOTS_STRING });
     private static final String FIND_IN_CALLTREE_STRING = MessageFormat.format(FIND_IN_STATEMENT, new Object[] { CALLTREE_STRING });
 
@@ -333,7 +335,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private CPUResultsSnapshot snapshot;
     private CombinedPanel combined;
     private CombinedViewTracker combinedViewTracker;
-    private Component findActionPresenter;
+    private JButton findActionPresenter;
     private JButton findNextPresenter;
     private JButton findPreviousPresenter;
     private JComboBox aggregationCombo;
@@ -566,10 +568,17 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         threadsCombo.addActionListener(this);
 
         toolBar.addSeparator();
-        findActionPresenter = ((FindAction) SystemAction.get(FindAction.class)).getToolbarPresenter();
-        toolBar.add(findActionPresenter);
+        
+        findActionPresenter = toolBar.add(SystemAction.get(FindAction.class));
         findPreviousPresenter = toolBar.add(new FindPreviousAction(this));
         findNextPresenter = toolBar.add(new FindNextAction(this));
+        
+        if (findActionPresenter instanceof AbstractButton) {
+            AbstractButton ab = (AbstractButton)findActionPresenter;
+            ab.setIcon(Utils.FIND_ACTION_ICON);
+            ab.setText(""); // NOI18N
+            ab.setToolTipText(FIND_ACTION_TOOLTIP);
+        }
 
         findActionPresenter.setEnabled(false);
         findPreviousPresenter.setEnabled(false);
