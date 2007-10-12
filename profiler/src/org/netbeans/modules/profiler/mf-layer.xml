@@ -323,6 +323,7 @@ made subject to such option by the copyright holder.
       <folder name="x-java">
         <folder name="Popup">
           <folder name="Profiling">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
             <attr name="position" intvalue="1920"/>
                         <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.shadow">
               <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
