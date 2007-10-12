@@ -85,6 +85,12 @@ made subject to such option by the copyright holder.
         <mapID target="GlobalFiltersPanel.HelpCtx" url="helppages/csh/csh_filters_global.html"/>
         <mapID target="QuickFilterPanel.HelpCtx" url="helppages/csh/csh_filters_quick.html"/>
         
+        <mapID target="ThreadsWindow.HelpCtx" url="helppages/csh/view_threads.html"/>
+        <mapID target="TelemetryWindow.HelpCtx" url="helppages/csh/view_telemetry.html"/>
+        <mapID target="LiveResultsWindow.HelpCtx" url="helppages/results_liveresults.html"/>
+        
+        
+        
         <!-- CSH topics for Attach Wizard -->
         <mapID target="AttachSettingsPanel.HelpCtx" url="helppages/csh/csh_attachwiz_1.html"/>
         <mapID target="ReviewSettingsPanel.HelpCtx" url="helppages/csh/csh_attachwiz_2.html"/>
