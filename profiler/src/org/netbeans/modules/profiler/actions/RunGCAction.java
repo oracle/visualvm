@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
+import javax.swing.Action;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -56,6 +57,13 @@ public final class RunGCAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING };
+    
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+
+    protected RunGCAction() {
+        super();
+        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_RunGCAction")); //NOI18N
+    }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
