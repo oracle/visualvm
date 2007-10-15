@@ -68,10 +68,12 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.awt.StatusDisplayer;
+import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -104,7 +106,10 @@ import javax.lang.model.type.WildcardType;
 import static javax.lang.model.util.ElementFilter.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.swing.JEditorPane;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
+import org.openide.text.NbDocument;
 
 
 /**
@@ -240,12 +245,9 @@ public final class SourceUtils {
     private static final String VM_INITIALIZER_SIG = "<clinit>"; // NOI18N
     private static final String[] APPLET_CLASSES = new String[] { "java.applet.Applet", "javax.swing.JApplet" }; // NOI18N
     private static final String[] TEST_CLASSES = new String[] { "junit.framework.TestCase", "junit.framework.TestSuite" }; // NOI18N
-
-    // -----
-    // I18N String constants
-    private static final String NO_SOURCE_FOUND_MESSAGE = NbBundle.getMessage(SourceUtils.class,
-                                                                              "MDRUtils_NoSourceFoundMessage" // NOI18N
-    );
+                                                                                                                           // -----
+                                                                                                                           // I18N String constants
+    private static final String NO_SOURCE_FOUND_MESSAGE = NbBundle.getMessage(SourceUtils.class, "MDRUtils_NoSourceFoundMessage");
     private static final String OPENING_SOURCE_MSG = NbBundle.getMessage(SourceUtils.class, "MDRUtils_OpeningSourceMsg"); // NOI18N
                                                                                                                           // -----
     private static final DeclaredTypeResolver declaredTypeResolver = new DeclaredTypeResolver();
@@ -300,14 +302,108 @@ public final class SourceUtils {
         return constructors.toArray(new ClientUtils.SourceCodeSelection[constructors.size()]);
     }
 
-    public static int getCurrentOffsetInEditor() {
-        JTextComponent mostActiveEditor = org.netbeans.editor.Registry.getMostActiveComponent();
+    /**
+     * Returns the project the currently activated document belongs to
+     * MUST BE INVOKED ON EDT
+     * @return The most active project or null
+     */
+    public static Project getCurrentProjectInEditor() {
+        TopComponent tc = TopComponent.getRegistry().getActivated();
+        if (tc != null) {
+            return tc.getLookup().lookup(Project.class);
+        }
+        return null;
+    }
+    
+    /**
+     * Returns the FileObject of the most active editor document
+     * MUST BE INVOKED ON EDT
+     * @return A FileObject or null
+     */
+    public static FileObject getCurrentFileInEditor() {
+        TopComponent tc = TopComponent.getRegistry().getActivated();
 
-        if ((mostActiveEditor != null) && (mostActiveEditor.getCaret() != null)) {
-            return mostActiveEditor.getCaretPosition();
+        if (tc != null) {
+            return tc.getLookup().lookup(FileObject.class);
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the caret position within the active editor document
+     * MUST BE INVOKED ON EDT
+     * @return The caret offset or -1
+     */
+    public static int getCurrentOffsetInEditor() {
+        TopComponent tc = TopComponent.getRegistry().getActivated();
+
+        if (tc != null) {
+            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
+            if (ec != null) {
+                for(JEditorPane pane : ec.getOpenedPanes()) {
+                    int position = pane.getCaretPosition();
+                    if (position > -1) {
+                        return position;
+                    }
+                }
+            }
         }
 
         return -1;
+    }
+    
+    /**
+     * Returns the caret position within the active editor document
+     * converted into line number
+     * MUST BE INVOKED ON EDT
+     * @return The line number or -1
+     */
+    public static int getCurrentLineInEditor() {
+        return getLineForOffsetInEditor(getCurrentOffsetInEditor());
+    }
+    
+    /**
+     * Calculates the line number for a given offset
+     * MUST BE INVOKED ON EDT
+     * @return Returns the line number within the active editor document or -1
+     */
+    public static int getLineForOffsetInEditor(int offset) {
+        TopComponent tc = TopComponent.getRegistry().getActivated();
+
+        if (tc != null) {
+            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
+
+            if (ec != null) {
+                return NbDocument.findLineNumber(ec.getDocument(), offset);
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
+     * Returns the tuple of start/end selection offset in the currently activated editor
+     * @return Tuple [startOffset, endOffset] or [-1, -1] if there is no selection
+     */
+    public static int[] getSelectionOffsets() {
+        int[] indexes = new int[]{-1, -1};
+        TopComponent tc = TopComponent.getRegistry().getActivated();
+
+        if (tc != null) {
+            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
+            if (ec != null) {
+                for(JEditorPane pane : ec.getOpenedPanes()) {
+                    int selStart = pane.getSelectionStart();
+                    if (selStart > -1) {
+                        indexes[0] = selStart;
+                        indexes[1] = pane.getSelectionEnd();
+                        break;
+                    }
+                }
+            }
+        }
+        return indexes;
     }
 
     /**
@@ -353,7 +449,8 @@ public final class SourceUtils {
 
                             TypeElement parentClass = controller.getTreeUtilities().scopeFor(position).getEnclosingClass();
 
-                            if (parentClass != null) { // no enclosing class found (i.e. cursor at import)
+                            if (parentClass != null) {
+                                // no enclosing class found (i.e. cursor at import)
                                 result.setValue(ElementUtilities.getBinaryName(parentClass));
                             }
                         }
@@ -563,7 +660,7 @@ public final class SourceUtils {
         }
 
         int index = 0;
-        String[] subclassesNames = new String[subclasses.size() /*0*/];
+        String[] subclassesNames = new String[subclasses.size()];
 
         Iterator it = subclasses.iterator();
 
@@ -730,7 +827,7 @@ public final class SourceUtils {
                         if (resolvedClass != null) {
                             resolvedFileObject.setValue(org.netbeans.api.java.source.SourceUtils.getFile(ElementHandle.create(resolvedClass),
                                                                                                          controller
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             .getClasspathInfo()));
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .getClasspathInfo()));
                         }
                     }
                 }, false);
@@ -845,14 +942,13 @@ public final class SourceUtils {
 
     public static void openSource(Project project, final String className, final String methodName, final String signature) {
         // *** logging stuff ***
-        Profiler.debug("Open Source: Project: " //NOI18N
-                       + ((project == null) ? "null" : ProjectUtilities.getProjectName(project))); // NOI18N
+        Profiler.debug("Open Source: Project: " + ((project == null) ? "null" : ProjectUtilities.getProjectName(project))); // NOI18N
         Profiler.debug("Open Source: Class name: " + className); // NOI18N
         Profiler.debug("Open Source: Method name: " + methodName); // NOI18N
         Profiler.debug("Open Source: Method sig: " + signature); // NOI18N
                                                                  // *********************
+                                                                 // create the javasource repository for all the source files
 
-        // create the javasource repository for all the source files
         final JavaSource js = getSources(project);
 
         try {
@@ -888,7 +984,6 @@ public final class SourceUtils {
                             final Element openElement = destinationElement;
                             String st = MessageFormat.format(OPENING_SOURCE_MSG, new Object[] { openElement.toString() });
                             final String finalStatusText = st + " ..."; // NOI18N
-
                             StatusDisplayer.getDefault().setStatusText(finalStatusText);
 
                             IDEUtils.runInEventDispatchThread(new Runnable() {
@@ -1110,8 +1205,7 @@ public final class SourceUtils {
 
                         if ((element != null)
                                 && ((element.getKind() == ElementKind.METHOD) || (element.getKind() == ElementKind.CONSTRUCTOR)
-                                       || (//element.getKind() == ElementKind.INSTANCE_INIT || // Not supported
-                            element.getKind() == ElementKind.STATIC_INIT))) {
+                                       || (element.getKind() == ElementKind.STATIC_INIT))) {
                             ExecutableElement method = (ExecutableElement) element;
                             String vmClassName = ElementUtilities.getBinaryName((TypeElement) method.getEnclosingElement());
                             String vmMethodName = getVMMethodName(method);
@@ -1205,14 +1299,21 @@ public final class SourceUtils {
         }
 
         switch (typeKind) {
-            case VOID: // VOID type, return "void" - will be converted later by VMUtils.typeToVMSignature
-                return type.toString();
-            case DECLARED: // Java class (also parametrized - "ArrayList<String>" or "ArrayList<T>"), need to generate correct innerclass signature using "$"
-                return ElementUtilities.getBinaryName(getDeclaredType(type));
-            case ARRAY: // Array means "String[]" or "T[]" and also varargs "Object ... args"
-                return getRealTypeName(((ArrayType) type).getComponentType(), ci) + "[]"; // NOI18N
-            case TYPEVAR: // TYPEVAR means "T" or "<T extends String>" or "<T extends List&Runnable>"
+            case VOID:
 
+                // VOID type, return "void" - will be converted later by VMUtils.typeToVMSignature
+                return type.toString();
+            case DECLARED:
+
+                // Java class (also parametrized - "ArrayList<String>" or "ArrayList<T>"), need to generate correct innerclass signature using "$"
+                return ElementUtilities.getBinaryName(getDeclaredType(type));
+            case ARRAY:
+
+                // Array means "String[]" or "T[]" and also varargs "Object ... args"
+                return getRealTypeName(((ArrayType) type).getComponentType(), ci) + "[]"; // NOI18N
+            case TYPEVAR:
+
+                // TYPEVAR means "T" or "<T extends String>" or "<T extends List&Runnable>"
                 List<?extends TypeMirror> subTypes = ci.getTypes().directSupertypes(type);
 
                 if (subTypes.size() == 0) {
@@ -1220,17 +1321,21 @@ public final class SourceUtils {
                 }
 
                 if ((subTypes.size() > 1) && subTypes.get(0).toString().equals("java.lang.Object")
-                        && getDeclaredType(subTypes.get(1)).getKind().isInterface()) { // NOI18N
-                                                                                       // Master type is interface
-
+                        && getDeclaredType(subTypes.get(1)).getKind().isInterface()) {
+                    // NOI18N
+                    // Master type is interface
                     return getRealTypeName(subTypes.get(1), ci);
                 } else {
                     // Master type is class
                     return getRealTypeName(subTypes.get(0), ci);
                 }
-            case WILDCARD: // WILDCARD means "<?>" or "<? extends Number>" or "<? super T>", shouldn't occur here
+            case WILDCARD:
+
+                // WILDCARD means "<?>" or "<? extends Number>" or "<? super T>", shouldn't occur here
                 throw new IllegalArgumentException("Unexpected WILDCARD parameter: " + type); // NOI18N
-            default: // Unexpected parameter type
+            default:
+
+                // Unexpected parameter type
                 throw new IllegalArgumentException("Unexpected type parameter: " + type + " of kind " + typeKind); // NOI18N
         }
     }
