@@ -43,6 +43,7 @@ package org.netbeans.modules.profiler.utils;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Scope;
 import com.sun.source.tree.Tree;
 import static com.sun.source.tree.Tree.Kind.*;
 import com.sun.source.util.TreePath;
@@ -60,6 +61,7 @@ import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.api.java.source.ElementUtilities;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.JavaSource.Phase;
+import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -72,6 +74,8 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
+import org.openide.text.NbDocument;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.io.IOException;
@@ -109,7 +113,6 @@ import javax.lang.model.util.Types;
 import javax.swing.JEditorPane;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
-import org.openide.text.NbDocument;
 
 
 /**
@@ -303,19 +306,6 @@ public final class SourceUtils {
     }
 
     /**
-     * Returns the project the currently activated document belongs to
-     * MUST BE INVOKED ON EDT
-     * @return The most active project or null
-     */
-    public static Project getCurrentProjectInEditor() {
-        TopComponent tc = TopComponent.getRegistry().getActivated();
-        if (tc != null) {
-            return tc.getLookup().lookup(Project.class);
-        }
-        return null;
-    }
-    
-    /**
      * Returns the FileObject of the most active editor document
      * MUST BE INVOKED ON EDT
      * @return A FileObject or null
@@ -332,29 +322,6 @@ public final class SourceUtils {
 
     /**
      * Returns the caret position within the active editor document
-     * MUST BE INVOKED ON EDT
-     * @return The caret offset or -1
-     */
-    public static int getCurrentOffsetInEditor() {
-        TopComponent tc = TopComponent.getRegistry().getActivated();
-
-        if (tc != null) {
-            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
-            if (ec != null) {
-                for(JEditorPane pane : ec.getOpenedPanes()) {
-                    int position = pane.getCaretPosition();
-                    if (position > -1) {
-                        return position;
-                    }
-                }
-            }
-        }
-
-        return -1;
-    }
-    
-    /**
-     * Returns the caret position within the active editor document
      * converted into line number
      * MUST BE INVOKED ON EDT
      * @return The line number or -1
@@ -362,48 +329,60 @@ public final class SourceUtils {
     public static int getCurrentLineInEditor() {
         return getLineForOffsetInEditor(getCurrentOffsetInEditor());
     }
-    
+
     /**
-     * Calculates the line number for a given offset
+     * Returns the caret position within the active editor document
      * MUST BE INVOKED ON EDT
-     * @return Returns the line number within the active editor document or -1
+     * @return The caret offset or -1
      */
-    public static int getLineForOffsetInEditor(int offset) {
-        TopComponent tc = TopComponent.getRegistry().getActivated();
+    public static int getCurrentOffsetInEditor() {
+        JTextComponent mostActiveEditor = org.netbeans.editor.Registry.getMostActiveComponent();
 
-        if (tc != null) {
-            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
-
-            if (ec != null) {
-                return NbDocument.findLineNumber(ec.getDocument(), offset);
-            }
+        if ((mostActiveEditor != null) && (mostActiveEditor.getCaret() != null)) {
+            return mostActiveEditor.getCaretPosition();
         }
-        
+
         return -1;
+
+        //        int offset = -1;
+        //        TopComponent tc = TopComponent.getRegistry().getActivated();
+        //
+        //        if (tc != null) {
+        //            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
+        //
+        //            if (ec != null) {
+        //                for (JEditorPane pane : ec.getOpenedPanes()) {
+        //                    int position = pane.getCaretPosition();
+        //
+        //                    if (position > -1) {
+        //                        offset = position;
+        //
+        //                        break;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //
+        //        return offset;
     }
-    
+
+    public static boolean isCurrentOffsetValid() {
+        return isOffsetValid(getCurrentFileInEditor(), getCurrentOffsetInEditor());
+    }
+
     /**
-     * Returns the tuple of start/end selection offset in the currently activated editor
-     * @return Tuple [startOffset, endOffset] or [-1, -1] if there is no selection
+     * Returns the project the currently activated document belongs to
+     * MUST BE INVOKED ON EDT
+     * @return The most active project or null
      */
-    public static int[] getSelectionOffsets() {
-        int[] indexes = new int[]{-1, -1};
+    public static Project getCurrentProjectInEditor() {
         TopComponent tc = TopComponent.getRegistry().getActivated();
 
         if (tc != null) {
-            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
-            if (ec != null) {
-                for(JEditorPane pane : ec.getOpenedPanes()) {
-                    int selStart = pane.getSelectionStart();
-                    if (selStart > -1) {
-                        indexes[0] = selStart;
-                        indexes[1] = pane.getSelectionEnd();
-                        break;
-                    }
-                }
-            }
+            return tc.getLookup().lookup(Project.class);
         }
-        return indexes;
+
+        return null;
     }
 
     /**
@@ -617,6 +596,37 @@ public final class SourceUtils {
         return JAVA_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
     }
 
+    /**
+     * Calculates the line number for a given offset
+     * MUST BE INVOKED ON EDT
+     * @return Returns the line number within the active editor document or -1
+     */
+    public static int getLineForOffsetInEditor(int offset) {
+        if (offset == -1) {
+            return -1;
+        }
+
+        TopComponent tc = TopComponent.getRegistry().getActivated();
+
+        if (tc != null) {
+            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
+
+            if (ec != null) {
+                return NbDocument.findLineNumber(ec.getDocument(), offset);
+            }
+        }
+
+        return -1;
+    }
+
+    public static boolean isOffsetValid(FileObject editorFile, int offset) {
+        if (editorFile == null) {
+            return false;
+        }
+
+        return validateOffset(editorFile, offset) != -1;
+    }
+
     public static boolean isRunnable(FileObject javaFile) {
         if (isTest(javaFile) || isApplet(javaFile)) {
             return true;
@@ -627,6 +637,34 @@ public final class SourceUtils {
         }
 
         return false;
+    }
+
+    /**
+     * Returns the tuple of start/end selection offset in the currently activated editor
+     * @return Tuple [startOffset, endOffset] or [-1, -1] if there is no selection
+     */
+    public static int[] getSelectionOffsets() {
+        int[] indexes = new int[] { -1, -1 };
+        TopComponent tc = TopComponent.getRegistry().getActivated();
+
+        if (tc != null) {
+            EditorCookie ec = tc.getLookup().lookup(EditorCookie.class);
+
+            if (ec != null) {
+                for (JEditorPane pane : ec.getOpenedPanes()) {
+                    int selStart = pane.getSelectionStart();
+
+                    if (selStart > -1) {
+                        indexes[0] = selStart;
+                        indexes[1] = pane.getSelectionEnd();
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return indexes;
     }
 
     public static String[] getSubclassesNames(final String className, Project project) {
@@ -827,7 +865,7 @@ public final class SourceUtils {
                         if (resolvedClass != null) {
                             resolvedFileObject.setValue(org.netbeans.api.java.source.SourceUtils.getFile(ElementHandle.create(resolvedClass),
                                                                                                          controller
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .getClasspathInfo()));
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .getClasspathInfo()));
                         }
                     }
                 }, false);
@@ -1495,5 +1533,33 @@ public final class SourceUtils {
         }
 
         return foundMethod;
+    }
+
+    private static int validateOffset(FileObject editorDoc, final int toValidate) {
+        final OutputParameter<Integer> validated = new OutputParameter<Integer>(-1);
+
+        JavaSource js = JavaSource.forFileObject(editorDoc);
+
+        if (js != null) {
+            try {
+                js.runUserActionTask(new Task<CompilationController>() {
+                        public void run(CompilationController controller)
+                                 throws Exception {
+                            controller.toPhase(JavaSource.Phase.RESOLVED);
+                            validated.setValue(-1); // non-validated default
+
+                            Scope sc = controller.getTreeUtilities().scopeFor(toValidate);
+
+                            if (sc.getEnclosingClass() != null) {
+                                    validated.setValue(toValidate);
+                            }
+                        }
+                    }, true);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
+        return validated.getValue();
     }
 }
