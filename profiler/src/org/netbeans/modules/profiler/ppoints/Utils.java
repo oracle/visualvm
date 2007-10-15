@@ -41,13 +41,16 @@
 package org.netbeans.modules.profiler.ppoints;
 
 import org.netbeans.api.java.source.UiUtils;
+import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.editor.Registry;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.table.EnhancedTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
+import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.netbeans.modules.profiler.utils.SourceUtils;
@@ -70,9 +73,9 @@ import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.GrayFilter;
@@ -82,6 +85,8 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 
@@ -92,36 +97,36 @@ import javax.swing.text.StyledDocument;
 public class Utils {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    // TODO the following method is not used anywhere; consider removing it completely
-    //    private static class JavaEditorContext {
-    //        //~ Instance fields ------------------------------------------------------------------------------------------------------
-    //
-    //        private Document document;
-    //        private FileObject fileObject;
-    //        private JTextComponent textComponent;
-    //
-    //        //~ Constructors ---------------------------------------------------------------------------------------------------------
-    //
-    //        public JavaEditorContext(JTextComponent textComponent, Document document, FileObject fileObject) {
-    //            this.textComponent = textComponent;
-    //            this.document = document;
-    //            this.fileObject = fileObject;
-    //        }
-    //
-    //        //~ Methods --------------------------------------------------------------------------------------------------------------
-    //
-    //        public Document getDocument() {
-    //            return document;
-    //        }
-    //
-    //        public FileObject getFileObject() {
-    //            return fileObject;
-    //        }
-    //
-    //        public JTextComponent getTextComponent() {
-    //            return textComponent;
-    //        }
-    //    }
+    private static class JavaEditorContext {
+        //~ Instance fields ------------------------------------------------------------------------------------------------------
+
+        private Document document;
+        private FileObject fileObject;
+        private JTextComponent textComponent;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        public JavaEditorContext(JTextComponent textComponent, Document document, FileObject fileObject) {
+            this.textComponent = textComponent;
+            this.document = document;
+            this.fileObject = fileObject;
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        public Document getDocument() {
+            return document;
+        }
+
+        public FileObject getFileObject() {
+            return fileObject;
+        }
+
+        public JTextComponent getTextComponent() {
+            return textComponent;
+        }
+    }
+
     private static class ProfilingPointPresenterListRenderer extends DefaultListCellRenderer {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -351,7 +356,7 @@ public class Utils {
 
         return new File(sourceFileRelativePath.replace(PROJECT_DIRECTORY_MARK,
                                                        FileUtil.toFile(project.getProjectDirectory()).getAbsolutePath()))
-                                                                                                                                                                                                                                                                                                                                                                    .getAbsolutePath(); // expand relative path to absolute
+                                                                                                                                                                                                                                                                                                                                                                       .getAbsolutePath(); // expand relative path to absolute
     }
 
     public static String getClassName(CodeProfilingPoint.Location location) {
@@ -371,14 +376,28 @@ public class Utils {
     }
 
     public static CodeProfilingPoint.Location getCurrentLocation(int lineOffset) {
-        int lineNumber = SourceUtils.getCurrentLineInEditor() + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
-        FileObject currentFile = SourceUtils.getCurrentFileInEditor();
+        JavaEditorContext mostActiveContext = getMostActiveJavaEditorContext();
 
-        if (currentFile == null) {
+        if (mostActiveContext == null) {
             return CodeProfilingPoint.Location.EMPTY;
         }
 
-        String fileName = FileUtil.toFile(currentFile).getAbsolutePath();
+        FileObject mostActiveJavaSource = mostActiveContext.getFileObject();
+
+        if (mostActiveJavaSource == null) {
+            return CodeProfilingPoint.Location.EMPTY;
+        }
+
+        File currentFile = FileUtil.toFile(mostActiveJavaSource);
+
+        if (currentFile == null) {
+            return CodeProfilingPoint.Location.EMPTY; // Happens for AbstractFileObject, for example JDK classes
+        }
+
+        String fileName = currentFile.getAbsolutePath();
+
+        int lineNumber = NbDocument.findLineNumber((StyledDocument) mostActiveContext.getDocument(),
+                                                   mostActiveContext.getTextComponent().getCaret().getDot()) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
 
         if (lineNumber == -1) {
             lineNumber = 1;
@@ -399,14 +418,27 @@ public class Utils {
     }
 
     public static CodeProfilingPoint.Location getCurrentSelectionEndLocation(int lineOffset) {
-        int[] offsets = SourceUtils.getSelectionOffsets();
+        JavaEditorContext mostActiveContext = getMostActiveJavaEditorContext();
 
-        if ((offsets[0] == -1) && (offsets[1] == -1)) {
+        if (mostActiveContext == null) {
             return CodeProfilingPoint.Location.EMPTY;
         }
 
-        String fileName = FileUtil.toFile(SourceUtils.getCurrentFileInEditor()).getAbsolutePath();
-        int lineNumber = SourceUtils.getLineForOffsetInEditor(offsets[1]) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
+        FileObject mostActiveJavaSource = mostActiveContext.getFileObject();
+
+        if (mostActiveJavaSource == null) {
+            return CodeProfilingPoint.Location.EMPTY;
+        }
+
+        JTextComponent mostActiveTextComponent = mostActiveContext.getTextComponent();
+
+        if (mostActiveTextComponent.getSelectedText() == null) {
+            return CodeProfilingPoint.Location.EMPTY;
+        }
+
+        String fileName = FileUtil.toFile(mostActiveJavaSource).getAbsolutePath();
+        int lineNumber = NbDocument.findLineNumber((StyledDocument) mostActiveContext.getDocument(),
+                                                   mostActiveTextComponent.getSelectionEnd()) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
 
         if (lineNumber == -1) {
             lineNumber = 1;
@@ -417,13 +449,25 @@ public class Utils {
     }
 
     public static CodeProfilingPoint.Location[] getCurrentSelectionLocations() {
-        int[] offsets = SourceUtils.getSelectionOffsets();
+        JavaEditorContext mostActiveContext = getMostActiveJavaEditorContext();
 
-        if ((offsets[0] == -1) || (offsets[1] == -1)) {
+        if (mostActiveContext == null) {
             return new CodeProfilingPoint.Location[0];
         }
 
-        File file = FileUtil.toFile(SourceUtils.getCurrentFileInEditor());
+        FileObject mostActiveJavaSource = mostActiveContext.getFileObject();
+
+        if (mostActiveJavaSource == null) {
+            return new CodeProfilingPoint.Location[0];
+        }
+
+        JTextComponent mostActiveTextComponent = mostActiveContext.getTextComponent();
+
+        if (mostActiveTextComponent.getSelectedText() == null) {
+            return new CodeProfilingPoint.Location[0];
+        }
+
+        File file = FileUtil.toFile(mostActiveJavaSource);
 
         if (file == null) {
             return new CodeProfilingPoint.Location[0]; // Most likely Java source
@@ -431,13 +475,15 @@ public class Utils {
 
         String fileName = file.getAbsolutePath();
 
-        int startLineNumber = SourceUtils.getLineForOffsetInEditor(offsets[0]) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
+        int startLineNumber = NbDocument.findLineNumber((StyledDocument) mostActiveContext.getDocument(),
+                                                        mostActiveTextComponent.getSelectionStart()) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
 
         if (startLineNumber == -1) {
             startLineNumber = 1;
         }
 
-        int endLineNumber = SourceUtils.getLineForOffsetInEditor(offsets[1]) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
+        int endLineNumber = NbDocument.findLineNumber((StyledDocument) mostActiveContext.getDocument(),
+                                                      mostActiveTextComponent.getSelectionEnd()) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
 
         if (endLineNumber == -1) {
             endLineNumber = 1;
@@ -452,14 +498,27 @@ public class Utils {
     }
 
     public static CodeProfilingPoint.Location getCurrentSelectionStartLocation(int lineOffset) {
-        int[] offsets = SourceUtils.getSelectionOffsets();
+        JavaEditorContext mostActiveContext = getMostActiveJavaEditorContext();
 
-        if ((offsets[0] == -1) && (offsets[1] == -1)) {
+        if (mostActiveContext == null) {
             return CodeProfilingPoint.Location.EMPTY;
         }
 
-        String fileName = FileUtil.toFile(SourceUtils.getCurrentFileInEditor()).getAbsolutePath();
-        int lineNumber = SourceUtils.getLineForOffsetInEditor(offsets[0]) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
+        FileObject mostActiveJavaSource = mostActiveContext.getFileObject();
+
+        if (mostActiveJavaSource == null) {
+            return CodeProfilingPoint.Location.EMPTY;
+        }
+
+        JTextComponent mostActiveTextComponent = mostActiveContext.getTextComponent();
+
+        if (mostActiveTextComponent.getSelectedText() == null) {
+            return CodeProfilingPoint.Location.EMPTY;
+        }
+
+        String fileName = FileUtil.toFile(mostActiveJavaSource).getAbsolutePath();
+        int lineNumber = NbDocument.findLineNumber((StyledDocument) mostActiveContext.getDocument(),
+                                                   mostActiveTextComponent.getSelectionStart()) + 1; // Line is 0-based, needs to be 1-based for CodeProfilingPoint.Location
 
         if (lineNumber == -1) {
             lineNumber = 1;
@@ -487,7 +546,7 @@ public class Utils {
             return -1;
         }
 
-        EditorCookie editorCookie = dataObject.getCookie(EditorCookie.class);
+        EditorCookie editorCookie = (EditorCookie) dataObject.getCookie(EditorCookie.class);
 
         if (editorCookie == null) {
             return -1;
@@ -570,7 +629,7 @@ public class Utils {
         }
 
         // LineCookie of pp
-        LineCookie lineCookie = dao.getCookie(LineCookie.class);
+        LineCookie lineCookie = (LineCookie) dao.getCookie(LineCookie.class);
 
         if (lineCookie == null) {
             return null;
@@ -592,7 +651,19 @@ public class Utils {
     }
 
     public static Project getMostActiveJavaProject() {
-        return SourceUtils.getCurrentProjectInEditor();
+        JavaEditorContext mostActiveContext = getMostActiveJavaEditorContext();
+
+        if (mostActiveContext == null) {
+            return null;
+        }
+
+        FileObject mostActiveFileObject = mostActiveContext.getFileObject();
+
+        if (mostActiveFileObject == null) {
+            return null;
+        }
+
+        return FileOwnerQuery.getOwner(mostActiveFileObject);
     }
 
     public static ListCellRenderer getPresenterListRenderer() {
@@ -611,7 +682,7 @@ public class Utils {
         File file = new File(location.getFile());
         int lineNumber = location.getLine();
 
-        List<CodeProfilingPoint> lineProfilingPoints = new ArrayList<CodeProfilingPoint>();
+        List<CodeProfilingPoint> lineProfilingPoints = new ArrayList();
         List<CodeProfilingPoint> profilingPoints = ProfilingPointsManager.getDefault()
                                                                          .getProfilingPoints(CodeProfilingPoint.class, null);
 
@@ -680,7 +751,7 @@ public class Utils {
 
     public static String getUniqueName(String name, String nameSuffix, Project project) {
         List<ProfilingPoint> projectProfilingPoints = ProfilingPointsManager.getDefault().getProfilingPoints(project, true);
-        Set<String> projectProfilingPointsNames = new HashSet<String>();
+        List<String> projectProfilingPointsNames = new LinkedList();
 
         for (ProfilingPoint projectProfilingPoint : projectProfilingPoints) {
             projectProfilingPointsNames.add(projectProfilingPoint.getName());
@@ -749,5 +820,21 @@ public class Utils {
                     UiUtils.open(fileObject, documentOffset);
                 } // this MUST use UiUtils since there is no replacement method yet
             });
+    }
+
+    private static JavaEditorContext getMostActiveJavaEditorContext() {
+        Iterator componentIterator = Registry.getComponentIterator();
+
+        while (componentIterator.hasNext()) {
+            JTextComponent component = (JTextComponent) componentIterator.next();
+            Document document = component.getDocument();
+            FileObject fileObject = NbEditorUtilities.getFileObject(document);
+
+            if ((fileObject != null) && fileObject.getExt().equalsIgnoreCase("java")) {
+                return new JavaEditorContext(component, document, fileObject); // NOI18N
+            }
+        }
+
+        return null;
     }
 }

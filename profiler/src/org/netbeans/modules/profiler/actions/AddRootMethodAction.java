@@ -42,6 +42,7 @@ package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
+import org.netbeans.editor.Registry;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
@@ -107,21 +108,20 @@ public final class AddRootMethodAction extends NodeAction {
     }
 
     protected void performAction(final Node[] nodes) {
-        // Read current offset in editor
-        // do it outside of the swingworker background thread as it needs to access TC in EDT
-        final int currentOffsetInEditor = SourceUtils.getCurrentOffsetInEditor();
-
-        if (currentOffsetInEditor == -1) {
-            return;
-        }
-        
         new NBSwingWorker() {
                 protected void doInBackground() {
                     try {
                         // Get DataObject
-                        DataObject dobj = nodes[0].getLookup().lookup(DataObject.class);
+                        DataObject dobj = (DataObject) nodes[0].getLookup().lookup(DataObject.class);
 
                         if (dobj == null) {
+                            return;
+                        }
+
+                        // Read current offset in editor
+                        int currentOffsetInEditor = SourceUtils.getCurrentOffsetInEditor();
+
+                        if (currentOffsetInEditor == -1) {
                             return;
                         }
 
@@ -158,7 +158,7 @@ public final class AddRootMethodAction extends NodeAction {
                         // Specify Profiling Settings as a context
                         ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
                                                                                       .getProfilingSettings();
-                        List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
+                        List<ProfilingSettings> cpuSettings = new ArrayList();
 
                         for (ProfilingSettings settings : projectSettings) {
                             if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
