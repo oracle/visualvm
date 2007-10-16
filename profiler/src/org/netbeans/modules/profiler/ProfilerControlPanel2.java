@@ -472,8 +472,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             stopButton.setText(null);
             UIUtils.fixButtonUI(stopButton);
             stopButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) stopButton
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           .getIcon())
-                                                                                                        .getImage()))));
+                                                                                                         .getIcon()).getImage()))));
             stopButton.setContentAreaFilled(false);
             stopButton.setMargin(new Insets(3, 3, 3, 3));
             stopButton.setRolloverEnabled(true);
