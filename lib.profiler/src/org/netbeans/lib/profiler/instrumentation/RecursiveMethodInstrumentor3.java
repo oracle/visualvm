@@ -69,62 +69,6 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
-                                                  byte[][] cachedClassFileBytes, RootMethods roots) {
-        DynamicClassInfo[] loadedClassInfos = preGetInitialMethodsToInstrument(loadedClasses, loadedClassLoaderIds,
-                                                                               cachedClassFileBytes);
-
-        rootMethods = roots;
-        noExplicitRootsSpecified = checkForNoRootsSpecified(roots);
-
-        // Check which root classes have already been loaded, and mark their root methods accordingly
-        for (int j = 0; j < loadedClassInfos.length; j++) {
-            if (loadedClassInfos[j] == null) {
-                continue; // Can this happen?
-            }
-
-            tryInstrumentSpawnedThreads(loadedClassInfos[j]); // This only checks for Runnable.run()
-
-            for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
-                String rootClassName = rootMethods.classNames[rIdx];
-                boolean isMatch = false;
-
-                if (rootMethods.classesWildcard[rIdx]) {
-                    if (matchesWildcard(Wildcards.unwildPackage(rootClassName), loadedClassInfos[j].getName())) {
-                        //            System.out.println("Matched package wildcard - " + rootClassName);
-                        isMatch = true;
-                    }
-                } else {
-                    if (loadedClassInfos[j].getName().equals(rootClassName)) { // precise match
-                        isMatch = true;
-                    }
-                }
-
-                if (isMatch) {
-                    if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
-                        if (rootMethods.markerMethods[rIdx]) {
-                            markAllMethodsMarker(loadedClassInfos[j]);
-                        } else {
-                            markAllMethodsRoot(loadedClassInfos[j]);
-                        }
-                    } else {
-                        markMethod(loadedClassInfos[j], rIdx);
-                        checkAndMarkMethodForInstrumentation(loadedClassInfos[j], rootMethods.methodNames[rIdx],
-                                                             rootMethods.methodSignatures[rIdx]);
-                    }
-                }
-            }
-
-            checkAndMarkAllMethodsForInstrumentation(loadedClassInfos[j]);
-        }
-
-        // So that class loading is measured correctly from the beginning
-        checkAndMarkMethodForInstrumentation(javaClassForName("java/lang/ClassLoader", 0), "loadClass",
-                                             "(Ljava/lang/String;)Ljava/lang/Class;"); // NOI18N
-
-        return createInstrumentedMethodPack();
-    }
-
     public Object[] getMethodsToInstrumentUponClassLoad(String className, int classLoaderId, boolean threadInCallGraph) {
         boolean DEBUG = false;
 
@@ -258,7 +202,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
     }
 
     protected boolean tryInstrumentSpawnedThreads(DynamicClassInfo clazz) {
-        if (instrumentSpawnedThreads) {
+        if (instrumentSpawnedThreads || noExplicitRootsSpecified) {
             if (clazz.implementsInterface("java/lang/Runnable") && (clazz.getName() != "java/lang/Thread")) { // NOI18N
 
                 boolean res = markMethodRoot(clazz, "run", "()V"); // NOI18N
@@ -286,6 +230,62 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
         checkAndMarkMethodForInstrumentation(clazz, idx);
 
         return true;
+    }
+
+    Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds, byte[][] cachedClassFileBytes,
+                                           RootMethods roots) {
+        DynamicClassInfo[] loadedClassInfos = preGetInitialMethodsToInstrument(loadedClasses, loadedClassLoaderIds,
+                                                                               cachedClassFileBytes);
+
+        rootMethods = roots;
+        checkForNoRootsSpecified(roots);
+
+        // Check which root classes have already been loaded, and mark their root methods accordingly
+        for (int j = 0; j < loadedClassInfos.length; j++) {
+            if (loadedClassInfos[j] == null) {
+                continue; // Can this happen?
+            }
+
+            tryInstrumentSpawnedThreads(loadedClassInfos[j]); // This only checks for Runnable.run()
+
+            for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
+                String rootClassName = rootMethods.classNames[rIdx];
+                boolean isMatch = false;
+
+                if (rootMethods.classesWildcard[rIdx]) {
+                    if (matchesWildcard(Wildcards.unwildPackage(rootClassName), loadedClassInfos[j].getName())) {
+                        //            System.out.println("Matched package wildcard - " + rootClassName);
+                        isMatch = true;
+                    }
+                } else {
+                    if (loadedClassInfos[j].getName().equals(rootClassName)) { // precise match
+                        isMatch = true;
+                    }
+                }
+
+                if (isMatch) {
+                    if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
+                        if (rootMethods.markerMethods[rIdx]) {
+                            markAllMethodsMarker(loadedClassInfos[j]);
+                        } else {
+                            markAllMethodsRoot(loadedClassInfos[j]);
+                        }
+                    } else {
+                        markMethod(loadedClassInfos[j], rIdx);
+                        checkAndMarkMethodForInstrumentation(loadedClassInfos[j], rootMethods.methodNames[rIdx],
+                                                             rootMethods.methodSignatures[rIdx]);
+                    }
+                }
+            }
+
+            checkAndMarkAllMethodsForInstrumentation(loadedClassInfos[j]);
+        }
+
+        // So that class loading is measured correctly from the beginning
+        checkAndMarkMethodForInstrumentation(javaClassForName("java/lang/ClassLoader", 0), "loadClass",
+                                             "(Ljava/lang/String;)Ljava/lang/Class;"); // NOI18N
+
+        return createInstrumentedMethodPack();
     }
 
     private void checkAndMarkAllMethodsForInstrumentation(DynamicClassInfo clazz) {
@@ -344,28 +344,25 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
         }
     }
 
-    private boolean checkForNoRootsSpecified(RootMethods roots) {
+    private void checkForNoRootsSpecified(RootMethods roots) {
         // It may happen, for example when directly attaching to a remote application and choosing the Entire App CPU
         // profiling, that there are no explicitly specified root methods (because the main method is not known in advance).
         // To get sensible profiling results, we take special measures, by just guessing what the main class is.
-        if ((roots == null) || (roots.classNames.length == 0)) {
-            return false;
-        }
+        noExplicitRootsSpecified = true;
+        
+        if ((roots != null) && (roots.classNames.length != 0)) {
+            int rootCount = roots.markerMethods.length;
 
-        boolean noRootsSpecified = true;
-        int rootCount = roots.markerMethods.length;
+            if (rootCount > 0) {
+                for (int i = 0; i < rootCount; i++) {
+                    if (!roots.markerMethods[i]) {
+                        noExplicitRootsSpecified = false;
 
-        if (rootCount > 0) {
-            for (int i = 0; i < rootCount; i++) {
-                if (!roots.markerMethods[i]) {
-                    noRootsSpecified = false;
-
-                    break;
+                        break;
+                    }
                 }
             }
         }
-
-        return noRootsSpecified;
     }
 
     //----------------------------------- Private implementation ------------------------------------------------
