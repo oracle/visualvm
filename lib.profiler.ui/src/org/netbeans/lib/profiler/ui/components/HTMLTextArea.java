@@ -606,7 +606,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
 
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
         super.setText("<html><body style=\"font-size: " + font.getSize() + "pt; font-family: " + font.getName()
-                      + ";\"><font color=\"" + colorText + "\">" + value + "</font></body></html>"); //NOI18N
+                      + ";\"><font color=\"" + colorText + "\"><div style=\"border:0px;margin:0px;padding:0px;\">" + value + "</div></font></body></html>"); //NOI18N
     }
 
     public void deleteSelection() {
