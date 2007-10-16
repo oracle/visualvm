@@ -989,7 +989,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
                         ProfilerLogger.log(ex);
                     }
 
-                    requestProfilingDataUpdate(false);
+                    requestProfilingDataUpdate(true);
                 }
             });
         runGCButton.setToolTipText(RUN_GC_TOOLTIP);
