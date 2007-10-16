@@ -468,11 +468,16 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             rerunButton.setBorder(myRolloverBorder);
             add(rerunButton);
 
-            JButton stopButton = new JButton(new StopAction());
-            stopButton.setText(null);
+            JButton stopButton = new JButton(new StopAction()) {
+                public void setText(String text) {}
+                public void setIcon(Icon icon) {
+                    super.setIcon(icon);
+                    setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon)getIcon()).getImage()))));
+                }
+            };
             UIUtils.fixButtonUI(stopButton);
             stopButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) stopButton
-                                                                                                         .getIcon()).getImage()))));
+                                                                                                          .getIcon()).getImage()))));
             stopButton.setContentAreaFilled(false);
             stopButton.setMargin(new Insets(3, 3, 3, 3));
             stopButton.setRolloverEnabled(true);
