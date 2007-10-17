@@ -161,7 +161,7 @@ public class CollapsedHashMap extends IteratingRule {
                 }
             }
 
-            if ((size / slots) > ratio) {
+            if (slots > 0 && (size / slots) > ratio) {
                 poorHM.add(new HMRecord(hm, size, slots));
             }
         }
