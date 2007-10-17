@@ -14,7 +14,8 @@
         <p>The Attach Wizard helps you configure the settings for profiling an application using the attach method.
         In most cases you only need to use the Attach wizard to profile an application running on a remote JVM.
         If your application is running on a local JVM and you can start the application from the IDE, 
-        you can use Profile Main Project.</p>
+        you can use Profile Main Project. For more information on when to use the attach mode, see
+        <a href="../profile_attach.html">Profiling Using Attach Mode</a>.</p>
         
         <p>You use this page of the Attach wizard to specify the type of application you want to profile and how
         you want to attach to the application. After specifying the attach settings, click Next to review the attach settings.</p>
@@ -35,11 +36,23 @@
             </ul>
             </li>
         
-        <li><b>Attach method.</b> Select an attach method according to the machine where the application is running.
+            <li><b>Attach method.</b> Select an attach method according to the machine where the application is running.
             <ul>
                 <li><b>Local.</b> Select Local if your application is running on the same machine as the IDE.</li>
                 <li><b>Remote.</b> Select Remote if the application is running on a remote machine.</li>
-            </ul></li>
+            </ul>
+            <ul class="note">
+                <li>If you choose the Remote attach method, you need to install the Profiler Remote Pack on the target machine.
+                    You can download the Profiler Remote Pack at the following URL:
+                    <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                        <param name="content" value="http://profiler.netbeans.org/">
+                        <param name="text" value="<html><u>http://profiler.netbeans.org/</u></html>">
+                        <param name="textFontSize" value="medium">
+                        <param name="textColor" value="blue">
+                    </object>
+                </p></li>
+            </ul>
+            </li>
         
             <li><b>Attach invocation.</b> Select the type of attach method.
             <ul>
