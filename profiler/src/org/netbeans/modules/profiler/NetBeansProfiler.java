@@ -107,23 +107,37 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.actions.CallableSystemAction;
 import org.openide.windows.WindowManager;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 
@@ -486,6 +500,7 @@ public final class NetBeansProfiler extends Profiler {
     private Properties rerunProps;
     private SessionSettings lastSessionSettings;
     private String rerunTarget;
+    private StringBuilder logMsgs = new StringBuilder();
     private ThreadsDataManager threadsManager;
     private TimeCollector collector = new TimeCollector();
     private VMTelemetryDataManager vmTelemetryManager;
@@ -830,14 +845,17 @@ public final class NetBeansProfiler extends Profiler {
 
                     //getThreadsManager().setSupportsSleepingStateMonitoring(
                     // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                    printDebugMsg("Profiler.attachToApp: ***************************************************"); //NOI18N
-                    printDebugMsg("profiling settings --------------------------------"); //NOI18N
-                    printDebugMsg(profilingSettings.debug());
-                    printDebugMsg("attach settings -----------------------------------"); //NOI18N
-                    printDebugMsg(attachSettings.debug());
-                    printDebugMsg("instrumentation filter ----------------------------"); //NOI18N
-                    printDebugMsg(sharedSettings.getInstrumentationFilter().debug()); //NOI18N
-                    printDebugMsg("Profiler.attachToApp: ***************************************************"); //NOI18N
+                    printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
+                    printDebugMsg("profiling settings --------------------------------", false); //NOI18N
+                    printDebugMsg(profilingSettings.debug(), false);
+                    printDebugMsg("attach settings -----------------------------------", false); //NOI18N
+                    printDebugMsg(attachSettings.debug(), false);
+                    printDebugMsg("instrumentation filter ----------------------------", false); //NOI18N
+                    printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+                    printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
+                    flushDebugMsgs();
+
+                    GestureSubmitter.logAttach(getProfiledProject(), profilingSettings, attachSettings);
 
                     changeStateTo(PROFILING_STARTED);
 
@@ -900,7 +918,7 @@ public final class NetBeansProfiler extends Profiler {
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
                             .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       .getTargetJDKVersionString()));
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         .getTargetJDKVersionString()));
                         monitor.monitorVM(targetAppRunner);
 
                         if (threadsMonitoringEnabled) {
@@ -1051,14 +1069,17 @@ public final class NetBeansProfiler extends Profiler {
 
                     //getThreadsManager().setSupportsSleepingStateMonitoring(
                     // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                    printDebugMsg("Profiler.connectToStartedApp: **************************************************"); //NOI18N
-                    printDebugMsg("profiling settings -------------------------------"); //NOI18N
-                    printDebugMsg(profilingSettings.debug());
-                    printDebugMsg("session settings ---------------------------------"); //NOI18N
-                    printDebugMsg(sessionSettings.debug());
-                    printDebugMsg("instrumentation filter ---------------------------"); // NOI18N
-                    printDebugMsg(sharedSettings.getInstrumentationFilter().debug()); //NOI18N
-                    printDebugMsg("Profiler.connectToStartedApp: **************************************************"); //NOI18N
+                    printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
+                    printDebugMsg("profiling settings -------------------------------", false); //NOI18N
+                    printDebugMsg(profilingSettings.debug(), false);
+                    printDebugMsg("session settings ---------------------------------", false); //NOI18N
+                    printDebugMsg(sessionSettings.debug(), false);
+                    printDebugMsg("instrumentation filter ---------------------------", false); // NOI18N
+                    printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+                    printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
+                    flushDebugMsgs();
+
+                    GestureSubmitter.logProfileApp(getProfiledProject(), profilingSettings, sessionSettings); // NOI18N
 
                     changeStateTo(PROFILING_STARTED);
 
@@ -1098,7 +1119,7 @@ public final class NetBeansProfiler extends Profiler {
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
                             .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             .getTargetJDKVersionString()));
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .getTargetJDKVersionString()));
                         IDEUtils.runInEventDispatchThread(new Runnable() {
                                 public void run() {
                                     monitor.monitorVM(targetAppRunner);
@@ -1276,12 +1297,16 @@ public final class NetBeansProfiler extends Profiler {
         final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
         profilingSettings.applySettings(sharedSettings);
 
-        printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************"); //NOI18N
-        printDebugMsg("profiling settings --------------------------------"); //NOI18N
-        printDebugMsg(profilingSettings.debug());
-        printDebugMsg("instrumentation filter ----------------------------"); // NOI18N
-        printDebugMsg(sharedSettings.getInstrumentationFilter().debug()); //NOI18N
-        printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************"); //NOI18N
+        printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
+        printDebugMsg("profiling settings --------------------------------", false); //NOI18N
+        printDebugMsg(profilingSettings.debug(), false);
+        printDebugMsg("instrumentation filter ----------------------------", false); // NOI18N
+        printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+        printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
+        flushDebugMsgs();
+
+        GestureSubmitter.logModify(getProfiledProject(), getProfiledSingleFile(), profilingSettings);
+
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
@@ -1389,13 +1414,6 @@ public final class NetBeansProfiler extends Profiler {
         //final long time = System.currentTimeMillis();
         profilingMode = MODE_PROFILE;
 
-        printDebugMsg("Profiler.profileClass: **************************************************"); //NOI18N
-        printDebugMsg("Profiler.profileClass: profiling settings -------------------------------"); //NOI18N
-        printDebugMsg(profilingSettings.debug());
-        printDebugMsg("Profiler.profileClass: session settings ---------------------------------"); //NOI18N
-        printDebugMsg(sessionSettings.debug());
-        printDebugMsg("Profiler.profileClass: **************************************************"); //NOI18N
-
         lastProfilingSettings = profilingSettings;
         lastSessionSettings = sessionSettings;
         lastMode = MODE_PROFILE;
@@ -1412,8 +1430,16 @@ public final class NetBeansProfiler extends Profiler {
 
         //getThreadsManager().setSupportsSleepingStateMonitoring(
         // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-        printDebugMsg("Instrumentation filter:\n" + sharedSettings.getInstrumentationFilter().debug()); //NOI18N
-                                                                                                        //    System.err.println("------------------------------------------------ 1: "+ (System.currentTimeMillis() - time));
+        printDebugMsg("Profiler.profileClass: **************************************************", false); //NOI18N
+        printDebugMsg("Profiler.profileClass: profiling settings -------------------------------", false); //NOI18N
+        printDebugMsg(profilingSettings.debug(), false);
+        printDebugMsg("Profiler.profileClass: session settings ---------------------------------", false); //NOI18N
+        printDebugMsg(sessionSettings.debug(), false);
+        printDebugMsg("Profiler.profileClass: **************************************************", false); //NOI18N
+        printDebugMsg("Instrumentation filter:\n" + sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+        flushDebugMsgs();
+
+        GestureSubmitter.logProfileClass(getProfiledSingleFile(), profilingSettings, sessionSettings); // NOI18N
 
         changeStateTo(PROFILING_STARTED);
 
@@ -1847,6 +1873,16 @@ public final class NetBeansProfiler extends Profiler {
         displayWarning(ENTIRE_APPLICATION_PROFILING_WARNING);
     }
 
+    private void flushDebugMsgs() {
+        String msg = logMsgs.toString();
+
+        if (LOGGER.isLoggable(Level.CONFIG) && !silent) {
+            LOGGER.config(msg);
+        } else { // just log
+            profilerErrorManager.log(msg);
+        }
+    }
+
     // -- Package-Private stuff --------------------------------------------------------------------------------------------
     private void loadGlobalFilters() {
         try {
@@ -1960,10 +1996,14 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     private void printDebugMsg(String msg) {
-        if (LOGGER.isLoggable(Level.CONFIG) && !silent) {
-            LOGGER.config(msg);
-        } else { // just log
-            profilerErrorManager.log(msg);
+        printDebugMsg(msg, true);
+    }
+
+    private void printDebugMsg(String msg, boolean flush) {
+        logMsgs.append(msg).append('\n');
+
+        if (flush) {
+            flushDebugMsgs();
         }
     }
 
