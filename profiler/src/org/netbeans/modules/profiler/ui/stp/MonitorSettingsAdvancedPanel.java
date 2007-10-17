@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.ui.stp;
 
+import javax.swing.event.DocumentEvent;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.modules.profiler.actions.JavaPlatformSelector;
 import org.netbeans.modules.profiler.ui.HyperlinkLabel;
@@ -67,6 +68,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentListener;
 
 
 /**
@@ -309,6 +311,11 @@ public class MonitorSettingsAdvancedPanel extends DefaultSettingsPanel implement
             };
         workingDirectoryLabel.setLabelFor(workingDirectoryTextField);
         workingDirectoryTextField.setToolTipText(STP_WORKDIR_TOOLTIP);
+        workingDirectoryTextField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e)  { checkWorkingDirectory(); }
+            public void removeUpdate(DocumentEvent e)  { checkWorkingDirectory(); }
+            public void changedUpdate(DocumentEvent e) { checkWorkingDirectory(); }
+        });
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
         constraints.gridy = 1;
@@ -430,6 +437,15 @@ public class MonitorSettingsAdvancedPanel extends DefaultSettingsPanel implement
         javaPlatformCombo.setEnabled(enableOverride);
         vmArgumentsLabel.setEnabled(enableOverride);
         vmArgumentsTextField.setEnabled(enableOverride);
+    }
+    
+    private void checkWorkingDirectory() {
+        String workDir = workingDirectoryTextField.getText().trim();
+        if (workDir.length() == 0 || new File(workDir).exists()) {
+            workingDirectoryTextField.setForeground(UIManager.getColor("TextField.foreground")); // NOI18N
+        } else {
+            workingDirectoryTextField.setForeground(Color.RED);
+        }
     }
 
     // --- Private implementation ------------------------------------------------

@@ -84,6 +84,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 
 
 /**
@@ -197,6 +198,8 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
                                                                           "SelectProfilingTask_InitSessionString"); // NOI18N
     private static final String CHOOSER_COMBO_ACCESS_DESCR = NbBundle.getMessage(SelectProfilingTask.class,
                                                                                  "SelectProfilingTask_ChooserComboAccessDescr"); // NOI18N
+    private static final String WORKDIR_INVALID_MSG = NbBundle.getMessage(SelectProfilingTask.class,
+                                                                                 "SelectProfilingTask_WorkDirInvalidMsg"); // NOI18N
                                                                                                                                  // -----
 
     // --- Constants declaration -------------------------------------------------
@@ -342,7 +345,15 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         Configuration result = null;
 
         if (spt.dd.getValue() == spt.runButton) {
-            result = new Configuration(project, spt.createFinalSettings(), null);
+            ProfilingSettings settings = spt.createFinalSettings();
+            if (settings.getOverrideGlobalSettings()) {
+                String workDir = settings.getWorkingDir().trim();
+                if (workDir.length() != 0 && !new java.io.File(workDir).exists()) {
+                    settings.setWorkingDir(""); // NOI18N
+                    NetBeansProfiler.getDefaultNB().displayWarning(WORKDIR_INVALID_MSG);
+                }
+            }
+            result = new Configuration(project, settings, null);
         }
 
         spt.cleanup();
