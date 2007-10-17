@@ -169,8 +169,6 @@ public class TriggeredTakeSnapshotProfilingPointFactory extends CodeProfilingPoi
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
         }
 
-        ;
-
         return profilingPoint;
     }
 

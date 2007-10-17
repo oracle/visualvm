@@ -167,8 +167,6 @@ public class TimedTakeSnapshotProfilingPointFactory extends CodeProfilingPointFa
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
         }
 
-        ;
-
         return profilingPoint;
     }
 

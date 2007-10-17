@@ -173,8 +173,6 @@ public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
         }
 
-        ;
-
         return profilingPoint;
     }
 

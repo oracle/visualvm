@@ -215,8 +215,6 @@ public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
         }
 
-        ;
-
         return profilingPoint;
     }
 
