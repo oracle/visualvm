@@ -242,13 +242,15 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
                 if (SNAPSHOT_1_MASK.equals(url.toString())) {
                     if (s1File != null) {
-                        ls = ResultsManager.getDefault().loadSnapshot(FileUtil.toFileObject(new File(s1File)));
+                        File f = new File(s1File);
+                        if (f.exists()) ls = ResultsManager.getDefault().loadSnapshot(FileUtil.toFileObject(f));
                     } else {
                         ls = loadedSnapshots[0].get();
                     }
                 } else if (SNAPSHOT_2_MASK.equals(url.toString())) {
                     if (s2File != null) {
-                        ls = ResultsManager.getDefault().loadSnapshot(FileUtil.toFileObject(new File(s2File)));
+                        File f = new File(s2File);
+                        if (f.exists()) ls = ResultsManager.getDefault().loadSnapshot(FileUtil.toFileObject(f));
                     } else {
                         ls = loadedSnapshots[1].get();
                     }
