@@ -42,11 +42,14 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.memorylint.MemoryLint;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.AnalysisControllerUI;
+import org.openide.util.NbBundle;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,6 +63,15 @@ import javax.swing.JPanel;
  * @author Jiri Sedlacek
  */
 public class AnalysisController extends AbstractTopLevelController implements NavigationHistoryManager.NavigationHistoryCapable {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+
+    // -----
+    // I18N String constants
+    private static final String CANNOT_RESOLVE_CLASS_MSG = NbBundle.getMessage(AnalysisController.class,
+                                                                               "AnalysisController_CannotResolveClassMsg"); // NOI18N
+    private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
+                                                                                  "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
+
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapFragmentWalker heapFragmentWalker;
@@ -152,13 +164,31 @@ public class AnalysisController extends AbstractTopLevelController implements Na
 
             String[] id = urls.split("/"); // NOI18N
             JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(id[0]);
-            Instance i = (Instance) c.getInstances().get(Integer.parseInt(id[1]) - 1);
-            heapFragmentWalker.getClassesController().showInstance(i);
+
+            if (c != null) {
+                Instance i = (Instance) c.getInstances().get(Integer.parseInt(id[1]) - 1);
+
+                if (i != null) {
+                    heapFragmentWalker.getClassesController().showInstance(i);
+                } else {
+                    NetBeansProfiler.getDefaultNB()
+                                    .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG,
+                                                                       new Object[] { id[1], c.getName() }));
+                }
+            } else {
+                NetBeansProfiler.getDefaultNB()
+                                .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+            }
         } else if (urls.startsWith("file://class/")) { // NOI18N
             urls = urls.substring("file://class/".length()); // NOI18N
 
             JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(urls);
-            heapFragmentWalker.getClassesController().showClass(c);
+
+            if (c != null) {
+                heapFragmentWalker.getClassesController().showClass(c);
+            } else {
+                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+            }
         }
     }
 
