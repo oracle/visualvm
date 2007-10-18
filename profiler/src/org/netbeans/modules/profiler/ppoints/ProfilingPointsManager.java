@@ -56,6 +56,7 @@ import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
@@ -465,7 +466,11 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
         if ((wasProfilingInProgress != profilingInProgress) || (wasProfilingSessionInProgres != profilingSessionInProgress)) {
             GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
-            ProfilingPointsWindow.getInstance().notifyProfilingStateChanged();
+            IDEUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        ProfilingPointsWindow.getInstance().notifyProfilingStateChanged(); // this needs to be called on EDT
+                    }
+                });
         }
     }
 

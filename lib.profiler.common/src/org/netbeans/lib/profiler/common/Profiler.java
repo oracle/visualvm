@@ -111,6 +111,7 @@ public abstract class Profiler {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Vector profilingStateListeners;
+    private int currentProfilingState = -1;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -238,6 +239,7 @@ public abstract class Profiler {
 
         if (!profilingStateListeners.contains(profilingStateListener)) {
             profilingStateListeners.add(profilingStateListener);
+            profilingStateListener.profilingStateChanged(new ProfilingStateEvent(-1, currentProfilingState, defaultProfiler));
             profilingStateListener.instrumentationChanged(-1, getTargetAppRunner().getProfilerClient().getCurrentInstrType());
         }
     }
@@ -358,6 +360,8 @@ public abstract class Profiler {
     }
 
     protected final void fireProfilingStateChange(final int oldProfilingState, final int newProfilingState) {
+        currentProfilingState = newProfilingState;
+
         if (profilingStateListeners == null) {
             return;
         }

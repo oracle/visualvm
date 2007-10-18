@@ -236,7 +236,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
             ProfilingSettings settingsToModify = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
                                                                          cpuSettings.toArray(new ProfilingSettings[cpuSettings
-                                                                                                                                                                                                                                              .size()]),
+                                                                                                                                                                                                                                               .size()]),
                                                                          lastProfilingSettings);
 
             if (settingsToModify == null) {
@@ -799,14 +799,15 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     public void profilingStateChanged(ProfilingStateEvent e) {
         updateActions(e.getNewState());
 
-        if (e.getNewState() == Profiler.PROFILING_INACTIVE) { // reset the live results display to its defaults
-                                                              //      if (currentDisplay != null) {
-                                                              //        currentDisplay.handleRemove();
-                                                              //        currentDisplay = null;
-                                                              //      }
-            handleShutdown();
-        } else {
-            handleStartup();
+        switch (e.getNewState()) {
+            case Profiler.PROFILING_INACTIVE:
+                handleShutdown();
+
+                break;
+            case Profiler.PROFILING_RUNNING:
+                handleStartup();
+
+                break;
         }
     }
 
@@ -876,8 +877,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
     protected void componentShowing() {
         super.componentShowing();
-
-        updateDrillDown();
+        updateResultsDisplay();
     }
 
     /**
@@ -1007,23 +1007,23 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         /*    toolBar.addSeparator();
         
-                                     valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
-                                       public Dimension getMaximumSize() {
-                                         return new Dimension(100, super.getMaximumSize().height);
-                                       }
-                                     };
-                                     toolBar.add(valueSlider);
-                                     valueFilterComponent = valueSlider;
+                                                                      valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
+                                                                        public Dimension getMaximumSize() {
+                                                                          return new Dimension(100, super.getMaximumSize().height);
+                                                                        }
+                                                                      };
+                                                                      toolBar.add(valueSlider);
+                                                                      valueFilterComponent = valueSlider;
         
-                                     valueSlider.addChangeListener(new ChangeListener() {
+                                                                      valueSlider.addChangeListener(new ChangeListener() {
         
-                                       public void stateChanged(ChangeEvent e) {
-                                         // make cubic curve instead of linear
-                                         double val = (double) valueSlider.getValue() / 10f;
-                                         val = val * val;
-                                         if (currentDisplay != null) currentDisplay.updateValueFilter(val);
-                                       }
-                                     }); */
+                                                                        public void stateChanged(ChangeEvent e) {
+                                                                          // make cubic curve instead of linear
+                                                                          double val = (double) valueSlider.getValue() / 10f;
+                                                                          val = val * val;
+                                                                          if (currentDisplay != null) currentDisplay.updateValueFilter(val);
+                                                                        }
+                                                                      }); */
         return toolBar;
     }
 
@@ -1232,9 +1232,11 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         if (!isOpened()) {
             return; // do nothing if i'm closed 
         }
+
         if (!resultsDumpForced.getAndSet(false) && !isAutoRefresh()) {
             return; // process only forced results if autorefresh is off
         }
+
         if (!resultsAvailable) {
             currentDisplay = noResultsPanel;
             currentDisplayComponent = null;
@@ -1243,8 +1245,9 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         }
 
         // does the current display support the instrumentation in use?
-        boolean instrSupported = (currentDisplay != null)
-                                 ? currentDisplay.supports(runner.getProfilerClient().getCurrentInstrType()) : false;
+        boolean instrSupported = (currentDisplayComponent != null)
+                                 && ((currentDisplay != null)
+                                     ? currentDisplay.supports(runner.getProfilerClient().getCurrentInstrType()) : false);
 
         if (!instrSupported) {
             if (currentDisplayComponent != null) {
