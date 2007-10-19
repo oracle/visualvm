@@ -60,7 +60,10 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
+import org.openide.filesystems.FileAttributeEvent;
+import org.openide.filesystems.FileEvent;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileRenameEvent;
 import org.openide.filesystems.FileUtil;
 import org.openide.text.Annotatable;
 import org.openide.text.Line;
@@ -96,6 +99,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import org.openide.filesystems.FileChangeListener;
 
 
 /**
@@ -217,6 +221,64 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             return owner;
         }
     }
+    
+    private class FileWatch {
+        private int references = 0;
+        private LocationFileListener listener;
+        
+        public FileWatch(LocationFileListener listener) { this.listener = listener; }
+        
+        public boolean hasReferences() { return references > 0; }
+        public LocationFileListener getListener() { return listener; }
+        
+        public void increaseReferences() { references++; }
+        public void decreaseReferences() { references--; }
+    }
+    
+    private class LocationFileListener implements FileChangeListener {
+        
+        private File file;
+        
+        public LocationFileListener(File file) { this.file = file; }
+
+        public void fileDeleted(final FileEvent fe) {
+            Runnable processor = new Runnable() {
+                public void run() { deleteProfilingPointsForFile(file); }
+            };
+            
+            if (SwingUtilities.isEventDispatchThread()) {
+                RequestProcessor.getDefault().post(processor);
+            } else {
+                processor.run();
+            }
+        }
+
+        public void fileRenamed(final FileRenameEvent fe) {
+            Runnable processor = new Runnable() {
+                public void run() { 
+                    FileObject renamedFileO = fe.getFile();
+                    File renamedFile = FileUtil.toFile(renamedFileO);
+                    if (renamedFile != null && renamedFile.exists() && renamedFile.isFile()) {
+                        updateProfilingPointsFile(file, renamedFile);
+                    } else {
+                        deleteProfilingPointsForFile(file);
+                    }
+                }
+            };
+            
+            if (SwingUtilities.isEventDispatchThread()) {
+                RequestProcessor.getDefault().post(processor);
+            } else {
+                processor.run();
+            }
+        }
+        
+        public void fileFolderCreated(FileEvent fe) {}
+        public void fileDataCreated(FileEvent fe) {}
+        public void fileChanged(FileEvent fe) {}
+        public void fileAttributeChanged(FileAttributeEvent fe) {}
+        
+    }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -264,6 +326,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private boolean profilingInProgress = false; // collecting data
     private boolean profilingSessionInProgress = false; // session started and not yet finished
     private int nextUniqueRPPIdentificator;
+    
+    private Map<File, FileWatch> profilingPointsFiles = new HashMap<File, FileWatch>();
+    private boolean ignoreStoreProfilingPoints = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -378,6 +443,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     // TODO: should optionally support also subprojects/project references
     public RuntimeProfilingPoint[] createCodeProfilingConfiguration(Project project, ProfilingSettings profilingSettings) {
+        
+        checkProfilingPoints(); // NOTE: Probably not neccessary but we need to be sure here
+        
         nextUniqueRPPIdentificator = 0;
 
         List<RuntimeProfilingPoint> runtimeProfilingPoints = new ArrayList();
@@ -403,6 +471,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     // TODO: should optionally support also subprojects/project references
     public GlobalProfilingPoint[] createGlobalProfilingConfiguration(Project project, ProfilingSettings profilingSettings) {
+        
+        checkProfilingPoints(); // NOTE: Probably not neccessary but we need to be sure here
+        
         List<ProfilingPoint> compatibleProfilingPoints = getCompatibleProfilingPoints(project, profilingSettings, false);
 
         for (ProfilingPoint compatibleProfilingPoint : compatibleProfilingPoints) {
@@ -503,8 +574,16 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                 annotate((CodeProfilingPoint) profilingPoint, (CodeProfilingPoint.Annotation[]) evt.getNewValue());
             }
 
-            ;
-
+            if (isLocationChange(evt)) {
+                CodeProfilingPoint.Location oldLocation = (CodeProfilingPoint.Location)evt.getOldValue();
+                if (oldLocation != null && !CodeProfilingPoint.Location.EMPTY.equals(oldLocation))
+                    removeFileWatch(new File(oldLocation.getFile()));
+                
+                CodeProfilingPoint.Location newLocation = (CodeProfilingPoint.Location)evt.getNewValue();
+                if (newLocation != null && !CodeProfilingPoint.Location.EMPTY.equals(newLocation))
+                    addFileWatch(new File(newLocation.getFile()));
+            }
+                
             if (isAppearanceChange(evt)) {
                 firePropertyChanged(PROPERTY_PROFILING_POINTS_CHANGED);
             }
@@ -680,9 +759,15 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private boolean isAnnotationChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
 
+        return propertyName.equals(CodeProfilingPoint.PROPERTY_ANNOTATION);
+    }
+    
+    private boolean isLocationChange(PropertyChangeEvent evt) {
+        String propertyName = evt.getPropertyName();
+
         return propertyName.equals(CodeProfilingPoint.PROPERTY_LOCATION);
     }
-
+    
     private boolean isAppearanceChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
 
@@ -704,14 +789,133 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
         return cachedSubprojects;
     }
+    
+    // Returns only valid profiling points (currently all GlobalProfilingPoints and CodeProfilingPoints with all locations pointing to a valid java file)
+    private ProfilingPoint[] getValidProfilingPoints(ProfilingPoint[] profilingPointsArr) {
+        ArrayList<ProfilingPoint> validProfilingPoints = new ArrayList<ProfilingPoint>();
+        for (ProfilingPoint profilingPoint : profilingPointsArr) if(profilingPoint.isValid()) validProfilingPoints.add(profilingPoint);
+        return validProfilingPoints.toArray(new ProfilingPoint[validProfilingPoints.size()]);
+    }
+    
+    // Returns only invalid profiling points (currently CodeProfilingPoints with any of the locations pointing to an invalid file)
+    private ProfilingPoint[] getInvalidProfilingPoints(ProfilingPoint[] profilingPointsArr) {
+        ArrayList<ProfilingPoint> invalidProfilingPoints = new ArrayList<ProfilingPoint>();
+        for (ProfilingPoint profilingPoint : profilingPointsArr) if(!profilingPoint.isValid()) invalidProfilingPoints.add(profilingPoint);
+        return invalidProfilingPoints.toArray(new ProfilingPoint[invalidProfilingPoints.size()]);
+    }
+    
+    // Checks if currently loaded profiling points are valid, invalid profiling points are silently deleted
+    private void checkProfilingPoints() {
+        ProfilingPoint[] invalidProfilingPoints = getInvalidProfilingPoints(profilingPoints.toArray(new ProfilingPoint[profilingPoints.size()]));
+        if (invalidProfilingPoints.length > 0) removeProfilingPoints(invalidProfilingPoints);
+    }
+    
+    private void addFileWatch(File file) {
+        FileObject fileo = FileUtil.toFileObject(file);
+        if (fileo != null) {
+            FileWatch fileWatch = profilingPointsFiles.get(file);
+            if (fileWatch == null) {
+                LocationFileListener listener = new LocationFileListener(file);
+                fileWatch = new FileWatch(listener);
+                fileo.addFileChangeListener(listener);
+                profilingPointsFiles.put(file, fileWatch);
+            }
+            fileWatch.increaseReferences();
+        }
+    }
+    
+    private void removeFileWatch(File file) {
+        FileObject fileo = file.exists() && file.isFile() ? FileUtil.toFileObject(file) : null;
+        if (fileo != null) {
+            FileWatch fileWatch = profilingPointsFiles.get(file);
+            if (fileWatch != null) {
+                fileWatch.decreaseReferences();
+                if (!fileWatch.hasReferences()) fileo.removeFileChangeListener(profilingPointsFiles.remove(file).getListener());
+            }
+        } else {
+            profilingPointsFiles.remove(file);
+        }
+    }
+    
+    private void addProfilingPointFileWatch(CodeProfilingPoint cpp) {
+        CodeProfilingPoint.Annotation[] annotations = cpp.getAnnotations();
+        for (CodeProfilingPoint.Annotation annotation : annotations) {
+            CodeProfilingPoint.Location location = cpp.getLocation(annotation);
+            String filename = location.getFile();
+            File file = new File(filename);
+            if (file.exists() && file.isFile()) addFileWatch(file);
+        }
+    }
+    
+    private void removeProfilingPointFileWatch(CodeProfilingPoint cpp) {
+        CodeProfilingPoint.Annotation[] annotations = cpp.getAnnotations();
+        for (CodeProfilingPoint.Annotation annotation : annotations) {
+            CodeProfilingPoint.Location location = cpp.getLocation(annotation);
+            String filename = location.getFile();
+            File file = new File(filename);
+            removeFileWatch(file);
+        }
+    }
+    
+    private CodeProfilingPoint[] getProfilingPointsForFile(File file) {
+        List<CodeProfilingPoint> profilingPointsForFile = new ArrayList<CodeProfilingPoint>();
+        
+        // TODO: could be optimized to search just within the owner Project
+        for (ProfilingPoint profilingPoint : profilingPoints) {
+            if (profilingPoint instanceof CodeProfilingPoint) {
+                CodeProfilingPoint cpp = (CodeProfilingPoint)profilingPoint;
+                for (CodeProfilingPoint.Annotation annotation : cpp.getAnnotations()) {
+                    CodeProfilingPoint.Location location = cpp.getLocation(annotation);
+                    File ppFile = new File(location.getFile());
+                    if (file.equals(ppFile)) {
+                        profilingPointsForFile.add(cpp);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return profilingPointsForFile.toArray(new CodeProfilingPoint[profilingPointsForFile.size()]);
+    }
+    
+    private void deleteProfilingPointsForFile(File file) {
+        removeProfilingPoints(getProfilingPointsForFile(file));
+    }
+    
+    private void updateProfilingPointsFile(File oldFile, File newFile) {
+        String newFilename = newFile.getAbsolutePath();
+        CodeProfilingPoint[] cppa = getProfilingPointsForFile(oldFile);
+        
+        ignoreStoreProfilingPoints = true;
+        
+        for (CodeProfilingPoint cpp : cppa) {
+            for (CodeProfilingPoint.Annotation annotation : cpp.getAnnotations()) {
+                CodeProfilingPoint.Location location = cpp.getLocation(annotation);
+                File ppFile = new File(location.getFile());
+                if (oldFile.equals(ppFile)) {
+                    CodeProfilingPoint.Location newLocation = new CodeProfilingPoint.Location(
+                            newFilename, location.getLine(), location.getOffset());
+                    cpp.setLocation(annotation, newLocation);
+                }
+            }
+        }
+        
+        ignoreStoreProfilingPoints = false;
+        storeProfilingPoints(cppa);
+    }
 
     private synchronized void addProfilingPoints(ProfilingPoint[] profilingPointsArr, boolean internalChange) {
+        
+        profilingPointsArr = getValidProfilingPoints(profilingPointsArr);
+        
         for (ProfilingPoint profilingPoint : profilingPointsArr) {
             profilingPoints.add(profilingPoint);
             profilingPoint.addPropertyChangeListener(this);
 
             if (profilingPoint instanceof CodeProfilingPoint) {
-                annotateProfilingPoint((CodeProfilingPoint) profilingPoint);
+                CodeProfilingPoint cpp = (CodeProfilingPoint) profilingPoint;
+                annotateProfilingPoint(cpp);
+                addProfilingPointFileWatch(cpp);
             }
         }
 
@@ -862,7 +1066,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private synchronized void removeProfilingPoints(ProfilingPoint[] profilingPointsArr, boolean internalChange) {
         for (ProfilingPoint profilingPoint : profilingPointsArr) {
             if (profilingPoint instanceof CodeProfilingPoint) {
-                deannotateProfilingPoint((CodeProfilingPoint) profilingPoint);
+                CodeProfilingPoint cpp = (CodeProfilingPoint) profilingPoint;
+                removeProfilingPointFileWatch(cpp);
+                deannotateProfilingPoint(cpp);
             }
 
             profilingPoint.removePropertyChangeListener(this);
@@ -907,6 +1113,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private synchronized void storeProfilingPoints(ProfilingPoint[] profilingPointsArr) {
+        if (ignoreStoreProfilingPoints) return;
+        
         Set<Project> projects = new HashSet();
         Set<ProfilingPointFactory> factories = new HashSet();
 
@@ -948,7 +1156,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
         for (ProfilingPoint closedProfilingPoint : closedProfilingPoints) {
             if (closedProfilingPoint instanceof CodeProfilingPoint) {
-                deannotateProfilingPoint((CodeProfilingPoint) closedProfilingPoint);
+                CodeProfilingPoint cpp = (CodeProfilingPoint) closedProfilingPoint;
+                removeProfilingPointFileWatch(cpp);
+                deannotateProfilingPoint(cpp);
             }
 
             closedProfilingPoint.hideResults(); // TODO: should stay open if subproject of profiled project

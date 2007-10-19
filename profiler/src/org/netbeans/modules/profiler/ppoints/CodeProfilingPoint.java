@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.ppoints;
 
+import java.io.File;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.openide.ErrorManager;
@@ -70,6 +71,22 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
+        
+        public boolean isValid() {
+            // TODO: should also check line number!
+            if (startLocation == null) return false;
+            String filename = startLocation.getFile();
+            File file = new File(filename);
+            if (!filename.endsWith(".java") || !file.exists() || !file.isFile()) return false; // NOI18N
+            
+            if (!usesEndLocation()) return true;
+            
+            // TODO: should also check line number!
+            if (endLocation == null) return false;
+            filename = endLocation.getFile();
+            file = new File(filename);
+            return filename.endsWith(".java") && file.exists() && file.isFile(); // NOI18N
+        }
 
         public void setEnabled(boolean enabled) {
             if (isEnabled() != enabled) {
@@ -89,14 +106,18 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
             }
 
             Annotation oldAnnotation = getEndAnnotation();
-            //      Location oldLocation = this.endLocation;
+            Location oldLocation = this.endLocation;
             this.endLocation = endLocation;
 
             Annotation newAnnotation = getEndAnnotation();
             getChangeSupport()
-                .firePropertyChange(PROPERTY_LOCATION,
+                .firePropertyChange(PROPERTY_ANNOTATION,
                                     (oldAnnotation == null) ? new Annotation[0] : new Annotation[] { oldAnnotation },
                                     (newAnnotation == null) ? new Annotation[0] : new Annotation[] { newAnnotation });
+            getChangeSupport()
+                .firePropertyChange(PROPERTY_LOCATION,
+                                    (oldLocation == null) ? Location.EMPTY : oldLocation,
+                                    (endLocation == null) ? Location.EMPTY : endLocation);
         }
 
         public Location getEndLocation() {
@@ -109,12 +130,14 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
             }
 
             Annotation oldAnnotation = getStartAnnotation();
-            //      Location oldLocation = this.startLocation;
+            Location oldLocation = this.startLocation;
             this.startLocation = startLocation;
 
             Annotation newAnnotation = getStartAnnotation();
             getChangeSupport()
-                .firePropertyChange(PROPERTY_LOCATION, new Annotation[] { oldAnnotation }, new Annotation[] { newAnnotation });
+                .firePropertyChange(PROPERTY_ANNOTATION, new Annotation[] { oldAnnotation }, new Annotation[] { newAnnotation });
+            getChangeSupport()
+                .firePropertyChange(PROPERTY_LOCATION, oldLocation, startLocation);
         }
 
         public Location getStartLocation() {
@@ -146,6 +169,14 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
             return usesEndLocation() ? new CodeProfilingPoint.Annotation[] { getStartAnnotation(), getEndAnnotation() }
                                      : new CodeProfilingPoint.Annotation[] { getStartAnnotation() };
         }
+        
+        public void setLocation(Annotation annotation, Location location) {
+            if (annotation.equals(getStartAnnotation())) {
+                setStartLocation(location);
+            } else if (annotation.equals(getEndAnnotation())) {
+                setEndLocation(location);
+            }
+        }
 
         Location getLocation(Annotation annotation) {
             if (annotation.equals(getStartAnnotation())) {
@@ -171,6 +202,14 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
+        
+        public boolean isValid() {
+            // TODO: should also check line number!
+            if (location == null) return false;
+            String filename = location.getFile();
+            File file = new File(filename);
+            return filename.endsWith(".java") && file.exists() && file.isFile(); // NOI18N
+        }
 
         public void setEnabled(boolean enabled) {
             if (isEnabled() != enabled) {
@@ -183,14 +222,16 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
             if (this.location.equals(location)) {
                 return;
             }
-
+            
             Annotation oldAnnotation = getAnnotation();
-            //      Location oldLocation = this.location;
+            Location oldLocation = this.location;
             this.location = location;
 
             Annotation newAnnotation = getAnnotation();
             getChangeSupport()
-                .firePropertyChange(PROPERTY_LOCATION, new Annotation[] { oldAnnotation }, new Annotation[] { newAnnotation });
+                .firePropertyChange(PROPERTY_ANNOTATION, new Annotation[] { oldAnnotation }, new Annotation[] { newAnnotation });
+            getChangeSupport()
+                .firePropertyChange(PROPERTY_LOCATION, oldLocation, location);
         }
 
         public Location getLocation() {
@@ -205,6 +246,10 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
 
         CodeProfilingPoint.Annotation[] getAnnotations() {
             return new CodeProfilingPoint.Annotation[] { getAnnotation() };
+        }
+        
+        public void setLocation(Annotation annotation, Location location) {
+            if (annotation.equals(getAnnotation())) setLocation(location);
         }
 
         Location getLocation(Annotation annotation) {
@@ -314,7 +359,7 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
             return "File: " + getFile() + ", line: " + getLine() + ", offset: " + getOffset(); // NOI18N
         }
     }
-
+    
     public abstract static class Annotation extends org.openide.text.Annotation {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -334,6 +379,7 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     static final String PROPERTY_LOCATION = "p_location"; // NOI18N
+    static final String PROPERTY_ANNOTATION = "p_annotation"; // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -353,6 +399,8 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
     }
 
     abstract Annotation[] getAnnotations();
+    
+    abstract void setLocation(Annotation annotation, Location location);
 
     abstract Location getLocation(Annotation annotation);
 

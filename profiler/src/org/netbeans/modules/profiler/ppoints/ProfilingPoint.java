@@ -164,6 +164,10 @@ public abstract class ProfilingPoint {
     public Project getProject() {
         return project;
     }
+    
+    public boolean isValid() {
+        return true;
+    }
 
     public abstract boolean hasResults();
 
