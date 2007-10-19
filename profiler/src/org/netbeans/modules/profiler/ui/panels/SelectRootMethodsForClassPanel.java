@@ -50,8 +50,8 @@ import org.netbeans.modules.profiler.selector.api.SelectorChildren;
 import org.netbeans.modules.profiler.selector.api.SelectorNode;
 import org.netbeans.modules.profiler.selector.api.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.api.nodes.GreedySelectorChildren;
+import org.netbeans.modules.profiler.selector.api.nodes.ProjectNode;
 import org.netbeans.modules.profiler.selector.api.ui.RootSelectorTree;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
@@ -61,12 +61,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,12 +71,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
@@ -152,7 +145,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
         d.pack(); // To properly layout HTML hint area
         d.setVisible(true);
 
-        //    ClientUtils.SourceCodeSelection[] rootMethods = this.currentSelectionSet.toArray(new ClientUtils.SourceCodeSelection[this.currentSelectionSet.size()]);
         this.currentProject = null;
 
         return advancedLogicalPackageTree.getSelection();
@@ -170,7 +162,9 @@ public class SelectRootMethodsForClassPanel extends JPanel {
 
                 @Override
                 protected TreeNode customizeRoot(final DefaultMutableTreeNode root) {
-                    final SelectorChildren children = new GreedySelectorChildren() {
+                    assert(root.getChildAt(0) instanceof ProjectNode);
+                    final Project project = ((ProjectNode) root.getChildAt(0)).getProject();
+                    final SelectorChildren<SelectorNode> children = new GreedySelectorChildren() {
                         protected List<SelectorNode> prepareChildren(SelectorNode parent) {
                             List<SelectorNode> nodes = new ArrayList<SelectorNode>();
                             Enumeration chldrn = root.children();
@@ -190,16 +184,14 @@ public class SelectRootMethodsForClassPanel extends JPanel {
                         }
                     };
 
-                    //        if (children.getNodeCount() == 0) {
-                    //          treeBuilderList.setSelectedIndex(defaultBuilderIndex);
-                    //        }
                     final ContainerNode newRoot = new ContainerNode() {
                         protected SelectorChildren getChildren() {
                             return children;
                         }
 
-                        public boolean isShowingInheritedMethods() {
-                            return true;
+                        @Override
+                        public Project getProject() {
+                            return project;
                         }
                     };
 
@@ -207,24 +199,8 @@ public class SelectRootMethodsForClassPanel extends JPanel {
 
                     return newRoot;
                 }
-
-                protected boolean isShowingInheritedMethods() {
-                    return true;
-                }
             };
 
-        //    treeBuilderList = new JComboBox();
-        //    treeBuilderList.addItemListener(new ItemListener() {
-        //      public void itemStateChanged(final ItemEvent e) {
-        //        if (currentProject != null && e.getStateChange() == ItemEvent.SELECTED) {
-        //          new NBSwingWorker() {
-        //            protected void doInBackground() {
-        //              updateSelectorProjects();
-        //            }
-        //          }.execute();
-        //        }
-        //      }
-        //    });
         container.setLayout(new GridBagLayout());
 
         hintArea = new HTMLTextArea() {
@@ -250,16 +226,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
         gridBagConstraints.insets = new Insets(10, 10, 0, 10);
         container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
 
-        //    JPanel comboPanel = new JPanel(new FlowLayout());
-        //    comboPanel.add(new JLabel(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_SelectViewLabel"))); // NOI18N
-        //    comboPanel.add(treeBuilderList);
-
-        //    gridBagConstraints = new GridBagConstraints();
-        //    gridBagConstraints.gridx = 1;
-        //    gridBagConstraints.gridy = 1;
-        //    gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //    gridBagConstraints.insets = new Insets(5, 10, 5, 10);
-        //    container.add(comboPanel, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -334,10 +300,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
                 }
             }
         }
-
-        //    treeBuilderList.setModel(new DefaultComboBoxModel(treeBuilders));
-        //    
-        //    treeBuilderList.setSelectedIndex(preferredIndex);
     }
 
     private void updateSelector(Runnable updater) {
@@ -346,7 +308,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
                                                            500); // NOI18N
 
         try {
-            //      treeBuilderList.setEnabled(false);
             advancedLogicalPackageTree.setEnabled(false);
             okButton.setEnabled(false);
             updater.run();
@@ -354,16 +315,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
             ph.finish();
             okButton.setEnabled(true);
             advancedLogicalPackageTree.setEnabled(true);
-
-            //      treeBuilderList.setEnabled(true);
         }
-    }
-
-    private void updateSelectorProjects() {
-        updateSelector(new Runnable() {
-                public void run() {
-                    advancedLogicalPackageTree.setProjects(new Project[] { currentProject });
-                }
-            });
     }
 }

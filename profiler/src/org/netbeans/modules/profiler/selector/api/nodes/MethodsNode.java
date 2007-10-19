@@ -59,6 +59,7 @@ import java.util.List;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import org.netbeans.modules.profiler.utils.ProjectUtilities;
 
 
 /**
@@ -75,7 +76,12 @@ public class MethodsNode extends ContainerNode {
             final List<MethodNode> methodNodes = new ArrayList<MethodNode>();
 
             try {
-                JavaSource js = JavaSource.create(parent.cpInfo, new FileObject[0]);
+                ClasspathInfo cpInfo = parent.cpInfo;
+                if (parent.isShowingInheritedMethods()) {
+                    // we need to have a complete project classpath to be able to show also inherited methods
+                    cpInfo = ProjectUtilities.getClasspathInfo(parent.getProject(), true, true, true);
+                }
+                JavaSource js = JavaSource.create(cpInfo, new FileObject[0]);
                 js.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
                         }
