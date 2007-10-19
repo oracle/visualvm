@@ -86,4 +86,12 @@ made subject to such option by the copyright holder.
       </jar>
     </target>
 
+    <target name="netbeans-extra">
+       <ant dir="remote-packs" target="profiler-server-all"/>
+    </target>
+
+    <target name="clean" depends="init,projectized-common.clean">
+       <delete dir="remote-packs/build"/>
+    </target>
+
 </project>
