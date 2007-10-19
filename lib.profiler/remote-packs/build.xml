@@ -182,7 +182,7 @@ made subject to such option by the copyright holder.
     </copy>	 
     <mkdir dir="build/nb-profiler-server/lib/deployed/jdk${jdk-version}"/>
     <copy todir="build/nb-profiler-server/lib/deployed/jdk${jdk-version}/${os-long-version}">	 
-       <fileset dir="${cluster}/lib/deployed/jdk${jdk-version}/${os-long-version}" />	 
+       <fileset dir="../release/lib/deployed/jdk${jdk-version}/${os-long-version}" />	 
     </copy>	 
   </target>
 
