@@ -62,7 +62,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     // when all target app threads are suspended. In that case, some thread may be suspended within getThreadInfo(), holding the lock.
     // It is also used to disable instrumentation to be on the safe side when we e.g. detach from a running multithreaded application -
     // it looks as if in this case de-instrumentation may not immediately propagate everywhere.
-    protected static boolean recursiveInstrumentationDisabled = false;
+    protected static volatile boolean recursiveInstrumentationDisabled = false;
 
     // ------------------------------------------ Timers -----------------------------------------------
     protected static boolean absoluteTimerOn;
