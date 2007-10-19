@@ -111,7 +111,7 @@ public abstract class Profiler {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Vector profilingStateListeners;
-    private int currentProfilingState = -1;
+    private int currentProfilingState = PROFILING_INACTIVE;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
