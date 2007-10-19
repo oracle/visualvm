@@ -1,0 +1,4 @@
+# profiler/modules/main 
+read global
+exclude ${l10n-module}/src/org/netbeans/modules/profiler/nb-log-file.url
+
