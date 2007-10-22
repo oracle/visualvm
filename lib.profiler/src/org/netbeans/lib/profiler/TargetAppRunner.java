@@ -53,9 +53,7 @@ import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.wireprotocol.AsyncMessageCommand;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.InternalStatsResponse;
-import java.awt.EventQueue;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -332,6 +330,12 @@ public class TargetAppRunner implements CommonConstants {
         return false;
     }
 
+    /**
+     *  Initiates profiling session
+     * @param attachMode 0 = no attach; 1 = direct; 2 = dynamic
+     * @param calibrationOnlyRun
+     * @return Returns TRUE if the connection to the profiler agent has been successfuly established
+     */
     public boolean initiateSession(int attachMode, boolean calibrationOnlyRun) {
         if (targetJVMIsAlive()) {
             return true;
