@@ -92,6 +92,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -436,7 +437,9 @@ public class ProfilingPointsWindowUI extends JPanel implements ActionListener, L
 
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName() == ProfilingPointsManager.PROPERTY_PROJECTS_CHANGED) {
-            updateProjectsCombo(); // also refreshes profiling points
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { updateProjectsCombo(); } // also refreshes profiling points
+            });
         } else if (evt.getPropertyName() == ProfilingPointsManager.PROPERTY_PROFILING_POINTS_CHANGED) {
             refreshProfilingPoints();
         }
