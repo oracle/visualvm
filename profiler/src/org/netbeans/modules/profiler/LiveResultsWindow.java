@@ -1238,8 +1238,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         }
 
         if (!resultsAvailable) {
-            currentDisplay = noResultsPanel;
-            currentDisplayComponent = null;
+            currentDisplay = null;
+            currentDisplayComponent = noResultsPanel;
 
             return;
         }
@@ -1276,4 +1276,4 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         updateDrillDown();
     }
-}
+    }
