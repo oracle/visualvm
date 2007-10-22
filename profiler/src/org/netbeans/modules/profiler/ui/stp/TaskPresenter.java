@@ -77,6 +77,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -558,6 +559,11 @@ public class TaskPresenter implements TaskChooser.Item {
                         }
                     }
                 });
+
+            // Allows the default dialog button to work correctly
+            KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0); // NOI18N
+            getInputMap().put(ks, ""); // NOI18N
+
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
