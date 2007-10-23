@@ -195,6 +195,7 @@ class SaveViewAction extends AbstractAction {
 
         saveFile = null;
         image = null;
+        imagePreview.reset();
 
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
@@ -338,6 +339,8 @@ class SaveViewAction extends AbstractAction {
         imagePreview.reset();
 
         if (result != JFileChooser.APPROVE_OPTION) {
+            image = null;
+            imagePreview.reset();
             return null; // cancelled by the user
         }
 
