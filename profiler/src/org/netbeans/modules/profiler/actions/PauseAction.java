@@ -50,6 +50,8 @@ import org.openide.util.NbBundle;
 
 /**
  * Pause all threads in the target application
+ * 
+ * NOTE: CURRENTLY NOT USED!
  *
  * @author Ian Formanek
  */

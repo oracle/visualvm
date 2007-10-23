@@ -133,7 +133,6 @@ made subject to such option by the copyright holder.
       <file name="org-netbeans-modules-profiler-actions-RerunAction.instance">
                 <attr name="position" intvalue="500"/>
             </file>
-<!--      <file name="org-netbeans-modules-profiler-actions-PauseAction.instance"/> -->
       <file name="org-netbeans-modules-profiler-actions-StopAction.instance">
                 <attr name="position" intvalue="700"/>
             </file>
@@ -178,22 +177,6 @@ made subject to such option by the copyright holder.
        </file>
         <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfileProjectAction.instance"/>
         </folder>
-      <!--folder name="View">
-        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
-        <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance"/>
-        <attr name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance/org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance" boolvalue="true"/>
-        <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
-        <attr name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance/org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance" boolvalue="true"/>
-        <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance"/>
-        <attr name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance/org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance" boolvalue="true"/>
-        <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance"/>
-        <attr name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance/org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance" boolvalue="true"/>
-        <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
-        <attr name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance/org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow" boolvalue="true"/>
-        <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow">
-          <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
-        </file>
-      </folder-->
       <folder name="Advanced">
         <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
         <attr name="position" intvalue="1800"/>
@@ -214,29 +197,8 @@ made subject to such option by the copyright holder.
                 </file>
         <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
         </folder>
-      <!--folder name="Help">
-        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
-        <file name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance"/>
-        <file name="profiler-website.url" url="nbresloc:/org/netbeans/modules/profiler/profiler-website.url">
-          <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
-        </file>
-        <file name="org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance"/>
-        <file name="profiler-help-sep1.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/> </file>
-        <file name="profiler-help-sep2.instance"> <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/> </file>
-        <file name="org-netbeans-modules-profiler-actions-AboutProfilerAction.instance"/>
-        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance"/>
-        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance/profiler-website.url"/>
-        <attr boolvalue="true" name="profiler-website.url/org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance"/>
-        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance/profiler-help-sep1.instance"/>
-        <attr boolvalue="true" name="profiler-help-sep1.instance/profiler-help-sep2.instance"/>
-        <attr boolvalue="true" name="profiler-help-sep2.instance/org-netbeans-modules-profiler-actions-AboutProfilerAction.instance"/>
-      </folder-->
 
       <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance"/>
-      <!--attr boolvalue="true" name="profiler-sep5.instance/View"/>
-      <attr boolvalue="true" name="View/profiler-sep6.instance"/-->
-      <!--attr boolvalue="true" name="Advanced/profiler-sep7.instance"/>
-      <attr boolvalue="true" name="profiler-sep7.instance/Help"/-->
     </folder>
   </folder>
 
@@ -276,7 +238,6 @@ made subject to such option by the copyright holder.
       </file>
       <file name="org-netbeans-modules-profiler-actions-AttachAction.instance"/>
       <file name="org-netbeans-modules-profiler-actions-RerunAction.instance"/>
-<!--      <file name="org-netbeans-modules-profiler-actions-PauseAction.instance"/> -->
       <file name="org-netbeans-modules-profiler-actions-StopAction.instance"/>
       <file name="org-netbeans-modules-profiler-actions-DetachAction.instance"/>
       <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance"/>
@@ -298,13 +259,6 @@ made subject to such option by the copyright holder.
       <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance"/>
       <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
       <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance"/>
-      <file name="org-netbeans-modules-profiler-actions-GlobalSettingsAction.instance"/>
-      <file name="org-netbeans-modules-profiler-actions-ProfilerHelpAction.instance"/>
-      <file name="profiler-website.url" url="nbresloc:/org/netbeans/modules/profiler/profiler-website.url">
-        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
-      </file>
-      <file name="org-netbeans-modules-profiler-actions-ProfilerFeedbackAction.instance"/>
-      <file name="org-netbeans-modules-profiler-actions-AboutProfilerAction.instance"/>
     </folder>
   </folder>
 

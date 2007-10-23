@@ -153,9 +153,9 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
         mode = Profiler.getDefault().getProfilingMode();
 
         if (mode == Profiler.MODE_PROFILE) {
-            putValue(Action.NAME, NbBundle.getMessage(WhatsNewAction.class, "LBL_StopAction" // NOI18N
+            putValue(Action.NAME, NbBundle.getMessage(StopAction.class, "LBL_StopAction" // NOI18N
             ));
-            putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(WhatsNewAction.class, "HINT_StopAction" // NOI18N
+            putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(StopAction.class, "HINT_StopAction" // NOI18N
             ));
             putValue(Action.SMALL_ICON,
                      new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/stop.png")) //NOI18N
@@ -164,9 +164,9 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
                      "org/netbeans/modules/profiler/actions/resources/stop.png" // NOI18N
             );
         } else {
-            putValue(Action.NAME, NbBundle.getMessage(WhatsNewAction.class, "LBL_DetachAction" // NOI18N
+            putValue(Action.NAME, NbBundle.getMessage(StopAction.class, "LBL_DetachAction" // NOI18N
             ));
-            putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(WhatsNewAction.class, "HINT_DetachAction" // NOI18N
+            putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(StopAction.class, "HINT_DetachAction" // NOI18N
             ));
             putValue(Action.SMALL_ICON,
                      new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/detach.png")) //NOI18N
