@@ -112,8 +112,6 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         setLayout(new BorderLayout());
         tabs = new JTabbedPane();
 
-        Profiler.getDefault().addProfilingStateListener(this);
-
         tabs.setTabPlacement(JTabbedPane.BOTTOM);
         add(tabs, BorderLayout.CENTER);
 
@@ -182,6 +180,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         setRequestFocusEnabled(true);
 
         tabs.addChangeListener(this);
+        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
