@@ -103,18 +103,20 @@ public class ImagePreviewPanel extends JPanel {
         currentTask = processor.post(new Runnable() {
                 public void run() {
                     try {
-                        // get image from the provider (long-running)
-                        BufferedImage image = imageProvider.getImage();
-                        
-                        if (image == null) {
+                        if (Thread.interrupted()) {
                             displayer.setIcon(null);
                             displayer.setText(NOT_AVAILABLE_MSG);
                             return;
                         }
-
-                        if (Thread.interrupted()) {
-                            image = null;
-
+                        
+                        // get image from the provider (long-running)
+                        BufferedImage image = imageProvider.getImage();
+                        
+                        if (Thread.interrupted()) image = null;
+                        
+                        if (image == null) {
+                            displayer.setIcon(null);
+                            displayer.setText(NOT_AVAILABLE_MSG);
                             return;
                         }
 
@@ -125,7 +127,8 @@ public class ImagePreviewPanel extends JPanel {
 
                         if (Thread.interrupted()) {
                             image = null;
-
+                            displayer.setIcon(null);
+                            displayer.setText(NOT_AVAILABLE_MSG);
                             return;
                         }
 
@@ -139,7 +142,8 @@ public class ImagePreviewPanel extends JPanel {
 
                             if (Thread.interrupted()) {
                                 image = null;
-
+                                displayer.setIcon(null);
+                                displayer.setText(NOT_AVAILABLE_MSG);
                                 return;
                             }
 
@@ -151,7 +155,8 @@ public class ImagePreviewPanel extends JPanel {
 
                         if (Thread.interrupted()) {
                             image = null;
-
+                            displayer.setIcon(null);
+                            displayer.setText(NOT_AVAILABLE_MSG);
                             return;
                         }
 
@@ -162,6 +167,8 @@ public class ImagePreviewPanel extends JPanel {
                         image = null;
 
                         if (Thread.interrupted()) {
+                            displayer.setIcon(null);
+                            displayer.setText(NOT_AVAILABLE_MSG);
                             return;
                         }
 

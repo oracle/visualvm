@@ -205,8 +205,9 @@ class SaveViewAction extends AbstractAction {
                         pHandle = ProgressHandleFactory.createHandle(SAVING_VIEW_MSG);
                         pHandle.setInitialDelay(0);
                         pHandle.start();
-
-                        ImageIO.write((bImage == null) ? viewProvider.getViewImage(visibleArea) : bImage, "png", file); //NOI18N
+                        
+                        BufferedImage img = (bImage == null) ? viewProvider.getViewImage(visibleArea) : bImage;
+                        if (img != null) ImageIO.write(img, "png", file); //NOI18N
                     } catch (IOException ex) {
                         //ex.printStackTrace();
                     } catch (OutOfMemoryError e) {
