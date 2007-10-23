@@ -301,6 +301,8 @@ public class History implements SynchronousXYChartModel, ActionsHandler, Profili
     public void profilingStateChanged(ProfilingStateEvent profilingStateEvent) {
         if (profilingStateEvent.getNewState() == Profiler.PROFILING_INACTIVE) {
             enabled = false;
+        } else if (profilingStateEvent.getNewState() == Profiler.PROFILING_STARTED) {
+            historyClassID = -1;
         }
     }
 
