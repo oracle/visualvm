@@ -105,6 +105,12 @@ public class ImagePreviewPanel extends JPanel {
                     try {
                         // get image from the provider (long-running)
                         BufferedImage image = imageProvider.getImage();
+                        
+                        if (image == null) {
+                            displayer.setIcon(null);
+                            displayer.setText(NOT_AVAILABLE_MSG);
+                            return;
+                        }
 
                         if (Thread.interrupted()) {
                             image = null;
