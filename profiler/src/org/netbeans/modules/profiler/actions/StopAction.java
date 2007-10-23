@@ -78,9 +78,9 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public StopAction() {
-        Profiler.getDefault().addProfilingStateListener(this);
         updateDisplayName();
         updateEnabledState();
+        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

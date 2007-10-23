@@ -548,8 +548,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar = createToolBar();
         toolBar.setBorder(new EmptyBorder(5, 5, 0, 5));
 
-        Profiler.getDefault().addProfilingStateListener(this);
-
         add(toolBar, BorderLayout.NORTH);
 
         noResultsPanel = new EmptyLiveResultsPanel();
@@ -617,10 +615,12 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         updateGraphButtons();
         hideDrillDown();
         //******************
-        ResultsManager.getDefault().addResultsListener(this);
-
+        
         setFocusable(true);
         setRequestFocusEnabled(true);
+        
+        Profiler.getDefault().addProfilingStateListener(this);
+        ResultsManager.getDefault().addResultsListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

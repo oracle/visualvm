@@ -65,8 +65,8 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RerunAction() {
-        Profiler.getDefault().addProfilingStateListener(this);
         putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(RerunAction.class, "HINT_RerunAction")); //NOI18N
+        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
