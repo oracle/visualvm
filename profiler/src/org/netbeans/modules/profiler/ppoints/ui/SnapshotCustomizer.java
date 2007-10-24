@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.ppoints.ui;
 
+import java.awt.Color;
 import org.openide.util.NbBundle;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -490,7 +491,11 @@ public class SnapshotCustomizer extends ValidityAwarePanel implements ActionList
     }
 
     private void updateValidity() {
-        boolean isValid = saveToProjectRadio.isSelected() || isDestinationDirectoryValid();
+        boolean isDirectoryValid = isDestinationDirectoryValid();
+
+        saveToFileField.setForeground(isDirectoryValid ? UIManager.getColor("TextField.foreground") : Color.RED); // NOI18N
+
+        boolean isValid = saveToProjectRadio.isSelected() || isDirectoryValid;
 
         if (isValid != areSettingsValid()) {
             fireValidityChanged(isValid);

@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.ppoints.ui;
 
+import java.awt.Color;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.modules.profiler.ppoints.CodeProfilingPoint;
 import org.netbeans.modules.profiler.ppoints.Utils;
@@ -574,6 +575,8 @@ public class LocationCustomizer extends ValidityAwarePanel implements ActionList
 
     private void updateValidity() {
         boolean isValid = isFileValid();
+
+        fileTextField.setForeground(isValid ? UIManager.getColor("TextField.foreground") : Color.RED); // NOI18N
 
         if (isValid != LocationCustomizer.this.areSettingsValid()) {
             fireValidityChanged(isValid);
