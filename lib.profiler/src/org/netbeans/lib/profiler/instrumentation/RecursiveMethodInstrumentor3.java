@@ -59,7 +59,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     // Attributes to hold saved values for root classes, methods and signatures
-    private boolean noExplicitRootsSpecified;
+    private boolean noExplicitRootsSpecified = false, mainMethodInstrumented = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -107,11 +107,11 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
 
         isRootClass = tryInstrumentSpawnedThreads(clazz); // This only checks for Runnable.run()
 
-        if (noExplicitRootsSpecified) { // Check if this class has main method. The first loaded class with main method should be main class.
+        if (noExplicitRootsSpecified && !mainMethodInstrumented) { // Check if this class has main method. The first loaded class with main method should be main class.
 
             if (tryMainMethodInstrumentation(clazz)) {
                 isRootClass = true;
-                noExplicitRootsSpecified = false;
+                mainMethodInstrumented = true;
             }
         }
 
@@ -202,6 +202,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
     }
 
     protected boolean tryInstrumentSpawnedThreads(DynamicClassInfo clazz) {
+//        System.err.println("TryInstrumentSpawnedThreads: " + instrumentSpawnedThreads + "/" + noExplicitRootsSpecified);
         if (instrumentSpawnedThreads || noExplicitRootsSpecified) {
             if (clazz.implementsInterface("java/lang/Runnable") && (clazz.getName() != "java/lang/Thread")) { // NOI18N
 
@@ -345,6 +346,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
     }
 
     private void checkForNoRootsSpecified(RootMethods roots) {
+//        System.err.println("Checking for no roots specified");
         // It may happen, for example when directly attaching to a remote application and choosing the Entire App CPU
         // profiling, that there are no explicitly specified root methods (because the main method is not known in advance).
         // To get sensible profiling results, we take special measures, by just guessing what the main class is.
@@ -363,6 +365,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
                 }
             }
         }
+//        System.err.println("NoRootsSpecified = " + noExplicitRootsSpecified);
     }
 
     //----------------------------------- Private implementation ------------------------------------------------
