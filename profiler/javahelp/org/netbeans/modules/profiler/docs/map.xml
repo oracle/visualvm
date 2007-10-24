@@ -104,4 +104,7 @@ made subject to such option by the copyright holder.
         
         <!--CSH ID for Options | Misc | Profiler :-->
         <mapID target="ProfilerOptions.Help" url="helppages/csh/options_profiler.html"/>
+        <!--CSH ID for select profiling task target dialog when profiling a freeform project -->
+        <mapID target="FreeFormProjectTypeProfiler.AntTaskSelectPanel.HelpCtx" url="helppages/profile_freeform.html"/>
+        
     </map>
