@@ -942,13 +942,13 @@ public final class ProjectUtilities {
         if (isProfilerIntegrated(project)) {
             if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(PROFILER_WILL_BE_UNINTEGRATED_MSG,
                                                                                                   new Object[] { projectName }),
-                                                                             NotifyDescriptor.OK_CANCEL_OPTION)) != NotifyDescriptor.OK_OPTION) {
+                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
                 return; // cancelled by the user
             }
         } else {
             if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(PROFILER_ISNT_INTEGRATED_MSG,
                                                                                                   new Object[] { projectName }),
-                                                                             NotifyDescriptor.OK_CANCEL_OPTION)) != NotifyDescriptor.OK_OPTION) {
+                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
                 return; // cancelled by the user
             }
         }
