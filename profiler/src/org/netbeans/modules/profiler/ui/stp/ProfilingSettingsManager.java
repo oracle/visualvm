@@ -56,6 +56,7 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import org.openide.filesystems.FileSystem;
 
 
 /**
@@ -118,40 +119,55 @@ public class ProfilingSettingsManager {
     }
 
     public ProfilingSettingsDescriptor getProfilingSettings(Project project) {
-        List<ProfilingSettings> profilingSettings = new LinkedList();
-        int lastSelectedProfilingSettingsIndex = -1;
+        final List<ProfilingSettings> profilingSettings = new LinkedList();
+        final int[] lastSelectedProfilingSettingsIndex = new int[] { -1 };
 
         try {
-            final FileObject profilingSettingsStorage = getProfilingSettingsStorage(project);
+            // get settings folder used for resolving filesystem for atomic action
+            FileObject settingsStorage = IDEUtils.getProjectSettingsFolder(project, false);
+            if (settingsStorage != null) {
+                // make final copies for atomic action
+                final Project projectF = project;
+//                final ProfilingSettings[] profilingSettingsF = profilingSettings;
+//                final ProfilingSettings lastSelectedProfilingSettingsF = lastSelectedProfilingSettings;
+                
+                // access configurations.xml in atomic action
+                FileSystem fs = settingsStorage.getFileSystem();
+                fs.runAtomicAction(new FileSystem.AtomicAction() {
+                    public void run() throws IOException {
+                        final FileObject profilingSettingsStorage = getProfilingSettingsStorage(projectF);
 
-            if (profilingSettingsStorage != null) {
-                Properties properties = loadSettings(profilingSettingsStorage);
+                        if (profilingSettingsStorage != null) {
+                            Properties properties = loadSettings(profilingSettingsStorage);
 
-                int index = 0;
+                            int index = 0;
 
-                while (properties.getProperty(index + "_" + ProfilingSettings.PROP_SETTINGS_NAME) != null) { // NOI18N
+                            while (properties.getProperty(index + "_" + ProfilingSettings.PROP_SETTINGS_NAME) != null) { // NOI18N
 
-                    ProfilingSettings settings = new ProfilingSettings();
-                    settings.load(properties, Integer.toString(index) + "_"); // NOI18N
+                                ProfilingSettings settings = new ProfilingSettings();
+                                settings.load(properties, Integer.toString(index) + "_"); // NOI18N
 
-                    if (settings != null) {
-                        profilingSettings.add(settings);
+                                if (settings != null) {
+                                    profilingSettings.add(settings);
+                                }
+
+                                index++;
+                            }
+
+                            try {
+                                lastSelectedProfilingSettingsIndex[0] = Integer.parseInt(properties.getProperty(PROP_LAST_SELECTED_SETTINGS_INDEX,
+                                                                                                             "0")); // NOI18N
+                            } catch (Exception e) {
+                            }
+
+                            SelectProfilingTask.SettingsConfigurator configurator = Utils.getSettingsConfigurator(projectF);
+
+                            if (configurator != null) {
+                                configurator.loadCustomSettings(properties);
+                            }
+                        }
                     }
-
-                    index++;
-                }
-
-                try {
-                    lastSelectedProfilingSettingsIndex = Integer.parseInt(properties.getProperty(PROP_LAST_SELECTED_SETTINGS_INDEX,
-                                                                                                 "0"));
-                } catch (Exception e) {
-                } // NOI18N
-
-                SelectProfilingTask.SettingsConfigurator configurator = Utils.getSettingsConfigurator(project);
-
-                if (configurator != null) {
-                    configurator.loadCustomSettings(properties);
-                }
+                });
             }
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
@@ -166,8 +182,8 @@ public class ProfilingSettingsManager {
         }
 
         return new ProfilingSettingsDescriptor(profilingSettingsArr,
-                                               (lastSelectedProfilingSettingsIndex == -1) ? null
-                                                                                          : profilingSettingsArr[lastSelectedProfilingSettingsIndex]);
+                                               (lastSelectedProfilingSettingsIndex[0] == -1) ? null
+                                                                                          : profilingSettingsArr[lastSelectedProfilingSettingsIndex[0]]);
     }
 
     public ProfilingSettings createDuplicateSettings(ProfilingSettings originalSettings,
@@ -200,39 +216,58 @@ public class ProfilingSettingsManager {
             if (lastSelectedProfilingSettings == null) {
                 lastSelectedProfilingSettings = profilingSettings[0];
             }
-
-            // store all settings in one file, add information about lastSelectedProfilingSettings
-            FileObject profilingSettingsStorage = getProfilingSettingsStorage(project);
-
-            if (profilingSettingsStorage == null) {
-                profilingSettingsStorage = createProfilingSettingsStorage(project);
+            
+            // get settings folder used for resolving filesystem for atomic action
+            FileObject settingsStorage = IDEUtils.getProjectSettingsFolder(project, true);
+            if (settingsStorage == null) {
+                ErrorManager.getDefault().log(ErrorManager.ERROR, "Cannot create project settings folder for " // NOI18N
+                                              + project + ", settings cannot be saved."); // NOI18N
+                return;
             }
 
-            if (profilingSettingsStorage != null) { // should not happen
+            // make final copies for atomic action
+            final Project projectF = project;
+            final ProfilingSettings[] profilingSettingsF = profilingSettings;
+            final ProfilingSettings lastSelectedProfilingSettingsF = lastSelectedProfilingSettings;
+            
+            // access configurations.xml in atomic action
+            FileSystem fs = settingsStorage.getFileSystem();
+            fs.runAtomicAction(new FileSystem.AtomicAction() {
+                public void run() throws IOException {
+                    // store all settings in one file, add information about lastSelectedProfilingSettings
+                    FileObject profilingSettingsStorage = getProfilingSettingsStorage(projectF);
 
-                Properties properties = new Properties();
-                int lastSelectedProfilingSettingsIndex = -1;
-
-                for (int i = 0; i < profilingSettings.length; i++) {
-                    ProfilingSettings settings = profilingSettings[i];
-
-                    if (settings == lastSelectedProfilingSettings) {
-                        lastSelectedProfilingSettingsIndex = i;
+                    if (profilingSettingsStorage == null) {
+                        profilingSettingsStorage = createProfilingSettingsStorage(projectF);
                     }
 
-                    settings.store(properties, Integer.toString(i) + "_"); // NOI18N
+                    if (profilingSettingsStorage != null) { // should not happen
+
+                        Properties properties = new Properties();
+                        int lastSelectedProfilingSettingsIndex = -1;
+
+                        for (int i = 0; i < profilingSettingsF.length; i++) {
+                            ProfilingSettings settings = profilingSettingsF[i];
+
+                            if (settings == lastSelectedProfilingSettingsF) {
+                                lastSelectedProfilingSettingsIndex = i;
+                            }
+
+                            settings.store(properties, Integer.toString(i) + "_"); // NOI18N
+                        }
+
+                        properties.put(PROP_LAST_SELECTED_SETTINGS_INDEX, Integer.toString(lastSelectedProfilingSettingsIndex));
+
+                        SelectProfilingTask.SettingsConfigurator configurator = Utils.getSettingsConfigurator(projectF);
+
+                        if (configurator != null) {
+                            configurator.storeCustomSettings(properties);
+                        }
+
+                        storeSettings(profilingSettingsStorage, properties);
+                    }
                 }
-
-                properties.put(PROP_LAST_SELECTED_SETTINGS_INDEX, Integer.toString(lastSelectedProfilingSettingsIndex));
-
-                SelectProfilingTask.SettingsConfigurator configurator = Utils.getSettingsConfigurator(project);
-
-                if (configurator != null) {
-                    configurator.storeCustomSettings(properties);
-                }
-
-                storeSettings(profilingSettingsStorage, properties);
-            }
+            });
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
         }
