@@ -513,35 +513,41 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
 
             ProfilingSettings settings = configurator.createFinalSettings();
 
-            ProgressHandle pHandle = ProgressHandleFactory.createHandle(INIT_SESSION_STRING);
+            final ProgressHandle pHandle = ProgressHandleFactory.createHandle(INIT_SESSION_STRING);
             pHandle.setInitialDelay(0);
             pHandle.start();
+            
+            try {
 
-            if (project != null) {
-                boolean rootMethodsPending = settings.instrRootMethodsPending;
-                boolean predefinedFilterPending = predefinedInstrFilterKeys.contains(settings.getSelectedInstrumentationFilter());
+                if (project != null) {
+                    boolean rootMethodsPending = settings.instrRootMethodsPending;
+                    boolean predefinedFilterPending = predefinedInstrFilterKeys.contains(settings.getSelectedInstrumentationFilter());
 
-                if (rootMethodsPending || predefinedFilterPending) {
-                    // Lazily compute default root methods
-                    if (rootMethodsPending) {
-                        settings.setInstrumentationRootMethods(ProjectUtilities.getProjectTypeProfiler(project)
-                                                                               .getDefaultRootMethods(project, profiledFile,
-                                                                                                      settings
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       .getProfileUnderlyingFramework(),
-                                                                                                      projectPackages));
-                    }
+                    if (rootMethodsPending || predefinedFilterPending) {
+                        // Lazily compute default root methods
+                        if (rootMethodsPending) {
+                            settings.setInstrumentationRootMethods(ProjectUtilities.getProjectTypeProfiler(project)
+                                                                                   .getDefaultRootMethods(project, profiledFile,
+                                                                                                          settings
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           .getProfileUnderlyingFramework(),
+                                                                                                          projectPackages));
+                        }
 
-                    // Lazily compute instrumentation filters
-                    if (predefinedFilterPending) {
-                        settings.setSelectedInstrumentationFilter(getResolvedPredefinedFilter((SimpleFilter) settings
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              .getSelectedInstrumentationFilter()));
+                        // Lazily compute instrumentation filters
+                        if (predefinedFilterPending) {
+                            settings.setSelectedInstrumentationFilter(getResolvedPredefinedFilter((SimpleFilter) settings
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .getSelectedInstrumentationFilter()));
+                        }
                     }
                 }
+                
+                return settings;
+            
+            } finally {
+                SwingUtilities.invokeLater(new Runnable() { // use SwingUtilities to give the UI some time when result is computed too soon
+                    public void run() { pHandle.finish(); }
+                });
             }
-
-            pHandle.finish();
-
-            return settings;
         } else {
             return null;
         }
