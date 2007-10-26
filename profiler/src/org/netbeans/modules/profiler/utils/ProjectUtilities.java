@@ -248,6 +248,8 @@ public final class ProjectUtilities {
 
     // Returns true if the project contains any Java sources (does not check subprojects!)
     public static boolean isJavaProject(Project project) {
+        if (project == null) return false;
+        
         Sources sources = ProjectUtils.getSources(project);
         SourceGroup[] sourceGroups = sources.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
 
