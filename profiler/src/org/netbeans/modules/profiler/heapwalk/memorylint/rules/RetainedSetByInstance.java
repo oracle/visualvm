@@ -105,8 +105,6 @@ public class RetainedSetByInstance extends IteratingRule {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void perform(Instance hm) {
-        System.out.println("Processing " + Utils.printInstance(hm));
-
         Set<Instance> retained = Utils.getRetainedSet(hm, heap);
         Histogram<Histogram.Entry> hist = new Histogram<Histogram.Entry>();
 
