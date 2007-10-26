@@ -51,6 +51,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import javax.swing.*;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
+import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 
 
 /**
@@ -58,7 +60,7 @@ import javax.swing.*;
  *
  * @author Ian Formanek
  */
-public final class InternalStatsAction extends AbstractAction {
+public final class InternalStatsAction extends AbstractAction implements ProfilingStateListener {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public InternalStatsAction() {
@@ -67,17 +69,12 @@ public final class InternalStatsAction extends AbstractAction {
         putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(InternalStatsAction.class, "HINT_InternalStatsAction" // NOI18N
         ));
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
+        
+        updateEnabledState();
+        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        return super.isEnabled();
-    }
 
     /**
      * Invoked when an action occurs.
@@ -108,5 +105,16 @@ public final class InternalStatsAction extends AbstractAction {
                     .displayWarning(MessageFormat.format(NbBundle.getMessage(InternalStatsAction.class, "MSG_NotAvailableNow"),
                                                          new Object[] { e.getMessage() })); // NOI18N
         }
+    }
+    
+    public void profilingStateChanged(final ProfilingStateEvent e) {
+        updateEnabledState();
+    }
+    
+    public void threadsMonitoringChanged() {} // ignore
+    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {} // ignore
+    
+    private void updateEnabledState() {
+        setEnabled(Profiler.getDefault().getProfilingState() == Profiler.PROFILING_RUNNING);
     }
 }

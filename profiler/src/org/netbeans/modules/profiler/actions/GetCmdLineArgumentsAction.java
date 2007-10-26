@@ -47,7 +47,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
@@ -55,6 +54,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import javax.swing.*;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
+import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 
 
 /**
@@ -62,7 +63,7 @@ import javax.swing.*;
  *
  * @author Ian Formanek
  */
-public final class GetCmdLineArgumentsAction extends AbstractAction {
+public final class GetCmdLineArgumentsAction extends AbstractAction implements ProfilingStateListener {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -84,17 +85,12 @@ public final class GetCmdLineArgumentsAction extends AbstractAction {
                  NbBundle.getMessage(GetCmdLineArgumentsAction.class, "HINT_GetCmdLineArgumentsAction") // NOI18N
         );
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
+        
+        updateEnabledState();
+        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        return super.isEnabled();
-    }
 
     /**
      * Invoked when an action occurs.
@@ -155,5 +151,16 @@ public final class GetCmdLineArgumentsAction extends AbstractAction {
                                                                              "MSG_NotAvailableNow"),
                                                          new Object[] { e.getMessage() })); // NOI18N
         }
+    }
+    
+    public void profilingStateChanged(final ProfilingStateEvent e) {
+        updateEnabledState();
+    }
+    
+    public void threadsMonitoringChanged() {} // ignore
+    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {} // ignore
+    
+    private void updateEnabledState() {
+        setEnabled(Profiler.getDefault().getProfilingState() == Profiler.PROFILING_RUNNING);
     }
 }
