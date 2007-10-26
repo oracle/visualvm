@@ -65,7 +65,7 @@ public class DeepSize extends IteratingRule {
         Customizer() {
             setOpaque(false);
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(new JLabel("Class:"));
+            add(new JLabel("Class name: "));
             txtFld = new JTextField(className, 15);
             txtFld.getDocument().addDocumentListener(new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
