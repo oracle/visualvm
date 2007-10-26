@@ -104,7 +104,7 @@ public class CollapsedHashMap extends IteratingRule {
 
     @Override
     public String getHTMLDescription() {
-        return "<html><body>This rule check for (<code>Weak</code>)<code>HashMap</code>s that have bad distribution "
+        return "<html><body>This rule checks for (<code>Weak</code>)<code>HashMap</code>s that have bad distribution "
                + "of entries among allocated buckets, like in the illustration: <br><img src='res/wrongmap.png'><br>"
                + "This can be caused by bad implementation of <code>hashcode()</code> or <code>equals()</code> methods of the objects "
                + "used as map keys." + "</body></html>";
