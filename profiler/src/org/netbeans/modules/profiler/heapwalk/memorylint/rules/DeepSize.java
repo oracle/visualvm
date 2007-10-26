@@ -87,7 +87,7 @@ public class DeepSize extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     Walker walker;
-    private String className = "java.util.jar.Manifest";
+    private String className = "java.io.File";
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
