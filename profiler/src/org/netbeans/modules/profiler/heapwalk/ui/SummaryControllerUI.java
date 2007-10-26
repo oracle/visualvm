@@ -296,7 +296,8 @@ public class SummaryControllerUI extends JPanel {
         return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;"
                + SYSTEM_PROPERTIES_STRING + "</b><br><hr>"
                + (showSystemProperties ? formatSystemProperties(systemProperties)
-                                       : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='#'>" + SHOW_SYSPROPS_LINK_STRING + "</a>")); // NOI18N
+                                       : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='#'>" + SHOW_SYSPROPS_LINK_STRING + "</a><br>&nbsp;")); // NOI18N
+        // NOTE: the above HTML string should be terminated by newline to workaround HTML rendering bug in JDK 5, see Issue 120157
     }
 
     private void createData(final boolean showSystemProperties) {
