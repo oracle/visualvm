@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : jbb-document.dtd
+    Created on : September 24, 2004, 10:52 AM
+    Author     : dagastin
+    Description: SPECjbb2005 DisplayScreen DTD
+        Purpose of the document follows.
+        
+    SPECjbb2005 JBB-Document DTD
+-->
+<!ELEMENT   JBB-Document    (DisplayName,Line*)>
+
+<!ELEMENT   DisplayName      (#PCDATA)>
+
+<!ELEMENT   Line  (LineData*)>
+<!ATTLIST Line row  CDATA #REQUIRED>
+<!ELEMENT   LineData    (#PCDATA)>
+
+

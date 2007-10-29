@@ -1,0 +1,8 @@
+simple.cpu.Bean.<init>()
+simple.cpu.Bean.run100()
+simple.cpu.Bean.run1000()
+simple.cpu.Bean.run20()
+simple.cpu.CPU1.main(String[])
+simple.cpu.CPUThread.<init>()
+simple.cpu.CPUThread.run()
+simple.cpu.CPUThread.run512()

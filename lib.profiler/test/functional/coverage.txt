@@ -1,0 +1,32 @@
+What functionality the functional tests cover.
+
+Test of calibration
+Tests of CPU profiling
+ Default settings
+ Instrumentation: sampled, full
+ CPU Instrumentation: lazy, eager, total
+ Instrument: methods invoke, setter/getter, empty methods
+ Instrumentation filters
+ Not instr. spawned threads
+ Set limit of spawned threads
+ Set instrumentation root methods
+ Measure methods with wait/sleep
+
+Tests of CPU snapshot
+ Check sums of subnodes in call tree - time, percents
+ Simple test of serialization/deserialization of snapshots
+ Test of reverse call stack
+
+Tests of memory profiling
+ Objects creations
+ Objects liveness
+ Check actual objects count and size
+ 
+Tests of code region profiling
+ Method code region
+ Code lines region
+ Method with wait/sleep
+
+Tests of monitor threads
+ List of running threads
+ Roughly states of threads

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : display.xml
+    Created on : September 24, 2004, 10:54 AM
+    Author     : dagastin
+    Description:
+        Purpose of the document follows.
+-->
+
+<!DOCTYPE JBB-Document SYSTEM "jbb-document.dtd">
+<JBB-Document>
+<DisplayName>JBB-Document-Template</DisplayName>
+</JBB-Document>

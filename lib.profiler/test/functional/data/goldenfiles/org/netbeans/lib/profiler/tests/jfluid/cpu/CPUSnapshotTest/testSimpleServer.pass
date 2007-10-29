@@ -1,0 +1,4 @@
+simple.CPU.test20()                                           5  
+ simple.CPU.test500()                                         5  
+  simple.CPU.test1000()                                       5  
+   simple.CPU.main(String[])                                  1  

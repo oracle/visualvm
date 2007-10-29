@@ -1,0 +1,8 @@
+Contains stacks.
+Name                            Objects 
+simple.memory.Bean              4094    
+simple.memory.Memory1           1       
+
+simple.memory.Bean
+ simple.memory.Memory1.add()
+  simple.memory.Memory1.main(String[])

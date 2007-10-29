@@ -1,0 +1,8 @@
+Contains stacks.
+Name                            LiveObjs  Allocs  Total   
+simple.memory.Bean              2047      4094    4094    
+simple.memory.Memory1           0         1       1       
+
+simple.memory.Bean
+ simple.memory.Memory1.add()
+  simple.memory.Memory1.main(String[])
