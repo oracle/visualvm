@@ -54,7 +54,7 @@ Filter-{x}-value: value of the filter (not to be localized)
 -->
 
 <properties>
-  <entry key="Filter-0-name"> Exclude java core classes</entry>
+  <entry key="Filter-0-name">Java Core Classes</entry>
   <entry key="Filter-0-value">java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa.</entry>
 
   <entry key="Filter-1-name">Apache.org Classes</entry>
