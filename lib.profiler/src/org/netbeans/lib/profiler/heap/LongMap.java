@@ -326,9 +326,9 @@ class LongMap {
         } catch (IOException ex) {
             if (ex.getCause() instanceof OutOfMemoryError) {
                 dumpBuffer = new FileData(file, length);
+            } else {
+                throw ex;
             }
-
-            throw ex;
         }
     }
 
