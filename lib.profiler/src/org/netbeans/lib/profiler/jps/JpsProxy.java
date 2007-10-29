@@ -40,6 +40,8 @@
 
 package org.netbeans.lib.profiler.jps;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.utils.MiscUtils;
@@ -61,9 +63,10 @@ import java.util.Set;
  * @author Misha Dmitriev
  */
 public class JpsProxy {
+ 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    /** Returns the array of records for all running VMs capable of dynaimic attach (JDK 1.6 and newer*/
+    /** Returns the array of records for all running VMs capable of dynaimic attach (JDK 1.6 and newer)*/
     public static RunningVM[] getRunningVMs() {
         String hostname = null;
         List vret = new ArrayList();
@@ -119,20 +122,13 @@ public class JpsProxy {
                     continue;
                 }
 
-                String javaVmVersion = MonitoredVmUtil.vmVersion(vm);
+                if (!isAttachable(vm)) {
+                    monitoredHost.detach(vm);
 
-                if (javaVmVersion.length() > 0) {
-                    String version = Platform.getJDKVersionString(javaVmVersion);
-
-                    if (!version.equals(CommonConstants.JDK_16_STRING) && !version.equals(CommonConstants.JDK_17_STRING)) {
-                        monitoredHost.detach(vm);
-
-                        continue;
-                    }
+                    continue;
                 }
 
                 String cmdString = MonitoredVmUtil.commandLine(vm);
-
                 String mainClass = MonitoredVmUtil.mainClass(vm, true);
                 String mainArgs = MonitoredVmUtil.mainArgs(vm);
                 String vmArgs = MonitoredVmUtil.jvmArgs(vm);
@@ -160,5 +156,35 @@ public class JpsProxy {
         }
 
         return (RunningVM[]) vret.toArray(new RunningVM[vret.size()]);
+    }
+
+    // invoke MonitoredVmUtil.isAttachable(MonitoredVm vm) using reflection (JDK 6 only code)
+    private static Method monitoredVmUtil_isAttachable;
+    
+    static {
+        try {
+            monitoredVmUtil_isAttachable = MonitoredVmUtil.class.getMethod("isAttachable",new Class[]{MonitoredVm.class}); // NOI18N
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private static boolean isAttachable(MonitoredVm vm) {
+        Object ret;
+        try {
+            ret = monitoredVmUtil_isAttachable.invoke(null, new Object[] {vm});
+            if (ret instanceof Boolean) {
+                return ((Boolean)ret).booleanValue();
+            }
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (InvocationTargetException ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 }
