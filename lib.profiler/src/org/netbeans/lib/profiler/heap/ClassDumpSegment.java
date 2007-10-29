@@ -156,6 +156,18 @@ class ClassDumpSegment extends TagBounds {
         return primitiveArray;
     }
 
+    Map getClassIdToClassMap() {
+        Map map = new HashMap(classes.size()*4/3);
+        Iterator classIt = classes.iterator();
+        
+        while(classIt.hasNext()) {
+            ClassDump cls = (ClassDump) classIt.next();
+            
+            map.put(new Long(cls.getJavaClassId()),cls);
+        }
+        return map;
+    }
+    
     void addInstanceSize(ClassDump cls, int tag, long instanceOffset) {
         if ((tag == HprofHeap.OBJECT_ARRAY_DUMP) || (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP)) {
             Integer sizeInt = (Integer) arrayMap.get(cls);

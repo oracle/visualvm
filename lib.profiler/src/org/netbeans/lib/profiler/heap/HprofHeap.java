@@ -365,6 +365,7 @@ class HprofHeap implements Heap {
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+        Map classIdToClassMap = classDumpBounds.getClassIdToClassMap();
 
         while (offset[0] < allInstanceDumpBounds.endOffset) {
             int classIdOffset = 0;
@@ -393,7 +394,7 @@ class HprofHeap implements Heap {
 
             if (classIdOffset != 0) {
                 long classId = dumpBuffer.getID(start + 1 + classIdOffset);
-                classDump = classDumpBounds.getClassDumpByID(classId);
+                classDump = (ClassDump) classIdToClassMap.get(new Long(classId));
             }
 
             if (classDump != null) {
