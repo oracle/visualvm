@@ -137,7 +137,15 @@ class LongMap {
         }
 
         public synchronized long getLong(long index) {
-            return ((long) (getInt(index)) << 32) + (getInt(index + 4) & 0xFFFFFFFFL);
+           int i = loadBufferIfNeeded(index);
+           return (((long)buf[i++] << 56) +
+                  ((long)(buf[i++] & 255) << 48) +
+                  ((long)(buf[i++] & 255) << 40) +
+                  ((long)(buf[i++] & 255) << 32) +
+                  ((long)(buf[i++] & 255) << 24) +
+                  ((buf[i++] & 255) << 16) +
+                  ((buf[i++] & 255) <<  8) +
+                  ((buf[i++] & 255) <<  0));
         }
 
         public synchronized void putInt(long index, int data) {
