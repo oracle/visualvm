@@ -55,7 +55,7 @@ FilterSet-{x}-active_filter-{y}: name of used filter, must match one of localize
 -->
 
 <properties>
-  <entry key="FilterSet-0-name">Exclude Java Core Classes</entry>
+  <entry key="FilterSet-0-name">Exclude java core classes</entry>
   <entry key="FilterSet-0-type">false</entry>
   <entry key="FilterSet-0-active_filter-0">Java Core Classes</entry>
 </properties>
