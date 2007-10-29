@@ -2214,11 +2214,11 @@ public final class NetBeansProfiler extends Profiler {
             LoadGenPlugin plugin = Lookup.getDefault().lookup(LoadGenPlugin.class);
 
             if (plugin != null) {
-                //        String scriptPath = profilingProperties.getProperty("profiler.loadgen.path"); // TODO factor out the "profiler.loadgen.path" constant; also used ing J2EEProjectTypeProfiler
-                //        if (scriptPath != null) {
-                //          plugin.stop(scriptPath);
-                //        }
-                plugin.stop();
+                String scriptPath = profilingProperties.getProperty("profiler.loadgen.path"); // TODO factor out the "profiler.loadgen.path" constant; also used ing J2EEProjectTypeProfiler
+
+                if (scriptPath != null) {
+                    plugin.stop(scriptPath);
+                }
             }
         }
     }
