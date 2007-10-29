@@ -116,12 +116,13 @@ class LongMap {
         byte[] buf;
         boolean bufferModified;
         long offset;
+        final int BUFFER_SIZE = 128;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         FileData(RandomAccessFile f, long length) throws IOException {
             file = f;
-            buf = new byte[ENTRY_SIZE];
+            buf = new byte[ENTRY_SIZE*BUFFER_SIZE];
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -171,19 +172,19 @@ class LongMap {
         }
 
         private int loadBufferIfNeeded(long index) {
-            int i = (int) (index % ENTRY_SIZE);
+            int i = (int) (index % (ENTRY_SIZE * BUFFER_SIZE));
             long newOffset = index - i;
 
             if (offset != newOffset) {
                 try {
                     if (bufferModified) {
                         file.seek(offset);
-                        file.write(buf);
+                        file.write(buf,0,getBufferSize(offset));
                         bufferModified = false;
                     }
 
                     file.seek(newOffset);
-                    file.readFully(buf);
+                    file.readFully(buf,0,getBufferSize(newOffset));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -192,6 +193,15 @@ class LongMap {
             }
 
             return i;
+        }
+
+        private int getBufferSize(long off) {
+            int size = buf.length;
+            
+            if (fileSize-off<buf.length) {
+                size = (int)(fileSize-off);
+            }
+            return size;
         }
     }
 
