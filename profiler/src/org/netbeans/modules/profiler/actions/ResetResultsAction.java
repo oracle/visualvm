@@ -49,6 +49,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.ResultsListener;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 
 /**
@@ -70,36 +72,49 @@ public final class ResetResultsAction extends AbstractAction {
         putValue("iconBase", // NOI18N
                  "org/netbeans/modules/profiler/actions/resources/resetResults.png" // NOI18N
         );
+        
+        updateEnabledState();
+        ResultsManager.getDefault().addResultsListener(new ResultsListener() {
+
+            public void resultsAvailable() {
+                updateEnabledState();
+            }
+
+            public void resultsReset() { 
+                updateEnabledState();
+            }
+            
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        return super.isEnabled();
-    }
 
     /**
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        try {
-            TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+        
+        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            public void run() {
+                ResultsManager.getDefault().reset();
+        
+                try {
+                    TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
 
-            if (runner.targetJVMIsAlive()) {
-                runner.resetTimers();
-            } else {
-                runner.getProfilerClient().resetClientData();
+                    if (runner.targetJVMIsAlive()) {
+                        runner.resetTimers();
+                    } else {
+                        runner.getProfilerClient().resetClientData();
 
-                // TODO 
-                //        CPUCallGraphBuilder.resetCollectors();
+                        // TODO 
+                        //        CPUCallGraphBuilder.resetCollectors();
+                    }
+                } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {} // ignore
             }
-        } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
-        } // ignore
-
-        ResultsManager.getDefault().reset();
+        });
+    }
+    
+    private void updateEnabledState() {
+        setEnabled(ResultsManager.getDefault().resultsAvailable());
     }
 }

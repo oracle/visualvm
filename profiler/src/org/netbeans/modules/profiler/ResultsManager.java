@@ -976,14 +976,8 @@ public final class ResultsManager {
     }
 
     void resultsReset() {
-        final int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
-
-        if ((instr == CommonConstants.INSTR_CODE_REGION) || (instr == CommonConstants.INSTR_RECURSIVE_FULL)
-                || (instr == CommonConstants.INSTR_RECURSIVE_SAMPLED)) {
-            // the results available is only reset for CPU profiling
-            resultsAvailable = false;
-        }
-
+        // NOTE: originally left as true for memory profiling due to Issue 60432, now seems to work correctly
+        resultsAvailable = false;
         fireResultsReset();
     }
 

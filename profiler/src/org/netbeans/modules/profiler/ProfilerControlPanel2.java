@@ -636,7 +636,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeCPUSnapshotButton.setRolloverEnabled(true);
             takeCPUSnapshotButton.setBorder(myRolloverBorder);
             takeCPUSnapshotButton.setToolTipText(TAKE_SNAPSHOT_BUTTON_TOOLTIP);
-            takeCPUSnapshotButton.setEnabled(false);
 
             // Take Memory snapshot
             takeMemorySnapshotButton = new org.netbeans.lib.profiler.ui.components.PopupButton(new String[] {
@@ -658,7 +657,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeMemorySnapshotButton.setRolloverEnabled(true);
             takeMemorySnapshotButton.setBorder(myRolloverBorder);
             takeMemorySnapshotButton.setToolTipText(TAKE_SNAPSHOT_BUTTON_TOOLTIP);
-            takeMemorySnapshotButton.setEnabled(false);
 
             // Take Fragment snapshot
             takeFragmentSnapshotButton = new JButton(TAKE_SNAPSHOT_BUTTON_NAME, TAKE_SNAPSHOT_FRAGMENT_ICON);
@@ -674,7 +672,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeFragmentSnapshotButton.setRolloverEnabled(true);
             takeFragmentSnapshotButton.setBorder(myRolloverBorder);
             takeFragmentSnapshotButton.setToolTipText(TAKE_SNAPSHOT_BUTTON_TOOLTIP);
-            takeFragmentSnapshotButton.setEnabled(false);
 
             liveResultsButton = new JButton(LIVE_RESULTS_BUTTON_NAME, LIVE_RESULTS_CPU_ICON);
             UIUtils.fixButtonUI(liveResultsButton);
@@ -692,11 +689,17 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
             displayedIcon = CPU;
 
-            resetResultsButton = new JButton(RESET_RESULTS_BUTTON_NAME,
-                                             new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/resetResults.png") // NOI18N
-            ));
+            resetResultsButton = new JButton(new ResetResultsAction()) {
+                public void setIcon(Icon icon) {
+                    super.setIcon(icon);
+                    setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon)getIcon()).getImage()))));
+                }
+            };
             UIUtils.fixButtonUI(resetResultsButton);
-            resetResultsButton.addActionListener(this);
+            resetResultsButton.setText(RESET_RESULTS_BUTTON_NAME);
+            resetResultsButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) resetResultsButton
+                                                                                                          .getIcon()).getImage()))));
+            
             resetResultsButton.setMargin(new Insets(3, 8, 3, 8));
             resetResultsButton.setContentAreaFilled(false);
             resetResultsButton.setVerticalTextPosition(SwingConstants.CENTER);
@@ -744,8 +747,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             }
                         });
                 }
-            } else if (e.getSource() == resetResultsButton) {
-                new ResetResultsAction().actionPerformed(null); // cleanup client data
             } else if (e.getSource() == liveResultsButton) {
                 LiveResultsWindow.getDefault().open();
                 LiveResultsWindow.getDefault().requestActive();
@@ -754,19 +755,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         public void refreshStatus() {
-            final int state = Profiler.getDefault().getProfilingState();
-            final int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
-            boolean enabled = ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING));
-            enabled = enabled && (instr != CommonConstants.INSTR_NONE);
-
-            if (!enabled) {
-                takeCPUSnapshotButton.setEnabled(false); // set disabled if profiling not active
-                takeMemorySnapshotButton.setEnabled(false);
-                takeFragmentSnapshotButton.setEnabled(false);
-            }
-
-            liveResultsButton.setEnabled(enabled);
-
+            updateResultsButtons();
+            
+            int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
             int newMode;
 
             switch (instr) {
@@ -816,21 +807,25 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         public void resultsAvailable() {
-            takeCPUSnapshotButton.setEnabled(true);
-            takeMemorySnapshotButton.setEnabled(true);
-            takeFragmentSnapshotButton.setEnabled(true);
+            updateResultsButtons();
         }
 
         public void resultsReset() {
-            final int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
-
-            if ((instr == CommonConstants.INSTR_CODE_REGION) || (instr == CommonConstants.INSTR_RECURSIVE_FULL)
-                    || (instr == CommonConstants.INSTR_RECURSIVE_SAMPLED)) {
-                // the take snapshot button is disabled until resultsAvailable notification comes for CPU profiling
-                takeCPUSnapshotButton.setEnabled(false);
-                takeMemorySnapshotButton.setEnabled(false);
-                takeFragmentSnapshotButton.setEnabled(false);
-            }
+            updateResultsButtons();
+        }
+        
+        private void updateResultsButtons() {
+            int state = Profiler.getDefault().getProfilingState();
+            int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
+            boolean enabled = ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING));
+            enabled = enabled && (instr != CommonConstants.INSTR_NONE); // no live results & snapshots for monitoring
+            
+            liveResultsButton.setEnabled(enabled);
+            
+            boolean dataAvailable = ResultsManager.getDefault().resultsAvailable();
+            takeCPUSnapshotButton.setEnabled(enabled && dataAvailable);
+            takeMemorySnapshotButton.setEnabled(enabled && dataAvailable);
+            takeFragmentSnapshotButton.setEnabled(enabled && dataAvailable);
         }
 
         public void snapshotRemoved(LoadedSnapshot snapshot) {
