@@ -896,6 +896,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
      * here can cause big problems). It should also set the results panel invisible (or is it already happening?) etc.
      */
     void reset() {
+        resultsAvailable = false;
         if (currentDisplay != null) {
             currentDisplay.reset();
             resetResultsDisplay();
