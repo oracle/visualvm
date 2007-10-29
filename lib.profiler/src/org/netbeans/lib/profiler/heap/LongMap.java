@@ -50,11 +50,11 @@ import java.nio.channels.FileChannel;
 
 
 /**
- * key - ID (long) of heap object
+ * key - ID (long/int) of heap object
  * value 8+4+8 = 20 bytes
- *  - offset (long) to dump file
+ *  - offset (long/int) to dump file
  *  - instance index (int) - unique number of this {@link Instance} among all instances of the same Java Class
- *  - ID (long) to nearest GC root, 0 for GC root or if is not computed yet
+ *  - ID (long/int) to nearest GC root, 0 for GC root or if is not computed yet
  *
  * @author Tomas Hurka
  */
@@ -89,23 +89,23 @@ class LongMap {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         void setIndex(int index) {
-            dumpBuffer.putInt(offset + KEY_SIZE + 8, index);
+            dumpBuffer.putInt(offset + KEY_SIZE + FOFFSET_SIZE, index);
         }
 
         int getIndex() {
-            return dumpBuffer.getInt(offset + KEY_SIZE + 8);
+            return dumpBuffer.getInt(offset + KEY_SIZE + FOFFSET_SIZE);
         }
 
         void setNearestGCRootPointer(long instanceId) {
-            dumpBuffer.putLong(offset + KEY_SIZE + 8 + 4, instanceId);
+            putID(offset + KEY_SIZE + FOFFSET_SIZE + 4, instanceId);
         }
 
         long getNearestGCRootPointer() {
-            return dumpBuffer.getLong(offset + KEY_SIZE + 8 + 4);
+            return getID(offset + KEY_SIZE + FOFFSET_SIZE + 4);
         }
 
         long getOffset() {
-            return dumpBuffer.getLong(offset + KEY_SIZE);
+            return getFoffset(offset + KEY_SIZE);
         }
     }
 
@@ -238,27 +238,37 @@ class LongMap {
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final int KEY_SIZE = 8;
-    private static final int VALUE_SIZE = 8 + 4 + 8;
-    private static final int ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     File tempFile;
+    private final int KEY_SIZE;
+    private final int VALUE_SIZE;
+    private final int ENTRY_SIZE;
+    private final int ID_SIZE;
+    private final int FOFFSET_SIZE;
     private Data dumpBuffer;
     private long fileSize;
     private long keys;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    LongMap(int size) throws FileNotFoundException, IOException {
+    LongMap(int size,int idSize,int foosetSize) throws FileNotFoundException, IOException {
+        assert idSize == 4 || idSize == 8;
+        assert foosetSize == 4 || foosetSize == 8;
         keys = (size * 4L) / 3L;
+        ID_SIZE = idSize;
+        FOFFSET_SIZE = foosetSize;
+        KEY_SIZE = ID_SIZE;
+        VALUE_SIZE = FOFFSET_SIZE + 4 + ID_SIZE;
+        ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
         fileSize = keys * ENTRY_SIZE;
         tempFile = File.createTempFile("NBProfiler", ".map"); // NOI18N
+        byte[] zeros = new byte[512*1024];
 
         RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
+         while(file.length()<fileSize) {
+            file.write(zeros);
+        }
         file.setLength(fileSize);
         setDumpBuffer(file);
         tempFile.deleteOnExit();
@@ -275,7 +285,7 @@ class LongMap {
         long index = getIndex(key);
 
         while (true) {
-            long mapKey = dumpBuffer.getLong(index);
+            long mapKey = getID(index);
 
             if (mapKey == key) {
                 return new Entry(index);
@@ -293,9 +303,9 @@ class LongMap {
         long index = getIndex(key);
 
         while (true) {
-            if (dumpBuffer.getLong(index) == 0L) {
-                dumpBuffer.putLong(index, key);
-                dumpBuffer.putLong(index + 8, value);
+            if (getID(index) == 0L) {
+                putID(index, key);
+                putFoffset(index + KEY_SIZE, value);
 
                 return;
             }
@@ -322,15 +332,43 @@ class LongMap {
         }
     }
 
-    private long getIndex(long key) {
-        long hash = ((key << 1) - (key << 8)) & 0x7FFFFFFFFFFFFFFFL;
+    private long getID(long index) {
+        if (ID_SIZE == 4) {
+            return dumpBuffer.getInt(index);
+        }
+        return dumpBuffer.getLong(index);
+    }
+    
+    private void putID(long index,long key) {
+        if (ID_SIZE == 4) {
+            dumpBuffer.putInt(index,(int)key);
+        } else {
+            dumpBuffer.putLong(index,key);
+        }
+    }
+    
+    private long getFoffset(long index) {
+        if (FOFFSET_SIZE == 4) {
+            return dumpBuffer.getInt(index);
+        }
+        return dumpBuffer.getLong(index);
+    }
+    
+    private void putFoffset(long index,long key) {
+        if (FOFFSET_SIZE == 4) {
+            dumpBuffer.putInt(index,(int)key);
+        } else {
+            dumpBuffer.putLong(index,key);
+        }
+    }
 
+    private long getIndex(long key) {
+        long hash = key & 0x7FFFFFFFFFFFFFFFL;
         return (hash % keys) * ENTRY_SIZE;
     }
 
     private long getNextIndex(long index) {
         index += ENTRY_SIZE;
-
         if (index >= fileSize) {
             index = 0;
         }

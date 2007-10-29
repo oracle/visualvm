@@ -130,7 +130,7 @@ class HprofHeap implements Heap {
             fillHeapTagBounds();
         }
 
-        idToOffsetMap = new LongMap(idMapSize);
+        idToOffsetMap = new LongMap(idMapSize,dumpBuffer.getIDSize(),dumpBuffer.getFoffsetSize());
         nearestGCRoot = new NearestGCRoot(this);
     }
 

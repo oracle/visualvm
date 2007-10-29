@@ -122,6 +122,10 @@ abstract class HprofByteBuffer {
         return idSize;
     }
 
+    int getFoffsetSize() {
+        return length<Integer.MAX_VALUE ? 4 : 8;        
+    }
+    
     abstract int getInt(long index);
 
     abstract long getLong(long index);
