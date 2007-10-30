@@ -38,6 +38,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+/*
+ * author Tomas Hurka
+ *        Ian Formanek
+ *        Misha Dmitriev
+ */
+
 #ifdef WIN32
 #include <Windows.h>
 #else

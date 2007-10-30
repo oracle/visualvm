@@ -38,6 +38,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+/*
+ * author Ian Formanek 
+ *        Misha Dmitriev
+ */
+
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
