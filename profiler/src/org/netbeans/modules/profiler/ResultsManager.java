@@ -262,6 +262,7 @@ public final class ResultsManager {
     }
 
     public void cctEstablished(RuntimeCCTNode runtimeCCTNode) {
+        if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
         resultsAvailable = true;
         fireResultsAvailable();
     }
@@ -971,6 +972,7 @@ public final class ResultsManager {
     }
 
     void resultsBecameAvailable() {
+        if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
         resultsAvailable = true;
         fireResultsAvailable();
     }
