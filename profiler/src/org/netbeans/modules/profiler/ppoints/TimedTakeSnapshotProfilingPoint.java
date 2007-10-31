@@ -554,6 +554,8 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
 
             if (getResetResults()) {
                 try {
+                    ResultsManager.getDefault().reset();
+                    
                     TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
 
                     if (runner.targetJVMIsAlive()) {
@@ -561,8 +563,6 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
                     }
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
                 } // ignore
-
-                ResultsManager.getDefault().reset();
             }
         }
 

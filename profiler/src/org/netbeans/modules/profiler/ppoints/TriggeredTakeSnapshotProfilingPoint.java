@@ -578,6 +578,8 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
 
             if (getResetResults()) {
                 try {
+                    ResultsManager.getDefault().reset();
+                    
                     TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
 
                     if (runner.targetJVMIsAlive()) {
@@ -586,7 +588,6 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
                 } // ignore
 
-                ResultsManager.getDefault().reset();
             }
         }
 
