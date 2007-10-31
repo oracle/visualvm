@@ -169,7 +169,7 @@ public final class IDEUtils {
     public static String getLibsDir() {
         final File dir = InstalledFileLocator.getDefault()
                                              .locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar",
-                                                     "org.netbeans.modules.profiler", false); //NOI18N
+                                                     "org.netbeans.lib.profiler", false); //NOI18N
 
         if (dir == null) {
             return null;
