@@ -86,6 +86,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
         status.beginTrans(false);
 
         try {
+            performInit(client, provider);
             nProfiledClasses = provider.getNProfiledClasses();
 
             int len = 0;
@@ -136,8 +137,6 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
                 //      System.err.println("Returned size is: "+methodNames.length + "x" + methodNames[0].length);
                 table = new JMethodIdTable(primArray, methodNames);
             }
-
-            performInit(client, provider);
         } finally {
             status.endTrans();
 
