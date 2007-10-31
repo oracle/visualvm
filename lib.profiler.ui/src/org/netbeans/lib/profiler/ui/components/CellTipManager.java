@@ -45,6 +45,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
+import org.netbeans.lib.profiler.global.Platform;
 
 
 public class CellTipManager implements MouseListener, MouseMotionListener {
@@ -293,6 +294,8 @@ public class CellTipManager implements MouseListener, MouseMotionListener {
     }
 
     public void registerComponent(JComponent component) {
+        if (Platform.isMac()) return; // CellTips don't work reliably on Mac (see Issue 89216) => disabled
+            
         if (!(component instanceof CellTipAware)) {
             throw new RuntimeException("Only components implementing org.netbeans.lib.profiler.ui.components.CellTipAware interface can be registered!"); // NOI18N
         }
@@ -306,6 +309,8 @@ public class CellTipManager implements MouseListener, MouseMotionListener {
     }
 
     public void unregisterComponent(JComponent component) {
+        if (Platform.isMac()) return; // CellTips don't work reliably on Mac (see Issue 89216) => disabled
+        
         if (!(component instanceof CellTipAware)) {
             throw new RuntimeException("Only components implementing org.netbeans.lib.profiler.ui.components.CellTipAware interface can be unregistered!"); // NOI18N
         }
