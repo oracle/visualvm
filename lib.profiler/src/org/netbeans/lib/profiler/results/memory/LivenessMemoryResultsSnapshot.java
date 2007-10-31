@@ -225,10 +225,6 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
         }
 
         currentEpoch = provider.getCurrentEpoch();
-
-        if (LOGGER.isLoggable(Level.FINEST)) {
-            debugValues();
-        }
     }
 
     public void readFromStream(DataInputStream in) throws IOException {
@@ -283,10 +279,6 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
         nTotalTrackedBytes = in.readLong();
         nTotalTracked = in.readInt();
         currentEpoch = in.readInt();
-
-        if (LOGGER.isLoggable(Level.FINEST)) {
-            debugValues();
-        }
     }
 
     public String toString() {
@@ -348,7 +340,8 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
                                                                          dontShowZeroLiveObjAllocPaths);
     }
 
-    private void debugValues() {
+    protected void debugValues() {
+        super.debugValues();
         LOGGER.finest("nTrackedAllocObjects.length: " + debugLength(nTrackedAllocObjects) // NOI18N
         );
         LOGGER.finest("nTrackedLiveObjects.length: " + debugLength(nTrackedLiveObjects) // NOI18N

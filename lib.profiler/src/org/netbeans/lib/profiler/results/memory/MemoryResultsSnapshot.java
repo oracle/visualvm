@@ -87,6 +87,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
 
         try {
             performInit(client, provider);
+            
             nProfiledClasses = provider.getNProfiledClasses();
 
             int len = 0;
@@ -303,7 +304,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
         return false; // no data but term nodes or nulls
     }
 
-    private void debugValues() {
+    protected void debugValues() {
         LOGGER.finest("nProfiledClasses: " + nProfiledClasses); // NOI18N
         LOGGER.finest("stacksForClasses.length: " + debugLength(stacksForClasses)); // NOI18N
         LOGGER.finest("objectsSizePerClass.length: " + debugLength(objectsSizePerClass));

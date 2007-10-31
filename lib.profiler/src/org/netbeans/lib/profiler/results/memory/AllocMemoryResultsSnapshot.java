@@ -130,7 +130,8 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
         return PresoObjAllocCCTNode.createPresentationCCTFromSnapshot(this, rootNode, getClassName(classId));
     }
 
-    private void debugValues() {
+    protected void debugValues() {
+        super.debugValues();
         LOGGER.finest("objectsCounts.length: " + debugLength(objectsCounts)); // NOI18N
     }
 }
