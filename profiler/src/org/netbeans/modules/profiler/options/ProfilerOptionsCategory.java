@@ -77,6 +77,8 @@ public class ProfilerOptionsCategory extends AdvancedOption {
                                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 optionsComponent.setBorder(BorderFactory.createEmptyBorder());
                 optionsComponent.setViewportBorder(BorderFactory.createEmptyBorder());
+                optionsComponent.getViewport().setOpaque(false);
+                optionsComponent.setOpaque(false);
             }
 
             return optionsComponent;
