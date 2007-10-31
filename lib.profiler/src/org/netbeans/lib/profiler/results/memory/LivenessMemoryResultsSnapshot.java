@@ -340,7 +340,7 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
                                                                          dontShowZeroLiveObjAllocPaths);
     }
 
-    protected void debugValues() {
+    void debugValues() {
         super.debugValues();
         LOGGER.finest("nTrackedAllocObjects.length: " + debugLength(nTrackedAllocObjects) // NOI18N
         );
