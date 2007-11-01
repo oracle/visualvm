@@ -146,10 +146,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
 
         public RuntimeProfilingPoint[] createRuntimeProfilingPoints() {
             RuntimeProfilingPoint rpp1 = createRuntimeProfilingPoint(getStartLocation());
+            if (rpp1 == null) return new RuntimeProfilingPoint[0]; // Cannot create RPP, wrong location
 
             if (usesEndLocation()) {
                 RuntimeProfilingPoint rpp2 = createRuntimeProfilingPoint(getEndLocation());
-
+                if (rpp2 == null) return new RuntimeProfilingPoint[0]; // Cannot create RPP, wrong location
                 return new RuntimeProfilingPoint[] { rpp1, rpp2 };
             } else {
                 return new RuntimeProfilingPoint[] { rpp1 };
@@ -239,7 +240,9 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         }
 
         public RuntimeProfilingPoint[] createRuntimeProfilingPoints() {
-            return new RuntimeProfilingPoint[] { createRuntimeProfilingPoint(getLocation()) };
+            RuntimeProfilingPoint rpp = createRuntimeProfilingPoint(getLocation());
+            if (rpp == null) return new RuntimeProfilingPoint[0]; // Cannot create RPP, wrong location
+            return new RuntimeProfilingPoint[] { rpp };
         }
 
         protected abstract Annotation getAnnotation();
@@ -414,9 +417,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
 
     RuntimeProfilingPoint createRuntimeProfilingPoint(Location location) {
         ProfilingPointsManager ppManager = ProfilingPointsManager.getDefault();
+        String className = Utils.getClassName(location);
+        if (className == null) return null; // Classname cannot be resolved, most likely invalid location
 
         return new RuntimeProfilingPoint(ppManager.createUniqueRuntimeProfilingPointIdentificator(),
-                                         Utils.getClassName(location), location.getLine(), location.getOffset(),
+                                         className, location.getLine(), location.getOffset(),
                                          getServerHandlerClassName(), getServerInfo());
     }
 

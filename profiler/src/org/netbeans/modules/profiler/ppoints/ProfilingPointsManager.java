@@ -455,6 +455,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             if (compatibleProfilingPoint.isEnabled() && compatibleProfilingPoint instanceof CodeProfilingPoint) {
                 CodeProfilingPoint compatibleCodeProfilingPoint = (CodeProfilingPoint) compatibleProfilingPoint;
                 RuntimeProfilingPoint[] rpps = compatibleCodeProfilingPoint.createRuntimeProfilingPoints();
+                
+                if (rpps.length == 0) ErrorManager.getDefault().log(ErrorManager.USER, "Cannot resolve RuntimeProfilingPoint(s) for " + compatibleCodeProfilingPoint.getName() + ", check location"); // NOI18N
 
                 for (int i = 0; i < rpps.length; i++) {
                     runtimeProfilingPoints.add(rpps[i]);
