@@ -43,8 +43,8 @@
             <li><b>Exclude time spent in Thread.sleep() and Object.wait().</b> When selected, these methods are not profiled.</li>
             <li><b>Profile underlying framework setup.</b>When selected, startup of the application's target JVM
             is also profiled.</li>
-            <li><b>Profile threads started after entering any root method.</b> When selected, instruments the code for 
-            any thread started after the application enters the root instrumentation method.
+            <li><b>Profile new Threads/Runnables.</b> When selected, instruments the code for 
+            any thread or runnable started after the application enters the root instrumentation method.
             This is selected by default when profiling the entire application.</li>
             <li><b>Limit number of profile threads.</b> When selected, every time a thread that has not been previously 
             registered enters the instrumented code, this counter is decremented. When 
