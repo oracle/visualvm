@@ -830,7 +830,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
             // TODO: move this code to a separate class performing the update if necessary
             if (NetBeansProfiler.getDefaultNB().processesProfilingPoints()) {
-                callForceObtainedResultsDump(runner.getProfilerClient());
+                callForceObtainedResultsDump(runner.getProfilerClient(), false);
             }
 
             // -----------------------------------------------------------------------
@@ -911,7 +911,13 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
     // -- Private implementation -------------------------------------------------------------------------------------------
     private static boolean callForceObtainedResultsDump(final ProfilerClient client) {
-        resultsDumpForced.set(true);
+        return callForceObtainedResultsDump(client, true);
+    }
+    
+    private static boolean callForceObtainedResultsDump(final ProfilerClient client, final boolean refreshDisplay) {
+        if (refreshDisplay) {
+            resultsDumpForced.set(true);
+        }
 
         try {
             if (client.getCurrentInstrType() != ProfilerEngineSettings.INSTR_CODE_REGION) {
