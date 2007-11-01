@@ -88,6 +88,7 @@ import javax.swing.SwingConstants;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 
 
 /**
@@ -328,6 +329,7 @@ public class Utils {
     private static final String TODAY_DATE_FORMAT = NbBundle.getMessage(Utils.class, "Utils_TodayDateFormat"); // NOI18N
     private static final String TODAY_DATE_FORMAT_HIRES = NbBundle.getMessage(Utils.class, "Utils_TodayDateFormatHiRes"); // NOI18N
     private static final String DAY_DATE_FORMAT = NbBundle.getMessage(Utils.class, "Utils_DayDateFormat"); // NOI18N
+    private static final String CANNOT_OPEN_SOURCE_MSG = NbBundle.getMessage(Utils.class, "Utils_CannotOpenSourceMsg"); // NOI18N
                                                                                                            // -----
     private static final String PROJECT_DIRECTORY_MARK = "{$projectDirectory}"; // NOI18N
 
@@ -562,16 +564,22 @@ public class Utils {
         if (document == null) {
             return -1;
         }
-
-        int linePosition = NbDocument.findLineOffset(document, location.getLine() - 1); // Line is 1-based, needs to be 0-based for NbDocument
+        
+        int linePosition;
         int lineOffset;
 
-        if (location.isLineStart()) {
-            lineOffset = 0;
-        } else if (location.isLineEnd()) {
-            lineOffset = NbDocument.findLineOffset(document, location.getLine()) - linePosition - 1; // TODO: workaround to get line length, could fail at the end of last line!!!
-        } else {
-            lineOffset = location.getOffset();
+        try {
+            linePosition = NbDocument.findLineOffset(document, location.getLine() - 1); // Line is 1-based, needs to be 0-based for NbDocument
+            
+            if (location.isLineStart()) {
+                lineOffset = 0;
+            } else if (location.isLineEnd()) {
+                lineOffset = NbDocument.findLineOffset(document, location.getLine()) - linePosition - 1; // TODO: workaround to get line length, could fail at the end of last line!!!
+            } else {
+                lineOffset = location.getOffset();
+            }
+        } catch (Exception e) {
+            return -1;
         }
 
         return linePosition + lineOffset;
@@ -812,6 +820,7 @@ public class Utils {
         final int documentOffset = getDocumentOffset(location);
 
         if (documentOffset == -1) {
+            NetBeansProfiler.getDefaultNB().displayError(CANNOT_OPEN_SOURCE_MSG);
             return;
         }
 
