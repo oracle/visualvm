@@ -106,7 +106,9 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
         }
 
         if (batchNotEmpty) {
-            fireCCTEstablished();
+            fireCCTEstablished(false);
+        } else {
+            fireCCTEstablished(true);
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -183,7 +185,7 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
         return (ProfilerClient) clientRef.get();
     }
 
-    private void fireCCTEstablished() {
+    private void fireCCTEstablished(boolean empty) {
         RuntimeCCTNode appNode = getAppRootNode();
 
         if (appNode == null) {
@@ -201,7 +203,7 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
         }
 
         for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
-            ((CCTProvider.Listener) iter.next()).cctEstablished(appNode);
+            ((CCTProvider.Listener) iter.next()).cctEstablished(appNode, empty);
         }
     }
 

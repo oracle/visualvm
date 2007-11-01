@@ -75,7 +75,11 @@ public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
         modules.add(module);
     }
 
-    public void cctEstablished(RuntimeCCTNode appNode) {
+    public void cctEstablished(RuntimeCCTNode appNode, boolean empty) {
+        if (empty) {
+            return;
+        }
+
         if (!(appNode instanceof RuntimeCPUCCTNode)) {
             return;
         }
@@ -96,7 +100,7 @@ public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
     }
 
     public void cctReset() {
-        cctEstablished(null);
+        cctEstablished(null, false);
     }
 
     public void removeAllModules() {

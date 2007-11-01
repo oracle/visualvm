@@ -86,7 +86,9 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
         appNode = null;
     }
 
-    public synchronized void cctEstablished(RuntimeCCTNode appRootNode) {
+    public synchronized void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+        if (empty) return;
+        
         if (appRootNode instanceof RuntimeCPUCCTNode) {
             appNode = (RuntimeCPUCCTNode) appRootNode;
         } else {

@@ -174,13 +174,17 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void cctEstablished(RuntimeCCTNode runtimeCCTNode) {
-            getDefault().resultsAvailable = true;
-            IDEUtils.runInEventDispatchThread(new Runnable() {
-                    public void run() {
-                        getDefault().updateResultsDisplay();
-                    }
-                });
+        public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
+            if (!empty) {
+                getDefault().resultsAvailable = true;
+                IDEUtils.runInEventDispatchThread(new Runnable() {
+                        public void run() {
+                            getDefault().updateResultsDisplay();
+                        }
+                    });
+            } else {
+                resultsDumpForced.set(false); // fix for issue #114638
+            }
         }
 
         public void cctReset() {
@@ -236,7 +240,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
             ProfilingSettings settingsToModify = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
                                                                          cpuSettings.toArray(new ProfilingSettings[cpuSettings
-                                                                                                                                                                                                                                               .size()]),
+                                                                                                                                                                                                                                                   .size()]),
                                                                          lastProfilingSettings);
 
             if (settingsToModify == null) {
@@ -615,10 +619,9 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         updateGraphButtons();
         hideDrillDown();
         //******************
-        
         setFocusable(true);
         setRequestFocusEnabled(true);
-        
+
         Profiler.getDefault().addProfilingStateListener(this);
         ResultsManager.getDefault().addResultsListener(this);
     }
@@ -897,6 +900,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
      */
     void reset() {
         resultsAvailable = false;
+
         if (currentDisplay != null) {
             currentDisplay.reset();
             resetResultsDisplay();
@@ -1008,23 +1012,23 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         /*    toolBar.addSeparator();
         
-                                                                      valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
-                                                                        public Dimension getMaximumSize() {
-                                                                          return new Dimension(100, super.getMaximumSize().height);
-                                                                        }
-                                                                      };
-                                                                      toolBar.add(valueSlider);
-                                                                      valueFilterComponent = valueSlider;
+                                                                                 valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
+                                                                                   public Dimension getMaximumSize() {
+                                                                                     return new Dimension(100, super.getMaximumSize().height);
+                                                                                   }
+                                                                                 };
+                                                                                 toolBar.add(valueSlider);
+                                                                                 valueFilterComponent = valueSlider;
         
-                                                                      valueSlider.addChangeListener(new ChangeListener() {
+                                                                                 valueSlider.addChangeListener(new ChangeListener() {
         
-                                                                        public void stateChanged(ChangeEvent e) {
-                                                                          // make cubic curve instead of linear
-                                                                          double val = (double) valueSlider.getValue() / 10f;
-                                                                          val = val * val;
-                                                                          if (currentDisplay != null) currentDisplay.updateValueFilter(val);
-                                                                        }
-                                                                      }); */
+                                                                                   public void stateChanged(ChangeEvent e) {
+                                                                                     // make cubic curve instead of linear
+                                                                                     double val = (double) valueSlider.getValue() / 10f;
+                                                                                     val = val * val;
+                                                                                     if (currentDisplay != null) currentDisplay.updateValueFilter(val);
+                                                                                   }
+                                                                                 }); */
         return toolBar;
     }
 
@@ -1277,4 +1281,4 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         updateDrillDown();
     }
-    }
+}

@@ -51,7 +51,12 @@ public interface CCTProvider {
     public static interface Listener {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        void cctEstablished(RuntimeCCTNode appRootNode);
+        /* void cctEstablished(RuntimeCCTNode appRootNode);
+         *
+         * in order to fix the issue #114638 i need to introduce the "empty" flag
+         * it should be removed once this code is cleaned up
+         */
+        void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy);
 
         void cctReset();
     }
