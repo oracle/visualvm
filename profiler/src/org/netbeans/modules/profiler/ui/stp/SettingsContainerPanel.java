@@ -294,14 +294,13 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
         add(Utils.createFillerPanel(), constraints);
 
         // basicAdvancedSettingsSwitchArea
-        basicAdvancedSettingsSwitchArea = new HyperlinkTextArea("<nobr><a href='#'>" + ADVANCED_SETTINGS_STRING + "</a></nobr>") {
-                ; // NOI18N
+        basicAdvancedSettingsSwitchArea = new HyperlinkTextArea(ADVANCED_SETTINGS_STRING) {
                 protected Color getHighlightColor() {
                     return Color.BLACK;
                 }
 
                 protected String getHighlightText(String originalText) {
-                    return originalText;
+                    return "<nobr><u>" + originalText + "</u></nobr>"; // NOI18N
                 }
 
                 protected Color getNormalColor() {
@@ -309,7 +308,7 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
                 }
 
                 protected String getNormalText(String originalText) {
-                    return originalText;
+                    return "<nobr><u>" + originalText + "</u></nobr>"; // NOI18N
                 }
             };
 
@@ -349,11 +348,13 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
 
         if (showingAdvancedSettings) {
             captionLabel.setText(MessageFormat.format(ADVANCED_CAPTION_TEXT, new Object[] { caption }));
-            basicAdvancedSettingsSwitchArea.setText("<nobr><a href='#'>" + BASIC_SETTINGS_STRING + "</a></nobr>"); // NOI18N
+            basicAdvancedSettingsSwitchArea.setText(BASIC_SETTINGS_STRING); // NOI18N
+            basicAdvancedSettingsSwitchArea.updateAppearance();
             contentsScroll.setViewportView(contents.getAdvancedSettingsPanel());
         } else {
             captionLabel.setText(caption);
-            basicAdvancedSettingsSwitchArea.setText("<nobr><a href='#'>" + ADVANCED_SETTINGS_STRING + "</a></nobr>"); // NOI18N
+            basicAdvancedSettingsSwitchArea.setText(ADVANCED_SETTINGS_STRING); // NOI18N
+            basicAdvancedSettingsSwitchArea.updateAppearance();
             contentsScroll.setViewportView(contents.getBasicSettingsPanel());
         }
 
