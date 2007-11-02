@@ -112,20 +112,18 @@ public abstract class SwingWorker {
                     try {
                         doInBackground();
                     } finally {
-                        Runnable finishTask = new Runnable() {
-                            public void run() {
-                                synchronized (warmupLock) {
-                                    workerRunning = false;
-                                }
-
-                                done();
-                            }
-                        };
+                        synchronized (warmupLock) {
+                            workerRunning = false;
+                        }
 
                         if (useEQ) {
-                            runInEventDispatchThread(finishTask);
+                            runInEventDispatchThread(new Runnable() {
+                                    public void run() {
+                                        done();
+                                    }
+                                });
                         } else {
-                            finishTask.run();
+                            done();
                         }
                     }
                 }
@@ -172,7 +170,6 @@ public abstract class SwingWorker {
                         taskService = Executors.newCachedThreadPool();
                     }
                 });
-
         }
     }
 
