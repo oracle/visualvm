@@ -81,6 +81,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -251,7 +252,7 @@ public class LoadGeneratorCustomizer extends ValidityAwarePanel implements Actio
         // captionPanel
         captionPanel = new JPanel(new BorderLayout(0, 0));
         captionPanel.setOpaque(true);
-        captionPanel.setBackground(Color.WHITE);
+        captionPanel.setBackground(UIUtils.getProfilerResultsBackground());
 
         // captionLabel
         captionLabel = new JLabel(caption, icon, SwingConstants.LEADING);

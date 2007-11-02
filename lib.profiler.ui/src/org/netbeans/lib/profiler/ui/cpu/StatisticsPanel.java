@@ -77,6 +77,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -100,7 +101,7 @@ public class StatisticsPanel extends JPanel {
         public JLabel valueLabel = new JLabel(""); // NOI18N
         public JPanel filler = new JPanel(new FlowLayout(0, 0, FlowLayout.LEADING));
         public KeyboardAwareLabel nameLabel; // NOI18N
-        private ColorIcon colorIcon = new ColorIcon(Color.WHITE);
+        private ColorIcon colorIcon = new ColorIcon(UIUtils.getProfilerResultsBackground());
         private PieChartModel model;
         private int index;
 
@@ -165,7 +166,7 @@ public class StatisticsPanel extends JPanel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         private void initComponents(final PieChart pieChart) {
-            pieChart.setBackground(Color.WHITE);
+            pieChart.setBackground(UIUtils.getProfilerResultsBackground());
 
             pieChart.addMouseListener(new MouseAdapter() {
                     @Override
@@ -262,7 +263,7 @@ public class StatisticsPanel extends JPanel {
         public Container() {
             setLayout(new BorderLayout());
             setOpaque(true);
-            setBackground(Color.WHITE);
+            setBackground(UIUtils.getProfilerResultsBackground());
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -546,7 +547,7 @@ public class StatisticsPanel extends JPanel {
                                                          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         contentsScrollPane.setBorder(BorderFactory.createEmptyBorder());
         contentsScrollPane.getViewport().setOpaque(true);
-        contentsScrollPane.getViewport().setBackground(Color.WHITE);
+        contentsScrollPane.getViewport().setBackground(UIUtils.getProfilerResultsBackground());
 
         setLayout(new BorderLayout());
         add(contentsScrollPane, BorderLayout.CENTER);

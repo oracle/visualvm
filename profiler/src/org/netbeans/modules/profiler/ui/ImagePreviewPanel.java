@@ -53,6 +53,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -240,7 +241,7 @@ public class ImagePreviewPanel extends JPanel {
 
         displayer = new JLabel();
         displayer.setHorizontalAlignment(JLabel.CENTER);
-        displayer.setBackground(Color.WHITE);
+        displayer.setBackground(UIUtils.getProfilerResultsBackground());
         displayer.setOpaque(true);
         displayer.setPreferredSize(new Dimension(200, 200));
         displayer.setBorder(BorderFactory.createCompoundBorder(UIManager.getBorder("TextField.border"),

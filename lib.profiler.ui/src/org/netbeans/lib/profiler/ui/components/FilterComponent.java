@@ -539,7 +539,7 @@ public class FilterComponent extends JPanel {
         JMenuItem menuItem = new JMenuItem();
         menuItem.setText(filterName);
         menuItem.setIcon(standardIcon);
-        menuItem.setBackground(Color.WHITE);
+        menuItem.setBackground(UIUtils.getProfilerResultsBackground());
         menuItem.addActionListener(popupItemsListener);
 
         filterTypePopup.add(menuItem);
@@ -853,7 +853,7 @@ public class FilterComponent extends JPanel {
                 }
             };
         filterTypePopup.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        filterTypePopup.setBackground(Color.WHITE);
+        filterTypePopup.setBackground(UIUtils.getProfilerResultsBackground());
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createCompoundBorder(textFieldBorder, BorderFactory.createEmptyBorder(2, 2, 2, 2)));

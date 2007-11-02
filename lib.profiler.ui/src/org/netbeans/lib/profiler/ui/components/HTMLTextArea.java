@@ -68,6 +68,7 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLWriter;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -569,6 +570,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         addHyperlinkListener(this);
         setTransferHandler(new HTMLTextAreaTransferHandler());
         setFont(UIManager.getFont("Label.font")); //NOI18N
+        setBackground(UIUtils.getProfilerResultsBackground());
         addMouseListener(this);
     }
 

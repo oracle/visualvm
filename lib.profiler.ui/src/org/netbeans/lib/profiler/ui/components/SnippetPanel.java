@@ -51,6 +51,7 @@ import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 public class SnippetPanel extends JPanel implements MouseListener, KeyListener, FocusListener {
@@ -60,7 +61,7 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public Padding() {
-            setBackground(Color.WHITE);
+            setBackground(UIUtils.getProfilerResultsBackground());
             setOpaque(true);
         }
 
@@ -179,10 +180,12 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final Color lineColor = new Color(214, 223, 247);
-    private static final Color backgroundColor = new Color(248, 248, 248);
-    private static final Color focusedBackgroundColor = new Color(230, 230, 230);
-    private static final Color textColor = Color.BLACK;
+    private static Color lineColor;
+    private static Color backgroundColor;
+    private static Color focusedBackgroundColor;
+    private static Color textColor;
+    
+    { initColors(); }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -216,6 +219,27 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    private static void initColors() {
+        Color systemBackgroundColor = UIUtils.getProfilerResultsBackground();
+        
+        int backgroundRed = systemBackgroundColor.getRed(); 
+        int backgroundGreen = systemBackgroundColor.getGreen();
+        int backgroundBlue = systemBackgroundColor.getBlue();
+        boolean inverseColors = backgroundRed < 41 || backgroundGreen < 32 || backgroundBlue < 25;
+
+        if (inverseColors) {
+            lineColor = UIUtils.getSafeColor(backgroundRed + 41, backgroundGreen + 32, backgroundBlue + 8);
+            backgroundColor = UIUtils.getSafeColor(backgroundRed + 7, backgroundGreen + 7, backgroundBlue + 7);
+            focusedBackgroundColor = new Color(backgroundRed + 25, backgroundGreen + 25, backgroundBlue + 25);
+        } else {
+            lineColor = UIUtils.getSafeColor(backgroundRed - 41 /*214*/, backgroundGreen - 32 /*223*/, backgroundBlue - 8 /*247*/);
+            backgroundColor = UIUtils.getSafeColor(backgroundRed - 7 /*248*/, backgroundGreen - 7 /*248*/, backgroundBlue - 7 /*248*/);
+            focusedBackgroundColor = UIUtils.getSafeColor(backgroundRed - 25 /*230*/, backgroundGreen - 25 /*230*/, backgroundBlue - 25 /*230*/);
+        }
+        
+        textColor = UIManager.getColor("Button.foreground"); // NOI18N
+    }
 
     public void setCollapsed(boolean collapsed) {
         if (this.collapsed == collapsed) {

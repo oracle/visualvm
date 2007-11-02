@@ -92,6 +92,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -233,15 +234,16 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
             setLayout(new BorderLayout());
 
             JPanel contentsPanel = new JPanel(new BorderLayout());
-            contentsPanel.setBackground(Color.WHITE);
+            contentsPanel.setBackground(UIUtils.getProfilerResultsBackground());
             contentsPanel.setOpaque(true);
-            contentsPanel.setBorder(BorderFactory.createMatteBorder(0, 15, 15, 15, Color.WHITE));
+            contentsPanel.setBorder(BorderFactory.createMatteBorder(0, 15, 15, 15, UIUtils.getProfilerResultsBackground()));
 
             headerArea = new HTMLTextArea();
 
             JScrollPane headerAreaScrollPane = new JScrollPane(headerArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            headerAreaScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 15, 0, Color.WHITE));
+            headerAreaScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 15, 0, UIUtils.getProfilerResultsBackground()));
+            headerAreaScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
             contentsPanel.add(headerAreaScrollPane, BorderLayout.NORTH);
 
             dataArea = new HTMLTextArea() {
@@ -279,7 +281,8 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
             TitledBorder tb = new TitledBorder(DATA_STRING);
             tb.setTitleFont(tb.getTitleFont().deriveFont(Font.BOLD));
             dataAreaScrollPane.setBorder(tb);
-            dataAreaScrollPane.setBackground(Color.WHITE);
+            dataAreaScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+            dataAreaScrollPane.setBackground(UIUtils.getProfilerResultsBackground());
             contentsPanel.add(dataAreaScrollPane, BorderLayout.CENTER);
 
             add(contentsPanel, BorderLayout.CENTER);

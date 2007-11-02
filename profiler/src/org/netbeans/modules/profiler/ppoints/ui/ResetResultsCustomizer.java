@@ -65,6 +65,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -195,7 +196,7 @@ public class ResetResultsCustomizer extends ValidityAwarePanel implements Docume
         // captionPanel
         captionPanel = new JPanel(new BorderLayout(0, 0));
         captionPanel.setOpaque(true);
-        captionPanel.setBackground(Color.WHITE);
+        captionPanel.setBackground(UIUtils.getProfilerResultsBackground());
 
         // captionLabel
         captionLabel = new JLabel(caption, icon, SwingConstants.LEADING);

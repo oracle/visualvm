@@ -44,6 +44,7 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.PixelGrabber;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -79,7 +80,7 @@ public final class UIUtils {
 
     public static Color getDarker(Color c) {
         if (c.equals(Color.WHITE)) {
-            return new Color(248, 248, 248);
+            return new Color(244, 244, 244);
         }
 
         return getSafeColor((int) (c.getRed() * ALTERNATE_ROW_DARKER_FACTOR), (int) (c.getGreen() * ALTERNATE_ROW_DARKER_FACTOR),
@@ -215,13 +216,42 @@ public final class UIUtils {
     
     private static Color profilerResultsBackground;
     
+    private static Color getGTKProfilerResultsBackground() {
+        int[] pixels = new int[1];
+        pixels[0] = -1;
+        
+        // Prepare textarea to grab the color from
+        JTextArea textArea = new JTextArea();
+        textArea.setSize(new Dimension(10, 10));
+        textArea.doLayout();
+        
+        // Print the textarea to an image
+        Image image = new BufferedImage(textArea.getSize().width, textArea.getSize().height, BufferedImage.TYPE_INT_RGB);
+        textArea.printAll(image.getGraphics());
+        
+        // Grab appropriate pixels to get the color
+        PixelGrabber pixelGrabber = new PixelGrabber(image, 5, 5, 1, 1, pixels, 0, 1);
+        try {
+            pixelGrabber.grabPixels();
+        } catch (InterruptedException e) {
+            return getNonGTKProfilerResultsBackground();
+        }
+        
+        return pixels[0] != -1 ? new Color(pixels[0]) : getNonGTKProfilerResultsBackground();
+    }
+    
+    private static Color getNonGTKProfilerResultsBackground() {
+        return UIManager.getColor("Table.background"); // NOI18N
+    }
+    
     public static Color getProfilerResultsBackground() {
         if (profilerResultsBackground == null) {
             if (isGTKLookAndFeel()) {
-                profilerResultsBackground = UIManager.getColor("TextPane.background"); // NOI18N
+                profilerResultsBackground = getGTKProfilerResultsBackground();
             } else {
-                profilerResultsBackground = UIManager.getColor("Table.background"); // NOI18N
+                profilerResultsBackground = getNonGTKProfilerResultsBackground();
             }
+            if (profilerResultsBackground == null) profilerResultsBackground = Color.WHITE;
         }
         
         return profilerResultsBackground;

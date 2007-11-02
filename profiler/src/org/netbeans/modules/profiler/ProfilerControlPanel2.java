@@ -441,7 +441,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         CPPanel() {
             setOpaque(true);
-            setBackground(Color.WHITE);
+            setBackground(CP_BACKGROUND_COLOR);
             setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         }
     }
@@ -907,7 +907,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 }
 
                 if (b != null) {
-                    b.setBackground(Color.WHITE);
+                    b.setBackground(CP_BACKGROUND_COLOR);
                     b.setBorder(BorderFactory.createCompoundBorder(comboBorder,
                                                                    BorderFactory.createEmptyBorder(0, b.getIconTextGap(), 0,
                                                                                                    b.getIconTextGap())));
@@ -915,7 +915,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             }
 
             combo.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-            combo.setBackground(Color.WHITE);
+            combo.setBackground(CP_BACKGROUND_COLOR);
 
             combo.addActionListener(this);
             OpenProjects.getDefault().addPropertyChangeListener(this);
@@ -1758,6 +1758,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     ); // NOI18N
     private static final String PREFERRED_ID = "PROFILERCONTROLPANEL_TC"; // NOI18N // for winsys persistence
     private static final Integer EXTERNALIZABLE_VERSION_WITH_SNAPSHOTS = new Integer(3);
+    
+    private static final Color CP_BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -1813,13 +1815,13 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         scrollPane = new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        spControls.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, Color.WHITE));
+        spControls.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, CP_BACKGROUND_COLOR));
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.getViewport().setBackground(CP_BACKGROUND_COLOR);
         scrollPane.getVerticalScrollBar().setUnitIncrement(50);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(50);
         add(scrollPane, BorderLayout.CENTER);
-
+        
         Profiler.getDefault().addProfilingStateListener(this);
         ResultsManager.getDefault().addSnapshotsListener(this);
         ResultsManager.getDefault().addResultsListener(this);

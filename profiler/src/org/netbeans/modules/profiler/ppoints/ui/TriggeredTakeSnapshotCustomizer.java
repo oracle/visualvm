@@ -64,6 +64,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -192,7 +193,7 @@ public class TriggeredTakeSnapshotCustomizer extends ValidityAwarePanel implemen
         // captionPanel
         captionPanel = new JPanel(new BorderLayout(0, 0));
         captionPanel.setOpaque(true);
-        captionPanel.setBackground(Color.WHITE);
+        captionPanel.setBackground(UIUtils.getProfilerResultsBackground());
 
         // captionLabel
         captionLabel = new JLabel(caption, icon, SwingConstants.LEADING);
