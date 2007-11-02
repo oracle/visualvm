@@ -974,6 +974,10 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     private static int firstTimeVMObjectAlloc(String className, int classLoaderId) {
+        if (internalClassName(className)) {
+            return -1;
+        }
+        
         serialClientOperationsLock.beginTrans(true);
 
         try {
