@@ -398,9 +398,23 @@ public class IntegrationUtils {
 
     // Returns extra command line arguments required when attaching on startup
     public static String getProfilerAgentCommandLineArgs(String targetPlatform, String targetJVM, boolean isRemote, int portNumber) {
-        if (!isWindowsPlatform(targetPlatform)
-                || (getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).indexOf(' ') == -1)) {
+        if ((getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).indexOf(' ') == -1)) {
             return getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber); //NOI18N
+        }
+        if (!isWindowsPlatform(targetPlatform)) { // Profiler is installed in directory with space on Unix (Linux, Solaris, Mac OS X)
+            // create temporary link in /tmp directory and use it instead of directory with space
+            try {  
+                File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
+                String tmpPath = tmpFile.getAbsolutePath();
+                String libsDirPath = getLibsDir(targetPlatform, isRemote);
+                String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
+                tmpFile.delete();
+                Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
+                new File(tmpPath).deleteOnExit();
+                return args.replace(libsDirPath,tmpPath);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
         return "-agentpath:" + "\"" + getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
