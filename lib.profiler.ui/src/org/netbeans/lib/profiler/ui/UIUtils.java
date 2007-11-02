@@ -65,7 +65,7 @@ public final class UIUtils {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger LOGGER = Logger.getLogger(UIUtils.class.getName());
-    public static final float ALTERNATE_ROW_DARKER_FACTOR = 0.92f;
+    public static final float ALTERNATE_ROW_DARKER_FACTOR = 0.96f;
     private static boolean toolTipValuesInitialized = false;
     private static Color unfocusedSelBg;
     private static Color unfocusedSelFg;
