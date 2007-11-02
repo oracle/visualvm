@@ -262,7 +262,7 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
 
         JLabel overheadLabel = new JLabel(OVERHEAD_LABEL_TEXT);
         overheadLabel.setFont(overheadLabel.getFont().deriveFont(overheadLabel.getFont().getSize2D() - 1));
-        overheadLabel.setForeground(Color.DARK_GRAY);
+        overheadLabel.setForeground(SelectProfilingTask.DARKLINK_COLOR_INACTIVE);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
@@ -296,7 +296,7 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
         // basicAdvancedSettingsSwitchArea
         basicAdvancedSettingsSwitchArea = new HyperlinkTextArea(ADVANCED_SETTINGS_STRING) {
                 protected Color getHighlightColor() {
-                    return Color.BLACK;
+                    return SelectProfilingTask.DARKLINK_COLOR;
                 }
 
                 protected String getHighlightText(String originalText) {
@@ -304,7 +304,7 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
                 }
 
                 protected Color getNormalColor() {
-                    return Color.DARK_GRAY;
+                    return SelectProfilingTask.DARKLINK_COLOR_INACTIVE;
                 }
 
                 protected String getNormalText(String originalText) {

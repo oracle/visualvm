@@ -84,6 +84,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 
 
@@ -203,8 +204,12 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
                                                                                                                                  // -----
 
     // --- Constants declaration -------------------------------------------------
-    public static Color BACKGROUND_COLOR = new Color(244, 244, 244);
-    public static Color BACKGROUND_COLOR_INACTIVE = new Color(237, 237, 237);
+    public static Color BACKGROUND_COLOR;
+    public static Color BACKGROUND_COLOR_INACTIVE;
+    public static Color DARKLINK_COLOR;
+    public static Color DARKLINK_COLOR_INACTIVE;
+    
+    { initColors(); }
 
     // --- Instance variables declaration ----------------------------------------
     private static SelectProfilingTask defaultInstance;
@@ -275,6 +280,35 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
                     initPreferredSize();
                 }
             });
+    }
+    
+    private static void initColors() {
+        Color systemBackgroundColor = UIUtils.getProfilerResultsBackground();
+        
+        int backgroundRed = systemBackgroundColor.getRed(); 
+        int backgroundGreen = systemBackgroundColor.getGreen();
+        int backgroundBlue = systemBackgroundColor.getBlue();
+        boolean inverseColors = backgroundRed < 18 || backgroundGreen < 18 || backgroundBlue < 18;
+        
+        if (inverseColors) {
+            BACKGROUND_COLOR = UIUtils.getSafeColor(backgroundRed + 11, backgroundGreen + 11, backgroundBlue + 11);
+            BACKGROUND_COLOR_INACTIVE = UIUtils.getSafeColor(backgroundRed + 18, backgroundGreen + 18, backgroundBlue + 18);
+        } else {
+            BACKGROUND_COLOR = UIUtils.getSafeColor(backgroundRed - 11 /*244*/, backgroundGreen - 11 /*244*/, backgroundBlue - 11 /*244*/);
+            BACKGROUND_COLOR_INACTIVE = UIUtils.getSafeColor(backgroundRed - 18 /*237*/, backgroundGreen - 18 /*237*/, backgroundBlue - 18 /*237*/);
+        }
+        
+        boolean textInverse = BACKGROUND_COLOR_INACTIVE.getRed() - Color.DARK_GRAY.getRed() < 50;
+        
+        if (textInverse) {
+            int darklinkExtent = Color.DARK_GRAY.getRed() - Color.BLACK.getRed();
+            int darklinkInverse = Color.WHITE.getRed() - darklinkExtent;
+            DARKLINK_COLOR = Color.WHITE;
+            DARKLINK_COLOR_INACTIVE = UIUtils.getSafeColor(darklinkInverse, darklinkInverse, darklinkInverse);
+        } else {
+            DARKLINK_COLOR = Color.BLACK;
+            DARKLINK_COLOR_INACTIVE = Color.DARK_GRAY;
+        }
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

@@ -550,6 +550,7 @@ public class TaskPresenter implements TaskChooser.Item {
 
         public TPHyperlinkTextArea(String text) {
             super(text);
+            setForeground(SelectProfilingTask.DARKLINK_COLOR_INACTIVE);
             addFocusListener(new FocusAdapter() {
                     public void focusGained(FocusEvent e) {
                         JComponent parent = (JComponent) getParent();
@@ -569,7 +570,7 @@ public class TaskPresenter implements TaskChooser.Item {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         protected Color getHighlightColor() {
-            return Color.BLACK;
+            return SelectProfilingTask.DARKLINK_COLOR;
         }
 
         protected String getHighlightText(String originalText) {
@@ -577,7 +578,7 @@ public class TaskPresenter implements TaskChooser.Item {
         } // NOI18N
 
         protected Color getNormalColor() {
-            return Color.DARK_GRAY;
+            return SelectProfilingTask.DARKLINK_COLOR_INACTIVE;
         }
 
         protected String getNormalText(String originalText) {
