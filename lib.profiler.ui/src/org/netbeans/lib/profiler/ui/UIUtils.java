@@ -65,7 +65,7 @@ public final class UIUtils {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger LOGGER = Logger.getLogger(UIUtils.class.getName());
-    public static final float ALTERNATE_ROW_DARKER_FACTOR = 0.92f;
+    public static final float ALTERNATE_ROW_DARKER_FACTOR = 0.96f;
     private static boolean toolTipValuesInitialized = false;
     private static Color unfocusedSelBg;
     private static Color unfocusedSelFg;
@@ -233,6 +233,7 @@ public final class UIUtils {
         PixelGrabber pixelGrabber = new PixelGrabber(image, 5, 5, 1, 1, pixels, 0, 1);
         try {
             pixelGrabber.grabPixels();
+            if (pixels[0] == -1) return Color.WHITE; // System background not customized
         } catch (InterruptedException e) {
             return getNonGTKProfilerResultsBackground();
         }
