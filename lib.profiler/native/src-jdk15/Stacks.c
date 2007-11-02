@@ -90,7 +90,7 @@ static jint convert_jmethodID_to_jint(jmethodID jmethod) {
 
             if (ba == -1L) {
                 base_addresses[i] = base_address;
-                fprintf(stderr,"Registering new base %lx\n",base_address);
+                //fprintf(stderr,"Profiler Agent: Registering new base %lx\n",base_address);
             }
             if (base_addresses[i]==base_address) {
                 jint offset = (long)jmethod&OFFSET_MASK;
@@ -99,7 +99,7 @@ static jint convert_jmethodID_to_jint(jmethodID jmethod) {
                 return offset;
             }
         }
-        fprintf(stderr,"Cannot convert %p\n",jmethod);
+        fprintf(stderr,"Profiler Agent Warning: Cannot convert %p\n",jmethod);
         return 0;
     } else {
         return (jint)jmethod;

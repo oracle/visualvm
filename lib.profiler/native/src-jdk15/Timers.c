@@ -81,7 +81,7 @@ JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getT
 	jvmtiError res;
 	
 	res = (*_jvmti)->GetCurrentThreadCpuTime(_jvmti,&threadTime);
-	if (res != JVMTI_ERROR_NONE) fprintf(stderr, "GetCurrentThreadCpuTime failed with %d\n",res);
+	if (res != JVMTI_ERROR_NONE) fprintf(stderr, "Profiler Agent Error: GetCurrentThreadCpuTime failed with %d\n",res);
 	assert(res == JVMTI_ERROR_NONE);
 	return threadTime;
 }
