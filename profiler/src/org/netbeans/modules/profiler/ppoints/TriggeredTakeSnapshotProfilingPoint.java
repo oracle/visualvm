@@ -291,6 +291,7 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
                                                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             TitledBorder tb = new TitledBorder(DATA_STRING);
             tb.setTitleFont(tb.getTitleFont().deriveFont(Font.BOLD));
+            tb.setTitleColor(javax.swing.UIManager.getColor("Label.foreground")); // NOI18N
             dataAreaScrollPane.setBorder(tb);
             dataAreaScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
             dataAreaScrollPane.setBackground(UIUtils.getProfilerResultsBackground());

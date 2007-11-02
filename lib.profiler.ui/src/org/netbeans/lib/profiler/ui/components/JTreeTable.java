@@ -342,18 +342,32 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             boolean focused;
             int xpos;
 
-            // move tree according to offsetX
-            g.translate(-offsetX, -currentlyPaintedRow * getRowHeight());
-
-            // draw row background
             selected = isRowSelected(currentlyPaintedRow);
             focused = JTreeTable.this.isFocusOwner();
+            
+            int rHeight = getRowHeight();
+
+            // move tree according to offsetX
+            g.translate(-offsetX, -currentlyPaintedRow * rHeight);
+
+            if (isGTK) { // Optimized for GTK but doesn't paint selection on the left side of renderer
+                // paint tree row, according to current Clip only one row is painted
+                super.paint(g);
+
+            // draw row background
+                Rectangle rowBounds = getRowBounds(currentlyPaintedRow);
+                xpos = rowBounds.x + rowBounds.width;
+                g.setColor(getRowColor(currentlyPaintedRow, selected, focused));
+                g.fillRect(xpos, currentlyPaintedRow * rHeight, getWidth() + offsetX - xpos, rHeight);
+            } else {
+                // draw row background
             xpos = selected ? 0 : getRowBounds(currentlyPaintedRow).x;
             g.setColor(getRowColor(currentlyPaintedRow, selected, focused));
-            g.fillRect(xpos, currentlyPaintedRow * getRowHeight(), getWidth() + offsetX, getRowHeight());
+                g.fillRect(xpos, currentlyPaintedRow * rHeight, getWidth() + offsetX, rHeight);
 
             // paint tree row, according to current Clip only one row is painted
             super.paint(g);
+        }
         }
 
         protected void setRowBackground(Color c) {
@@ -388,6 +402,8 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
     public static final boolean SORT_ORDER_DESC = false;
     public static final boolean SORT_ORDER_ASC = true;
+
+    private static final boolean isGTK = UIUtils.isGTKLookAndFeel();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
