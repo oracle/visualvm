@@ -290,7 +290,7 @@ public class ProfilerInterface implements CommonConstants {
     // classLoadHook() trying to record adjustTime event, while serialClientOperationsLock is held by an outer invocation
     // of classLoadHook() or methodInvokedFirstTime(). To avoid all these problems we use this simple way to avoid
     // unnecessary classLoadHook() invocations.
-    private static volatile boolean inInstrumentMethodGroupCall;
+    private static volatile Thread instrumentMethodGroupCallThread;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -774,7 +774,7 @@ public class ProfilerInterface implements CommonConstants {
         try {
             String className = clazz.getName();
 
-            if (inInstrumentMethodGroupCall || internalClassName(className)) { // See comment at inInstrumentMethodGroupCall
+            if (instrumentMethodGroupCallThread == Thread.currentThread() || internalClassName(className)) { // See comment at inInstrumentMethodGroupCall
                 ClassLoaderManager.registerLoader(clazz); // Still register the loader, for reasons related with
                                                           // management of jmethodIds
 
@@ -1025,7 +1025,7 @@ public class ProfilerInterface implements CommonConstants {
     private static void instrumentMethodGroupNow(InstrumentMethodGroupData imgb)
                                           throws Exception {
         try {
-            inInstrumentMethodGroupCall = true;
+            instrumentMethodGroupCallThread = Thread.currentThread();
 
             int res = 0;
             long time = Timers.getCurrentTimeInCounts();
@@ -1081,7 +1081,7 @@ public class ProfilerInterface implements CommonConstants {
                 maxHotswappingTime = time;
             }
 
-            inInstrumentMethodGroupCall = false;
+            instrumentMethodGroupCallThread = null;
         } catch (Throwable t) {
             if (t instanceof Classes.RedefineException) {
                 int nClasses = imgb.getNClasses();
@@ -1118,7 +1118,7 @@ public class ProfilerInterface implements CommonConstants {
                 throw new Exception(MessageFormat.format(UNEXPECTED_EXCEPTION_MSG, new Object[] { t, sw.toString() }));
             }
         } finally {
-            inInstrumentMethodGroupCall = false;
+            instrumentMethodGroupCallThread = null;
         }
     }
 
