@@ -72,7 +72,7 @@ public class DirectorySelector extends javax.swing.JPanel {
     }
   };
   
-  private String label = ""; // NOI18N
+  private String label = org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.caption.text"); // NOI18N
   private String initPath = ""; // NOI18N
   
   /** Creates new form DirectorySelector */
