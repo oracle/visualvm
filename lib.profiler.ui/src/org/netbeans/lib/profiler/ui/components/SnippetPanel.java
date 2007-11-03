@@ -185,7 +185,7 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
     private static Color focusedBackgroundColor;
     private static Color textColor;
     
-    { initColors(); }
+    static { initColors(); }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

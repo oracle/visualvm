@@ -209,7 +209,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     public static Color DARKLINK_COLOR;
     public static Color DARKLINK_COLOR_INACTIVE;
     
-    { initColors(); }
+    static { initColors(); }
 
     // --- Instance variables declaration ----------------------------------------
     private static SelectProfilingTask defaultInstance;
