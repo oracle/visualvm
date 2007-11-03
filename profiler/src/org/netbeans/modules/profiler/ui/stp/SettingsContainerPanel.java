@@ -47,7 +47,6 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -345,18 +344,21 @@ public class SettingsContainerPanel extends JPanel implements ChangeListener, He
         contents.synchronizeBasicAdvancedPanels(); // TODO: cleanup, calling only when switching basic -> advanced is enough
 
         showingAdvancedSettings = !showingAdvancedSettings;
+        JPanel contentsPanel;
 
         if (showingAdvancedSettings) {
             captionLabel.setText(MessageFormat.format(ADVANCED_CAPTION_TEXT, new Object[] { caption }));
-            basicAdvancedSettingsSwitchArea.setText(BASIC_SETTINGS_STRING); // NOI18N
-            basicAdvancedSettingsSwitchArea.updateAppearance();
-            contentsScroll.setViewportView(contents.getAdvancedSettingsPanel());
+            basicAdvancedSettingsSwitchArea.setText(BASIC_SETTINGS_STRING);
+            contentsPanel = contents.getAdvancedSettingsPanel();
         } else {
             captionLabel.setText(caption);
-            basicAdvancedSettingsSwitchArea.setText(ADVANCED_SETTINGS_STRING); // NOI18N
-            basicAdvancedSettingsSwitchArea.updateAppearance();
-            contentsScroll.setViewportView(contents.getBasicSettingsPanel());
+            basicAdvancedSettingsSwitchArea.setText(ADVANCED_SETTINGS_STRING);
+            contentsPanel = contents.getBasicSettingsPanel();
         }
+        
+        basicAdvancedSettingsSwitchArea.updateAppearance();
+        contentsPanel.setBackground(getBackground());
+        contentsScroll.setViewportView(contentsPanel);
 
         // TODO: update cursor according to current mouse position
         SwingUtilities.invokeLater(new Runnable() {
