@@ -55,10 +55,14 @@ public class ClassChildren extends SelectorChildren<ClassNode> {
 
     protected List<SelectorNode> prepareChildren(final ClassNode parent) {
         List<SelectorNode> contents = new ArrayList<SelectorNode>();
-        SelectorNode content = new ConstructorsNode(parent.getCpInfo(), parent);
+        SelectorNode content = null;
 
-        if (!content.isLeaf()) {
-            contents.add(content);
+        if (!parent.isAnonymous()) { // no constructors for anonymous inner classes
+            content = new ConstructorsNode(parent.getCpInfo(), parent);
+
+            if (!content.isLeaf()) {
+                contents.add(content);
+            }
         }
 
         content = new MethodsNode(parent.getCpInfo(), parent);

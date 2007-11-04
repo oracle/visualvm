@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.selector.api.nodes;
 
+import javax.lang.model.element.NestingKind;
 import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.java.source.ElementHandle;
 import javax.lang.model.element.TypeElement;
@@ -55,7 +56,8 @@ public abstract class AbstractClassNode extends ContainerNode {
 
     private ClasspathInfo cpInfo;
     private ElementHandle<TypeElement> classHandle;
-
+    private boolean anonymous;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of AbstractClassNode */
@@ -63,12 +65,14 @@ public abstract class AbstractClassNode extends ContainerNode {
         this(cpInfo, icon, classElement, classElement.getSimpleName().toString(), parent);
         this.cpInfo = cpInfo;
         this.classHandle = ElementHandle.create(classElement);
+        this.anonymous = classElement.getNestingKind().compareTo(NestingKind.ANONYMOUS) == 0;
     }
 
     public AbstractClassNode(ClasspathInfo cpInfo, Icon icon, TypeElement classElement, String className, ContainerNode parent) {
         super(className, icon, parent);
         this.cpInfo = cpInfo;
         this.classHandle = ElementHandle.create(classElement);
+        this.anonymous = classElement.getNestingKind().compareTo(NestingKind.ANONYMOUS) == 0;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -80,4 +84,9 @@ public abstract class AbstractClassNode extends ContainerNode {
     public ClasspathInfo getCpInfo() {
         return cpInfo;
     }
+
+    public boolean isAnonymous() {
+        return anonymous;
+    }
+    
 }
