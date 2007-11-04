@@ -98,7 +98,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
     private Project currentProject;
     private RootSelectorTree advancedLogicalPackageTree;
     private SelectionTreeBuilder defaultBuilder = null;
-    private Set<ClientUtils.SourceCodeSelection> currentSelectionSet = new HashSet<ClientUtils.SourceCodeSelection>();
     private String assignedClassName;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -264,7 +263,8 @@ public class SelectRootMethodsForClassPanel extends JPanel {
     }
 
     private String demaskInnerClass(String className) {
-        return className.replace('$', '.'); // NOI18N
+        return className;
+//        return className.replace('$', '.'); // NOI18N
     }
 
     private SelectorNode[] findElligibleNodes(SelectorNode currentRoot) {
