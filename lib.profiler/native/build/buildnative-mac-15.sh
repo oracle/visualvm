@@ -34,7 +34,9 @@ BuildForJDK()
 	common_functions.o"
 
 	BuildForArch "ppc"
+        BuildForArch "ppc64"
 	BuildForArch "i386"
+        BuildForArch "x86_64"
 
 	lipo -create libprofilerinterface_ppc.jnilib libprofilerinterface_i386.jnilib \
 	-output ../../release/lib/deployed/$JDK_ID/mac/libprofilerinterface.jnilib
