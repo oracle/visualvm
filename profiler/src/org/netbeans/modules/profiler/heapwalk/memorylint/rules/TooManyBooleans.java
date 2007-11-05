@@ -60,10 +60,15 @@ public class TooManyBooleans extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public TooManyBooleans() {
-        super("Too many Boolean", "Checks other instances of Boolean the Boolean.TRUE and Boolean.FALSE", "java.lang.Boolean");
+        super("Too many Boolean", "Checks instances of Boolean other than Boolean.TRUE and Boolean.FALSE", "java.lang.Boolean");
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Checks if there are more than two instances of <code>Boolean</code> on the heap (only <code>Boolean.TRUE</code> and <code>Boolean.FALSE</code> are necessary).</body></html>";
+    }
 
     protected void perform(Instance in) {
         if (in.equals(TRUE) || in.equals(FALSE)) {

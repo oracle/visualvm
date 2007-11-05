@@ -67,6 +67,11 @@ public class OverallocatedString extends IteratingRule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Computes overhead of <code>String</code>s that have their backing <code>char[]</code> larger than necessary (for example result of <code>String.substring()</code>).</body></html>";
+    }
 
     protected void perform(Instance in) {
         int off = fldOffset.getIntValue(in);

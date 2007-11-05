@@ -94,6 +94,11 @@ public class WrongWeakHashMap extends IteratingRule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Identifies improperly used <code>WeakHashMap</code>s where a value strongly references its key.</body></html>";
+    }
 
     protected void perform(Instance hm) {
         scanWeakHashmap(hm);

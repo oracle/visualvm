@@ -106,6 +106,11 @@ public class RetainedSetByInstance extends IteratingRule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Computes retained set for each instance of given class.</body></html>";
+    }
 
     public void perform(Instance hm) {
         Set<Instance> retained = Utils.getRetainedSet(hm, heap);

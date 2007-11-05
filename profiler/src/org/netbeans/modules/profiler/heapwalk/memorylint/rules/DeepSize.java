@@ -99,6 +99,11 @@ public class DeepSize extends IteratingRule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Computes reachable (deep) size of all instances of given class.</body></html>";
+    }
 
     @Override
     protected JComponent createCustomizer() {

@@ -63,6 +63,11 @@ public class DuplicatedString extends IteratingRule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Computes total memory wasted by duplicated <code>String</code>s and tries to identify thir referrers.</body></html>";
+    }
 
     protected void perform(Instance in) {
         String str = helper.decodeString(in);

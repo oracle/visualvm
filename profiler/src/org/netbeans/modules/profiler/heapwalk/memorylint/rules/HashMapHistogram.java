@@ -101,6 +101,11 @@ public class HashMapHistogram extends IteratingRule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body>Computes memory used by <code>HashMap</code> structures and <code>String</code>s referenced from the <code>HashMap</code>s.</body></html>";
+    }
 
     protected void perform(Instance hm) {
         HashmapEntry he = sizeOfHashmap(hm);
