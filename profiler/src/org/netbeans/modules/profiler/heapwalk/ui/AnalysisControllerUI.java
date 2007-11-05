@@ -198,16 +198,22 @@ public class AnalysisControllerUI extends JPanel {
 
         return presenter;
     }
+    
+    public void displayNewRules() {
+        initRules();
+    }
 
     public void setResult(final String result) {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     resultsContainer.removeAll();
-                    resultsContainer.add(new HTMLTextArea(result) {
-                            protected void showURL(URL url) {
-                                analysisController.showURL(url);
-                            }
-                        }, BorderLayout.CENTER);
+                    HTMLTextArea resultDisplayer = new HTMLTextArea(result) {
+                        protected void showURL(URL url) {
+                            analysisController.showURL(url);
+                        }
+                    };
+                    try { resultDisplayer.setCaretPosition(0); } catch (Exception e) {}
+                    resultsContainer.add(resultDisplayer, BorderLayout.CENTER);
                     resultsContainer.invalidate();
                     revalidate();
                     repaint();
@@ -386,88 +392,92 @@ public class AnalysisControllerUI extends JPanel {
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 GridBagConstraints constraints;
+                                
+                                synchronized(getTreeLock()) {
+                                    rulesContainer.removeAll();
 
-                                for (int i = 0; i < rules.size(); i++) {
-                                    final Rule rule = rules.get(i);
-                                    final String ruleName = rule.getDisplayName();
-                                    final String ruleDescription = rule.getDescription();
-                                    final JComponent ruleCustomizer = rule.getCustomizer();
-                                    final String htmlDescription = rule.getHTMLDescription();
+                                    for (int i = 0; i < rules.size(); i++) {
+                                        final Rule rule = rules.get(i);
+                                        final String ruleName = rule.getDisplayName();
+                                        final String ruleDescription = rule.getDescription();
+                                        final JComponent ruleCustomizer = rule.getCustomizer();
+                                        final String htmlDescription = rule.getHTMLDescription();
 
-                                    JCheckBox checkBox = new JCheckBox(ruleName, true);
-                                    checkBox.setActionCommand("RULE_CHECKBOX"); // NOI18N
-                                    checkBox.setOpaque(false);
-                                    checkBox.setToolTipText(ruleDescription);
+                                        JCheckBox checkBox = new JCheckBox(ruleName);
+                                        checkBox.setActionCommand("RULE_CHECKBOX"); // NOI18N
+                                        checkBox.setOpaque(false);
+                                        checkBox.setToolTipText(ruleDescription);
+                                        constraints = new GridBagConstraints();
+                                        constraints.gridx = 0;
+                                        constraints.gridy = i;
+                                        constraints.gridwidth = ((ruleCustomizer == null) && (htmlDescription == null))
+                                                                ? GridBagConstraints.REMAINDER : 1;
+                                        constraints.fill = GridBagConstraints.NONE;
+                                        constraints.anchor = GridBagConstraints.WEST;
+                                        constraints.insets = new Insets(0, 0, 0, 0);
+                                        rulesContainer.add(checkBox, constraints);
+                                        checkBox.addActionListener(new ActionListener() {
+                                                public void actionPerformed(ActionEvent e) {
+                                                    updatePerformButton();
+                                                }
+                                            });
+
+                                        if (htmlDescription != null) {
+                                            HTMLLabel description = new HTMLLabel("<a href='#info'>" + INFO_STRING + "</a>") { // NOI18N
+                                                protected void showURL(URL url) {
+                                                    DescriptionDisplayer.showDescription(rule, htmlDescription);
+                                                }
+                                            };
+
+                                            description.setOpaque(false);
+                                            constraints = new GridBagConstraints();
+                                            constraints.gridx = 1;
+                                            constraints.gridy = i;
+                                            constraints.gridwidth = (ruleCustomizer == null) ? GridBagConstraints.REMAINDER : 1;
+                                            constraints.fill = GridBagConstraints.NONE;
+                                            constraints.anchor = GridBagConstraints.WEST;
+                                            constraints.insets = new Insets(0, 2, 0, 0);
+                                            rulesContainer.add(description, constraints);
+                                        }
+
+                                        if (ruleCustomizer != null) {
+                                            ruleCustomizer.setOpaque(false);
+                                            constraints = new GridBagConstraints();
+                                            constraints.gridx = 2;
+                                            constraints.gridy = i;
+                                            constraints.gridwidth = GridBagConstraints.REMAINDER;
+                                            constraints.fill = GridBagConstraints.NONE;
+                                            constraints.anchor = GridBagConstraints.WEST;
+                                            constraints.insets = new Insets(0, 8, 0, 5);
+                                            rulesContainer.add(ruleCustomizer, constraints);
+                                        }
+                                    }
+
+                                    JPanel fillerPanel = new JPanel(new GridBagLayout());
+                                    fillerPanel.setOpaque(false);
                                     constraints = new GridBagConstraints();
                                     constraints.gridx = 0;
-                                    constraints.gridy = i;
-                                    constraints.gridwidth = ((ruleCustomizer == null) && (htmlDescription == null))
-                                                            ? GridBagConstraints.REMAINDER : 1;
-                                    constraints.fill = GridBagConstraints.NONE;
+                                    constraints.gridy = rules.size();
+                                    constraints.gridwidth = GridBagConstraints.REMAINDER;
+                                    constraints.weightx = 1;
+                                    constraints.fill = GridBagConstraints.HORIZONTAL;
                                     constraints.anchor = GridBagConstraints.WEST;
                                     constraints.insets = new Insets(0, 0, 0, 0);
-                                    rulesContainer.add(checkBox, constraints);
-                                    checkBox.addActionListener(new ActionListener() {
-                                            public void actionPerformed(ActionEvent e) {
-                                                updatePerformButton();
-                                            }
-                                        });
+                                    rulesContainer.add(fillerPanel, constraints);
 
-                                    if (htmlDescription != null) {
-                                        HTMLLabel description = new HTMLLabel("<a href='#info'>" + INFO_STRING + "</a>") { // NOI18N
-                                            protected void showURL(URL url) {
-                                                DescriptionDisplayer.showDescription(rule, htmlDescription);
-                                            }
-                                        };
+                                    constraints = new GridBagConstraints();
+                                    constraints.gridx = 1;
+                                    constraints.gridy = 3;
+                                    constraints.gridwidth = 1;
+                                    constraints.fill = GridBagConstraints.NONE;
+                                    constraints.anchor = GridBagConstraints.EAST;
+                                    constraints.insets = new Insets(3, 0, 0, 8);
+                                    add(performButton, constraints);
 
-                                        description.setOpaque(false);
-                                        constraints = new GridBagConstraints();
-                                        constraints.gridx = 1;
-                                        constraints.gridy = i;
-                                        constraints.gridwidth = (ruleCustomizer == null) ? GridBagConstraints.REMAINDER : 1;
-                                        constraints.fill = GridBagConstraints.NONE;
-                                        constraints.anchor = GridBagConstraints.WEST;
-                                        constraints.insets = new Insets(0, 2, 0, 0);
-                                        rulesContainer.add(description, constraints);
-                                    }
-
-                                    if (ruleCustomizer != null) {
-                                        ruleCustomizer.setOpaque(false);
-                                        constraints = new GridBagConstraints();
-                                        constraints.gridx = 2;
-                                        constraints.gridy = i;
-                                        constraints.gridwidth = GridBagConstraints.REMAINDER;
-                                        constraints.fill = GridBagConstraints.NONE;
-                                        constraints.anchor = GridBagConstraints.WEST;
-                                        constraints.insets = new Insets(0, 8, 0, 5);
-                                        rulesContainer.add(ruleCustomizer, constraints);
-                                    }
+                                    settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
+                                                         + RULES_TO_APPLY_STRING + "</b><br><hr>"); // NOI18N
+                                    updatePerformButton();
                                 }
-
-                                JPanel fillerPanel = new JPanel(new GridBagLayout());
-                                fillerPanel.setOpaque(false);
-                                constraints = new GridBagConstraints();
-                                constraints.gridx = 0;
-                                constraints.gridy = rules.size();
-                                constraints.gridwidth = GridBagConstraints.REMAINDER;
-                                constraints.weightx = 1;
-                                constraints.fill = GridBagConstraints.HORIZONTAL;
-                                constraints.anchor = GridBagConstraints.WEST;
-                                constraints.insets = new Insets(0, 0, 0, 0);
-                                rulesContainer.add(fillerPanel, constraints);
-
-                                constraints = new GridBagConstraints();
-                                constraints.gridx = 1;
-                                constraints.gridy = 3;
-                                constraints.gridwidth = 1;
-                                constraints.fill = GridBagConstraints.NONE;
-                                constraints.anchor = GridBagConstraints.EAST;
-                                constraints.insets = new Insets(3, 0, 0, 8);
-                                add(performButton, constraints);
-
-                                settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
-                                                     + RULES_TO_APPLY_STRING + "</b><br><hr>"); // NOI18N
-                                updatePerformButton();
                             }
                         });
                 }

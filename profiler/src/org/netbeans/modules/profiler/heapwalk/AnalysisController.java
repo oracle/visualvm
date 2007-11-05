@@ -56,6 +56,7 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JPanel;
+import org.openide.ErrorManager;
 
 
 /**
@@ -75,7 +76,7 @@ public class AnalysisController extends AbstractTopLevelController implements Na
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapFragmentWalker heapFragmentWalker;
-    private List<Rule> rules;
+    private List<Rule> rules = null;
     private MemoryLint runningMemoryLint;
     private boolean analysisRunning = false;
 
@@ -139,14 +140,18 @@ public class AnalysisController extends AbstractTopLevelController implements Na
             runningMemoryLint = ml;
             BrowserUtils.performTask(new Runnable() {
                     public void run() {
-                        ml.process(selectedRules);
+                        try {
+                            ml.process(selectedRules);
+                        } catch (Exception e) {
+                            ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
+                        }
                         rules = null;
                         analysisRunning = false;
                         runningMemoryLint = null;
 
-                        if (!ml.isInterruped()) {
-                            ((AnalysisControllerUI) getPanel()).setResult(ml.getResults());
-                        }
+                        AnalysisControllerUI ui = (AnalysisControllerUI)getPanel();
+                        ui.displayNewRules();
+                        if (!ml.isInterruped()) ui.setResult(ml.getResults());
                     }
                 });
 
@@ -166,13 +171,16 @@ public class AnalysisController extends AbstractTopLevelController implements Na
             JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(id[0]);
 
             if (c != null) {
-                Instance i = (Instance) c.getInstances().get(Integer.parseInt(id[1]) - 1);
+                List<Instance> instances = c.getInstances();
+                Instance i = null;
+                int instanceNumber = Integer.parseInt(id[1]);
+                if (instanceNumber <= instances.size()) i = instances.get(instanceNumber - 1);
 
                 if (i != null) {
                     heapFragmentWalker.getClassesController().showInstance(i);
                 } else {
                     NetBeansProfiler.getDefaultNB()
-                                    .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG,
+                                    .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
                                                                        new Object[] { id[1], c.getName() }));
                 }
             } else {
