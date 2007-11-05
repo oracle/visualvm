@@ -733,9 +733,10 @@ public final class ProjectUtilities {
             for (Iterator it = spp.getSubprojects().iterator(); it.hasNext();) {
                 Project p = (Project) it.next();
 
-                if (projects.add(p)) {
-                    fetchSubprojects(p, projects);
-                }
+                if (p != null) // NOTE: workaround for Issue 121157 for NetBeans 6.0 FCS branch, will be removed in trunk!!!
+                    if (projects.add(p)) {
+                        fetchSubprojects(p, projects);
+                    }
             }
         }
     }
