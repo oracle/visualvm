@@ -49,6 +49,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 public class ProfilerOptionsCategory extends AdvancedOption {
@@ -77,8 +78,15 @@ public class ProfilerOptionsCategory extends AdvancedOption {
                                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 optionsComponent.setBorder(BorderFactory.createEmptyBorder());
                 optionsComponent.setViewportBorder(BorderFactory.createEmptyBorder());
-                optionsComponent.getViewport().setOpaque(false);
-                optionsComponent.setOpaque(false);
+                if (UIUtils.isMetalLookAndFeel() || UIUtils.isWindowsLookAndFeel()) {
+                     // JTabbedPane (container) has other than Panel.background color on Metal, XP and probably Vista
+                    optionsComponent.getViewport().setBackground(settingsPanel.getBackground());
+                    optionsComponent.setBackground(settingsPanel.getBackground());
+                } else {
+                    // Must be transparent at least for Aqua and GTK
+                    optionsComponent.getViewport().setOpaque(false);
+                    optionsComponent.setOpaque(false);
+                }
             }
 
             return optionsComponent;
