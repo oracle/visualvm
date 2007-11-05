@@ -72,7 +72,7 @@ public class WrongWeakHashMap extends IteratingRule {
 
         @Override
         public String toString() {
-            return Utils.printClass(getContext(), getContext().getRootIncommingString(hm)) + ":" + Utils.printInstance(hm)
+            return Utils.printClass(getContext(), getContext().getRootIncommingString(hm)) + ": " + Utils.printInstance(hm)
                    + " is wrong: " + Utils.printInstance(key) + " is reachable from " + Utils.printInstance(value) + "<br>";
         }
     }

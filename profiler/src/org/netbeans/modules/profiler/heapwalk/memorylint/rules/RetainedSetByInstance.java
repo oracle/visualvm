@@ -45,6 +45,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -66,7 +67,9 @@ public class RetainedSetByInstance extends IteratingRule {
 
         Customizer() {
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(new JLabel("Class name:"));
+            JLabel caption = new JLabel("Class name:");
+            caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+            add(caption);
             txtFld = new JTextField(CLASSNAME, 15);
             txtFld.getDocument().addDocumentListener(new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
@@ -87,7 +90,7 @@ public class RetainedSetByInstance extends IteratingRule {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static String CLASSNAME = "org.netbeans.modules.editor.NbEditorDocument";
+    private static String CLASSNAME = "java.io.File";
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -124,6 +127,11 @@ public class RetainedSetByInstance extends IteratingRule {
     @Override
     protected void prepareRule(MemoryLint context) {
         heap = context.getHeap();
+    }
+    
+    @Override
+    protected String resultsHeader() {
+        return "<h2>" + getDisplayName() + " (" + Utils.printClass(getContext(), CLASSNAME) + ")</h2>";
     }
 
     @Override

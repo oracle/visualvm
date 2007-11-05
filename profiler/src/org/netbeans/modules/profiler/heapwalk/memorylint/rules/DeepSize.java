@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.memorylint.rules;
 
+import javax.swing.BorderFactory;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import javax.swing.BoxLayout;
@@ -65,7 +66,9 @@ public class DeepSize extends IteratingRule {
         Customizer() {
             setOpaque(false);
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(new JLabel("Class name: "));
+            JLabel caption = new JLabel("Class name:");
+            caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+            add(caption);
             txtFld = new JTextField(className, 15);
             txtFld.getDocument().addDocumentListener(new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
@@ -87,7 +90,7 @@ public class DeepSize extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     Walker walker;
-    private String className = "java.io.File";
+    private static String className = "java.io.File";
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -113,7 +116,7 @@ public class DeepSize extends IteratingRule {
 
     @Override
     protected String resultsHeader() {
-        return "<h1>" + getDisplayName() + " (all instances of " + Utils.printClass(getContext(), className) + ")</h1>";
+        return "<h2>" + getDisplayName() + " (all instances of " + Utils.printClass(getContext(), className) + ")</h2>";
     }
 
     protected void summary() {

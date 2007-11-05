@@ -103,6 +103,6 @@ public abstract class Rule {
     protected abstract JComponent createCustomizer();
 
     protected String resultsHeader() {
-        return "<h1>" + getDisplayName() + "</h1>";
+        return "<h2>" + getDisplayName() + "</h2>";
     }
 }

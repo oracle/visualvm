@@ -373,6 +373,8 @@ public class Utils {
     }
 
     public static String printInstance(Instance in) {
-        return in.getJavaClass().getName() + '@' + Long.toHexString(in.getInstanceId()) + '#' + in.getInstanceNumber();
+        String className = in.getJavaClass().getName();
+        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>";
+//        return in.getJavaClass().getName() + '@' + Long.toHexString(in.getInstanceId()) + '#' + in.getInstanceNumber();
     }
 }

@@ -91,7 +91,7 @@ public final class Distribution {
 
         @Override
         public String toString() {
-            return type.getName() + ":" + getCount() + "/" + getSize() + "B";
+            return Utils.printClass(null, type.getName()) + ": " + getCount() + "/" + getSize() + "B";
         }
 
         private void count(Instance in) {

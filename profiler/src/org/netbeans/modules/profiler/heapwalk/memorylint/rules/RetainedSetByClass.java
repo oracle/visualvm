@@ -65,6 +65,11 @@ public class RetainedSetByClass extends Rule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    @Override
+    public String getHTMLDescription() {
+        return "<html><body><b>Warning!</b><br><br>This rule takes a long time to compute and can use a big amout of memory on large heaps!</body></html>";
+    }
 
     public void perform() {
         Heap heap = context.getHeap();
