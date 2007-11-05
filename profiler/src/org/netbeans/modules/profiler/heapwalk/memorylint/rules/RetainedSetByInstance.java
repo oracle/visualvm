@@ -53,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.openide.util.NbBundle;
 
 
 public class RetainedSetByInstance extends IteratingRule {
@@ -67,7 +68,7 @@ public class RetainedSetByInstance extends IteratingRule {
 
         Customizer() {
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            JLabel caption = new JLabel("Class name:");
+            JLabel caption = new JLabel(NbBundle.getMessage(RetainedSetByInstance.class, "LBL_ClassName"));
             caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
             add(caption);
             txtFld = new JTextField(CLASSNAME, 15);
@@ -90,7 +91,7 @@ public class RetainedSetByInstance extends IteratingRule {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static String CLASSNAME = "java.io.File";
+    private static String CLASSNAME = "java.io.File";  // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -100,16 +101,16 @@ public class RetainedSetByInstance extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RetainedSetByInstance() {
-        super("Histograms of retained sets", "Prints histogram of retained set held by instances of class", //                "javax.swing.ImageIcon");
-        //                "org.netbeans.modules.apisupport.project.NbModuleProject\\$SavedHook");
-        CLASSNAME);
+        super(NbBundle.getMessage(RetainedSetByInstance.class, "LBL_RSBI_Name"),
+                NbBundle.getMessage(RetainedSetByInstance.class, "LBL_RSBI_Desc"),
+                CLASSNAME);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Computes retained set for each instance of given class.</body></html>";
+        return NbBundle.getMessage(RetainedSetByInstance.class, "LBL_RSBI_LongDesc");
     }
 
     public void perform(Instance hm) {
@@ -136,13 +137,13 @@ public class RetainedSetByInstance extends IteratingRule {
     
     @Override
     protected String resultsHeader() {
-        return "<h2>" + getDisplayName() + " (" + Utils.printClass(getContext(), CLASSNAME) + ")</h2>";
+        return "<h2>" + getDisplayName() + " (" + Utils.printClass(getContext(), CLASSNAME) + ")</h2>"; // NOI18N
     }
 
     @Override
     protected void summary() {
         for (Histogram h : allDocs) {
-            getContext().appendResults("<hr>Histogram of retained size:<br>");
+//            getContext().appendResults("<hr>Histogram of retained size:<br>");
             getContext().appendResults(h.toString(0));
         }
     }

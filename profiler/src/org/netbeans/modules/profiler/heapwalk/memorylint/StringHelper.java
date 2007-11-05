@@ -64,21 +64,21 @@ public class StringHelper {
 
     StringHelper(Heap heap) {
         this.heap = heap;
-        clsString = heap.getJavaClassByName("java.lang.String");
-        fldOffset = new FieldAccess(clsString, "offset");
-        fldCount = new FieldAccess(clsString, "count");
-        fldValue = new FieldAccess(clsString, "value");
+        clsString = heap.getJavaClassByName("java.lang.String"); // NOI18N
+        fldOffset = new FieldAccess(clsString, "offset"); // NOI18N
+        fldCount = new FieldAccess(clsString, "count"); // NOI18N
+        fldValue = new FieldAccess(clsString, "value"); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public String decodeString(Instance in) {
         if (in == null) {
-            return "null";
+            return "null"; // NOI18N
         }
 
-        if (!"java.lang.String".equals(in.getJavaClass().getName())) {
-            return "<<" + in.getJavaClass().getName() + ">>";
+        if (!"java.lang.String".equals(in.getJavaClass().getName())) { // NOI18N
+            return "<<" + in.getJavaClass().getName() + ">>"; // NOI18N
         }
 
         int off = fldOffset.getIntValue(in);
@@ -86,7 +86,7 @@ public class StringHelper {
         PrimitiveArrayInstance arrValue = (PrimitiveArrayInstance) fldValue.getRefValue(in);
 
         if (arrValue == null) {
-            return "";
+            return ""; // NOI18N
         }
 
         char[] data = getCharArray(arrValue);

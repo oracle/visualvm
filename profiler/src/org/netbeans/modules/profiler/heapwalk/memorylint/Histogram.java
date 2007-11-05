@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -87,7 +88,7 @@ public final class Histogram<T extends Histogram.Entry> {
 
         @Override
         public String toString() {
-            return "#:" + getCount() + "/" + getSize() + "B\n";
+            return "#:" + getCount() + "/" + getSize() + "B\n"; // NOI18N
         }
 
         /**
@@ -176,14 +177,14 @@ public final class Histogram<T extends Histogram.Entry> {
             int size = entry.getValue().getSize();
 
             if (size > treshold) {
-                result.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>");
+                result.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>"); // NOI18N
             }
 
             totalSize += size;
             totalCount += entry.getValue().getCount();
         }
 
-        result.append("Total instance count: ").append(totalCount).append(", size: ").append(totalSize).append("<br>");
+        result.append(NbBundle.getMessage(Histogram.class, "FMT_HistogramSum", totalCount, totalSize));
 
         return result.toString();
     }

@@ -105,7 +105,7 @@ public abstract class IteratingRule extends Rule {
             List<Instance> instances = actCls.getInstances();
 
             for (Instance inst : instances) {
-                Logger.getLogger(IteratingRule.class.getName()).log(Level.FINE, "Executing rule on {0} instance", inst);
+                Logger.getLogger(IteratingRule.class.getName()).log(Level.FINE, "Executing rule on {0} instance", inst); // NOI18N
                 perform(inst);
                 progress.setValue(progress.getValue() + 1);
 

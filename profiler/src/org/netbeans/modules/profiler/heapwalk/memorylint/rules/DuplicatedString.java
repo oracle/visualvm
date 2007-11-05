@@ -45,6 +45,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import java.util.HashMap;
+import org.openide.util.NbBundle;
 
 
 public class DuplicatedString extends IteratingRule {
@@ -59,14 +60,16 @@ public class DuplicatedString extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public DuplicatedString() {
-        super("Duplicated Strings", "Find String duplicates and measure their cost", "java.lang.String");
+        super(NbBundle.getMessage(DuplicatedString.class, "LBL_DupStr_Name"),
+                NbBundle.getMessage(DuplicatedString.class, "LBL_DupStr_Desc"),
+                "java.lang.String"); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Computes total memory wasted by duplicated <code>String</code>s and tries to identify thir referrers.</body></html>";
+        return NbBundle.getMessage(DuplicatedString.class, "LBL_DupStr_LongDesc");
     }
 
     protected void perform(Instance in) {
@@ -92,16 +95,16 @@ public class DuplicatedString extends IteratingRule {
         map.put(str, val);
     }
 
-    protected void prepareRule(MemoryLint context) {
+    protected @Override void prepareRule(MemoryLint context) {
         Heap heap = context.getHeap();
         helper = context.getStringHelper();
 
-        JavaClass clsString = heap.getJavaClassByName("java.lang.String");
-        fldValue = new FieldAccess(clsString, "value");
+        JavaClass clsString = heap.getJavaClassByName("java.lang.String"); // NOI18N
+        fldValue = new FieldAccess(clsString, "value"); // NOI18N
     }
 
-    protected void summary() {
-        getContext().appendResults("<b>Total waste: " + total + "B</b>, distributed by domain source:<br>");
+    protected @Override void summary() {
+        getContext().appendResults(NbBundle.getMessage(DuplicatedString.class, "FMT_DupStr_Result", total));
         getContext().appendResults(dupSources.toString(50000));
     }
 }

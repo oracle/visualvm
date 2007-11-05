@@ -48,6 +48,7 @@ import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 public class CollapsedHashMap extends IteratingRule {
@@ -73,10 +74,13 @@ public class CollapsedHashMap extends IteratingRule {
         @Override
         public String toString() {
             boolean reallyBad = slots == 1;
-
-            return Utils.printClass(getContext(), getContext().getRootIncommingString(hm)) + ": " + Utils.printInstance(hm) + " "
-                   + size + " entries are allocated to " + (reallyBad ? "<b>" : "") + slots + " buckets"
-                   + (reallyBad ? "</b>" : "");
+            return NbBundle.getMessage(CollapsedHashMap.class, "FMT_CHM_Record",
+                    new Object[] {
+                        Utils.printClass(getContext(), getContext().getRootIncommingString(hm)),
+                        Utils.printInstance(hm),
+                        size,
+                        slots
+                    });
         }
     }
 
@@ -96,18 +100,16 @@ public class CollapsedHashMap extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CollapsedHashMap() {
-        super("Collapsed (Weak)HashMaps", "HashMaps populated by entries with poorly distributed hashcode",
-              "java.util.HashMap|java.util.WeakHashMap");
+        super(NbBundle.getMessage(CollapsedHashMap.class, "LBL_CHM_Name"),
+                NbBundle.getMessage(CollapsedHashMap.class, "LBL_CHM_Desc"),
+                "java.util.HashMap|java.util.WeakHashMap"); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     @Override
     public String getHTMLDescription() {
-        return "<html><body>This rule checks for (<code>Weak</code>)<code>HashMap</code>s that have bad distribution "
-               + "of entries among allocated buckets, like in the illustration: <br><img src='res/wrongmap.png'><br>"
-               + "This can be caused by bad implementation of <code>hashcode()</code> or <code>equals()</code> methods of the objects "
-               + "used as map keys." + "</body></html>";
+        return NbBundle.getMessage(CollapsedHashMap.class, "LBL_CHM_LongDesc");
     }
 
     public void setRatio(float ratio) {
@@ -126,18 +128,18 @@ public class CollapsedHashMap extends IteratingRule {
     @Override
     protected void prepareRule(MemoryLint context) {
         Heap heap = context.getHeap();
-        clsHM = heap.getJavaClassByName("java.util.HashMap");
-        fldHMTable = new FieldAccess(clsHM, "table");
-        fldHMSize = new FieldAccess(clsHM, "size");
-        clsWHM = heap.getJavaClassByName("java.util.WeakHashMap");
-        fldWHMTable = new FieldAccess(clsWHM, "table");
-        fldWHMSize = new FieldAccess(clsWHM, "size");
+        clsHM = heap.getJavaClassByName("java.util.HashMap"); // NOI18N
+        fldHMTable = new FieldAccess(clsHM, "table"); // NOI18N
+        fldHMSize = new FieldAccess(clsHM, "size"); // NOI18N
+        clsWHM = heap.getJavaClassByName("java.util.WeakHashMap"); // NOI18N
+        fldWHMTable = new FieldAccess(clsWHM, "table"); // NOI18N
+        fldWHMSize = new FieldAccess(clsWHM, "size"); // NOI18N
     }
 
     @Override
     protected void summary() {
         for (HMRecord hm : poorHM) {
-            getContext().appendResults(hm.toString() + "<br>");
+            getContext().appendResults(hm.toString() + "<br>"); // NOI18N
         }
     }
 

@@ -50,7 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
+import org.openide.util.NbBundle;
 
 
 public class DeepSize extends IteratingRule {
@@ -66,7 +66,7 @@ public class DeepSize extends IteratingRule {
         Customizer() {
             setOpaque(false);
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            JLabel caption = new JLabel("Class name:");
+            JLabel caption = new JLabel(NbBundle.getMessage(DeepSize.class, "LBL_ClassName"));
             caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
             add(caption);
             txtFld = new JTextField(className, 15);
@@ -90,19 +90,21 @@ public class DeepSize extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     Walker walker;
-    private static String className = "java.io.File";
+    private static String className = "java.io.File"; // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public DeepSize() {
-        super("Reachable size", "Computes deep size of all instances of given class.", "");
+        super(NbBundle.getMessage(DeepSize.class, "LBL_DS_Name"),
+                NbBundle.getMessage(DeepSize.class, "LBL_DS_Desc"),
+                ""); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Computes reachable (deep) size of all instances of given class.</body></html>";
+        return NbBundle.getMessage(DeepSize.class, "LBL_DS_LongDesc");
     }
 
     @Override
@@ -114,21 +116,21 @@ public class DeepSize extends IteratingRule {
         walker.walk(hm);
     }
 
-    protected void prepareRule(MemoryLint context) {
+    protected @Override void prepareRule(MemoryLint context) {
         setClassNamePattern(className);
         walker = new Walker();
     }
 
     @Override
     protected String resultsHeader() {
-        return "<h2>" + getDisplayName() + " (all instances of " + Utils.printClass(getContext(), className) + ")</h2>";
+        return NbBundle.getMessage(DeepSize.class, "LBL_DS_ResHeader", Utils.printClass(getContext(), className));
     }
 
-    protected void summary() {
+    protected @Override void summary() {
         Distribution res = walker.getResults();
         String str = res.toString();
-        str = str.replace("\n", "<br>");
-        str = str.replace("  ", "&nbsp;&nbsp;");
+        str = str.replace("\n", "<br>"); // NOI18N
+        str = str.replace("  ", "&nbsp;&nbsp;"); // NOI18N
         getContext().appendResults(str);
     }
 }

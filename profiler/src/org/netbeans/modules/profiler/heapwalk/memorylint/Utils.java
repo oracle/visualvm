@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -84,7 +85,7 @@ public class Utils {
 
         while (!fifo.isEmpty()) {
             if (fifo.size() > 200) {
-                System.err.println("overflow!");
+                Logger.getLogger(Utils.class.getName()).log(Level.FINE, "overflow in isReachableFrom {0}, {1}", new Object[] { source, target });
 
                 break;
             }
@@ -105,7 +106,7 @@ public class Utils {
                 if (v instanceof ObjectFieldValue) {
                     Field fld = ((ObjectFieldValue) v).getField();
 
-                    if ("referent".equals(fld.getName()) && "java.lang.ref.Reference".equals(fld.getDeclaringClass().getName())) {
+                    if ("referent".equals(fld.getName()) && "java.lang.ref.Reference".equals(fld.getDeclaringClass().getName())) { // NOI18N
                         continue;
                     }
 
@@ -171,12 +172,12 @@ public class Utils {
      */
     public static Set<Instance> getRetainedSet(Collection<Instance> objSet, Heap heap) {
         Field ref = null;
-        JavaClass reference = heap.getJavaClassByName("java.lang.ref.Reference");
+        JavaClass reference = heap.getJavaClassByName("java.lang.ref.Reference"); // NOI18N
 
         for (Object /*Field*/ fld : reference.getFields()) {
             Field f = (Field) fld;
 
-            if ("referent".equals(f.getName())) {
+            if ("referent".equals(f.getName())) { // NOI18N
                 ref = f;
 
                 break;
@@ -309,7 +310,7 @@ public class Utils {
 
         while (!fifo.isEmpty()) {
             if (fifo.size() > 10) {
-                System.err.println("overflow!");
+                Logger.getLogger(Utils.class.getName()).log(Level.FINE, "overflow in getSignificantIncommingString({0})", new Object[] { in });
 
                 break;
             }
@@ -325,7 +326,7 @@ public class Utils {
                     temp = "<< " + rName; // there is at least some incoming ref
                 }
 
-                if (rName.startsWith("java.") || rName.startsWith("javax.")) {
+                if (rName.startsWith("java.") || rName.startsWith("javax.")) { // NOI18N
                     Instance i = v.getDefiningInstance();
 
                     if (processed.add(i)) {
@@ -338,21 +339,21 @@ public class Utils {
             }
         }
 
-        return (temp == null) ? "unknown" : temp;
+        return (temp == null) ? "unknown" : temp; // NOI18N
     }
 
     public static String printClass(MemoryLint context, String cls) {
-        if (cls.startsWith("<<")) {
-            cls = cls.substring("<<".length());
+        if (cls.startsWith("<<")) { // NOI18N
+            cls = cls.substring("<<".length()); // NOI18N
         }
 
-        if ("unknown".equals(cls)) {
-            return "unknown class";
+        if ("unknown".equals(cls)) { // NOI18N
+            return NbBundle.getMessage(Utils.class, "LBL_UnknownClass");
         }
 
         String fullName = cls;
         String dispName = cls;
-        String field = "";
+        String field = ""; // NOI18N
 
         // now you can wrap it with a/href to given class
         int dotIdx = cls.lastIndexOf('.');
@@ -369,12 +370,12 @@ public class Utils {
 
         dispName = fullName.substring(dotIdx + 1);
 
-        return "<a href='file://class/" + fullName + "'>" + dispName + "</a>" + field;
+        return "<a href='file://class/" + fullName + "'>" + dispName + "</a>" + field; // NOI18N
     }
 
     public static String printInstance(Instance in) {
         String className = in.getJavaClass().getName();
-        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>";
+        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
 //        return in.getJavaClass().getName() + '@' + Long.toHexString(in.getInstanceId()) + '#' + in.getInstanceNumber();
     }
 }

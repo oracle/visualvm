@@ -48,6 +48,7 @@ import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 public class HashMapHistogram extends IteratingRule {
@@ -71,7 +72,7 @@ public class HashMapHistogram extends IteratingRule {
 
         @Override
         public String toString() {
-            return "#:" + getCount() + "/" + getSize() + "B, " + hmeCount + " HMEs, " + strCount + " Strings<br>";
+            return "#:" + getCount() + "/" + getSize() + "B, " + hmeCount + " HMEs, " + strCount + " Strings<br>"; // NOI18N
         }
 
         @Override
@@ -97,14 +98,16 @@ public class HashMapHistogram extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public HashMapHistogram() {
-        super("HashMap histograms", "Scans all HashMap instances and prints statistics of their usage", "java.util.HashMap");
+        super(NbBundle.getMessage(HashMapHistogram.class, "LBL_HMH_Name"),
+                NbBundle.getMessage(HashMapHistogram.class, "LBL_HMH_Desc"),
+                "java.util.HashMap"); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Computes memory used by <code>HashMap</code> structures and <code>String</code>s referenced from the <code>HashMap</code>s.</body></html>";
+        return NbBundle.getMessage(HashMapHistogram.class, "LBL_HMH_LongDesc");
     }
 
     protected void perform(Instance hm) {
@@ -114,20 +117,20 @@ public class HashMapHistogram extends IteratingRule {
         byIncomming.add(incomming, he);
     }
 
-    protected void prepareRule(MemoryLint context) {
+    protected @Override void prepareRule(MemoryLint context) {
         Heap heap = context.getHeap();
-        clsString = heap.getJavaClassByName("java.lang.String");
-        clsHM = heap.getJavaClassByName("java.util.HashMap");
-        clsHME = heap.getJavaClassByName("java.util.HashMap$Entry");
-        fldSValue = new FieldAccess(clsString, "value");
-        fldHMTable = new FieldAccess(clsHM, "table");
-        fldHMEKey = new FieldAccess(clsHME, "key");
-        fldHMEValue = new FieldAccess(clsHME, "value");
-        fldHMENext = new FieldAccess(clsHME, "next");
+        clsString = heap.getJavaClassByName("java.lang.String"); // NOI18N
+        clsHM = heap.getJavaClassByName("java.util.HashMap"); // NOI18N
+        clsHME = heap.getJavaClassByName("java.util.HashMap$Entry"); // NOI18N
+        fldSValue = new FieldAccess(clsString, "value"); // NOI18N
+        fldHMTable = new FieldAccess(clsHM, "table"); // NOI18N
+        fldHMEKey = new FieldAccess(clsHME, "key"); // NOI18N
+        fldHMEValue = new FieldAccess(clsHME, "value"); // NOI18N
+        fldHMENext = new FieldAccess(clsHME, "next"); // NOI18N
         byIncomming = new Histogram<HashmapEntry>();
     }
 
-    protected void summary() {
+    protected @Override void summary() {
         getContext().appendResults(byIncomming.toString(50000));
     }
 
@@ -146,7 +149,7 @@ public class HashMapHistogram extends IteratingRule {
             return 0;
         }
 
-        if ("java.lang.String".equals(obj.getJavaClass().getName())) {
+        if ("java.lang.String".equals(obj.getJavaClass().getName())) { // NOI18N
             if (add(obj)) {
                 int sz = obj.getSize();
                 Instance arr = fldSValue.getRefValue(obj);

@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import java.util.HashMap;
 import java.util.Map;
+import org.openide.util.NbBundle;
 
 
 public class OverallocatedString extends IteratingRule {
@@ -62,15 +63,16 @@ public class OverallocatedString extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public OverallocatedString() {
-        super("Overallocated Strings", "Covers long living results of String.substring(), computes amount of wasted memory",
-              "java.lang.String");
+        super(NbBundle.getMessage(OverallocatedString.class, "LBL_OverStr_Name"),
+                NbBundle.getMessage(OverallocatedString.class, "LBL_OverStr_Desc"),
+                "java.lang.String"); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Computes overhead of <code>String</code>s that have their backing <code>char[]</code> larger than necessary (for example result of <code>String.substring()</code>).</body></html>";
+        return NbBundle.getMessage(OverallocatedString.class, "LBL_OverStr_LongDesc");
     }
 
     protected void perform(Instance in) {
@@ -96,15 +98,15 @@ public class OverallocatedString extends IteratingRule {
 
     protected void prepareRule(MemoryLint context) {
         Heap heap = context.getHeap();
-        clsString = heap.getJavaClassByName("java.lang.String");
-        fldOffset = new FieldAccess(clsString, "offset");
-        fldCount = new FieldAccess(clsString, "count");
-        fldValue = new FieldAccess(clsString, "value");
+        clsString = heap.getJavaClassByName("java.lang.String"); // NOI18N
+        fldOffset = new FieldAccess(clsString, "offset"); // NOI18N
+        fldCount = new FieldAccess(clsString, "count"); // NOI18N
+        fldValue = new FieldAccess(clsString, "value"); // NOI18N
     }
 
     @Override
     protected void summary() {
-        getContext().appendResults("<b>Wasted " + total + "B</b> on overallocated Strings<br>");
+        getContext().appendResults(NbBundle.getMessage(OverallocatedString.class, "FMT_OverStr_Result", total));
 
         Histogram<Histogram.Entry> h = new Histogram<Histogram.Entry>();
 

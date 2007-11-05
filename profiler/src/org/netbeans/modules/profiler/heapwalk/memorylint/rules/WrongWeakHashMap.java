@@ -48,6 +48,7 @@ import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 public class WrongWeakHashMap extends IteratingRule {
@@ -72,8 +73,14 @@ public class WrongWeakHashMap extends IteratingRule {
 
         @Override
         public String toString() {
-            return Utils.printClass(getContext(), getContext().getRootIncommingString(hm)) + ": " + Utils.printInstance(hm)
-                   + " is wrong: " + Utils.printInstance(key) + " is reachable from " + Utils.printInstance(value) + "<br>";
+            return NbBundle.getMessage(WrongWeakHashMap.class, "FMT_WWMH_Entry",
+                    new Object[] {
+                        Utils.printClass(getContext(), getContext().getRootIncommingString(hm)),
+                        Utils.printInstance(hm),
+                        Utils.printInstance(key),
+                        Utils.printInstance(value)
+                    }
+            );
         }
     }
 
@@ -90,14 +97,17 @@ public class WrongWeakHashMap extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public WrongWeakHashMap() {
-        super("Leaking WeakHashMap", "WeakHashMap with values strong referencing the keys", "java.util.WeakHashMap");
+        super(NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWMH_Name"),
+                NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWMH_Desc"),
+                "java.util.WeakHashMap");
+        
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Identifies improperly used <code>WeakHashMap</code>s where a value strongly references its key.</body></html>";
+        return NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWMH_LongDesc");
     }
 
     protected void perform(Instance hm) {
@@ -108,14 +118,14 @@ public class WrongWeakHashMap extends IteratingRule {
     protected void prepareRule(MemoryLint context) {
         // TODO WeakHashMap might not be present in the dump
         Heap heap = context.getHeap();
-        clsHM = heap.getJavaClassByName("java.util.WeakHashMap");
-        clsHME = heap.getJavaClassByName("java.util.WeakHashMap$Entry");
-        fldHMTable = new FieldAccess(clsHM, "table");
+        clsHM = heap.getJavaClassByName("java.util.WeakHashMap"); // NOI18N
+        clsHME = heap.getJavaClassByName("java.util.WeakHashMap$Entry"); // NOI18N
+        fldHMTable = new FieldAccess(clsHM, "table"); // NOI18N
 
-        JavaClass ref = heap.getJavaClassByName("java.lang.ref.Reference");
-        fldHMEKey = new FieldAccess(ref, "referent");
-        fldHMEValue = new FieldAccess(clsHME, "value");
-        fldHMENext = new FieldAccess(clsHME, "next");
+        JavaClass ref = heap.getJavaClassByName("java.lang.ref.Reference"); // NOI18N
+        fldHMEKey = new FieldAccess(ref, "referent"); // NOI18N
+        fldHMEValue = new FieldAccess(clsHME, "value"); // NOI18N
+        fldHMENext = new FieldAccess(clsHME, "next"); // NOI18N
     }
 
     @Override

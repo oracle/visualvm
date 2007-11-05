@@ -44,6 +44,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.memorylint.*;
+import org.openide.util.NbBundle;
 
 
 public class TooManyBooleans extends IteratingRule {
@@ -60,14 +61,16 @@ public class TooManyBooleans extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public TooManyBooleans() {
-        super("Too many Boolean", "Checks instances of Boolean other than Boolean.TRUE and Boolean.FALSE", "java.lang.Boolean");
+        super(NbBundle.getMessage(TooManyBooleans.class, "LBL_TMB_Name"),
+                NbBundle.getMessage(TooManyBooleans.class, "LBL_TMB_Desc"),
+                "java.lang.Boolean"); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body>Checks if there are more than two instances of <code>Boolean</code> on the heap (only <code>Boolean.TRUE</code> and <code>Boolean.FALSE</code> are necessary).</body></html>";
+        return NbBundle.getMessage(TooManyBooleans.class, "LBL_TMB_LongDesc");
     }
 
     protected void perform(Instance in) {
@@ -79,7 +82,7 @@ public class TooManyBooleans extends IteratingRule {
         booleans.add(Utils.printClass(getContext(), getContext().getRootIncommingString(in)), new Histogram.Entry(in.getSize()));
     }
 
-    protected void prepareRule(MemoryLint context) {
+    protected @Override void prepareRule(MemoryLint context) {
         heap = context.getHeap();
         helper = context.getStringHelper();
 
@@ -88,13 +91,13 @@ public class TooManyBooleans extends IteratingRule {
         FALSE = (Instance) booleanClass.getValueOfStaticField("FALSE"); // NOI18N
     }
 
-    protected void summary() {
+    protected @Override void summary() {
         if (count > 0) {
-            getContext()
-                .appendResults("There are " + (count + 2) + " Boolean instances wasting " + (count * TRUE.getSize()) + "B<br>");
+            getContext().appendResults(
+                    NbBundle.getMessage(TooManyBooleans.class, "FMT_TMB_Result", count+2, (count * TRUE.getSize())));
             getContext().appendResults(booleans.toString(0));
         } else {
-            getContext().appendResults("There are not more than two Boolean instances: OK");
+            getContext().appendResults(NbBundle.getMessage(TooManyBooleans.class, "FMT_TMB_ResultOK"));
         }
     }
 }

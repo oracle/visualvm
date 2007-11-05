@@ -51,6 +51,7 @@ import java.util.logging.Logger;
 
 //import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
+import org.openide.util.NbBundle;
 
 
 public class RetainedSetByClass extends Rule {
@@ -61,14 +62,15 @@ public class RetainedSetByClass extends Rule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RetainedSetByClass() {
-        super("Retained sets by class histograms", "Prints histogram of retained set held by every class");
+        super(NbBundle.getMessage(RetainedSetByClass.class, "LBL_RSBC_Name"),
+                NbBundle.getMessage(RetainedSetByClass.class, "LBL_RSBC_Desc"));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     @Override
     public String getHTMLDescription() {
-        return "<html><body><b>Warning!</b><br><br>This rule takes a long time to compute and can use a big amout of memory on large heaps!</body></html>";
+        return NbBundle.getMessage(RetainedSetByClass.class, "LBL_RSBC_LongDesc");
     }
 
     public void perform() {
@@ -82,7 +84,7 @@ public class RetainedSetByClass extends Rule {
         Histogram<Histogram.Entry> hist = new Histogram<Histogram.Entry>();
 
         for (JavaClass cls : classes) {
-            Logger.getLogger(RetainedSetByClass.class.getName()).log(Level.FINE, "Executing rule on class {0}.", cls);
+            Logger.getLogger(RetainedSetByClass.class.getName()).log(Level.FINE, "Executing rule on class {0}.", cls); // NOI18N
             performClass(cls, hist);
 
             if (context.isInterruped()) {
@@ -118,7 +120,7 @@ public class RetainedSetByClass extends Rule {
     }
 
     private void summary(Histogram h) {
-        context.appendResults("<hr>Histogram of retained size:<br>");
+//        context.appendResults("<hr>Histogram of retained size:<br>");
         context.appendResults(h.toString(0));
     }
 }

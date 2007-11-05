@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -91,7 +92,7 @@ public final class Distribution {
 
         @Override
         public String toString() {
-            return Utils.printClass(null, type.getName()) + ": " + getCount() + "/" + getSize() + "B";
+            return Utils.printClass(null, type.getName()) + ": " + getCount() + "/" + getSize() + "B"; // NOI18N
         }
 
         private void count(Instance in) {
@@ -149,10 +150,12 @@ public final class Distribution {
     public String toString() {
         StringBuffer result = new StringBuffer();
 
-        result.append(allEntry.getCount() + " objects (" + allEntry.getSize() + "B):\n");
+        result.append(NbBundle.getMessage(Distribution.class, "FMT_DistEntry",
+                allEntry.getCount(),
+                allEntry.getSize()));
 
         for (JavaClass key : getClasses()) {
-            result.append("  " + getResults(key) + "\n");
+            result.append("  " + getResults(key) + "\n"); // NOI18N
         }
 
         return result.toString();
