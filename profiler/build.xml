@@ -61,5 +61,43 @@ made subject to such option by the copyright holder.
     </target>
 
     <target name="netbeans-extra" depends="nblib"/>
+    
+  <target name="netbeans-extra-ml" depends="release-ml" if="locales"/>
+
+  <target name="check-run-mlbuild" depends="basic-init">
+    <property name="translated.src.dir" value="${nb_all}/translatedfiles/src/${module.name}/src"/>
+    <condition property="locjar.locales" value="${locales}">
+      <and>
+        <isset property="locales" />
+        <not>
+          <isset property="locjar.locales"/>
+        </not>
+      </and>
+    </condition>
+    <available file="${nb_all}/translatedfiles/src/${module.name}" type="dir" property="translated.src.dir.exist"/>
+    <condition property="run.ml.build" value="true">
+      <and>
+        <isset property="translated.src.dir.exist"/>
+        <isset property="locjar.locales"/>
+        <length string="${locjar.locales}" when="greater" length="0"/>
+      </and>
+    </condition>
+  </target>
+
+  <target name="release-ml" depends="basic-init,check-run-mlbuild" if="run.ml.build">
+      <taskdef name="repeat" classname="org.netbeans.nbbuild.Repeat"
+               classpath="${nb_all}/nbbuild/nbantext.jar"/>
+      <repeat target="release-one-locale" name="locale" values="${locales}"/>
+  </target>
+  
+  <target name="release-one-locale" if="locale">
+      <copy todir="${cluster}">
+          <fileset dir="${nb_all}/translatedfiles/src/${module.name}/release">
+              <include name="**/filters-default_${locale}.xml"/>
+              <include name="**/filtersets-default_${locale}.xml"/>
+          </fileset>
+      </copy>
+  </target>
+  
 
 </project>
