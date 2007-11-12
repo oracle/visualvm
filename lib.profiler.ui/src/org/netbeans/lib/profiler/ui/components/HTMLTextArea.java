@@ -603,7 +603,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
 
         Font font = getFont();
         Color textColor = getForeground();
-        value = value.replaceAll("\\n\\r|\\n|\\r|\\r\\n", "<br>"); //NOI18N
+        value = value.replaceAll("\\n\\r|\\r\\n|\\n|\\r", "<br>"); //NOI18N
         value = value.replaceAll("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
 
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
