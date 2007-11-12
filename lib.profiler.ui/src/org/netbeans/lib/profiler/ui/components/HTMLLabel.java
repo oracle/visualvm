@@ -91,7 +91,7 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         Font font = getFont();
         Color textColor = getForeground();
         
-        value = value.replaceAll("\\n\\r|\\n|\\r", "<br>"); //NOI18N
+        value = value.replaceAll("\\n\\r|\\n|\\r|\\r\\n", "<br>"); //NOI18N
         value = value.replaceAll("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
         
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
