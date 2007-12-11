@@ -108,7 +108,14 @@ public class SameNameClassGroup {
 
     /** Find a class compatible with the given loader (see definition in checkFroCompatibility()) in this group. */
     public BaseClassInfo findCompatibleClass(int classLoaderId) {
-        for (int i = 0; i < classes.size(); i++) {
+        int size = classes.size();
+        for (int i = 0; i < size; i++) {
+            BaseClassInfo clazz = (BaseClassInfo) classes.get(i);
+            if (clazz.getLoaderId() == classLoaderId) {
+                return clazz;
+            }
+        }
+        for (int i = 0; i < size; i++) {
             BaseClassInfo clazz = (BaseClassInfo) classes.get(i);
             clazz = checkForCompatibility(clazz, classLoaderId);
 
