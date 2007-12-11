@@ -295,12 +295,7 @@ class ClassLoaderManager implements CommonConstants {
                             // [ian]: this seems like a reason for EXCEPTION_ACCESS_VIOLATION when doing getMethodNamesForJMethodIds
                             ProfilerInterface.dumpExistingResults(false);
 
-                            // Grabbing separateThreadExecutionLock is needed to make this command mutually exclusive with
-                            // DUMP_EXISTING_RESULTS coming from client. Both of these commands result in another command from the
-                            // other side first, then response, and only then the other side sends response to the first command.
-                            // That's what makes the management of these two
-                            // commands so complex.
-                            synchronized (ProfilerServer.execInSeparateThreadLock) {
+//                            synchronized (ProfilerServer.execInSeparateThreadLock) {
                                 ProfilerInterface.serialClientOperationsLock.beginTrans(true);
 
                                 try {
@@ -311,7 +306,7 @@ class ClassLoaderManager implements CommonConstants {
                                 } finally {
                                     ProfilerInterface.serialClientOperationsLock.endTrans();
                                 }
-                            }
+//                            }
 
                             clRef.clear();
                         } while ((clRef = (PhantomReference) rq.poll()) != null);
