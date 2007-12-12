@@ -162,6 +162,14 @@ public class MemoryDataFrameProcessor extends AbstractDataFrameProcessor {
 
                     break;
                 }
+                default: {
+                    LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in MemoryDataFrameProcessor: "
+                                  + (int) eventType // NOI18N
+                                  + " at " + curPos // NOI18N
+                                  );
+
+                    break; // NOI18N
+                }
             }
         } while (curPos < bufSize);
     }

@@ -299,7 +299,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         break;
                     }
                     default: {
-                        LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: "
+                        LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: "
                                       + (int) eventType // NOI18N
                                       + " at " + position // NOI18N
                                       );
