@@ -426,5 +426,6 @@ public class ThreadInfo {
         absEntryTime = lastWaitStartTime = threadEntryTime = 0;
         rootMethodStackDepth = stackDepth = 0;
         inCallGraph = sampleDue = false;
+        evBuf = null;
     }
 }

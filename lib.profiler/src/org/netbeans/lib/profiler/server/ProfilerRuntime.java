@@ -118,12 +118,16 @@ public class ProfilerRuntime implements CommonConstants {
                     break; // We don't try to perform more than one global buffer dumps yet
                 }
 
-                eventBuffer[globalEvBufPos++] = SET_FOLLOWING_EVENTS_THREAD;
-                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId >> 8) & 0xFF);
-                eventBuffer[globalEvBufPos++] = (byte) (ti.threadId & 0xFF);
-                System.arraycopy(ti.evBuf, ti.evBufDumpLastPos, eventBuffer, globalEvBufPos, curPos - ti.evBufDumpLastPos);
-                globalEvBufPos += (curPos - ti.evBufDumpLastPos);
-                ti.evBufDumpLastPos = curPos;
+                int evBufSize = curPos - ti.evBufDumpLastPos;
+
+                if (evBufSize > 0) {
+                    eventBuffer[globalEvBufPos++] = SET_FOLLOWING_EVENTS_THREAD;
+                    eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId >> 8) & 0xFF);
+                    eventBuffer[globalEvBufPos++] = (byte) (ti.threadId & 0xFF);
+                    System.arraycopy(ti.evBuf, ti.evBufDumpLastPos, eventBuffer, globalEvBufPos, evBufSize);
+                    globalEvBufPos += evBufSize;
+                    ti.evBufDumpLastPos = curPos;
+                }
             }
 
             externalActionsHandler.handleEventBufferDump(eventBuffer, 0, globalEvBufPos);
