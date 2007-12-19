@@ -86,6 +86,10 @@ made subject to such option by the copyright holder.
       </jar>
     </target>
 
+    <target name="release" depends="projectized-common.release">
+        <fixcrlf eol="crlf" srcdir="${cluster}/lib/deployed" includes="**/*.map"/>
+    </target>
+
     <target name="netbeans-extra">
        <ant dir="remote-packs" target="profiler-server-all"/>
     </target>
