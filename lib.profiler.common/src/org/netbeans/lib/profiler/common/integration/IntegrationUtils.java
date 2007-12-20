@@ -332,6 +332,8 @@ public class IntegrationUtils {
                 return PLATFORM_SOLARIS_AMD64_OS;
             } else if (Platform.isSolarisSparc()) {
                 return PLATFORM_SOLARIS_SPARC64_OS;
+            } else if (Platform.isMac()) {
+                return PLATFORM_MAC_OS;
             }
 
             return PLATFORM_SOLARIS_SPARC64_OS; // Not supported platform => assume UNIX
