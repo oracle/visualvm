@@ -40,12 +40,16 @@
 
 package org.netbeans.modules.profiler.heapwalk.memorylint;
 
+import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
+import org.netbeans.lib.profiler.heap.Type;
 
 
 /**
@@ -58,6 +62,55 @@ import java.util.Queue;
 public final class Walker {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
+    private static final Type OBJECT = new Type() {
+        public String getName() { return "object"; }
+    };
+    
+    private class ArrayEntryValue implements ObjectFieldValue, Field {
+        int idx;
+        private Instance src;
+        private Instance target;
+
+        public ArrayEntryValue(int idx, Instance src, Instance target) {
+            this.idx = idx;
+            this.src = src;
+            this.target = target;
+        }
+        
+        public Instance getInstance() {
+            return target;
+        }
+
+        public Field getField() {
+            return this;
+        }
+
+        public String getValue() {
+            return "Instance #" + target.getInstanceId();
+        }
+
+        public Instance getDefiningInstance() {
+            return src;
+        }
+
+        public JavaClass getDeclaringClass() {
+            return src.getJavaClass(); // XXX
+        }
+
+        public String getName() {
+            return "[" + idx + "]";
+        }
+
+        public boolean isStatic() {
+            return false;
+        }
+
+        public Type getType() {
+            return OBJECT;
+        }
+        
+    }
+    
     public static interface Filter {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -91,6 +144,21 @@ public final class Walker {
 
         while (!q.isEmpty()) {
             Instance act = q.poll();
+            
+            if (act instanceof ObjectArrayInstance) {
+                List<Instance> out = ((ObjectArrayInstance)act).getValues();
+                int i = 0;
+                for (Instance target : out) {
+                    if (target != null) {
+                        if (f.accept(new ArrayEntryValue(i, act, target)) && !log.isCounted(target)) {
+                            log.add(target);
+                            q.add(target);
+                        }
+                    }
+                    i++;
+                }
+            }
+
             @SuppressWarnings("unchecked")
             List<FieldValue> out = (List<FieldValue>) act.getFieldValues();
 
