@@ -733,7 +733,7 @@ class HprofHeap implements Heap {
         int tag = dumpBuffer.get(start);
 
         //int time = dumpBuffer.getInt(start+1);
-        int len = dumpBuffer.getInt(start + 1 + 4);
+        long len = dumpBuffer.getInt(start + 1 + 4) & 0xFFFFFFFFL;  // len is unsigned int
         offset[0] = start + 1 + 4 + 4 + len;
 
         return tag;
