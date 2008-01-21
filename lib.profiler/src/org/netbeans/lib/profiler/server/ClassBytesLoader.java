@@ -69,6 +69,12 @@ public class ClassBytesLoader {
     public static byte[] getClassFileBytes(String className) {
         String resourceName = className.replace('.', '/') + ".class"; // NOI18N
         URL classUrl = ClassLoader.getSystemResource(resourceName);
+        // in case the classname is a synthetic class there is no resource defining its bytecode
+        if (classUrl == null) {
+            System.err.println("***Profiler agent warning: could not get .class file for a synthetic class " + className
+                               + " in ClassBytesLoader.getClassFileBytes"); // NOI18N
+            return null;
+        }
         String proto = classUrl.getProtocol();
 
         if (proto == null) { // Should not happen, this is a critical error message
