@@ -42,7 +42,7 @@ made subject to such option by the copyright holder.
 
 <project basedir="." default="all" name="jfluid/test">
     <!-- Name of tested module -->
-    <property name="xtest.module" value="profiler/libs/jfluid"/>
+    <property name="xtest.module" value="lib.profiler"/>
     
     <!-- Points to directory with profiler to test -->
     <property name="profiler.dest.dir" value="${xtest.profiler.dest.dir}/profiler2"/>

@@ -44,7 +44,7 @@ made subject to such option by the copyright holder.
 
 <project name="profiler-server" default="profiler-server-all" basedir=".">
 
-  <import file="../../../../nbbuild/templates/projectized.xml"/>
+  <import file="../../nbbuild/templates/projectized.xml"/>
 
   <!-- ** Targets for remote-packs zips. These zips are used to facilitate remote profiling -->
 
