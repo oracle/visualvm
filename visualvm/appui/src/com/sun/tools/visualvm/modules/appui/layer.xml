@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License version 2 only, as
+ published by the Free Software Foundation.  Sun designates this
+ particular file as subject to the "Classpath" exception as provided
+ by Sun in the LICENSE file that accompanied this code.
+
+ This code is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ version 2 for more details (a copy is included in the LICENSE file that
+ accompanied this code).
+
+ You should have received a copy of the GNU General Public License version
+ 2 along with this work; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ CA 95054 USA or visit www.sun.com if you need additional information or
+ have any questions.
+-->
+
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Help">
+            <file name="com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Edit">
+            <file name="Separator3.instance_hidden"/>
+            <file name="org-netbeans-core-actions-JumpNextAction.shadow_hidden"/>
+            <file name="org-netbeans-core-actions-JumpPrevAction.shadow_hidden"/>
+            <file name="org-openide-actions-ReplaceAction.instance_hidden"/>
+        </folder>
+        <folder name="File">
+            <file name="Separator2.instance_hidden"/>
+        </folder>
+        <file name="GoTo_hidden"/>
+        <folder name="Help">
+            <file name="Separator1.instance_hidden"/>
+            <file name="master-help.xml_hidden"/>
+            <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
+            <file name="com-sun-tools-visualvm-modules-appui-AboutAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Help/com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
+                <attr name="position" intvalue="1200"/>
+            </file>
+        </folder>
+        <folder name="Profile">
+            <file name="Advanced_hidden"/>
+            <file name="Help_hidden"/>
+            <file name="View_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-StopAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance_hidden"/>
+            <file name="profiler-sep1.instance_hidden"/>
+            <file name="profiler-sep2.instance_hidden"/>
+            <file name="profiler-sep3.instance_hidden"/>
+            <file name="profiler-sep4.instance_hidden"/>
+            <file name="profiler-sep5.instance_hidden"/>
+            <file name="profiler-sep6.instance_hidden"/>
+            <file name="profiler-sep7.instance_hidden"/>
+        </folder>
+        <folder name="Tools">
+            <file name="Separator1.instance_hidden"/>
+            <file name="Separator2.instance_hidden"/>
+            <file name="Separator3.instance_hidden"/>
+            <file name="org-netbeans-modules-favorites-templates-TemplatesAction.instance_hidden"/>
+            <file name="org-netbeans-modules-options-OptionsWindowAction.shadow_hidden"/>
+            <file name="org-openide-actions-ToolsAction.instance_hidden"/>
+        </folder>
+        <folder name="View">
+            <file name="Separator1.instance_hidden"/>
+            <file name="Separator2.instance_hidden"/>
+            <file name="org-netbeans-core-actions-HTMLViewAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-LogAction.instance_hidden"/>
+            <file name="org-netbeans-core-multiview-EditorsAction.instance_hidden"/>
+        </folder>
+        <folder name="Window">
+            <file name="CloneDocumentAction.shadow_hidden"/>
+            <file name="CloseAllButThisAction.shadow_hidden"/>
+            <file name="CloseAllDocumentsAction.shadow_hidden"/>
+            <file name="DocumentsAction.shadow_hidden"/>
+            <file name="Profile_hidden"/>
+            <file name="ProgressListAction.shadow_hidden"/>
+            <file name="Separator4.instance_hidden"/>
+            <file name="SwitchToRecentDocumentAction.shadow_hidden"/>
+            <file name="ViewFavoritesTabAction.shadow_hidden"/>
+            <file name="org-netbeans-core-actions-GlobalPropertiesAction.shadow_hidden"/>
+        </folder>
+    </folder>
+    <folder name="Toolbars">
+        <file name="Profile_hidden"/>
+    </folder>
+</filesystem>

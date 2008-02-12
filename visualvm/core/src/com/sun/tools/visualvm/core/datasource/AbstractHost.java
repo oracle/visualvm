@@ -1,0 +1,106 @@
+/*
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * CA 95054 USA or visit www.sun.com if you need additional information or
+ * have any questions.
+ */
+
+package com.sun.tools.visualvm.core.datasource;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Set;
+
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+public abstract class AbstractHost extends AbstractDataSource implements Host {
+
+    private final String hostName;
+    private String displayName;
+    private InetAddress inetAddress;
+
+
+    public AbstractHost(String hostName) throws UnknownHostException {
+        this(hostName, hostName);
+    }
+
+    public AbstractHost(String hostName, String displayName) throws UnknownHostException {
+        this(hostName, displayName, InetAddress.getByName(hostName));
+    }
+
+    public AbstractHost(String hostName, String displayName, InetAddress inetAddress) {
+        if (hostName == null) throw new IllegalArgumentException("Host name cannot be null");
+        if (inetAddress == null) throw new IllegalArgumentException("InetAddress cannot be null");
+        
+        this.hostName = hostName;
+        this.displayName = displayName == null ? hostName : displayName;
+        this.inetAddress = inetAddress;
+    }
+    
+    
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setDisplayName(String newDisplayName) {
+        if (displayName == null) throw new IllegalArgumentException("Display name cannot be null");
+        if (displayName.equals(newDisplayName)) return;
+        String oldDisplayName = displayName;
+        displayName = newDisplayName;
+        getChangeSupport().firePropertyChange(PROPERTY_DISPLAYNAME, oldDisplayName, newDisplayName);
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+    
+    public InetAddress getInetAddress() {
+        return inetAddress;
+    }
+    
+    public Set<Application> getApplications() {
+        return getRepository().getDataSources(Application.class);
+    }
+    
+    
+    public int hashCode() {
+        InetAddress address = getInetAddress();
+        if (this == Host.LOCALHOST) return address.hashCode();
+        if (address.isAnyLocalAddress()) return Host.LOCALHOST.hashCode();
+        else return getInetAddress().hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Host)) return false;
+        Host host = (Host)obj;
+        InetAddress thisAddress = getInetAddress();
+        InetAddress otherAddress = host.getInetAddress();
+        if (thisAddress.isAnyLocalAddress() && otherAddress.isAnyLocalAddress()) return true;
+        else return thisAddress.equals(otherAddress);
+    }
+
+    public String toString() {
+        return getHostName() + " [display name: " + getDisplayName() + (getInetAddress() != null ? ", IP: " + getInetAddress().getHostAddress() : "") + "]";
+    }
+
+}
