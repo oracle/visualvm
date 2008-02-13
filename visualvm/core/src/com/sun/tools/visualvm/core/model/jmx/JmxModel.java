@@ -130,7 +130,17 @@ public class JmxModel extends Model {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvm.findByName("sun.management.JMXConnectorServer.address");
                 LocalVirtualMachine lvm = new LocalVirtualMachine(app.getPid(), jvm.isAttachable(), connectorAddress);
-                proxyClient = new ProxyClient(this, lvm);
+                if (!lvm.isManageable()) {
+                    if (lvm.isAttachable()) {
+                        proxyClient = new ProxyClient(this, lvm);
+                    } else {
+                        System.err.println("WARNING: The JMX management agent " +
+                                "cannot be enabled in this application (pid " +
+                                app.getPid() + ")");
+                    }
+                } else {
+                    proxyClient = new ProxyClient(this, lvm);
+                }
             } else {
                 // TODO: Remove the following two lines when Connection Dialog is implemented.
                 String username = System.getProperty("jconsole.username");
