@@ -33,6 +33,7 @@ import net.java.visualvm.modules.glassfish.datasource.GlassFishApplicationProvid
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServletProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishServletViewProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishWebModuleViewProvider;
+import net.java.visualvm.modules.glassfish.explorer.GlassFishModelNodeBuilder;
 import net.java.visualvm.modules.glassfish.explorer.GlassFishWebModuleNodeBuilder;
 import net.java.visualvm.modules.glassfish.explorer.GlassFishServletNodeBuilder;
 import org.openide.modules.ModuleInstall;
@@ -64,6 +65,7 @@ public class Installer extends ModuleInstall {
         new GlassFishWebModuleViewProvider().initialize();
         new GlassFishServletViewProvider().initialize();
         new GlassFishOverview().initialize();
+        new GlassFishModelNodeBuilder().initialize();
     }
 
     @Override

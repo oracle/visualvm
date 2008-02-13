@@ -23,41 +23,17 @@
  * have any questions.
  */
 
-package net.java.visualvm.modules.glassfish.datasource;
+package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.appserv.management.monitor.ServletMonitor;
-import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import java.util.Map;
+import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
+import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishWebModule extends GlassFishApplication {
-    private WebModuleVirtualServerMonitor monitor;
-    private String objectName;
-    
-    public GlassFishWebModule(String name, String objName, WebModuleVirtualServerMonitor monitor, GlassFishRoot gfRoot) {
-        super(name, monitor.getDomainRoot(), gfRoot);
-        this.monitor = monitor;
-        objectName = objName;
-    }
-
-    public String getObjectName() {
-        return objectName;
-    }
-
-    public WebModuleVirtualServerMonitor getMonitor() {
-        return monitor;
-    }
-
-    @Override
-    public void generateContents() {
-        for(Map.Entry<String, ServletMonitor> monitorEntry : monitor.getServletMonitorMap().entrySet()) {
-            GlassFishServlet servlet = new GlassFishServlet(monitorEntry.getKey(), this, monitorEntry.getValue());
-            getOwner().getRepository().addDataSource(servlet);
-        }
+public class GlassFishModelNode extends DataSourceExplorerNode<GlassFishRoot> {
+    public GlassFishModelNode(GlassFishRoot root) {
+        super("Model", null, root);
     }
 }

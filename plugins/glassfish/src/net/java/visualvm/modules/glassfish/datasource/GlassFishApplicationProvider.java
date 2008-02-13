@@ -24,6 +24,7 @@
  */
 package net.java.visualvm.modules.glassfish.datasource;
 
+import com.sun.appserv.management.j2ee.J2EETypes;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
@@ -31,8 +32,12 @@ import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.model.jmx.JMXModel;
+import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 
 
 /**
@@ -40,6 +45,7 @@ import java.util.Set;
  * @author Jaroslav Bachorik
  */
 public class GlassFishApplicationProvider extends DefaultDataSourceProvider<GlassFishApplication> implements DataChangeListener<GlassFishRoot> {
+    private final static Pattern eePattern = Pattern.compile(".*+,J2EEApplication=(.*+),.*");
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void dataChanged(DataChangeEvent<GlassFishRoot> event) {
@@ -77,10 +83,17 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
 
     private void processNewApplication(final GlassFishRoot root) {
         ServerRootMonitor srm = root.getDomainRoot().getMonitoringRoot().getServerRootMonitorMap().get(root.getName());
-
+        JMXModel jmx = JMXModelFactory.getJmxModelFor(root.getApplication());
+        
         for (Map.Entry<String, WebModuleVirtualServerMonitor> virtMonitorEntry : srm.getWebModuleVirtualServerMonitorMap()
                                                                                     .entrySet()) {
-            GlassFishWebModule module = new GlassFishWebModule(virtMonitorEntry.getKey(), virtMonitorEntry.getValue(), root);
+            String objectName = JMXUtil.getObjectName(J2EETypes.WEB_MODULE, virtMonitorEntry.getKey(), jmx);
+            String moduleName = JMXUtil.getWebModuleName(objectName, jmx);
+            String appName = JMXUtil.getJ2EEAppName(objectName);
+            
+            if (moduleName == null || moduleName.length() ==0) continue;
+
+            GlassFishWebModule module = new GlassFishWebModule(appName != null ? (moduleName + " (in " + appName +")") : moduleName, objectName, virtMonitorEntry.getValue(), root);
             registerDataSource(module);
             root.getRepository().addDataSource(module);
         }
@@ -91,4 +104,6 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
                 }
             });
     }
+    
+    
 }

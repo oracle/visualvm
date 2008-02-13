@@ -25,29 +25,29 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
 import com.sun.tools.visualvm.core.explorer.ExplorerNode;
 import com.sun.tools.visualvm.core.explorer.ExplorerNodeBuilder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class GlassFishApplicationNodeBuilder<T extends GlassFishApplication> implements ExplorerNodeBuilder<T>{
-    private final Map<T, GlassFishApplicationNode<T>> nodesCache = new ConcurrentHashMap<T, GlassFishApplicationNode<T>>();
+public class GlassFishModelNodeBuilder implements ExplorerNodeBuilder<GlassFishRoot> {
+    private final Map<GlassFishRoot, GlassFishModelNode> nodesCache = new ConcurrentHashMap<GlassFishRoot, GlassFishModelNode>();
     
-    public ExplorerNode<T> getNodeFor(T dataSource) {
+    public ExplorerNode<GlassFishRoot> getNodeFor(GlassFishRoot dataSource) {
         if (nodesCache.containsKey(dataSource)) {
             return nodesCache.get(dataSource);
         }
-        final GlassFishApplicationNode<T> newNode = createNewNode(dataSource);
+        final GlassFishModelNode newNode = new GlassFishModelNode(dataSource);
         ExplorerModelSupport modelSupport = ExplorerModelSupport.sharedInstance();
-        ExplorerNode<GlassFishRoot> parent = modelSupport.getNodeFor(dataSource.getGlassFishRoot());
+        ExplorerNode<Application> parent = modelSupport.getNodeFor(dataSource.getApplication());
         modelSupport.addNode(newNode, parent);
         nodesCache.put(dataSource, newNode);
         
@@ -61,5 +61,8 @@ public abstract class GlassFishApplicationNodeBuilder<T extends GlassFishApplica
         return newNode;
     }
     
-    abstract protected GlassFishApplicationNode<T> createNewNode(T dataSource);
+    public void initialize() {
+        ExplorerModelSupport.sharedInstance().addBuilder(this, GlassFishRoot.class);
+    }
+
 }
