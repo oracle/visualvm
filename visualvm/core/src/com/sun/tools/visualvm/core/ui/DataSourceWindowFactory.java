@@ -51,7 +51,7 @@ public class DataSourceWindowFactory {
     private static DataSourceWindowFactory sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
-    private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSourceViewsProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
     
     
     /**
@@ -71,7 +71,7 @@ public class DataSourceWindowFactory {
      * @param provider DataSourceViewProvider to be added,
      * @param scope scope of DataSource types for which the provider provides views.
      */
-    public void addViewProvider(DataSourceViewProvider provider, Class<? extends DataSource> scope) {
+    public void addViewProvider(DataSourceViewsProvider provider, Class<? extends DataSource> scope) {
         providers.put(provider, scope);
     }
     
@@ -80,7 +80,7 @@ public class DataSourceWindowFactory {
      * 
      * @param provider DataSourceViewProvider to be removed.
      */
-    public void removeViewProvider(DataSourceViewProvider provider) {
+    public void removeViewProvider(DataSourceViewsProvider provider) {
         providers.remove(provider);
     }
     
@@ -91,9 +91,9 @@ public class DataSourceWindowFactory {
      * @return true if there is at least one provider providing at least one view for given DataSource, false otherwise.
      */
     public boolean canCreateWindowFor(DataSource dataSource) {
-        Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
-        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource)) return true;
         return false;
     }
@@ -144,18 +144,18 @@ public class DataSourceWindowFactory {
     
     List<? extends DataSourceView> getViews(DataSource dataSource) {
         List<DataSourceView> views = new ArrayList();
-        Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
-        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource))
                 views.addAll(compatibleProvider.getViews(dataSource));
         Collections.sort(views);
         return views;
     }
     
-    private Set<DataSourceViewProvider> getCompatibleProviders(DataSource dataSource) {
-        Set<DataSourceViewProvider> compatibleProviders = new HashSet();
-        Set<DataSourceViewProvider> providersSet = providers.keySet();
-        for (DataSourceViewProvider provider : providersSet)
+    private Set<DataSourceViewsProvider> getCompatibleProviders(DataSource dataSource) {
+        Set<DataSourceViewsProvider> compatibleProviders = new HashSet();
+        Set<DataSourceViewsProvider> providersSet = providers.keySet();
+        for (DataSourceViewsProvider provider : providersSet)
             if (providers.get(provider).isInstance(dataSource))
                 compatibleProviders.add(provider);
         return compatibleProviders;

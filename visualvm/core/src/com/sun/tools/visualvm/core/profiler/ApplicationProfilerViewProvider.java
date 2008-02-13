@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationProfilerViewProvider implements DataSourceViewProvider<Application>{
+class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Application>{
     
     public Map<Application, DataSourceView> viewsCache = new HashMap();
     

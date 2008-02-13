@@ -32,7 +32,7 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -51,7 +51,7 @@ import net.java.visualvm.modules.glassfish.ui.Chart;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletViewProvider implements DataSourceViewProvider<GlassFishServlet> {
+public class GlassFishServletViewProvider implements DataSourceViewsProvider<GlassFishServlet> {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class GlassfishServletView extends DataSourceView {

@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.core.dataview.overview;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.model.host.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class HostOverviewViewProvider implements DataSourceViewProvider<Host>{
+class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
     
     public Map<Host, DataSourceView> viewsCache = new HashMap();
     

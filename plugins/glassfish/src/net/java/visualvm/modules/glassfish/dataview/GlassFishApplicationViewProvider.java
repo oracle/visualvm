@@ -43,7 +43,7 @@ import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
@@ -70,7 +70,7 @@ import net.java.visualvm.modules.glassfish.ui.TransactionsPanel;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishApplicationViewProvider implements DataSourceViewProvider<Application> {
+public class GlassFishApplicationViewProvider implements DataSourceViewsProvider<Application> {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

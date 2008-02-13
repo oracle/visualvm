@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public interface DataSourceViewProvider<X extends DataSource> {
+public interface DataSourceViewsProvider<X extends DataSource> {
 
     /**
      * Returns true if the provider provides a view for given DataSource instance, false otherwise.

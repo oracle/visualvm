@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ import javax.management.MBeanServerConnection;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-class MBeansViewProvider implements DataSourceViewProvider<Application> {
+class MBeansViewProvider implements DataSourceViewsProvider<Application> {
 
     private Map<Application, DataSourceView> viewsCache = new HashMap();
 

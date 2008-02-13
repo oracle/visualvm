@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +171,7 @@ public class DataSourceWindowManager {
      * @param selectLastView true if the added view should be selected within the Window.
      */
     // NOTE: display own progress...
-    public void addViews(final DataSource owner, final List<? extends DataSourceView> views, final boolean selectWindow, final boolean toFront, final boolean selectFirstView) {
+    public <X extends DataSourceView> void addViews(final DataSource owner, final List<X> views, final boolean selectWindow, final boolean toFront, final boolean selectFirstView) {
         processor.post(new Runnable() {
             public void run() {
                 DataSourceWindow window = getOpenedWindow(owner);
@@ -178,8 +179,17 @@ public class DataSourceWindowManager {
                 if (!wasOpened) window = createNewWindow(owner);
                 if (window == null) return;
                 
-                for (DataSourceView dataSourceView : views)
-                    if (!window.containsView(dataSourceView)) window.addView(dataSourceView);
+                final List<X> newViews = new ArrayList();
+                for (X view : views) if (!window.containsView(view)) newViews.add(view);
+                
+                for (X view : newViews) view.willBeAdded();
+                try {
+                    final DataSourceWindow windowF = window;
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() { for (X view : newViews) windowF.addView(view); }
+                    });
+                } catch (Exception e) {}
+                for (X view : newViews) view.added();
                 
                 DataSourceView view = selectFirstView ? views.iterator().next() : null;
                 displayWindow(window, view, !wasOpened, selectWindow, toFront);

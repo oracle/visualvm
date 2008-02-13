@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.core.dataview.overview;
 
 import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author Tomas Hurka
  */
-class CoreDumpOverviewViewProvider implements DataSourceViewProvider<CoreDump>{
+class CoreDumpOverviewViewProvider implements DataSourceViewsProvider<CoreDump>{
     
     private Map<CoreDump, DataSourceView> viewsCache = new HashMap();
     

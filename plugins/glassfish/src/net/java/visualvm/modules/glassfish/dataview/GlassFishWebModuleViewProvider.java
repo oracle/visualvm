@@ -48,7 +48,7 @@ import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -83,7 +83,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<GlassFishWebModule> {
+public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<GlassFishWebModule> {
     
     private static class GlassfishWebModuleView extends DataSourceView {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class ThreadDumpViewProvider implements DataSourceViewProvider<ThreadDump>{
+class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
     
     private Map<ThreadDump, DataSourceView> viewsCache = new HashMap();
     
