@@ -6,10 +6,8 @@
     <description>Builds the module suite plugins.</description>
     <import file="nbproject/build-impl.xml"/>
 
-<!--
     <target name="-pre-build">
-        <ant antfile="build.xml" dir="../visualvm" target="create-platform" inheritAll="false"/>
+        <subant antfile="build.xml" buildpath="../visualvm" target="create-platform" inheritrefs="false" inheritall="false"/>
     </target>
     <target name="build" depends="-pre-build,suite.build"/>
--->
 </project>
