@@ -124,4 +124,75 @@ public class JMXUtil {
         }
         return null;
     }
+    
+    public static final String getObjectName(String type, String moduleUniqueName, JMXModel jmx) {
+        try {
+            for(String deplObjName : getDeployedObjects(jmx)) {
+                if (deplObjName.startsWith("com.sun.appserv:j2eeType=" + type + ",name=" + moduleUniqueName)) {
+                    return deplObjName;
+                }
+            }
+        } catch (NullPointerException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return moduleUniqueName;
+    }
+    
+    public static final String getJ2EEAppName(String objectName) {
+        int startIndex = objectName.indexOf(",J2EEApplication=");
+        int stopIndex = -1;
+        if (startIndex > -1) {
+            stopIndex = objectName.indexOf(",", startIndex + 1);
+        }
+        if (startIndex > -1 && stopIndex > -1 && stopIndex > startIndex) {
+            String appName = objectName.substring(startIndex + 17, stopIndex - 1);
+            if (appName == null || appName.startsWith("nul")) return null;
+            return new String(appName);
+        } else {
+            return null;
+        }
+    }
+    
+    public static final String getWebModuleName(String objectName, JMXModel jmx) {
+        try {
+            return (String) jmx.getMBeanServerConnection().getAttribute(new ObjectName(objectName), "name");
+        } catch (MBeanException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (AttributeNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (InstanceNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (ReflectionException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (MalformedObjectNameException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (NullPointerException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
+    }
+    
+    public static final String[] getDeployedObjects(JMXModel jmx) {
+        try {
+            ObjectName on = new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime");
+            return (String[]) jmx.getMBeanServerConnection().getAttribute(on, "deployedObjects");
+        } catch (MBeanException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (AttributeNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (InstanceNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (ReflectionException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (MalformedObjectNameException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (NullPointerException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return new String[0];
+    }
 }

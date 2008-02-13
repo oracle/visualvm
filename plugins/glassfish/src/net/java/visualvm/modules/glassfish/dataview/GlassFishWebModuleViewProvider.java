@@ -24,17 +24,29 @@
  */
 package net.java.visualvm.modules.glassfish.dataview;
 
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 import net.java.visualvm.modules.glassfish.ui.StatsTable;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats;
+import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+import com.sun.tools.visualvm.core.model.jmx.JMXModel;
+import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceUIManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -43,16 +55,23 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
 import net.java.visualvm.modules.glassfish.explorer.GlassFishApplicationNode;
 import net.java.visualvm.modules.glassfish.ui.Chart;
+import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
@@ -90,8 +109,30 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<Gl
 
             module = webModule;
 
+            JPanel masterPanel = new JPanel(new BorderLayout());
+            masterPanel.setOpaque(false);
+            
             HTMLTextArea generalDataArea = new HTMLTextArea();
-
+            generalDataArea.setText(buildInfo());
+            generalDataArea.setBorder(BorderFactory.createEmptyBorder());
+            generalDataArea.setOpaque(false);
+            
+            JScrollPane generalDataScroll = new JScrollPane(generalDataArea);
+            generalDataScroll.setViewportBorder(BorderFactory.createEmptyBorder());
+            generalDataScroll.setBorder(BorderFactory.createEmptyBorder());
+            generalDataScroll.setOpaque(false);
+            
+            JLabel appLink = new JLabel("<html><body><h2>Application hosted by <a href=\"#\">" + ExplorerModelSupport.sharedInstance().getNodeFor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>");
+            appLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            appLink.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    DataSourceUIManager.sharedInstance().openWindow(module.getGlassFishRoot().getApplication());
+                }
+            });
+            masterPanel.add(generalDataScroll, BorderLayout.CENTER);
+            masterPanel.add(appLink, BorderLayout.NORTH);
+            
             JPanel chartActiveSessionsPanel = new JPanel(new BorderLayout());
             chartActiveSessionsPanel.setOpaque(false);
             activeSessionsChart = new Chart() {
@@ -155,7 +196,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<Gl
             wsScroller.setOpaque(false);
             wsPanel.add(wsScroller, BorderLayout.CENTER);
 
-            DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Overview", null, generalDataArea);
+            DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Overview", null, masterPanel);
             DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
             dvc = new DataViewComponent(masterView, masterConfiguration);
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Sessions", true), DataViewComponent.TOP_LEFT);
@@ -183,6 +224,38 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<Gl
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        private String buildInfo() {
+                JMXModel jmx = JMXModelFactory.getJmxModelFor(module.getGlassFishRoot().getApplication());
+                StringBuilder sb = new StringBuilder();
+            try {
+                ObjectName objName = new ObjectName(module.getObjectName());
+                MBeanServerConnection connection = jmx.getMBeanServerConnection();
+                sb.append("<br/>");
+                sb.append("<b>Context: </b>").append(connection.getAttribute(objName, "path")).append("<br/>");
+                sb.append("<b>Document Base: </b>").append(connection.getAttribute(objName, "docBase")).append("<br/>");
+                sb.append("<b>Working Dir: </b>").append(connection.getAttribute(objName, "workDir")).append("<br/>");
+                sb.append("<br/>");
+                boolean cacheAllowed = (Boolean)connection.getAttribute(objName, "cachingAllowed");
+                sb.append("<b>Caching: </b>").append(cacheAllowed ? "Allowed" : "Disallowed").append("<br/>");
+                sb.append("<br/>");
+            } catch (MBeanException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (AttributeNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (InstanceNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (ReflectionException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (MalformedObjectNameException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (NullPointerException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            return sb.toString();
+        }
+        
         @Override
         public DataViewComponent getView() {
             return dvc;
