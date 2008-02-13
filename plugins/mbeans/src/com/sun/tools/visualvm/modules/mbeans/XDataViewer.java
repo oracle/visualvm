@@ -105,7 +105,8 @@ class XDataViewer {
 
     public Component createOperationViewer(Object value,
                                            XMBean mbean) {
-        if(value instanceof Number) return null;
+        if (value instanceof Number) return null;
+        if (value instanceof Component) return (Component) value;
         return createAttributeViewer(value, mbean, null, null);
     }
 
