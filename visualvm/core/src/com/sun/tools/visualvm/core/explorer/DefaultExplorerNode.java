@@ -116,8 +116,7 @@ public class DefaultExplorerNode<T> extends DefaultMutableTreeNode implements Ex
     }
     
     public String toString() {
-        if (getUserObject() != null) return getUserObject().toString();
-        else return getName();
+        return getName();
     }
 
 }
