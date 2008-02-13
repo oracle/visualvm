@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.SwingUtilities;
 
 /**
  * Class responsible for creating UIs (windows, TopComponents) for DataSources.
@@ -45,21 +46,21 @@ import java.util.Set;
  * @author Jiri Sedlacek
  */
 // TODO: synchronize!!!
-public class DataSourceUIFactory {
+public class DataSourceWindowFactory {
 
-    private static DataSourceUIFactory sharedInstance;
+    private static DataSourceWindowFactory sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
     private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
     
     
     /**
-     * Returns singleton instance of DataSourceUIFactory.
+     * Returns singleton instance of DataSourceWindowFactory.
      * 
-     * @return singleton instance of DataSourceUIFactory.
+     * @return singleton instance of DataSourceWindowFactory.
      */
-    public static synchronized DataSourceUIFactory sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new DataSourceUIFactory();
+    public static synchronized DataSourceWindowFactory sharedInstance() {
+        if (sharedInstance == null) sharedInstance = new DataSourceWindowFactory();
         return sharedInstance;
     }
     
@@ -98,27 +99,46 @@ public class DataSourceUIFactory {
     }
     
     
-    DataSourceUI createWindowFor(DataSource dataSource) {
-        DataSourceUI window = new DataSourceUI(dataSource);
-    
-        // TODO: Implement using DataSourceTypeFactory
-        if (dataSource instanceof Application) {
-            Application application = (Application)dataSource;
-            ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
-            if (applicationType != null) {
-                window.setName(applicationType.getName());
-                window.setIcon(applicationType.getIcon());
-            } else {
-                ExplorerNode dataSourceNode = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
-                window.setName(dataSourceNode.getName());
-            }
-        } else {
-            ExplorerNode dataSourceNode = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
-            window.setName(dataSourceNode.getName());
-        }
-        
-        List<? extends DataSourceView> views = getViews(dataSource);
-        for (DataSourceView view : views) window.addView(view);
+    DataSourceWindow createWindowFor(final DataSource dataSource) {
+        // Create window for the DataSource
+        final DataSourceWindow window = new DataSourceWindow(dataSource);
+
+        // Resolve all views to be displayed
+        final List<? extends DataSourceView> views = getViews(dataSource);
+
+        // Blocking notification that the view will be added
+        for (DataSourceView view : views) view.willBeAdded();
+
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    // Blocking adding of views to the window
+                    for (DataSourceView view : views) window.addView(view);
+
+                    // Decorate the window according to the DataSource
+                    // TODO: Implement using DataSourceTypeFactory
+                    if (dataSource instanceof Application) {
+                        Application application = (Application)dataSource;
+                        ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
+                        if (applicationType != null) {
+                            window.setName(applicationType.getName());
+                            window.setIcon(applicationType.getIcon());
+                        } else {
+                            ExplorerNode dataSourceNode = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
+                            window.setName(dataSourceNode.getName());
+                        }
+                    } else {
+                        ExplorerNode dataSourceNode = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
+                        window.setName(dataSourceNode.getName());
+                    }
+                }
+            });
+        } catch (Exception e) {}
+
+        // Blocking notification that the view has been added
+        for (DataSourceView view : views) view.added();
+
+        // Return window with all views
         return window;
     }
     
@@ -142,7 +162,7 @@ public class DataSourceUIFactory {
     }
     
     
-    private DataSourceUIFactory() {
+    private DataSourceWindowFactory() {
     }
 
 }

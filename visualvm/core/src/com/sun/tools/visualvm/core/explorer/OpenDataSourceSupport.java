@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceUIManager;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +58,7 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSourceE
 
     public ExplorerActionDescriptor getDefaultAction(DataSourceExplorerNode node) {
         DataSource dataSource = node.getDataSource();
-        if (DataSourceUIFactory.sharedInstance().canCreateWindowFor(dataSource))
+        if (DataSourceWindowFactory.sharedInstance().canCreateWindowFor(dataSource))
             return new ExplorerActionDescriptor(new OpenDataSourceAction(dataSource), 0);
         else return null;
     }
@@ -78,15 +78,9 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSourceE
         }
         
         public void actionPerformed(ActionEvent e) {
-            DataSourceUIManager uiManager = DataSourceUIManager.sharedInstance();
-            
-            // Open DataSource in separate TopComponent
-            if (dataSource.getMaster() == null) uiManager.openWindow(dataSource);
-            
-            // Open DataSource as a view in its ViewMaster's TopComponent
             DataSource viewMaster = dataSource.getMaster();
-            if (viewMaster != null) uiManager.addView(viewMaster, dataSource);
-            else uiManager.openWindow(dataSource);
+            if (viewMaster != null) DataSourceWindowManager.sharedInstance().addViews(viewMaster, dataSource);
+            else DataSourceWindowManager.sharedInstance().openWindow(dataSource);
             
         }
         

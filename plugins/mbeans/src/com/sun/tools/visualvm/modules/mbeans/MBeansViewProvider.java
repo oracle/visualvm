@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +64,6 @@ class MBeansViewProvider implements DataSourceViewProvider<Application> {
     }
 
     static void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(new MBeansViewProvider(), Application.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(new MBeansViewProvider(), Application.class);
     }
 }

@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceUIManager;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -432,7 +432,7 @@ class ApplicationProfilerView extends DataSourceView {
                 }
                 protected void showURL(URL url) {
                   Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
-                  DataSourceUIManager.sharedInstance().openWindow(profiledApplication);
+                  DataSourceWindowManager.sharedInstance().openWindow(profiledApplication);
                 }
 
                 // NOTE: overriding dimensions prevents UI "jumping" when changing the link

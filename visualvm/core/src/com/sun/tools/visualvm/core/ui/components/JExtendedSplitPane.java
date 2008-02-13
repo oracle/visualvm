@@ -29,8 +29,6 @@ import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
@@ -64,40 +62,28 @@ public class JExtendedSplitPane extends JSplitPane {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ComponentListener splitPaneComponentListener = new SplitPaneComponentListener();
-    private HierarchyListener splitPaneHierarchyListener = new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && isShowing()) {
-                    updateVisibility();
-                    if (cachedResizeWeight != -1) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                JExtendedSplitPane.super.setResizeWeight(cachedResizeWeight);
-                                cachedResizeWeight = -1;
-                            }
-                        });
-                    }
-                }
-            }
-        };
+    
     private double dividerLocation;
     private double cachedResizeWeight = -1;
-    private int dividerSize;
+    private int customDividerSize;
+    
+    public void doLayout() {
+        super.doLayout();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (cachedResizeWeight != -1) {
+                    JExtendedSplitPane.super.setResizeWeight(cachedResizeWeight);
+                    cachedResizeWeight = -1;
+                }
+                updateVisibility();
+            }
+        });
+    }
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public JExtendedSplitPane() {
-        super();
-        addHierarchyListener(splitPaneHierarchyListener);
-    }
-
-    public JExtendedSplitPane(int newOrientation) {
-        super(newOrientation);
-        addHierarchyListener(splitPaneHierarchyListener);
-    }
-
-    public JExtendedSplitPane(int newOrientation, boolean newContinuousLayout) {
-        super(newOrientation, newContinuousLayout);
-        addHierarchyListener(splitPaneHierarchyListener);
+    
+    public JExtendedSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
+        this(newOrientation, false, newLeftComponent, newRightComponent);
     }
 
     public JExtendedSplitPane(int newOrientation, boolean newContinuousLayout, Component newLeftComponent,
@@ -114,25 +100,6 @@ public class JExtendedSplitPane extends JSplitPane {
         if (!newRightComponent.isVisible()) {
             computeDividerLocationWhenInitiallyHidden(newRightComponent);
         }
-        
-        addHierarchyListener(splitPaneHierarchyListener);
-    }
-
-    public JExtendedSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
-        super(newOrientation, newLeftComponent, newRightComponent);
-        registerListeners(newLeftComponent);
-        registerListeners(newRightComponent);
-        updateVisibility();
-
-        if (!newLeftComponent.isVisible()) {
-            computeDividerLocationWhenInitiallyHidden(newLeftComponent);
-        }
-
-        if (!newRightComponent.isVisible()) {
-            computeDividerLocationWhenInitiallyHidden(newRightComponent);
-        }
-        
-        addHierarchyListener(splitPaneHierarchyListener);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -143,7 +110,7 @@ public class JExtendedSplitPane extends JSplitPane {
 
     public void setDividerSize(int newSize) {
         super.setDividerSize(newSize);
-        dividerSize = newSize;
+        customDividerSize = newSize;
     }
     
     public void requestDividerLocation(double requestedDividerLocation) {
@@ -153,6 +120,10 @@ public class JExtendedSplitPane extends JSplitPane {
         } else if (isVisible()) { // Divider not visible, will be updated in updateVisibility()
             dividerLocation = requestedDividerLocation;
         } else if (!isVisible()) { // SplitPane not visible, will be initialized by resizeWeight and updated in hierarchyChanged() handler
+//            System.err.println(">>> Thread during: " + Thread.currentThread());
+//            Thread.dumpStack();
+//            System.err.println(">>> REQUEST: " + requestedDividerLocation);
+//            Thread.dumpStack();
             if (cachedResizeWeight == -1) cachedResizeWeight = getResizeWeight();
             super.setResizeWeight(requestedDividerLocation);
         }
@@ -225,19 +196,19 @@ public class JExtendedSplitPane extends JSplitPane {
         if (getTopComponent().isVisible() || getBottomComponent().isVisible()) {
             if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
                 if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getSize().width / (getSize().getWidth() - dividerSize);
+                    dividerLocation = hiddenComponent.getSize().width / (getSize().getWidth() - customDividerSize);
                 } else {
-                    dividerLocation = (getSize().getWidth() - dividerSize - hiddenComponent.getSize().width) / (getSize()
+                    dividerLocation = (getSize().getWidth() - customDividerSize - hiddenComponent.getSize().width) / (getSize()
                                                                                                                     .getWidth()
-                                                                                                               - dividerSize);
+                                                                                                               - customDividerSize);
                 }
             } else {
                 if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getSize().height / (getSize().getHeight() - dividerSize);
+                    dividerLocation = hiddenComponent.getSize().height / (getSize().getHeight() - customDividerSize);
                 } else {
-                    dividerLocation = (getSize().getHeight() - dividerSize - hiddenComponent.getSize().height) / (getSize()
+                    dividerLocation = (getSize().getHeight() - customDividerSize - hiddenComponent.getSize().height) / (getSize()
                                                                                                                       .getHeight()
-                                                                                                                 - dividerSize);
+                                                                                                                 - customDividerSize);
                 }
             }
         }
@@ -247,19 +218,19 @@ public class JExtendedSplitPane extends JSplitPane {
         if (getTopComponent().isVisible() || getBottomComponent().isVisible()) {
             if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
                 if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getPreferredSize().width / (getPreferredSize().getWidth() - dividerSize);
+                    dividerLocation = hiddenComponent.getPreferredSize().width / (getPreferredSize().getWidth() - customDividerSize);
                 } else {
-                    dividerLocation = (getPreferredSize().getWidth() - dividerSize - hiddenComponent.getPreferredSize().width) / (getPreferredSize()
+                    dividerLocation = (getPreferredSize().getWidth() - customDividerSize - hiddenComponent.getPreferredSize().width) / (getPreferredSize()
                                                                                                                                       .getWidth()
-                                                                                                                                 - dividerSize);
+                                                                                                                                 - customDividerSize);
                 }
             } else {
                 if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getPreferredSize().height / (getPreferredSize().getHeight() - dividerSize);
+                    dividerLocation = hiddenComponent.getPreferredSize().height / (getPreferredSize().getHeight() - customDividerSize);
                 } else {
-                    dividerLocation = (getPreferredSize().getHeight() - dividerSize - hiddenComponent.getPreferredSize().height) / (getPreferredSize()
+                    dividerLocation = (getPreferredSize().getHeight() - customDividerSize - hiddenComponent.getPreferredSize().height) / (getPreferredSize()
                                                                                                                                         .getHeight()
-                                                                                                                                   - dividerSize);
+                                                                                                                                   - customDividerSize);
                 }
             }
         }
@@ -288,7 +259,7 @@ public class JExtendedSplitPane extends JSplitPane {
 
         if (firstComponent.isVisible() && secondComponent.isVisible()) {
             if (!divider.isVisible()) {
-                JExtendedSplitPane.super.setDividerSize(dividerSize);
+                JExtendedSplitPane.super.setDividerSize(customDividerSize);
                 divider.setVisible(true);
                 setDividerLocation(dividerLocation);
             }

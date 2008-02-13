@@ -29,20 +29,22 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
+import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class DataSourceUI extends TopComponent {
+class DataSourceWindow extends TopComponent {
 
     private int viewsCount = 0;
 
     private DataSource dataSource;
 
 
-    public DataSourceUI(DataSource dataSource) {
+    public DataSourceWindow(DataSource dataSource) {
         initComponents();
         this.dataSource = dataSource;
     }
@@ -59,12 +61,20 @@ class DataSourceUI extends TopComponent {
         else tabbedContainer.setSelectedIndex(viewIndex);
     }
     
-    public void removeView(DataSourceView view) {
+    public void removeView(final DataSourceView view) {
         int viewIndex = indexOf(view);
         if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
         else tabbedContainer.removeTabAt(viewIndex);
-        view.removed();
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() { view.removed(); }
+        });
+            
         viewsCount--;
+    }
+    
+    public Set<DataSourceView> getViews() {
+        return tabbedContainer.getViews();
     }
     
     public boolean containsView(DataSourceView view) {
@@ -78,7 +88,7 @@ class DataSourceUI extends TopComponent {
     
     
     protected final void componentClosed() {
-        DataSourceUIManager.sharedInstance().unregisterClosedWindow(this);
+        DataSourceWindowManager.sharedInstance().unregisterClosedWindow(this);
     }
     
     
@@ -86,16 +96,16 @@ class DataSourceUI extends TopComponent {
         setLayout(new BorderLayout());
 
         // tabbedContainer
-        tabbedContainer = new DataSourceUITabbedPane();
+        tabbedContainer = new DataSourceWindowTabbedPane();
         tabbedContainer.addPropertyChangeListener("close", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                removeView(tabbedContainer.getDataSourceView((DataSourceUITabbedPane.DataSourceViewContainer)evt.getNewValue()));
+                removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.DataSourceViewContainer)evt.getNewValue()));
             }
         });
         add(tabbedContainer, BorderLayout.CENTER);
     }
     
-    private DataSourceUITabbedPane tabbedContainer;
+    private DataSourceWindowTabbedPane tabbedContainer;
     
     
     public int getPersistenceType() { return TopComponent.PERSISTENCE_NEVER; }

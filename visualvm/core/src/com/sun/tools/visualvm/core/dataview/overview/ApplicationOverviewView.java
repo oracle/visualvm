@@ -47,16 +47,27 @@ class ApplicationOverviewView extends DataSourceView {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/overview.png";
 
+    private Application application;
+    
     private DataViewComponent view;
     
 
     public ApplicationOverviewView(Application application) {
         super("Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10);
-        view = createViewComponent(application);
-        OverviewViewSupport.getInstance().getApplicationOverviewPluggableView().makeCustomizations(view, application);
+        this.application = application;
+    }
+    
+    
+    protected void willBeAdded() {
+        JVMFactory.getJVMFor(application); 
     }
         
     public DataViewComponent getView() {
+        if (view == null) {
+            view = createViewComponent(application);
+            OverviewViewSupport.getInstance().getApplicationOverviewPluggableView().makeCustomizations(view, application);
+            application = null;
+        }
         return view;
     }
     

@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
-import com.sun.tools.visualvm.core.ui.components.DisplayArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

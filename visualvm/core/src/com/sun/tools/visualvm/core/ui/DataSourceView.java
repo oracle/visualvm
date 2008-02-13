@@ -29,14 +29,14 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Image;
 
 /**
- * Definition of a subtab representing a concrete view of a DataSource in DataSource UI.
+ * Definition of a subtab representing a concrete view of a DataSource in DataSource Window.
  *
  * @author Jiri Sedlacek
  */
 public abstract class DataSourceView implements Comparable {
 
     /**
-     * View will be added as a last view to the DataSource UI.
+     * View will be added as a last view to the DataSource Window.
      */
     public static final int POSITION_AT_THE_END = Integer.MAX_VALUE;
 
@@ -48,6 +48,9 @@ public abstract class DataSourceView implements Comparable {
 
     /**
      * Creates new DataSourceView.
+     * 
+     * Order of the notifications/queries is as follows:
+     * willBeAdded() -> getView() -> added() -> removed()
      * 
      * @param name name of the view as it appears in the subtab,
      * @param icon icon of the view as it appears in the subtab,
@@ -83,6 +86,7 @@ public abstract class DataSourceView implements Comparable {
     
     /**
      * Returns DataViewComponent implementing the view.
+     * Called from EDT.
      * 
      * @return DataViewComponent implementing the view.
      */
@@ -108,7 +112,25 @@ public abstract class DataSourceView implements Comparable {
     
     
     /**
+     * Notification when the view is about to be added to DataSourceWindow.
+     * This notification comes from a thread other than EDT and its main intention
+     * is to provide a possibility to do some models inits before the actual UI is displayed.
+     * This call is blocking (blocks opening the view, progress bar is shown) but long-running initializations should
+     * still use separate thread and update the UI after the models are ready.
+     */
+    protected void willBeAdded() {
+    }
+    
+    /**
+     * Notification when the view has been added to DataSourceWindow.
+     * This notification comes from a thread other than EDT.
+     */
+    protected void added() {
+    }
+    
+    /**
      * Notification when the view has been either programatically removed from tabbed pane or closed by the user by clicking the X.
+     * This notification comes from a thread other than EDT
      */
     protected void removed() {
     }

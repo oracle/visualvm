@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.tools.sa.SAAgent;
 import com.sun.tools.visualvm.core.tools.sa.SAAgentFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceUIManager;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -66,7 +66,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                             application.getRepository().addDataSource(heapDump);
                             registerDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceUIManager.sharedInstance().addView(application, heapDump); }
+                                public void run() { DataSourceWindowManager.sharedInstance().addViews(application, heapDump); }
                             });
                             application.notifyWhenFinished(new DataFinishedListener<Application>() {
                                 public void dataFinished(Application dataSource) { removeHeapDumps(dataSource, false); }
@@ -110,7 +110,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                             coreDump.getRepository().addDataSource(heapDump);
                             registerDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceUIManager.sharedInstance().addView(coreDump, heapDump); }
+                                public void run() { DataSourceWindowManager.sharedInstance().addViews(coreDump, heapDump); }
                             });
                             coreDump.notifyWhenFinished(new DataFinishedListener<CoreDump>() {
                                 public void dataFinished(CoreDump dataSource) { removeHeapDumps(dataSource, false); }

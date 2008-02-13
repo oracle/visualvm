@@ -46,7 +46,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -65,7 +67,7 @@ import org.openide.util.Exceptions;
  * @author Jiri Sedlacek (copied from org.openide.awt.CloseButtonTabbedPane)
  *
  */
-class DataSourceUITabbedPane extends JTabbedPane {
+class DataSourceWindowTabbedPane extends JTabbedPane {
   
   private Image closeTabImage;
   private Image closeTabPressedImage;
@@ -77,7 +79,7 @@ class DataSourceUITabbedPane extends JTabbedPane {
   private Map<DataSourceViewContainer, DataSourceView> mapping = new HashMap();
   
   
-  DataSourceUITabbedPane() {
+  DataSourceWindowTabbedPane() {
     addChangeListener( new ChangeListener() {
       public void stateChanged(ChangeEvent e) {
         reset();
@@ -111,6 +113,18 @@ class DataSourceUITabbedPane extends JTabbedPane {
       for (int i = 0; i < getTabCount(); i++)
           if (((DataSourceViewContainer)getComponentAt(i)).getView() == view.getView()) return i;
       return -1;
+  }
+  
+  public Set<DataSourceView> getViews() {
+      Set<DataSourceView> views = new HashSet();
+      
+      for (Component component : getComponents()) {
+          DataSourceViewContainer container = (DataSourceViewContainer)component;
+          DataSourceView view = mapping.get(container);
+          views.add(view);
+      }
+      
+      return views;
   }
   
   // NOTE: has to be allowed, is called from super.add() needed in addViewTab()
@@ -398,11 +412,11 @@ class DataSourceUITabbedPane extends JTabbedPane {
       MouseEvent e = (MouseEvent) ev;
       
       Component c = (Component) e.getSource();
-      while (c != null && !(c instanceof DataSourceUITabbedPane))
+      while (c != null && !(c instanceof DataSourceWindowTabbedPane))
         c = c.getParent();
       if (c == null)
         return;
-      final DataSourceUITabbedPane tab = (DataSourceUITabbedPane) c;
+      final DataSourceWindowTabbedPane tab = (DataSourceWindowTabbedPane) c;
       
       Point p = SwingUtilities.convertPoint((Component) e.getSource(),
         e.getPoint(),

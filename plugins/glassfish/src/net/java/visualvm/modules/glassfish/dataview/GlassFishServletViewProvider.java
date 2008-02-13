@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -158,7 +158,7 @@ public class GlassFishServletViewProvider implements DataSourceViewProvider<Glas
     }
 
     public void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, GlassFishServlet.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, GlassFishServlet.class);
 
         //        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(actionsProvider, GlassfishApplicationNode.class);
     }

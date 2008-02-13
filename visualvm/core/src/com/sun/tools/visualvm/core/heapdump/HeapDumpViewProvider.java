@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +63,7 @@ class HeapDumpViewProvider implements DataSourceViewProvider<HeapDump>{
     }
 
     void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, HeapDump.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, HeapDump.class);
     }
 
 }

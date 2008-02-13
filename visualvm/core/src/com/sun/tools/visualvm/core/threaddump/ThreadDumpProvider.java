@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.tools.sa.SAAgent;
 import com.sun.tools.visualvm.core.tools.sa.SAAgentFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceUIManager;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -68,7 +68,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                             application.getRepository().addDataSource(threadDump);
                             registerDataSource(threadDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceUIManager.sharedInstance().addView(application, threadDump); }
+                                public void run() { DataSourceWindowManager.sharedInstance().addViews(application, threadDump); }
                             });
                             application.notifyWhenFinished(new DataFinishedListener<Application>() {
                                 public void dataFinished(Application dataSource) { removeThreadDumps(dataSource, false); }
@@ -116,7 +116,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                             coreDump.getRepository().addDataSource(threadDump);
                             registerDataSource(threadDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceUIManager.sharedInstance().addView(coreDump, threadDump); }
+                                public void run() { DataSourceWindowManager.sharedInstance().addViews(coreDump, threadDump); }
                             });
                             coreDump.notifyWhenFinished(new DataFinishedListener<CoreDump>() {
                                 public void dataFinished(CoreDump dataSource) { removeThreadDumps(dataSource, false); }

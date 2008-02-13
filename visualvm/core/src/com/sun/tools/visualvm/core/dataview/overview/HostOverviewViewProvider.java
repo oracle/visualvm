@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.model.host.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +55,7 @@ class HostOverviewViewProvider implements DataSourceViewProvider<Host>{
     }
 
     void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, Host.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, Host.class);
     }
 
 }

@@ -59,15 +59,21 @@ class ApplicationMonitorView extends DataSourceView {
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/graphs.png";
 
     private DataViewComponent view;
+    private Application application;
     
 
     public ApplicationMonitorView(Application application) {
         super("Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20);
-        view = createViewComponent(application);
-        MonitorViewSupport.getInstance().getApplicationPluggableView().makeCustomizations(view, application);
+        this.application = application;
     }
         
     public DataViewComponent getView() {
+        if (view == null) {
+            view = createViewComponent(application);
+            MonitorViewSupport.getInstance().getApplicationPluggableView().makeCustomizations(view, application);
+            application = null;
+        }
+        
         return view;
     }
     

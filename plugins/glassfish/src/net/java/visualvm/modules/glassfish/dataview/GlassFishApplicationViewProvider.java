@@ -41,7 +41,7 @@ import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -119,7 +119,7 @@ public class GlassFishApplicationViewProvider implements DataSourceViewProvider<
     }
 
     public void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, Application.class);
     }
 
     public boolean supportsViewFor(Application dataSource) {

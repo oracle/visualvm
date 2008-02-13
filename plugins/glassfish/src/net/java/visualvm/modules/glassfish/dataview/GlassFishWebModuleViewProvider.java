@@ -45,8 +45,8 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceUIManager;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -127,7 +127,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<Gl
             appLink.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    DataSourceUIManager.sharedInstance().openWindow(module.getGlassFishRoot().getApplication());
+                    DataSourceWindowManager.sharedInstance().openWindow(module.getGlassFishRoot().getApplication());
                 }
             });
             masterPanel.add(generalDataScroll, BorderLayout.CENTER);
@@ -330,7 +330,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<Gl
     }
 
     public void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, GlassFishWebModule.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, GlassFishWebModule.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(actionsProvider, GlassFishApplicationNode.class);
     }
 

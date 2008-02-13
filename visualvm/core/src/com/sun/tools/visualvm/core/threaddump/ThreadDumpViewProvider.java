@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +67,7 @@ class ThreadDumpViewProvider implements DataSourceViewProvider<ThreadDump>{
     }
 
     void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, ThreadDump.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, ThreadDump.class);
     }
 
 }

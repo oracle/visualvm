@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.core.dataview.overview;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +54,7 @@ class ApplicationOverviewViewProvider implements DataSourceViewProvider<Applicat
     }
 
     void initialize() {
-        DataSourceUIFactory.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceWindowFactory.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }
