@@ -89,7 +89,8 @@ class XTextField extends JPanel
         if(isCallable)
             textField.addActionListener(this);
 
-        boolean fieldEditable = Utils.isEditableType(expectedClass.getName());
+        boolean fieldEditable = expectedClass == null ? false :
+            Utils.isEditableType(expectedClass.getName());
         if (fieldEditable && isCallable) {
             textField.setEditable(true);
         }
@@ -109,7 +110,8 @@ class XTextField extends JPanel
     protected void init(Object value, Class expectedClass) {
         this.expectedClass = expectedClass;
         this.value = value;
-        boolean fieldEditable =  Utils.isEditableType(expectedClass.getName());
+        boolean fieldEditable = expectedClass == null ? false :
+            Utils.isEditableType(expectedClass.getName());
         clearObject();
         if (value != null) {
             textField.setText(value.toString());

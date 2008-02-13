@@ -137,10 +137,13 @@ class XTextFieldEditor extends XTextField implements TableCellEditor {
         } else {
             className = String.class.getName();
         }
+        Class<?> clazz;
         try {
-            init(value,Utils.getClass(className));
+            clazz = Utils.getClass(className);
+        } catch (ClassNotFoundException e) {
+            clazz = null;
         }
-        catch(Exception e) {}
+        init(value, clazz);
 
         return this;
     }

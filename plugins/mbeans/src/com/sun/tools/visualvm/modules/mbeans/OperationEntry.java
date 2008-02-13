@@ -71,7 +71,6 @@ class OperationEntry extends JPanel {
                           JButton button,
                           XMBeanOperations xoperations) {
         try {
-            String defaultVal;
             MBeanParameterInfo params[] = operation.getSignature();
             add(new JLabel("(",JLabel.CENTER));
             inputs = new XTextField[params.length];
@@ -90,9 +89,16 @@ class OperationEntry extends JPanel {
                 else
                     if (fieldWidth < 10) fieldWidth = 10;
 
+                Class<?> clazz;
+                try {
+                    clazz = Utils.getClass(params[i].getType());
+                } catch (ClassNotFoundException e) {
+                    clazz = null;
+                }
+
                 add(inputs[i] =
                         new XTextField(Utils.getReadableClassName(defaultTextValue),
-                        Utils.getClass(params[i].getType()),
+                        clazz,
                         fieldWidth,
                         isCallable,
                         button,
@@ -105,10 +111,8 @@ class OperationEntry extends JPanel {
             add(new JLabel(")",JLabel.CENTER));
             validate();
             doLayout();
-        }
-        catch (Exception e) {
-            System.out.println("Error setting Operation panel :"+
-                               e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error setting Operation panel: " + e.toString());
         }
     }
 
