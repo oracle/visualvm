@@ -37,8 +37,8 @@ import com.sun.appserv.management.monitor.statistics.KeepAliveStats;
 import com.sun.appserv.management.monitor.statistics.TransactionServiceStats;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
@@ -76,7 +76,7 @@ public class GlassFishApplicationViewProvider implements DataSourceViewProvider<
 
     @Override
     public Set<?extends DataSourceView> getViews(final Application application) {
-        JMXModel model = JMXModelFactory.getJmxModelFor(application);
+        JmxModel model = JmxModelFactory.getJmxModelFor(application);
 
         if (model != null) {
             try {

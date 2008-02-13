@@ -27,9 +27,9 @@ package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.jmx.CachedMBeanServerConnection;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel.ConnectionState;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel.ConnectionState;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.*;
@@ -166,12 +166,12 @@ class MBeansTab extends JPanel implements
     }
     
     public MBeanServerConnection getMBeanServerConnection() {
-        JMXModel jmx = JMXModelFactory.getJmxModelFor(application);
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         return jmx == null ? null : jmx.getMBeanServerConnection();
     }
     
     public CachedMBeanServerConnection getCachedMBeanServerConnection() {
-        JMXModel jmx = JMXModelFactory.getJmxModelFor(application);
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         return jmx == null ? null : jmx.getCachedMBeanServerConnection();
     }
     
@@ -227,7 +227,7 @@ class MBeansTab extends JPanel implements
     
     /* property change listener:  propertyChange */
     public void propertyChange(PropertyChangeEvent evt) {
-        if (JMXModel.CONNECTION_STATE_PROPERTY.equals(evt.getPropertyName())) {
+        if (JmxModel.CONNECTION_STATE_PROPERTY.equals(evt.getPropertyName())) {
             ConnectionState newState = (ConnectionState) evt.getNewValue();
             switch (newState) {
                 case CONNECTED:

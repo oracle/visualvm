@@ -39,8 +39,8 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
@@ -225,7 +225,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewProvider<Gl
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         private String buildInfo() {
-                JMXModel jmx = JMXModelFactory.getJmxModelFor(module.getGlassFishRoot().getApplication());
+                JmxModel jmx = JmxModelFactory.getJmxModelFor(module.getGlassFishRoot().getApplication());
                 StringBuilder sb = new StringBuilder();
             try {
                 ObjectName objName = new ObjectName(module.getObjectName());

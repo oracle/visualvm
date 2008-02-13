@@ -35,32 +35,32 @@ import com.sun.tools.visualvm.core.datasource.Application;
  *
  * @author Luis-Miguel Alventosa
  */
-public class JMXModelFactory
-        extends ModelFactory<JMXModel, Application>
-        implements ModelProvider<JMXModel, Application> {
+public class JmxModelFactory
+        extends ModelFactory<JmxModel, Application>
+        implements ModelProvider<JmxModel, Application> {
 
-    private static JMXModelFactory factory;
+    private static JmxModelFactory factory;
 
-    private JMXModelFactory() {
+    private JmxModelFactory() {
     }
 
-    public static synchronized JMXModelFactory getDefault() {
+    public static synchronized JmxModelFactory getDefault() {
         if (factory == null) {
-            factory = new JMXModelFactory();
+            factory = new JmxModelFactory();
             factory.registerFactory(factory);
         }
         return factory;
     }
 
-    public static JMXModel getJmxModelFor(Application app) {
+    public static JmxModel getJmxModelFor(Application app) {
         return getDefault().getModel(app);
     }
 
-    public JMXModel createModelFor(Application app) {
+    public JmxModel createModelFor(Application app) {
         if (app instanceof JvmstatApplication) {
-            return new JMXModel((JvmstatApplication) app);
+            return new JmxModel((JvmstatApplication) app);
         } else if (app instanceof JmxApplication) {
-            return new JMXModel((JmxApplication) app);
+            return new JmxModel((JmxApplication) app);
         }
         return null;
     }

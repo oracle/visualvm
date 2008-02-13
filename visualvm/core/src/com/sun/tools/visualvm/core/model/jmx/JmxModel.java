@@ -86,7 +86,7 @@ import sun.rmi.transport.LiveRef;
  *
  * @author Luis-Miguel Alventosa
  */
-public class JMXModel extends Model {
+public class JmxModel extends Model {
 
     private ProxyClient client;
 
@@ -117,7 +117,7 @@ public class JMXModel extends Model {
         CONNECTING
     }
 
-    public JMXModel(JvmstatApplication application) {
+    public JmxModel(JvmstatApplication application) {
         JvmstatApplication app = application;
         JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(app);
         try {
@@ -175,7 +175,7 @@ public class JMXModel extends Model {
         }
     }
 
-    public JMXModel(JmxApplication application) {
+    public JmxModel(JmxApplication application) {
         JmxApplication app = application;
         try {
             // TODO: Remove the following two lines when Connection Dialog is implemented.
@@ -261,9 +261,9 @@ public class JMXModel extends Model {
         private boolean sslStub = false;
         private final String connectionName;
         private final String displayName;
-        private final JMXModel model;
+        private final JmxModel model;
 
-        public ProxyClient(JMXModel model, String hostName, int port,
+        public ProxyClient(JmxModel model, String hostName, int port,
                 String userName, String password) throws IOException {
             this.model = model;
             this.connectionName = getConnectionName(hostName, port, userName);
@@ -286,7 +286,7 @@ public class JMXModel extends Model {
             }
         }
 
-        public ProxyClient(JMXModel model, String url,
+        public ProxyClient(JmxModel model, String url,
                 String userName, String password) throws IOException {
             this.model = model;
             this.advancedUrl = url;
@@ -295,7 +295,7 @@ public class JMXModel extends Model {
             setParameters(new JMXServiceURL(url), userName, password);
         }
 
-        public ProxyClient(JMXModel model, LocalVirtualMachine lvm)
+        public ProxyClient(JmxModel model, LocalVirtualMachine lvm)
                 throws IOException {
             this.model = model;
             this.lvm = lvm;
@@ -447,7 +447,7 @@ public class JMXModel extends Model {
             ConnectionState oldState = this.connectionState;
             this.connectionState = state;
             model.propertyChangeSupport.firePropertyChange(
-                    JMXModel.CONNECTION_STATE_PROPERTY, oldState, state);
+                    JmxModel.CONNECTION_STATE_PROPERTY, oldState, state);
         }
 
         public ConnectionState getConnectionState() {
@@ -645,7 +645,7 @@ public class JMXModel extends Model {
         }
 
         private void dispose() {
-            JMXModel.this.removePropertyChangeListener(this);
+            JmxModel.this.removePropertyChangeListener(this);
         }
     }
 

@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel.ConnectionState;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel.ConnectionState;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -965,7 +965,7 @@ class Plotter extends JComponent
 
     // Called on EDT
     public void propertyChange(PropertyChangeEvent ev) {
-        if (JMXModel.CONNECTION_STATE_PROPERTY.equals(ev.getPropertyName())) {
+        if (JmxModel.CONNECTION_STATE_PROPERTY.equals(ev.getPropertyName())) {
             ConnectionState newState = (ConnectionState) ev.getNewValue();
             switch (newState) {
               case DISCONNECTED:

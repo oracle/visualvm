@@ -25,7 +25,7 @@
 
 package net.java.visualvm.modules.glassfish.jmx;
 
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import java.io.IOException;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -41,7 +41,7 @@ import org.openide.util.Exceptions;
  * @author Jaroslav Bachorik
  */
 public class JMXUtil {
-    public static final String getServerName(JMXModel jmx) {
+    public static final String getServerName(JmxModel jmx) {
         try {
             Object serverNameObj = jmx.getMBeanServerConnection().getAttribute(new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime"), "J2EEServer");
             return serverNameObj != null ? serverNameObj.toString() : null;
@@ -63,7 +63,7 @@ public class JMXUtil {
         return null;
     }
     
-    public static final String getServerConfig(JMXModel jmx) {
+    public static final String getServerConfig(JmxModel jmx) {
         try {
             Object serverConfObj = jmx.getMBeanServerConnection().getAttribute(new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime"), "config-ref");
             return serverConfObj != null ? serverConfObj.toString() : null;
@@ -85,7 +85,7 @@ public class JMXUtil {
         return null;
     }
     
-    public static final String getServerConfigDir(JMXModel jmx) {
+    public static final String getServerConfigDir(JmxModel jmx) {
         try {
             Object serverConfDirObj = jmx.getMBeanServerConnection().invoke(new ObjectName("com.sun.appserv:type=domain,category=config"), "getConfigDir", null, null);
             return serverConfDirObj != null ? serverConfDirObj.toString() : null;
@@ -105,7 +105,7 @@ public class JMXUtil {
         return null;
     }
     
-    public static final String getServerDomain(JMXModel jmx) {
+    public static final String getServerDomain(JmxModel jmx) {
         try {
             Object serverDomainObj = jmx.getMBeanServerConnection().invoke(new ObjectName("com.sun.appserv:type=domain,category=config"), "getName", null, null);
             return serverDomainObj != null ? serverDomainObj.toString() : null;
@@ -125,7 +125,7 @@ public class JMXUtil {
         return null;
     }
     
-    public static final String getObjectName(String type, String moduleUniqueName, JMXModel jmx) {
+    public static final String getObjectName(String type, String moduleUniqueName, JmxModel jmx) {
         try {
             for(String deplObjName : getDeployedObjects(jmx)) {
                 if (deplObjName.startsWith("com.sun.appserv:j2eeType=" + type + ",name=" + moduleUniqueName)) {
@@ -153,7 +153,7 @@ public class JMXUtil {
         }
     }
     
-    public static final String getWebModuleName(String objectName, JMXModel jmx) {
+    public static final String getWebModuleName(String objectName, JmxModel jmx) {
         try {
             return (String) jmx.getMBeanServerConnection().getAttribute(new ObjectName(objectName), "name");
         } catch (MBeanException ex) {
@@ -174,7 +174,7 @@ public class JMXUtil {
         return null;
     }
     
-    public static final String[] getDeployedObjects(JMXModel jmx) {
+    public static final String[] getDeployedObjects(JmxModel jmx) {
         try {
             ObjectName on = new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime");
             return (String[]) jmx.getMBeanServerConnection().getAttribute(on, "deployedObjects");

@@ -34,8 +34,8 @@ import com.sun.appserv.management.config.SystemPropertiesAccess;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.ViewPlugin;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
@@ -65,11 +65,11 @@ public class GlassFishOverview implements ViewPlugin<Application> {
 
         private DomainRoot domainRoot;
         private String serverName, configName;
-        private JMXModel jmxModel;
+        private JmxModel jmxModel;
         
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public GlassfishViewDescriptor(DomainRoot root, JMXModel jmx) {
+        public GlassfishViewDescriptor(DomainRoot root, JmxModel jmx) {
             domainRoot = root;
             jmxModel = jmx;
             assert domainRoot != null && jmxModel != null;
@@ -205,7 +205,7 @@ public class GlassFishOverview implements ViewPlugin<Application> {
 
             if (roots.size() == 1) {
                 GlassFishRoot root = roots.iterator().next();
-                JMXModel jmx = JMXModelFactory.getJmxModelFor(application);
+                JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
                 return Collections.singleton(new GlassfishViewDescriptor(root.getDomainRoot(), jmx));
             } else {
                 return Collections.EMPTY_SET;

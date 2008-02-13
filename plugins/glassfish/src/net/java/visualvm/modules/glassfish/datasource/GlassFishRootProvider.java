@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
@@ -125,7 +125,7 @@ public class GlassFishRootProvider extends DefaultDataSourceProvider<GlassFishRo
                                 return; // no server name; fail early
                             }
 
-                            JMXModel jmx = JMXModelFactory.getJmxModelFor(app);
+                            JmxModel jmx = JmxModelFactory.getJmxModelFor(app);
                             MBeanServerConnection serverConnection = jmx.getMBeanServerConnection();
                             DomainRoot dr = AMXUtil.getDomainRoot(serverConnection);
 

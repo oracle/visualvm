@@ -69,7 +69,7 @@ public class JvmJmxModel extends Model {
 
     public JvmJmxModel(Application application) {
         app = application;
-        mbsc = JMXModelFactory.getJmxModelFor(app).getCachedMBeanServerConnection();
+        mbsc = JmxModelFactory.getJmxModelFor(app).getCachedMBeanServerConnection();
     }
 
     public synchronized ClassLoadingMXBean getClassLoadingMXBean() {

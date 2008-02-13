@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DisplayArea;
@@ -71,7 +71,7 @@ class MBeansView extends DataSourceView {
     private DataViewComponent createViewComponent() {
         // MBeansTab
         MBeansTab mbeansTab = new MBeansTab(application);
-        JMXModel jmx = JMXModelFactory.getJmxModelFor(application);
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         jmx.addPropertyChangeListener(mbeansTab);
 
         // MBeansTreeView

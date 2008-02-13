@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.modules.jconsole;
 
 import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceUIFactory;
@@ -50,7 +50,7 @@ class JConsoleViewProvider implements DataSourceViewProvider<Application> {
     }
 
     public boolean supportsViewFor(Application application) {
-        JMXModel jmx = JMXModelFactory.getJmxModelFor(application);
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
         return mbsc != null;
     }

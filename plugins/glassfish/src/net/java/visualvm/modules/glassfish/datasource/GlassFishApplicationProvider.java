@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.model.jmx.JMXModel;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -83,7 +83,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
 
     private void processNewApplication(final GlassFishRoot root) {
         ServerRootMonitor srm = root.getDomainRoot().getMonitoringRoot().getServerRootMonitorMap().get(root.getName());
-        JMXModel jmx = JMXModelFactory.getJmxModelFor(root.getApplication());
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(root.getApplication());
         
         for (Map.Entry<String, WebModuleVirtualServerMonitor> virtMonitorEntry : srm.getWebModuleVirtualServerMonitorMap()
                                                                                     .entrySet()) {

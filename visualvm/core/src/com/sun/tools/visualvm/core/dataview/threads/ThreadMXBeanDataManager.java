@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.core.dataview.threads;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.jmx.CachedMBeanServerConnection;
-import com.sun.tools.visualvm.core.model.jmx.JMXModelFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.HashSet;
@@ -51,7 +51,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
   private boolean refreshRunning;
 
   public ThreadMXBeanDataManager(Application app, ThreadMXBean tb) {
-    serverConnection = JMXModelFactory.getJmxModelFor(app).getCachedMBeanServerConnection();
+    serverConnection = JmxModelFactory.getJmxModelFor(app).getCachedMBeanServerConnection();
     threadBean = tb;
   }
   
