@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.Model;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
+import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -790,6 +791,13 @@ public class JMXModel extends Model {
 
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
+            // Check if MBeanServerConnection call is performed on EDT
+            if (EventQueue.isDispatchThread()) {
+                System.err.println("WARNING: MBeanServerConnection call " +
+                        "performed on Event Dispatch Thread!");
+                Thread.dumpStack();
+            }
+            // Invoke MBeanServerConnection call
             try {
                 return method.invoke(conn, args);
             } catch (InvocationTargetException e) {
