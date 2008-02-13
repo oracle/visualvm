@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.core.dataview.monitor;
 
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JvmJmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.model.jvm.MonitoredData;
@@ -38,14 +40,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.lang.management.MemoryMXBean;
 import java.text.NumberFormat;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.Utilities;
@@ -79,7 +86,7 @@ class ApplicationMonitorView extends DataSourceView {
     
     
     private DataViewComponent createViewComponent(Application application) {
-        final MasterViewSupport masterViewSupport = new MasterViewSupport();
+        final MasterViewSupport masterViewSupport = new MasterViewSupport(application);
         DataViewComponent dvc = new DataViewComponent(
                 masterViewSupport.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
@@ -123,9 +130,11 @@ class ApplicationMonitorView extends DataSourceView {
     
     private static class MasterViewSupport extends JPanel  {
         
+        private Application application;
         private HTMLTextArea area;
         
-        public MasterViewSupport() {
+        public MasterViewSupport(Application application) {
+            this.application = application;
             initComponents();
         }
         
@@ -152,8 +161,45 @@ class ApplicationMonitorView extends DataSourceView {
             // TODO: implement listener for Application.oomeHeapDumpEnabled
             
             add(area, BorderLayout.CENTER);
+
+            final JButton gcButton = new JButton("Perform GC"); // TODO: I18N
+            gcButton.setEnabled(false);
+            JvmJmxModel model = JvmJmxModelFactory.getJvmJmxModelFor(application);
+            if (model != null) {
+                final MemoryMXBean memory = model.getMemoryMXBean();
+                if (memory != null) {
+                    gcButton.setEnabled(true);
+                    gcButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            Object src = e.getSource();
+                            if (src == gcButton) {
+                                gc(memory);
+                            }
+                        }
+                    });
+                }
+            }
+            JPanel buttonArea = new JPanel();
+            buttonArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            buttonArea.add(gcButton);
+            buttonArea.setBackground(area.getBackground());
+            add(buttonArea, BorderLayout.AFTER_LINE_ENDS);
         }
-        
+
+        private void gc(final MemoryMXBean memory) {
+            new SwingWorker<Void, Void>() {
+                @Override
+                public Void doInBackground() {
+                    try {
+                        memory.gc();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute();
+        }
+
         private String getBasicTelemetry(MonitoredData data) {
             if (data == null) return "<nobr><b>Uptime:</b></nobr>";
             else return "<nobr><b>Uptime:</b> " + getTime(data.getUpTime()) + "</nobr>";
