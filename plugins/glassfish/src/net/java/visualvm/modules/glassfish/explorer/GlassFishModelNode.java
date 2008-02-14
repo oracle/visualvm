@@ -25,15 +25,15 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
+//import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishModelNode extends DataSourceExplorerNode<GlassFishRoot> {
-    public GlassFishModelNode(GlassFishRoot root) {
-        super("Model", null, root);
-    }
+public class GlassFishModelNode/* extends DataSourceExplorerNode<GlassFishRoot>*/ {
+//    public GlassFishModelNode(GlassFishRoot root) {
+//        super("Model", null, root);
+//    }
 }

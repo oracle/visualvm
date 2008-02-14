@@ -60,12 +60,12 @@ public class Installer extends ModuleInstall {
         new GlassFishRootProvider().initialize();
         new GlassFishApplicationProvider().initialize();
         new GlassFishServletProvider().initialize();
-        new GlassFishWebModuleNodeBuilder().initialize();
-        new GlassFishServletNodeBuilder().initialize();
+//        new GlassFishWebModuleNodeBuilder().initialize();
+//        new GlassFishServletNodeBuilder().initialize();
         new GlassFishWebModuleViewProvider().initialize();
         new GlassFishServletViewProvider().initialize();
         new GlassFishOverview().initialize();
-        new GlassFishModelNodeBuilder().initialize();
+//        new GlassFishModelNodeBuilder().initialize();
     }
 
     @Override

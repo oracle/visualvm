@@ -24,55 +24,55 @@
  */
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
-import com.sun.tools.visualvm.core.explorer.ExplorerNode;
-import com.sun.tools.visualvm.core.explorer.ExplorerNodeBuilder;
-import java.util.HashMap;
-import java.util.Map;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
+//import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+//import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+//import com.sun.tools.visualvm.core.explorer.ExplorerNode;
+//import com.sun.tools.visualvm.core.explorer.ExplorerNodeBuilder;
+//import java.util.HashMap;
+//import java.util.Map;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletNodeBuilder implements ExplorerNodeBuilder<GlassFishServlet> {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private final Object modelLock = new Object();
-    private Map<ExplorerNode<GlassFishWebModule>, GlassFishServletsNode> servletsNodeMap = new  HashMap<ExplorerNode<GlassFishWebModule>, GlassFishServletsNode>();
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public ExplorerNode<GlassFishServlet> getNodeFor(GlassFishServlet dataSource) {
-        ExplorerModelSupport modelSupport = ExplorerModelSupport.sharedInstance();
-        ExplorerNode<GlassFishWebModule> parent = modelSupport.getNodeFor(dataSource.getOwner());
-        GlassFishServletsNode servletsNode = null;
-
-        synchronized (modelLock) {
-            if (!servletsNodeMap.containsKey(parent)) {
-                servletsNode = new GlassFishServletsNode();
-                servletsNodeMap.put(parent, servletsNode);
-                modelSupport.addNode(servletsNode, parent);
-            } else {
-                servletsNode = servletsNodeMap.get(parent);
-            }
-        }
-
-        final GlassFishServletNode appNode = new GlassFishServletNode(dataSource);
-        modelSupport.addNode(appNode, servletsNode);
-
-        dataSource.notifyWhenFinished(new DataFinishedListener() {
-                public void dataFinished(Object dataSource) {
-                    ExplorerModelSupport.sharedInstance().removeNode(appNode);
-                }
-            });
-
-        return appNode;
-    }
-
-    public void initialize() {
-        ExplorerModelSupport.sharedInstance().addBuilder(this, GlassFishServlet.class);
-    }
+public class GlassFishServletNodeBuilder/* implements ExplorerNodeBuilder<GlassFishServlet> */{
+//    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+//
+//    private final Object modelLock = new Object();
+//    private Map<ExplorerNode<GlassFishWebModule>, GlassFishServletsNode> servletsNodeMap = new  HashMap<ExplorerNode<GlassFishWebModule>, GlassFishServletsNode>();
+//    //~ Methods ------------------------------------------------------------------------------------------------------------------
+//
+//    public ExplorerNode<GlassFishServlet> getNodeFor(GlassFishServlet dataSource) {
+//        ExplorerModelSupport modelSupport = ExplorerModelSupport.sharedInstance();
+//        ExplorerNode<GlassFishWebModule> parent = modelSupport.getNodeFor(dataSource.getOwner());
+//        GlassFishServletsNode servletsNode = null;
+//
+//        synchronized (modelLock) {
+//            if (!servletsNodeMap.containsKey(parent)) {
+//                servletsNode = new GlassFishServletsNode();
+//                servletsNodeMap.put(parent, servletsNode);
+//                modelSupport.addNode(servletsNode, parent);
+//            } else {
+//                servletsNode = servletsNodeMap.get(parent);
+//            }
+//        }
+//
+//        final GlassFishServletNode appNode = new GlassFishServletNode(dataSource);
+//        modelSupport.addNode(appNode, servletsNode);
+//
+//        dataSource.notifyWhenFinished(new DataFinishedListener() {
+//                public void dataFinished(Object dataSource) {
+//                    ExplorerModelSupport.sharedInstance().removeNode(appNode);
+//                }
+//            });
+//
+//        return appNode;
+//    }
+//
+//    public void initialize() {
+//        ExplorerModelSupport.sharedInstance().addBuilder(this, GlassFishServlet.class);
+//    }
 }

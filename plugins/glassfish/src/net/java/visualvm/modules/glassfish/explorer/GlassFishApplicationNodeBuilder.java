@@ -25,41 +25,41 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
-import com.sun.tools.visualvm.core.explorer.ExplorerNode;
-import com.sun.tools.visualvm.core.explorer.ExplorerNodeBuilder;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
+//import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+//import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+//import com.sun.tools.visualvm.core.explorer.ExplorerNode;
+//import com.sun.tools.visualvm.core.explorer.ExplorerNodeBuilder;
+//import java.util.Map;
+//import java.util.concurrent.ConcurrentHashMap;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class GlassFishApplicationNodeBuilder<T extends GlassFishApplication> implements ExplorerNodeBuilder<T>{
-    private final Map<T, GlassFishApplicationNode<T>> nodesCache = new ConcurrentHashMap<T, GlassFishApplicationNode<T>>();
-    
-    public ExplorerNode<T> getNodeFor(T dataSource) {
-        if (nodesCache.containsKey(dataSource)) {
-            return nodesCache.get(dataSource);
-        }
-        final GlassFishApplicationNode<T> newNode = createNewNode(dataSource);
-        ExplorerModelSupport modelSupport = ExplorerModelSupport.sharedInstance();
-        ExplorerNode<GlassFishRoot> parent = modelSupport.getNodeFor(dataSource.getGlassFishRoot());
-        modelSupport.addNode(newNode, parent);
-        nodesCache.put(dataSource, newNode);
-        
-        dataSource.notifyWhenFinished(new DataFinishedListener() {
-            public void dataFinished(Object dataSource) { 
-                nodesCache.remove(dataSource);
-                ExplorerModelSupport.sharedInstance().removeNode(newNode);   
-            }
-        });
-        
-        return newNode;
-    }
-    
-    abstract protected GlassFishApplicationNode<T> createNewNode(T dataSource);
+public abstract class GlassFishApplicationNodeBuilder/*<T extends GlassFishApplication> implements ExplorerNodeBuilder<T>*/{
+//    private final Map<T, GlassFishApplicationNode<T>> nodesCache = new ConcurrentHashMap<T, GlassFishApplicationNode<T>>();
+//    
+//    public ExplorerNode<T> getNodeFor(T dataSource) {
+//        if (nodesCache.containsKey(dataSource)) {
+//            return nodesCache.get(dataSource);
+//        }
+//        final GlassFishApplicationNode<T> newNode = createNewNode(dataSource);
+//        ExplorerModelSupport modelSupport = ExplorerModelSupport.sharedInstance();
+//        ExplorerNode<GlassFishRoot> parent = modelSupport.getNodeFor(dataSource.getGlassFishRoot());
+//        modelSupport.addNode(newNode, parent);
+//        nodesCache.put(dataSource, newNode);
+//        
+//        dataSource.notifyWhenFinished(new DataFinishedListener() {
+//            public void dataFinished(Object dataSource) { 
+//                nodesCache.remove(dataSource);
+//                ExplorerModelSupport.sharedInstance().removeNode(newNode);   
+//            }
+//        });
+//        
+//        return newNode;
+//    }
+//    
+//    abstract protected GlassFishApplicationNode<T> createNewNode(T dataSource);
 }

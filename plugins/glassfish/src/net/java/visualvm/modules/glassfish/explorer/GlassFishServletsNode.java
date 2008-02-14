@@ -25,14 +25,14 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.explorer.DefaultExplorerNode;
+//import com.sun.tools.visualvm.core.explorer.DefaultExplorerNode;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletsNode extends DefaultExplorerNode {
-    public GlassFishServletsNode() {
-        super("Servlets", null);
-    }
+public class GlassFishServletsNode/* extends DefaultExplorerNode */{
+//    public GlassFishServletsNode() {
+//        super("Servlets", null);
+//    }
 }

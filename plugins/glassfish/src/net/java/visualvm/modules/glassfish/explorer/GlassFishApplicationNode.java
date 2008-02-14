@@ -25,19 +25,19 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
-import org.openide.util.Utilities;
+//import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
+//import javax.swing.Icon;
+//import javax.swing.ImageIcon;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
+//import org.openide.util.Utilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class GlassFishApplicationNode<T extends GlassFishApplication> extends DataSourceExplorerNode<T> {    
-    public GlassFishApplicationNode(T dataSource, Icon icon) {
-        super(dataSource.getName(), icon, dataSource);
-    }
+public abstract class GlassFishApplicationNode/*<T extends GlassFishApplication> extends DataSourceExplorerNode<T>*/ {    
+//    public GlassFishApplicationNode(T dataSource, Icon icon) {
+//        super(dataSource.getName(), icon, dataSource);
+//    }
 }

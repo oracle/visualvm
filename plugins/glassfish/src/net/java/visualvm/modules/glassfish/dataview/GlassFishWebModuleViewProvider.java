@@ -37,7 +37,7 @@ import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
@@ -52,7 +52,6 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
-import net.java.visualvm.modules.glassfish.explorer.GlassFishApplicationNode;
 import net.java.visualvm.modules.glassfish.ui.Chart;
 import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
@@ -122,7 +121,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             generalDataScroll.setBorder(BorderFactory.createEmptyBorder());
             generalDataScroll.setOpaque(false);
             
-            JLabel appLink = new JLabel("<html><body><h2>Application hosted by <a href=\"#\">" + ExplorerModelSupport.sharedInstance().getNodeFor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>");
+            JLabel appLink = new JLabel("<html><body><h2>Application hosted by <a href=\"#\">" + DataSourceDescriptorFactory.getDescriptor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>");
             appLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
             appLink.addMouseListener(new MouseAdapter() {
                 @Override

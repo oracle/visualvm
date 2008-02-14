@@ -25,19 +25,19 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
-import org.openide.util.Utilities;
+//import javax.swing.Icon;
+//import javax.swing.ImageIcon;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
+//import org.openide.util.Utilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishWebModuleNode extends GlassFishApplicationNode<GlassFishWebModule> {
-    private static final Icon NODE_ICON = new ImageIcon(Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png", true));
-    public GlassFishWebModuleNode(GlassFishWebModule dataSource) {
-        super(dataSource, NODE_ICON);
-    }
+public class GlassFishWebModuleNode /*extends GlassFishApplicationNode<GlassFishWebModule>*/ {
+//    private static final Icon NODE_ICON = new ImageIcon(Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png", true));
+//    public GlassFishWebModuleNode(GlassFishWebModule dataSource) {
+//        super(dataSource, NODE_ICON);
+//    }
     
 }

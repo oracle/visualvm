@@ -25,22 +25,22 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
+//import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishWebModuleNodeBuilder extends GlassFishApplicationNodeBuilder<GlassFishWebModule> {
+public class GlassFishWebModuleNodeBuilder /*extends GlassFishApplicationNodeBuilder<GlassFishWebModule>*/ {
 
-    @Override
-    protected GlassFishApplicationNode<GlassFishWebModule> createNewNode(GlassFishWebModule dataSource) {
-        return new GlassFishWebModuleNode(dataSource);
-    }
-    
-    public void initialize() {
-        ExplorerModelSupport.sharedInstance().addBuilder(this, GlassFishWebModule.class);
-    }
+//    @Override
+//    protected GlassFishApplicationNode<GlassFishWebModule> createNewNode(GlassFishWebModule dataSource) {
+//        return new GlassFishWebModuleNode(dataSource);
+//    }
+//    
+//    public void initialize() {
+//        ExplorerModelSupport.sharedInstance().addBuilder(this, GlassFishWebModule.class);
+//    }
     
 }

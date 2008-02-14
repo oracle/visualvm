@@ -25,24 +25,24 @@
 
 package net.java.visualvm.modules.glassfish.explorer;
 
-import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
-import org.openide.util.Utilities;
+//import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
+//import javax.swing.Icon;
+//import javax.swing.ImageIcon;
+//import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
+//import org.openide.util.Utilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletNode extends DataSourceExplorerNode<GlassFishServlet> {
-    private static final Icon NODE_ICON = new ImageIcon(Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png", true));
-    
-    public GlassFishServletNode(GlassFishServlet dataSource) {
-        this(dataSource.getName(), NODE_ICON, dataSource);
-    }
-
-    public GlassFishServletNode(String name, Icon icon, GlassFishServlet dataSource) {
-        super(name, icon, dataSource);
-    }
+public class GlassFishServletNode/* extends DataSourceExplorerNode<GlassFishServlet> */{
+//    private static final Icon NODE_ICON = new ImageIcon(Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png", true));
+//    
+//    public GlassFishServletNode(GlassFishServlet dataSource) {
+//        this(dataSource.getName(), NODE_ICON, dataSource);
+//    }
+//
+//    public GlassFishServletNode(String name, Icon icon, GlassFishServlet dataSource) {
+//        super(name, icon, dataSource);
+//    }
 }
