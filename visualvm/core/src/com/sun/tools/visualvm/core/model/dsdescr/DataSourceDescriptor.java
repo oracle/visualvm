@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.model.dsdescr;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
@@ -34,7 +35,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public interface DataSourceDescriptor {
+public interface DataSourceDescriptor<X extends DataSource> {
     
     public static final int POSITION_AT_THE_END = Integer.MAX_VALUE;
     

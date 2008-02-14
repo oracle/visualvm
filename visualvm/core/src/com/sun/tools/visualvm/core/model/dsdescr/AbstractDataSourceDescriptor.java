@@ -37,7 +37,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public abstract class AbstractDataSourceDescriptor implements DataSourceDescriptor {
+public abstract class AbstractDataSourceDescriptor<X extends DataSource> implements DataSourceDescriptor<X> {
     
     private final PropertyChangeSupport changeSupport;
     
@@ -47,14 +47,15 @@ public abstract class AbstractDataSourceDescriptor implements DataSourceDescript
     private int preferredPosition;
     
     
-    public AbstractDataSourceDescriptor(DataSource dataSource) {
+    public AbstractDataSourceDescriptor(X dataSource) {
         this(dataSource, dataSource.toString(), null, null, POSITION_AT_THE_END);
     }
     
-    public AbstractDataSourceDescriptor(DataSource dataSource, String name, String description, Image icon, int preferredPosition) {
+    public AbstractDataSourceDescriptor(X dataSource, String name, String description, Image icon, int preferredPosition) {
         if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null");
         
         changeSupport = new PropertyChangeSupport(dataSource);
+        registerChangeListeners(dataSource);
         
         setName(name);
         setDescription(description);
@@ -134,6 +135,9 @@ public abstract class AbstractDataSourceDescriptor implements DataSourceDescript
         int oldPosition = preferredPosition;
         preferredPosition = newPosition;
         changeSupport.firePropertyChange(PROPERTY_ICON, oldPosition, newPosition);
+    }
+    
+    protected void registerChangeListeners(X dataSource) {
     }
 
 }
