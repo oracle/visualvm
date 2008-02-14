@@ -38,35 +38,35 @@ import java.util.WeakHashMap;
  *
  * @author Tomas Hurka
  */
-public abstract class ModelFactory<M extends Model,B extends DataSource> {
+public abstract class ModelFactory<M extends Model,D extends DataSource> {
 
-  private SortedSet<ModelProvider<M, B>> factories = new TreeSet(new SubModelFactoryComparator());
-  private Map<B,Reference<M>> modelMap = new WeakHashMap();
+  private SortedSet<ModelProvider<M, D>> factories = new TreeSet(new ModelProviderComparator());
+  private Map<D, Reference<M>> modelMap = new WeakHashMap();
 
-  public final synchronized M getModel(B app) {
-    Reference<M> modelRef = modelMap.get(app);
+  public final synchronized M getModel(D dataSource) {
+    Reference<M> modelRef = modelMap.get(dataSource);
     if (modelRef != null) {
-      M jvm = modelRef.get();
-      if (jvm != null) {
-        return jvm;
+      M model = modelRef.get();
+      if (model != null) {
+        return model;
       }
     }
-    for (ModelProvider<M, B> factory : factories) {
-      M model = factory.createModelFor(app);
+    for (ModelProvider<M, D> factory : factories) {
+      M model = factory.createModelFor(dataSource);
       if (model != null) {
-        modelMap.put(app,new SoftReference(model));
+        modelMap.put(dataSource,new SoftReference(model));
         return model;
       }
     }
     return null;
   }
   
-  public final synchronized void registerFactory(ModelProvider<M, B> newFactory) {
+  public final synchronized void registerFactory(ModelProvider<M, D> newFactory) {
     clearCache();
     factories.add(newFactory);
   }
   
-  public final synchronized boolean unregisterFactory(ModelProvider<M, B> oldFactory) {
+  public final synchronized boolean unregisterFactory(ModelProvider<M, D> oldFactory) {
    clearCache();
    return factories.remove(oldFactory);
   }
@@ -79,9 +79,9 @@ public abstract class ModelFactory<M extends Model,B extends DataSource> {
     if (!modelMap.isEmpty()) modelMap = new WeakHashMap();
   }
   
-  private class SubModelFactoryComparator implements Comparator<ModelProvider<M,B>> {
+  private class ModelProviderComparator implements Comparator<ModelProvider<M,D>> {
 
-    public int compare(ModelProvider<M, B> factory1, ModelProvider<M, B> factory2) {
+    public int compare(ModelProvider<M, D> factory1, ModelProvider<M, D> factory2) {
       int thisVal = factory1.depth();
       int anotherVal = factory2.depth();
 
