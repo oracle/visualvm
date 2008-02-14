@@ -70,8 +70,11 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
+import javax.management.Notification;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -248,7 +251,8 @@ public class JmxModel extends Model {
         return null;
     }
 
-    static class ProxyClient {
+    static class ProxyClient implements NotificationListener {
+
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;
         private volatile boolean isDead = true;
         private String hostName = null;
@@ -454,8 +458,8 @@ public class JmxModel extends Model {
         }
 
         private void setConnectionState(ConnectionState state) {
-            ConnectionState oldState = this.connectionState;
-            this.connectionState = state;
+            ConnectionState oldState = connectionState;
+            connectionState = state;
             model.propertyChangeSupport.firePropertyChange(
                     JmxModel.CONNECTION_STATE_PROPERTY, oldState, state);
         }
@@ -483,10 +487,10 @@ public class JmxModel extends Model {
 
         private void tryConnect() throws IOException {
             if (jmxUrl == null && "localhost".equals(hostName) && port == 0) {
-                this.jmxc = null;
+                jmxc = null;
                 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                this.conn = mbs;
-                this.cachedConn = Snapshot.newSnapshot(mbs);
+                conn = mbs;
+                cachedConn = Snapshot.newSnapshot(mbs);
             } else {
                 if (lvm != null) {
                     if (!lvm.isManageable()) {
@@ -496,8 +500,8 @@ public class JmxModel extends Model {
                             throw new IOException(lvm + " not manageable");
                         }
                     }
-                    if (this.jmxUrl == null) {
-                        this.jmxUrl = new JMXServiceURL(lvm.connectorAddress());
+                    if (jmxUrl == null) {
+                        jmxUrl = new JMXServiceURL(lvm.connectorAddress());
                     }
                 }
                 // Need to pass in credentials ?
@@ -507,10 +511,13 @@ public class JmxModel extends Model {
                         if (stub == null) {
                             checkSslConfig();
                         }
-                        this.jmxc = new RMIConnector(stub, null);
+                        jmxc = new RMIConnector(stub, null);
+                        jmxc.addConnectionNotificationListener(this, null, null);
                         jmxc.connect();
                     } else {
-                        this.jmxc = JMXConnectorFactory.connect(jmxUrl);
+                        jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, null);
+                        jmxc.addConnectionNotificationListener(this, null, null);
+                        jmxc.connect();
                     }
                 } else {
                     Map<String, String[]> env = new HashMap<String, String[]>();
@@ -521,17 +528,20 @@ public class JmxModel extends Model {
                         if (stub == null) {
                             checkSslConfig();
                         }
-                        this.jmxc = new RMIConnector(stub, null);
+                        jmxc = new RMIConnector(stub, null);
+                        jmxc.addConnectionNotificationListener(this, null, null);
                         jmxc.connect(env);
                     } else {
-                        this.jmxc = JMXConnectorFactory.connect(jmxUrl, env);
+                        jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
+                        jmxc.addConnectionNotificationListener(this, null, null);
+                        jmxc.connect(env);
                     }
                 }
                 MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
-                this.conn = Checker.newChecker(this, mbsc);
-                this.cachedConn = Snapshot.newSnapshot(conn);
+                conn = Checker.newChecker(this, mbsc);
+                cachedConn = Snapshot.newSnapshot(conn);
             }
-            this.isDead = false;
+            isDead = false;
         }
 
         public static String getConnectionName(LocalVirtualMachine lvm) {
@@ -608,7 +618,13 @@ public class JmxModel extends Model {
                 try {
                     jmxc.close();
                 } catch (IOException e) {
-                // Ignore ???
+                    // Ignore...
+                } finally {
+                    try {
+                        jmxc.removeConnectionNotificationListener(this);
+                    } catch (Exception e) {
+                        // Ignore...
+                    }
                 }
             }
             // Set connection state to DISCONNECTED
@@ -628,6 +644,14 @@ public class JmxModel extends Model {
 
         boolean isConnected() {
             return !isDead();
+        }
+
+        public void handleNotification(Notification n, Object hb) {
+            if (n instanceof JMXConnectionNotification) {
+                if (JMXConnectionNotification.FAILED.equals(n.getType())) {
+                    markAsDead();
+                }
+            }
         }
     }
 
@@ -779,8 +803,7 @@ public class JmxModel extends Model {
 
         public static MBeanServerConnection newChecker(
                 ProxyClient client, MBeanServerConnection mbsc) {
-            final InvocationHandler ih =
-                    new CheckerInvocationHandler(client, mbsc);
+            final InvocationHandler ih = new CheckerInvocationHandler(mbsc);
             return (MBeanServerConnection) Proxy.newProxyInstance(
                     Checker.class.getClassLoader(),
                     new Class[]{MBeanServerConnection.class},
@@ -790,12 +813,9 @@ public class JmxModel extends Model {
 
     static class CheckerInvocationHandler implements InvocationHandler {
 
-        private final ProxyClient client;
         private final MBeanServerConnection conn;
 
-        CheckerInvocationHandler(
-                ProxyClient client, MBeanServerConnection conn) {
-            this.client = client;
+        CheckerInvocationHandler(MBeanServerConnection conn) {
             this.conn = conn;
         }
 
@@ -811,11 +831,7 @@ public class JmxModel extends Model {
             try {
                 return method.invoke(conn, args);
             } catch (InvocationTargetException e) {
-                Throwable t = e.getCause();
-                if (t instanceof IOException) {
-                    client.markAsDead();
-                }
-                throw t;
+                throw e.getCause();
             }
         }
     }
