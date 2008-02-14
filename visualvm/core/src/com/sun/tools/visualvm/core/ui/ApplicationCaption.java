@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.core.ui;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -62,7 +62,7 @@ class ApplicationCaption extends JPanel {
         });
         
         setRunning(application.getState() == DataSource.STATE_AVAILABLE);
-        setApplicationName(ExplorerModelSupport.sharedInstance().getNodeFor(application).getName());
+        setApplicationName(DataSourceDescriptorFactory.getDescriptor(application).getName());
         setApplicationPid(-1); // TODO: provide PID once name doesn't contain it
 //        setApplicationIcon(new ImageIcon(ApplicationTypeFactory.getApplicationTypeFor(application).getIcon()));
     }

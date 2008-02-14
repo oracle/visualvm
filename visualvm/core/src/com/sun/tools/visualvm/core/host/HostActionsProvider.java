@@ -61,7 +61,7 @@ class HostActionsProvider {
         }
         
         public void actionPerformed(ActionEvent e) {
-            HostDescriptor hostDescriptor = HostUtils.defineHost();
+            HostProperties hostDescriptor = HostUtils.defineHost();
             if (hostDescriptor != null) HostsSupport.getInstance().getHostProvider().createHost(hostDescriptor, true);
         }
         
@@ -75,7 +75,7 @@ class HostActionsProvider {
         
         public void actionPerformed(ActionEvent e) {
             Host host = (Host)e.getSource();
-            HostDescriptor hostDescriptor = HostUtils.renameHost(host);
+            HostProperties hostDescriptor = HostUtils.renameHost(host);
             if (hostDescriptor != null) host.setDisplayName(hostDescriptor.getDisplayName());
         }
         

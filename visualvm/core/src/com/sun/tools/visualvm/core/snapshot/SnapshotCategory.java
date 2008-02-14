@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.Snapshot;
+import java.io.File;
 
 
 /**
@@ -79,7 +80,7 @@ public abstract class SnapshotCategory<X extends Snapshot> {
      * 
      * @return prefix of files containing the snapshots.
      */
-    public String getPrefix() {
+    protected String getPrefix() {
         return prefix;
     }
     
@@ -88,8 +89,14 @@ public abstract class SnapshotCategory<X extends Snapshot> {
      * 
      * @return suffix of files containing the snapshots.
      */
-    public String getSuffix() {
+    protected String getSuffix() {
         return suffix;
+    }
+    
+    protected boolean isSnapshot(File file) {
+        if (!file.isFile()) return false;
+        String fileName = file.getName();
+        return fileName.startsWith(prefix) && fileName.endsWith(suffix);
     }
     
     /**
@@ -97,7 +104,11 @@ public abstract class SnapshotCategory<X extends Snapshot> {
      * 
      * @return unique name for a new snapshot.
      */
-    public String createSnapshotName() {
+    public String createFileName() {
         return getPrefix() + System.currentTimeMillis() + getSuffix();
+    }
+    
+    public String getDisplayName(X snapshot) {
+        return snapshot.toString();
     }
 }

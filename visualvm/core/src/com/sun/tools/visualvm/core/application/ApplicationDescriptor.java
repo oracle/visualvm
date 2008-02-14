@@ -42,9 +42,5 @@ public class ApplicationDescriptor extends AbstractDataSourceDescriptor<Applicat
         setDescription(ApplicationTypeFactory.getApplicationTypeFor(application).getDescription());
         setIcon(ApplicationTypeFactory.getApplicationTypeFor(application).getIcon());
     }
-    
-    protected void registerChangeListeners(Application application) {
-        // TODO: register PropertyChangeListener for the application
-    }
 
 }

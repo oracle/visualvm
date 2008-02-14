@@ -60,7 +60,6 @@ public class HostsSupport {
         
         new RemoteHostsContainerSupport().initialize();
 
-        new HostNodeBuilder().initialize();
         new HostActionsProvider().initialize();
         
         new MonitoredHostProvider().initialize();

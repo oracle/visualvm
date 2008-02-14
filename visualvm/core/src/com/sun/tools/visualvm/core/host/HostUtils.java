@@ -53,7 +53,7 @@ class HostUtils extends JPanel {
 
   private boolean internalChange = false;
 
-  public static HostDescriptor defineHost() {
+  public static HostProperties defineHost() {
     HostUtils hc = getInstance();
     hc.setupDefineHost();
     
@@ -63,11 +63,11 @@ class HostUtils extends JPanel {
     d.pack();
     d.setVisible(true);
     
-    if (dd.getValue() == hc.okButton) return new HostDescriptor(hc.getHostName(), hc.getDisplayName());
+    if (dd.getValue() == hc.okButton) return new HostProperties(hc.getHostName(), hc.getDisplayName());
     else return null;
   }
   
-  public static HostDescriptor renameHost(Host host) {
+  public static HostProperties renameHost(Host host) {
     HostUtils hc = getInstance();
     hc.setupRenameHost(host);
     
@@ -77,7 +77,7 @@ class HostUtils extends JPanel {
     d.pack();
     d.setVisible(true);
     
-    if (dd.getValue() == hc.okButton) return new HostDescriptor(hc.getHostName(), hc.getDisplayName());
+    if (dd.getValue() == hc.okButton) return new HostProperties(hc.getHostName(), hc.getDisplayName());
     else return null;
   }
   

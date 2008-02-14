@@ -25,8 +25,21 @@
 
 package com.sun.tools.visualvm.core.model.dsdescr;
 
+import com.sun.tools.visualvm.core.application.ApplicationDescriptor;
+import com.sun.tools.visualvm.core.coredump.CoreDumpDescriptor;
+import com.sun.tools.visualvm.core.coredump.CoreDumpsContainer;
+import com.sun.tools.visualvm.core.coredump.CoreDumpsContainerDescriptor;
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.HeapDump;
+import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasource.ThreadDump;
+import com.sun.tools.visualvm.core.heapdump.HeapDumpDescriptor;
+import com.sun.tools.visualvm.core.host.HostDescriptor;
+import com.sun.tools.visualvm.core.host.RemoteHostsContainer;
+import com.sun.tools.visualvm.core.host.RemoteHostsContainerDescriptor;
+import com.sun.tools.visualvm.core.threaddump.ThreadDumpDescriptor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +57,12 @@ public final class DataSourceDescriptorFactory {
         DataSourceDescriptor descriptor = mapping.get(dataSource);
         if (descriptor == null) {
             if (dataSource instanceof Application) descriptor = new ApplicationDescriptor((Application)dataSource);
+            else if (dataSource instanceof CoreDump) descriptor = new CoreDumpDescriptor((CoreDump)dataSource);
+            else if (dataSource instanceof CoreDumpsContainer) descriptor = new CoreDumpsContainerDescriptor((CoreDumpsContainer)dataSource);
+            else if (dataSource instanceof HeapDump) descriptor = new HeapDumpDescriptor((HeapDump)dataSource);
+            else if (dataSource instanceof ThreadDump) descriptor = new ThreadDumpDescriptor((ThreadDump)dataSource);
+            else if (dataSource instanceof Host) descriptor = new HostDescriptor((Host)dataSource);
+            else if (dataSource instanceof RemoteHostsContainer) descriptor = new RemoteHostsContainerDescriptor((RemoteHostsContainer)dataSource);
             else descriptor = new AbstractDataSourceDescriptor(dataSource) {};
             mapping.put(dataSource, descriptor);
         }

@@ -99,7 +99,6 @@ public class ThreadDumpSupport {
         threadDumpViewProvider = new ThreadDumpViewProvider();
         threadDumpViewProvider.initialize();
         
-        new ThreadDumpNodeBuilder().initialize();
         new ThreadDumpActionsProvider().initialize();
     }
 

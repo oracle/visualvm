@@ -101,7 +101,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     File snapshotDir = coreDump.getStorage();
-                    String name = HeapDumpSupport.getInstance().getCategory().createSnapshotName();
+                    String name = HeapDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
                     SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
                     try {

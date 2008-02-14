@@ -51,7 +51,6 @@ public class ApplicationsSupport {
         jvmstatApplicationProvider = new JvmstatApplicationProvider();
         jvmstatApplicationProvider.initialize();
 
-        new ApplicationNodeBuilder().initialize();
         new ApplicationActionsProvider().initialize();
         
         new JmxApplicationProvider().initialize();

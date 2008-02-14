@@ -94,7 +94,6 @@ public class HeapDumpSupport {
         heapDumpViewProvider = new HeapDumpViewProvider();
         heapDumpViewProvider.initialize();
 
-        new HeapDumpNodeBuilder().initialize();
         new HeapDumpActionsProvider().initialize();
     }
 

@@ -25,12 +25,9 @@
 
 package com.sun.tools.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
-import com.sun.tools.visualvm.core.explorer.ExplorerNode;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,21 +113,9 @@ public class DataSourceWindowFactory {
                     for (DataSourceView view : views) window.addView(view);
 
                     // Decorate the window according to the DataSource
-                    // TODO: Implement using DataSourceTypeFactory
-                    if (dataSource instanceof Application) {
-                        Application application = (Application)dataSource;
-                        ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
-                        if (applicationType != null) {
-                            window.setName(applicationType.getName());
-                            window.setIcon(applicationType.getIcon());
-                        } else {
-                            ExplorerNode dataSourceNode = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
-                            window.setName(dataSourceNode.getName());
-                        }
-                    } else {
-                        ExplorerNode dataSourceNode = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
-                        window.setName(dataSourceNode.getName());
-                    }
+                    DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+                    window.setName(descriptor.getName());
+                    window.setIcon(descriptor.getIcon());
                 }
             });
         } catch (Exception e) {}

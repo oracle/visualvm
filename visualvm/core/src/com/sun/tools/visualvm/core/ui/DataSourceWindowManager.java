@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+import com.sun.tools.visualvm.core.model.dstype.DataSourceDesciptorFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -88,7 +89,7 @@ public class DataSourceWindowManager {
                     ProgressHandle pHandle = null;
                     try {
                         // Setup progress bar
-                        pHandle = ProgressHandleFactory.createHandle("Opening " + ExplorerModelSupport.sharedInstance().getNodeFor(dataSource).getName() + "...");
+                        pHandle = ProgressHandleFactory.createHandle("Opening " + DataSourceDesciptorFactory.getDataSourceDescriptorFor(dataSource).getName() + "...");
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         

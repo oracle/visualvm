@@ -53,7 +53,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     }
 
 
-    public void createHost(final HostDescriptor hostDescriptor, final boolean interactive) {
+    public void createHost(final HostProperties hostDescriptor, final boolean interactive) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 createHostImpl(hostDescriptor, interactive);
@@ -73,7 +73,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     }
     
     
-    private void createHostImpl(HostDescriptor hostDescriptor, boolean interactive) {
+    private void createHostImpl(HostProperties hostDescriptor, boolean interactive) {
         final String hostName = hostDescriptor.getHostName();
         HostImpl newHost = null;
         ProgressHandle pHandle = null;

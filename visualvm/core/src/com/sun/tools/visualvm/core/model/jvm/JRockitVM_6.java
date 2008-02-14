@@ -82,7 +82,7 @@ public class JRockitVM_6 extends JRockitVM {
   public File takeThreadDump() throws IOException {
     String dump = getStackTrace();
     File snapshotDir = application.getStorage();
-    String name = ThreadDumpSupport.getInstance().getCategory().createSnapshotName();
+    String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
     File dumpFile = new File(snapshotDir,name);
     OutputStream os = new FileOutputStream(dumpFile);
     os.write(dump.getBytes("UTF-8"));

@@ -27,10 +27,7 @@ package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
 /**
  * Class for accessing the explorer tree.
@@ -57,75 +54,13 @@ public class ExplorerSupport {
 
 
     /**
-     * Returns a TreePath instance of given ExplorerNode.
-     * 
-     * @param node ExplorerNode to get the TreePath for.
-     * @return TreePath instance of given ExplorerNode.
-     */
-    public TreePath getTreePath(ExplorerNode node) {
-        return new TreePath(mainTreeModel.getPathToRoot(node));
-    }
-
-    /**
-     * Expands given ExplorerNode in explorer tree.
-     * 
-     * @param node ExplorerNode to be expanded.
-     */
-    public void expandNode(final ExplorerNode node) {
-        SwingUtilities.invokeLater(new Runnable() {
-           public void run() { mainTree.expandPath(getTreePath(node)); } 
-        });
-    }
-    
-    /**
-     * Collapses given ExplorerNode in explorer tree.
-     * 
-     * @param node ExplorerNode to be collapsed.
-     */
-    public void collapseNode(final ExplorerNode node) {
-        SwingUtilities.invokeLater(new Runnable() {
-           public void run() { mainTree.collapsePath(getTreePath(node)); } 
-        });
-    }
-    
-    /**
-     * Returns true if given ExplorerNode appears expanded in explorer tree, false otherwise.
-     * 
-     * @param node ExplorerNode to get the expansion state for.
-     * @return true if given ExplorerNode appears expanded in explorer tree, false otherwise.
-     */
-    public boolean isNodeExpanded(ExplorerNode node) {
-        return mainTree.isExpanded(getTreePath(node));
-    }
-    
-    /**
      * Selects an ExplorerNode representing given DataSource in explorer tree.
      * 
      * @param dataSource DataSource to be selected.
      */
     public void selectDataSource(DataSource dataSource) {
-        ExplorerNode node = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
-        if (node != null) selectNode(node);
-    }
-    
-    /**
-     * Selects given ExplorerNode in explorer tree.
-     * 
-     * @param node ExplorerNode to be selected.
-     */
-    public void selectNode(final ExplorerNode node) {
-        SwingUtilities.invokeLater(new Runnable() {
-           public void run() { getTreeSelectionModel().setSelectionPath(getTreePath(node)); } 
-        });
-    }
-    
-    /**
-     * Returns TreeSelectionModel of explorer tree.
-     * 
-     * @return TreeSelectionModel of explorer tree.
-     */
-    public TreeSelectionModel getTreeSelectionModel() {
-        return mainTree.getSelectionModel();
+//        ExplorerNode node = ExplorerModelSupport.sharedInstance().getNodeFor(dataSource);
+//        if (node != null) selectNode(node);
     }
     
     /**
@@ -137,8 +72,8 @@ public class ExplorerSupport {
             
     
     private ExplorerSupport() {
-        mainTree = ExplorerUI.instance().getTree();
-        mainTreeModel = ExplorerModelSupport.sharedInstance().getExplorerModel();
+//        mainTree = ExplorerUI.instance().getTree();
+//        mainTreeModel = ExplorerModelSupport.sharedInstance().getExplorerModel();
         OpenDataSourceSupport.getInstance().initialize();
     }
 

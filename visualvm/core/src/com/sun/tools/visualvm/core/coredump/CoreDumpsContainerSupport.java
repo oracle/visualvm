@@ -33,8 +33,7 @@ import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
  *
  * @author Jiri Sedlacek
  */
-// TODO: define DataSourceDescriptor for CoreDumpsContainer
-public class CoreDumpsContainerSupport extends DefaultDataSourceProvider<CoreDumpsContainer> {
+class CoreDumpsContainerSupport extends DefaultDataSourceProvider<CoreDumpsContainer> {
     
     private void initContainer() {
         CoreDumpsContainer container = CoreDumpsContainer.sharedInstance();
@@ -42,9 +41,10 @@ public class CoreDumpsContainerSupport extends DefaultDataSourceProvider<CoreDum
         registerDataSource(container);
     }
     
-    void register() {
-        initContainer();
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+    static void register() {
+        CoreDumpsContainerSupport support = new CoreDumpsContainerSupport();
+        support.initContainer();
+        DataSourceRepository.sharedInstance().addDataSourceProvider(support);
     }
 
 }

@@ -30,11 +30,18 @@ package com.sun.tools.visualvm.core.coredump;
  * @author Tomas Hurka
  */
 public class CoreDumpSupport {
+    
+    private static final CoreDumpCategory category = new CoreDumpCategory();
+    
+    
+    static CoreDumpCategory getCategory() {
+        return category;
+    }
 
+    
     public static void register() {
-        new CoreDumpsContainerSupport().register();
+        CoreDumpsContainerSupport.register();
         CoreDumpProvider.register();
-        CoreDumpNodeBuilder.register();
         CoreDumpActionsProvider.register();
     }
 

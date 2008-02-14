@@ -103,7 +103,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     File snapshotDir = coreDump.getStorage();
-                    String name = ThreadDumpSupport.getInstance().getCategory().createSnapshotName();
+                    String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
                     SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
                     String dump = saAget.takeThreadDump();

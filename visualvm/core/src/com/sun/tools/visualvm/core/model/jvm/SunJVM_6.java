@@ -153,7 +153,7 @@ public class SunJVM_6 extends SunJVM_5 {
 
   public File takeHeapDump() throws IOException {
     File snapshotDir = application.getStorage();
-    String name = HeapDumpSupport.getInstance().getCategory().createSnapshotName();
+    String name = HeapDumpSupport.getInstance().getCategory().createFileName();
     File dumpFile = new File(snapshotDir,name);
     String dump = takeHeapDump(dumpFile.getAbsolutePath());
     System.out.println("Dump "+dump);
@@ -167,7 +167,7 @@ public class SunJVM_6 extends SunJVM_5 {
   public File takeThreadDump() throws IOException {
     String dump = getStackTrace();
     File snapshotDir = application.getStorage();
-    String name = ThreadDumpSupport.getInstance().getCategory().createSnapshotName();
+    String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
     File dumpFile = new File(snapshotDir,name);
     OutputStream os = new FileOutputStream(dumpFile);
     os.write(dump.getBytes("UTF-8"));
