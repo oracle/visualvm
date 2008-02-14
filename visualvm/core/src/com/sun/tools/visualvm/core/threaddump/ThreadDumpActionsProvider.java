@@ -25,9 +25,6 @@
 
 package com.sun.tools.visualvm.core.threaddump;
 
-import com.sun.tools.visualvm.core.explorer.ThreadDumpNode;
-import com.sun.tools.visualvm.core.explorer.ApplicationNode;
-import com.sun.tools.visualvm.core.explorer.CoreDumpNode;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
@@ -46,24 +43,27 @@ import javax.swing.AbstractAction;
  * @author Jiri Sedlacek
  */
 class ThreadDumpActionsProvider {
+    
+    private final TakeApplicationThreadDumpAction takeApplicationThreadDumpAction = new TakeApplicationThreadDumpAction();
+    private final TakeCoreDumpThreadDumpAction takeCoreDumpThreadDumpAction = new TakeCoreDumpThreadDumpAction();
+    private final DeleteThreadDumpAction deleteThreadDumpAction = new DeleteThreadDumpAction();
+    
 
-   void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationNodeActionProvider(), ApplicationNode.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpNodeActionProvider(), CoreDumpNode.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ThreadDumpNodeActionProvider(), ThreadDumpNode.class);
+    void initialize() {
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationNodeActionProvider(), Application.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpNodeActionProvider(), CoreDump.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ThreadDumpNodeActionProvider(), ThreadDumpImpl.class);
     }    
     
     
     private class TakeApplicationThreadDumpAction extends AbstractAction {
         
-        private Application application;
-        
-        public TakeApplicationThreadDumpAction(Application application) {
+        public TakeApplicationThreadDumpAction() {
             super("Thread Dump");
-            this.application = application;
         }
         
         public void actionPerformed(ActionEvent e) {
+            Application application = (Application)e.getSource();
             ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
         }
         
@@ -71,14 +71,12 @@ class ThreadDumpActionsProvider {
     
     private class TakeCoreDumpThreadDumpAction extends AbstractAction {
         
-        private CoreDump coreDump;
-        
-        public TakeCoreDumpThreadDumpAction(CoreDump coreDump) {
+        public TakeCoreDumpThreadDumpAction() {
             super("Thread Dump");
-            this.coreDump = coreDump;
         }
         
         public void actionPerformed(ActionEvent e) {
+            CoreDump coreDump = (CoreDump)e.getSource();
             ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
         }
         
@@ -86,59 +84,55 @@ class ThreadDumpActionsProvider {
     
     private class DeleteThreadDumpAction extends AbstractAction {
         
-        private ThreadDumpImpl threadDump;
-        
-        public DeleteThreadDumpAction(ThreadDumpImpl threadDump) {
+        public DeleteThreadDumpAction() {
             super("Delete");
-            this.threadDump = threadDump;
         }
         
         public void actionPerformed(ActionEvent e) {
+            ThreadDumpImpl threadDump = (ThreadDumpImpl)e.getSource();
             ThreadDumpSupport.getInstance().getThreadDumpProvider().deleteThreadDump(threadDump);
         }
         
     }
     
-    private class ApplicationNodeActionProvider implements ExplorerActionsProvider<ApplicationNode> {
+    private class ApplicationNodeActionProvider implements ExplorerActionsProvider<Application> {
 
-        public ExplorerActionDescriptor getDefaultAction(ApplicationNode node) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(ApplicationNode node) {
+        public List<ExplorerActionDescriptor> getActions(Application application) {
             List<ExplorerActionDescriptor> actions = new LinkedList();
             
-            Application application = node.getDataSource();
             JVM jvm = JVMFactory.getJVMFor(application);
             if (jvm.isTakeThreadDumpSupported())
-                actions.add(new ExplorerActionDescriptor(new TakeApplicationThreadDumpAction(node.getDataSource()), 10));
+                actions.add(new ExplorerActionDescriptor(takeApplicationThreadDumpAction, 10));
             
             return actions;
         }
         
     }
     
-    private class CoreDumpNodeActionProvider implements ExplorerActionsProvider<CoreDumpNode> {
+    private class CoreDumpNodeActionProvider implements ExplorerActionsProvider<CoreDump> {
 
-        public ExplorerActionDescriptor getDefaultAction(CoreDumpNode node) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(CoreDump coreDump) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(CoreDumpNode node) {
+        public List<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
             List<ExplorerActionDescriptor> actions = new LinkedList();
             
-            actions.add(new ExplorerActionDescriptor(new TakeCoreDumpThreadDumpAction(node.getDataSource()), 10));
+            actions.add(new ExplorerActionDescriptor(takeCoreDumpThreadDumpAction, 10));
             
             return actions;
         }
         
     }
     
-    private class ThreadDumpNodeActionProvider implements ExplorerActionsProvider<ThreadDumpNode> {
+    private class ThreadDumpNodeActionProvider implements ExplorerActionsProvider<ThreadDumpImpl> {
 
-        public ExplorerActionDescriptor getDefaultAction(ThreadDumpNode node) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(ThreadDumpImpl threadDump) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(ThreadDumpNode node) {
+        public List<ExplorerActionDescriptor> getActions(ThreadDumpImpl threadDump) {
             List<ExplorerActionDescriptor> actions = new LinkedList();
             
-            if (node.getDataSource() instanceof ThreadDumpImpl)
-                actions.add(new ExplorerActionDescriptor(new DeleteThreadDumpAction((ThreadDumpImpl)node.getDataSource()), 10));
+            actions.add(new ExplorerActionDescriptor(deleteThreadDumpAction, 10));
             
             return actions;
         }

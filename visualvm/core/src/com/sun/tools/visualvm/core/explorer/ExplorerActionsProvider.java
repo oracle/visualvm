@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.explorer;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ import java.util.List;
  *
  * @author Jiri Sedlacek
  */
-public interface ExplorerActionsProvider <T extends ExplorerNode> {
+public interface ExplorerActionsProvider <T extends DataSource> {
 
     /**
      * Returns ExplorerActionDescriptor describing the default action for given ExplorerNode.
@@ -44,7 +45,7 @@ public interface ExplorerActionsProvider <T extends ExplorerNode> {
      * @param node ExplorerNode for which to display the action,
      * @return ExplorerActionDescriptor describing the default action for given ExplorerNode.
      */
-    public ExplorerActionDescriptor getDefaultAction(T node);
+    public ExplorerActionDescriptor getDefaultAction(T dataSource);
 
     /**
      * Returns list of ExplorerActionDesctiptors describing actions for given ExplorerNode.
@@ -54,6 +55,6 @@ public interface ExplorerActionsProvider <T extends ExplorerNode> {
      * @param node ExplorerNode for which to display the actions,
      * @return list of ExplorerActionDesctiptors describing actions for given ExplorerNode.
      */
-    public List<ExplorerActionDescriptor> getActions(T node);
+    public List<ExplorerActionDescriptor> getActions(T dataSource);
 
 }

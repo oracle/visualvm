@@ -25,12 +25,11 @@
 
 package com.sun.tools.visualvm.core.host;
 
-import com.sun.tools.visualvm.core.explorer.HostNode;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.core.explorer.ExplorerRoot;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -43,13 +42,15 @@ import javax.swing.AbstractAction;
  */
 class HostActionsProvider {
 
+    private final RenameHostAction renameHostAction = new RenameHostAction();
     private final AddNewHostAction addNewHostAction = new AddNewHostAction();
+    private final RemoveHostAction removeHostAction = new RemoveHostAction();
 
 
     void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HostNodeActionProvider(), HostNode.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HostsNodeActionProvider(), RemoteHostsNode.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new RootNodeActionProvider(), ExplorerRoot.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HostActionProvider(), Host.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);
     }    
     
     
@@ -68,14 +69,12 @@ class HostActionsProvider {
     
     private class RenameHostAction extends AbstractAction {
         
-        private Host host;
-        
-        public RenameHostAction(Host host) {
+        public RenameHostAction() {
             super("Rename...");
-            this.host = host;
         }
         
         public void actionPerformed(ActionEvent e) {
+            Host host = (Host)e.getSource();
             HostDescriptor hostDescriptor = HostUtils.renameHost(host);
             if (hostDescriptor != null) host.setDisplayName(hostDescriptor.getDisplayName());
         }
@@ -84,45 +83,42 @@ class HostActionsProvider {
     
     private class RemoveHostAction extends AbstractAction {
         
-        private HostImpl host;
-        
-        public RemoveHostAction(HostImpl host) {
+        public RemoveHostAction() {
             super("Remove");
-            this.host = host;
         }
         
         public void actionPerformed(ActionEvent e) {
+            HostImpl host = (HostImpl)e.getSource();
             HostsSupport.getInstance().getHostProvider().removeHost(host, true);
         }
         
     }
     
     
-    private class HostNodeActionProvider implements ExplorerActionsProvider<HostNode> {
+    private class HostActionProvider implements ExplorerActionsProvider<Host> {
         
-        public ExplorerActionDescriptor getDefaultAction(HostNode hostNode) {
+        public ExplorerActionDescriptor getDefaultAction(Host host) {
             return null;
         }
 
-        public List<ExplorerActionDescriptor> getActions(HostNode hostNode) {
-            Host host = hostNode.getHost();
+        public List<ExplorerActionDescriptor> getActions(Host host) {
             if (host == null || host == Host.LOCALHOST) return Collections.EMPTY_LIST;
             
             List<ExplorerActionDescriptor> actions = new LinkedList();
 
-            actions.add(new ExplorerActionDescriptor(new RenameHostAction(host), 10));
+            actions.add(new ExplorerActionDescriptor(renameHostAction, 10));
             
-            if (host instanceof HostImpl) actions.add(new ExplorerActionDescriptor(new RemoveHostAction((HostImpl)host), 20));
+            if (host instanceof HostImpl) actions.add(new ExplorerActionDescriptor(removeHostAction, 20));
 
             return actions;
         }
     }
     
-    private class HostsNodeActionProvider implements ExplorerActionsProvider<RemoteHostsNode> {
+    private class RemoteHostsContainerActionProvider implements ExplorerActionsProvider<RemoteHostsContainer> {
 
-        public ExplorerActionDescriptor getDefaultAction(RemoteHostsNode node) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(RemoteHostsNode node) {
+        public List<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
             List<ExplorerActionDescriptor> actions = new LinkedList();
             
             actions.add(new ExplorerActionDescriptor(addNewHostAction, 0));
@@ -132,11 +128,11 @@ class HostActionsProvider {
         
     }
     
-    private class RootNodeActionProvider implements ExplorerActionsProvider<ExplorerRoot> {
+    private class DataSourceRootActionProvider implements ExplorerActionsProvider<DataSourceRoot> {
 
-        public ExplorerActionDescriptor getDefaultAction(ExplorerRoot node) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(ExplorerRoot node) {
+        public List<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
             List<ExplorerActionDescriptor> actions = new LinkedList();
             
             actions.add(new ExplorerActionDescriptor(addNewHostAction, 10));

@@ -34,7 +34,6 @@ import javax.management.ReflectionException;
 import net.java.visualvm.modules.glassfish.ui.StatsTable;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats;
-import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
@@ -77,6 +76,7 @@ import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
 
 
 /**
@@ -289,7 +289,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static ExplorerActionsProvider<GlassFishApplicationNode> actionsProvider = new ExplorerActionsProvider<GlassFishApplicationNode>() {
+    private static ExplorerActionsProvider<GlassFishApplication> actionsProvider = new ExplorerActionsProvider<GlassFishApplication>() {
         private List<ExplorerActionDescriptor> actions = new ArrayList<ExplorerActionDescriptor>() {
 
             {
@@ -306,7 +306,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             }
         };
 
-        public ExplorerActionDescriptor getDefaultAction(GlassFishApplicationNode node) {
+        public ExplorerActionDescriptor getDefaultAction(GlassFishApplication application) {
             return null;
 
             //            return new ExplorerActionDescriptor(new AbstractAction("Open") {
@@ -317,7 +317,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             //            }, 0);
         }
 
-        public List<ExplorerActionDescriptor> getActions(GlassFishApplicationNode node) {
+        public List<ExplorerActionDescriptor> getActions(GlassFishApplication application) {
             return actions;
         }
     };
@@ -331,7 +331,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
 
     public void initialize() {
         DataSourceWindowFactory.sharedInstance().addViewProvider(this, GlassFishWebModule.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(actionsProvider, GlassFishApplicationNode.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(actionsProvider, GlassFishApplication.class);
     }
 
     public boolean supportsViewFor(GlassFishWebModule dataSource) {

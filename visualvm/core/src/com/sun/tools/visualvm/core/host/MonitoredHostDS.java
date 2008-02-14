@@ -45,6 +45,7 @@ public class MonitoredHostDS extends AbstractDataSource {
     MonitoredHostDS(Host host) throws MonitorException, URISyntaxException {
         this.host = host;
         monitoredHost = MonitoredHost.getMonitoredHost(host.getHostName());
+        setVisible(false);
     }
 
     

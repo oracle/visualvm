@@ -68,6 +68,9 @@ public interface DataSource {
      * This means that the DataSource has been removed from all repositories and won't change its state any more.
      */
     public static final int STATE_FINISHED = Integer.MIN_VALUE;
+    
+    
+    public static final DataSourceRoot ROOT = new DataSourceRoot();
 
 
     public void setOwner(DataSource owner);

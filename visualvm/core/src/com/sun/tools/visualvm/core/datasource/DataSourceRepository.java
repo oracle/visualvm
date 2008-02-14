@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.explorer.ExplorerModelBuilder;
 
 /**
  * Central repository of all known DataSources.
@@ -69,6 +70,7 @@ public final class DataSourceRepository extends DefaultDataSourceProvider<DataSo
 
     public void dataChanged(DataChangeEvent<DataSource> event) {
         updateDataSources(event.getAdded(), event.getRemoved());
+        ExplorerModelBuilder.getInstance().dataChanged(event);
     }
     
     

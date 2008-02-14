@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.host;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
@@ -114,6 +115,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                     });
                 }
             } else {
+                RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
                 registerDataSource(newHost);
             }
         }
@@ -132,6 +134,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     private void initLocalHost() {
         try {
             LOCALHOST = new HostImpl("localhost", "Local");
+            DataSource.ROOT.getRepository().addDataSource(LOCALHOST);
             registerDataSource(LOCALHOST);
         } catch (UnknownHostException e) {
             System.err.println("Critical failure: cannot resolve localhost");

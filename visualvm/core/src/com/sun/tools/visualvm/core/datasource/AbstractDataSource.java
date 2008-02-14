@@ -39,7 +39,7 @@ import java.util.Set;
  * @author Jiri Sedlacek
  */
 // TODO: synchronize using RequestProcessor??
-public class AbstractDataSource implements DataSource {
+public abstract class AbstractDataSource implements DataSource {
 
     private DataSource owner;
     private DataSource master;

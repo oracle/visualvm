@@ -57,6 +57,8 @@ public class HostsSupport {
     private HostsSupport() {
         hostProvider = new HostProvider();
         hostProvider.initialize();
+        
+        new RemoteHostsContainerSupport().initialize();
 
         new HostNodeBuilder().initialize();
         new HostActionsProvider().initialize();

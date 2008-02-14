@@ -37,9 +37,11 @@ import javax.swing.AbstractAction;
  *
  * @author Jiri Sedlacek
  */
-final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSourceExplorerNode> {
+final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSource> {
 
     private static OpenDataSourceSupport instance;
+    
+    private final OpenDataSourceAction openDataSourceAction = new OpenDataSourceAction(); 
 
 
     public static synchronized OpenDataSourceSupport getInstance() {
@@ -49,35 +51,32 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSourceE
 
 
     void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(this, DataSourceExplorerNode.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(this, DataSource.class);
     }
     
     private OpenDataSourceSupport() {
     }
     
 
-    public ExplorerActionDescriptor getDefaultAction(DataSourceExplorerNode node) {
-        DataSource dataSource = node.getDataSource();
+    public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) {
         if (DataSourceWindowFactory.sharedInstance().canCreateWindowFor(dataSource))
-            return new ExplorerActionDescriptor(new OpenDataSourceAction(dataSource), 0);
+            return new ExplorerActionDescriptor(openDataSourceAction, 0);
         else return null;
     }
 
-    public List<ExplorerActionDescriptor> getActions(DataSourceExplorerNode node) {
+    public List<ExplorerActionDescriptor> getActions(DataSource dataSource) {
         return Collections.EMPTY_LIST;
     }
     
     
     private class OpenDataSourceAction extends AbstractAction {
         
-        private DataSource dataSource;
-        
-        public OpenDataSourceAction(DataSource dataSource) {
+        public OpenDataSourceAction() {
             super("Open");
-            this.dataSource = dataSource;
         }
         
         public void actionPerformed(ActionEvent e) {
+            DataSource dataSource = (DataSource)e.getSource();
             DataSource viewMaster = dataSource.getMaster();
             if (viewMaster != null) DataSourceWindowManager.sharedInstance().addViews(viewMaster, dataSource);
             else DataSourceWindowManager.sharedInstance().openWindow(dataSource);

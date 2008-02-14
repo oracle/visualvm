@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.application;
 
-import com.sun.tools.visualvm.core.explorer.ApplicationNode;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
@@ -43,46 +42,50 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class ApplicationActionsProvider implements ExplorerActionsProvider<ApplicationNode> {
+class ApplicationActionsProvider implements ExplorerActionsProvider<Application> {
     
-    private static class HeapDumpOnOOMEAction extends AbstractAction {
-        boolean enable;
-        Application application;
-        
-        HeapDumpOnOOMEAction(Application app,boolean ena) {
-            super(ena?"Enable Heap Dump on OOME":"Disable Heap Dump on OOME");
-            application = app;
-            enable = ena;
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    JVM jvm = JVMFactory.getJVMFor(application);
-                    jvm.setDumpOnOOMEnabled(enable);
-                }
-            });
-        }
-    }
+    private final HeapDumpOnOOMEAction heapDumpOnOOMEAction = new HeapDumpOnOOMEAction();
     
-    public ExplorerActionDescriptor getDefaultAction(ApplicationNode applicationNode) {
+    
+    public ExplorerActionDescriptor getDefaultAction(Application application) {
         return null;
     }
     
-    public List<ExplorerActionDescriptor> getActions(ApplicationNode applicationNode) {
-        Application application = applicationNode.getUserObject();
+    public List<ExplorerActionDescriptor> getActions(Application application) {
         List<ExplorerActionDescriptor> actions = new ArrayList();
         JVM jvm = JVMFactory.getJVMFor(application);
         if (jvm.isDumpOnOOMEnabledSupported()) {
             actions.add(new ExplorerActionDescriptor(null, 40));
-            actions.add(new ExplorerActionDescriptor(new HeapDumpOnOOMEAction(application,!jvm.isDumpOnOOMEnabled()), 41));
+            actions.add(new ExplorerActionDescriptor(heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
         }
         return actions;
         
     }
     
+    
     void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(this, ApplicationNode.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(this, Application.class);
+    }
+    
+    
+    private static class HeapDumpOnOOMEAction extends AbstractAction {
+        
+        boolean oomeEnabled;
+        
+        public HeapDumpOnOOMEAction refresh(boolean oomeEnabled) {
+            this.oomeEnabled = oomeEnabled;
+            putValue(NAME, oomeEnabled ? "Enable Heap Dump on OOME" : "Disable Heap Dump on OOME");
+            return this;
+        }
+        
+        public void actionPerformed(final ActionEvent e) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    JVM jvm = JVMFactory.getJVMFor((Application)e.getSource());
+                    jvm.setDumpOnOOMEnabled(oomeEnabled);
+                }
+            });
+        }
     }
     
 }

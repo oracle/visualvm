@@ -25,13 +25,12 @@
 
 package com.sun.tools.visualvm.core.coredump;
 
-import com.sun.tools.visualvm.core.explorer.CoreDumpNode;
 import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.core.explorer.ExplorerNode;
-import com.sun.tools.visualvm.core.explorer.ExplorerRoot;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +47,9 @@ class CoreDumpActionsProvider {
     
     static void register() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
-        explorer.addExplorerActionsProvider(new CoreDumpNodeActionProvider(), CoreDumpNode.class);
-        explorer.addExplorerActionsProvider(new CoreDumpsNodeActionProvider(), CoreDumpsNode.class);
-        explorer.addExplorerActionsProvider(new RootNodeActionProvider(), ExplorerRoot.class);
+        explorer.addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDump.class);
+        explorer.addExplorerActionsProvider(new CoreDumpsContainerActionProvider(), CoreDumpsContainer.class);
+        explorer.addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
     
     
@@ -64,7 +63,7 @@ class CoreDumpActionsProvider {
             CoreDumpConfigurator newCoreDumpConfiguration = CoreDumpConfigurator.defineCoreDump();
             if (newCoreDumpConfiguration != null) {
                 CoreDumpProvider provider = CoreDumpProvider.sharedInstance();
-                provider.createHost(newCoreDumpConfiguration.getCoreDumpFile(),newCoreDumpConfiguration.getDisplayname(), newCoreDumpConfiguration.getJavaHome());
+                provider.createCoreDump(newCoreDumpConfiguration.getCoreDumpFile(),newCoreDumpConfiguration.getDisplayname(), newCoreDumpConfiguration.getJavaHome());
             }
         }
     }
@@ -102,19 +101,17 @@ class CoreDumpActionsProvider {
         
     }
     
-    private static abstract class CoreDumpActionProvider<T extends ExplorerNode> implements ExplorerActionsProvider<T> {
+    private static abstract class AbstractCoreDumpActionProvider<T extends DataSource> implements ExplorerActionsProvider<T> {
         
-        public ExplorerActionDescriptor getDefaultAction(T coreDumpNode) {
+        public ExplorerActionDescriptor getDefaultAction(T dataSource) {
             return null;
         }
         
     }
     
-    private static class CoreDumpNodeActionProvider extends CoreDumpActionProvider<CoreDumpNode> {
+    private static class CoreDumpActionProvider extends AbstractCoreDumpActionProvider<CoreDump> {
         
-        public List<ExplorerActionDescriptor> getActions(CoreDumpNode coreDumpNode) {
-            CoreDump coreDump = coreDumpNode.getCoreDump();
-            
+        public List<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
             List<ExplorerActionDescriptor> actions = new ArrayList();
             
             actions.add(new ExplorerActionDescriptor(null, 30));
@@ -125,9 +122,9 @@ class CoreDumpActionsProvider {
         }
     }
     
-    private static class CoreDumpsNodeActionProvider extends CoreDumpActionProvider<CoreDumpsNode> {
+    private static class CoreDumpsContainerActionProvider extends AbstractCoreDumpActionProvider<CoreDumpsContainer> {
         
-        public List<ExplorerActionDescriptor> getActions(CoreDumpsNode node) {
+        public List<ExplorerActionDescriptor> getActions(CoreDumpsContainer container) {
             List<ExplorerActionDescriptor> actions = new ArrayList();
             
             actions.add(new ExplorerActionDescriptor(addNewCoreDumpAction, 0));
@@ -137,11 +134,9 @@ class CoreDumpActionsProvider {
         
     }
     
-    private static class RootNodeActionProvider implements ExplorerActionsProvider<ExplorerRoot> {
+    private static class DataSourceRootActionProvider extends AbstractCoreDumpActionProvider<DataSource> {
         
-        public ExplorerActionDescriptor getDefaultAction(ExplorerRoot node) { return null; }
-        
-        public List<ExplorerActionDescriptor> getActions(ExplorerRoot node) {
+        public List<ExplorerActionDescriptor> getActions(DataSource root) {
             List<ExplorerActionDescriptor> actions = new ArrayList();
             
             actions.add(new ExplorerActionDescriptor(addNewCoreDumpAction, 20));

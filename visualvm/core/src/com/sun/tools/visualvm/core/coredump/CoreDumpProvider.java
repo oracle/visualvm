@@ -53,15 +53,15 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     private CoreDumpProvider() {
     }
     
-    void createHost(final String coreDumpFile, final String displayName, final String jdkHome) {
+    void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                createHostImpl(coreDumpFile, displayName, jdkHome);
+                createCoreDumpImpl(coreDumpFile, displayName, jdkHome);
             }
         });
     }
     
-    private void createHostImpl(final String coreDumpFile, final String displayName, final String jdkHome) {
+    private void createCoreDumpImpl(final String coreDumpFile, final String displayName, final String jdkHome) {
         final CoreDumpImpl coreDump;
         try {
             coreDump = new CoreDumpImpl(new File(coreDumpFile), displayName, jdkHome);
@@ -78,6 +78,7 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
                 }
             });
         } else {
+            CoreDumpsContainer.sharedInstance().getRepository().addDataSource(coreDump);
             registerDataSource(coreDump);
         }
     }

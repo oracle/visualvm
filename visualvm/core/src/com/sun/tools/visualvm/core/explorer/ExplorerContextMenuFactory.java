@@ -25,7 +25,12 @@
 
 package com.sun.tools.visualvm.core.explorer;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +51,7 @@ public class ExplorerContextMenuFactory {
 
     private static ExplorerContextMenuFactory sharedInstance;
 
-    private final Map<ExplorerActionsProvider, Class<? extends ExplorerNode>> providers = Collections.synchronizedMap(new HashMap());
+    private final Map<ExplorerActionsProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
 
 
     /**
@@ -67,7 +72,7 @@ public class ExplorerContextMenuFactory {
      * @param provider ExplorerActionsProvider to be added,
      * @param scope scope of ExplorerNode instances for which the ExplorerActionsProvider provides the actions.
      */
-    public void addExplorerActionsProvider(ExplorerActionsProvider provider, Class<? extends ExplorerNode> scope) {
+    public void addExplorerActionsProvider(ExplorerActionsProvider provider, Class<? extends DataSource> scope) {
         providers.put(provider, scope);
     }
     
@@ -82,9 +87,9 @@ public class ExplorerContextMenuFactory {
     }
     
     
-    JPopupMenu createPopupMenuFor(ExplorerNode node) {
+    JPopupMenu createPopupMenuFor(DataSource dataSource) {
         // Get actions for the node
-        List<Action>[] actionsArray = getActions(node);
+        List<Action>[] actionsArray = getActions(dataSource);
         List<Action> defaultActions = actionsArray[0];
         List<Action> actions = actionsArray[1];
 
@@ -99,7 +104,7 @@ public class ExplorerContextMenuFactory {
         if (!defaultActions.isEmpty()) {
             for (Action defaultAction : defaultActions) {
                 if (realDefaultAction) {
-                    JMenuItem defaultItem = new JMenuItem(defaultAction);
+                    JMenuItem defaultItem = new DataSourceItem(dataSource, defaultAction);
                     defaultItem.setFont(defaultItem.getFont().deriveFont(Font.BOLD));
                     popupMenu.add(defaultItem);
                     realDefaultAction = false;
@@ -115,7 +120,7 @@ public class ExplorerContextMenuFactory {
         // Insert other actions
         if (!actions.isEmpty()) {
             for (Action action : actions) {
-                if (action != null) popupMenu.add(action);
+                if (action != null) popupMenu.add(new DataSourceItem(dataSource, action));
                 else popupMenu.addSeparator();
             }
         }
@@ -124,15 +129,19 @@ public class ExplorerContextMenuFactory {
     }
     
     
-    Action getDefaultActionFor(ExplorerNode node) {
-        Set<ExplorerActionsProvider> filteredProviders = getProvidersFor(node);
+    Action getDefaultActionFor(DataSource dataSource) {
+        Set<ExplorerActionsProvider> filteredProviders = getProvidersFor(dataSource);
         List<ExplorerActionDescriptor> defaultActionsDescriptors = new ArrayList();
         
         // Create lists of ExplorerActionDescriptors
         for (ExplorerActionsProvider provider : filteredProviders) {
-            ExplorerActionDescriptor defaultAction = provider.getDefaultAction(node);
+            ExplorerActionDescriptor defaultAction = provider.getDefaultAction(dataSource);
             if (defaultAction != null) defaultActionsDescriptors.add(defaultAction);
         }
+        
+        // Add implicit default action defined by DataSourceDescriptor
+        ExplorerActionDescriptor implicitDefaultAction = DataSourceDescriptorFactory.getDescriptor(dataSource).getImplicitDefaultAction();
+        if (implicitDefaultAction != null) defaultActionsDescriptors.add(implicitDefaultAction);
         
         // Sort ExplorerActionDescriptors according to actionOrder
         Collections.sort(defaultActionsDescriptors);
@@ -140,17 +149,23 @@ public class ExplorerContextMenuFactory {
         return defaultActionsDescriptors.isEmpty() ? null : defaultActionsDescriptors.get(0).getAction();
     }
     
-    private List<Action>[] getActions(ExplorerNode node) {
-        Set<ExplorerActionsProvider> filteredProviders = getProvidersFor(node);
+    private List<Action>[] getActions(DataSource dataSource) {
+        Set<ExplorerActionsProvider> filteredProviders = getProvidersFor(dataSource);
         List<ExplorerActionDescriptor> defaultActionsDescriptors = new ArrayList();
         List<ExplorerActionDescriptor> actionsDescriptors = new ArrayList();
         
         // Create lists of ExplorerActionDescriptors
         for (ExplorerActionsProvider provider : filteredProviders) {
-            ExplorerActionDescriptor defaultAction = provider.getDefaultAction(node);
+            ExplorerActionDescriptor defaultAction = provider.getDefaultAction(dataSource);
             if (defaultAction != null) defaultActionsDescriptors.add(defaultAction);
-            actionsDescriptors.addAll(provider.getActions(node));
+            actionsDescriptors.addAll(provider.getActions(dataSource));
         }
+        
+        // Add implicit actions defined by DataSourceDescriptor
+        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+        ExplorerActionDescriptor implicitDefaultAction = descriptor.getImplicitDefaultAction();
+        if (implicitDefaultAction != null) defaultActionsDescriptors.add(implicitDefaultAction);
+        actionsDescriptors.addAll(descriptor.getImplicitActions());
         
         // Sort ExplorerActionDescriptors according to actionOrder
         Collections.sort(defaultActionsDescriptors);
@@ -167,17 +182,54 @@ public class ExplorerContextMenuFactory {
     }
     
     
-    private Set<ExplorerActionsProvider> getProvidersFor(ExplorerNode node) {
-        Map<ExplorerActionsProvider, Class<? extends ExplorerNode>> currentProviders = new HashMap(providers);
+    private Set<ExplorerActionsProvider> getProvidersFor(DataSource dataSource) {
+        Map<ExplorerActionsProvider, Class<? extends DataSource>> currentProviders = new HashMap(providers);
         Set<ExplorerActionsProvider> currentProvidersSet = currentProviders.keySet();
         Set<ExplorerActionsProvider> filteredProviders = new HashSet();
         for (ExplorerActionsProvider provider : currentProvidersSet)
-            if (currentProviders.get(provider).isInstance(node)) filteredProviders.add(provider);
+            if (currentProviders.get(provider).isInstance(dataSource)) filteredProviders.add(provider);
         return filteredProviders;
     }
     
     
     private ExplorerContextMenuFactory() {
+    }
+    
+    
+    private static class DataSourceItem extends JMenuItem {
+        
+        private DataSource dataSource;
+        
+        public DataSourceItem(DataSource dataSource, Action action) {
+            super(action);
+            this.dataSource = dataSource;
+        }
+        
+        protected void fireActionPerformed(ActionEvent event) {
+            // Guaranteed to return a non-null array
+            Object[] listeners = listenerList.getListenerList();
+            ActionEvent e = null;
+            // Process the listeners last to first, notifying
+            // those that are interested in this event
+            for (int i = listeners.length-2; i>=0; i-=2) {
+                if (listeners[i]==ActionListener.class) {
+                    // Lazily create the event:
+                    if (e == null) {
+                          String actionCommand = event.getActionCommand();
+                          if(actionCommand == null) {
+                             actionCommand = getActionCommand();
+                          }
+                          e = new ActionEvent(dataSource,
+                                              ActionEvent.ACTION_PERFORMED,
+                                              actionCommand,
+                                              event.getWhen(),
+                                              event.getModifiers());
+                    }
+                    ((ActionListener)listeners[i+1]).actionPerformed(e);
+                }          
+            }
+        }
+        
     }
 
 }

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.explorer;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -74,15 +75,16 @@ class ExplorerUI extends JPanel {
     private void performDefaultAction(TreePath path) {
         if (path == null) return;
     
-        ExplorerNode node = (ExplorerNode)path.getLastPathComponent();
-        Action defaultAction = getDefaultAction(node);
+        ExplorerNodeX node = (ExplorerNodeX)path.getLastPathComponent();
+        DataSource dataSource = node.getUserObject();
+        Action defaultAction = getDefaultAction(dataSource);
         if (defaultAction == null) return;
     
-        defaultAction.actionPerformed(new ActionEvent(this, 0, "Default Action"));
+        defaultAction.actionPerformed(new ActionEvent(dataSource, 0, "Default Action"));
     }
     
-    private static Action getDefaultAction(ExplorerNode node) {
-        return ExplorerContextMenuFactory.sharedInstance().getDefaultActionFor(node);
+    private static Action getDefaultAction(DataSource dataSource) {
+        return ExplorerContextMenuFactory.sharedInstance().getDefaultActionFor(dataSource);
     }
             
     
@@ -90,20 +92,21 @@ class ExplorerUI extends JPanel {
         setLayout(new BorderLayout());
         
         // explorerTree
-        explorerTree = new JTree(ExplorerModelSupport.sharedInstance().getExplorerModel()) {
+//        explorerTree = new JTree(ExplorerModelSupport.sharedInstance().getExplorerModel()) {
+        explorerTree = new JTree(ExplorerModelBuilder.getInstance().getModel()) {
             protected void processMouseEvent(MouseEvent e) {
                 vetoTreeExpansion = false;
                 if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() >= getToggleClickCount()) {
                     TreePath path = getPathForLocation(e.getX(), e.getY());
-                    ExplorerNode node = path != null ? (ExplorerNode)path.getLastPathComponent() : null;
-                    if (node != null && getDefaultAction(node) != null && getPathBounds(path).contains(e.getX(), e.getY())) vetoTreeExpansion = true;
+                    ExplorerNodeX node = path != null ? (ExplorerNodeX)path.getLastPathComponent() : null;
+                    if (node != null && getDefaultAction(node.getUserObject()) != null && getPathBounds(path).contains(e.getX(), e.getY())) vetoTreeExpansion = true;
                 }
                 super.processMouseEvent(e);
             }
         };
         explorerTree.setRootVisible(false);
         explorerTree.setShowsRootHandles(true);
-//        explorerTree.setRowHeight(dataSourcesTree.getRowHeight() + 4);
+//        explorerTree.setRowHeight(explorerTree.getRowHeight() + 2);
         explorerTree.setCellRenderer(new ExplorerNodeRenderer());
         explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
@@ -155,10 +158,10 @@ class ExplorerUI extends JPanel {
                 
                 // Determine the node for which to display context menu
                 TreePath selectedPath = explorerTree.getSelectionPath();
-                ExplorerNode selectedNode = selectedPath != null ? (ExplorerNode)selectedPath.getLastPathComponent() : ExplorerRoot.NODE;
+                ExplorerNodeX selectedNode = selectedPath != null ? (ExplorerNodeX)selectedPath.getLastPathComponent() : null;
         
                 // Create popup menu and display it
-                JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(selectedNode);
+                JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(selectedNode == null ? DataSource.ROOT : selectedNode.getUserObject());
                 if (popupMenu != null) popupMenu.show(explorerTree, e.getX(), e.getY());
                 
             } else if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() == explorerTree.getToggleClickCount()) {

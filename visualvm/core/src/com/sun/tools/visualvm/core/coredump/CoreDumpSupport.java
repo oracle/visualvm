@@ -32,6 +32,7 @@ package com.sun.tools.visualvm.core.coredump;
 public class CoreDumpSupport {
 
     public static void register() {
+        new CoreDumpsContainerSupport().register();
         CoreDumpProvider.register();
         CoreDumpNodeBuilder.register();
         CoreDumpActionsProvider.register();
