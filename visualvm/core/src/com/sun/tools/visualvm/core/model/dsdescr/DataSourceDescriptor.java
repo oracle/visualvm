@@ -26,10 +26,8 @@
 package com.sun.tools.visualvm.core.model.dsdescr;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
-import java.util.Set;
 
 /**
  *
@@ -55,11 +53,6 @@ public interface DataSourceDescriptor<X extends DataSource> {
     public String getDescription();
     
     public int getPreferredPosition();
-    
-    
-    public ExplorerActionDescriptor getImplicitDefaultAction();
-    
-    public Set<ExplorerActionDescriptor> getImplicitActions();
     
     
     /**

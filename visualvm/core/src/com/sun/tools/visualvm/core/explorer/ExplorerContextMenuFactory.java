@@ -139,10 +139,6 @@ public class ExplorerContextMenuFactory {
             if (defaultAction != null) defaultActionsDescriptors.add(defaultAction);
         }
         
-        // Add implicit default action defined by DataSourceDescriptor
-        ExplorerActionDescriptor implicitDefaultAction = DataSourceDescriptorFactory.getDescriptor(dataSource).getImplicitDefaultAction();
-        if (implicitDefaultAction != null) defaultActionsDescriptors.add(implicitDefaultAction);
-        
         // Sort ExplorerActionDescriptors according to actionOrder
         Collections.sort(defaultActionsDescriptors);
         
@@ -160,12 +156,6 @@ public class ExplorerContextMenuFactory {
             if (defaultAction != null) defaultActionsDescriptors.add(defaultAction);
             actionsDescriptors.addAll(provider.getActions(dataSource));
         }
-        
-        // Add implicit actions defined by DataSourceDescriptor
-        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-        ExplorerActionDescriptor implicitDefaultAction = descriptor.getImplicitDefaultAction();
-        if (implicitDefaultAction != null) defaultActionsDescriptors.add(implicitDefaultAction);
-        actionsDescriptors.addAll(descriptor.getImplicitActions());
         
         // Sort ExplorerActionDescriptors according to actionOrder
         Collections.sort(defaultActionsDescriptors);

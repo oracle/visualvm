@@ -80,14 +80,6 @@ public abstract class AbstractDataSourceDescriptor<X extends DataSource> impleme
         return preferredPosition;
     }
 
-    public ExplorerActionDescriptor getImplicitDefaultAction() {
-        return null;
-    }
-
-    public Set<ExplorerActionDescriptor> getImplicitActions() {
-        return Collections.EMPTY_SET;
-    }
-
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
