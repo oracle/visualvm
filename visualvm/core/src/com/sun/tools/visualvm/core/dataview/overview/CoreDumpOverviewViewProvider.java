@@ -52,7 +52,10 @@ class CoreDumpOverviewViewProvider implements DataSourceViewsProvider<CoreDump>{
 
     public synchronized Set<? extends DataSourceView> getViews(CoreDump coreDump) {
         DataSourceView view = viewsCache.get(coreDump);
-        if (view == null) view = new CoreDumpOverviewView(coreDump);
+        if (view == null) {
+            view = new CoreDumpOverviewView(coreDump);
+            viewsCache.put(coreDump, view);
+        }
         return Collections.singleton(view);
     }
 

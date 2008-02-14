@@ -49,7 +49,10 @@ class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Applica
 
     public synchronized Set<? extends DataSourceView> getViews(Application application) {
         DataSourceView view = viewsCache.get(application);
-        if (view == null) view = new ApplicationOverviewView(application);
+        if (view == null) {
+            view = new ApplicationOverviewView(application);
+            viewsCache.put(application, view);
+        }
         return Collections.singleton(view);
     }
 

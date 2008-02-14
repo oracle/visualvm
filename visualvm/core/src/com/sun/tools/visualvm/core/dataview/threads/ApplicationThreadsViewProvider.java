@@ -52,7 +52,10 @@ class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Applicat
 
     public synchronized Set<? extends DataSourceView> getViews(Application application) {
         DataSourceView view = viewsCache.get(application);
-        if (view == null) view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean());
+        if (view == null) {
+            view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean());
+            viewsCache.put(application, view);
+        }
         return Collections.singleton(view);
     }
 

@@ -26,7 +26,10 @@
 package com.sun.tools.visualvm.core.profiler;
 
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
+import java.util.Set;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
@@ -40,6 +43,7 @@ public class ProfilerSupport {
     private static ProfilerSupport instance;
     
     private Application profiledApplication;
+    private ApplicationProfilerViewProvider profilerViewProvider;
 
 
     public static synchronized ProfilerSupport getInstance() {
@@ -54,6 +58,13 @@ public class ProfilerSupport {
   
     Application getProfiledApplication() {
         return profiledApplication;
+    }
+    
+    void selectActiveProfilerView() {
+        if (profiledApplication == null) return;
+        Set<? extends DataSourceView> activeViewSet = profilerViewProvider.getViews(profiledApplication);
+        if (activeViewSet.isEmpty()) return;
+        DataSourceWindowManager.sharedInstance().addView(profiledApplication, activeViewSet.iterator().next());
     }
     
     
@@ -115,22 +126,17 @@ public class ProfilerSupport {
         // Display blocking notification
         NetBeansProfiler.getDefaultNB().displayInfoAndWait("<html><b>Calibration will be performed.</b><br><br>Profiler will perform initial JDK calibration. Please make sure that other applications<br>are not placing a noticeable load on your machine at this time and click the OK button.</html>");
 
-//        // Disable UI refresh
-//        DataSourceManager.getDefault().setAutoRefresh(false);
-
         // Perform calibration
         boolean result = NetBeansProfiler.getDefaultNB().runConfiguredCalibration();
-
-//        // Refresh UI
-//        DataSourceManager.getDefault().refreshImmediately();
-//        DataSourceManager.getDefault().setAutoRefresh(true);
 
         return result;
     }
     
     
     private ProfilerSupport() {
-        new ApplicationProfilerViewProvider().initialize();
+        profilerViewProvider = new ApplicationProfilerViewProvider();
+        profilerViewProvider.initialize();
+        
         checkCalibration();
     }
 

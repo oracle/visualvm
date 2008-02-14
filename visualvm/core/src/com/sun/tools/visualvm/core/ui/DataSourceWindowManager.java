@@ -192,7 +192,7 @@ public class DataSourceWindowManager {
                 } catch (Exception e) {}
                 for (X view : newViews) view.added();
                 
-                DataSourceView view = selectFirstView ? views.iterator().next() : null;
+                DataSourceView view = (selectFirstView && !views.isEmpty()) ? views.iterator().next() : null;
                 displayWindow(window, view, !wasOpened, selectWindow, toFront);
             }
         });

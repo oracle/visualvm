@@ -28,9 +28,8 @@ package com.sun.tools.visualvm.core.profiler;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -246,7 +245,7 @@ class ApplicationProfilerView extends DataSourceView {
                       enableControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
                     } else {
-//                      statusValueLabel.setText("<nobr>profiling of <a href='#'>" + ExplorerModelSupport.sharedInstance().getNodeFor(profiledApplication).getName() + "</a> in progress</nobr>");
+                      statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + "</a> in progress</nobr>");
                       disableControlButtons();
                     }
 
@@ -431,8 +430,7 @@ class ApplicationProfilerView extends DataSourceView {
                   super.setText("<nobr>" + text + "</nobr>");
                 }
                 protected void showURL(URL url) {
-                  Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
-                  DataSourceWindowManager.sharedInstance().openWindow(profiledApplication);
+                  ProfilerSupport.getInstance().selectActiveProfilerView();
                 }
 
                 // NOTE: overriding dimensions prevents UI "jumping" when changing the link

@@ -50,7 +50,10 @@ class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
 
     public synchronized Set<? extends DataSourceView> getViews(Host host) {
         DataSourceView view = viewsCache.get(host);
-        if (view == null) view = new HostOverviewView(host);
+        if (view == null) {
+            view = new HostOverviewView(host);
+            viewsCache.put(host, view);
+        }
         return Collections.singleton(view);
     }
 

@@ -54,7 +54,10 @@ class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Applica
 
     public synchronized Set<? extends DataSourceView> getViews(Application application) {
         DataSourceView view = viewsCache.get(application);
-        if (view == null) view = new ApplicationProfilerView(application);
+        if (view == null) {
+            view = new ApplicationProfilerView(application);
+            viewsCache.put(application, view);
+        }
         return Collections.singleton(view);
     }
 

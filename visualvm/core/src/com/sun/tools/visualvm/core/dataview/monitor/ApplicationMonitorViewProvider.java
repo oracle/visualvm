@@ -52,7 +52,10 @@ class ApplicationMonitorViewProvider implements DataSourceViewsProvider<Applicat
 
     public synchronized Set<? extends DataSourceView> getViews(Application application) {
         DataSourceView view = viewsCache.get(application);
-        if (view == null) view = new ApplicationMonitorView(application);
+        if (view == null) {
+            view = new ApplicationMonitorView(application);
+            viewsCache.put(application, view);
+        }
         return Collections.singleton(view);
     }
 
