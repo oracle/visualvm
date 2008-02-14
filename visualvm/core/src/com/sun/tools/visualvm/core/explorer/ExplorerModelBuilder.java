@@ -33,17 +33,13 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
 /**
  *
@@ -65,16 +61,12 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     
-    public TreeModel getModel() {
+    DefaultTreeModel getModel() {
         return explorerModel;
     }
     
     
     public void dataChanged(DataChangeEvent event) {
-//        System.err.println(">>> Data changed...");
-//        System.err.println(">>>    added:   " + event.getAdded());
-//        System.err.println(">>>    removed: " + event.getRemoved());
-//        System.err.println(">>> ---------------------------------");
         processAddedDataSource(event.getAdded());
         processRemovedDataSources(event.getRemoved());
     }
@@ -120,11 +112,11 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         });
     }
     
-    private ExplorerNode getNodeFor(DataSource dataSource) {
+    ExplorerNode getNodeFor(DataSource dataSource) {
         return nodes.get(dataSource);
     }
     
-    private boolean isNodeInTree(DataSource dataSource) {
+    boolean isNodeInTree(DataSource dataSource) {
         return getNodeFor(dataSource) != null;
     }
     
