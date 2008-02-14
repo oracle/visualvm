@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.host;
 
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 
 /**
  *
@@ -58,6 +59,7 @@ public class HostsSupport {
         hostProvider = new HostProvider();
         hostProvider.initialize();
         
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorFactory());
         new RemoteHostsContainerSupport().initialize();
 
         new HostActionsProvider().initialize();

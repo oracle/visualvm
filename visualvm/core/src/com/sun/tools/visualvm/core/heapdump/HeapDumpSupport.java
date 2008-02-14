@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.heapdump;
 
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableView;
@@ -85,7 +86,7 @@ public class HeapDumpSupport {
 
     private HeapDumpSupport() {
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
-        
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorFactory());
         heapDumpProvider = new HeapDumpProvider();
         heapDumpProvider.initialize();
         

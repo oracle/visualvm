@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.threaddump;
 
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableView;
@@ -91,6 +92,7 @@ public class ThreadDumpSupport {
     private ThreadDumpSupport() {
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
         
+        DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorFactory());
         threadDumpProvider = new ThreadDumpProvider();
         threadDumpProvider.initialize();
         

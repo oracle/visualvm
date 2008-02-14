@@ -23,34 +23,40 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.model.dstype;
+package com.sun.tools.visualvm.core.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.HeapDump;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
 import java.awt.Image;
-
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Tomas Hurka
  */
-class DefaultDataSourceDescriptor extends DataSourceDescriptor  {
-    private DataSource dataSource;
+class HeapDumpDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    
-    DefaultDataSourceDescriptor(DataSource ds) {
-        dataSource = ds;
+    HeapDumpDescriptorFactory() {
     }
     
-    public String getName() {
-        return dataSource.toString();
-    }
-
-    public String getDescription() {
+    public DataSourceDescriptor createModelFor(DataSource ds) {
+        if (ds instanceof HeapDump) {
+            return new HeapDumpDescriptor((HeapDump) ds);
+        }
         return null;
     }
-
-    public Image getIcon() {
-        return null;
+    
+    private static class HeapDumpDescriptor extends AbstractSnapshotDescriptor<HeapDump> {
+        
+        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
+        
+        public HeapDumpDescriptor(HeapDump heapDump) {
+            super(heapDump, HeapDumpSupport.getInstance().getCategory(), ICON);
+        }
+        
     }
 
 }

@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.core.coredump;
 
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+
 /**
  *
  * @author Tomas Hurka
@@ -40,6 +42,7 @@ public class CoreDumpSupport {
 
     
     public static void register() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorFactory());
         CoreDumpsContainerSupport.register();
         CoreDumpProvider.register();
         CoreDumpActionsProvider.register();

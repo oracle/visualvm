@@ -23,13 +23,14 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.model.dstype;
+package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.model.dsdescr.*;
 import java.awt.Image;
 
 /**
@@ -42,11 +43,8 @@ class ApplicationDescriptorFactory extends AbstractModelProvider<DataSourceDescr
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (ds instanceof Application) {
-            Application app = (Application) ds;
-            ApplicationType type = ApplicationTypeFactory.getApplicationTypeFor(app);
-            
-            return new ApplicationDescriptor(type);
+        if (ds instanceof Application) {            
+            return new ApplicationDescriptor((Application) ds);
         }
         return null;
     }
@@ -54,8 +52,8 @@ class ApplicationDescriptorFactory extends AbstractModelProvider<DataSourceDescr
     private static class ApplicationDescriptor extends DataSourceDescriptor {
         private ApplicationType appType;
         
-        ApplicationDescriptor(ApplicationType at) {
-            appType = at;
+        ApplicationDescriptor(Application app) {
+            appType = ApplicationTypeFactory.getApplicationTypeFor(app);
         }
         
         public String getName() {
@@ -69,6 +67,7 @@ class ApplicationDescriptorFactory extends AbstractModelProvider<DataSourceDescr
         public Image getIcon() {
             return appType.getIcon();
         }
+
     }
     
 }

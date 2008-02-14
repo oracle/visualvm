@@ -23,37 +23,40 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.model.dstype;
+package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.ModelFactory;
-import com.sun.tools.visualvm.core.model.ModelProvider;
+import com.sun.tools.visualvm.core.datasource.ThreadDump;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
+import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Tomas Hurka
  */
-public class DataSourceDesciptorFactory extends ModelFactory<DataSourceDescriptor,DataSource> implements ModelProvider<DataSourceDescriptor,DataSource> {
-
-  private static DataSourceDesciptorFactory dsDescFactory;
-
-  private DataSourceDesciptorFactory() {
-  }
-
-  public static synchronized DataSourceDesciptorFactory getDefault() {
-    if (dsDescFactory == null) {
-      dsDescFactory = new DataSourceDesciptorFactory();
-      dsDescFactory.registerFactory(dsDescFactory);
-      dsDescFactory.registerFactory(new ApplicationDescriptorFactory());
+class ThreadDumpDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+    
+    ThreadDumpDescriptorFactory() {
     }
-    return dsDescFactory;
-  }
-  
-  public static DataSourceDescriptor getDataSourceDescriptorFor(DataSource ds) {
-    return getDefault().getModel(ds);
-  }
-  
-  public DataSourceDescriptor createModelFor(DataSource ds) {
-    return new DefaultDataSourceDescriptor(ds);
-  }
+    
+    public DataSourceDescriptor createModelFor(DataSource ds) {
+        if (ds instanceof ThreadDump) {
+            return new ThreadDumpDescriptor((ThreadDump) ds);
+        }
+        return null;
+    }
+    
+    private static class ThreadDumpDescriptor extends AbstractSnapshotDescriptor<ThreadDump> {
+        
+        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
+        
+        public ThreadDumpDescriptor(ThreadDump threadDump) {
+            super(threadDump, ThreadDumpSupport.getInstance().getCategory(), ICON);
+        }
+        
+    }
+
 }

@@ -62,7 +62,7 @@ class ApplicationCaption extends JPanel {
         });
         
         setRunning(application.getState() == DataSource.STATE_AVAILABLE);
-        setApplicationName(DataSourceDescriptorFactory.getDescriptor(application).getName());
+        setApplicationName(DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
         setApplicationPid(-1); // TODO: provide PID once name doesn't contain it
 //        setApplicationIcon(new ImageIcon(ApplicationTypeFactory.getApplicationTypeFor(application).getIcon()));
     }

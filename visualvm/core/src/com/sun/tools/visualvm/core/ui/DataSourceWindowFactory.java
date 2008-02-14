@@ -113,7 +113,7 @@ public class DataSourceWindowFactory {
                     for (DataSourceView view : views) window.addView(view);
 
                     // Decorate the window according to the DataSource
-                    DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+                    DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDataSourceDescriptorFor(dataSource);
                     window.setName(descriptor.getName());
                     window.setIcon(descriptor.getIcon());
                 }

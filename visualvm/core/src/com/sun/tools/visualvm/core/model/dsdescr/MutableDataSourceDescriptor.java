@@ -26,41 +26,36 @@
 package com.sun.tools.visualvm.core.model.dsdescr;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public abstract class AbstractDataSourceDescriptor<X extends DataSource> implements DataSourceDescriptor<X> {
-    
-    private final PropertyChangeSupport changeSupport;
+public abstract class MutableDataSourceDescriptor extends DataSourceDescriptor {
     
     private Image icon;
     private String name;
     private String description;
     private int preferredPosition;
+    private final PropertyChangeSupport changeSupport;
     
     
-    public AbstractDataSourceDescriptor(X dataSource) {
+    public MutableDataSourceDescriptor(DataSource dataSource) {
         this(dataSource, dataSource.toString(), null, null, POSITION_AT_THE_END);
     }
     
-    public AbstractDataSourceDescriptor(X dataSource, String name, String description, Image icon, int preferredPosition) {
+    public MutableDataSourceDescriptor(DataSource dataSource, String n, String desc, Image ic, int pos) {
+        super();        
         if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null");
-        
         changeSupport = new PropertyChangeSupport(dataSource);
-        registerChangeListeners(dataSource);
-        
-        setName(name);
-        setDescription(description);
-        setIcon(icon);
-        setPreferredPosition(preferredPosition);
+        name = n;
+        description = desc;
+        icon = ic;
+        preferredPosition = pos;
     }
     
 
@@ -79,7 +74,6 @@ public abstract class AbstractDataSourceDescriptor<X extends DataSource> impleme
     public int getPreferredPosition() {
         return preferredPosition;
     }
-
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
@@ -100,36 +94,27 @@ public abstract class AbstractDataSourceDescriptor<X extends DataSource> impleme
     
     protected void setName(String newName) {
         if (newName == null) throw new IllegalArgumentException("Name cannot be null");
-        if (newName.equals(name)) return;
         String oldName = name;
         name = newName;
         changeSupport.firePropertyChange(PROPERTY_NAME, oldName, newName);
     }
     
     protected void setDescription(String newDescription) {
-        if (description == null && newDescription == null) return;
-        if ((description != null && description.equals(newDescription)) ||
-                (newDescription != null && newDescription.equals(description))) return;
         String oldDescription = description;
         description = newDescription;
         changeSupport.firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, newDescription);
     }
     
     protected void setIcon(Image newIcon) {
-        if (icon == newIcon) return;
         Image oldIcon = icon;
         icon = newIcon;
         changeSupport.firePropertyChange(PROPERTY_ICON, oldIcon, newIcon);
     }
     
     protected void setPreferredPosition(int newPosition) {
-        if (preferredPosition == newPosition) return;
         int oldPosition = preferredPosition;
         preferredPosition = newPosition;
-        changeSupport.firePropertyChange(PROPERTY_ICON, oldPosition, newPosition);
-    }
-    
-    protected void registerChangeListeners(X dataSource) {
+        changeSupport.firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
     }
 
 }

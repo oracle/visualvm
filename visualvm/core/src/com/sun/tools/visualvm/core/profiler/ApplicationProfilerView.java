@@ -245,7 +245,7 @@ class ApplicationProfilerView extends DataSourceView {
                       enableControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
                     } else {
-                      statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + "</a> in progress</nobr>");
+                      statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDataSourceDescriptorFor(profiledApplication).getName() + "</a> in progress</nobr>");
                       disableControlButtons();
                     }
 

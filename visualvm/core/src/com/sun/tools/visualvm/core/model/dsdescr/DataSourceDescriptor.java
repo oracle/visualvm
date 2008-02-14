@@ -1,23 +1,23 @@
 /*
  *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  *  This code is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License version 2 only, as
  *  published by the Free Software Foundation.  Sun designates this
  *  particular file as subject to the "Classpath" exception as provided
  *  by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  *  This code is distributed in the hope that it will be useful, but WITHOUT
  *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  version 2 for more details (a copy is included in the LICENSE file that
  *  accompanied this code).
- * 
+ *
  *  You should have received a copy of the GNU General Public License version
  *  2 along with this work; if not, write to the Free Software Foundation,
  *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  *  Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
@@ -25,15 +25,19 @@
 
 package com.sun.tools.visualvm.core.model.dsdescr;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
+import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
+
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public interface DataSourceDescriptor<X extends DataSource> {
+public abstract class DataSourceDescriptor extends Model {
+
     
     public static final int POSITION_AT_THE_END = Integer.MAX_VALUE;
     
@@ -45,15 +49,19 @@ public interface DataSourceDescriptor<X extends DataSource> {
     
     public static final String PROPERTY_PREFERRED_POSITION = "prop_preferred_position";
     
+    public abstract Image getIcon();
     
-    public Image getIcon();
+    public abstract String getName();
     
-    public String getName();
+    public abstract String getDescription();
     
-    public String getDescription();
+    public int getPreferredPosition() {
+        return POSITION_AT_THE_END;
+    }    
     
-    public int getPreferredPosition();
-    
+    public ExplorerActionDescriptor getImplicitDefaultAction() {
+        return null;
+    }
     
     /**
      * Add a PropertyChangeListener to the listener list.
@@ -65,7 +73,8 @@ public interface DataSourceDescriptor<X extends DataSource> {
      *
      * @param listener  The PropertyChangeListener to be added
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    }
     
     /**
      * Add a PropertyChangeListener for a specific property.  The listener
@@ -80,7 +89,9 @@ public interface DataSourceDescriptor<X extends DataSource> {
      * @param propertyName  The name of the property to listen on.
      * @param listener  The PropertyChangeListener to be added
      */
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    }
+    
     
     /**
      * Remove a PropertyChangeListener from the listener list.
@@ -93,7 +104,8 @@ public interface DataSourceDescriptor<X extends DataSource> {
      *
      * @param listener  The PropertyChangeListener to be removed
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    }
     
     /**
      * Remove a PropertyChangeListener for a specific property.
@@ -108,6 +120,6 @@ public interface DataSourceDescriptor<X extends DataSource> {
      * @param propertyName  The name of the property that was listened on.
      * @param listener  The PropertyChangeListener to be removed
      */
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
-
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    }
 }

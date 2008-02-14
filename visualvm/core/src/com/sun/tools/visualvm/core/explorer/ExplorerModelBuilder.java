@@ -122,7 +122,7 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     private ExplorerNode createNodeFor(final DataSource dataSource) {
         final ExplorerNode node = new ExplorerNode(dataSource);
-        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDataSourceDescriptorFor(dataSource);
         
         // Update node appearance according to descriptor changes
         descriptor.addPropertyChangeListener(new PropertyChangeListener() {

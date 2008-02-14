@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 
 /**
  *
@@ -54,6 +55,7 @@ public class ApplicationsSupport {
         new ApplicationActionsProvider().initialize();
         
         new JmxApplicationProvider().initialize();
+        DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorFactory());
     }
 
 }

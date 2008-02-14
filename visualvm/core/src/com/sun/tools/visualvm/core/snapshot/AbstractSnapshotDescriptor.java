@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.Snapshot;
-import com.sun.tools.visualvm.core.model.dsdescr.AbstractDataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.MutableDataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -34,17 +34,15 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-public class AbstractSnapshotDescriptor<X extends Snapshot> extends AbstractDataSourceDescriptor {
-    
-    private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredumps.png", true);
+public class AbstractSnapshotDescriptor<X extends Snapshot> extends MutableDataSourceDescriptor {
     
     
     public AbstractSnapshotDescriptor(X snapshot, SnapshotCategory<X> category, Image icon) {
-        super(snapshot);
-        
-        setName(category.getDisplayName(snapshot));
-        setDescription(snapshot.getFile() == null ? getName() + " without file" : snapshot.getFile().getAbsolutePath());
-        setIcon(icon);
+        super(snapshot,
+              category.getDisplayName(snapshot),
+              snapshot.getFile() == null ? category.getDisplayName(snapshot) + " without file" : snapshot.getFile().getAbsolutePath(),
+              icon,
+              POSITION_AT_THE_END);
     }
 
 }
