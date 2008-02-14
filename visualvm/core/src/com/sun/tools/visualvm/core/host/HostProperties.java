@@ -23,25 +23,30 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.explorer;
-
-import com.sun.tools.visualvm.core.datasource.DataSource;
+package com.sun.tools.visualvm.core.host;
 
 /**
- * Builder responsible for creating ExplorerNode instances and adding them to the explorer tree.
  *
  * @author Jiri Sedlacek
  */
-public interface ExplorerNodeBuilder <A extends DataSource> {
+class HostProperties {
 
-    /**
-     * Returns ExplorerNode for given DataSource or null if this builder won't handle the DataSource.
-     * Created nodes should be cached or correct ,equals() implementation for new nodes should be ensured
-     * as the Builder is asked for the ExplorerNode multiple times during DataSource/ExplorerNode lifecycle.
-     * 
-     * @param dataSource DataSource to create the ExplorerNode for
-     * @return ExplorerNode for given DataSource or null if this builder won't handle the DataSource.
-     */
-    public ExplorerNode<A> getNodeFor(A dataSource);
+    private String hostName;
+    private String displayName;
+
+
+    public HostProperties(String hostName, String displayName) {
+        this.hostName = hostName;
+        this.displayName = displayName;
+    }
+
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 
 }

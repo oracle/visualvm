@@ -23,34 +23,23 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.core.model.dsdescr;
+package com.sun.tools.visualvm.core.heapdump;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.datasource.HeapDump;
+import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
 import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-// NOTE: will be moved to core.application and registered into DataSourceDescriptorFactory from there
-public class ApplicationDescriptor extends AbstractDataSourceDescriptor {
+public class HeapDumpDescriptor extends AbstractSnapshotDescriptor<HeapDump> {
     
-    public ApplicationDescriptor(Application application) {
-        super(application, getName(application), getDescription(application), getIcon(application), POSITION_AT_THE_END);
-    }
+    private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
     
-    
-    private static String getName(Application application) {
-        return ApplicationTypeFactory.getApplicationTypeFor(application).getName();
-    }
-    
-    private static String getDescription(Application application) {
-        return ApplicationTypeFactory.getApplicationTypeFor(application).getDescription();
-    }
-    
-    private static Image getIcon(Application application) {
-        return ApplicationTypeFactory.getApplicationTypeFor(application).getIcon();
+    public HeapDumpDescriptor(HeapDump heapDump) {
+        super(heapDump, HeapDumpSupport.getInstance().getCategory(), ICON);
     }
 
 }
