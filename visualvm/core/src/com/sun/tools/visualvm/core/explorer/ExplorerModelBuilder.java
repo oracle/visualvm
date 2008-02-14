@@ -54,8 +54,8 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     private static ExplorerModelBuilder instance;
     
-    private final Map<DataSource, ExplorerNodeX> nodes;
-    private final ExplorerNodeX explorerRoot;
+    private final Map<DataSource, ExplorerNode> nodes;
+    private final ExplorerNode explorerRoot;
     private final DefaultTreeModel explorerModel;
     
     
@@ -81,7 +81,7 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     
     private void processAddedDataSource(Set<DataSource> added) {
-        Set<ExplorerNodeX> addedNodes = new HashSet();
+        Set<ExplorerNode> addedNodes = new HashSet();
         
         for (DataSource dataSource : added) {
             // DataSource is finished and shouldn't be displayed at all
@@ -98,10 +98,10 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processRemovedDataSources(Set<DataSource> removed) {
-        Set<ExplorerNodeX> removedNodes = new HashSet();
+        Set<ExplorerNode> removedNodes = new HashSet();
         
         for (DataSource dataSource : removed) {
-            ExplorerNodeX node = getNodeFor(dataSource);
+            ExplorerNode node = getNodeFor(dataSource);
             if (node != null) removedNodes.add(node);
         }
         
@@ -120,7 +120,7 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         });
     }
     
-    private ExplorerNodeX getNodeFor(DataSource dataSource) {
+    private ExplorerNode getNodeFor(DataSource dataSource) {
         return nodes.get(dataSource);
     }
     
@@ -128,8 +128,8 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         return getNodeFor(dataSource) != null;
     }
     
-    private ExplorerNodeX createNodeFor(final DataSource dataSource) {
-        final ExplorerNodeX node = new ExplorerNodeX(dataSource);
+    private ExplorerNode createNodeFor(final DataSource dataSource) {
+        final ExplorerNode node = new ExplorerNode(dataSource);
         DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
         
         // Update node appearance according to descriptor changes
@@ -149,7 +149,7 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         return node;
     }
     
-    private void updateNode(ExplorerNodeX node, PropertyChangeEvent evt) {
+    private void updateNode(ExplorerNode node, PropertyChangeEvent evt) {
         String property = evt.getPropertyName();
         Object newValue = evt.getNewValue();
         
@@ -167,7 +167,7 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         } else if (DataSourceDescriptor.PROPERTY_PREFERRED_POSITION.equals(property)) {
             Integer preferredPosition = (Integer)newValue;
             node.setPreferredPosition(preferredPosition);
-            ExplorerNodeX parent = (ExplorerNodeX)node.getParent();
+            ExplorerNode parent = (ExplorerNode)node.getParent();
             if (parent != null) {
                 parent.addNode(node);
                 explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) });
@@ -175,7 +175,7 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         }
     }
     
-    private void updateNode(DataSource dataSource, ExplorerNodeX node, PropertyChangeEvent evt) {
+    private void updateNode(DataSource dataSource, ExplorerNode node, PropertyChangeEvent evt) {
         // DataSource became visible and parent defined, node needs to be added
         if (dataSource.isVisible() && dataSource.getOwner() != null && !isNodeInTree(dataSource))
             addNodes(Collections.singleton(node));
@@ -189,31 +189,31 @@ public class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         }
     }
     
-    private void addNodes(Set<ExplorerNodeX> added) {
-        Set<ExplorerNodeX> parents = new HashSet();
+    private void addNodes(Set<ExplorerNode> added) {
+        Set<ExplorerNode> parents = new HashSet();
                 
-        for (ExplorerNodeX node : added) {
+        for (ExplorerNode node : added) {
             DataSource dataSource = node.getUserObject();
-            ExplorerNodeX nodeParent = getNodeFor(dataSource.getOwner());
+            ExplorerNode nodeParent = getNodeFor(dataSource.getOwner());
             nodes.put(dataSource, node);
             nodeParent.addNode(node);
             parents.add(nodeParent);
         }
         
-        for (ExplorerNodeX parent : parents) explorerModel.nodeStructureChanged(parent);
+        for (ExplorerNode parent : parents) explorerModel.nodeStructureChanged(parent);
     }
     
-    private void removeNodes(Set<ExplorerNodeX> removed) {
-        Set<ExplorerNodeX> parents = new HashSet();
+    private void removeNodes(Set<ExplorerNode> removed) {
+        Set<ExplorerNode> parents = new HashSet();
         
-        for (ExplorerNodeX node : removed) {
-            ExplorerNodeX nodeParent = (ExplorerNodeX)node.getParent();
+        for (ExplorerNode node : removed) {
+            ExplorerNode nodeParent = (ExplorerNode)node.getParent();
             node.removeFromParent();
             parents.add(nodeParent);
             nodes.remove(node.getUserObject());
         }
         
-        for (ExplorerNodeX parent : parents) explorerModel.nodeStructureChanged(parent);
+        for (ExplorerNode parent : parents) explorerModel.nodeStructureChanged(parent);
     }
     
     

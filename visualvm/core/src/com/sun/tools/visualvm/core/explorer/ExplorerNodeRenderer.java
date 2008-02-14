@@ -38,7 +38,7 @@ class ExplorerNodeRenderer extends DefaultTreeCellRenderer {
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         Component renderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        ExplorerNodeX dsn = (ExplorerNodeX)value;
+        ExplorerNode dsn = (ExplorerNode)value;
         JLabel rl = (JLabel)renderer;
         rl.setText(dsn.getName());
         rl.setIcon(dsn.getIcon());

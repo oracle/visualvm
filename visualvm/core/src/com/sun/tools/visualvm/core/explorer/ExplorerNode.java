@@ -37,19 +37,18 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @author Jiri Sedlacek
  */
-// TODO: rename to ExplorerNode
-final class ExplorerNodeX extends DefaultMutableTreeNode implements Comparable {
+final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     
     private String name;
     private Icon icon;
     private int preferredPosition;
     
     
-    public ExplorerNodeX(DataSource dataSource) {
+    public ExplorerNode(DataSource dataSource) {
         super(dataSource);
     }
     
-    public ExplorerNodeX(DataSource dataSource, String name, Icon icon, int preferredPosition) {
+    public ExplorerNode(DataSource dataSource, String name, Icon icon, int preferredPosition) {
         super(dataSource);
         setName(name);
         setIcon(icon);
@@ -75,24 +74,24 @@ final class ExplorerNodeX extends DefaultMutableTreeNode implements Comparable {
     }
     
     
-    public void addNode(ExplorerNodeX newChild) {
+    public void addNode(ExplorerNode newChild) {
         addNodes(Collections.singleton(newChild));
     }
     
-    public void addNodes(Set<ExplorerNodeX> newChildren) {
-        List<ExplorerNodeX> sortedNewChildren = new ArrayList(newChildren);
+    public void addNodes(Set<ExplorerNode> newChildren) {
+        List<ExplorerNode> sortedNewChildren = new ArrayList(newChildren);
         Collections.sort(sortedNewChildren);
         int insertPosition = 0;
-        for (ExplorerNodeX newChild : sortedNewChildren) {
+        for (ExplorerNode newChild : sortedNewChildren) {
             int newChildPreferredPosition = newChild.getPreferredPosition();
             if (insertPosition == getChildCount()) {
                 add(newChild);
                 insertPosition++;
             } else {
-                ExplorerNodeX node = (ExplorerNodeX)getChildAt(insertPosition);
+                ExplorerNode node = (ExplorerNode)getChildAt(insertPosition);
                 while (node.getPreferredPosition() <= newChildPreferredPosition && insertPosition < getChildCount()) {
                     insertPosition++;
-                    if (insertPosition < getChildCount()) node = (ExplorerNodeX)getChildAt(insertPosition);
+                    if (insertPosition < getChildCount()) node = (ExplorerNode)getChildAt(insertPosition);
                 }
                 if (insertPosition == getChildCount()) add(newChild);
                 else insert(newChild, insertPosition);
@@ -103,7 +102,7 @@ final class ExplorerNodeX extends DefaultMutableTreeNode implements Comparable {
     
     
     public int compareTo(Object o) {
-        ExplorerNodeX node = (ExplorerNodeX)o;
+        ExplorerNode node = (ExplorerNode)o;
         int preferredNodePosition = node.getPreferredPosition();
         if (preferredPosition == preferredNodePosition) return 0;
         if (preferredPosition > preferredNodePosition) return 1;

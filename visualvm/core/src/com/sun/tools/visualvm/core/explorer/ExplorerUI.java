@@ -75,7 +75,7 @@ class ExplorerUI extends JPanel {
     private void performDefaultAction(TreePath path) {
         if (path == null) return;
     
-        ExplorerNodeX node = (ExplorerNodeX)path.getLastPathComponent();
+        ExplorerNode node = (ExplorerNode)path.getLastPathComponent();
         DataSource dataSource = node.getUserObject();
         Action defaultAction = getDefaultAction(dataSource);
         if (defaultAction == null) return;
@@ -98,7 +98,7 @@ class ExplorerUI extends JPanel {
                 vetoTreeExpansion = false;
                 if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() >= getToggleClickCount()) {
                     TreePath path = getPathForLocation(e.getX(), e.getY());
-                    ExplorerNodeX node = path != null ? (ExplorerNodeX)path.getLastPathComponent() : null;
+                    ExplorerNode node = path != null ? (ExplorerNode)path.getLastPathComponent() : null;
                     if (node != null && getDefaultAction(node.getUserObject()) != null && getPathBounds(path).contains(e.getX(), e.getY())) vetoTreeExpansion = true;
                 }
                 super.processMouseEvent(e);
@@ -158,7 +158,7 @@ class ExplorerUI extends JPanel {
                 
                 // Determine the node for which to display context menu
                 TreePath selectedPath = explorerTree.getSelectionPath();
-                ExplorerNodeX selectedNode = selectedPath != null ? (ExplorerNodeX)selectedPath.getLastPathComponent() : null;
+                ExplorerNode selectedNode = selectedPath != null ? (ExplorerNode)selectedPath.getLastPathComponent() : null;
         
                 // Create popup menu and display it
                 JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(selectedNode == null ? DataSource.ROOT : selectedNode.getUserObject());
