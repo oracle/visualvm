@@ -77,7 +77,7 @@ class ApplicationMonitorView extends DataSourceView {
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent(application);
-            MonitorViewSupport.getInstance().getApplicationPluggableView().makeCustomizations(view, application);
+            MonitorViewSupport.getInstance().getApplicationMonitorPluggableView().makeCustomizations(view, application);
             application = null;
         }
         

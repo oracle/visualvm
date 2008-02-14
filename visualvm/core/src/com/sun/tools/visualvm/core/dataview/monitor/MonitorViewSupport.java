@@ -55,11 +55,11 @@ public class MonitorViewSupport {
      * 
      * @return PluggableView instance to be used to customize the Monitor view of an application.
      */
-    public PluggableView getPluggableView() {
-        return getApplicationPluggableView();
+    public PluggableView getApplicationPluggableView() {
+        return getApplicationMonitorPluggableView();
     }
     
-    ApplicationMonitorPluggableView getApplicationPluggableView() {
+    ApplicationMonitorPluggableView getApplicationMonitorPluggableView() {
         return applicationPluggableView;
     }
     

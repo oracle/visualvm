@@ -74,12 +74,7 @@ public class ThreadDumpSupport {
         return threadDumpPluggableView;
     }
     
-    /**
-     * Published by mistake, will be made package-private in next milestone!
-     * 
-     * @return non-public type ThreadDumpPluggableView
-     */
-    public ThreadDumpPluggableView getThreadDumpPluggableView() {
+    ThreadDumpPluggableView getThreadDumpPluggableView() {
         return threadDumpPluggableView;
     }
 

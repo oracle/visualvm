@@ -147,8 +147,8 @@ public class DataSourceWindowManager {
      * @param view DataSourceView to be added.
      */
     // NOTE: display own progress...
-    public void addView(DataSource owner, DataSourceView view) {
-        addViews(owner, Collections.singletonList(view), true, true, true);
+    public void addView(DataSource master, DataSourceView view) {
+        addViews(master, Collections.singletonList(view), true, true, true);
     }
     
     /**
@@ -158,8 +158,8 @@ public class DataSourceWindowManager {
      * @param dataSource DataSource to add the views for.
      */
     // NOTE: display own progress...
-    public void addViews(DataSource owner, DataSource dataSource) {
-        addViews(owner, DataSourceWindowFactory.sharedInstance().getViews(dataSource), true, true, true);
+    public void addViews(DataSource master, DataSource dataSource) {
+        addViews(master, DataSourceWindowFactory.sharedInstance().getViews(dataSource), true, true, true);
     }
     
     /**
@@ -172,12 +172,12 @@ public class DataSourceWindowManager {
      * @param selectLastView true if the added view should be selected within the Window.
      */
     // NOTE: display own progress...
-    public <X extends DataSourceView> void addViews(final DataSource owner, final List<X> views, final boolean selectWindow, final boolean toFront, final boolean selectFirstView) {
+    public <X extends DataSourceView> void addViews(final DataSource master, final List<X> views, final boolean selectWindow, final boolean toFront, final boolean selectFirstView) {
         processor.post(new Runnable() {
             public void run() {
-                DataSourceWindow window = getOpenedWindow(owner);
+                DataSourceWindow window = getOpenedWindow(master);
                 boolean wasOpened = window != null;
-                if (!wasOpened) window = createNewWindow(owner);
+                if (!wasOpened) window = createNewWindow(master);
                 if (window == null) return;
                 
                 final List<X> newViews = new ArrayList();
@@ -198,8 +198,8 @@ public class DataSourceWindowManager {
         });
     }
     
-    public void selectView(DataSource owner, DataSourceView dataSourceView) {
-        selectView(owner, dataSourceView, true, true);
+    public void selectView(DataSource master, DataSourceView dataSourceView) {
+        selectView(master, dataSourceView, true, true);
     }
     
     /**
@@ -210,10 +210,10 @@ public class DataSourceWindowManager {
      * @param selectWindow true if the opened Window should be made visible,
      * @param toFront true if the opened Window should be moved to front of all other Windows,
      */
-    public void selectView(final DataSource owner, final DataSourceView view, final boolean selectWindow, final boolean toFront) {
+    public void selectView(final DataSource master, final DataSourceView view, final boolean selectWindow, final boolean toFront) {
         processor.post(new Runnable() {
             public void run() {
-                DataSourceWindow window = getOpenedWindow(owner);
+                DataSourceWindow window = getOpenedWindow(master);
                 if (window == null) return;
                 displayWindow(window, view, false, selectWindow, toFront);
             }
@@ -226,8 +226,8 @@ public class DataSourceWindowManager {
      * @param dataSource DataSource from which to remove the Window,
      * @param dataSourceView DataSourceView to remove.
      */
-    public void removeView(final DataSource dataSource, final DataSourceView dataSourceView) {
-        final DataSourceWindow window = getOpenedWindow(dataSource);
+    public void removeView(final DataSource master, final DataSourceView dataSourceView) {
+        final DataSourceWindow window = getOpenedWindow(master);
         if (window == null) return;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -243,9 +243,9 @@ public class DataSourceWindowManager {
      * @param dataSourceView DataSourceView to check,
      * @return true if the Window of given DataSource contains the view, false otherwise.
      */
-    public boolean containsView(DataSource dataSource, DataSourceView dataSourceView) {
+    public boolean containsView(DataSource master, DataSourceView dataSourceView) {
         // NOTE: Should be called from EDT!!!
-        DataSourceWindow window = getOpenedWindow(dataSource);
+        DataSourceWindow window = getOpenedWindow(master);
         if (window == null) return false;
         return window.containsView(dataSourceView);
     }
