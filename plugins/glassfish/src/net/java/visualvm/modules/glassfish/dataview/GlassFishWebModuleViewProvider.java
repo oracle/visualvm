@@ -61,9 +61,8 @@ import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -289,7 +288,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static ExplorerActionsProvider<GlassFishApplication> actionsProvider = new ExplorerActionsProvider<GlassFishApplication>() {
-        private List<ExplorerActionDescriptor> actions = new ArrayList<ExplorerActionDescriptor>() {
+        private Set<ExplorerActionDescriptor> actions = new HashSet<ExplorerActionDescriptor>() {
 
             {
                 add(new ExplorerActionDescriptor(new AbstractAction("Start") {
@@ -316,7 +315,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             //            }, 0);
         }
 
-        public List<ExplorerActionDescriptor> getActions(GlassFishApplication application) {
+        public Set<ExplorerActionDescriptor> getActions(GlassFishApplication application) {
             return actions;
         }
     };

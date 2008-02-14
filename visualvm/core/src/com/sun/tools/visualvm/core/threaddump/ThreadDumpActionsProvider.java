@@ -34,8 +34,8 @@ import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.AbstractAction;
 
 /**
@@ -99,8 +99,8 @@ class ThreadDumpActionsProvider {
 
         public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(Application application) {
-            List<ExplorerActionDescriptor> actions = new LinkedList();
+        public Set<ExplorerActionDescriptor> getActions(Application application) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             JVM jvm = JVMFactory.getJVMFor(application);
             if (jvm.isTakeThreadDumpSupported())
@@ -115,8 +115,8 @@ class ThreadDumpActionsProvider {
 
         public ExplorerActionDescriptor getDefaultAction(CoreDump coreDump) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
-            List<ExplorerActionDescriptor> actions = new LinkedList();
+        public Set<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(takeCoreDumpThreadDumpAction, 10));
             
@@ -129,8 +129,8 @@ class ThreadDumpActionsProvider {
 
         public ExplorerActionDescriptor getDefaultAction(ThreadDumpImpl threadDump) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(ThreadDumpImpl threadDump) {
-            List<ExplorerActionDescriptor> actions = new LinkedList();
+        public Set<ExplorerActionDescriptor> getActions(ThreadDumpImpl threadDump) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(deleteThreadDumpAction, 10));
             

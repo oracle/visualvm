@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import javax.swing.AbstractAction;
 
 /**
@@ -64,8 +64,8 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSource>
         else return null;
     }
 
-    public List<ExplorerActionDescriptor> getActions(DataSource dataSource) {
-        return Collections.EMPTY_LIST;
+    public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
+        return Collections.EMPTY_SET;
     }
     
     

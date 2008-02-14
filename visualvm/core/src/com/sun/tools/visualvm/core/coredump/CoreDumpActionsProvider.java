@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.AbstractAction;
 
 /**
@@ -111,8 +111,8 @@ class CoreDumpActionsProvider {
     
     private static class CoreDumpActionProvider extends AbstractCoreDumpActionProvider<CoreDump> {
         
-        public List<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
-            List<ExplorerActionDescriptor> actions = new ArrayList();
+        public Set<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(null, 30));
             actions.add(new ExplorerActionDescriptor(new RenameCoreDumpAction(coreDump), 40));
@@ -124,8 +124,8 @@ class CoreDumpActionsProvider {
     
     private static class CoreDumpsContainerActionProvider extends AbstractCoreDumpActionProvider<CoreDumpsContainer> {
         
-        public List<ExplorerActionDescriptor> getActions(CoreDumpsContainer container) {
-            List<ExplorerActionDescriptor> actions = new ArrayList();
+        public Set<ExplorerActionDescriptor> getActions(CoreDumpsContainer container) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(addNewCoreDumpAction, 0));
             
@@ -136,8 +136,8 @@ class CoreDumpActionsProvider {
     
     private static class DataSourceRootActionProvider extends AbstractCoreDumpActionProvider<DataSource> {
         
-        public List<ExplorerActionDescriptor> getActions(DataSource root) {
-            List<ExplorerActionDescriptor> actions = new ArrayList();
+        public Set<ExplorerActionDescriptor> getActions(DataSource root) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(addNewCoreDumpAction, 20));
             

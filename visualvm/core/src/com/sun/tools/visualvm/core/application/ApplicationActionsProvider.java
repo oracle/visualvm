@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import org.openide.util.RequestProcessor;
 
@@ -51,8 +51,8 @@ class ApplicationActionsProvider implements ExplorerActionsProvider<Application>
         return null;
     }
     
-    public List<ExplorerActionDescriptor> getActions(Application application) {
-        List<ExplorerActionDescriptor> actions = new ArrayList();
+    public Set<ExplorerActionDescriptor> getActions(Application application) {
+        Set<ExplorerActionDescriptor> actions = new HashSet();
         JVM jvm = JVMFactory.getJVMFor(application);
         if (jvm.isDumpOnOOMEnabledSupported()) {
             actions.add(new ExplorerActionDescriptor(null, 40));

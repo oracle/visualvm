@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Provider of actions for explorer context menu.
@@ -55,6 +55,6 @@ public interface ExplorerActionsProvider <T extends DataSource> {
      * @param node ExplorerNode for which to display the actions,
      * @return list of ExplorerActionDesctiptors describing actions for given ExplorerNode.
      */
-    public List<ExplorerActionDescriptor> getActions(T dataSource);
+    public Set<ExplorerActionDescriptor> getActions(T dataSource);
 
 }

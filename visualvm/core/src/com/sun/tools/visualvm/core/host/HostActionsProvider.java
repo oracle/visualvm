@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.AbstractAction;
 
 /**
@@ -101,10 +101,10 @@ class HostActionsProvider {
             return null;
         }
 
-        public List<ExplorerActionDescriptor> getActions(Host host) {
-            if (host == null || host == Host.LOCALHOST) return Collections.EMPTY_LIST;
+        public Set<ExplorerActionDescriptor> getActions(Host host) {
+            if (host == null || host == Host.LOCALHOST) return Collections.EMPTY_SET;
             
-            List<ExplorerActionDescriptor> actions = new LinkedList();
+            Set<ExplorerActionDescriptor> actions = new HashSet();
 
             actions.add(new ExplorerActionDescriptor(renameHostAction, 10));
             
@@ -118,8 +118,8 @@ class HostActionsProvider {
 
         public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
-            List<ExplorerActionDescriptor> actions = new LinkedList();
+        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(addNewHostAction, 0));
             
@@ -132,8 +132,8 @@ class HostActionsProvider {
 
         public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) { return null; }
 
-        public List<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
-            List<ExplorerActionDescriptor> actions = new LinkedList();
+        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
+            Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(addNewHostAction, 10));
             
