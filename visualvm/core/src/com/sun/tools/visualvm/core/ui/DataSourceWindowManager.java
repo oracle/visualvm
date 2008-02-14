@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.explorer.ExplorerModelSupport;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.util.ArrayList;
 import java.util.Collections;
