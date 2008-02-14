@@ -133,6 +133,7 @@
                 <package>com.sun.tools.visualvm.core.heapdump</package>
                 <package>com.sun.tools.visualvm.core.model</package>
                 <package>com.sun.tools.visualvm.core.model.apptype</package>
+                <package>com.sun.tools.visualvm.core.model.dsdescr</package>
                 <package>com.sun.tools.visualvm.core.model.dstype</package>
                 <package>com.sun.tools.visualvm.core.model.host</package>
                 <package>com.sun.tools.visualvm.core.model.jmx</package>
