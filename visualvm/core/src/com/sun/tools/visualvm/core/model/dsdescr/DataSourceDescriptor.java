@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.model.dsdescr;
 
-import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
@@ -57,10 +56,6 @@ public abstract class DataSourceDescriptor extends Model {
     
     public int getPreferredPosition() {
         return POSITION_AT_THE_END;
-    }    
-    
-    public ExplorerActionDescriptor getImplicitDefaultAction() {
-        return null;
     }
     
     /**
