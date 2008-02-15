@@ -63,8 +63,7 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     }
 
     public void setDisplayName(String newDisplayName) {
-        if (displayName == null) throw new IllegalArgumentException("Display name cannot be null");
-        if (displayName.equals(newDisplayName)) return;
+        if (newDisplayName == null) throw new IllegalArgumentException("Display name cannot be null");
         String oldDisplayName = displayName;
         displayName = newDisplayName;
         getChangeSupport().firePropertyChange(PROPERTY_DISPLAYNAME, oldDisplayName, newDisplayName);

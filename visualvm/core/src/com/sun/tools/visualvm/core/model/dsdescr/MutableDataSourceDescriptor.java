@@ -100,12 +100,14 @@ public abstract class MutableDataSourceDescriptor extends DataSourceDescriptor {
     }
     
     protected void setDescription(String newDescription) {
+        if (description == null && newDescription == null) return;
         String oldDescription = description;
         description = newDescription;
         changeSupport.firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, newDescription);
     }
     
     protected void setIcon(Image newIcon) {
+        if (icon == null && newIcon == null) return;
         Image oldIcon = icon;
         icon = newIcon;
         changeSupport.firePropertyChange(PROPERTY_ICON, oldIcon, newIcon);

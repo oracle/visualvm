@@ -61,7 +61,7 @@ public abstract class AbstractDataSource implements DataSource {
     
     
     public synchronized void setOwner(DataSource newOwner) {
-        if (owner == newOwner) return;
+        if (owner == null && newOwner == null) return;
         DataSource oldOwner = owner;
         owner = newOwner;
         getChangeSupport().firePropertyChange(PROPERTY_OWNER, oldOwner, newOwner);
@@ -76,7 +76,6 @@ public abstract class AbstractDataSource implements DataSource {
     }
     
     public synchronized void setVisible(boolean newVisible) {
-        if (visible == newVisible) return;
         boolean oldVisible = visible;
         visible = newVisible;
         getChangeSupport().firePropertyChange(PROPERTY_VISIBLE, oldVisible, newVisible);
@@ -127,7 +126,6 @@ public abstract class AbstractDataSource implements DataSource {
     
     
     protected synchronized void setState(int newState) {
-        if (state == newState) return;
         if (state == STATE_FINISHED) throw new RuntimeException("Cannot change state from STATE_FINISHED");
         int oldState = state;
         state = newState;

@@ -60,6 +60,7 @@ class CoreDumpImpl extends AbstractSnapshot implements CoreDump {
     }
     
     public void setDisplayName(String newDisplayName) {
+        if (displayName == null && newDisplayName == null) return;
         String oldDisplayName = displayName;
         displayName = newDisplayName;
         getChangeSupport().firePropertyChange(PROPERTY_DISPLAYNAME, oldDisplayName, newDisplayName);

@@ -54,7 +54,6 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     
     protected void setFile(File newFile) {
         if (file == null && newFile == null) return;
-        if ((file != null && file.equals(newFile)) || (newFile != null && newFile.equals(file))) return;
         File oldFile = file;
         file = newFile;
         getChangeSupport().firePropertyChange(PROPERTY_FILE, oldFile, newFile);
