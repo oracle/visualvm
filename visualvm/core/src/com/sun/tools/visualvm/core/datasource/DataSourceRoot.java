@@ -32,5 +32,9 @@ package com.sun.tools.visualvm.core.datasource;
 public final class DataSourceRoot extends AbstractDataSource {
     
     DataSourceRoot() {}
+    
+    public void setVisible(boolean visible) {
+        if (!visible) throw new IllegalArgumentException("DataSourceRoot cannot be hidden");
+    }
 
 }
