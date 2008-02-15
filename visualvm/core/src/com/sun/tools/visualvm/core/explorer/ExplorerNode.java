@@ -79,6 +79,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     }
     
     public void addNodes(Set<ExplorerNode> newChildren) {
+        boolean firstChildren = getChildCount() == 0;
         List<ExplorerNode> sortedNewChildren = new ArrayList(newChildren);
         Collections.sort(sortedNewChildren);
         int insertPosition = 0;
@@ -98,6 +99,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
                 insertPosition++;
             }
         }
+        if (firstChildren && getChildCount() > 0) ExplorerSupport.sharedInstance().expandNode(this);
     }
     
     

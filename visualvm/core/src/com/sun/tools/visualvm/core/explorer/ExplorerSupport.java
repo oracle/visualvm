@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -65,14 +66,20 @@ public class ExplorerSupport {
      * 
      * @param dataSource DataSource to be selected.
      */
-    public void selectDataSource(DataSource dataSource) {
+    public void selectDataSource(final DataSource dataSource) {
         if (dataSource == null) return;
-        ExplorerNode node = getNode(dataSource);
-        if (node != null) mainTree.setSelectionPath(getPath(node));
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                ExplorerNode node = getNode(dataSource);
+                if (node != null) mainTree.setSelectionPath(getPath(node));
+            } 
+        });
     }
     
     public void clearSelection() {
-        mainTree.clearSelection();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { mainTree.clearSelection(); } 
+        });
     }
     
     public DataSource getSelectedDataSource() {
@@ -85,6 +92,28 @@ public class ExplorerSupport {
     
     public void removeSelectionListener(ExplorerSelectionListener listener) {
         selectionListeners.remove(listener);
+    }
+    
+    public void expandDataSource(DataSource dataSource) {
+        expandNode(getNode(dataSource));
+    }
+    
+    void expandNode(final ExplorerNode node) {
+        if (node == null) return;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { mainTree.expandPath(getPath(node)); } 
+        });
+    }
+    
+    public void collapseDataSource(DataSource dataSource) {
+        collapseNode(getNode(dataSource));
+    }
+    
+    void collapseNode(final ExplorerNode node) {
+        if (node == null) return;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { mainTree.collapsePath(getPath(node)); } 
+        });
     }
     
     /**
