@@ -82,8 +82,8 @@ class XTree extends JTree {
             DefaultMutableTreeNode parent,
             DefaultMutableTreeNode child,
             int index) {
-        boolean isRootLeaf = parent.isRoot() && parent.isLeaf();
         DefaultTreeModel model = (DefaultTreeModel) getModel();
+        boolean isRootLeaf = (parent == model.getRoot()) && parent.isLeaf();
         model.insertNodeInto(child, parent, index);
         // Make the root node's children visible if the
         // parent node is the root node and is a leaf
