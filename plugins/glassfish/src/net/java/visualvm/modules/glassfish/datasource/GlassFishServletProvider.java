@@ -25,7 +25,6 @@
 package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.monitor.ServletMonitor;
-import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -40,6 +39,10 @@ import java.util.Set;
  * @author Jaroslav Bachorik
  */
 public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFishServlet> implements DataChangeListener<GlassFishWebModule> {
+    private final static GlassFishServletProvider INSTANCE = new GlassFishServletProvider();
+    
+    private GlassFishServletProvider() {}
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void dataChanged(DataChangeEvent<GlassFishWebModule> event) {
@@ -61,9 +64,14 @@ public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFis
         }
     }
 
-    public void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, GlassFishWebModule.class);
+    public static void initialize() {
+        DataSourceRepository.sharedInstance().addDataSourceProvider(INSTANCE);
+        DataSourceRepository.sharedInstance().addDataChangeListener(INSTANCE, GlassFishWebModule.class);
+    }
+    
+    public static void shutdown() {
+        DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
+        DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
     }
 
     private void processFinishedModule(GlassFishWebModule module) {

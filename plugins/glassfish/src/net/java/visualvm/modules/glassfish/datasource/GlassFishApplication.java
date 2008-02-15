@@ -32,17 +32,22 @@ import com.sun.appserv.management.DomainRoot;
  * @author Jaroslav Bachorik
  */
 public abstract class GlassFishApplication extends GlassFishDataSource {    
-    private GlassFishRoot glassFishRoot;
+    private GlassFishModel glassFishRoot;
+    private String name;
     
-    public GlassFishApplication(String name, DomainRoot root, GlassFishRoot gfRoot) {
-        super(name, root);
-        glassFishRoot = gfRoot;
+    public GlassFishApplication(String name, DomainRoot root, GlassFishModel gfRoot) {
+        super(root);
+        this.name = name;
+        this.glassFishRoot = gfRoot;
     }
 
-    public GlassFishRoot getGlassFishRoot() {
+    public GlassFishModel getGlassFishRoot() {
         return glassFishRoot;
     }
 
+    public String getName() {
+        return name;
+    }
     
     abstract public void generateContents();
 }

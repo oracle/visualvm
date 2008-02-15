@@ -52,6 +52,8 @@ import net.java.visualvm.modules.glassfish.ui.Chart;
  * @author Jaroslav Bachorik
  */
 public class GlassFishServletViewProvider implements DataSourceViewsProvider<GlassFishServlet> {
+    private final static GlassFishServletViewProvider INSTANCE = new GlassFishServletViewProvider();
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class GlassfishServletView extends DataSourceView {
@@ -151,16 +153,20 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
         }
     }
 
+    private GlassFishServletViewProvider() {}
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Set<?extends DataSourceView> getViews(GlassFishServlet dataSource) {
         return Collections.singleton(new GlassfishServletView(dataSource));
     }
 
-    public void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(this, GlassFishServlet.class);
-
-        //        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(actionsProvider, GlassfishApplicationNode.class);
+    public static void initialize() {
+        DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, GlassFishServlet.class);
+    }
+    
+    public static void shutdown() {
+        DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
     }
 
     public boolean supportsViewFor(GlassFishServlet dataSource) {

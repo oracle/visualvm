@@ -25,46 +25,24 @@
 package net.java.visualvm.modules.glassfish.dataview;
 
 import com.sun.appserv.management.DomainRoot;
-import com.sun.appserv.management.monitor.ConnectionQueueMonitor;
-import com.sun.appserv.management.monitor.FileCacheMonitor;
 import com.sun.appserv.management.monitor.HTTPServiceMonitor;
-import com.sun.appserv.management.monitor.KeepAliveMonitor;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
 import com.sun.appserv.management.monitor.TransactionServiceMonitor;
-import com.sun.appserv.management.monitor.statistics.ConnectionQueueStats;
-import com.sun.appserv.management.monitor.statistics.FileCacheStats;
-import com.sun.appserv.management.monitor.statistics.KeepAliveStats;
-import com.sun.appserv.management.monitor.statistics.TransactionServiceStats;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVM;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.scheduler.Quantum;
-import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
-import com.sun.tools.visualvm.core.scheduler.Scheduler;
-import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
-import org.openide.util.Utilities;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
-import net.java.visualvm.modules.glassfish.ui.ConnectionQueuePanel;
-import net.java.visualvm.modules.glassfish.ui.FileCachePanel;
-import net.java.visualvm.modules.glassfish.ui.KeepAlivePanel;
-import net.java.visualvm.modules.glassfish.ui.TransactionsPanel;
-
 
 /**
  *
@@ -72,44 +50,46 @@ import net.java.visualvm.modules.glassfish.ui.TransactionsPanel;
  */
 public class GlassFishApplicationViewProvider implements DataSourceViewsProvider<Application> {
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    private final static GlassFishApplicationViewProvider INSTANCE = new GlassFishApplicationViewProvider();
 
+    private GlassFishApplicationViewProvider() {
+    }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
     @Override
-    public Set<?extends DataSourceView> getViews(final Application application) {
+    public Set<? extends DataSourceView> getViews(final Application application) {
+        if (!(application instanceof GlassFishApplication)) {
+            return Collections.EMPTY_SET;
+        }
+
+        GlassFishApplication gfApplication = (GlassFishApplication) application;
+
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
 
         if (model != null) {
             try {
-                DomainRoot dr = AMXUtil.getDomainRoot(model.getMBeanServerConnection());
+                final Map<String, ServerRootMonitor> serverMonitors = gfApplication.getDomainRoot().getMonitoringRoot().getServerRootMonitorMap();
+                final String serverName = JMXUtil.getServerName(model);
 
-                if (dr != null) {
-                    dr.waitAMXReady();
-
-                    final Map<String, ServerRootMonitor> serverMonitors = dr.getMonitoringRoot().getServerRootMonitorMap();
-                    JVM jvm = JVMFactory.getJVMFor(application);
-                    final String serverName = JMXUtil.getServerName(model);
-
-                    if (serverMonitors.get(serverName) == null) {
-                        return Collections.EMPTY_SET;
-                    }
-
-                    return new HashSet<DataSourceView>() {
-
-                            {
-                                HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
-                                TransactionServiceMonitor transMonitor = serverMonitors.get(serverName)
-                                                                                       .getTransactionServiceMonitor();
-
-                                if (httpMonitor != null) {
-                                    add(new HTTPServiceView(application, httpMonitor));
-                                }
-
-                                if (transMonitor != null) {
-                                    add(new TransactionServiceView(application, transMonitor));
-                                }
-                            }
-                        };
+                if (serverMonitors.get(serverName) == null) {
+                    return Collections.EMPTY_SET;
                 }
+
+                return new HashSet<DataSourceView>() {
+
+                    {
+                        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
+                        TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
+
+                        if (httpMonitor != null) {
+                            add(new HTTPServiceView(application, httpMonitor));
+                        }
+
+                        if (transMonitor != null) {
+                            add(new TransactionServiceView(application, transMonitor));
+                        }
+                    }
+                };
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -118,8 +98,12 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
         return Collections.EMPTY_SET;
     }
 
-    public void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(this, Application.class);
+    public static void initialize() {
+        DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, Application.class);
+    }
+
+    public static void shutdown() {
+        DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
     }
 
     public boolean supportsViewFor(Application dataSource) {

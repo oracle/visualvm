@@ -84,14 +84,6 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
             if (jvm.isGetSystemPropertiesSupported()) {
               domainName = jvm.getSystemProperties().getProperty("com.sun.aas.domainName", domainName);
             }
-//            JmxModel vm = JmxModelFactory.getJmxModelFor(app);
-//            DomainRoot dr = AMXUtil.getDomainRoot(vm.getCachedMBeanServerConnection());
-//            dr.waitAMXReady();
-//            Map<String, J2EEServer> servers = dr.getJ2EEDomain().getJ2EEServerMap();
-//            System.out.println("Listing all servers available:");
-//            for(Map.Entry<String, J2EEServer> server : servers.entrySet()) {
-//                System.out.println(server.getKey() + "(running on " +  server.getValue().getJVM().getjavaVersion() + ")");
-//            }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }

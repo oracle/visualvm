@@ -26,16 +26,12 @@
 package net.java.visualvm.modules.glassfish;
 
 import net.java.visualvm.modules.glassfish.dataview.GlassFishApplicationViewProvider;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.ui.ViewPlugin;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishRootProvider;
+import net.java.visualvm.modules.glassfish.datasource.GlassFishModelProvider;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishApplicationProvider;
+import net.java.visualvm.modules.glassfish.datasource.GlassFishDataSourceDescriptorFactory;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServletProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishServletViewProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishWebModuleViewProvider;
-import net.java.visualvm.modules.glassfish.explorer.GlassFishModelNodeBuilder;
-import net.java.visualvm.modules.glassfish.explorer.GlassFishWebModuleNodeBuilder;
-import net.java.visualvm.modules.glassfish.explorer.GlassFishServletNodeBuilder;
 import org.openide.modules.ModuleInstall;
 
 
@@ -52,25 +48,28 @@ public class Installer extends ModuleInstall {
 
     @Override
     public void restored() {
-        factory = new GlassFishApplicationTypeFactory();
-        ApplicationTypeFactory.getDefault().registerFactory(factory);
-        
-//        ApplicationUI.registerAdditionalDataViewProvider(new GlassFishApplicationViewProvider());
-        new GlassFishApplicationViewProvider().initialize();
-        new GlassFishRootProvider().initialize();
-        new GlassFishApplicationProvider().initialize();
-        new GlassFishServletProvider().initialize();
-//        new GlassFishWebModuleNodeBuilder().initialize();
-//        new GlassFishServletNodeBuilder().initialize();
-        new GlassFishWebModuleViewProvider().initialize();
-        new GlassFishServletViewProvider().initialize();
-        new GlassFishOverview().initialize();
-//        new GlassFishModelNodeBuilder().initialize();
+        GlassFishApplicationTypeFactory.initialize();        
+        GlassFishApplicationViewProvider.initialize();
+        GlassFishModelProvider.initialize();
+        GlassFishApplicationProvider.initialize();
+        GlassFishServletProvider.initialize();
+        GlassFishWebModuleViewProvider.initialize();
+        GlassFishServletViewProvider.initialize();
+        GlassFishOverview.initialize();
+        GlassFishDataSourceDescriptorFactory.initialize();
     }
 
     @Override
     public void uninstalled() {
-        ApplicationTypeFactory.getDefault().unregisterFactory(factory);
+        GlassFishApplicationTypeFactory.shutdown();   
+        GlassFishApplicationViewProvider.shutdown();
+        GlassFishModelProvider.shutdown();
+        GlassFishApplicationProvider.shutdown();
+        GlassFishServletProvider.shutdown();
+        GlassFishWebModuleViewProvider.shutdown();
+        GlassFishServletViewProvider.shutdown();
+        GlassFishOverview.shutdown();
+        GlassFishDataSourceDescriptorFactory.shutdown();
         super.uninstalled();
     }
 }

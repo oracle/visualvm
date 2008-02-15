@@ -27,19 +27,40 @@ package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.monitor.ServletMonitor;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import java.awt.Image;
 import java.util.Map;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class GlassFishWebModule extends GlassFishApplication {
+    private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png",
+                                                                   true);
     private WebModuleVirtualServerMonitor monitor;
     private String objectName;
     
-    public GlassFishWebModule(String name, String objName, WebModuleVirtualServerMonitor monitor, GlassFishRoot gfRoot) {
+    private DataSourceDescriptor descriptor = new DataSourceDescriptor() {
+
+        @Override
+        public Image getIcon() {
+            return NODE_ICON;
+        }
+
+        @Override
+        public String getName() {
+            return GlassFishWebModule.this.getName();
+        }
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+    };
+    
+    public GlassFishWebModule(String name, String objName, WebModuleVirtualServerMonitor monitor, GlassFishModel gfRoot) {
         super(name, monitor.getDomainRoot(), gfRoot);
         this.monitor = monitor;
         objectName = objName;
@@ -59,5 +80,10 @@ public class GlassFishWebModule extends GlassFishApplication {
             GlassFishServlet servlet = new GlassFishServlet(monitorEntry.getKey(), this, monitorEntry.getValue());
             getOwner().getRepository().addDataSource(servlet);
         }
+    }
+
+    @Override
+    public DataSourceDescriptor getDescriptor() {
+        return descriptor;
     }
 }

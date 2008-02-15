@@ -39,7 +39,7 @@ import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.ViewPlugin;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
+import net.java.visualvm.modules.glassfish.datasource.GlassFishModel;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import java.awt.BorderLayout;
@@ -58,6 +58,8 @@ import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
  * @author Jaroslav Bachorik
  */
 public class GlassFishOverview implements ViewPlugin<Application> {
+    private static final GlassFishOverview INSTANCE = new GlassFishOverview();
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class GlassfishViewDescriptor implements ViewDescriptor {
@@ -193,6 +195,8 @@ public class GlassFishOverview implements ViewPlugin<Application> {
         }
     }
 
+    private GlassFishOverview() {}
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Set<AreaDescriptor> getAreasFor(Application application) {
@@ -201,10 +205,10 @@ public class GlassFishOverview implements ViewPlugin<Application> {
 
     public Set<? extends ViewDescriptor> getViewsFor(Application application) {
         if (ApplicationTypeFactory.getApplicationTypeFor(application) instanceof GlassFishApplicationType) {
-            Set<GlassFishRoot> roots = application.getRepository().getDataSources(GlassFishRoot.class);
+            Set<GlassFishModel> roots = application.getRepository().getDataSources(GlassFishModel.class);
 
             if (roots.size() == 1) {
-                GlassFishRoot root = roots.iterator().next();
+                GlassFishModel root = roots.iterator().next();
                 JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
                 return Collections.singleton(new GlassfishViewDescriptor(root.getDomainRoot(), jmx));
             } else {
@@ -215,7 +219,11 @@ public class GlassFishOverview implements ViewPlugin<Application> {
         }
     }
 
-    public void initialize() {
-        OverviewViewSupport.getInstance().getApplicationPluggableView().addPlugin(this, Application.class);
+    public static void initialize() {
+        OverviewViewSupport.getInstance().getApplicationPluggableView().addPlugin(INSTANCE, Application.class);
+    }
+    
+    public static void shutdown() {
+        OverviewViewSupport.getInstance().getApplicationPluggableView().removePlugin(INSTANCE);
     }
 }

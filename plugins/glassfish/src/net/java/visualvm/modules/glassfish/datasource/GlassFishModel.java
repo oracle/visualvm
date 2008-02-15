@@ -23,17 +23,49 @@
  * have any questions.
  */
 
-package net.java.visualvm.modules.glassfish.explorer;
+package net.java.visualvm.modules.glassfish.datasource;
 
-//import com.sun.tools.visualvm.core.explorer.DataSourceExplorerNode;
-//import net.java.visualvm.modules.glassfish.datasource.GlassFishRoot;
+import com.sun.appserv.management.DomainRoot;
+import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import java.awt.Image;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishModelNode/* extends DataSourceExplorerNode<GlassFishRoot>*/ {
-//    public GlassFishModelNode(GlassFishRoot root) {
-//        super("Model", null, root);
-//    }
+public class GlassFishModel extends GlassFishDataSource {
+    private Application application;
+    
+    private final static DataSourceDescriptor DESCRIPTOR = new DataSourceDescriptor() {
+
+        @Override
+        public Image getIcon() {
+            return null;
+        }
+
+        @Override
+        public String getName() {
+            return "Model";
+        }
+
+        @Override
+        public String getDescription() {
+            return "GlassFish/SJSAS Logical Model";
+        }
+    };
+    
+    public GlassFishModel(DomainRoot root, Application app) {
+        super(root);
+        application = app;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    @Override
+    public DataSourceDescriptor getDescriptor() {
+        return DESCRIPTOR;
+    }
 }

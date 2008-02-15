@@ -26,23 +26,54 @@
 package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.monitor.ServletMonitor;
-import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class GlassFishServlet extends GlassFishDataSource {
+    private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png",
+                                                                   true);
     private ServletMonitor monitor;
+    private String name;
+    
+    private DataSourceDescriptor descriptor = new DataSourceDescriptor() {
+
+        @Override
+        public Image getIcon() {
+            return NODE_ICON;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+    };
     
     public GlassFishServlet(String name, GlassFishWebModule master, ServletMonitor monitor) {
-        super(name, monitor.getDomainRoot(), master);
+        super(monitor.getDomainRoot(), master);
         this.monitor = monitor;
+        this.name = name;
     }
 
     public ServletMonitor getMonitor() {
         return monitor;
+    }
+
+    @Override
+    public DataSourceDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -34,9 +34,6 @@ import javax.management.ReflectionException;
 import net.java.visualvm.modules.glassfish.ui.StatsTable;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats;
-import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
-import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
-import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
@@ -59,14 +56,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -74,7 +68,6 @@ import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
 
 
 /**
@@ -82,6 +75,7 @@ import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
  * @author Jaroslav Bachorik
  */
 public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<GlassFishWebModule> {
+    private final static GlassFishWebModuleViewProvider INSTANCE = new GlassFishWebModuleViewProvider();
     
     private static class GlassfishWebModuleView extends DataSourceView {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
@@ -285,41 +279,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static ExplorerActionsProvider<GlassFishApplication> actionsProvider = new ExplorerActionsProvider<GlassFishApplication>() {
-        private Set<ExplorerActionDescriptor> actions = new HashSet<ExplorerActionDescriptor>() {
-
-            {
-                add(new ExplorerActionDescriptor(new AbstractAction("Start") {
-                        public void actionPerformed(ActionEvent e) {
-                            throw new UnsupportedOperationException("Not supported yet.");
-                        }
-                    }, 0));
-                add(new ExplorerActionDescriptor(new AbstractAction("Stop") {
-                        public void actionPerformed(ActionEvent e) {
-                            throw new UnsupportedOperationException("Not supported yet.");
-                        }
-                    }, 1));
-            }
-        };
-
-        public ExplorerActionDescriptor getDefaultAction(GlassFishApplication application) {
-            return null;
-
-            //            return new ExplorerActionDescriptor(new AbstractAction("Open") {
-            //
-            //                public void actionPerformed(ActionEvent e) {
-            //                    throw new UnsupportedOperationException("Not supported yet.");
-            //                }
-            //            }, 0);
-        }
-
-        public Set<ExplorerActionDescriptor> getActions(GlassFishApplication application) {
-            return actions;
-        }
-    };
-
+    private GlassFishWebModuleViewProvider() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -327,9 +287,12 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
         return Collections.singleton(new GlassfishWebModuleView(dataSource));
     }
 
-    public void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(this, GlassFishWebModule.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(actionsProvider, GlassFishApplication.class);
+    public static void initialize() {
+        DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
+    }
+    
+    public static void shutdown() {
+        DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
     }
 
     public boolean supportsViewFor(GlassFishWebModule dataSource) {

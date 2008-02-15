@@ -29,6 +29,7 @@ package net.java.visualvm.modules.glassfish;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.apptype.MainClassApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 
@@ -38,6 +39,18 @@ import com.sun.tools.visualvm.core.model.jvm.JVM;
  * @author Jaroslav Bachorik
  */
 public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFactory {
+    private final static GlassFishApplicationTypeFactory INSTANCE = new GlassFishApplicationTypeFactory();
+    
+    private GlassFishApplicationTypeFactory() {}
+    
+    public static void initialize() {
+        ApplicationTypeFactory.getDefault().registerFactory(INSTANCE);
+    }
+    
+    public static void shutdown() {
+        ApplicationTypeFactory.getDefault().unregisterFactory(INSTANCE);
+    }
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     @Override

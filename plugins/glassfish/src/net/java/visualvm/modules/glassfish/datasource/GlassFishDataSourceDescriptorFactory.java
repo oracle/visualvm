@@ -25,22 +25,33 @@
 
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.appserv.management.DomainRoot;
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishRoot extends GlassFishDataSource {
-    private Application application;
+public class GlassFishDataSourceDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
+    final private static GlassFishDataSourceDescriptorFactory INSTANCE = new GlassFishDataSourceDescriptorFactory();
     
-    public GlassFishRoot(String name, DomainRoot root, Application app) {
-        super(name, root);
-        application = app;
+    private GlassFishDataSourceDescriptorFactory() {}
+    
+    @Override
+    public DataSourceDescriptor createModelFor(DataSource glassFishDS) {
+        if (glassFishDS instanceof GlassFishDataSource) {
+            return ((GlassFishDataSource)glassFishDS).getDescriptor();
+        }
+        return null;
+    }
+    
+    public static void initialize() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(INSTANCE);
     }
 
-    public Application getApplication() {
-        return application;
+    public static void shutdown() {
+        DataSourceDescriptorFactory.getDefault().unregisterFactory(INSTANCE);
     }
 }
