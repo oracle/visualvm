@@ -60,7 +60,7 @@ public class HostsSupport {
         hostProvider.initialize();
         
         DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorFactory());
-        new RemoteHostsContainerSupport().initialize();
+        new RemoteHostsContainerProvider().initialize();
 
         new HostActionsProvider().initialize();
         

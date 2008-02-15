@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
  * @author Jiri Sedlacek
  */
 // TODO: define DataSourceDescriptor for RemoteHostsContainer
-public class RemoteHostsContainerSupport extends DefaultDataSourceProvider<RemoteHostsContainer> {
+public class RemoteHostsContainerProvider extends DefaultDataSourceProvider<RemoteHostsContainer> {
     
     private void initContainer() {
         RemoteHostsContainer container = RemoteHostsContainer.sharedInstance();

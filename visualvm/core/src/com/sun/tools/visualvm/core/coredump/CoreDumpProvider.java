@@ -91,7 +91,10 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     
     protected <Y extends CoreDumpImpl> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
-        for (CoreDumpImpl coreDump : removed) coreDump.finished();
+        for (CoreDumpImpl coreDump : removed) {
+            CoreDumpsContainer.sharedInstance().getRepository().removeDataSource(coreDump);
+            coreDump.finished();
+        }
     }
     
     static void register() {

@@ -69,7 +69,10 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     
     protected <Y extends HostImpl> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
-        for (HostImpl host : removed) host.finished();
+        for (HostImpl host : removed) {
+            RemoteHostsContainer.sharedInstance().getRepository().removeDataSource(host);
+            host.finished();
+        }
     }
     
     
