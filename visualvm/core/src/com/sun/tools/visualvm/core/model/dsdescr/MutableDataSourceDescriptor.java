@@ -41,14 +41,15 @@ public abstract class MutableDataSourceDescriptor extends DataSourceDescriptor {
     private String name;
     private String description;
     private int preferredPosition;
+    private int autoExpansionPolicy;
     private final PropertyChangeSupport changeSupport;
     
     
     public MutableDataSourceDescriptor(DataSource dataSource) {
-        this(dataSource, dataSource.toString(), null, null, POSITION_AT_THE_END);
+        this(dataSource, dataSource.toString(), null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
     }
     
-    public MutableDataSourceDescriptor(DataSource dataSource, String n, String desc, Image ic, int pos) {
+    public MutableDataSourceDescriptor(DataSource dataSource, String n, String desc, Image ic, int pos, int aep) {
         super();        
         if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null");
         changeSupport = new PropertyChangeSupport(dataSource);
@@ -56,6 +57,7 @@ public abstract class MutableDataSourceDescriptor extends DataSourceDescriptor {
         description = desc;
         icon = ic;
         preferredPosition = pos;
+        autoExpansionPolicy = aep;
     }
     
 
@@ -73,6 +75,10 @@ public abstract class MutableDataSourceDescriptor extends DataSourceDescriptor {
 
     public int getPreferredPosition() {
         return preferredPosition;
+    }
+    
+    public int getAutoExpansionPolicy() {
+        return autoExpansionPolicy;
     }
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -117,6 +123,12 @@ public abstract class MutableDataSourceDescriptor extends DataSourceDescriptor {
         int oldPosition = preferredPosition;
         preferredPosition = newPosition;
         changeSupport.firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
+    }
+    
+    protected void getAutoExpansionPolicy(int newPolicy) {
+        int oldPolicy = autoExpansionPolicy;
+        autoExpansionPolicy = newPolicy;
+        changeSupport.firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, newPolicy);
     }
 
 }

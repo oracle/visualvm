@@ -179,6 +179,7 @@ class ExplorerModelBuilder {
         node.setName(descriptor.getName());
         node.setIcon(descriptor.getIcon() == null ? null : new ImageIcon(descriptor.getIcon()));
         node.setPreferredPosition(descriptor.getPreferredPosition());
+        node.setAutoExpansionPolicy(descriptor.getAutoExpansionPolicy());
     }
     
     private void updateNode(final ExplorerNode node, final PropertyChangeEvent evt) {
@@ -206,6 +207,8 @@ class ExplorerModelBuilder {
                         parent.addNode(node);
                         explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) });
                     }
+                } else if (DataSourceDescriptor.PROPERTY_EXPANSION_POLICY.equals(property)) {
+                    node.setAutoExpansionPolicy((Integer)evt.getNewValue());
                 }
             }
         });

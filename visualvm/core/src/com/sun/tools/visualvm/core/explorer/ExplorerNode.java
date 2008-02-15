@@ -26,12 +26,14 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
 
 /**
  *
@@ -42,6 +44,9 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     private String name;
     private Icon icon;
     private int preferredPosition;
+    private int autoExpansionPolicy;
+    
+    private boolean firstExpansionFlag = true;
     
     
     public ExplorerNode(DataSource dataSource) {
@@ -64,11 +69,6 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
         return icon;
     }
     
-    public int getPreferredPosition() {
-        return preferredPosition;
-    }
-    
-    
     public DataSource getUserObject() {
         return (DataSource)super.getUserObject();
     }
@@ -79,7 +79,8 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     }
     
     public void addNodes(Set<ExplorerNode> newChildren) {
-        boolean firstChildren = getChildCount() == 0;
+        int originalChildCount = getChildCount();
+        
         List<ExplorerNode> sortedNewChildren = new ArrayList(newChildren);
         Collections.sort(sortedNewChildren);
         int insertPosition = 0;
@@ -99,7 +100,31 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
                 insertPosition++;
             }
         }
-        if (firstChildren && getChildCount() > 0) ExplorerSupport.sharedInstance().expandNode(this);
+        
+        boolean shouldExpand = false;
+        boolean firstChildAdded = originalChildCount == 0 && getChildCount() > 0;
+        switch (autoExpansionPolicy) {
+//            case DataSourceDescriptor.EXPAND_NEVER:
+//                break;
+            case DataSourceDescriptor.EXPAND_ON_FIRST_CHILD:
+                if (firstExpansionFlag && firstChildAdded) shouldExpand = true;
+                firstExpansionFlag = false;
+                break;
+            case DataSourceDescriptor.EXPAND_ON_EACH_FIRST_CHILD:
+                if (firstChildAdded) shouldExpand = true;
+                break;
+            case DataSourceDescriptor.EXPAND_ON_EACH_NEW_CHILD:
+            case DataSourceDescriptor.EXPAND_ON_EACH_CHILD_CHANGE:
+                if (newChildren.size() > 0) shouldExpand = true;
+                break;
+        }
+        if (shouldExpand) ExplorerSupport.sharedInstance().expandNode(this);
+    }
+    
+    public void remove(MutableTreeNode aChild) {
+        super.remove(aChild);
+        if (autoExpansionPolicy == DataSourceDescriptor.EXPAND_ON_EACH_CHILD_CHANGE)
+            ExplorerSupport.sharedInstance().expandNode(this);
     }
     
     
@@ -116,6 +141,11 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     }
     
     
+    protected int getPreferredPosition() {
+        return preferredPosition;
+    }
+    
+    
     void setName(String name) {
         this.name = name;
     }
@@ -126,6 +156,11 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     
     void setPreferredPosition(int preferredPosition) {
         this.preferredPosition = preferredPosition;
+    }
+    
+    void setAutoExpansionPolicy(int autoExpansionPolicy) {
+        this.autoExpansionPolicy = autoExpansionPolicy;
+        firstExpansionFlag = true;
     }
 
 }

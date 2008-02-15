@@ -48,6 +48,18 @@ public abstract class DataSourceDescriptor extends Model {
     
     public static final String PROPERTY_PREFERRED_POSITION = "prop_preferred_position";
     
+    public static final String PROPERTY_EXPANSION_POLICY = "prop_expansion_policy";
+    
+    public static final int EXPAND_NEVER = 0;
+    
+    public static final int EXPAND_ON_FIRST_CHILD = 1;
+    
+    public static final int EXPAND_ON_EACH_FIRST_CHILD = 2;
+    
+    public static final int EXPAND_ON_EACH_NEW_CHILD = 3;
+    
+    public static final int EXPAND_ON_EACH_CHILD_CHANGE = 4;
+    
     public abstract Image getIcon();
     
     public abstract String getName();
@@ -56,6 +68,10 @@ public abstract class DataSourceDescriptor extends Model {
     
     public int getPreferredPosition() {
         return POSITION_AT_THE_END;
+    }
+    
+    public int getAutoExpansionPolicy() {
+        return EXPAND_ON_FIRST_CHILD;
     }
     
     /**

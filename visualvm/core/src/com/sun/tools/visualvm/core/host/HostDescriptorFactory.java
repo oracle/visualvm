@@ -69,7 +69,7 @@ class HostDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,D
         }
         
         private HostDescriptor(Host host) {
-            super(host,host.getDisplayName(),null,NODE_ICON,POSITION_AT_THE_END);
+            super(host,host.getDisplayName(),null,NODE_ICON,POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
@@ -119,6 +119,10 @@ class HostDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,D
         
         public int getPreferredPosition() {
             return 10;
+        }
+        
+        public int getAutoExpansionPolicy() {
+            return EXPAND_ON_EACH_NEW_CHILD;
         }
         
     }

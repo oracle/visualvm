@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.core.snapshot;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.model.dsdescr.MutableDataSourceDescriptor;
 import java.awt.Image;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -41,8 +40,7 @@ public class AbstractSnapshotDescriptor<X extends Snapshot> extends MutableDataS
         super(snapshot,
               category.getDisplayName(snapshot),
               snapshot.getFile() == null ? category.getDisplayName(snapshot) + " without file" : snapshot.getFile().getAbsolutePath(),
-              icon,
-              POSITION_AT_THE_END);
+              icon, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
     }
 
 }
