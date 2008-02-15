@@ -95,7 +95,6 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
         for (MonitoredHostDS monitoredHost : monitoredHosts) {
             try { monitoredHost.getMonitoredHost().removeHostListener(mapping.get(host)); } catch (MonitorException ex) {}
             mapping.remove(host);
-            monitoredHost.finished();
         }
     }
     
