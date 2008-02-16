@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +49,7 @@ public abstract class AbstractDataSource implements DataSource {
     private final DataSourceContainer<DataSource> repository = new DefaultDataSourceContainer(this);
     private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-    private final Set<DataFinishedListener> removedListeners = Collections.synchronizedSet(new HashSet());
+    private final Set<WeakReference<DataFinishedListener>> removedListeners = Collections.synchronizedSet(new HashSet());
 
 
     public AbstractDataSource() {
@@ -117,7 +118,7 @@ public abstract class AbstractDataSource implements DataSource {
     public void notifyWhenFinished(DataFinishedListener listener) {
         if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
         if (isFinished()) listener.dataFinished(this);
-        else removedListeners.add(listener);
+        else removedListeners.add(new WeakReference(listener));
     }
     
     public boolean isFinished() {
@@ -130,7 +131,13 @@ public abstract class AbstractDataSource implements DataSource {
         int oldState = state;
         state = newState;
         getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
-        if (newState == STATE_FINISHED) for (DataFinishedListener listener : removedListeners) listener.dataFinished(this);
+        if (newState == STATE_FINISHED) {
+            for (WeakReference<DataFinishedListener> listenerReference : removedListeners) {
+                DataFinishedListener listener = listenerReference.get();
+                if (listener != null) listener.dataFinished(this);
+            }
+            removedListeners.clear();
+        }
     }
     
     
