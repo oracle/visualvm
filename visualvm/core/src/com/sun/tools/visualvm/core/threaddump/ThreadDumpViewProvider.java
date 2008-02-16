@@ -43,7 +43,7 @@ import java.util.Set;
  */
 class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
     
-    private Map<ThreadDump, DataSourceView> viewsCache = new HashMap();
+    private final Map<ThreadDump, DataSourceView> viewsCache = new HashMap();
     
 
     public boolean supportsViewFor(ThreadDump threadDump) {
@@ -59,7 +59,10 @@ class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
         DataSourceView view = viewsCache.get(threadDump);
         if (view == null) {
             view = new ThreadDumpView(threadDump) {
-                protected void removed() { viewsCache.remove(threadDump); }
+                protected void removed() {
+                    super.removed();
+                    viewsCache.remove(threadDump);
+                }
             };
             viewsCache.put(threadDump, view);
         }

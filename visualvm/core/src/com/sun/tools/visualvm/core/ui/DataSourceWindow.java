@@ -73,6 +73,11 @@ class DataSourceWindow extends TopComponent {
         viewsCount--;
     }
     
+    public void removeAllViews() {
+        Set<DataSourceView> views = getViews();
+        for (DataSourceView view : views) removeView(view);
+    }
+    
     public Set<DataSourceView> getViews() {
         return tabbedContainer.getViews();
     }

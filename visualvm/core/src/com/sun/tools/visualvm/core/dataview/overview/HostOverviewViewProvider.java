@@ -41,17 +41,22 @@ import java.util.Set;
  */
 class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
     
-    public Map<Host, DataSourceView> viewsCache = new HashMap();
+    private final Map<Host, DataSourceView> viewsCache = new HashMap();
     
 
     public boolean supportsViewFor(Host host) {
         return HostOverviewFactory.getSystemOverviewFor(host) != null;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(Host host) {
+    public synchronized Set<? extends DataSourceView> getViews(final Host host) {
         DataSourceView view = viewsCache.get(host);
         if (view == null) {
-            view = new HostOverviewView(host);
+            view = new HostOverviewView(host) {
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(host);
+                }
+            };
             viewsCache.put(host, view);
         }
         return Collections.singleton(view);

@@ -55,7 +55,10 @@ class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
         DataSourceView view = viewsCache.get(heapDump);
         if (view == null) {
             view = new HeapDumpView(heapDump) {
-                public void removed() { viewsCache.remove(heapDump); }
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(heapDump);
+                }
             };
             viewsCache.put(heapDump, view);
         }

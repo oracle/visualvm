@@ -40,17 +40,22 @@ import java.util.Set;
  */
 class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application>{
     
-    private Map<Application, DataSourceView> viewsCache = new HashMap();
+    private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
     public boolean supportsViewFor(Application application) {
         return true;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(Application application) {
+    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
         DataSourceView view = viewsCache.get(application);
         if (view == null) {
-            view = new ApplicationOverviewView(application);
+            view = new ApplicationOverviewView(application) {
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(application);
+                }
+            };
             viewsCache.put(application, view);
         }
         return Collections.singleton(view);

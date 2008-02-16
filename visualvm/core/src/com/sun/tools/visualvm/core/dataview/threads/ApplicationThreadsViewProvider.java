@@ -42,7 +42,7 @@ import java.util.Set;
  */
 class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application>{
     
-    public Map<Application, DataSourceView> viewsCache = new HashMap();
+    private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
     public boolean supportsViewFor(Application application) {
@@ -50,10 +50,15 @@ class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Applicat
         return jmx != null && jmx.getThreadMXBean() != null;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(Application application) {
+    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
         DataSourceView view = viewsCache.get(application);
         if (view == null) {
-            view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean());
+            view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean()) {
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(application);
+                }
+            };
             viewsCache.put(application, view);
         }
         return Collections.singleton(view);

@@ -40,20 +40,24 @@ import java.util.Set;
  */
 class CoreDumpOverviewViewProvider implements DataSourceViewsProvider<CoreDump>{
     
-    private Map<CoreDump, DataSourceView> viewsCache = new HashMap();
+    private final Map<CoreDump, DataSourceView> viewsCache = new HashMap();
     
     private CoreDumpOverviewViewProvider() {
-        
     }
     
     public boolean supportsViewFor(CoreDump coreDump) {
         return true;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(CoreDump coreDump) {
+    public synchronized Set<? extends DataSourceView> getViews(final CoreDump coreDump) {
         DataSourceView view = viewsCache.get(coreDump);
         if (view == null) {
-            view = new CoreDumpOverviewView(coreDump);
+            view = new CoreDumpOverviewView(coreDump) {
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(coreDump);
+                }
+            };
             viewsCache.put(coreDump, view);
         }
         return Collections.singleton(view);

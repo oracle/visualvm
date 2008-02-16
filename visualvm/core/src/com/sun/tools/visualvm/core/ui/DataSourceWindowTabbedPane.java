@@ -105,6 +105,12 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()));
   }
   
+  public void removeTabAt(int index) {
+      DataSourceViewContainer container = (DataSourceViewContainer)getComponentAt(index);
+      super.removeTabAt(index);
+      mapping.remove(container);
+  }
+  
   public DataSourceView getDataSourceView(DataSourceViewContainer container) {
       return mapping.get(container);
   }

@@ -288,13 +288,7 @@ public class DataSourceWindowManager {
     void unregisterClosedWindow(final DataSourceWindow window) {
         DataSource dataSource = getDataSourceFor(window);
         openedWindows.remove(dataSource);
-        
-        final Set<DataSourceView> views = window.getViews();
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                for (DataSourceView view : views) view.removed();
-            }
-        });
+        window.removeAllViews();
     }
     
     
