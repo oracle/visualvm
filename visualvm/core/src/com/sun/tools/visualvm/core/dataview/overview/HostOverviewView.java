@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.dataview.overview;
 
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.host.HostOverview;
 import com.sun.tools.visualvm.core.model.host.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -91,7 +92,7 @@ class HostOverviewView extends DataSourceView {
         final SwapMemoryViewSupport swapMemoryViewSupport = new SwapMemoryViewSupport();
         dvc.addDetailsView(swapMemoryViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
-        Timer timer = new Timer(2000, new ActionListener() {
+        final Timer timer = new Timer(2000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 final long time = System.currentTimeMillis();
                 SwingUtilities.invokeLater(new Runnable() {
@@ -104,6 +105,9 @@ class HostOverviewView extends DataSourceView {
             }
         });
         timer.start();
+        host.notifyWhenFinished(new DataFinishedListener() {
+            public void dataFinished(Object dataSource) { timer.stop(); }
+        });
         // TODO: create listener for host availability and start/stop the timer accordingly
         
         return dvc;

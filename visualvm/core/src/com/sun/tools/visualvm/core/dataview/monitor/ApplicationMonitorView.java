@@ -67,11 +67,17 @@ class ApplicationMonitorView extends DataSourceView {
 
     private DataViewComponent view;
     private Application application;
+    private JVM jvm;
+    private MonitoredDataListener monitoredDataListener;
     
 
     public ApplicationMonitorView(Application application) {
         super("Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20);
         this.application = application;
+    }
+    
+    public void willBeAdded() {
+        jvm = JVMFactory.getJVMFor(application);
     }
         
     public DataViewComponent getView() {
@@ -91,23 +97,23 @@ class ApplicationMonitorView extends DataSourceView {
                 masterViewSupport.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        final HeapViewSupport heapViewSupport = new HeapViewSupport(application);
+        final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Heap", true), DataViewComponent.TOP_LEFT);
         dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
-        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(application);
+        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(jvm);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("PermGen", true), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
-        final ClassesViewSupport classesViewSupport = new ClassesViewSupport(application);
+        final ClassesViewSupport classesViewSupport = new ClassesViewSupport(jvm);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Classes", true), DataViewComponent.BOTTOM_LEFT);
         dvc.addDetailsView(classesViewSupport.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
         
-        final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(application);
+        final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(jvm);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Threads", true), DataViewComponent.BOTTOM_RIGHT);
         dvc.addDetailsView(threadsViewSupport.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
         
-        JVMFactory.getJVMFor(application).addMonitoredDataListener(new MonitoredDataListener() {
+        monitoredDataListener = new MonitoredDataListener() {
             public void monitoredDataEvent(final MonitoredData data) {
                 final long time = System.currentTimeMillis();
                 SwingUtilities.invokeLater(new Runnable() {
@@ -120,9 +126,14 @@ class ApplicationMonitorView extends DataSourceView {
                     }
                 });
             }
-        });
+        };
+        jvm.addMonitoredDataListener(monitoredDataListener);
         
         return dvc;
+    }
+    
+    protected void removed() {
+        if (jvm != null) jvm.removeMonitoredDataListener(monitoredDataListener);
     }
     
     
@@ -238,8 +249,7 @@ class ApplicationMonitorView extends DataSourceView {
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public HeapViewSupport(Application application) {
-            JVM jvm = JVMFactory.getJVMFor(application);
+        public HeapViewSupport(JVM jvm) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
             initComponents();
         }        
@@ -351,8 +361,7 @@ class ApplicationMonitorView extends DataSourceView {
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public PermGenViewSupport(Application application) {
-            JVM jvm = JVMFactory.getJVMFor(application);
+        public PermGenViewSupport(JVM jvm) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
             initComponents();
         }        
@@ -464,8 +473,7 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel unloadedSharedClassesLabel;
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public ClassesViewSupport(Application application) {
-            JVM jvm = JVMFactory.getJVMFor(application);
+        public ClassesViewSupport(JVM jvm) {
             classMonitoringSupported = jvm.isClassMonitoringSupported();
             initComponents();
         }        
@@ -588,8 +596,7 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel startedThreadsLabel;
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public ThreadsViewSupport(Application application) {
-            JVM jvm = JVMFactory.getJVMFor(application);
+        public ThreadsViewSupport(JVM jvm) {
             threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
             initComponents();
         }        
