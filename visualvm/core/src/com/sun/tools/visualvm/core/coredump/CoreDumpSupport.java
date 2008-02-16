@@ -42,7 +42,7 @@ public class CoreDumpSupport {
 
     
     public static void register() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorFactory());
+        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainerProvider.register();
         CoreDumpProvider.register();
         CoreDumpActionsProvider.register();

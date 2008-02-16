@@ -86,7 +86,7 @@ public class HeapDumpSupport {
 
     private HeapDumpSupport() {
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorFactory());
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorProvider());
         
         heapDumpProvider = new HeapDumpProvider();
         heapDumpProvider.initialize();

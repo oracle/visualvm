@@ -86,7 +86,7 @@ public class ThreadDumpSupport {
 
     private ThreadDumpSupport() {
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
-        DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorFactory());
+        DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorProvider());
         
         threadDumpProvider = new ThreadDumpProvider();
         threadDumpProvider.initialize();

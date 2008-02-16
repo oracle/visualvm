@@ -39,9 +39,9 @@ import org.openide.util.Utilities;
  *
  * @author Tomas Hurka
  */
-class HostDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    HostDescriptorFactory() {
+    HostDescriptorProvider() {
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {

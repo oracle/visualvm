@@ -23,40 +23,51 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.heapdump;
+package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.HeapDump;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
+import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.model.dsdescr.*;
 import java.awt.Image;
-import org.openide.util.Utilities;
 
 /**
  *
  * @author Tomas Hurka
  */
-class HeapDumpDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
-    
-    HeapDumpDescriptorFactory() {
+class ApplicationDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+
+    ApplicationDescriptorProvider() {
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (ds instanceof HeapDump) {
-            return new HeapDumpDescriptor((HeapDump) ds);
+        if (ds instanceof Application) {            
+            return new ApplicationDescriptor((Application) ds);
         }
         return null;
     }
     
-    private static class HeapDumpDescriptor extends AbstractSnapshotDescriptor<HeapDump> {
+    private static class ApplicationDescriptor extends DataSourceDescriptor {
+        private ApplicationType appType;
         
-        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
-        
-        public HeapDumpDescriptor(HeapDump heapDump) {
-            super(heapDump, HeapDumpSupport.getInstance().getCategory(), ICON);
+        ApplicationDescriptor(Application app) {
+            appType = ApplicationTypeFactory.getApplicationTypeFor(app);
         }
         
-    }
+        public String getName() {
+            return appType.getName();
+        }
 
+        public String getDescription() {
+            return appType.getDescription();
+        }
+
+        public Image getIcon() {
+            return appType.getIcon();
+        }
+
+    }
+    
 }

@@ -39,9 +39,9 @@ import org.openide.util.Utilities;
  *
  * @author Tomas Hurka
  */
-class CoreDumpDescriptorFactory extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    CoreDumpDescriptorFactory() {
+    CoreDumpDescriptorProvider() {
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {

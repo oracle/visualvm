@@ -56,7 +56,7 @@ public class HostsSupport {
 
 
     private HostsSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorFactory());
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorProvider());
         
         hostProvider = new HostProvider();
         hostProvider.initialize();
