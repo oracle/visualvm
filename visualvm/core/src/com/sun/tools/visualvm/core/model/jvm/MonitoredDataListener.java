@@ -26,11 +26,16 @@
 package com.sun.tools.visualvm.core.model.jvm;
 
 /**
- *
+ * A "monitoredDataEvent" event is periodically fired by {@link JVM}.
+ * 
  * @author Tomas Hurka
  */
 public interface MonitoredDataListener {
 
+  /**
+   * This method is peridically called by JVM.
+   * @param data A {@link MonitoredData} object describing the monitored data. 
+   */   
   void monitoredDataEvent(MonitoredData data);
 
 }

@@ -41,16 +41,21 @@ import sun.jvmstat.monitor.VmIdentifier;
 
 
 /**
- *
+ * The JVMFactory class is a factory class for getting {@link JVM} representation 
+ * for the {@link Application}.
  * @author Tomas Hurka
  */
-public class JVMFactory extends ModelFactory<JVM,Application> implements ModelProvider<JVM,Application> {
+public final class JVMFactory extends ModelFactory<JVM,Application> implements ModelProvider<JVM,Application> {
 
     private static JVMFactory jvmFactory;
 
     private JVMFactory() {
     }
     
+    /**
+     * getter for the default version of the JVMFactory
+     * @return instance of {@link JVMFactory}
+     */
     public static synchronized JVMFactory getDefault() {
         if (jvmFactory == null) {
             jvmFactory = new JVMFactory();
@@ -60,6 +65,13 @@ public class JVMFactory extends ModelFactory<JVM,Application> implements ModelPr
         return jvmFactory;
     }
     
+    /**
+     * Factory method for obtaining {@link JVM} for {@link Application}. Note that there
+     * is only one instance of {@link JVM} for concrete application. This {@link JVM} 
+     * instance is cached.
+     * @param app application 
+     * @return {@link JVM} instance which encapsulates application's JVM.
+     */
     public static JVM getJVMFor(Application app) {
         return getDefault().getModel(app);
     }
@@ -77,6 +89,13 @@ public class JVMFactory extends ModelFactory<JVM,Application> implements ModelPr
         }
     }
     
+    /**
+     * Default {@link ModelProvider} implementation, which creates 
+     * dummy {@link JVM} instance. If you want to extend JVMFactory use 
+     * {@link JVMFactory.registerFactory()} to register instance of {@link ModelProvider}
+     * @param appl application
+     * @return dummy instance of {@link JVM}
+     */
     public JVM createModelFor(Application appl) {
         if (appl instanceof JvmstatApplication) {
             JvmstatApplication app = (JvmstatApplication) appl;
