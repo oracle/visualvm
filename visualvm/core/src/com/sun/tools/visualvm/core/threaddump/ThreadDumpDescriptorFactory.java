@@ -51,7 +51,7 @@ class ThreadDumpDescriptorFactory extends AbstractModelProvider<DataSourceDescri
     
     private static class ThreadDumpDescriptor extends AbstractSnapshotDescriptor<ThreadDump> {
         
-        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
+        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/threaddump.png", true);
         
         public ThreadDumpDescriptor(ThreadDump threadDump) {
             super(threadDump, ThreadDumpSupport.getInstance().getCategory(), ICON);
