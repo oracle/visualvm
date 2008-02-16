@@ -49,13 +49,14 @@ public class ApplicationsSupport {
     }
 
     public ApplicationsSupport() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorFactory());
+        
         jvmstatApplicationProvider = new JvmstatApplicationProvider();
         jvmstatApplicationProvider.initialize();
 
         new ApplicationActionsProvider().initialize();
         
         new JmxApplicationProvider().initialize();
-        DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorFactory());
     }
 
 }

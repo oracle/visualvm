@@ -56,10 +56,11 @@ public class HostsSupport {
 
 
     private HostsSupport() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorFactory());
+        
         hostProvider = new HostProvider();
         hostProvider.initialize();
         
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorFactory());
         new RemoteHostsContainerProvider().initialize();
 
         new HostActionsProvider().initialize();
