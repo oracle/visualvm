@@ -41,5 +41,11 @@ class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     public ThreadDumpCategory() {
         super(NAME, ThreadDump.class, PREFIX, SUFFIX);
     }
+    
+    public String getDisplayName(ThreadDump snapshot) {
+        String displayName = super.getDisplayName(snapshot);
+        if (isSnapshot(snapshot.getFile())) return "[threaddump] " + displayName;
+        else return displayName;
+    }
 
 }

@@ -41,5 +41,11 @@ class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     public HeapDumpCategory() {
         super(NAME, HeapDump.class, PREFIX, SUFFIX);
     }
+    
+    public String getDisplayName(HeapDump snapshot) {
+        String displayName = super.getDisplayName(snapshot);
+        if (isSnapshot(snapshot.getFile())) return "[heapdump] " + displayName;
+        else return displayName;
+    }
 
 }

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.Snapshot;
 import java.io.File;
+import java.util.Date;
 
 
 /**
@@ -96,7 +97,15 @@ public abstract class SnapshotCategory<X extends Snapshot> {
     protected boolean isSnapshot(File file) {
         if (!file.isFile()) return false;
         String fileName = file.getName();
-        return fileName.startsWith(prefix) && fileName.endsWith(suffix);
+        return fileName.startsWith(getPrefix()) && fileName.endsWith(getSuffix());
+    }
+    
+    protected String getBaseFileName(String fileName) {
+        String pref = getPrefix();
+        String suff = getSuffix();
+        if (pref != null && fileName.startsWith(pref)) fileName = fileName.substring(pref.length());
+        if (suff != null && fileName.endsWith(suff)) fileName = fileName.substring(0, fileName.length() - suff.length());
+        return fileName;
     }
     
     /**
@@ -109,7 +118,19 @@ public abstract class SnapshotCategory<X extends Snapshot> {
     }
     
     public String getDisplayName(X snapshot) {
-        if (snapshot.getFile() != null) return snapshot.getFile().getName();
+        File file = snapshot.getFile();
+        if (file != null) {
+            String fileName = file.getName();
+            if (isSnapshot(file)) {
+                try {
+                    long timeStamp = Long.parseLong(getBaseFileName(fileName));
+                    return org.netbeans.lib.profiler.utils.StringUtils.formatUserDate(new Date(timeStamp));
+                } catch (NumberFormatException e) {
+                    return fileName;
+                }
+            }
+            else return fileName;
+        }
         else return snapshot.toString();
     }
 }
