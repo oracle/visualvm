@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.datasource.Application;
  *
  * @author Tomas Hurka
  */
-public class ApplicationTypeFactory extends ModelFactory<ApplicationType,Application> implements ModelProvider<ApplicationType,Application> {
+public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,Application> implements ModelProvider<ApplicationType,Application> {
 
   private static ApplicationTypeFactory appTypeFactory;
 

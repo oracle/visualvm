@@ -34,7 +34,7 @@ import java.awt.Image;
  *
  * @author Tomas Hurka
  */
-public class DataSourceDescriptorFactory extends ModelFactory<DataSourceDescriptor,DataSource> implements ModelProvider<DataSourceDescriptor,DataSource> {
+public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDescriptor,DataSource> implements ModelProvider<DataSourceDescriptor,DataSource> {
     
     private static DataSourceDescriptorFactory dsDescFactory;
     

@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.core.datasource.Application;
  *
  * @author Luis-Miguel Alventosa
  */
-public class JvmJmxModelFactory
+public final class JvmJmxModelFactory
         extends ModelFactory<JvmJmxModel, Application>
         implements ModelProvider<JvmJmxModel, Application> {
 
