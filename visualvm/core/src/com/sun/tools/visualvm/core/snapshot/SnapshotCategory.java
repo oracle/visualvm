@@ -109,6 +109,7 @@ public abstract class SnapshotCategory<X extends Snapshot> {
     }
     
     public String getDisplayName(X snapshot) {
-        return snapshot.toString();
+        if (snapshot.getFile() != null) return snapshot.getFile().getName();
+        else return snapshot.toString();
     }
 }
