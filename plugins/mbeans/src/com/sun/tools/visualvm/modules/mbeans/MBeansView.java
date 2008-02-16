@@ -98,7 +98,7 @@ class MBeansView extends DataSourceView {
 
         JExtendedSplitPane contentsSplitPane = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, mbeansTreeView, mbeansDisplayArea);
         tweakSplitPaneUI(contentsSplitPane);
-        contentsSplitPane.requestDividerLocation(0.3);
+        contentsSplitPane.setDividerLocation(0.3);
         contentsSplitPane.setResizeWeight(0);
 
         JPanel contentsPanel = new JPanel(new BorderLayout());

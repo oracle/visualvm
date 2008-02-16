@@ -30,7 +30,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 
@@ -64,20 +63,16 @@ public class JExtendedSplitPane extends JSplitPane {
     private ComponentListener splitPaneComponentListener = new SplitPaneComponentListener();
     
     private double dividerLocation;
-    private double cachedResizeWeight = -1;
     private int customDividerSize;
+    private double requestedDividerLocation = -1;
     
     public void doLayout() {
+        if (requestedDividerLocation != -1) {
+            setDividerLocation(requestedDividerLocation);
+            requestedDividerLocation = -1;
+            updateVisibility();
+        }
         super.doLayout();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (cachedResizeWeight != -1) {
-                    JExtendedSplitPane.super.setResizeWeight(cachedResizeWeight);
-                    cachedResizeWeight = -1;
-                }
-                updateVisibility();
-            }
-        });
     }
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -113,25 +108,15 @@ public class JExtendedSplitPane extends JSplitPane {
         customDividerSize = newSize;
     }
     
-    public void requestDividerLocation(double requestedDividerLocation) {
+    public void setDividerLocation(double requestedDividerLocation) {
         Component divider = getDivider();
         if (isVisible() && divider.isVisible()) { // SplitPane fully visible
-            setDividerLocation(requestedDividerLocation);
+            super.setDividerLocation(requestedDividerLocation);
         } else if (isVisible()) { // Divider not visible, will be updated in updateVisibility()
             dividerLocation = requestedDividerLocation;
-        } else if (!isVisible()) { // SplitPane not visible, will be initialized by resizeWeight and updated in hierarchyChanged() handler
-//            System.err.println(">>> Thread during: " + Thread.currentThread());
-//            Thread.dumpStack();
-//            System.err.println(">>> REQUEST: " + requestedDividerLocation);
-//            Thread.dumpStack();
-            if (cachedResizeWeight == -1) cachedResizeWeight = getResizeWeight();
-            super.setResizeWeight(requestedDividerLocation);
+        } else if (!isVisible()) { // SplitPane not visible, dividerLocation will be set on first visible doLayout()
+            this.requestedDividerLocation = requestedDividerLocation;
         }
-    }
-    
-    public void setResizeWeight(double resizeWeight) {
-        if (cachedResizeWeight != -1) cachedResizeWeight = resizeWeight;
-        else super.setResizeWeight(resizeWeight);
     }
 
     public void setLeftComponent(Component comp) { // Actually setTopComponent is implemented as setLeftComponent

@@ -79,17 +79,17 @@ public final class DataViewComponent extends JPanel {
         double topHorizontalDividerResizeWeight = detailsViewConfiguration.getTopHorizontalDividerResizeWeight();
         if (topHorizontalDividerResizeWeight != -1) detailsTopHorizontalSplitter.setResizeWeight(topHorizontalDividerResizeWeight);
         double topHorizontalDividerLocation = detailsViewConfiguration.getTopHorizontalDividerLocation();
-        if (topHorizontalDividerLocation != -1) detailsTopHorizontalSplitter.requestDividerLocation(topHorizontalDividerLocation);
+        if (topHorizontalDividerLocation != -1) detailsTopHorizontalSplitter.setDividerLocation(topHorizontalDividerLocation);
         
         double bottomHorizontalDividerResizeWeight = detailsViewConfiguration.getBottomHorizontalDividerResizeWeight();
         if (bottomHorizontalDividerResizeWeight != -1) detailsBottomHorizontalSplitter.setResizeWeight(bottomHorizontalDividerResizeWeight);
         double bottomHorizontalDividerLocation = detailsViewConfiguration.getBottomHorizontalDividerLocation();
-        if (bottomHorizontalDividerLocation != -1) detailsBottomHorizontalSplitter.requestDividerLocation(bottomHorizontalDividerLocation);
+        if (bottomHorizontalDividerLocation != -1) detailsBottomHorizontalSplitter.setDividerLocation(bottomHorizontalDividerLocation);
         
         double verticalDividerResizeWeight = detailsViewConfiguration.getVerticalDividerResizeWeight();
         if (verticalDividerResizeWeight != -1) detailsVerticalSplitter.setResizeWeight(verticalDividerResizeWeight);
         double verticalDividerLocation = detailsViewConfiguration.getVerticalDividerLocation();
-        if (verticalDividerLocation != -1) detailsVerticalSplitter.requestDividerLocation(verticalDividerLocation);
+        if (verticalDividerLocation != -1) detailsVerticalSplitter.setDividerLocation(verticalDividerLocation);
     }
     
     // Configures area (closable etc.)
@@ -217,7 +217,7 @@ public final class DataViewComponent extends JPanel {
         };
         tweakSplitPaneUI(detailsTopHorizontalSplitter);
         detailsTopHorizontalSplitter.setResizeWeight(0.5d);
-        detailsTopHorizontalSplitter.requestDividerLocation(0.5d);
+        detailsTopHorizontalSplitter.setDividerLocation(0.5d);
         detailsTopPanel.add(detailsTopHorizontalSplitter, BorderLayout.CENTER);
 
 
@@ -238,7 +238,7 @@ public final class DataViewComponent extends JPanel {
         };
         tweakSplitPaneUI(detailsBottomHorizontalSplitter);
         detailsBottomHorizontalSplitter.setResizeWeight(0.5d);
-        detailsBottomHorizontalSplitter.requestDividerLocation(0.5d);
+        detailsBottomHorizontalSplitter.setDividerLocation(0.5d);
         detailsBottomPanel.add(detailsBottomHorizontalSplitter, BorderLayout.CENTER);
 
 
@@ -258,7 +258,7 @@ public final class DataViewComponent extends JPanel {
         };
         tweakSplitPaneUI(detailsVerticalSplitter);
         detailsVerticalSplitter.setResizeWeight(0.5d);
-        detailsVerticalSplitter.requestDividerLocation(0.5d);
+        detailsVerticalSplitter.setDividerLocation(0.5d);
         detailsPanel.add(detailsVerticalSplitter, BorderLayout.CENTER);
 
 
