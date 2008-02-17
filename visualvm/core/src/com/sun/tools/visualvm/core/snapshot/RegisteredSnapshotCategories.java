@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,10 +34,6 @@ import java.util.Set;
 
 /**
  * A repository of registered SnapshotCategory instances.
- * This is currently used in the Overview tab to display number of saved snapshots
- * for an application/core dump. Snapshot providers don't need to register the types
- * here if not to be displayed in the UI, for example core dumps are displayed in
- * a separate entry in the explorer.
  *
  * @author Jiri Sedlacek
  */
@@ -76,14 +73,32 @@ public final class RegisteredSnapshotCategories {
         categories.remove(category);
     }
 
-    // TODO: implement some kind of stable sorting (introduce getPreferredPosition)
     /**
-     * Returns list of registered SnapshotCategory instances.
+     * Returns list of registered SnapshotCategory instances to be shown in UI.
      * 
-     * @return list of registered SnapshotCategory instances.
+     * @return list of registered SnapshotCategory instances to be shown in UI.
      */
-    public List<SnapshotCategory> getCategories() {
-        return new ArrayList(categories);
+    public List<SnapshotCategory> getVisibleCategories() {
+        List<SnapshotCategory> allCategories = new ArrayList(categories);
+        List<SnapshotCategory> visibleCategories = new ArrayList();
+        for (SnapshotCategory category : allCategories)
+            if (category.getPreferredPosition() != SnapshotCategory.POSITION_NONE)
+                visibleCategories.add(category);
+        
+        Collections.sort(visibleCategories, Positionable.COMPARATOR);
+        
+        return visibleCategories;
+    }
+    
+    /**
+     * Returns list of all registered SnapshotCategory instances.
+     * 
+     * @return list of all registered SnapshotCategory instances.
+     */
+    public List<SnapshotCategory> getAllCategories() {
+        List<SnapshotCategory> allCategories = new ArrayList(categories);
+        Collections.sort(allCategories, Positionable.COMPARATOR);
+        return allCategories;
     }
     
     

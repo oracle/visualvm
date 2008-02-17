@@ -26,21 +26,29 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.io.File;
 import java.util.Date;
 
 
 /**
  * Category describing a snapshot type.
+ * Category should return POSITION_NONE for getPreferredPosition() if it's not to be shown in UI.
  *
  * @author Jiri Sedlacek
  */
-public abstract class SnapshotCategory<X extends Snapshot> {
+public abstract class SnapshotCategory<X extends Snapshot> implements Positionable {
+    
+    /**
+     * Category won't be displayed in UI.
+     */
+    public static final int POSITION_NONE = Integer.MIN_VALUE;
 
     private final String name;
     private final Class<X> type;
     private final String prefix;
     private final String suffix;
+    private final int preferredPosition;
 
     /**
      * Creates new instance of SnapshotCategory.
@@ -50,12 +58,13 @@ public abstract class SnapshotCategory<X extends Snapshot> {
      * @param prefix prefix of files containing the snapshots,
      * @param suffix suffix of files containing the snapshots.
      */
-    public SnapshotCategory(String name, Class<X> type, String prefix, String suffix) {
+    public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition) {
         super();
         this.name = name;
         this.type = type;
         this.prefix = prefix;
         this.suffix = suffix;
+        this.preferredPosition = preferredPosition;
     }
 
     /**
@@ -74,6 +83,15 @@ public abstract class SnapshotCategory<X extends Snapshot> {
      */
     public Class<X> getType() {
         return type;
+    }
+    
+    /**
+     * Returns preferred position of this category within other categories when presented in UI.
+     * 
+     * @return preferred position of this category within other categories when presented in UI.
+     */
+    public int getPreferredPosition() {
+        return preferredPosition;
     }
     
     /**

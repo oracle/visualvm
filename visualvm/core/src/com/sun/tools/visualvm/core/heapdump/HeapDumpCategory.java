@@ -39,7 +39,7 @@ class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     public static final String SUFFIX = ".hprof";
     
     public HeapDumpCategory() {
-        super(NAME, HeapDump.class, PREFIX, SUFFIX);
+        super(NAME, HeapDump.class, PREFIX, SUFFIX, 20);
     }
     
     public String getDisplayName(HeapDump snapshot) {

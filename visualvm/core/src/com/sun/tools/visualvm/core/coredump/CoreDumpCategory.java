@@ -39,7 +39,7 @@ class CoreDumpCategory extends SnapshotCategory<CoreDump> {
     public static final String SUFFIX = ".core";
     
     public CoreDumpCategory() {
-        super(NAME, CoreDump.class, PREFIX, SUFFIX);
+        super(NAME, CoreDump.class, PREFIX, SUFFIX, POSITION_NONE);
     }
     
     public String getDisplayName(CoreDump coreDump) {

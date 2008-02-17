@@ -153,7 +153,7 @@ public final class OverviewViewSupport {
         private String getSavedData(DataSource ds) {
             StringBuilder data = new StringBuilder();
             
-            List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getCategories();
+            List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
             for (SnapshotCategory category : snapshotCategories)
                 data.append("<b>" + category.getName() + ":</b> " + ds.getRepository().getDataSources(category.getType()).size() + "<br>");
 

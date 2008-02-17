@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.coredump;
 
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 
 /**
  *
@@ -42,6 +43,7 @@ public final class CoreDumpSupport {
 
     
     public static void register() {
+        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
         DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainerProvider.register();
         CoreDumpProvider.register();

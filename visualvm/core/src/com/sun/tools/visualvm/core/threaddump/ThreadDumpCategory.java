@@ -39,7 +39,7 @@ class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     public static final String SUFFIX = ".tdump";
     
     public ThreadDumpCategory() {
-        super(NAME, ThreadDump.class, PREFIX, SUFFIX);
+        super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10);
     }
     
     public String getDisplayName(ThreadDump snapshot) {
