@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.core.dataview.threads;
 
-import com.sun.tools.visualvm.core.ui.PluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 
 /**
  * A public entrypoint to the Threads subtab.
@@ -55,7 +55,7 @@ public final class ThreadsViewSupport {
      * 
      * @return PluggableView instance to be used to customize the Threads view of an application.
      */
-    public PluggableView getApplicationPluggableView() {
+    public PluggableViewSupport getApplicationPluggableView() {
         return applicationPluggableView;
     }
 

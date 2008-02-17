@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.util.Set;
 
 /**
- * Definition of a plugin which can modify a PluggableView.
+ * Definition of a plugin which can modify pluggable DataSourceView.
  *
  * @author Jiri Sedlacek
  */

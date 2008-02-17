@@ -36,7 +36,7 @@ import java.net.URI;
  *
  * @author Jiri Sedlacek
  */
-public class DesktopUtils {
+public final class DesktopUtils {
 
     private static final Object allowDesktopOpen = System.getProperty("com.sun.tools.visualvm.core.ui.DesktopUtils.allowDesktopOpen");
 

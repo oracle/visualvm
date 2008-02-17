@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.core.threaddump;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 
 /**
  * A public entrypoint to the thread dump support in VisualVM.
@@ -70,7 +70,7 @@ public final class ThreadDumpSupport {
      * 
      * @return PluggableView instance to be used to customize the thread dump view.
      */
-    public PluggableView getPluggableView() {
+    public PluggableViewSupport getPluggableView() {
         return threadDumpPluggableView;
     }
     

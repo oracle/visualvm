@@ -26,14 +26,14 @@
 package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.ThreadDump;
-import com.sun.tools.visualvm.core.ui.AbstractPluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ThreadDumpPluggableView extends AbstractPluggableView<ThreadDump> {
+class ThreadDumpPluggableView extends PluggableViewSupport<ThreadDump> {
 
     public <X extends ThreadDump> boolean allowsNewArea(X dataSource, int location) {
         return true;

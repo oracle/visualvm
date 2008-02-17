@@ -35,29 +35,61 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Support class allowing customization of DataSourceViews by ViewPlugins.
  *
  * @author Jiri Sedlacek
  */
-public abstract class AbstractPluggableView<A extends DataSource> implements PluggableView<A> {
+public abstract class PluggableViewSupport<A extends DataSource> {
 
     private Map<ViewPlugin<? extends A>, Class<? extends A>> plugins = Collections.synchronizedMap(new HashMap());
 
 
+    /**
+     * Registers new ViewPlugin.
+     * 
+     * @param plugin ViewPlugin to add.
+     * @param scope scope of DataSources for whose views the plugin plugs into.
+     */
     public <X extends A> void addPlugin(ViewPlugin<X> plugin, Class<X> scope) {
         plugins.put(plugin, scope);
     }
 
+    /**
+     * Unregisters ViewPlugin.
+     * 
+     * @param plugin ViewPlugin to remove.
+     */
     public <X extends A> void removePlugin(ViewPlugin<X> plugin) {
         plugins.remove(plugin);
     }
 
 
+    /**
+     * Returns true if the pluggable view allows defining new areas for given DataSource instance at given location, false otherwise.
+     * 
+     * @param dataSource DataSource for which to define new area,
+     * @param location location of new area.
+     * @return true if the pluggable view allows defining new areas for given DataSource instance at given location, false otherwise.
+     */
     public abstract <X extends A> boolean allowsNewArea(X dataSource, int location);
 
+    /**
+     * Returns true if the pluggable view allows adding new view for given DataSource at given location. false otherwise.
+     * 
+     * @param dataSource DataSource for which to add new view,
+     * @param location location of new view.
+     * @return true if the pluggable view allows adding new view for given DataSource at given location. false otherwise.
+     */
     public abstract <X extends A> boolean allowsNewView(X dataSource, int location);
     
     
     // TODO: check generics
+    /**
+     * Customizes given view of given DataSource by registered ViewPlugins.
+     * 
+     * @param view DataViewComponent to customize, 
+     * @param dataSource DataSource for which to customize the view.
+     */
     protected <X extends A> void customizeView(DataViewComponent view, X dataSource) {
         
         List<ViewPlugin<X>> compatiblePlugins = getCompatiblePlugins(dataSource);
@@ -78,6 +110,12 @@ public abstract class AbstractPluggableView<A extends DataSource> implements Plu
         
     }
     
+    /**
+     * Returns list of ViewPlugins registered to customize view of given DataSource.
+     * 
+     * @param dataSource DataSource for which to customize the view.
+     * @return list of ViewPlugins registered to customize view of given DataSource.
+     */
     protected <X extends A> List<ViewPlugin<X>> getCompatiblePlugins(X dataSource) {
         List<ViewPlugin<X>> compatiblePlugins = new ArrayList();
         

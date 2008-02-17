@@ -33,7 +33,7 @@ import javax.swing.JScrollPane;
  *
  * @author Jiri Sedlacek
  */
-public class ScrollableContainer extends JScrollPane {
+public final class ScrollableContainer extends JScrollPane {
 
     public ScrollableContainer(JComponent view) {
         setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);

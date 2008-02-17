@@ -26,14 +26,14 @@
 package com.sun.tools.visualvm.core.dataview.threads;
 
 import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.ui.AbstractPluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ApplicationThreadsPluggableView extends AbstractPluggableView<Application> {
+class ApplicationThreadsPluggableView extends PluggableViewSupport<Application> {
 
     public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
         switch (location) {

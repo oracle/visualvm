@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
@@ -78,7 +78,7 @@ public final class OverviewViewSupport {
      * 
      * @return PluggableView instance to be used to customize the Overview view of a host.
      */
-    public PluggableView getHostPluggableView() {
+    public PluggableViewSupport getHostPluggableView() {
         return getHostOverviewPluggableView();
     }
     
@@ -91,7 +91,7 @@ public final class OverviewViewSupport {
      * 
      * @return PluggableView instance to be used to customize the Overview view of an application.
      */
-    public PluggableView getApplicationPluggableView() {
+    public PluggableViewSupport getApplicationPluggableView() {
         return getApplicationOverviewPluggableView();
     }
 
@@ -104,7 +104,7 @@ public final class OverviewViewSupport {
      * 
      * @return PluggableView instance to be used to customize the Overview view of a core dump.
      */
-    public PluggableView getCoreDumpPluggableView() {
+    public PluggableViewSupport getCoreDumpPluggableView() {
         return getCoreDumpOverviewPluggableView();
     }
     

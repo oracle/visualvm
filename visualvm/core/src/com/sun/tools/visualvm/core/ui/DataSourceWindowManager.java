@@ -39,12 +39,11 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.RequestProcessor;
 
 /**
- * Class managing Windows (windows, TopComponents) of DataSource instances.
+ * Class managing DataSourceWindows (TopComponents).
  *
  * @author Jiri Sedlacek
  */
-// TODO: don't force the user to call these methods in EDT, use SwingUtilities.invokeLater when neccessary
-public class DataSourceWindowManager {
+public final class DataSourceWindowManager {
     
     private static final RequestProcessor processor = new RequestProcessor("DataSourceWindowManager Processor");
 
@@ -108,6 +107,11 @@ public class DataSourceWindowManager {
         });
     }
     
+    /**
+     * Selects opened window of given DataSource.
+     * 
+     * @param dataSource DataSource to select the view for.
+     */
     public void selectWindow(DataSource dataSource) {
         selectWindow(dataSource, true);
     }
@@ -197,6 +201,12 @@ public class DataSourceWindowManager {
         });
     }
     
+    /**
+     * Select opened view in opened window of master DataSource.
+     * 
+     * @param master DataSource whose window contains the view to select,
+     * @param dataSourceView view to select.
+     */
     public void selectView(DataSource master, DataSourceView dataSourceView) {
         selectView(master, dataSourceView, true, true);
     }

@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.core.heapdump;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 
 /**
  * A public entrypoint to the heap dump support in VisualVM.
@@ -70,7 +70,7 @@ public final class HeapDumpSupport {
      * 
      * @return PluggableView instance to be used to customize the heap dump view.
      */
-    public PluggableView getPluggableView() {
+    public PluggableViewSupport getPluggableView() {
         return heapDumpPluggableView;
     }
     

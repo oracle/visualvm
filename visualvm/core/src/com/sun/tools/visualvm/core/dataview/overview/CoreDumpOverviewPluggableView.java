@@ -26,14 +26,14 @@
 package com.sun.tools.visualvm.core.dataview.overview;
 
 import com.sun.tools.visualvm.core.datasource.CoreDump;
-import com.sun.tools.visualvm.core.ui.AbstractPluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class CoreDumpOverviewPluggableView extends AbstractPluggableView<CoreDump> {
+class CoreDumpOverviewPluggableView extends PluggableViewSupport<CoreDump> {
 
     public <X extends CoreDump> boolean allowsNewArea(X dataSource, int location) {
         switch (location) {

@@ -43,7 +43,7 @@ import javax.swing.SwingUtilities;
  * @author Jiri Sedlacek
  */
 // TODO: synchronize!!!
-public class DataSourceWindowFactory {
+public final class DataSourceWindowFactory {
 
     private static DataSourceWindowFactory sharedInstance;
 

@@ -26,14 +26,14 @@
 package com.sun.tools.visualvm.core.dataview.overview;
 
 import com.sun.tools.visualvm.core.datasource.Host;
-import com.sun.tools.visualvm.core.ui.AbstractPluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class HostOverviewPluggableView extends AbstractPluggableView<Host> {
+class HostOverviewPluggableView extends PluggableViewSupport<Host> {
 
     public <X extends Host> boolean allowsNewArea(X dataSource, int location) {
         switch (location) {

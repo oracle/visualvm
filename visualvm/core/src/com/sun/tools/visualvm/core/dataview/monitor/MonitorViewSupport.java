@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.core.dataview.monitor;
 
-import com.sun.tools.visualvm.core.ui.PluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 
 /**
  * A public entrypoint to the Monitor subtab.
@@ -55,7 +55,7 @@ public final class MonitorViewSupport {
      * 
      * @return PluggableView instance to be used to customize the Monitor view of an application.
      */
-    public PluggableView getApplicationPluggableView() {
+    public PluggableViewSupport getApplicationPluggableView() {
         return getApplicationMonitorPluggableView();
     }
     

@@ -26,14 +26,14 @@
 package com.sun.tools.visualvm.core.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.HeapDump;
-import com.sun.tools.visualvm.core.ui.AbstractPluggableView;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class HeapDumpPluggableView extends AbstractPluggableView<HeapDump> {
+class HeapDumpPluggableView extends PluggableViewSupport<HeapDump> {
 
     public <X extends HeapDump> boolean allowsNewArea(X dataSource, int location) {
         return true;

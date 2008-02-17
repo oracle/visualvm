@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceCaptionFactory;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
