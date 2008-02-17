@@ -54,24 +54,24 @@ public class SnapshotSupport {
     }
     
     /**
-     * Returns default storage directory for DataSource snapshots
+     * Returns default storage directory for temporary (runtime) DataSource snapshots
      * 
-     * @return default storage directory for DataSource snapshots
+     * @return default storage directory for temporary (runtime) DataSource snapshots
      */
-    public String getDefaultStorageDirectoryString() {
+    public String getTemporaryStorageDirectoryString() {
         if (defaultStorageDirectoryString == null)
             defaultStorageDirectoryString = System.getProperty("java.io.tmpdir") + File.separator + DEFAULT_DATASOURCES_STORAGE_DIR;
         return defaultStorageDirectoryString;
     }
     
     /**
-     * Returns default storage directory for DataSource snapshots
+     * Returns default storage directory for temporary (runtime) DataSource snapshots
      * 
-     * @return default storage directory for DataSource snapshots
+     * @return default storage directory for temporary (runtime) DataSource snapshots
      */
-    public File getDefaultStorageDirectory() {
+    public File getTemporaryStorageDirectory() {
         if (defaultStorageDirectory == null) {
-            String defaultStorageString = getDefaultStorageDirectoryString();
+            String defaultStorageString = getTemporaryStorageDirectoryString();
             defaultStorageDirectory = new File(defaultStorageString);
             if (!defaultStorageDirectory.exists() && !defaultStorageDirectory.mkdir())
                 throw new IllegalStateException("Cannot create storage directory " + defaultStorageString);
