@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.model.dsdescr;
 
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
@@ -35,10 +36,7 @@ import java.beans.PropertyChangeListener;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public abstract class DataSourceDescriptor extends Model {
-
-    
-    public static final int POSITION_AT_THE_END = Integer.MAX_VALUE;
+public abstract class DataSourceDescriptor extends Model implements Positionable {
     
     public static final String PROPERTY_ICON = "prop_icon";
     

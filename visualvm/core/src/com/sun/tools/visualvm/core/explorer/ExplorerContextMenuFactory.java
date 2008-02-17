@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -136,7 +137,7 @@ public final class ExplorerContextMenuFactory {
         }
         
         // Sort ExplorerActionDescriptors according to actionOrder
-        Collections.sort(defaultActionsDescriptors);
+        Collections.sort(defaultActionsDescriptors, Positionable.COMPARATOR);
         
         return defaultActionsDescriptors.isEmpty() ? null : defaultActionsDescriptors.get(0).getAction();
     }
@@ -154,8 +155,8 @@ public final class ExplorerContextMenuFactory {
         }
         
         // Sort ExplorerActionDescriptors according to actionOrder
-        Collections.sort(defaultActionsDescriptors);
-        Collections.sort(actionsDescriptors);
+        Collections.sort(defaultActionsDescriptors, Positionable.COMPARATOR);
+        Collections.sort(actionsDescriptors, Positionable.COMPARATOR);
         
         // Create sorted lists of actions
         List<Action> defaultActions = new ArrayList(defaultActionsDescriptors.size());

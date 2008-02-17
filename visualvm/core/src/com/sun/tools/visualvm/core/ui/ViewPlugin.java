@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.util.Set;
 
@@ -74,7 +75,7 @@ public interface ViewPlugin<X extends DataSource> {
     /**
      * Descriptor of the view to be added to PluggableView.
      */
-    public static interface ViewDescriptor {
+    public static interface ViewDescriptor extends Positionable {
         /**
          * Returns view to be added to PluggableView.
          * 
@@ -87,8 +88,6 @@ public interface ViewPlugin<X extends DataSource> {
          * @return location of the view to be added to PluggableView.
          */
         public int getLocation();
-        
-        public int getPreferredPosition();
     }
 
 }

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.explorer;
 
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import javax.swing.Action;
 
 /**
@@ -32,7 +33,7 @@ import javax.swing.Action;
  *
  * @author Jiri Sedlacek
  */
-public final class ExplorerActionDescriptor implements Comparable {
+public final class ExplorerActionDescriptor implements Positionable {
 
     private final Action action;
     private final int preferredPosition;
@@ -66,26 +67,6 @@ public final class ExplorerActionDescriptor implements Comparable {
      */
     public int getPreferredPosition() {
         return preferredPosition;
-    }
-
-    /**
-     * Compares this object with the specified object for order.  Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object.
-     *
-     * @param   o the object to be compared.
-     * @return  a negative integer, zero, or a positive integer as this object
-     *		is less than, equal to, or greater than the specified object.
-     *
-     * @throws ClassCastException if the specified object's type prevents it
-     *         from being compared to this object.
-     */
-    public int compareTo(Object o) {
-        ExplorerActionDescriptor descriptor = (ExplorerActionDescriptor)o;
-        int descriptorActionOrder = descriptor.preferredPosition;
-        if (preferredPosition == descriptorActionOrder) return 0;
-        if (preferredPosition > descriptorActionOrder) return 1;
-        return -1;
     }
 
 }

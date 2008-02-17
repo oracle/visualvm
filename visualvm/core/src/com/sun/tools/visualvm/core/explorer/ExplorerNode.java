@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +40,7 @@ import javax.swing.tree.MutableTreeNode;
  *
  * @author Jiri Sedlacek
  */
-final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
+final class ExplorerNode extends DefaultMutableTreeNode implements Positionable {
     
     private String name;
     private Icon icon;
@@ -82,7 +83,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
         int originalChildCount = getChildCount();
         
         List<ExplorerNode> sortedNewChildren = new ArrayList(newChildren);
-        Collections.sort(sortedNewChildren);
+        Collections.sort(sortedNewChildren, Positionable.COMPARATOR);
         int insertPosition = 0;
         for (ExplorerNode newChild : sortedNewChildren) {
             int newChildPreferredPosition = newChild.getPreferredPosition();
@@ -128,20 +129,12 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Comparable {
     }
     
     
-    public int compareTo(Object o) {
-        ExplorerNode node = (ExplorerNode)o;
-        int preferredNodePosition = node.getPreferredPosition();
-        if (preferredPosition == preferredNodePosition) return 0;
-        if (preferredPosition > preferredNodePosition) return 1;
-        return -1;
-    }
-    
     public String toString() {
         return getName();
     }
     
     
-    protected int getPreferredPosition() {
+    public int getPreferredPosition() {
         return preferredPosition;
     }
     

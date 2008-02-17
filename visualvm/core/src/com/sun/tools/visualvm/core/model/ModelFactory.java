@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.model;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.ClassNameComparator;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Comparator;
@@ -92,7 +93,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         return -1;
       }
       // same depth -> use class name to create artifical ordering
-      return factory1.getClass().getName().compareTo(factory2.getClass().getName());
+      return ClassNameComparator.INSTANCE.compare(factory1, factory2);
     }
   }
 }

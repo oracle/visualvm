@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.ui;
 
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Image;
 
@@ -33,13 +34,7 @@ import java.awt.Image;
  *
  * @author Jiri Sedlacek
  */
-public abstract class DataSourceView implements Comparable {
-
-    /**
-     * View will be added as a last view to the DataSource Window.
-     */
-    public static final int POSITION_AT_THE_END = Integer.MAX_VALUE;
-
+public abstract class DataSourceView implements Positionable {
 
     private String name;
     private Image icon;
@@ -133,27 +128,6 @@ public abstract class DataSourceView implements Comparable {
      * This notification comes from a thread other than EDT
      */
     protected void removed() {
-    }
-    
-    
-    /**
-     * Compares this object with the specified object for order.  Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object.
-     *
-     * @param   o the object to be compared.
-     * @return  a negative integer, zero, or a positive integer as this object
-     *		is less than, equal to, or greater than the specified object.
-     *
-     * @throws ClassCastException if the specified object's type prevents it
-     *         from being compared to this object.
-     */
-    public final int compareTo(Object o) {
-        DataSourceView view = (DataSourceView)o;
-        int viewPosition = view.preferredPosition;
-        if (preferredPosition == viewPosition) return 0;
-        if (preferredPosition > viewPosition) return 1;
-        return -1;
     }
 
 }

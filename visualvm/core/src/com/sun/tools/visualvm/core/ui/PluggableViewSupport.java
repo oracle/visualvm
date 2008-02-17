@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.ClassNameComparator;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,7 +124,7 @@ public abstract class PluggableViewSupport<A extends DataSource> {
         for (ViewPlugin<? extends A> plugin : pluginsSet)
             if (plugins.get(plugin).isInstance(dataSource)) compatiblePlugins.add((ViewPlugin<X>)plugin);
         
-        // TODO: sort plugins in some stable way (classname)
+        Collections.sort(compatiblePlugins, ClassNameComparator.INSTANCE);
         
         return compatiblePlugins;
     }
