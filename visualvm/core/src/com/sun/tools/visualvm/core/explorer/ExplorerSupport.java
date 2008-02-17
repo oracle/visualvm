@@ -45,7 +45,6 @@ public class ExplorerSupport {
     private static ExplorerSupport sharedInstance;
 
     private JTree mainTree;
-//    private DefaultTreeModel mainTreeModel;
     
     private Set<ExplorerSelectionListener> selectionListeners = Collections.synchronizedSet(new HashSet());
 
@@ -62,7 +61,7 @@ public class ExplorerSupport {
 
 
     /**
-     * Selects an ExplorerNode representing given DataSource in explorer tree.
+     * Selects DataSource in explorer tree.
      * 
      * @param dataSource DataSource to be selected.
      */
@@ -76,24 +75,46 @@ public class ExplorerSupport {
         });
     }
     
+    /**
+     * Clears selection of explorer tree.
+     */
     public void clearSelection() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() { mainTree.clearSelection(); } 
         });
     }
     
+    /**
+     * Returns DataSource selected in explorer tree or null if no DataSource is selected.
+     * 
+     * @return DataSource selected in explorer tree or null if no DataSource is selected.
+     */
     public DataSource getSelectedDataSource() {
         return getDataSource(mainTree.getSelectionPath());
     }
     
+    /**
+     * Adds a listener to receive notifications about explorer tree selection change.
+     * 
+     * @param listener listener to add.
+     */
     public void addSelectionListener(ExplorerSelectionListener listener) {
         selectionListeners.add(listener);
     }
     
+    /**
+     * Removes explorer tree selection listener.
+     * @param listener listener to remove.
+     */
     public void removeSelectionListener(ExplorerSelectionListener listener) {
         selectionListeners.remove(listener);
     }
     
+    /**
+     * Expands DataSource if displayed and collapsed in explorer tree.
+     * 
+     * @param dataSource DataSource to expand.
+     */
     public void expandDataSource(DataSource dataSource) {
         expandNode(getNode(dataSource));
     }
@@ -105,6 +126,11 @@ public class ExplorerSupport {
         });
     }
     
+    /**
+     * Collapses DataSource if displayed and expanded in explorer tree.
+     * 
+     * @param dataSource DataSource to collapse.
+     */
     public void collapseDataSource(DataSource dataSource) {
         collapseNode(getNode(dataSource));
     }
@@ -142,7 +168,6 @@ public class ExplorerSupport {
     private ExplorerSupport() {
         mainTree = ExplorerUI.instance().getTree();
         mainTree.addTreeSelectionListener(new ExplorerTreeSelectionListener());
-//        mainTreeModel = ExplorerModelBuilder.getInstance().getModel();
         OpenDataSourceSupport.getInstance().initialize();
     }
     

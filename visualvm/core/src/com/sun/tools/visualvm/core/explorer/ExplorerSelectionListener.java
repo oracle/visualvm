@@ -28,11 +28,17 @@ package com.sun.tools.visualvm.core.explorer;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
+ * Listener receiving notifications of explorer tree selection changes.
  *
  * @author Jiri Sedlacek
  */
 public interface ExplorerSelectionListener {
     
+    /**
+     * Notification that selection of explorer tree changed.
+     * 
+     * @param selected instance of selected DataSource or null if no DataSource is selected.
+     */
     public void selectionChanged(DataSource selected);
 
 }

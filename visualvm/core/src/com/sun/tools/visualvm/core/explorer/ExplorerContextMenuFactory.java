@@ -45,7 +45,7 @@ import javax.swing.JPopupMenu;
  *
  * @author Jiri Sedlacek
  */
-public class ExplorerContextMenuFactory {
+public final class ExplorerContextMenuFactory {
 
     private static ExplorerContextMenuFactory sharedInstance;
 
@@ -63,7 +63,6 @@ public class ExplorerContextMenuFactory {
     }
 
 
-    // Add ExplorerActions provider
     /**
      * Adds a new ExplorerActionsProvider for DataSource instances compatible with given scope.
      * 
@@ -74,7 +73,6 @@ public class ExplorerContextMenuFactory {
         providers.put(provider, scope);
     }
     
-    // Remove ExplorerActions provider
     /**
      * Removes a ExplorerActionsProvider.
      * 
