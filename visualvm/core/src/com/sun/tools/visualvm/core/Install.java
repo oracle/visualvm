@@ -94,7 +94,7 @@ public class Install extends ModuleInstall {
     }
     
     private void cleanupPreviousSession() {
-        File defaultStorage = new File(SnapshotSupport.getInstance().getDefaultStorageDirectoryString());
+        File defaultStorage = new File(SnapshotSupport.getInstance().getTemporaryStorageDirectoryString());
         if (defaultStorage.exists() && defaultStorage.isDirectory()) deleteFolder(defaultStorage);
     }
     

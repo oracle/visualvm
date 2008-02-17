@@ -99,7 +99,7 @@ public abstract class AbstractDataSource implements DataSource {
     }
     
     public File getStorage() {
-        return SnapshotSupport.getInstance().getDefaultStorageDirectory();
+        return SnapshotSupport.getInstance().getTemporaryStorageDirectory();
     }
 
     public DataSourceContainer getRepository() {
