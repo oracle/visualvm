@@ -48,12 +48,12 @@ import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
- * A public entrypoint to the Overview subtab of an application/core dump/host.
+ * A public entrypoint to the Overview subtab.
  *
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class OverviewViewSupport {
+public final class OverviewViewSupport {
 
     private static OverviewViewSupport instance;
 

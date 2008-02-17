@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.datasupport;
 
 /**
- * A listener for one-time notifications when an item is removed from a repository.
+ * A listener for one-time notifications that the data became finished.
  * After receiving a notification the listener is immediately removed from the list
  * of registered listeners.
  *
@@ -35,7 +35,7 @@ package com.sun.tools.visualvm.core.datasupport;
 public interface DataFinishedListener<X> {
 
     /**
-     * Invoked only once when the monitored item has been removed from the repository.
+     * Invoked only once when the monitored data became finished.
      * 
      * @param dataSource item removed from the repository.
      */

@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
  *
  * @author Tomas Hurka
  */
-public class CoreDumpSupport {
+public final class CoreDumpSupport {
     
     private static final CoreDumpCategory category = new CoreDumpCategory();
     

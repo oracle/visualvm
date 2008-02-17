@@ -28,11 +28,11 @@ package com.sun.tools.visualvm.core.dataview.monitor;
 import com.sun.tools.visualvm.core.ui.PluggableView;
 
 /**
- * A public entrypoint to the Monitor subtab of an application.
+ * A public entrypoint to the Monitor subtab.
  *
  * @author Jiri Sedlacek
  */
-public class MonitorViewSupport {
+public final class MonitorViewSupport {
 
     private static MonitorViewSupport instance;
 

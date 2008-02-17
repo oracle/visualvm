@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.core.ui.PluggableView;
  *
  * @author Jiri Sedlacek
  */
-public class HeapDumpSupport {
+public final class HeapDumpSupport {
 
     private static HeapDumpSupport instance;
 

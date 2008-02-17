@@ -32,7 +32,7 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
  *
  * @author Jiri Sedlacek
  */
-public class HostsSupport {
+public final class HostsSupport {
 
     private static HostsSupport instance;
 

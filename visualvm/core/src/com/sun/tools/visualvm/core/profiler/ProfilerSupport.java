@@ -38,7 +38,7 @@ import org.netbeans.modules.profiler.ProfilerIDESettings;
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerSupport {
+public final class ProfilerSupport {
 
     private static ProfilerSupport instance;
     

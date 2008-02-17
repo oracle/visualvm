@@ -28,11 +28,11 @@ package com.sun.tools.visualvm.core.dataview.threads;
 import com.sun.tools.visualvm.core.ui.PluggableView;
 
 /**
- * A public entrypoint to the Threads subtab of an application.
+ * A public entrypoint to the Threads subtab.
  *
  * @author Jiri Sedlacek
  */
-public class ThreadsViewSupport {
+public final class ThreadsViewSupport {
     
     private static ThreadsViewSupport instance;
 

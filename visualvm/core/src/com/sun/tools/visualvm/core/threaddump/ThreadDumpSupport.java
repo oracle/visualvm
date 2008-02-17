@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.core.ui.PluggableView;
  *
  * @author Jiri Sedlacek
  */
-public class ThreadDumpSupport {
+public final class ThreadDumpSupport {
 
     private static ThreadDumpSupport instance;
 
