@@ -65,17 +65,27 @@ public interface DataSource {
     public static final int STATE_AVAILABLE = 1;
     /**
      * DataSource is at the end of it's lifecycle.
-     * This means that the DataSource has been removed from all repositories and won't change its state any more.
+     * This means that state of the DataSource will always be STATE_FINISHED.
      */
     public static final int STATE_FINISHED = Integer.MIN_VALUE;
     
-    
+    /**
+     * Virtual root of DataSource tree.
+     * ROOT corresponds to invisible root of explorer tree.
+     */
     public static final DataSourceRoot ROOT = new DataSourceRoot();
 
-
+    /**
+     * Sets owner of this DataSource.
+     * Do not use this method directly, owner is set automatically when adding a DataSource
+     * into owner's repository.
+     * 
+     * @param owner owner of this DataSource.
+     */
     public void setOwner(DataSource owner);
     /**
-     * Returns the "parent" of this DataSource.
+     * Returns owner of this DataSource.
+     * Owner is the DataSource which repository contains this DataSource.
      * 
      * @return "parent" of this DataSource.
      */
@@ -90,8 +100,17 @@ public interface DataSource {
      */
     public int getState();
     
+    /**
+     * Sets visibility of this DataSource in explorer tree.
+     * 
+     * @param visible
+     */
     public void setVisible(boolean visible);
-    
+    /**
+     * Returns true if this DataSource is visible in explorer tree, false otherwise.
+     * 
+     * @return true if this DataSource is visible in explorer tree, false otherwise.
+     */
     public boolean isVisible();
     
     /**
@@ -174,19 +193,17 @@ public interface DataSource {
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
     
     /**
-     * Returns true if this DataSource has already been removed from the VisualVM.
-     * At this time the DataSource shouldn't be referenced neither from DataSourceRepository nor
-     * from any repository of any other DataSource.
+     * Returns true if state of this DataSource is STATE_FINISHED.
      * 
-     * @return true if this DataSource has been removed from the VisualVM.
+     * @return true if state of this DataSource is STATE_FINISHED.
      */
     public boolean isFinished();
     
-    // Notifies when the DataSource has been removed (notifications is sent just once)
     /**
      * Registers a DataRemovedListener for a single notification when this DataSource is removed.
      * This event occurs only once during the DataSource lifecycle exactly when the isRemoved() method
-     * starts to return true.
+     * starts to return true. Listeners are referenced by WeakReferences so they don't have to be
+     * unregistered to be released from heap.
      * 
      * @param listener a DataRemovedListener for a single notification when this DataSource is removed.
      */

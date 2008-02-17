@@ -37,6 +37,9 @@ import java.util.Set;
 import org.openide.util.RequestProcessor;
 
 /**
+ * Default implementation of DataSourceProvider.
+ * DataSourceProviders can benefit from extending this class which implements
+ * managing created DataSource instances and firing the events to listeners.
  *
  * @author Jiri Sedlacek
  */
@@ -48,6 +51,9 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
     private final DataSource owner;
     
     
+    /**
+     * Creates new instance of DefaultDataSourceProvider.
+     */
     public DefaultDataSourceProvider() {
         this(null);
     }
@@ -85,10 +91,20 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
     }
     
     
+    /**
+     * Registers added DataSource into this provider.
+     * 
+     * @param added added DataSource to register.
+     */
     protected <Y extends X> void registerDataSource(Y added) {
         registerDataSources(Collections.singleton(added));
     }
     
+    /**
+     * Registers added DataSources into this provider.
+     * 
+     * @param added added DataSources to register.
+     */
     protected <Y extends X> void registerDataSources(final Set<Y> added) {
         queue.post(new Runnable() {
             public void run() {
@@ -105,10 +121,20 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
         });
     }
     
+    /**
+     * Unregisters removed DataSource from this provider.
+     * 
+     * @param removed removed DataSource to unregister.
+     */
     protected <Y extends X> void unregisterDataSource(Y removed) {
         unregisterDataSources(Collections.singleton(removed));
     }
     
+    /**
+     * Unregisters removed DataSources from this provider.
+     * 
+     * @param removed removed DataSources to unregister.
+     */
     protected <Y extends X> void unregisterDataSources(final Set<Y> removed) {
         queue.post(new Runnable() {
             public void run() {
@@ -119,6 +145,12 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
         });
     }
     
+    /**
+     * Registers added DataSources into this provider and unregisters removed DataSources from this provider.
+     * 
+     * @param added added DataSources to register.
+     * @param removed removed DataSources to unregister.
+     */
     protected <Y extends X> void updateDataSources(final Set<Y> added, final Set<Y> removed) {
         queue.post(new Runnable() {
             public void run() {
@@ -126,8 +158,8 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
                 dataSources.removeAll(removed);
                 if (owner != null) {
                     for (Y dataSource : added) {
-                        // TODO: group added by owners and use owner.getRepository().removeDataSources()
-                        if (dataSource.getOwner() != null) dataSource.getOwner().getRepository().removeDataSource(dataSource);
+                        DataSource dataSourceOwner = dataSource.getOwner();
+                        if (dataSourceOwner != null) dataSourceOwner.getRepository().removeDataSource(dataSource);
                         dataSource.setOwner(owner);
                     }
                     for (Y dataSource : removed) dataSource.setOwner(null);

@@ -35,6 +35,9 @@ import java.io.File;
  */
 public interface Snapshot extends DataSource {
     
+    /**
+     * Named property for snapshot file.
+     */
     public static final String PROPERTY_FILE = "prop_file";
     
     /**

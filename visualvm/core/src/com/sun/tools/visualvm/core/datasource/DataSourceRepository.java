@@ -30,6 +30,11 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 
 /**
  * Central repository of all known DataSources.
+ * Each DataSourceProvider which wants to publish created DataSources
+ * should register into DataSourceRepository. This allows other (depending) providers
+ * to discover new DataSource and process it. For example Host provider registers
+ * new Host instances into DataSourceRepository, the instances are the discovered
+ * by Application provider which tries to detect all applications running on the Host.
  *
  * @author Jiri Sedlacek
  */

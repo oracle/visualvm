@@ -28,15 +28,27 @@ package com.sun.tools.visualvm.core.datasource;
 import java.io.File;
 
 /**
+ * Abstract implementation of HeapDump.
  *
  * @author Jiri Sedlacek
  */
 public abstract class AbstractHeapDump extends AbstractSnapshot implements HeapDump {
     
+    /**
+     * Creates new instance of AbstractHeapDump with the data stored in a file.
+     * 
+     * @param file file where heap dump is saved.
+     */
     public AbstractHeapDump(File file) {
         this(file, null);
     }
     
+    /**
+     * Creates new instance of AbstractHeapDump with the data stored in a file and defined master.
+     * 
+     * @param file file where heap dump is saved,
+     * @param master DataSource in whose window the heap dump will be displayed.
+     */
     public AbstractHeapDump(File file, DataSource master) {
         super(file, master);
     }

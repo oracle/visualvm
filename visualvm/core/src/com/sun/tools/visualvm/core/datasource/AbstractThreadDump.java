@@ -28,15 +28,27 @@ package com.sun.tools.visualvm.core.datasource;
 import java.io.File;
 
 /**
+ * Abstract implementation of ThreadDump.
  *
  * @author Jiri Sedlacek
  */
 public abstract class AbstractThreadDump extends AbstractSnapshot implements ThreadDump {
     
+    /**
+     * Creates new instance of AbstractThreadDump with the data stored in a file.
+     * 
+     * @param file file where thread dump is saved.
+     */
     public AbstractThreadDump(File file) {
         this(file, null);
     }
     
+    /**
+     * Creates new instance of AbstractThreadDump with the data stored in a file and defined master.
+     * 
+     * @param file file where thread dump is saved,
+     * @param master DataSource in whose window the thread dump will be displayed.
+     */
     public AbstractThreadDump(File file, DataSource master) {
         super(file, master);
     }

@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.datasource;
 
 /**
+ * Virtual root of DataSource tree.
  *
  * @author Jiri Sedlacek
  */

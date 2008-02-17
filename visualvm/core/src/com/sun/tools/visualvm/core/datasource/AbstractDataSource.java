@@ -52,10 +52,18 @@ public abstract class AbstractDataSource implements DataSource {
     private final Set<WeakReference<DataFinishedListener>> removedListeners = Collections.synchronizedSet(new HashSet());
 
 
+    /**
+     * Creates new instance of AbstractDataSource with no master.
+     */
     public AbstractDataSource() {
         this(null);
     }
 
+    /**
+     * Creates new instance of AbstractDataSource with defined master.
+     * 
+     * @param master master of the DataSource.
+     */
     public AbstractDataSource(DataSource master) {
         this.master = master;
     }
@@ -126,6 +134,13 @@ public abstract class AbstractDataSource implements DataSource {
     }
     
     
+    /**
+     * Sets state of the DataSource.
+     * Note that once the state is STATE_FINSHED it cannot be further changed. Attempt to chage
+     * state from STATE_FINISHED will cause a RuntimeException.
+     * 
+     * @param newState state of the DataSource.
+     */
     protected synchronized void setState(int newState) {
         if (state == STATE_FINISHED) throw new RuntimeException("Cannot change state from STATE_FINISHED");
         int oldState = state;
@@ -141,7 +156,11 @@ public abstract class AbstractDataSource implements DataSource {
     }
     
     
-    // NOTE: doesn't need to be final
+    /**
+     * Returns instance of PropertyChangeSupport used for processing property changes.
+     * 
+     * @return instance of PropertyChangeSupport used for processing property changes.
+     */
     protected final PropertyChangeSupport getChangeSupport() {
         return changeSupport;
     }

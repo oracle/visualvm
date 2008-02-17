@@ -30,6 +30,7 @@ import java.net.UnknownHostException;
 import java.util.Set;
 
 /**
+ * Abstract implementation of Host.
  *
  * @author Jiri Sedlacek
  */
@@ -40,14 +41,34 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     private InetAddress inetAddress;
 
 
+    /**
+     * Creates new instance of Host defined by hostName.
+     * 
+     * @param hostName name or IP of the host.
+     * @throws java.net.UnknownHostException if host cannot be resolved using provided hostName/IP.
+     */
     public AbstractHost(String hostName) throws UnknownHostException {
         this(hostName, hostName);
     }
 
+    /**
+     * Creates new instance of Host defined by hostName and displayName.
+     * 
+     * @param hostName name or IP of the host,
+     * @param displayName string which represents this Host instance in UI or null (hostName will be used instead).
+     * @throws java.net.UnknownHostException if host cannot be resolved using provided hostName/IP.
+     */
     public AbstractHost(String hostName, String displayName) throws UnknownHostException {
         this(hostName, displayName, InetAddress.getByName(hostName));
     }
 
+    /**
+     * Creates new instance of Host defined by hostName, displayName and InetAddress instance for the host.
+     * 
+     * @param hostName name or IP of the host,
+     * @param displayName string which represents this Host instance in UI or null (hostName will be used instead),
+     * @param inetAddress InetAddress instance for the host.
+     */
     public AbstractHost(String hostName, String displayName, InetAddress inetAddress) {
         if (hostName == null) throw new IllegalArgumentException("Host name cannot be null");
         if (inetAddress == null) throw new IllegalArgumentException("InetAddress cannot be null");

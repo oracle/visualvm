@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.datasource;
 import java.io.File;
 
 /**
+ * Abstract implementation of Snapshot.
  *
  * @author Jiri Sedlacek
  */
@@ -36,10 +37,21 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     private File file;
     
     
+    /**
+     * Creates new instance of AbstractSnapshot with the data stored in a file.
+     * 
+     * @param file file where snapshot is saved.
+     */
     public AbstractSnapshot(File file) {
         this(file, null);
     }
     
+    /**
+     * Creates new instance of AbstractSnapshot with the data stored in a file and defined master.
+     * 
+     * @param file file where snapshot is saved,
+     * @param master DataSource in whose window the snapshot will be displayed.
+     */
     public AbstractSnapshot(File file, DataSource master) {
         super(master);
         this.file = file;
@@ -51,7 +63,11 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
         return file;
     }
     
-    
+    /**
+     * Sets the file where data of this snapshot are stored.
+     * 
+     * @param newFile file where data of this snapshot are stored.
+     */
     protected void setFile(File newFile) {
         if (file == null && newFile == null) return;
         File oldFile = file;
@@ -59,6 +75,12 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
         getChangeSupport().firePropertyChange(PROPERTY_FILE, oldFile, newFile);
     }
     
+    /**
+     * Deletes the file where data of this snapshot are stored.
+     * Note that this method only deletes the file, not the Snapshot instance.
+     * 
+     * @return true if the file has been successfully deleted, false otherwise.
+     */
     protected boolean deleteFile() {
         boolean deleted = false;
         
