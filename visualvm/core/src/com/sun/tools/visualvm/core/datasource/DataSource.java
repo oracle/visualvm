@@ -202,8 +202,12 @@ public interface DataSource {
     /**
      * Registers a DataRemovedListener for a single notification when this DataSource is removed.
      * This event occurs only once during the DataSource lifecycle exactly when the isRemoved() method
-     * starts to return true. Listeners are referenced by WeakReferences so they don't have to be
-     * unregistered to be released from heap.
+     * starts to return true.
+     * Note that this listener is referenced by WeakReference in monitored DataSource -
+     * be sure that the listener has at least one strong reference. You should always avoid writing
+     * code like this:<pre>
+     * DataSource.notifyWhenFinished(new DataFinishedListener() { ... });
+     * </pre>
      * 
      * @param listener a DataRemovedListener for a single notification when this DataSource is removed.
      */

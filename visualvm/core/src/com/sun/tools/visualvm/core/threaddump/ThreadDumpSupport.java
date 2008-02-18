@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.threaddump;
 
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
@@ -64,6 +65,18 @@ public final class ThreadDumpSupport {
     public SnapshotCategory getCategory() {
         return category;
     }
+    
+    /**
+     * Takes thread dump from Application.
+     * 
+     * @param application Application to take the thread dump,
+     * @param openView true if taken thread dump should be opened, false otherwise.
+     */
+    public void takeThreadDump(Application application, boolean openView) {
+        threadDumpProvider.createThreadDump(application, openView);
+    }
+    
+    // TODO: publish takeThreadDump for CoreDump??
     
     /**
      * Returns PluggableView instance to be used to customize the thread dump view.

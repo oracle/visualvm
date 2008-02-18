@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -41,7 +42,7 @@ import javax.swing.UIManager;
  *
  * @author Jiri Sedlacek
  */
-class HostCaption extends JPanel {
+class HostCaption extends JPanel implements DataFinishedListener<Host> {
 
     private static boolean animate = false;
     private static final int ANIMATION_RATE = 80;
@@ -53,6 +54,8 @@ class HostCaption extends JPanel {
 
     public HostCaption(Host host) {
         initComponents();
+        
+        host.notifyWhenFinished(this);
 
         //setAlive(host.isAlive());
         setAlive(true);
@@ -64,6 +67,10 @@ class HostCaption extends JPanel {
 //            public void booted(Host host) { setAlive(true); }
 //            public void terminated(Host host) { setAlive(false); }
 //        });
+    }
+    
+    public void dataFinished(Host host) {
+        setAlive(false);
     }
     
     public static void setAnimate(boolean animate) {

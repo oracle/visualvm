@@ -27,14 +27,20 @@ package com.sun.tools.visualvm.core.dataview.threads;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.model.jvm.JVM;
+import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.lang.management.ThreadMXBean;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -46,38 +52,49 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationThreadsView extends DataSourceView {
+class ApplicationThreadsView extends DataSourceView implements DataFinishedListener<Application> {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/monitor.png";
     private static final int DEFAULT_REFRESH = 1000;
 
     private DataViewComponent view;
+    private Application application;
+    private JVM jvm;
+    private ThreadMXBean threadBean;
+    private Timer timer;
     
 
     public ApplicationThreadsView(Application application, ThreadMXBean threadBean) {
         super("Threads", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30);
-        view = createViewComponent(application, threadBean);
-        ThreadsViewSupport.getInstance().getApplicationThreadsPluggableView().makeCustomizations(view, application);
+        this.application = application;
+        this.threadBean = threadBean;
+    }
+    
+    public void willBeAdded() {
+        jvm = JVMFactory.getJVMFor(application);
     }
         
     public DataViewComponent getView() {
+        if (view == null) {
+            view = createViewComponent();
+            ThreadsViewSupport.getInstance().getApplicationThreadsPluggableView().makeCustomizations(view, application);
+        }
+        
         return view;
     }
     
     
-    private DataViewComponent createViewComponent(Application application, ThreadMXBean threadBean) {
+    private DataViewComponent createViewComponent() {
         final ThreadMXBeanDataManager threadsManager = new ThreadMXBeanDataManager(application, threadBean);
-        final Timer timer = new Timer(DEFAULT_REFRESH, new ActionListener() {
+        timer = new Timer(DEFAULT_REFRESH, new ActionListener() {
             public void actionPerformed(ActionEvent e) { threadsManager.refreshThreads(); }
         });
         timer.setCoalesce(true);
         timer.start();
-        application.notifyWhenFinished(new DataFinishedListener() {
-            public void dataFinished(Object dataSource) { timer.stop(); }
-        });
+        application.notifyWhenFinished(this);
                 
         final DataViewComponent dvc = new DataViewComponent(
-                new MasterViewSupport(application, threadsManager, timer).getMasterView(),
+                new MasterViewSupport(application, jvm, threadsManager, timer).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Threads visualization", true), DataViewComponent.TOP_LEFT);
@@ -97,13 +114,19 @@ class ApplicationThreadsView extends DataSourceView {
         return dvc;
     }
     
+    public void dataFinished(Application dataSource) {
+        timer.stop();
+    }
+    
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel  {
+    private static class MasterViewSupport extends JPanel implements DataFinishedListener<Application> {
         
-        public MasterViewSupport(Application application, ThreadMXBeanDataManager threadsManager, Timer timer) {
-            initComponents(application, threadsManager, timer);
+        private JButton threadDumpButton;
+        
+        public MasterViewSupport(Application application, JVM jvm, ThreadMXBeanDataManager threadsManager, Timer timer) {
+            initComponents(application, jvm, threadsManager, timer);
         }
         
         
@@ -111,8 +134,12 @@ class ApplicationThreadsView extends DataSourceView {
             return new DataViewComponent.MasterView("Threads", null, this);
         }
         
+        public void dataFinished(Application dataSource) {
+            threadDumpButton.setEnabled(false);
+        }
         
-        private void initComponents(Application application, final ThreadMXBeanDataManager threadsManager, Timer timer) {
+        
+        private void initComponents(final Application application, JVM jvm, final ThreadMXBeanDataManager threadsManager, Timer timer) {
             setLayout(new BorderLayout());
             
             final HTMLTextArea area = new HTMLTextArea("<nobr>" + getThreadsCounts(threadsManager) + "</nobr>");
@@ -129,6 +156,25 @@ class ApplicationThreadsView extends DataSourceView {
             });
             
             add(area, BorderLayout.CENTER);
+            
+            threadDumpButton = new JButton(new AbstractAction("Thread Dump") {
+                public void actionPerformed(ActionEvent e) {
+                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                }
+            });
+            threadDumpButton.setEnabled(jvm.isTakeThreadDumpSupported());
+            
+            JPanel buttonsArea = new JPanel(new BorderLayout());
+            buttonsArea.setBackground(area.getBackground());
+            JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
+            buttonsContainer.setBackground(area.getBackground());
+            buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
+            buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
+            
+            add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
+            
+            application.notifyWhenFinished(this);
         }
         
         private String getThreadsCounts(ThreadMXBeanDataManager threadsManager) {

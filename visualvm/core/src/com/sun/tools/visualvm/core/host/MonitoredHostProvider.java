@@ -53,6 +53,10 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
     private static final RequestProcessor processor = new RequestProcessor("MonitoredHostProvider Processor");
     
     private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
+    
+    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
+        public void dataFinished(Host host) { processFinishedHost(host); }
+    };
             
     
     public void dataChanged(final DataChangeEvent<Host> event) {
@@ -78,9 +82,7 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
             mapping.put(host, monitoredHostListener);
             monitoredHost.addHostListener(monitoredHostListener);
             
-            host.notifyWhenFinished(new DataFinishedListener() {
-                public void dataFinished(Object dataSource) { processFinishedHost(host); }
-            });
+            host.notifyWhenFinished(hostFinishedListener);
             
         } catch (Exception e) {
             // Host doesn't support jvmstat monitoring (jstatd not running)

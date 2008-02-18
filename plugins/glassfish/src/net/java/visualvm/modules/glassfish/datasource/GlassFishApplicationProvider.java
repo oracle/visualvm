@@ -42,7 +42,7 @@ import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishApplicationProvider extends DefaultDataSourceProvider<GlassFishApplication> implements DataChangeListener<GlassFishModel> {
+public class GlassFishApplicationProvider extends DefaultDataSourceProvider<GlassFishApplication> implements DataChangeListener<GlassFishModel>, DataFinishedListener<GlassFishModel> {
     private static final GlassFishApplicationProvider INSTANCE = new GlassFishApplicationProvider();
         
     private GlassFishApplicationProvider() {}
@@ -76,6 +76,10 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
         DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
     }
+    
+    public void dataFinished(GlassFishModel root) {
+        processFinishedApplication(root);
+    }
 
     private void processFinishedApplication(GlassFishModel app) {
         // TODO: remove listener!!!
@@ -106,11 +110,6 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
             root.getRepository().addDataSource(module);
         }
 
-        root.notifyWhenFinished(new DataFinishedListener() {
-
-            public void dataFinished(Object dataSource) {
-                processFinishedApplication(root);
-            }
-            });
+        root.notifyWhenFinished(this);
     }
 }

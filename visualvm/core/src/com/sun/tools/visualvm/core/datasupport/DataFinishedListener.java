@@ -29,6 +29,8 @@ package com.sun.tools.visualvm.core.datasupport;
  * A listener for one-time notifications that the data became finished.
  * After receiving a notification the listener is immediately removed from the list
  * of registered listeners.
+ * Note that this listener is referenced by WeakReference in monitored DataSource -
+ * be sure that the listener has at least one strong reference.
  *
  * @author Jiri Sedlacek
  */

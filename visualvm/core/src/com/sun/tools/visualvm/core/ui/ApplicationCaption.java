@@ -44,7 +44,7 @@ import javax.swing.UIManager;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationCaption extends JPanel {
+class ApplicationCaption extends JPanel implements DataFinishedListener<Application> {
 
     private static boolean animate = false;
     private static final int ANIMATION_RATE = 80;
@@ -57,14 +57,16 @@ class ApplicationCaption extends JPanel {
     public ApplicationCaption(Application application) {
         initComponents();
         
-        application.notifyWhenFinished(new DataFinishedListener() {
-            public void dataFinished(Object dataSource) { setRunning(false); }
-        });
+        application.notifyWhenFinished(this);
         
         setRunning(application.getState() == DataSource.STATE_AVAILABLE);
         setApplicationName(DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
         setApplicationPid(-1); // TODO: provide PID once name doesn't contain it
 //        setApplicationIcon(new ImageIcon(ApplicationTypeFactory.getApplicationTypeFor(application).getIcon()));
+    }
+    
+    public void dataFinished(Application application) {
+        setRunning(false);
     }
     
     public static void setAnimate(boolean animate) {

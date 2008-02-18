@@ -42,6 +42,7 @@ import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,6 +61,12 @@ import org.openide.NotifyDescriptor;
 class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplication> implements DataChangeListener<MonitoredHostDS> {
     
     private final Map<Integer, JvmstatApplication> applications = new HashMap();
+    
+    private final Map<MonitoredHostDS, HostListener> mapping = Collections.synchronizedMap(new HashMap());
+    
+    private final DataFinishedListener<MonitoredHostDS> hostFinishedListener = new DataFinishedListener<MonitoredHostDS>() {
+        public void dataFinished(MonitoredHostDS host) { processFinishedHost(host); }
+    };
     
     
     // Not to be called from user code, use Application.CURRENT_APPLICATION instead
@@ -128,14 +135,17 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
             e.printStackTrace();
         }
         
-        final HostListener hostListenerF = hostListener;
-        hostDs.notifyWhenFinished(new DataFinishedListener() { 
-            public void dataFinished(Object dataSource) {
-                if (hostListenerF != null)
-                    try { monitoredHost.removeHostListener(hostListenerF); } catch (MonitorException ex) {}
-                processAllTerminatedApplications(host);
-            }
-        });
+        if (hostListener != null) {
+            mapping.put(hostDs, hostListener);
+            hostDs.notifyWhenFinished(hostFinishedListener);
+        }
+    }
+    
+    private void processFinishedHost(MonitoredHostDS host) {
+        HostListener hostListener = mapping.get(host);
+        mapping.remove(host);
+        try { host.getMonitoredHost().removeHostListener(hostListener); } catch (MonitorException ex) {}
+        processAllTerminatedApplications(host.getHost());
     }
     
     private void processNewApplicationsByIds(Host host, MonitoredHostDS monitoredHost, Set<Integer> applicationIds) {

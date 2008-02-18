@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.tools.sa.SAAgent;
@@ -43,6 +44,7 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
 
@@ -53,29 +55,43 @@ import org.openide.util.RequestProcessor;
  */
 class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
     
+    private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
+        public void dataFinished(Application application) { removeThreadDumps(application, false); }
+    };
+    
+    private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
+        public void dataFinished(CoreDump coredump) { removeThreadDumps(coredump, false); }
+    };
+    
+    
     void createThreadDump(final Application application, final boolean openView) {
          RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
+                JVM jvm = JVMFactory.getJVMFor(application);
+                if (!jvm.isTakeThreadDumpSupported()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for " + DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
+                        }
+                    });
+                    return;
+                }
+                
                 ProgressHandle pHandle = null;
                 try {
                     pHandle = ProgressHandleFactory.createHandle("Creating Thread Dump...");
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    JVM jvm = JVMFactory.getJVMFor(application);
-                    if (jvm.isTakeThreadDumpSupported()) {
-                        try {
-                            final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
-                            application.getRepository().addDataSource(threadDump);
-                            registerDataSource(threadDump);
-                            if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceWindowManager.sharedInstance().addViews(application, threadDump); }
-                            });
-                            application.notifyWhenFinished(new DataFinishedListener<Application>() {
-                                public void dataFinished(Application dataSource) { removeThreadDumps(dataSource, false); }
-                            });
-                        } catch (IOException ex) {
-                            ErrorManager.getDefault().notify(ex);
-                        }
+                    try {
+                        final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
+                        application.getRepository().addDataSource(threadDump);
+                        registerDataSource(threadDump);
+                        if (openView) SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { DataSourceWindowManager.sharedInstance().addViews(application, threadDump); }
+                        });
+                        application.notifyWhenFinished(applicationFinishedListener);
+                    } catch (IOException ex) {
+                        ErrorManager.getDefault().notify(ex);
                     }
                 } finally {
                     final ProgressHandle pHandleF = pHandle;
@@ -118,9 +134,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().addViews(coreDump, threadDump); }
                             });
-                            coreDump.notifyWhenFinished(new DataFinishedListener<CoreDump>() {
-                                public void dataFinished(CoreDump dataSource) { removeThreadDumps(dataSource, false); }
-                            });
+                            coreDump.notifyWhenFinished(coredumpFinishedListener);
                         } catch (Exception ex) {
                             ErrorManager.getDefault().notify(ex);
                         }

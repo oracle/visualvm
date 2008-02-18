@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.tools.sa.SAAgent;
@@ -41,6 +42,7 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
 
@@ -51,29 +53,43 @@ import org.openide.util.RequestProcessor;
  */
 class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
     
+    private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
+        public void dataFinished(Application application) { removeHeapDumps(application, false); }
+    };
+    
+    private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
+        public void dataFinished(CoreDump coredump) { removeHeapDumps(coredump, false); }
+    };
+    
+    
     void createHeapDump(final Application application, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
+                JVM jvm = JVMFactory.getJVMFor(application);
+                if (!jvm.isTakeHeapDumpSupported()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            NetBeansProfiler.getDefaultNB().displayError("Cannot take heap dump for " + DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
+                        }
+                    });
+                    return;
+                }
+                
                 ProgressHandle pHandle = null;
                 try {
                     pHandle = ProgressHandleFactory.createHandle("Creating Heap Dump...");
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    JVM jvm = JVMFactory.getJVMFor(application);
-                    if (jvm.isTakeHeapDumpSupported()) {
-                        try {
-                            final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
-                            application.getRepository().addDataSource(heapDump);
-                            registerDataSource(heapDump);
-                            if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceWindowManager.sharedInstance().addViews(application, heapDump); }
-                            });
-                            application.notifyWhenFinished(new DataFinishedListener<Application>() {
-                                public void dataFinished(Application dataSource) { removeHeapDumps(dataSource, false); }
-                            });
-                        } catch (IOException ex) {
-                            ErrorManager.getDefault().notify(ex);
-                        }
+                    try {
+                        final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
+                        application.getRepository().addDataSource(heapDump);
+                        registerDataSource(heapDump);
+                        if (openView) SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { DataSourceWindowManager.sharedInstance().addViews(application, heapDump); }
+                        });
+                        application.notifyWhenFinished(applicationFinishedListener);
+                    } catch (IOException ex) {
+                        ErrorManager.getDefault().notify(ex);
                     }
                 } finally {
                     final ProgressHandle pHandleF = pHandle;
@@ -112,9 +128,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().addViews(coreDump, heapDump); }
                             });
-                            coreDump.notifyWhenFinished(new DataFinishedListener<CoreDump>() {
-                                public void dataFinished(CoreDump dataSource) { removeHeapDumps(dataSource, false); }
-                            });
+                            coreDump.notifyWhenFinished(coredumpFinishedListener);
                         }
                     } catch (Exception ex) {
                         ErrorManager.getDefault().notify(ex);

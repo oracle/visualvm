@@ -50,7 +50,7 @@ import javax.management.MBeanServerConnection;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishModel> implements DataChangeListener<Application> {
+public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishModel> implements DataChangeListener<Application>, DataFinishedListener<Application> {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final GlassFishModelProvider INSTANCE = new GlassFishModelProvider();
@@ -91,6 +91,10 @@ public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishM
         DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
     }
+    
+    public void dataFinished(Application application) {
+        processFinishedApplication(application);
+    }
 
     private void processFinishedApplication(Application app) {
         // TODO: remove listener!!!
@@ -123,11 +127,7 @@ public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishM
                             registerDataSource(gfm);
                             app.getRepository().addDataSource(gfm);
 
-                            app.notifyWhenFinished(new DataFinishedListener() {
-                                    public void dataFinished(Object dataSource) {
-                                        processFinishedApplication(app);
-                                    }
-                                });
+                            app.notifyWhenFinished(GlassFishModelProvider.this);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }

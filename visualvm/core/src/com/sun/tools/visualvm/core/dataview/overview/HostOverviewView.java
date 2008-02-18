@@ -56,27 +56,40 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-class HostOverviewView extends DataSourceView {
+class HostOverviewView extends DataSourceView implements DataFinishedListener<Host> {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/overview.png";
 
     private DataViewComponent view;
+    private Host host;
+    private Timer timer;
+    private HostOverview hostOverview;
     
 
     public HostOverviewView(Host host) {
         super("Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
-        view = createViewComponent(host);
-        OverviewViewSupport.getInstance().getHostOverviewPluggableView().makeCustomizations(view, host);
+        this.host = host;
+    }
+    
+    public void willBeAdded() {
+        hostOverview = HostOverviewFactory.getSystemOverviewFor(host);
     }
         
     public DataViewComponent getView() {
+        if (view == null) {
+            view = createViewComponent();
+            OverviewViewSupport.getInstance().getHostOverviewPluggableView().makeCustomizations(view, host);
+        }
+        
         return view;
     }
     
+    public void dataFinished(Host dataSource) {
+        timer.stop();
+    }
     
-    private DataViewComponent createViewComponent(Host host) {
-        final HostOverview hostOverview = HostOverviewFactory.getSystemOverviewFor(host);
-                
+    
+    private DataViewComponent createViewComponent() {
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport(host).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
@@ -92,7 +105,7 @@ class HostOverviewView extends DataSourceView {
         final SwapMemoryViewSupport swapMemoryViewSupport = new SwapMemoryViewSupport();
         dvc.addDetailsView(swapMemoryViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
-        final Timer timer = new Timer(2000, new ActionListener() {
+        timer = new Timer(2000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 final long time = System.currentTimeMillis();
                 SwingUtilities.invokeLater(new Runnable() {
@@ -105,9 +118,7 @@ class HostOverviewView extends DataSourceView {
             }
         });
         timer.start();
-        host.notifyWhenFinished(new DataFinishedListener() {
-            public void dataFinished(Object dataSource) { timer.stop(); }
-        });
+        host.notifyWhenFinished(this);
         // TODO: create listener for host availability and start/stop the timer accordingly
         
         return dvc;

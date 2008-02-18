@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.heapdump;
 
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
@@ -64,6 +65,18 @@ public final class HeapDumpSupport {
     public SnapshotCategory getCategory() {
         return category;
     }
+    
+    /**
+     * Takes heap dump from Application.
+     * 
+     * @param application Application to take the heap dump,
+     * @param openView true if taken heap dump should be opened, false otherwise.
+     */
+    public void takeHeapDump(Application application, boolean openView) {
+        heapDumpProvider.createHeapDump(application, openView);
+    }
+    
+    // TODO: publish takeHeapDump for CoreDump??
     
     /**
      * Returns PluggableView instance to be used to customize the heap dump view.

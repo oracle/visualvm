@@ -136,7 +136,7 @@ public abstract class AbstractDataSource implements DataSource {
     
     /**
      * Sets state of the DataSource.
-     * Note that once the state is STATE_FINSHED it cannot be further changed. Attempt to chage
+     * Note that once the state is STATE_FINSHED it cannot be further changed. Attempt to change
      * state from STATE_FINISHED will cause a RuntimeException.
      * 
      * @param newState state of the DataSource.

@@ -102,7 +102,7 @@ class ApplicationProfilerView extends DataSourceView {
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements ProfilingStateListener {
+    private static class MasterViewSupport extends JPanel implements ProfilingStateListener, DataFinishedListener<Application> {
         
         private Application application;
         private ProfilingResultsViewSupport profilingResultsView;
@@ -127,18 +127,18 @@ class ApplicationProfilerView extends DataSourceView {
             NetBeansProfiler.getDefaultNB().addProfilingStateListener(this);
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
-            application.notifyWhenFinished(new DataFinishedListener() {
-                public void dataFinished(Object dataSource) {
-                    disableControlButtons();
-                    statusValueLabel.setText("application terminated");
-                    NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
-                }
-            });
+            application.notifyWhenFinished(this);
         }
         
         
         public DataViewComponent.MasterView getMasterView() {
             return new DataViewComponent.MasterView("Profiler", null, this);
+        }
+        
+        public void dataFinished(Application application) {
+            disableControlButtons();
+            statusValueLabel.setText("application terminated");
+            NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
         }
         
         

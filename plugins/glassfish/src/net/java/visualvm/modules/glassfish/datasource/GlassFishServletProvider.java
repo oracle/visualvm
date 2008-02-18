@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFishServlet> implements DataChangeListener<GlassFishWebModule> {
+public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFishServlet> implements DataChangeListener<GlassFishWebModule>, DataFinishedListener<GlassFishWebModule> {
     private final static GlassFishServletProvider INSTANCE = new GlassFishServletProvider();
     
     private GlassFishServletProvider() {}
@@ -73,6 +73,10 @@ public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFis
         DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
     }
+    
+    public void dataFinished(GlassFishWebModule module) {
+        processFinishedModule(module);
+    }
 
     private void processFinishedModule(GlassFishWebModule module) {
         // TODO: remove listener!!!
@@ -88,10 +92,6 @@ public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFis
             module.getRepository().addDataSource(servlet);
         }
 
-        module.notifyWhenFinished(new DataFinishedListener() {
-                public void dataFinished(Object dataSource) {
-                    processFinishedModule(module);
-                }
-            });
+        module.notifyWhenFinished(this);
     }
 }
