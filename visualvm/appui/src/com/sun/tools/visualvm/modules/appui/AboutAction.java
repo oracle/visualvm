@@ -48,7 +48,7 @@ import org.openide.windows.WindowManager;
 
 public final class AboutAction extends AbstractAction {
 
-    private String versionString = "Dev"; // Use "Dev" for development builds
+    private String versionString = "Milestone 3"; // Use "Dev" for development builds
 
 
     public AboutAction() {
