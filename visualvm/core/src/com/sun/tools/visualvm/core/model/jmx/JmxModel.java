@@ -86,6 +86,33 @@ import sun.rmi.server.UnicastRef2;
 import sun.rmi.transport.LiveRef;
 
 /**
+ * This class encapsulates the JMX functionality of the target Java application.
+ *
+ * Call {@link JmxModelFactory.getJmxModelFor()} to get an instance of the
+ * {@link JmxModel} class.
+ *
+ * Usually this class will be used as follows:
+ *
+ * <pre>
+ * JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
+ * MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
+ * if (mbsc != null) {
+ *    // Invoke JMX operations...
+ * }
+ * </pre>
+ *
+ * {@link JmxModel.getCachedMBeanServerConnection()} should be called
+ * if you want to get a {@link CachedMBeanServerConnection} instead of
+ * a plain MBeanServerConnection.
+ *
+ * In case the JMX connection is not established yet, you could register
+ * a listener on the {@code JmxModel} for ConnectionState property changes.
+ * The JmxModel notifies any PropertyChangeListeners about the ConnectionState
+ * property change to CONNECTED and DISCONNECTED. The JmxModel instance will
+ * be the source for any generated events.
+ *
+ * Polling for the ConnectionState is also possible by calling
+ * {@link JmxModel.getConnectionState()}.
  *
  * @author Luis-Miguel Alventosa
  */
@@ -120,6 +147,11 @@ public class JmxModel extends Model {
         CONNECTING
     }
 
+    /**
+     * Creates an instance of {@code JmxModel} for a {@link JvmstatApplication}.
+     *
+     * @param application the {@link JvmstatApplication}.
+     */
     public JmxModel(JvmstatApplication application) {
         JvmstatApplication app = application;
         JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(app);
@@ -188,13 +220,20 @@ public class JmxModel extends Model {
         }
     }
 
+    /**
+     * Creates an instance of {@code JmxModel} for a {@link JmxApplication}.
+     *
+     * @param application the {@link JmxApplication}.
+     */
     public JmxModel(JmxApplication application) {
         JmxApplication app = application;
         try {
             // TODO: Remove the following two lines when Connection Dialog is implemented.
             String username = System.getProperty("jconsole.username");
             String password = System.getProperty("jconsole.password");
-            ProxyClient proxyClient = new ProxyClient(this, app.getId(), username, password);
+            JMXServiceURL url = app.getJMXServiceURL();
+            ProxyClient proxyClient =
+                    new ProxyClient(this, url.toString(), username, password);
             if (proxyClient != null) {
                 client = proxyClient;
                 proxyClient.connect();
@@ -206,6 +245,17 @@ public class JmxModel extends Model {
         }
     }
 
+    /**
+     * Add a {@link java.beans.PropertyChangeListener PropertyChangeListener}
+     * to the listener list.
+     * The listener is registered for all properties.
+     * The same listener object may be added more than once, and will be called
+     * as many times as it is added.
+     * If {@code listener} is {@code null}, no exception is thrown and
+     * no action is taken.
+     *
+     * @param listener the {@code PropertyChangeListener} to be added.
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
@@ -217,6 +267,17 @@ public class JmxModel extends Model {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Removes a {@link java.beans.PropertyChangeListener PropertyChangeListener}
+     * from the listener list. This
+     * removes a {@code PropertyChangeListener} that was registered for all
+     * properties. If {@code listener} was added more than once to the same
+     * event source, it will be notified one less time after being removed. If
+     * {@code listener} is {@code null}, or was never added, no exception is
+     * thrown and no action is taken.
+     *
+     * @param listener the {@code PropertyChangeListener} to be removed.
+     */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         if (!(listener instanceof WeakPCL)) {
             // Search for the WeakPCL holding this listener (if any)
@@ -230,6 +291,11 @@ public class JmxModel extends Model {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
+    /**
+     * Returns the current connection state.
+     *
+     * @return the current connection state.
+     */
     public ConnectionState getConnectionState() {
         if (client != null) {
             return client.getConnectionState();
@@ -237,6 +303,16 @@ public class JmxModel extends Model {
         return ConnectionState.DISCONNECTED;
     }
 
+    /**
+     * Returns the {@link MBeanServerConnection MBeanServerConnection} for the
+     * connection to an application. The returned {@code MBeanServerConnection}
+     * object becomes invalid when the connection state is changed to the
+     * {@link ConnectionState#DISCONNECTED DISCONNECTED} state.
+     *
+     * @return the {@code MBeanServerConnection} for the
+     * connection to an application. It returns {@code null}
+     * if the JMX connection couldn't be established.
+     */
     public MBeanServerConnection getMBeanServerConnection() {
         if (client != null) {
             return client.getMBeanServerConnection();
@@ -244,6 +320,16 @@ public class JmxModel extends Model {
         return null;
     }
 
+    /**
+     * Returns the {@link CachedMBeanServerConnection cached MBeanServerConnection}
+     * for the connection to an application. The returned {@code CachedMBeanServerConnection}
+     * object becomes invalid when the connection state is changed to the
+     * {@link ConnectionState#DISCONNECTED DISCONNECTED} state.
+     *
+     * @return the {@code CachedMBeanServerConnection} for the
+     * connection to an application. It returns {@code null}
+     * if the JMX connection couldn't be established.
+     */
     public CachedMBeanServerConnection getCachedMBeanServerConnection() {
         if (client != null) {
             return client.getCachedMBeanServerConnection();

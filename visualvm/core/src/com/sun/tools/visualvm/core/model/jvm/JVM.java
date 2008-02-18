@@ -30,46 +30,44 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-
 /**
- *
  * This class encapsulates functionality of the target Java application. Use
  * {@link JVMFactory.getJVMFor()} to get instance of JVM class.
  * @author Tomas Hurka
  */
-public abstract class JVM extends Model  {
-    
+public abstract class JVM extends Model {
+
     /**
      * Tests if target JVM is JRE 1.4.
      * @return <CODE>true</CODE> if JVM is JRE 1.4, <CODE>false</CODE> otherwise
      */
     public abstract boolean is14();
-    
+
     /**
      * Tests if target JVM is JRE 1.5.
      * @return <CODE>true</CODE> if JVM is JRE 1.5, <CODE>false</CODE> otherwise
      */
     public abstract boolean is15();
-    
+
     /**
      * Tests if target JVM is JRE 1.6.
      * @return <CODE>true</CODE> if JVM is JRE 1.6, <CODE>false</CODE> otherwise
      */
     public abstract boolean is16();
-    
+
     /**
      * Tests if target JVM is JRE 1.7.
      * @return <CODE>true</CODE> if JVM is JRE 1.7, <CODE>false</CODE> otherwise
      */
     public abstract boolean is17();
-    
+
     /**
      * Tests if target JVM supports Attach API.
      * {@link http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html}
      * @return <CODE>true</CODE> if JVM supports Attach API, <CODE>false</CODE> otherwise
      */
     public abstract boolean isAttachable();
-    
+
     /**
      * Tests if target JVM supports getting basic JVM informations. This includes
      * getCommandLine(), getJvmArgs(), getJvmFlags(), getMainClass(),
@@ -78,26 +76,31 @@ public abstract class JVM extends Model  {
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isBasicInfoSupported();
+
     /**
      * Return the command line for the target Java application.
      * @return Returns the command line of the target Java application.
      */
     public abstract String getCommandLine();
+
     /**
      * Return the JVM arguments for the target Java application.
      * @return Returns the arguments passed to the JVM for the target Java application
      */
     public abstract String getJvmArgs();
+
     /**
      * Return the JVM flags for the target Java application.
      * @return Returns the flags passed to the JVM for the target Java application
      */
     public abstract String getJvmFlags();
+
     /**
      * Return the arguments to the main class for the target Java application.
      * @return Returns the arguments to the main class.
      */
     public abstract String getMainArgs();
+
     /**
      * Return the main class for the target Java application or the name of the jar file if the application
      * was started with the <code>-jar</code> option.
@@ -105,11 +108,13 @@ public abstract class JVM extends Model  {
      * or the name of the jar file.
      */
     public abstract String getMainClass();
+
     /**
      * Return the VM version for the target Java application.
      * @return Returns the version of the target Java application
      */
     public abstract String getVmVersion();
+
     /**
      * Returns the java.home property for the target Java application.
      * "java.home" property specify the directory
@@ -117,19 +122,21 @@ public abstract class JVM extends Model  {
      * @return Returns java.home property.
      */
     public abstract String getJavaHome();
+
     /**
      * Returns the java.vm.info property for the target Java application.
      * the java.vm.info property (which is reflected in the text displayed by "java -version")
      * @return Returns java.vm.info property.
      */
     public abstract String getVMInfo();
+
     /**
      * Returns the java.vm.name property for the target Java application.
      * java.vm.name property is Java Virtual Machine implementation name.
      * @return Returns java.vm.name property.
      */
     public abstract String getVMName();
-    
+
     /**
      * Tests if target JVM monitoring is supported. If true, JVM fires
      * {@link MonitoredDataListener#monitoredDataEvent()}
@@ -137,6 +144,7 @@ public abstract class JVM extends Model  {
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isMonitoringSupported();
+
     /**
      * Tests if target JVM supports class monitoring. If true,
      * methods getLoadedClasses(), getSharedLoadedClasses(),
@@ -146,6 +154,7 @@ public abstract class JVM extends Model  {
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isClassMonitoringSupported();
+
     /**
      * Tests if target JVM supports thread monitoring. If true,
      * methods getThreadsDaemon(), getThreadsLive(),
@@ -155,6 +164,7 @@ public abstract class JVM extends Model  {
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isThreadMonitoringSupported();
+
     /**
      * Tests if target JVM supports thread monitoring. If true,
      * methods getGenCapacity(), getGenUsed(), getGenMaxCapacity()
@@ -163,70 +173,76 @@ public abstract class JVM extends Model  {
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isMemoryMonitoringSupported();
+
     /**
      * Adds a {@link MonitoredDataListener} to the listener list.
      * @param l the MonitoredDataListener to be added
      */
     public abstract void addMonitoredDataListener(MonitoredDataListener l);
+
     /**
      * Removes a {@link MonitoredDataListener} to the listener list.
      * @param l the MonitoredDataListener to be removed
      */
     public abstract void removeMonitoredDataListener(MonitoredDataListener l);
-    
+
     /**
      * Tests if it is possible to obtain system properties from target JVM.
      * @return <CODE>true</CODE> if JVM supports system properties,
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isGetSystemPropertiesSupported();
+
     /**
      * Returns a map of names and values of all system properties of target JVM.
      * @return a map of names and values of all system properties.
      */
     public abstract Properties getSystemProperties();
-    
+
     /**
      * Tests if it is possible to set HeapDumpOnOutOfMemoryError flag in target JVM.
      * @return <CODE>true</CODE> if JVM supports setting of HeapDumpOnOutOfMemoryError flag,
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isDumpOnOOMEnabledSupported();
+
     /**
      * Gets value of HeapDumpOnOutOfMemoryError flag from target JVM.
      * @return returns value of HeapDumpOnOutOfMemoryError flag.
      */
     public abstract boolean isDumpOnOOMEnabled();
+
     /**
      * sets HeapDumpOnOutOfMemoryError flag on target JVM.
      * @param enabled new vaule of HeapDumpOnOutOfMemoryError flag
      */
     public abstract void setDumpOnOOMEnabled(boolean enabled);
-    
+
     /**
      * Tests if it is possible to obtain heap dump from target JVM.
      * @return <CODE>true</CODE> if JVM supports heap dump,
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isTakeHeapDumpSupported();
+
     /**
      * Takes heap dump of target JVM.
      * @return returns {@link File} where heap dump is stored.
      * @throws java.io.IOException I/O error
      */
     public abstract File takeHeapDump() throws IOException;
-    
+
     /**
      * Tests if it is possible to obtain thread dump from target JVM.
      * @return <CODE>true</CODE> if JVM supports thread dump,
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isTakeThreadDumpSupported();
+
     /**
      * Takes thread dump of target JVM.
      * @throws java.io.IOException i/O error
      * @return Returns {@link String} of the thread dump from target JVM.
      */
     public abstract File takeThreadDump() throws IOException;
-    
 }

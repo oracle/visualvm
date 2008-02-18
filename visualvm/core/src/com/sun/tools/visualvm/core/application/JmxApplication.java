@@ -27,15 +27,24 @@ package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractApplication;
 import com.sun.tools.visualvm.core.datasource.Host;
+import javax.management.remote.JMXServiceURL;
 
 /**
- *
- * @author Jiri Sedlacek
+ * This type of application represents an application
+ * that is built from a {@link JMXServiceURL}.
+ * 
+ * @author Luis-Miguel Alventosa
  */
 public final class JmxApplication extends AbstractApplication {
 
-    JmxApplication(Host host, String connectionString) {
-        super(host, connectionString);
+    private final JMXServiceURL url;
+
+    public JmxApplication(JMXServiceURL url) {
+        super(Host.LOCALHOST, url.toString()); // Host is ignored here
+        this.url = url;
     }
 
+    public JMXServiceURL getJMXServiceURL() {
+        return url;
+    }
 }
