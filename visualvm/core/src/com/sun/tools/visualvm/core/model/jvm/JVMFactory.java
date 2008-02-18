@@ -41,8 +41,9 @@ import sun.jvmstat.monitor.VmIdentifier;
 
 
 /**
- * The JVMFactory class is a factory class for getting {@link JVM} representation 
- * for the {@link Application}.
+ * The JVMFactory class is a factory class for getting the
+ * {@link JVM} representation  for the {@link Application}.
+ * 
  * @author Tomas Hurka
  */
 public final class JVMFactory extends ModelFactory<JVM,Application> implements ModelProvider<JVM,Application> {
@@ -53,8 +54,8 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
     }
     
     /**
-     * getter for the default version of the JVMFactory
-     * @return instance of {@link JVMFactory}
+     * Getter for the default version of the JVMFactory.
+     * @return instance of {@link JVMFactory}.
      */
     public static synchronized JVMFactory getDefault() {
         if (jvmFactory == null) {
@@ -67,7 +68,7 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
     
     /**
      * Factory method for obtaining {@link JVM} for {@link Application}. Note that there
-     * is only one instance of {@link JVM} for concrete application. This {@link JVM} 
+     * is only one instance of {@link JVM} for a concrete application. This {@link JVM}
      * instance is cached.
      * @param app application 
      * @return {@link JVM} instance which encapsulates application's JVM.
@@ -91,34 +92,35 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
     
     /**
      * Default {@link ModelProvider} implementation, which creates 
-     * dummy {@link JVM} instance. If you want to extend JVMFactory use 
-     * {@link JVMFactory.registerFactory()} to register instance of {@link ModelProvider}
-     * @param appl application
+     * dummy {@link JVM} instances. If you want to extend JVMFactory use 
+     * {@link JVMFactory.registerFactory()} to register the new instances
+     * of {@link ModelProvider} for the different types of {@link Application}.
+     * @param app application
      * @return dummy instance of {@link JVM}
      */
-    public JVM createModelFor(Application appl) {
-        if (appl instanceof JvmstatApplication) {
-            JvmstatApplication app = (JvmstatApplication) appl;
+    public JVM createModelFor(Application app) {
+        if (app instanceof JvmstatApplication) {
+            JvmstatApplication app2 = (JvmstatApplication) app;
             MonitoredVm vm = null;
             try {
-                vm = getMonitoredVm(app);
+                vm = getMonitoredVm(app2);
                 String vmVersion = MonitoredVmUtil.vmVersion(vm);
                 if (vmVersion != null) {
                     SunJVM_4 jvm = null;
                     // Check for Sun VM (and maybe other?)
-                    if (vmVersion.startsWith("1.4.")) jvm = new SunJVM_4(app,vm); // NOI18N
+                    if (vmVersion.startsWith("1.4.")) jvm = new SunJVM_4(app2,vm); // NOI18N
                     
-                    else if (vmVersion.startsWith("1.5.")) jvm = new SunJVM_5(app,vm); // NOI18N
+                    else if (vmVersion.startsWith("1.5.")) jvm = new SunJVM_5(app2,vm); // NOI18N
                     
-                    else if (vmVersion.startsWith("1.6.")) jvm = new SunJVM_6(app,vm); // NOI18N
-                    else if (vmVersion.startsWith("10.0")) jvm = new SunJVM_6(app,vm); // NOI18N // Sun HotSpot Express
+                    else if (vmVersion.startsWith("1.6.")) jvm = new SunJVM_6(app2,vm); // NOI18N
+                    else if (vmVersion.startsWith("10.0")) jvm = new SunJVM_6(app2,vm); // NOI18N // Sun HotSpot Express
                     
-                    else if (vmVersion.startsWith("1.7.")) jvm = new SunJVM_7(app,vm); // NOI18N
-                    else if (vmVersion.startsWith("11.0")) jvm = new SunJVM_7(app,vm); // NOI18N
-                    else if (vmVersion.startsWith("12.0")) jvm = new SunJVM_7(app,vm); // NOI18N // Sun HotSpot Express
+                    else if (vmVersion.startsWith("1.7.")) jvm = new SunJVM_7(app2,vm); // NOI18N
+                    else if (vmVersion.startsWith("11.0")) jvm = new SunJVM_7(app2,vm); // NOI18N
+                    else if (vmVersion.startsWith("12.0")) jvm = new SunJVM_7(app2,vm); // NOI18N // Sun HotSpot Express
                     
                     if (jvm != null) {
-                        app.notifyWhenFinished(jvm);
+                        app2.notifyWhenFinished(jvm);
                         return jvm;
                     }
                 }
@@ -129,6 +131,6 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
                 vm.detach();
             }
         }
-        return new DefaultJVM(appl);
+        return new DefaultJVM(app);
     }
 }

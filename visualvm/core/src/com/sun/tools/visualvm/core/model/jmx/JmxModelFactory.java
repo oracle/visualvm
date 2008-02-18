@@ -32,6 +32,8 @@ import com.sun.tools.visualvm.core.model.ModelProvider;
 import com.sun.tools.visualvm.core.datasource.Application;
 
 /**
+ * The {@code JmxModelFactory} class is a factory class for getting
+ * the {@link JmxModel} representation for the {@link Application}.
  *
  * @author Luis-Miguel Alventosa
  */
@@ -44,6 +46,11 @@ public final class JmxModelFactory
     private JmxModelFactory() {
     }
 
+    /**
+     * Getter for the default version of the {@link JmxFactory}.
+     * 
+     * @return an instance of {@link JmxFactory}.
+     */
     public static synchronized JmxModelFactory getDefault() {
         if (factory == null) {
             factory = new JmxModelFactory();
@@ -52,10 +59,33 @@ public final class JmxModelFactory
         return factory;
     }
 
+    /**
+     * Factory method for obtaining the {@link JmxModel} for the given
+     * {@link Application}. Note that there is only one instance of
+     * {@link JmxModel} for application instance. This {@link JmxModel}
+     * instance is cached.
+     * 
+     * @param app application.
+     * 
+     * @return a {@link JmxModel} instance which encapsulates the
+     * application's JMX model.
+     */
     public static JmxModel getJmxModelFor(Application app) {
         return getDefault().getModel(app);
     }
 
+    /**
+     * Default {@link ModelProvider} implementation for {@link JmxModel}.
+     * 
+     * In order to extend the {@code JmxModelFactory} to register your
+     * own {@link JmxModel}s for the different types of {@link Application}
+     * call {@link JmxModelFactory.registerFactory()} supplying the new
+     * instance of {@link ModelProvider}.
+     * 
+     * @param app application.
+     * 
+     * @return an instance of {@link JmxModel}.
+     */
     public JmxModel createModelFor(Application app) {
         if (app instanceof JvmstatApplication) {
             return new JmxModel((JvmstatApplication) app);
