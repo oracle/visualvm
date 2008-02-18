@@ -49,7 +49,9 @@ import javax.management.ObjectName;
 import org.openide.ErrorManager;
 
 /**
- *
+ * This model relies on the {@link JmxModel} for the given application
+ * and returns MXBean proxies for the Java platform MXBeans.
+ * 
  * @author Luis-Miguel Alventosa
  */
 public class JvmJmxModel extends Model {
@@ -67,11 +69,19 @@ public class JvmJmxModel extends Model {
     private List<MemoryManagerMXBean> memoryManagerMXBeans = null;
     private List<MemoryPoolMXBean> memoryPoolMXBeans = null;
 
+    /**
+     * Creates an instance of {@code JvmJmxModel} for a given {@link Application}.
+     *
+     * @param application the {@link Application} instance.
+     */
     public JvmJmxModel(Application application) {
         app = application;
         mbsc = JmxModelFactory.getJmxModelFor(app).getCachedMBeanServerConnection();
     }
 
+    /**
+     * Returns an MXBean proxy for the class loading system of the JVM.
+     */
     public synchronized ClassLoadingMXBean getClassLoadingMXBean() {
         if (mbsc != null && classLoadingMXBean == null) {
             classLoadingMXBean = getMXBean(CLASS_LOADING_MXBEAN_NAME, ClassLoadingMXBean.class);
@@ -79,6 +89,9 @@ public class JvmJmxModel extends Model {
         return classLoadingMXBean;
     }
 
+    /**
+     * Returns an MXBean proxy for the compilation system of the JVM.
+     */
     public synchronized CompilationMXBean getCompilationMXBean() {
         if (mbsc != null && compilationMXBean == null) {
             compilationMXBean = getMXBean(COMPILATION_MXBEAN_NAME, CompilationMXBean.class);
@@ -86,6 +99,9 @@ public class JvmJmxModel extends Model {
         return compilationMXBean;
     }
 
+    /**
+     * Returns an MXBean proxy for the logging system of the JVM.
+     */
     public synchronized LoggingMXBean getLoggingMXBean() {
         if (mbsc != null && loggingMXBean == null) {
             loggingMXBean = getMXBean(LogManager.LOGGING_MXBEAN_NAME, LoggingMXBean.class);
@@ -93,6 +109,9 @@ public class JvmJmxModel extends Model {
         return loggingMXBean;
     }
 
+    /**
+     * Returns a collection of MXBean proxies for the garbage collectors of the JVM.
+     */
     public synchronized Collection<GarbageCollectorMXBean> getGarbageCollectorMXBeans() {
         // TODO: How to deal with changes to the list?
         if (mbsc != null && garbageCollectorMXBeans == null) {
@@ -127,6 +146,9 @@ public class JvmJmxModel extends Model {
         return garbageCollectorMXBeans;
     }
 
+    /**
+     * Returns a collection of MXBean proxies for the memory managers of the JVM.
+     */
     public synchronized Collection<MemoryManagerMXBean> getMemoryManagerMXBeans() {
         // TODO: How to deal with changes to the list?
         if (mbsc != null && memoryManagerMXBeans == null) {
@@ -161,6 +183,9 @@ public class JvmJmxModel extends Model {
         return memoryManagerMXBeans;
     }
 
+    /**
+     * Returns an MXBean proxy for the memory system of the JVM.
+     */
     public synchronized MemoryMXBean getMemoryMXBean() {
         if (mbsc != null && memoryMXBean == null) {
             memoryMXBean = getMXBean(MEMORY_MXBEAN_NAME, MemoryMXBean.class);
@@ -168,6 +193,9 @@ public class JvmJmxModel extends Model {
         return memoryMXBean;
     }
 
+    /**
+     * Returns a collection of MXBean proxies for the memory pools of the JVM.
+     */
     public synchronized Collection<MemoryPoolMXBean> getMemoryPoolMXBeans() {
         // TODO: How to deal with changes to the list?
         if (mbsc != null && memoryPoolMXBeans == null) {
@@ -202,6 +230,9 @@ public class JvmJmxModel extends Model {
         return memoryPoolMXBeans;
     }
 
+    /**
+     * Returns an MXBean proxy for the operating system of the JVM.
+     */
     public synchronized OperatingSystemMXBean getOperatingSystemMXBean() {
         if (mbsc != null && operatingSystemMXBean == null) {
             operatingSystemMXBean = getMXBean(OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
@@ -209,6 +240,9 @@ public class JvmJmxModel extends Model {
         return operatingSystemMXBean;
     }
 
+    /**
+     * Returns an MXBean proxy for the runtime system of the JVM.
+     */
     public synchronized RuntimeMXBean getRuntimeMXBean() {
         if (mbsc != null && runtimeMXBean == null) {
             runtimeMXBean = getMXBean(RUNTIME_MXBEAN_NAME, RuntimeMXBean.class);
@@ -216,6 +250,9 @@ public class JvmJmxModel extends Model {
         return runtimeMXBean;
     }
 
+    /**
+     * Returns an MXBean proxy for the thread system of the JVM.
+     */
     public synchronized ThreadMXBean getThreadMXBean() {
         if (mbsc != null && threadMXBean == null) {
             threadMXBean = getMXBean(THREAD_MXBEAN_NAME, ThreadMXBean.class);
@@ -223,6 +260,11 @@ public class JvmJmxModel extends Model {
         return threadMXBean;
     }
 
+    /**
+     * Generic method that returns an MXBean proxy for the given platform
+     * MXBean identified by its ObjectName and which implements the supplied
+     * interface.
+     */
     public <T> T getMXBean(ObjectName objectName, Class<T> interfaceClass) {
         return getMXBean(objectName.toString(), interfaceClass);
     }
