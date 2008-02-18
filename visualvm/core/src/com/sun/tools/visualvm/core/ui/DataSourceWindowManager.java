@@ -87,7 +87,7 @@ public final class DataSourceWindowManager {
                     ProgressHandle pHandle = null;
                     try {
                         // Setup progress bar
-                        pHandle = ProgressHandleFactory.createHandle("Opening " + DataSourceDescriptorFactory.getDataSourceDescriptorFor(dataSource).getName() + "...");
+                        pHandle = ProgressHandleFactory.createHandle("Opening " + DataSourceDescriptorFactory.getDescriptor(dataSource).getName() + "...");
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         

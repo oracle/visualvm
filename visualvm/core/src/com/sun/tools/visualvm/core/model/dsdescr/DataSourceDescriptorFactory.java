@@ -49,7 +49,7 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
         return dsDescFactory;
     }
     
-    public static DataSourceDescriptor getDataSourceDescriptorFor(DataSource ds) {
+    public static DataSourceDescriptor getDescriptor(DataSource ds) {
         return getDefault().getModel(ds);
     }
     

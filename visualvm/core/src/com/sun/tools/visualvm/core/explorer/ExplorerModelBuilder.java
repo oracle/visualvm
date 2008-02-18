@@ -96,7 +96,7 @@ class ExplorerModelBuilder {
                             final ExplorerNode node = new ExplorerNode(dataSource);
                             addedNodes.add(node);
                             
-                            DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDataSourceDescriptorFor(dataSource);
+                            DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
                             PropertyChangeListener descriptorListener = new PropertyChangeListener() {
                                 public void propertyChange(PropertyChangeEvent evt) {
                                     updateNode(node, evt);
@@ -162,7 +162,7 @@ class ExplorerModelBuilder {
                         ExplorerNode node = getNodeFor(dataSource);
                         removedNodes.add(node);
                         
-                        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDataSourceDescriptorFor(dataSource);
+                        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
                         descriptor.removePropertyChangeListener(descriptorListeners.get(descriptor));
                         descriptorListeners.remove(descriptor);
                     }

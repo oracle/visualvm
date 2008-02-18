@@ -60,7 +60,7 @@ class ApplicationCaption extends JPanel implements DataFinishedListener<Applicat
         application.notifyWhenFinished(this);
         
         setRunning(application.getState() == DataSource.STATE_AVAILABLE);
-        setApplicationName(DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
+        setApplicationName(DataSourceDescriptorFactory.getDescriptor(application).getName());
         setApplicationPid(-1); // TODO: provide PID once name doesn't contain it
 //        setApplicationIcon(new ImageIcon(ApplicationTypeFactory.getApplicationTypeFor(application).getIcon()));
     }

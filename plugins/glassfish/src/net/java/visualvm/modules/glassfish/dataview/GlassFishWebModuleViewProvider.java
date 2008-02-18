@@ -114,7 +114,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             generalDataScroll.setBorder(BorderFactory.createEmptyBorder());
             generalDataScroll.setOpaque(false);
             
-            JLabel appLink = new JLabel("<html><body><h2>Application hosted by <a href=\"#\">" + DataSourceDescriptorFactory.getDataSourceDescriptorFor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>");
+            JLabel appLink = new JLabel("<html><body><h2>Application hosted by <a href=\"#\">" + DataSourceDescriptorFactory.getDescriptor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>");
             appLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
             appLink.addMouseListener(new MouseAdapter() {
                 @Override

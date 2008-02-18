@@ -71,7 +71,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                 if (!jvm.isTakeThreadDumpSupported()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for " + DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
+                            NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for " + DataSourceDescriptorFactory.getDescriptor(application).getName());
                         }
                     });
                     return;

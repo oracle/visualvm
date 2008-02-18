@@ -69,7 +69,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                 if (!jvm.isTakeHeapDumpSupported()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError("Cannot take heap dump for " + DataSourceDescriptorFactory.getDataSourceDescriptorFor(application).getName());
+                            NetBeansProfiler.getDefaultNB().displayError("Cannot take heap dump for " + DataSourceDescriptorFactory.getDescriptor(application).getName());
                         }
                     });
                     return;
