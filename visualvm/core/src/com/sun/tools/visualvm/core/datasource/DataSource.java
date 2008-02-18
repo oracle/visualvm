@@ -194,22 +194,26 @@ public interface DataSource {
     
     /**
      * Returns true if state of this DataSource is STATE_FINISHED.
+     * This means that the DataSource has been unregistered from all repositories
+     * and removed from explorer tree.
+     * Once the DataSource is in STATE_FINISHED, its state won't change any more.
      * 
      * @return true if state of this DataSource is STATE_FINISHED.
      */
     public boolean isFinished();
     
     /**
-     * Registers a DataRemovedListener for a single notification when this DataSource is removed.
-     * This event occurs only once during the DataSource lifecycle exactly when the isRemoved() method
-     * starts to return true.
+     * Registers a DataFinishedListener for a single notification when this DataSource is removed.
+     * This event occurs only once during the DataSource lifecycle exactly when the isFinished() method
+     * starts to return true. At this time the DataSource should be unregistered from all repositories
+     * and removed from explorer tree.
      * Note that this listener is referenced by WeakReference in monitored DataSource -
      * be sure that the listener has at least one strong reference. You should always avoid writing
      * code like this:<pre>
      * DataSource.notifyWhenFinished(new DataFinishedListener() { ... });
      * </pre>
      * 
-     * @param listener a DataRemovedListener for a single notification when this DataSource is removed.
+     * @param listener a DataFinishedListener for a single notification when state of this DataSource becomes STATE_FINISHED.
      */
     public void notifyWhenFinished(DataFinishedListener listener);
 
