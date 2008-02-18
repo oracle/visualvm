@@ -55,18 +55,7 @@ public interface Positionable {
      * Implementation of Comparator based on getPreferredPosition() value.
      */
     static final class PositionableComparator implements Comparator {
-        /**
-         * Compares this object with the specified object for order.  Returns a
-         * negative integer, zero, or a positive integer as this object is less
-         * than, equal to, or greater than the specified object.
-         *
-         * @param   o the object to be compared.
-         * @return  a negative integer, zero, or a positive integer as this object
-         *		is less than, equal to, or greater than the specified object.
-         *
-         * @throws ClassCastException if the specified object's type prevents it
-         *         from being compared to this object.
-         */
+        
         public int compare(Object o1, Object o2) {
             Positionable p1 = (Positionable)o1;
             Positionable p2 = (Positionable)o2;

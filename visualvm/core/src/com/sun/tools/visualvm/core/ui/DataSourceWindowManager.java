@@ -146,7 +146,7 @@ public final class DataSourceWindowManager {
     /**
      * Adds an additional view to the Window of given DataSource or selects it if already added.
      * 
-     * @param owner DataSource to add the view to,
+     * @param master DataSource to add the view to,
      * @param view DataSourceView to be added.
      */
     // NOTE: display own progress...
@@ -157,7 +157,7 @@ public final class DataSourceWindowManager {
     /**
      * Adds additional views to a DataSource to the Window of viewMaster DataSource or selects it if already added.
      * 
-     * @param owner viewMaster of the DataSource,
+     * @param master viewMaster of the DataSource,
      * @param dataSource DataSource to add the views for.
      */
     // NOTE: display own progress...
@@ -168,11 +168,11 @@ public final class DataSourceWindowManager {
     /**
      * Adds additional views to a DataSource to the Window of viewMaster DataSource or selects it if already added.
      * 
-     * @param owner viewMaster of the DataSource,
-     * @param dataSourceViews DataSourceView instances to be added,
+     * @param master viewMaster of the DataSource,
+     * @param views DataSourceView instances to be added,
      * @param selectWindow true if the opened Window should be made visible,
      * @param toFront true if the opened Window should be moved to front of all other Windows,
-     * @param selectLastView true if the added view should be selected within the Window.
+     * @param selectFirstView true if the added view should be selected within the Window.
      */
     // NOTE: display own progress...
     public <X extends DataSourceView> void addViews(final DataSource master, final List<X> views, final boolean selectWindow, final boolean toFront, final boolean selectFirstView) {
@@ -205,17 +205,17 @@ public final class DataSourceWindowManager {
      * Select opened view in opened window of master DataSource.
      * 
      * @param master DataSource whose window contains the view to select,
-     * @param dataSourceView view to select.
+     * @param view view to select.
      */
-    public void selectView(DataSource master, DataSourceView dataSourceView) {
-        selectView(master, dataSourceView, true, true);
+    public void selectView(DataSource master, DataSourceView view) {
+        selectView(master, view, true, true);
     }
     
     /**
      * Selects already opened view in already opened DataSource Window.
      * 
-     * @param dataSource DataSource to select the view for,
-     * @param dataSourceView DataSourceView to select,
+     * @param master DataSource to select the view for,
+     * @param view DataSourceView to select,
      * @param selectWindow true if the opened Window should be made visible,
      * @param toFront true if the opened Window should be moved to front of all other Windows,
      */
@@ -232,15 +232,15 @@ public final class DataSourceWindowManager {
     /**
      * Removes a view from a DataSource Window.
      * 
-     * @param dataSource DataSource from which to remove the Window,
-     * @param dataSourceView DataSourceView to remove.
+     * @param master DataSource from which to remove the Window,
+     * @param view DataSourceView to remove.
      */
-    public void removeView(final DataSource master, final DataSourceView dataSourceView) {
+    public void removeView(final DataSource master, final DataSourceView view) {
         final DataSourceWindow window = getOpenedWindow(master);
         if (window == null) return;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                window.removeView(dataSourceView);
+                window.removeView(view);
             }
         });
     }
@@ -248,15 +248,15 @@ public final class DataSourceWindowManager {
     /**
      * Returns true if the Window of given DataSource contains the view, false otherwise.
      * 
-     * @param dataSource DataSource to check the view for,
-     * @param dataSourceView DataSourceView to check,
+     * @param master DataSource to check the view for,
+     * @param view DataSourceView to check,
      * @return true if the Window of given DataSource contains the view, false otherwise.
      */
-    public boolean containsView(DataSource master, DataSourceView dataSourceView) {
+    public boolean containsView(DataSource master, DataSourceView view) {
         // NOTE: Should be called from EDT!!!
         DataSourceWindow window = getOpenedWindow(master);
         if (window == null) return false;
-        return window.containsView(dataSourceView);
+        return window.containsView(view);
     }
     
     

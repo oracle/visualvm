@@ -42,18 +42,18 @@ public interface ExplorerActionsProvider <T extends DataSource> {
      * The provider is asked for the action each time the context menu is to be shown so the response should be
      * as fast as possible.
      * 
-     * @param node ExplorerNode for which to display the action,
-     * @return ExplorerActionDescriptor describing the default action for given ExplorerNode.
+     * @param dataSource DataSource for which to display the action,
+     * @return ExplorerActionDescriptor describing the default action for given DataSource.
      */
     public ExplorerActionDescriptor getDefaultAction(T dataSource);
 
     /**
-     * Returns list of ExplorerActionDesctiptors describing actions for given ExplorerNode.
+     * Returns set of ExplorerActionDesctiptors describing actions for given DataSource.
      * The provider is asked for the action each time the context menu is to be shown so the response should be
      * as fast as possible.
      * 
-     * @param node ExplorerNode for which to display the actions,
-     * @return list of ExplorerActionDesctiptors describing actions for given ExplorerNode.
+     * @param dataSource DataSource for which to display the actions,
+     * @return set of ExplorerActionDesctiptors describing actions for given DataSource.
      */
     public Set<ExplorerActionDescriptor> getActions(T dataSource);
 
