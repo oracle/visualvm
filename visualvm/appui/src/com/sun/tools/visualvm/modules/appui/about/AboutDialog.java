@@ -38,7 +38,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 
 /**
  *
@@ -198,21 +197,21 @@ public class AboutDialog {
     
     // --- main method for testing purposes ------------------------------------
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
-        
-        AboutDialog aboutDialog = AboutDialog.getInstance();
-        
-        aboutDialog.setCaption("About VisualVM");
-        aboutDialog.setBuildID("Version: Dev (Build xxx)");
-        aboutDialog.setMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on NetBeans Platform. For more information, please visit https://visualvm.dev.java.net.");
-        aboutDialog.setHTMLMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on <a href=\"http://www.netbeans.org/products/platform/\">NetBeans Platform</a>. For more information, please visit <a href=\"https://visualvm.dev.java.net\">https://visualvm.dev.java.net</a>.");
-        aboutDialog.setDetails("<b>Version: </b> Dev");
-        aboutDialog.setLogfile("E:\\Dev\\userdirdev\\var\\log\\messages.log");
-        
-        aboutDialog.show();
-    }
+//    public static void main(String[] args) {
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//        } catch (Exception e) {}
+//        
+//        AboutDialog aboutDialog = AboutDialog.getInstance();
+//        
+//        aboutDialog.setCaption("About VisualVM");
+//        aboutDialog.setBuildID("Version: Dev (Build xxx)");
+//        aboutDialog.setMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on NetBeans Platform. For more information, please visit https://visualvm.dev.java.net.");
+//        aboutDialog.setHTMLMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on <a href=\"http://www.netbeans.org/products/platform/\">NetBeans Platform</a>. For more information, please visit <a href=\"https://visualvm.dev.java.net\">https://visualvm.dev.java.net</a>.");
+//        aboutDialog.setDetails("<b>Version: </b> Dev");
+//        aboutDialog.setLogfile("E:\\Dev\\userdirdev\\var\\log\\messages.log");
+//        
+//        aboutDialog.show();
+//    }
     
 }
