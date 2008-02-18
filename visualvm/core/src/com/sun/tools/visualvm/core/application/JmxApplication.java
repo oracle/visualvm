@@ -39,7 +39,7 @@ public final class JmxApplication extends AbstractApplication {
 
     private final JMXServiceURL url;
 
-    JmxApplication(JMXServiceURL url) {
+    public JmxApplication(JMXServiceURL url) {
         super(Host.LOCALHOST, url.toString()); // Host is ignored here
         this.url = url;
     }
