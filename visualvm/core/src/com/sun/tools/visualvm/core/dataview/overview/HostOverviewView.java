@@ -71,7 +71,7 @@ class HostOverviewView extends DataSourceView implements DataFinishedListener<Ho
         this.host = host;
     }
     
-    public void willBeAdded() {
+    protected void willBeAdded() {
         hostOverview = HostOverviewFactory.getSystemOverviewFor(host);
     }
         
@@ -82,6 +82,10 @@ class HostOverviewView extends DataSourceView implements DataFinishedListener<Ho
         }
         
         return view;
+    }
+    
+    protected void removed() {
+        timer.stop();
     }
     
     public void dataFinished(Host dataSource) {
