@@ -231,7 +231,9 @@ public class JmxModel extends Model {
             // TODO: Remove the following two lines when Connection Dialog is implemented.
             String username = System.getProperty("jconsole.username");
             String password = System.getProperty("jconsole.password");
-            ProxyClient proxyClient = new ProxyClient(this, app.getId(), username, password);
+            JMXServiceURL url = app.getJMXServiceURL();
+            ProxyClient proxyClient =
+                    new ProxyClient(this, url.toString(), username, password);
             if (proxyClient != null) {
                 client = proxyClient;
                 proxyClient.connect();
