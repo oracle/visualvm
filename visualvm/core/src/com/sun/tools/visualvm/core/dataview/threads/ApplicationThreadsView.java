@@ -46,6 +46,7 @@ import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.util.Utilities;
 
 /**
@@ -61,6 +62,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
     private Application application;
     private JVM jvm;
     private ThreadMXBean threadBean;
+    private ThreadMXBeanDataManager threadsManager;
     private Timer timer;
     
 
@@ -70,8 +72,9 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         this.threadBean = threadBean;
     }
     
-    public void willBeAdded() {
+    protected void willBeAdded() {
         jvm = JVMFactory.getJVMFor(application);
+        threadsManager = new ThreadMXBeanDataManager(application, threadBean);
     }
         
     public DataViewComponent getView() {
@@ -83,9 +86,16 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         return view;
     }
     
+    protected void removed() {
+        timer.stop();
+    }
+    
+    public void dataFinished(Application dataSource) {
+        timer.stop();
+    }
+    
     
     private DataViewComponent createViewComponent() {
-        final ThreadMXBeanDataManager threadsManager = new ThreadMXBeanDataManager(application, threadBean);
         timer = new Timer(DEFAULT_REFRESH, new ActionListener() {
             public void actionPerformed(ActionEvent e) { threadsManager.refreshThreads(); }
         });
@@ -114,16 +124,14 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         return dvc;
     }
     
-    public void dataFinished(Application dataSource) {
-        timer.stop();
-    }
-    
     
     // --- General data --------------------------------------------------------
     
     private static class MasterViewSupport extends JPanel implements DataFinishedListener<Application> {
         
+        private HTMLTextArea area;
         private JButton threadDumpButton;
+        
         
         public MasterViewSupport(Application application, JVM jvm, ThreadMXBeanDataManager threadsManager, Timer timer) {
             initComponents(application, jvm, threadsManager, timer);
@@ -142,16 +150,14 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         private void initComponents(final Application application, JVM jvm, final ThreadMXBeanDataManager threadsManager, Timer timer) {
             setLayout(new BorderLayout());
             
-            final HTMLTextArea area = new HTMLTextArea("<nobr>" + getThreadsCounts(threadsManager) + "</nobr>");
+            area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            updateThreadsCounts(threadsManager);
             setBackground(area.getBackground());
             
             timer.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    int selStart = area.getSelectionStart();
-                    int selEnd   = area.getSelectionEnd();
-                    area.setText("<nobr>" + getThreadsCounts(threadsManager) + "</nobr>");
-                    area.select(selStart, selEnd);
+                    updateThreadsCounts(threadsManager);
                 }
             });
             
@@ -177,13 +183,32 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
             application.notifyWhenFinished(this);
         }
         
-        private String getThreadsCounts(ThreadMXBeanDataManager threadsManager) {
-            StringBuilder data = new StringBuilder();
+        private void updateThreadsCounts(final ThreadMXBeanDataManager threadsManager) {
+            
+            final int[] threads = new int[2];
+            
+            new NBSwingWorker() {
+                protected void doInBackground() {
+                    try {
+                        threads[0] = threadsManager.getThreadCount();
+                        threads[1] = threadsManager.getDaemonThreadCount();
+                    } catch (Exception ex) {
+                        threads[0] = 0;
+                        threads[1] = 0;
+                    }
+                }
+                protected void done() {
+                    StringBuilder data = new StringBuilder();
           
-            data.append("<b>Live threads:</b> " + threadsManager.getThreadCount() + "<br>");
-            data.append("<b>Daemon threads:</b> " + threadsManager.getDaemonThreadCount() + "<br>");
-          
-            return data.toString();
+                    data.append("<b>Live threads:</b> " + threads[0] + "<br>");
+                    data.append("<b>Daemon threads:</b> " + threads[1] + "<br>");
+
+                    int selStart = area.getSelectionStart();
+                    int selEnd   = area.getSelectionEnd();
+                    area.setText(data.toString());
+                    area.select(selStart, selEnd);
+                }
+            }.execute();
         }
         
     }

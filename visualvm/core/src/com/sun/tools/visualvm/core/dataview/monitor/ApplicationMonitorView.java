@@ -80,7 +80,7 @@ class ApplicationMonitorView extends DataSourceView {
         this.application = application;
     }
     
-    public void willBeAdded() {
+    protected void willBeAdded() {
         jvm = JVMFactory.getJVMFor(application);
         JvmJmxModel jvmJmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
         memoryMXBean = jvmJmxModel == null ? null : jvmJmxModel.getMemoryMXBean();
@@ -93,6 +93,10 @@ class ApplicationMonitorView extends DataSourceView {
         }
         
         return view;
+    }
+    
+    protected void removed() {
+        if (jvm != null) jvm.removeMonitoredDataListener(monitoredDataListener);
     }
     
     
@@ -135,10 +139,6 @@ class ApplicationMonitorView extends DataSourceView {
         jvm.addMonitoredDataListener(monitoredDataListener);
         
         return dvc;
-    }
-    
-    protected void removed() {
-        if (jvm != null) jvm.removeMonitoredDataListener(monitoredDataListener);
     }
     
     
