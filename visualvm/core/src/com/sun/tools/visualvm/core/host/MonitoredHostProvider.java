@@ -90,7 +90,7 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
         public void dataFinished(Host host) {
             ScheduledTask task = watchedHosts.remove(host);
             if (task != null) {
-                Scheduler.getSharedInstance().unschedule(task);
+                Scheduler.sharedInstance().unschedule(task);
             }
             processFinishedHost(host);
         }
@@ -99,7 +99,7 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
 
     public void dataChanged(final DataChangeEvent<Host> event) {
         for (Host host : event.getAdded()) {
-            watchedHosts.put(host, Scheduler.getSharedInstance().schedule(new DiscoveryTask(host), Quantum.seconds(3)));
+            watchedHosts.put(host, Scheduler.sharedInstance().schedule(new DiscoveryTask(host), Quantum.seconds(3)));
         }
     }
 

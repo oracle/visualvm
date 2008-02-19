@@ -61,7 +61,7 @@ public class Scheduler implements PropertyChangeListener {
      * Singleton accessor
      * @return Returns the shared instance of scheduler service
      */
-    public static final Scheduler getSharedInstance() {
+    public static final Scheduler sharedInstance() {
         return INSTANCE;
     }
 
@@ -122,32 +122,36 @@ public class Scheduler implements PropertyChangeListener {
                     schedulerService.scheduleAtFixedRate(new Runnable() {
 
                         public void run() {
-                            if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.finest("Notifying scheduled tasks at interval " + interval);
-                            }
-
-                            long timeStamp = System.currentTimeMillis();
-                            Set<WeakReference<DefaultScheduledTask>> myReceivers = Collections.EMPTY_SET;
-
-                            synchronized (interval2recevier) {
-                                myReceivers = new HashSet<WeakReference<DefaultScheduledTask>>(interval2recevier.get(interval));
+                            try {
                                 if (LOGGER.isLoggable(Level.FINEST)) {
-                                    LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);
+                                    LOGGER.finest("Notifying scheduled tasks at interval " + interval);
                                 }
-                            }
 
-                            int deadRefCounter = notifyReceivers(timeStamp, myReceivers);
-
-                            if (deadRefCounter > 0) {
-                                Set<WeakReference<DefaultScheduledTask>> cleansed = cleanDeadRefs(interval, myReceivers);
+                                long timeStamp = System.currentTimeMillis();
+                                Set<WeakReference<DefaultScheduledTask>> myReceivers = Collections.EMPTY_SET;
 
                                 synchronized (interval2recevier) {
-                                    interval2recevier.remove(interval);
-                                    interval2recevier.put(interval, cleansed);
+                                    myReceivers = new HashSet<WeakReference<DefaultScheduledTask>>(interval2recevier.get(interval));
+                                    if (LOGGER.isLoggable(Level.FINEST)) {
+                                        LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);
+                                    }
                                 }
-                            }
-                            if (LOGGER.isLoggable(Level.FINEST)) {
-                                System.out.println("Finished");
+
+                                int deadRefCounter = notifyReceivers(timeStamp, myReceivers);
+
+                                if (deadRefCounter > 0) {
+                                    Set<WeakReference<DefaultScheduledTask>> cleansed = cleanDeadRefs(interval, myReceivers);
+
+                                    synchronized (interval2recevier) {
+                                        interval2recevier.remove(interval);
+                                        interval2recevier.put(interval, cleansed);
+                                    }
+                                }
+                                if (LOGGER.isLoggable(Level.FINEST)) {
+                                    System.out.println("Finished");
+                                }
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, "Exception in scheduler", e);
                             }
                         }
                     }, 0, interval.interval, interval.unit);
