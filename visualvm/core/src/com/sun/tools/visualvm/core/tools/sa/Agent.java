@@ -89,7 +89,7 @@ class Agent {
     
     Arguments getArguments() throws ClassNotFoundException {
         if (args == null) {
-            args = new Arguments(saClassLoader.Argumets());
+            args = new Arguments(saClassLoader.Arguments());
         }
         return args;
     }

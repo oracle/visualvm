@@ -26,33 +26,70 @@
 package com.sun.tools.visualvm.core.tools.sa;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-
 /**
  *
  * @author Tomas Hurka
+ * @author Luis-Miguel Alventosa
  */
 class SAWrapper {
     URLClassLoader loader;
     File libraryPath;
 
-    SAWrapper(File jdkHome,File saJarFile) throws MalformedURLException {
+    SAWrapper(File jdkHome, File saJarFile) throws MalformedURLException {
         URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
-        libraryPath = new File(jdkHome,"jre/lib/"+System.getProperty("os.arch"));
-        System.out.println("Path "+libraryPath.getAbsolutePath());
+        libraryPath = new File(jdkHome, "jre/lib/" + System.getProperty("os.arch"));
+        System.out.println("Path " + libraryPath.getAbsolutePath());
         loader = new URLClassLoader(saJarUrls) {
+            @Override
             protected String findLibrary(String libname) {
                 String name = System.mapLibraryName(libname);
-                File library = new File(libraryPath,name);
-                System.out.println("Library "+library.getAbsolutePath());
-                        
-                if (library.exists()) {
-                    return library.getAbsolutePath();
+                File library = new File(libraryPath, name);
+                System.out.println("Library " + library.getAbsolutePath());
+                if (library.exists() && library.canRead()) {
+                    String absPath = temporaryLibrary(library);
+                    if (absPath != null) {
+                        return absPath;
+                    }
                 }
                 return super.findLibrary(libname);
+            }
+
+            /**
+             * Copy the specified native library into the temporary directory
+             * and return the absolute path. Returns null, if we fail to copy
+             * the library.
+             */
+            private synchronized String temporaryLibrary(File library) {
+                try {
+                    InputStream is = new FileInputStream(library);
+                    if (is != null) {
+                        File file =
+                                File.createTempFile(library.getName() + ".", null);
+                        file.deleteOnExit();
+                        FileOutputStream fileOutput = new FileOutputStream(file);
+                        int c;
+                        while ((c = is.read()) != -1) {
+                            fileOutput.write(c);
+                        }
+                        is.close();
+                        fileOutput.close();
+                        if (file.exists()) {
+                            return file.getAbsolutePath();
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("WARNING: Failed to load library (" +
+                            library.getName() + "): " + e);
+                    return null;
+                }
+                return null;
             }
         };
     }
@@ -77,7 +114,7 @@ class SAWrapper {
         return classForName("sun.jvm.hotspot.utilities.HeapHprofBinWriter");    // NOI18N
     }
     
-    Class Argumets() throws ClassNotFoundException {
+    Class Arguments() throws ClassNotFoundException {
         return classForName("sun.jvm.hotspot.runtime.Arguments");
     }
 }
