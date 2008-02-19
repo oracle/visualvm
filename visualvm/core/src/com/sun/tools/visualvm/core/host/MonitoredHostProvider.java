@@ -22,7 +22,6 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package com.sun.tools.visualvm.core.host;
 
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
@@ -37,78 +36,115 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
 
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.scheduler.Quantum;
+import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
+import com.sun.tools.visualvm.core.scheduler.Scheduler;
+import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.openide.util.RequestProcessor;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 // A provider for MonitoredHostDS
-class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> implements DataChangeListener<Host> {
-    
-    private static final RequestProcessor processor = new RequestProcessor("MonitoredHostProvider Processor");
-    
-    private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
-    
-    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
-        public void dataFinished(Host host) { processFinishedHost(host); }
-    };
-            
-    
-    public void dataChanged(final DataChangeEvent<Host> event) {
-        processor.post(new Runnable() {
-            public void run() {
-                Set<Host> newHosts = event.getAdded();
-                for (Host host : newHosts) processNewHost(host);
+class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> implements DataChangeListener<Host> {    
+    private class DiscoveryTask implements SchedulerTask {
+        private Host host;
+        final private AtomicBoolean hostAvailable = new AtomicBoolean(false);
+        
+        public DiscoveryTask(Host host) {
+            this.host = host;
+        }
+        public void onSchedule(long timeStamp) {
+            if (MonitoredHostDS.isAvailableFor(host) && isRegistered(host)) {
+                if (hostAvailable.compareAndSet(false, true)) {
+                    processNewHost(host);
+                }
+            } else {
+                if (hostAvailable.compareAndSet(true, false)) {
+//                    processFinishedHost(host);
+                }
             }
-        });
+        }
     }
     
-    
-    private void processNewHost(final Host host) {        
+//    private static final RequestProcessor processor = new RequestProcessor("MonitoredHostProvider Processor");
+    private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap<Host, HostListener>());
+    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
+
+        public void dataFinished(Host host) {
+            ScheduledTask task = watchedHosts.remove(host);
+            if (task != null) {
+                Scheduler.getSharedInstance().unschedule(task);
+            }
+            processFinishedHost(host);
+        }
+    };
+    final private Map<Host, ScheduledTask> watchedHosts = Collections.synchronizedMap(new HashMap<Host, ScheduledTask>());
+
+    public void dataChanged(final DataChangeEvent<Host> event) {
+        for (Host host : event.getAdded()) {
+            watchedHosts.put(host, Scheduler.getSharedInstance().schedule(new DiscoveryTask(host), Quantum.seconds(3)));
+        }
+    }
+
+    private void processNewHost(final Host host) {
         try {
             MonitoredHostDS monitoredHostDS = new MonitoredHostDS(host);
             host.getRepository().addDataSource(monitoredHostDS);
             registerDataSource(monitoredHostDS);
             final MonitoredHost monitoredHost = monitoredHostDS.getMonitoredHost();
             HostListener monitoredHostListener = new HostListener() {
-                public void vmStatusChanged(final VmStatusChangeEvent e) {}
-                public void disconnected(HostEvent e) { processFinishedHost(host); }
+
+                public void vmStatusChanged(final VmStatusChangeEvent e) {
+                }
+
+                public void disconnected(HostEvent e) {
+                    processFinishedHost(host);
+                }
             };
             mapping.put(host, monitoredHostListener);
             monitoredHost.addHostListener(monitoredHostListener);
-            
+
             host.notifyWhenFinished(hostFinishedListener);
-            
+
         } catch (Exception e) {
             // Host doesn't support jvmstat monitoring (jstatd not running)
             // TODO: maybe display a hint that by running jstatd on that host applications can be discovered automatically
         }
     }
-    
-    private void processFinishedHost(Host host) {
+
+    private void processFinishedHost(final Host host) {
         Set<MonitoredHostDS> monitoredHosts = host.getRepository().getDataSources(MonitoredHostDS.class);
         host.getRepository().removeDataSources(monitoredHosts);
         unregisterDataSources(monitoredHosts);
         for (MonitoredHostDS monitoredHost : monitoredHosts) {
-            try { monitoredHost.getMonitoredHost().removeHostListener(mapping.get(host)); } catch (MonitorException ex) {}
+            try {
+                monitoredHost.getMonitoredHost().removeHostListener(mapping.get(host));
+            } catch (MonitorException ex) {
+            }
             mapping.remove(host);
         }
     }
-    
+
     protected <Y extends MonitoredHostDS> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
-        for (MonitoredHostDS monitoredHost : removed) monitoredHost.finished();
+        for (MonitoredHostDS monitoredHost : removed) {
+            monitoredHost.finished();
+        }
     }
     
-    
+    private boolean isRegistered(Host host) {
+        return watchedHosts.containsKey(host);
+    }
+
     void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(MonitoredHostProvider.this, Host.class);
     }
-
 }

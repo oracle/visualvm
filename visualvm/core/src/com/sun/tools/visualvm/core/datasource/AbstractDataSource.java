@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +42,26 @@ import java.util.Set;
  */
 // TODO: synchronize using RequestProcessor??
 public abstract class AbstractDataSource implements DataSource {
+    private class WeakReferenceX<T> extends WeakReference<T> {
+        public WeakReferenceX(T referent, ReferenceQueue<? super T> q) {
+            super(referent, q);
+        }
 
+        public WeakReferenceX(T referent) {
+            super(referent);
+        }
+        
+        public int hashCode() {
+            return this.get() != null ? this.get().hashCode() : 0;
+        }
+        
+        public boolean equals(Object o) {
+            if (this.get() == null && o == null) return true;
+            if (o == null) return false;
+            if (!(o instanceof WeakReferenceX)) return false;
+            return this.get().equals(((WeakReferenceX)o).get());
+        }
+    }
     private DataSource owner;
     private DataSource master;
     private int state = STATE_AVAILABLE;
@@ -49,7 +69,7 @@ public abstract class AbstractDataSource implements DataSource {
     private final DataSourceContainer<DataSource> repository = new DefaultDataSourceContainer(this);
     private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-    private final Set<WeakReference<DataFinishedListener>> removedListeners = Collections.synchronizedSet(new HashSet());
+    private final Set<WeakReferenceX<DataFinishedListener>> removedListeners = Collections.synchronizedSet(new HashSet());
 
 
     /**
@@ -126,7 +146,7 @@ public abstract class AbstractDataSource implements DataSource {
     public void notifyWhenFinished(DataFinishedListener listener) {
         if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
         if (isFinished()) listener.dataFinished(this);
-        else removedListeners.add(new WeakReference(listener));
+        else removedListeners.add(new WeakReferenceX(listener));
     }
     
     public boolean isFinished() {

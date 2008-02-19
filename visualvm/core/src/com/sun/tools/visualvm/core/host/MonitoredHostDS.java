@@ -48,6 +48,13 @@ public class MonitoredHostDS extends AbstractDataSource {
         setVisible(false);
     }
 
+    public static boolean isAvailableFor(Host host) {
+        try {
+            MonitoredHost.getMonitoredHost(host.getHostName());
+            return true;
+        } catch (Exception e) {}
+        return false;
+    }
     
     public MonitoredHost getMonitoredHost() {
         return monitoredHost;

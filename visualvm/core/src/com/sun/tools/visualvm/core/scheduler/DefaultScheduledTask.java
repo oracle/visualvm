@@ -108,6 +108,10 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
     public void suspend() {
         setInterval(Quantum.SUSPENDED);
     }
+
+    public boolean isSuspended() {
+        return interval.equals(Quantum.SUSPENDED);
+    }
     
     /**
      * @see com.sun.tools.visualvm.core.scheduler.SchedulerTask#onSchedule(long)

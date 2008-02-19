@@ -35,24 +35,6 @@ public interface ScheduledTask {
      * Property-change support
      */
     public static final String INTERVAL_PROPERTY = "Task.Interval";
-    
-    /**
-     * A special case of suspended task
-     */
-    public static final ScheduledTask SUSPENDED_TASK = new ScheduledTask() {
-        public Quantum getInterval() {
-            return Quantum.SUSPENDED;
-        }
-
-        public void setInterval(Quantum quantum) {
-            // do nothing
-        }
-
-        public void suspend() {
-            // do nothing
-        }
-    };
-
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -73,4 +55,11 @@ public interface ScheduledTask {
      * A shortcut to calling <code>setInterval(Quantum.SUSPENDED)</code>
      */
     void suspend();
+    
+    /**
+     * Indicates the suspension status of the task
+     * @return Returns the suspension status of the task
+     */
+    boolean isSuspended();
+    
 }

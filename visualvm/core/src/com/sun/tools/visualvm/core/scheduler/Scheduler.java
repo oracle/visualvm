@@ -37,7 +37,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  * An interval based scheduler service
  * Used to execute various tasks at the predefined interval
@@ -47,17 +46,13 @@ import java.util.logging.Logger;
 public class Scheduler implements PropertyChangeListener {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final Logger LOGGER = Logger.getLogger(Scheduler.class.getName());
-    
     private static final Scheduler INSTANCE = new Scheduler();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     private final Map<Quantum, Set<WeakReference<DefaultScheduledTask>>> interval2recevier = new HashMap<Quantum, Set<WeakReference<DefaultScheduledTask>>>();
-    private final ScheduledExecutorService schedulerService = Executors.newScheduledThreadPool(Runtime.getRuntime()
-                                                                                                      .availableProcessors());
+    private final ScheduledExecutorService schedulerService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     private Scheduler() {
     }
 
@@ -91,11 +86,8 @@ public class Scheduler implements PropertyChangeListener {
      * @return Returns an instance of <code>ScheduledTask</code> that can be used to later modify the interval of execution
      */
     public final ScheduledTask schedule(final SchedulerTask task, final Quantum interval, boolean immediate) {
-        if (interval.equals(Quantum.SUSPENDED)) {
-            return ScheduledTask.SUSPENDED_TASK;
-        }
-
-        if (immediate) {
+        boolean suspended = interval.equals(Quantum.SUSPENDED);
+        if (immediate && !suspended) {
             task.onSchedule(System.currentTimeMillis());
         }
 
@@ -110,10 +102,6 @@ public class Scheduler implements PropertyChangeListener {
      * @param task The task to be unscheduled
      */
     public final void unschedule(final ScheduledTask task) {
-        if (task.getInterval().equals(Quantum.SUSPENDED)) {
-            return;
-        }
-
         remove((DefaultScheduledTask) task, task.getInterval());
     }
 
@@ -130,7 +118,9 @@ public class Scheduler implements PropertyChangeListener {
                 Set<WeakReference<DefaultScheduledTask>> newReceivers = new HashSet<WeakReference<DefaultScheduledTask>>();
                 newReceivers.add(new WeakReference<DefaultScheduledTask>(task));
                 interval2recevier.put(interval, newReceivers);
-                schedulerService.scheduleAtFixedRate(new Runnable() {
+                if (!interval.equals(Quantum.SUSPENDED)) {
+                    schedulerService.scheduleAtFixedRate(new Runnable() {
+
                         public void run() {
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.finest("Notifying scheduled tasks at interval " + interval);
@@ -142,8 +132,7 @@ public class Scheduler implements PropertyChangeListener {
                             synchronized (interval2recevier) {
                                 myReceivers = new HashSet<WeakReference<DefaultScheduledTask>>(interval2recevier.get(interval));
                                 if (LOGGER.isLoggable(Level.FINEST)) {
-                                    LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0")
-                                                       + " scheduled tasks for interval " + interval);
+                                    LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);
                                 }
                             }
 
@@ -162,6 +151,7 @@ public class Scheduler implements PropertyChangeListener {
                             }
                         }
                     }, 0, interval.interval, interval.unit);
+                }
             } else {
                 receivers.add(new WeakReference<DefaultScheduledTask>(task));
             }
@@ -191,6 +181,9 @@ public class Scheduler implements PropertyChangeListener {
             if (rcv == null) {
                 deadRefCounter++;
 
+                continue;
+            }
+            if (rcv.isSuspended()) {
                 continue;
             }
 
@@ -223,6 +216,7 @@ public class Scheduler implements PropertyChangeListener {
                     }
 
                     if (rcv.equals(task)) {
+                        rcv.suspend();
                         receivers.remove(rcv);
 
                         break;
