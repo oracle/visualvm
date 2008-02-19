@@ -31,6 +31,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -47,6 +49,7 @@ public class ExplorerSupport {
     private JTree mainTree;
     
     private Set<ExplorerSelectionListener> selectionListeners = Collections.synchronizedSet(new HashSet());
+    private Set<ExplorerExpansionListener> expansionListeners = Collections.synchronizedSet(new HashSet());
 
 
     /**
@@ -142,6 +145,14 @@ public class ExplorerSupport {
         });
     }
     
+    public void addExpansionListener(ExplorerExpansionListener listener) {
+        expansionListeners.add(listener);
+    }
+    
+    public void removeExpansionListener(ExplorerExpansionListener listener) {
+        expansionListeners.remove(listener);
+    }
+    
     /**
      * Opens the explorer tree window (Applications).
      */
@@ -168,6 +179,7 @@ public class ExplorerSupport {
     private ExplorerSupport() {
         mainTree = ExplorerUI.instance().getTree();
         mainTree.addTreeSelectionListener(new ExplorerTreeSelectionListener());
+        mainTree.addTreeExpansionListener(new ExplorerTreeExpansionListener());
         OpenDataSourceSupport.getInstance().initialize();
     }
     
@@ -178,6 +190,26 @@ public class ExplorerSupport {
             DataSource selectedDataSource = getSelectedDataSource();
             Set<ExplorerSelectionListener> listeners = new HashSet(selectionListeners);
             for (ExplorerSelectionListener listener : listeners) listener.selectionChanged(selectedDataSource);
+        }
+        
+    }
+    
+    private class ExplorerTreeExpansionListener implements TreeExpansionListener {
+
+        public void treeExpanded(TreeExpansionEvent event) {
+            DataSource expandedDataSource = getDataSource(event.getPath());
+            if (expandedDataSource != null) {
+                Set<ExplorerExpansionListener> listeners = new HashSet(expansionListeners);
+                for (ExplorerExpansionListener listener : listeners) listener.dataSourceExpanded(expandedDataSource);
+            }
+        }
+
+        public void treeCollapsed(TreeExpansionEvent event) {
+            DataSource collapsedDataSource = getDataSource(event.getPath());
+            if (collapsedDataSource != null) {
+                Set<ExplorerExpansionListener> listeners = new HashSet(expansionListeners);
+                for (ExplorerExpansionListener listener : listeners) listener.dataSourceCollapsed(collapsedDataSource);
+            }
         }
         
     }
