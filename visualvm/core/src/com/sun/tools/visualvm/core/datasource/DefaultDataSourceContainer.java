@@ -64,5 +64,9 @@ public class DefaultDataSourceContainer<X extends DataSource> extends DefaultDat
     public <Y extends X> void removeDataSources(Set<Y> removed) {
         super.unregisterDataSources(removed);
     }
+    
+    public <Y extends X> void updateDataSources(Set<Y> added, Set<Y> removed) {
+        super.updateDataSources(added, removed);
+    }
 
 }

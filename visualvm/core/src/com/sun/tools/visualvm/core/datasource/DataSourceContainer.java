@@ -61,5 +61,13 @@ public interface DataSourceContainer<X extends DataSource> extends DataSourcePro
      * @param removed set of DataSource instances to be removed.
      */
     public <Y extends X> void removeDataSources(Set<Y> removed);
+    
+    /**
+     * Adds and removes DataSource instances ro/from the container.
+     * 
+     * @param added set of DataSource instances to be added,
+     * @param removed set of DataSource instances to be removed.
+     */
+    public <Y extends X> void updateDataSources(Set<Y> added, Set<Y> removed);
 
 }
