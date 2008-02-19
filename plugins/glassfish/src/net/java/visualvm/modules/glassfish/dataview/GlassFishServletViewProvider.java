@@ -118,7 +118,7 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
             dvc.addDetailsView(new DataViewComponent.DetailsView("Requests", null, chartReqsPanel, null),
                                DataViewComponent.BOTTOM_LEFT);
 
-            refreshTask = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+            refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
                 public void onSchedule(long timeStamp) {
                     refreshData(timeStamp);

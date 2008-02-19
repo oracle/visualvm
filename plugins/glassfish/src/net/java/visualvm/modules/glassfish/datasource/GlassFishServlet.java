@@ -59,7 +59,7 @@ public class GlassFishServlet extends GlassFishDataSource {
     };
     
     public GlassFishServlet(String name, GlassFishWebModule master, ServletMonitor monitor) {
-        super(monitor.getDomainRoot(), master);
+        super(master);
         this.monitor = monitor;
         this.name = name;
     }

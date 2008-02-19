@@ -22,10 +22,8 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.appserv.management.DomainRoot;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.awt.Image;
@@ -35,8 +33,8 @@ import java.awt.Image;
  * @author Jaroslav Bachorik
  */
 public class GlassFishModel extends GlassFishDataSource {
+
     private Application application;
-    
     private final static DataSourceDescriptor DESCRIPTOR = new DataSourceDescriptor() {
 
         @Override
@@ -53,10 +51,15 @@ public class GlassFishModel extends GlassFishDataSource {
         public String getDescription() {
             return "GlassFish/SJSAS Logical Model";
         }
+
+        @Override
+        public int getAutoExpansionPolicy() {
+            return EXPAND_NEVER;
+        }
     };
-    
-    public GlassFishModel(DomainRoot root, Application app) {
-        super(root);
+
+    public GlassFishModel(Application app) {
+        super();
         application = app;
     }
 
@@ -69,3 +72,8 @@ public class GlassFishModel extends GlassFishDataSource {
         return DESCRIPTOR;
     }
 }
+
+//            GlassFishWebModule module = new GlassFishWebModule(appName != null ? (moduleName + " (in " + appName + ")") : moduleName, objectName, virtMonitorEntry.getValue(), root);
+//            registerDataSource(module);
+//            root.getRepository().addDataSource(module);
+

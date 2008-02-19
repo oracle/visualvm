@@ -27,10 +27,10 @@ package net.java.visualvm.modules.glassfish.jmx;
 
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import java.io.IOException;
+import java.util.Map;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -156,6 +156,28 @@ public class JMXUtil {
     public static final String getWebModuleName(String objectName, JmxModel jmx) {
         try {
             return (String) jmx.getMBeanServerConnection().getAttribute(new ObjectName(objectName), "name");
+        } catch (MBeanException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (AttributeNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (InstanceNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (ReflectionException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (MalformedObjectNameException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (NullPointerException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
+    }
+    
+    public static final String getWebModuleName(String objectName, JmxModel jmx, Map<String, String> context2name) {
+        try {
+            String ctxMapping = (String) jmx.getMBeanServerConnection().getAttribute(new ObjectName(objectName), "name");
+            return context2name.get(ctxMapping);
         } catch (MBeanException ex) {
             Exceptions.printStackTrace(ex);
         } catch (AttributeNotFoundException ex) {

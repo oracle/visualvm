@@ -40,7 +40,6 @@ public class GlassFishWebModule extends GlassFishApplication {
     private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png",
                                                                    true);
     private WebModuleVirtualServerMonitor monitor;
-    private String objectName;
     
     private DataSourceDescriptor descriptor = new DataSourceDescriptor() {
 
@@ -61,13 +60,9 @@ public class GlassFishWebModule extends GlassFishApplication {
     };
     
     public GlassFishWebModule(String name, String objName, WebModuleVirtualServerMonitor monitor, GlassFishModel gfRoot) {
-        super(name, monitor.getDomainRoot(), gfRoot);
+        super(name, objName, gfRoot);
         this.monitor = monitor;
-        objectName = objName;
-    }
-
-    public String getObjectName() {
-        return objectName;
+        
     }
 
     public WebModuleVirtualServerMonitor getMonitor() {

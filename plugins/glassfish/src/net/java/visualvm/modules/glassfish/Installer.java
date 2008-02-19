@@ -25,9 +25,9 @@
 
 package net.java.visualvm.modules.glassfish;
 
+import net.java.visualvm.modules.glassfish.datasource.GlassFishApplicationProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishApplicationViewProvider;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishModelProvider;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishApplicationProvider;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishDataSourceDescriptorProvider;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServletProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishServletViewProvider;
@@ -51,12 +51,12 @@ public class Installer extends ModuleInstall {
         GlassFishApplicationTypeFactory.initialize();        
         GlassFishApplicationViewProvider.initialize();
         GlassFishModelProvider.initialize();
-        GlassFishApplicationProvider.initialize();
         GlassFishServletProvider.initialize();
         GlassFishWebModuleViewProvider.initialize();
         GlassFishServletViewProvider.initialize();
         GlassFishOverview.initialize();
         GlassFishDataSourceDescriptorProvider.initialize();
+        GlassFishApplicationProvider.initialize();
     }
 
     @Override
@@ -64,12 +64,12 @@ public class Installer extends ModuleInstall {
         GlassFishApplicationTypeFactory.shutdown();   
         GlassFishApplicationViewProvider.shutdown();
         GlassFishModelProvider.shutdown();
-        GlassFishApplicationProvider.shutdown();
         GlassFishServletProvider.shutdown();
         GlassFishWebModuleViewProvider.shutdown();
         GlassFishServletViewProvider.shutdown();
         GlassFishOverview.shutdown();
         GlassFishDataSourceDescriptorProvider.shutdown();
+        GlassFishApplicationProvider.shutdown();
         super.uninstalled();
     }
 }

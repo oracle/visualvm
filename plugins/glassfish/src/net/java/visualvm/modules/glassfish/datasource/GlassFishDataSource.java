@@ -25,7 +25,6 @@
 
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.appserv.management.DomainRoot;
 import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
@@ -35,20 +34,13 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
  * @author Jaroslav Bachorik
  */
 public abstract class GlassFishDataSource extends AbstractDataSource {
-    private DomainRoot domainRoot;
-    
-    public GlassFishDataSource(DomainRoot root) {
-        this(root, null);
+    public GlassFishDataSource() {
+        this(null);
     }
     
-    public GlassFishDataSource( DomainRoot root, DataSource master) {
+    public GlassFishDataSource(DataSource master) {
         super(master);
-        this.domainRoot = root;
     }
-
-    public DomainRoot getDomainRoot() {
-        return domainRoot;
-    }
-    
+   
     abstract public DataSourceDescriptor getDescriptor();
 }

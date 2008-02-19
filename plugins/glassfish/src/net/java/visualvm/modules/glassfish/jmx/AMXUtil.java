@@ -29,6 +29,7 @@ import com.sun.appserv.management.DomainRoot;
 import com.sun.appserv.management.base.SystemInfo;
 import com.sun.appserv.management.client.ProxyFactory;
 import com.sun.appserv.management.monitor.MonitoringRoot;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import javax.management.MBeanServerConnection;
 
 /**
@@ -46,6 +47,14 @@ public class AMXUtil {
         return monitoringRoot ==  null ? dr.getMonitoringRoot() : monitoringRoot;
     }
 
+    public static DomainRoot getDomainRoot(JmxModel model) {
+        try {
+            return getDomainRoot(model.getMBeanServerConnection());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
     public static DomainRoot getDomainRoot(MBeanServerConnection connection) throws Exception {
         try {
             return domainRoot == null ? getAMXProxyFactory(connection).getDomainRoot() : domainRoot;

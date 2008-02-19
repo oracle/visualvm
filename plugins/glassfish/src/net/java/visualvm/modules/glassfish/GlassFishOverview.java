@@ -52,25 +52,22 @@ import java.util.Set;
 import javax.swing.JPanel;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 
-
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class GlassFishOverview implements ViewPlugin<Application> {
-    private static final GlassFishOverview INSTANCE = new GlassFishOverview();
-    
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
+    private static final GlassFishOverview INSTANCE = new GlassFishOverview();
+
+    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
     private static class GlassfishViewDescriptor implements ViewDescriptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
-
         private DomainRoot domainRoot;
-        private String serverName, configName;
+        private String serverName,  configName;
         private JmxModel jmxModel;
-        
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
 
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
         public GlassfishViewDescriptor(DomainRoot root, JmxModel jmx) {
             domainRoot = root;
             jmxModel = jmx;
@@ -81,7 +78,6 @@ public class GlassFishOverview implements ViewPlugin<Application> {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
         public int getLocation() {
             return DataViewComponent.TOP_RIGHT;
         }
@@ -99,7 +95,7 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             panel.add(area, BorderLayout.CENTER);
 
             DataViewComponent.DetailsView details = new DataViewComponent.DetailsView("SJSAS/GlassFish",
-                                                                                      "Application server details", panel, null);
+                    "Application server details", panel, null);
 
             return details;
         }
@@ -119,21 +115,21 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             }
             return ports;
         }
-        
+
         private Collection<String> getIIOPPorts(IIOPServiceConfig config) {
             //iiop ports
-                Map<String,IIOPListenerConfig> iiopListeners = config.getIIOPListenerConfigMap();
+            Map<String, IIOPListenerConfig> iiopListeners = config.getIIOPListenerConfigMap();
             Collection<String> iports = new ArrayList<String>();
-            for(String key : iiopListeners.keySet()){
+            for (String key : iiopListeners.keySet()) {
                 String iport = iiopListeners.get(key).getPort();
-                if (iport.startsWith("$")){
-                    iport = resolveToken( (iport.substring(2, iport.length()-1) ));
+                if (iport.startsWith("$")) {
+                    iport = resolveToken((iport.substring(2, iport.length() - 1)));
                 }
                 iports.add(iport);
             }
             return iports;
         }
-        
+
         private String getDomain() {
             String domain;
             domain = JMXUtil.getServerDomain(jmxModel);
@@ -152,22 +148,26 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             sb.append("<b>HTTP Port(s): </b>");
 
             Collection<String> hports = getHTTPPorts(cc.getHTTPServiceConfig());
-            for(Iterator<String> iter=hports.iterator();iter.hasNext();) {
+            for (Iterator<String> iter = hports.iterator(); iter.hasNext();) {
                 sb.append(iter.next());
-                if (iter.hasNext()) sb.append(",");
+                if (iter.hasNext()) {
+                    sb.append(",");
+                }
             }
             sb.append("<br/>");
-            
+
             sb.append("<b>IOOP Port(s): </b> ");
 
             Collection<String> iports = getIIOPPorts(cc.getIIOPServiceConfig());
-            for(Iterator<String> iter=iports.iterator();iter.hasNext();) {
+            for (Iterator<String> iter = iports.iterator(); iter.hasNext();) {
                 sb.append(iter.next());
-                if (iter.hasNext()) sb.append(",");
+                if (iter.hasNext()) {
+                    sb.append(",");
+                }
             }
             sb.append("<br/>");
             sb.append("<br/>");
-            
+
             String version = domainRoot.getJ2EEDomain().getJ2EEServerMap().get(serverName).getserverVersion();
             sb.append("<b>Installed Version: </b>").append(version).append("<br/>");
             return sb.toString();
@@ -195,34 +195,31 @@ public class GlassFishOverview implements ViewPlugin<Application> {
         }
     }
 
-    private GlassFishOverview() {}
-    
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    private GlassFishOverview() {
+    }
 
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
     public Set<AreaDescriptor> getAreasFor(Application application) {
         return Collections.EMPTY_SET;
     }
 
     public Set<? extends ViewDescriptor> getViewsFor(Application application) {
         if (ApplicationTypeFactory.getApplicationTypeFor(application) instanceof GlassFishApplicationType) {
-            Set<GlassFishModel> roots = application.getRepository().getDataSources(GlassFishModel.class);
-
-            if (roots.size() == 1) {
-                GlassFishModel root = roots.iterator().next();
-                JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-                return Collections.singleton(new GlassfishViewDescriptor(root.getDomainRoot(), jmx));
-            } else {
-                return Collections.EMPTY_SET;
+            JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
+            if (jmx != null) {
+                DomainRoot dr = AMXUtil.getDomainRoot(jmx);
+                if (dr != null) {
+                    return Collections.singleton(new GlassfishViewDescriptor(AMXUtil.getDomainRoot(jmx), jmx));
+                }
             }
-        } else {
-            return Collections.EMPTY_SET;
         }
+        return Collections.EMPTY_SET;
     }
 
     public static void initialize() {
         OverviewViewSupport.getInstance().getApplicationPluggableView().addPlugin(INSTANCE, Application.class);
     }
-    
+
     public static void shutdown() {
         OverviewViewSupport.getInstance().getApplicationPluggableView().removePlugin(INSTANCE);
     }

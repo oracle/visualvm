@@ -68,7 +68,7 @@ class TransactionServiceView extends DataSourceView {
         };
         TransactionsPanel panel = new TransactionsPanel();
         panel.setModel(model);
-        transRefreshTask = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+        transRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {

@@ -57,7 +57,7 @@ public abstract class AbstractStatsTableModel<PM, M extends MonitoringStats, S e
     public AbstractStatsTableModel(PM aMonitor, Quantum refreshInterval) {
         super();
         monitor = aMonitor;
-        refresh = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+        refresh = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             public void onSchedule(long timeStamp) {
                 synchronized (statsList) {

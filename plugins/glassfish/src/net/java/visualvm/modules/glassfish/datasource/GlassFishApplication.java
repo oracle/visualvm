@@ -25,8 +25,6 @@
 
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.appserv.management.DomainRoot;
-
 /**
  *
  * @author Jaroslav Bachorik
@@ -34,11 +32,13 @@ import com.sun.appserv.management.DomainRoot;
 public abstract class GlassFishApplication extends GlassFishDataSource {    
     private GlassFishModel glassFishRoot;
     private String name;
+    private String objectName;
     
-    public GlassFishApplication(String name, DomainRoot root, GlassFishModel gfRoot) {
-        super(root);
+    public GlassFishApplication(String name, String objName, GlassFishModel gfRoot) {
+        super();
         this.name = name;
         this.glassFishRoot = gfRoot;
+        this.objectName = objName;
     }
 
     public GlassFishModel getGlassFishRoot() {
@@ -49,5 +49,35 @@ public abstract class GlassFishApplication extends GlassFishDataSource {
         return name;
     }
     
+    public String getObjectName() {
+        return objectName;
+    }
+    
     abstract public void generateContents();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GlassFishApplication other = (GlassFishApplication) obj;
+        if (this.glassFishRoot != other.glassFishRoot && (this.glassFishRoot == null || !this.glassFishRoot.equals(other.glassFishRoot))) {
+            return false;
+        }
+        if (this.objectName != other.objectName && (this.objectName == null || !this.objectName.equals(other.objectName))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 11 * hash + (this.glassFishRoot != null ? this.glassFishRoot.hashCode() : 0);
+        hash = 11 * hash + (this.objectName != null ? this.objectName.hashCode() : 0);
+        return hash;
+    }
 }

@@ -116,7 +116,7 @@ class HTTPServiceView extends DataSourceView {
         };
 
         cqp.setModel(model);
-        queueRefreshTask = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+        queueRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {
@@ -181,7 +181,7 @@ class HTTPServiceView extends DataSourceView {
         };
 
         fcp.setModel(model);
-        cacheRefreshTask = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+        cacheRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {
@@ -252,7 +252,7 @@ class HTTPServiceView extends DataSourceView {
         };
 
         kap.setModel(model);
-        kaRefreshTask = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+        kaRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {

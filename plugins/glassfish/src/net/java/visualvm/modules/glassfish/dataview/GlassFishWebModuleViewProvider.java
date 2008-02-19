@@ -207,7 +207,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             dvc.addDetailsView(new DataViewComponent.DetailsView("WebServices", null, wsPanel, null),
                                DataViewComponent.BOTTOM_LEFT);
 
-            refreshTask = Scheduler.getSharedInstance().schedule(new SchedulerTask() {
+            refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
                 public void onSchedule(long timeStamp) {
                     refreshData(timeStamp);
                 }

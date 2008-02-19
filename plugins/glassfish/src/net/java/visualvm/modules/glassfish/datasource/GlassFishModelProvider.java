@@ -24,7 +24,6 @@
  */
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.appserv.management.DomainRoot;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
@@ -32,19 +31,8 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVM;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
-import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
-import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.management.MBeanServerConnection;
-
 
 /**
  *
@@ -52,17 +40,12 @@ import javax.management.MBeanServerConnection;
  */
 public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishModel> implements DataChangeListener<Application>, DataFinishedListener<Application> {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
     private static final GlassFishModelProvider INSTANCE = new GlassFishModelProvider();
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private ExecutorService modelBuilder = Executors.newCachedThreadPool();
-
-    private GlassFishModelProvider() {}
     
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    private GlassFishModelProvider() {
+    }
 
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
     public void dataChanged(DataChangeEvent<Application> event) {
         if (event.getAdded().isEmpty() && event.getRemoved().isEmpty()) {
             // Initial event to deliver DataSources already created by the provider before registering to it as a listener
@@ -81,12 +64,12 @@ public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishM
             }
         }
     }
-    
+
     public static void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().addDataChangeListener(INSTANCE, Application.class);
     }
-    
+
     public static void shutdown() {
         DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
@@ -105,34 +88,16 @@ public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishM
 
     private void processNewApplication(final Application app) {
         if (ApplicationTypeFactory.getApplicationTypeFor(app) instanceof GlassFishApplicationType) {
-            modelBuilder.submit(new Runnable() {
-                    public void run() {
-                        try {
-                            JmxModel jmx = JmxModelFactory.getJmxModelFor(app);
-                            while (jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-                                Thread.sleep((int)(Math.random() * 200d));
-                            }
-                            
-                            MBeanServerConnection serverConnection = jmx.getMBeanServerConnection();
-                            DomainRoot dr = AMXUtil.getDomainRoot(serverConnection);
+            GlassFishModel gfm = new GlassFishModel(app);
+            registerDataSource(gfm);
+            app.getRepository().addDataSource(gfm);
 
-                            while (dr == null) {
-                                Thread.sleep(500);
-                                dr = AMXUtil.getDomainRoot(serverConnection);
-                            }
+            app.notifyWhenFinished(new DataFinishedListener() {
 
-                            dr.waitAMXReady();
-
-                            GlassFishModel gfm = new GlassFishModel(dr, app);
-                            registerDataSource(gfm);
-                            app.getRepository().addDataSource(gfm);
-
-                            app.notifyWhenFinished(GlassFishModelProvider.this);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
+                public void dataFinished(Object dataSource) {
+                    processFinishedApplication(app);
+                }
+            });
         }
     }
 }

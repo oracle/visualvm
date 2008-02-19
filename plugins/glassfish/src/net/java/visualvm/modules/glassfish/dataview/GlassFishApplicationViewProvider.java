@@ -62,37 +62,41 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
             return Collections.EMPTY_SET;
         }
 
-        GlassFishApplication gfApplication = (GlassFishApplication) application;
-
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
+        if (model == null) {
+            return Collections.EMPTY_SET;
+        }
 
-        if (model != null) {
-            try {
-                final Map<String, ServerRootMonitor> serverMonitors = gfApplication.getDomainRoot().getMonitoringRoot().getServerRootMonitorMap();
-                final String serverName = JMXUtil.getServerName(model);
+        DomainRoot dr = AMXUtil.getDomainRoot(model);
+        if (dr == null) {
+            return Collections.EMPTY_SET;
+        }
 
-                if (serverMonitors.get(serverName) == null) {
-                    return Collections.EMPTY_SET;
-                }
+        try {
+            final Map<String, ServerRootMonitor> serverMonitors = dr.getMonitoringRoot().getServerRootMonitorMap();
+            final String serverName = JMXUtil.getServerName(model);
 
-                return new HashSet<DataSourceView>() {
-
-                    {
-                        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
-                        TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
-
-                        if (httpMonitor != null) {
-                            add(new HTTPServiceView(application, httpMonitor));
-                        }
-
-                        if (transMonitor != null) {
-                            add(new TransactionServiceView(application, transMonitor));
-                        }
-                    }
-                };
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (serverMonitors.get(serverName) == null) {
+                return Collections.EMPTY_SET;
             }
+
+            return new HashSet<DataSourceView>() {
+
+                {
+                    HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
+                    TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
+
+                    if (httpMonitor != null) {
+                        add(new HTTPServiceView(application, httpMonitor));
+                    }
+
+                    if (transMonitor != null) {
+                        add(new TransactionServiceView(application, transMonitor));
+                    }
+                }
+                };
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return Collections.EMPTY_SET;
