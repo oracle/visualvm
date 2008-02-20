@@ -66,7 +66,7 @@ import org.openide.util.Utilities;
  */
 class ApplicationMonitorView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/graphs.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/monitor.png";
 
     private DataViewComponent view;
     private Application application;

@@ -56,7 +56,7 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
     
     private static class CoreDumpDescriptor extends AbstractSnapshotDescriptor<CoreDump> implements PropertyChangeListener {
         
-        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredumps.png", true);
+        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredump.png", true);
         
         static CoreDumpDescriptor newInstance(CoreDump coreDump) {
             CoreDumpDescriptor desc = new CoreDumpDescriptor(coreDump);

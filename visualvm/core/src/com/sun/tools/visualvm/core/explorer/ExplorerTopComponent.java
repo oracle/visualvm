@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import java.awt.BorderLayout;
-import javax.swing.SwingUtilities;
 import org.openide.util.Utilities;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -40,7 +39,7 @@ import org.openide.windows.WindowManager;
 final class ExplorerTopComponent extends TopComponent {
 
     private static final String PREFERRED_ID = "ExplorerTopComponent";
-    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/mgmtControlPanel.png";
+    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/localHost.png";
 
     private static ExplorerTopComponent instance;
 
