@@ -35,12 +35,14 @@ import java.awt.event.MouseEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
@@ -106,7 +108,7 @@ class ExplorerUI extends JPanel {
         };
         explorerTree.setRootVisible(false);
         explorerTree.setShowsRootHandles(true);
-//        explorerTree.setRowHeight(explorerTree.getRowHeight() + 2);
+        explorerTree.setRowHeight(getTreeRowHeight());
         explorerTree.setCellRenderer(new ExplorerNodeRenderer());
         explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
@@ -137,6 +139,13 @@ class ExplorerUI extends JPanel {
         });
         
         add(explorerTreeScrollPane, BorderLayout.CENTER);
+    }
+    
+    private static int getTreeRowHeight() {
+        // NOTE: At least on GTK this returns -1
+        int rowHeight = UIManager.getInt("Tree.rowHeight");
+        if (rowHeight != -1) return rowHeight + 2;
+        else return new JLabel("XXX").getPreferredSize().height + 4;
     }
     
     
