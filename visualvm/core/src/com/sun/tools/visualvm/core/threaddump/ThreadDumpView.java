@@ -115,6 +115,22 @@ class ThreadDumpView extends DataSourceView {
             return value.replace("&", "&amp;").replace("<", "&lt;");
         }
 
+        private static String transform(String value) {
+            StringBuilder sb = new StringBuilder();
+            String[] result = value.split("\\n");
+            for (int i = 0; i < result.length; i++) {
+                String line = result[i];
+                if (line.isEmpty()) {
+                    sb.append("<span>" + line + "\n</span>");
+                } else if (line.substring(0, 1).matches("\\s")) {
+                    sb.append("<span style=\"color: #CC3300\">" + line + "\n</span>");
+                } else {
+                    sb.append("<span style=\"color: #0033CC\">" + line + "\n</span>");
+                }
+            }
+            return sb.toString();
+        }
+
         private void loadThreadDump(final File file) {
             RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -127,7 +143,9 @@ class ThreadDumpView extends DataSourceView {
                   ex.printStackTrace();
                 }
                 try {
-                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" + htmlize(new String(data, "UTF-8")) + "</pre></nobr>");
+                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" +
+                          transform(htmlize(new String(data, "UTF-8"))) +
+                          "</pre></nobr>");
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
