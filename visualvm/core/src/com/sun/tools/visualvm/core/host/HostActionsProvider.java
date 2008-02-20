@@ -116,14 +116,12 @@ class HostActionsProvider {
     
     private class RemoteHostsContainerActionProvider implements ExplorerActionsProvider<RemoteHostsContainer> {
 
-        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
+            return new ExplorerActionDescriptor(addNewHostAction, 0);
+        }
 
         public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(addNewHostAction, 0));
-            
-            return actions;
+            return Collections.EMPTY_SET;
         }
         
     }

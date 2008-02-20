@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -107,6 +108,10 @@ class CoreDumpActionsProvider {
             return null;
         }
         
+        public Set<ExplorerActionDescriptor> getActions(T coreDump) {
+            return Collections.EMPTY_SET;
+        }
+        
     }
     
     private static class CoreDumpActionProvider extends AbstractCoreDumpActionProvider<CoreDump> {
@@ -124,12 +129,8 @@ class CoreDumpActionsProvider {
     
     private static class CoreDumpsContainerActionProvider extends AbstractCoreDumpActionProvider<CoreDumpsContainer> {
         
-        public Set<ExplorerActionDescriptor> getActions(CoreDumpsContainer container) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(addNewCoreDumpAction, 0));
-            
-            return actions;
+        public ExplorerActionDescriptor getDefaultAction(CoreDumpsContainer dataSource) {
+            return new ExplorerActionDescriptor(addNewCoreDumpAction, 0);
         }
         
     }
