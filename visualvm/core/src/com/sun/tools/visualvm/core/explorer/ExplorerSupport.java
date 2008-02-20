@@ -153,13 +153,6 @@ public class ExplorerSupport {
         expansionListeners.remove(listener);
     }
     
-    /**
-     * Opens the explorer tree window (Applications).
-     */
-    public void openExplorer() {
-        ExplorerTopComponent.getInstance().open();
-    }
-    
     
     private DataSource getDataSource(TreePath path) {
         if (path == null) return null;

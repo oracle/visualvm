@@ -32,12 +32,10 @@ import com.sun.tools.visualvm.core.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.core.host.HostsSupport;
 import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
 import com.sun.tools.visualvm.core.dataview.threads.ThreadsViewSupport;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.profiler.ProfilerSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotSupport;
 import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.io.File;
-import javax.swing.SwingUtilities;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.RequestProcessor;
 
@@ -55,12 +53,7 @@ public class Install extends ModuleInstall {
         org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        init();
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { ExplorerSupport.sharedInstance().openExplorer(); }
-                        });
-                    }
+                    public void run() { init(); }
                 });
             }
         });

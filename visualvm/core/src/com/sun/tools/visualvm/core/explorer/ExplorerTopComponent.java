@@ -61,23 +61,26 @@ final class ExplorerTopComponent extends TopComponent {
     }
     
     
+    /**
+    * Gets default instance. Do not use directly: reserved for *.settings files only,
+    * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
+    * To obtain the singleton instance, use {@link findInstance}.
+    */
     public static synchronized ExplorerTopComponent getInstance() {
-        if (instance == null) {
-            Runnable instanceResolver = new Runnable() {
-                public void run() {
-                    TopComponent explorerTopComponent = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-                    if ((explorerTopComponent != null) && explorerTopComponent instanceof ExplorerTopComponent) {
-                        instance = (ExplorerTopComponent)explorerTopComponent;
-                    } else {
-                        instance = new ExplorerTopComponent();
-                    }
-                }
-            };
-            if (SwingUtilities.isEventDispatchThread()) instanceResolver.run();
-            else try { SwingUtilities.invokeAndWait(instanceResolver); } catch (Exception e) {}
-        }
-
+        if (instance == null) instance = new ExplorerTopComponent();
         return instance;
+    }
+  
+    /**
+    * Obtain the ExplorerTopComponent instance. Never call {@link #getDefault} directly!
+    */
+    public static synchronized ExplorerTopComponent findInstance() {
+        TopComponent explorerTopComponent = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
+        if (explorerTopComponent == null) return getInstance();
+        if (explorerTopComponent instanceof ExplorerTopComponent) return (ExplorerTopComponent)explorerTopComponent;
+    
+        System.err.println("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior.");
+        return getInstance();
     }
     
     private boolean needsDocking() {

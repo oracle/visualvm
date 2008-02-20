@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.explorer;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
@@ -35,20 +36,30 @@ import org.openide.util.Utilities;
  * Action which shows ExplorerTopComponent component.
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-// TODO: should be moved to private package and use ExplorerSupport.openExplorer
+// TODO: should be moved to private package
 public final class ExplorerTopComponentAction extends AbstractAction {
+    
+    private static Action instance;
+    
+    
+    public static Action getInstance() {
+        if (instance == null) instance = new ExplorerTopComponentAction();
+        return instance;
+    }
   
-  public ExplorerTopComponentAction() {
-    super(NbBundle.getMessage(ExplorerTopComponentAction.class, "CTL_ExplorerTopComponentAction"));
-    putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(ExplorerTopComponent.ICON_PATH, true)));
-  }
-  
-  public void actionPerformed(ActionEvent evt) {
-    ExplorerTopComponent win = ExplorerTopComponent.getInstance();
-    win.open();
-    win.requestActive();
-  }
+    public void actionPerformed(ActionEvent evt) {
+        ExplorerTopComponent win = ExplorerTopComponent.getInstance();
+        win.open();
+        win.requestActive();
+    }
+    
+    
+    private ExplorerTopComponentAction() {
+        super(NbBundle.getMessage(ExplorerTopComponentAction.class, "CTL_ExplorerTopComponentAction"));
+        putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(ExplorerTopComponent.ICON_PATH, true)));
+    }
   
 }
 

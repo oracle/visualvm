@@ -29,12 +29,14 @@
 <filesystem>
     <folder name="Actions">
         <folder name="Window">
-            <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
+            <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.ExplorerTopComponentAction.getInstance"/>
+            </file>
         </folder>
     </folder>
     <folder name="Menu">
         <folder name="Window">
-            <file name="MGMTControlPanelAction.shadow">
+            <file name="ExplorerTopComponentAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
             </file>
         </folder>
@@ -48,6 +50,16 @@
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
                 <attr name="url_key" stringvalue="com_sun_tools_visualvm_core_update_center"/>
             </file>
+        </folder>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="ExplorerTopComponent.settings" url="explorer/ExplorerTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="explorer">
+                <file name="ExplorerTopComponent.wstcref" url="explorer/ExplorerTopComponentWstcref.xml"/>
+            </folder>
         </folder>
     </folder>
 </filesystem>
