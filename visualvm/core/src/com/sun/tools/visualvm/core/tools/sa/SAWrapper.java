@@ -43,6 +43,12 @@ class SAWrapper {
     File libraryPath;
 
     SAWrapper(File jdkHome, File saJarFile) throws MalformedURLException {
+	// By default SA agent classes prefer dbx debugger to proc debugger
+	// and Windows process debugger to windbg debugger. SA expects 
+	// special properties to be set to choose other debuggers.
+        // We will set those here before attaching to SA agent.
+	System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true");
+	System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");
         URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
         libraryPath = new File(jdkHome, "jre/lib/" + System.getProperty("os.arch"));
         System.out.println("Path " + libraryPath.getAbsolutePath());
