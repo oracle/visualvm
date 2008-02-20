@@ -110,7 +110,11 @@ class ThreadDumpView extends DataSourceView {
             
             add(contentsPanel, BorderLayout.CENTER);
         }
-        
+
+        private static String htmlize(String value) {
+            return value.replace("&", "&amp;").replace("<", "&lt;");
+        }
+
         private void loadThreadDump(final File file) {
             RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -123,7 +127,7 @@ class ThreadDumpView extends DataSourceView {
                   ex.printStackTrace();
                 }
                 try {
-                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" + new String(data, "UTF-8") + "</pre></nobr>");
+                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" + htmlize(new String(data, "UTF-8")) + "</pre></nobr>");
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
