@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
@@ -51,6 +52,7 @@ public class Scheduler implements PropertyChangeListener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private final Map<Quantum, Set<WeakReference<DefaultScheduledTask>>> interval2recevier = new HashMap<Quantum, Set<WeakReference<DefaultScheduledTask>>>();
     private final ScheduledExecutorService schedulerService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+    private final ExecutorService intermediateTaskService = Executors.newCachedThreadPool();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private Scheduler() {
@@ -88,7 +90,11 @@ public class Scheduler implements PropertyChangeListener {
     public final ScheduledTask schedule(final SchedulerTask task, final Quantum interval, boolean immediate) {
         boolean suspended = interval.equals(Quantum.SUSPENDED);
         if (immediate && !suspended) {
-            task.onSchedule(System.currentTimeMillis());
+            intermediateTaskService.submit(new Runnable() {
+                public void run() {
+                    task.onSchedule(System.currentTimeMillis());
+                }
+            });
         }
 
         DefaultScheduledTask scheduled = new DefaultScheduledTask(interval, task);
