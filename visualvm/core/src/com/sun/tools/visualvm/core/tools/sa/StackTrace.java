@@ -33,6 +33,7 @@ import java.util.List;
 /**
  *
  * @author Tomas Hurka
+ * @author Luis-Miguel Alventosa
  */
 class StackTrace {
 
@@ -69,12 +70,7 @@ class StackTrace {
                 boolean objectWaitFrame = isJavaLangObjectWaitFrame(javaFrame);
                 for (;!javaFrame.isNull();javaFrame=javaFrame.invokeSA("javaSender")) {
                     printJavaFrame(out, javaFrame);
-                    try {
-                        printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
-                    } catch (Exception e) {
-                        System.out.println("WARNING: Failed to get detailed info for monitors.");
-                        e.printStackTrace();
-                    }
+                    printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
                     waitingToLockMonitor = null;
                     objectWaitFrame = false;
                 }
@@ -98,50 +94,64 @@ class StackTrace {
         return false;
     }
     
-    private void printMonitors(final PrintStream out, final SAObject javaFrame, Object waitingToLockMonitor, boolean objectWaitFrame) throws IllegalAccessException, InvocationTargetException {
+    private void printMonitors(
+            final PrintStream out, final SAObject javaFrame,
+            Object waitingToLockMonitor, boolean objectWaitFrame)
+            throws IllegalAccessException, InvocationTargetException {
         if (objectWaitFrame) {
             SAObject stackValueCollection = javaFrame.invokeSA("getLocals");
             Boolean isEmpty = (Boolean) stackValueCollection.invoke("isEmpty");
             if (!isEmpty.booleanValue()) {
-                Object oopHandle = stackValueCollection.invoke("oopHandleAt",0);
-                printMonitor(out,oopHandle,"waiting on");
+                Object oopHandle = stackValueCollection.invoke("oopHandleAt", 0);
+                printMonitor(out, oopHandle, "waiting on");
             }
         }
-        List mList = (List) javaFrame.invoke("getMonitors");
-        Object[] monitors = mList.toArray();
-        for (int i = monitors.length -1 ; i >= 0; i--) {
-            SAObject monitorInfo = new SAObject(monitors[i]);
-            Object ownerHandle = monitorInfo.invoke("owner");
-            if (ownerHandle != null) {
-                String state="locked";
-                if (waitingToLockMonitor != null) {
-                    Object objectHandle = new SAObject(waitingToLockMonitor).invoke("object");
-                    if (objectHandle.equals(ownerHandle)) {
-                        state = "waiting to lock";
+        try {
+            List mList = (List) javaFrame.invoke("getMonitors");
+            Object[] monitors = mList.toArray();
+            for (int i = monitors.length - 1; i >= 0; i--) {
+                SAObject monitorInfo = new SAObject(monitors[i]);
+                Object ownerHandle = monitorInfo.invoke("owner");
+                if (ownerHandle != null) {
+                    String state = "locked";
+                    if (waitingToLockMonitor != null) {
+                        Object objectHandle = new SAObject(waitingToLockMonitor).invoke("object");
+                        if (objectHandle.equals(ownerHandle)) {
+                            state = "waiting to lock";
+                        }
                     }
+                    printMonitor(out, ownerHandle, state);
                 }
-                printMonitor(out, ownerHandle, state);
             }
+        } catch (Exception e) {
+            // Ignore...
         }
     }
-    
-    private void printMonitor(final PrintStream out, final Object ownerHandle, final String state) throws IllegalAccessException, InvocationTargetException {
-        out.print("\t- "+state+" <");
-        out.print(ownerHandle);
-        out.print("> ");
-        printOop(out, ownerHandle);
-        out.println();
+
+    private void printMonitor(
+            final PrintStream out,
+            final Object ownerHandle,
+            final String state) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("\t- " + state + " <" + ownerHandle + "> ");
+            printOop(sb, ownerHandle);
+            out.println(sb.toString());
+        } catch (Exception e) {
+            // Ignore...
+        }
     }
-    
-    private void printOop(final PrintStream out, final Object oopHandle) throws IllegalAccessException, InvocationTargetException {
-        SAObject oop = heap.invokeSA("newOop",oopHandle);
+
+    private void printOop(StringBuilder sb, Object oopHandle)
+            throws IllegalAccessException, InvocationTargetException {
+        SAObject oop = heap.invokeSA("newOop", oopHandle);
         if (!oop.isNull()) {
-            out.print("(a ");
+            sb.append("(a ");
             String monitorClassName = (String) oop.invokeSA("getKlass").invokeSA("getName").invoke("asString");
-            out.print(monitorClassName.replace('/','.'));
-            out.print(")");
+            sb.append(monitorClassName.replace('/', '.'));
+            sb.append(")");
         } else {
-            out.print("(raw monitor)");
+            sb.append("(Raw Monitor)");
         }
     }
     
