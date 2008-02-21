@@ -90,7 +90,7 @@ public abstract class AbstractStatsTableModel<PM, M extends MonitoringStats, S e
         if (columnsInitialized.get()) {
             return columnNames.length;
         } else {
-            return -1;
+            return 0;
         }
     }
 

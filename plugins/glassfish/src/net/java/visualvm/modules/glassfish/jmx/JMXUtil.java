@@ -177,6 +177,7 @@ public class JMXUtil {
     public static final String getWebModuleName(String objectName, JmxModel jmx, Map<String, String> context2name) {
         try {
             String ctxMapping = (String) jmx.getMBeanServerConnection().getAttribute(new ObjectName(objectName), "name");
+            if (!ctxMapping.startsWith("/")) ctxMapping = "/" + ctxMapping;
             return context2name.get(ctxMapping);
         } catch (MBeanException ex) {
             Exceptions.printStackTrace(ex);

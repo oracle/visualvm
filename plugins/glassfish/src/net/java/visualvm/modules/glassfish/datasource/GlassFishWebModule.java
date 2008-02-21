@@ -57,6 +57,11 @@ public class GlassFishWebModule extends GlassFishApplication {
         public String getDescription() {
             return null;
         }
+
+        @Override
+        public int getAutoExpansionPolicy() {
+            return DataSourceDescriptor.EXPAND_NEVER;
+        }
     };
     
     public GlassFishWebModule(String name, String objName, WebModuleVirtualServerMonitor monitor, GlassFishModel gfRoot) {

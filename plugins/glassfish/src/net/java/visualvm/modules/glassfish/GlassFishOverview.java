@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 
 /**
@@ -90,13 +91,28 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             JPanel panel = new JPanel(new BorderLayout());
             panel.setOpaque(false);
 
-            HTMLTextArea area = new HTMLTextArea(buildInfo());
+            final HTMLTextArea area = new HTMLTextArea();
             area.setOpaque(false);
             panel.add(area, BorderLayout.CENTER);
 
             DataViewComponent.DetailsView details = new DataViewComponent.DetailsView("SJSAS/GlassFish",
                     "Application server details", panel, null);
 
+           new  SwingWorker<Void, Void>() {
+                private String areaText = null;
+                @Override
+                protected Void doInBackground() throws Exception {
+                    areaText = buildInfo();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    if (areaText != null) area.setText(areaText);
+                
+                }
+            }.execute();
+            
             return details;
         }
 

@@ -56,6 +56,12 @@ public class GlassFishServlet extends GlassFishDataSource {
         public String getDescription() {
             return null;
         }
+
+//        @Override
+//        public int getAutoExpansionPolicy() {
+//            return DataSourceDescriptor.EXPAND_NEVER;
+//        }
+        
     };
     
     public GlassFishServlet(String name, GlassFishWebModule master, ServletMonitor monitor) {

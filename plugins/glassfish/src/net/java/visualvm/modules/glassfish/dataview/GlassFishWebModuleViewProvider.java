@@ -58,6 +58,8 @@ import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -76,6 +78,7 @@ import javax.swing.table.TableRowSorter;
  */
 public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<GlassFishWebModule> {
     private final static GlassFishWebModuleViewProvider INSTANCE = new GlassFishWebModuleViewProvider();
+    private final Map<GlassFishWebModule, GlassfishWebModuleView> viewMap = new  HashMap<GlassFishWebModule, GlassFishWebModuleViewProvider.GlassfishWebModuleView>();
     
     private static class GlassfishWebModuleView extends DataSourceView {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
@@ -206,7 +209,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
                                DataViewComponent.BOTTOM_LEFT);
             dvc.addDetailsView(new DataViewComponent.DetailsView("WebServices", null, wsPanel, null),
                                DataViewComponent.BOTTOM_LEFT);
-
+            
             refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
                 public void onSchedule(long timeStamp) {
                     refreshData(timeStamp);
@@ -256,7 +259,6 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
         private void refreshData(long sampleTime) {
             WebModuleVirtualServerMonitor monitor = module.getMonitor();
             WebModuleVirtualServerStats stats = monitor.getWebModuleVirtualServerStats();
-
             activeSessionsChart.getModel()
                                .addItemValues(sampleTime,
                                               new long[] {
@@ -284,7 +286,15 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Set<?extends DataSourceView> getViews(GlassFishWebModule dataSource) {
-        return Collections.singleton(new GlassfishWebModuleView(dataSource));
+        synchronized(viewMap) {
+            if (viewMap.containsKey(dataSource)) {
+                return Collections.singleton(viewMap.get(dataSource));
+            } else {
+                GlassfishWebModuleView view = new GlassfishWebModuleView(dataSource);
+                viewMap.put(dataSource, view);
+                return Collections.singleton(view);
+            }
+        }
     }
 
     public static void initialize() {
@@ -293,6 +303,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     
     public static void shutdown() {
         DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
+        INSTANCE.viewMap.clear();
     }
 
     public boolean supportsViewFor(GlassFishWebModule dataSource) {

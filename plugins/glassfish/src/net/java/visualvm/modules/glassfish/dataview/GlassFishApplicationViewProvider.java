@@ -29,6 +29,7 @@ import com.sun.appserv.management.monitor.HTTPServiceMonitor;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
 import com.sun.appserv.management.monitor.TransactionServiceMonitor;
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
@@ -37,10 +38,10 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishApplication;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 
@@ -51,14 +52,17 @@ import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 public class GlassFishApplicationViewProvider implements DataSourceViewsProvider<Application> {
 
     private final static GlassFishApplicationViewProvider INSTANCE = new GlassFishApplicationViewProvider();
-
+    private final Map<Application, HTTPServiceView> httpServiceViewMap = new  HashMap<Application, HTTPServiceView>();
+    private final Map<Application, TransactionServiceView> transServiceViewMap = new  HashMap<Application, TransactionServiceView>();
+    
     private GlassFishApplicationViewProvider() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     @Override
     public Set<? extends DataSourceView> getViews(final Application application) {
-        if (!(application instanceof GlassFishApplication)) {
+        ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(application);
+        if (!(at instanceof GlassFishApplicationType)) {
             return Collections.EMPTY_SET;
         }
 
@@ -87,11 +91,11 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
                     TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
 
                     if (httpMonitor != null) {
-                        add(new HTTPServiceView(application, httpMonitor));
+                        add(getHTTPServiceView(application, httpMonitor));
                     }
 
                     if (transMonitor != null) {
-                        add(new TransactionServiceView(application, transMonitor));
+                        add(getTransactionServiceView(application, transMonitor));
                     }
                 }
                 };
@@ -102,12 +106,38 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
         return Collections.EMPTY_SET;
     }
 
+    private HTTPServiceView getHTTPServiceView(Application app, HTTPServiceMonitor monitor) {
+        synchronized(httpServiceViewMap) {
+            if (httpServiceViewMap.containsKey(app)) {
+                return httpServiceViewMap.get(app);
+            } else {
+                HTTPServiceView view = new HTTPServiceView(app, monitor);
+                httpServiceViewMap.put(app, view);
+                return view;
+            }
+        }
+    }
+    
+    private TransactionServiceView getTransactionServiceView(Application app, TransactionServiceMonitor monitor) {
+        synchronized(transServiceViewMap) {
+            if (transServiceViewMap.containsKey(app)) {
+                return transServiceViewMap.get(app);
+            } else {
+                TransactionServiceView view = new TransactionServiceView(app, monitor);
+                transServiceViewMap.put(app, view);
+                return view;
+            }
+        }
+    }
+    
     public static void initialize() {
         DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, Application.class);
     }
 
     public static void shutdown() {
         DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
+        INSTANCE.httpServiceViewMap.clear();
+        INSTANCE.transServiceViewMap.clear();
     }
 
     public boolean supportsViewFor(Application dataSource) {

@@ -66,7 +66,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
         @Override
         public DataSourceDescriptor getDescriptor() {
             return new MutableDataSourceDescriptor(this) {
-
+                @Override
                 public int getAutoExpansionPolicy() {
                     return EXPAND_NEVER;
                 }
@@ -109,7 +109,9 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
             Map<String, String> contextRootMap = new HashMap<String, String>();
 
             for (Map.Entry<String, WebModuleConfig> cfgEntry : map.entrySet()) {
-                contextRootMap.put(cfgEntry.getValue().getContextRoot(), cfgEntry.getKey());
+                String contextRoot = cfgEntry.getValue().getContextRoot();
+                if (!contextRoot.startsWith("/")) contextRoot = "/" + contextRoot;
+                contextRootMap.put(contextRoot, cfgEntry.getKey());
             }
             Set<GlassFishApplication> currentApps = new HashSet<GlassFishApplication>();
             for (Map.Entry<String, WebModuleVirtualServerMonitor> virtMonitorEntry : srm.getWebModuleVirtualServerMonitorMap().entrySet()) {
@@ -125,21 +127,20 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
                 currentApps.add(webModule);
             }
 
-            Set<GlassFishApplication> toRemove = new HashSet<GlassFishApplication>(model.getRepository().getDataSources());
+            Set<GlassFishApplication> toRemoveApps = new HashSet<GlassFishApplication>(model.getRepository().getDataSources());
             Set<GlassFishApplication> toAdd = new HashSet<GlassFishApplication>(currentApps);
-            toRemove.removeAll(currentApps);
+            toRemoveApps.removeAll(currentApps);
             toAdd.removeAll(model.getRepository().getDataSources());
             
             Set<LazyLoadingSource> lazy = model.getRepository().getDataSources(LazyLoadingSource.class);
             if (toAdd.size() == 0 && lazy.size() > 0) return;
             unregisterDataSources(lazy);
-            model.getRepository().removeDataSources(lazy);
-
-            unregisterDataSources(toRemove);
-            model.getRepository().removeDataSources(toRemove);
-
+            Set<GlassFishDataSource> toRemove = new  HashSet<GlassFishDataSource>(toRemoveApps);
+            toRemove.addAll(lazy);
+            
+            unregisterDataSources(toRemoveApps);
             registerDataSources(toAdd);
-            model.getRepository().addDataSources(toAdd);
+            model.getRepository().updateDataSources(toAdd, toRemove);
         }
     }
 

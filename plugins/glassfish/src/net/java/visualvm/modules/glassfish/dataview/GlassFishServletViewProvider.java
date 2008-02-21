@@ -42,6 +42,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.JPanel;
 import net.java.visualvm.modules.glassfish.ui.Chart;
@@ -53,6 +55,7 @@ import net.java.visualvm.modules.glassfish.ui.Chart;
  */
 public class GlassFishServletViewProvider implements DataSourceViewsProvider<GlassFishServlet> {
     private final static GlassFishServletViewProvider INSTANCE = new GlassFishServletViewProvider();
+    private final Map<GlassFishServlet, GlassfishServletView> viewMap = new  HashMap<GlassFishServlet, GlassFishServletViewProvider.GlassfishServletView>();
     
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -158,7 +161,15 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Set<?extends DataSourceView> getViews(GlassFishServlet dataSource) {
-        return Collections.singleton(new GlassfishServletView(dataSource));
+        synchronized(viewMap) {
+            if (viewMap.containsKey(dataSource)) {
+                return Collections.singleton(viewMap.get(dataSource));
+            } else {
+                GlassfishServletView view = new GlassfishServletView(dataSource);
+                viewMap.put(dataSource, view);
+                return Collections.singleton(view);
+            }
+        }
     }
 
     public static void initialize() {
@@ -167,6 +178,7 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
     
     public static void shutdown() {
         DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
+        INSTANCE.viewMap.clear();
     }
 
     public boolean supportsViewFor(GlassFishServlet dataSource) {
