@@ -100,14 +100,12 @@ public final class ExplorerContextMenuFactory {
         boolean realDefaultAction = true;
         if (!defaultActions.isEmpty()) {
             for (Action defaultAction : defaultActions) {
+                JMenuItem defaultItem = new DataSourceItem(dataSource, defaultAction);
                 if (realDefaultAction) {
-                    JMenuItem defaultItem = new DataSourceItem(dataSource, defaultAction);
                     defaultItem.setFont(defaultItem.getFont().deriveFont(Font.BOLD));
-                    popupMenu.add(defaultItem);
                     realDefaultAction = false;
-                } else {
-                    popupMenu.add(defaultAction);
                 }
+                popupMenu.add(defaultItem);
             }
         }
 
