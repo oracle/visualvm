@@ -69,7 +69,12 @@ class StackTrace {
                 boolean objectWaitFrame = isJavaLangObjectWaitFrame(javaFrame);
                 for (;!javaFrame.isNull();javaFrame=javaFrame.invokeSA("javaSender")) {
                     printJavaFrame(out, javaFrame);
-                    printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
+                    try {
+                        printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
+                    } catch (Exception e) {
+                        System.out.println("WARNING: Failed to get detailed info for monitors.");
+                        e.printStackTrace();
+                    }
                     waitingToLockMonitor = null;
                     objectWaitFrame = false;
                 }
@@ -152,7 +157,7 @@ class StackTrace {
         Integer bci = (Integer) javaFrame.invoke("getBCI");
         out.print("(");
         if (((Boolean)method.invoke("isNative")).booleanValue()) {
-            out.print("native method");
+            out.print("Native Method");
         } else {
             Integer lineNumber = (Integer) method.invoke("getLineNumberFromBCI",bci);
             SAObject sourceName = klass.invokeSA("getSourceFileName");
