@@ -43,6 +43,8 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
     // @GuardedBy intervalLock
     private Quantum interval;
     private SchedulerTask delegateTask;
+    private Quantum suspendedFrom = Quantum.SUSPENDED;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public DefaultScheduledTask(Quantum interval, SchedulerTask task) {
@@ -106,9 +108,15 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
      * @see com.sun.tools.visualvm.core.scheduler.ScheduledTask#suspend()
      */
     public void suspend() {
+        if (suspendedFrom.equals(Quantum.SUSPENDED)) suspendedFrom = getInterval();
         setInterval(Quantum.SUSPENDED);
     }
 
+    public void resume() {
+        setInterval(suspendedFrom);
+        suspendedFrom = Quantum.SUSPENDED;
+    }
+    
     public boolean isSuspended() {
         return interval.equals(Quantum.SUSPENDED);
     }

@@ -109,6 +109,7 @@ public class Scheduler implements PropertyChangeListener {
      */
     public final void unschedule(final ScheduledTask task) {
         remove((DefaultScheduledTask) task, task.getInterval());
+        task.suspend();
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -204,10 +205,6 @@ public class Scheduler implements PropertyChangeListener {
     }
 
     private void remove(final DefaultScheduledTask task, Quantum interval) {
-        if (interval.equals(Quantum.SUSPENDED)) {
-            return;
-        }
-
         task.removePropertyChangeListener(ScheduledTask.INTERVAL_PROPERTY, this);
 
         synchronized (interval2recevier) {
@@ -228,7 +225,7 @@ public class Scheduler implements PropertyChangeListener {
                     if (rcv.equals(task)) {
                         rcv.suspend();
                         receivers.remove(rcv);
-
+                        rcv.resume();
                         break;
                     }
                 }

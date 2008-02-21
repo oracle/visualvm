@@ -57,6 +57,11 @@ public interface ScheduledTask {
     void suspend();
     
     /**
+     * Resumes a previously suspended task
+     */
+    void resume();
+    
+    /**
      * Indicates the suspension status of the task
      * @return Returns the suspension status of the task
      */
