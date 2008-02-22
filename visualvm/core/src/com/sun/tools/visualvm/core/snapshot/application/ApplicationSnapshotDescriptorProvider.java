@@ -60,8 +60,6 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         
         static ApplicationSnapshotDescriptor newInstance(ApplicationSnapshot snapshot) {
             ApplicationSnapshotDescriptor desc = new ApplicationSnapshotDescriptor(snapshot);
-//            snapshot.addPropertyChangeListener(Host.PROPERTY_DISPLAYNAME,desc);
-//            desc.setName(snapshot.getDisplayName());
             return desc; 
         }
         
@@ -78,30 +76,6 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         }
         
     }
-    
-//    private static class LocalHostDescriptor extends DataSourceDescriptor {
-//        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/localHost.png", true);
-//
-//        LocalHostDescriptor() {
-//        }
-//        
-//        public String getName() {
-//            return Host.LOCALHOST.getDisplayName();
-//        }
-//        
-//        public Image getIcon() {
-//            return NODE_ICON;
-//        }
-//        
-//        public int getPreferredPosition() {
-//            return 0;
-//        }
-//
-//        public String getDescription() {
-//            return null;
-//        }
-//        
-//    }
     
     private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);

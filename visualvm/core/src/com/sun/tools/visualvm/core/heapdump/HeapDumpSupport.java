@@ -40,7 +40,7 @@ public final class HeapDumpSupport {
 
     private static HeapDumpSupport instance;
 
-    private final SnapshotCategory category;
+    private final SnapshotCategory category = new HeapDumpCategory();
     private final HeapDumpProvider heapDumpProvider;
     private final HeapDumpViewProvider heapDumpViewProvider;
     private final HeapDumpPluggableView heapDumpPluggableView;
@@ -98,15 +98,13 @@ public final class HeapDumpSupport {
 
 
     private HeapDumpSupport() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorProvider());
         heapDumpProvider = new HeapDumpProvider();
         heapDumpProvider.initialize();
         
         heapDumpPluggableView = new HeapDumpPluggableView();
         
         heapDumpViewProvider = new HeapDumpViewProvider();
-        
-        category = new HeapDumpCategory(heapDumpProvider);
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorProvider());
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
 
         heapDumpViewProvider.initialize();

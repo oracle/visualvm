@@ -28,18 +28,25 @@ package com.sun.tools.visualvm.core.snapshot.application;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import java.io.File;
 
 /**
- * Support for snapshots in VisualVM.
+ * Support for application snapshots in VisualVM.
  *
  * @author Jiri Sedlacek
  */
 public final class ApplicationSnapshotsSupport {
     
     private static ApplicationSnapshotsSupport instance;
+    
+    private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
+    
+    private File snapshotsStorageDirectory;
+    private String snapshotsStorageDirectoryString;
 
     private ApplicationSnapshotProvider snapshotProvider;
-    private SnapshotCategory snapshotCategory;
+    private SnapshotCategory snapshotCategory = new ApplicationSnapshotCategory();
 
 
     /**
@@ -67,11 +74,31 @@ public final class ApplicationSnapshotsSupport {
         return snapshotProvider;
     }
     
+    String getSnapshotsStorageDirectoryString() {
+        if (snapshotsStorageDirectoryString == null)
+            snapshotsStorageDirectoryString = new File(SnapshotsSupport.getInstance().getPersistentStorageDirectory(), SNAPSHOTS_STORAGE_DIRNAME).getAbsolutePath();
+        return snapshotsStorageDirectoryString;
+    }
+    
+    File getSnapshotsStorageDirectory() {
+        if (snapshotsStorageDirectory == null) {
+            String snapshotsStorageString = getSnapshotsStorageDirectoryString();
+            snapshotsStorageDirectory = new File(snapshotsStorageString);
+            if (snapshotsStorageDirectory.exists() && snapshotsStorageDirectory.isFile())
+                throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString + ", file in the way");
+            if (snapshotsStorageDirectory.exists() && (!snapshotsStorageDirectory.canRead() || !snapshotsStorageDirectory.canWrite()))
+                throw new IllegalStateException("Cannot access snapshots storage directory " + snapshotsStorageString + ", read&write permission required");
+            if (!snapshotsStorageDirectory.exists() && !snapshotsStorageDirectory.mkdir())
+                throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString);
+        }
+        return snapshotsStorageDirectory;
+    }
+    
     
     private ApplicationSnapshotsSupport() {
-        snapshotProvider = ApplicationSnapshotProvider.sharedInstance();
-        snapshotCategory = new ApplicationSnapshotCategory(snapshotProvider);
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationSnapshotDescriptorProvider());
+        snapshotProvider = ApplicationSnapshotProvider.sharedInstance();
+        
         RegisteredSnapshotCategories.sharedInstance().addCategory(snapshotCategory);
         
         snapshotProvider.initialize();

@@ -27,19 +27,21 @@ package com.sun.tools.visualvm.core.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.CoreDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.tools.sa.SAAgent;
 import com.sun.tools.visualvm.core.tools.sa.SAAgentFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -53,13 +55,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
-    
-    public Snapshot loadSnapshot(File file, DataSource master) {
-        // TODO: check how to process registering/unregistering new DataSource
-        return new HeapDumpImpl(file, master);
-    }
-    
+class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
     
     private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
         public void dataFinished(Application application) { removeHeapDumps(application, false); }
@@ -68,6 +64,32 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
     private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
         public void dataFinished(CoreDump coredump) { removeHeapDumps(coredump, false); }
     };
+    
+    private final DataFinishedListener<ApplicationSnapshot> snapshotFinishedListener = new DataFinishedListener<ApplicationSnapshot>() {
+        public void dataFinished(ApplicationSnapshot snapshot) { processFinishedSnapshot(snapshot); }
+    };
+    
+    
+    public void dataChanged(DataChangeEvent<ApplicationSnapshot> event) {
+        Set<ApplicationSnapshot> snapshots = event.getAdded();
+        for (ApplicationSnapshot snapshot : snapshots) processNewSnapshot(snapshot);
+    }
+    
+    
+    private void processNewSnapshot(ApplicationSnapshot snapshot) {
+        Set<HeapDumpImpl> heapDumps = new HashSet();
+        File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
+        for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
+        snapshot.getRepository().addDataSources(heapDumps);
+        registerDataSources(heapDumps);
+        snapshot.notifyWhenFinished(snapshotFinishedListener);
+    }
+    
+    private void processFinishedSnapshot(ApplicationSnapshot snapshot) {
+        Set<HeapDumpImpl> heapDumps = snapshot.getRepository().getDataSources(HeapDumpImpl.class);
+        snapshot.getRepository().removeDataSources(heapDumps);
+        unregisterDataSources(heapDumps);
+    }
     
     
     void createHeapDump(final Application application, final boolean openView) {
@@ -89,7 +111,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        final HeapDumpImpl heapDump = (HeapDumpImpl)loadSnapshot(jvm.takeHeapDump(), application);
+                        final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
                         application.getRepository().addDataSource(heapDump);
                         registerDataSource(heapDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
@@ -130,7 +152,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                     SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
                     try {
                         if (saAget.takeHeapDump(dumpFile.getAbsolutePath())) {
-                            final HeapDumpImpl heapDump = (HeapDumpImpl)loadSnapshot(dumpFile, coreDump);
+                            final HeapDumpImpl heapDump = new HeapDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(heapDump);
                             registerDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
@@ -171,6 +193,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
     
     void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
     }
     
 }

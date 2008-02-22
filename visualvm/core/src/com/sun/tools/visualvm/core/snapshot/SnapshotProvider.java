@@ -25,10 +25,8 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
-import java.io.File;
 
 
 /**
@@ -36,8 +34,6 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-public abstract class SnapshotProvider<A extends Snapshot> extends DefaultDataSourceProvider<A> implements SnapshotLoader {
-    
-    public abstract Snapshot loadSnapshot(File file, DataSource master);
+public abstract class SnapshotProvider<A extends Snapshot> extends DefaultDataSourceProvider<A> {
     
 }

@@ -52,15 +52,6 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     }
     
     
-    public Snapshot loadSnapshot(File file, DataSource master) {
-        // TODO: check how to process registering/unregistering new DataSource
-        ApplicationSnapshot snapshot = new ApplicationSnapshot(file);
-        Set<Snapshot> snapshotsSet = new HashSet(SnapshotsSupport.getInstance().getSnapshots(snapshot.getFile(), snapshot));
-        snapshot.getRepository().addDataSources(snapshotsSet);
-        return snapshot;
-    }
-    
-    
     private ApplicationSnapshotProvider() {
     }
     
@@ -76,7 +67,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         Set<Snapshot> snapshots = dataSource.getRepository().getDataSources(Snapshot.class);
         if (snapshots.isEmpty()) return;
         
-        File snapshotDirectory = new File(SnapshotsSupport.getInstance().getPersistentStorageDirectory(),
+        File snapshotDirectory = new File(ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory(),
                 ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
         
         if (!snapshotDirectory.exists() && !snapshotDirectory.mkdir())
@@ -94,8 +85,6 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         }
         
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
-        Set<Snapshot> snapshotsSet = new HashSet(SnapshotsSupport.getInstance().getSnapshots(snapshot.getFile(), snapshot));
-        snapshot.getRepository().addDataSources(snapshotsSet);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         registerDataSource(snapshot);
     }
@@ -116,12 +105,16 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         }
     }
     
-    
+        
     private void loadSnapshots() {
-        SnapshotsSupport support = SnapshotsSupport.getInstance();
-        Set<Snapshot> snapshots = support.getSnapshots(support.getPersistentStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory(), null);
+        File[] files = ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory().listFiles(
+                ApplicationSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
+        
+        Set<ApplicationSnapshot> snapshots = new HashSet();
+        for (File file : files) snapshots.add(new ApplicationSnapshot(file));
+        
         SnapshotsContainer.sharedInstance().getRepository().addDataSources(snapshots);
-//        registerDataSources(snapshots);
+        registerDataSources(snapshots);
     }
     
     

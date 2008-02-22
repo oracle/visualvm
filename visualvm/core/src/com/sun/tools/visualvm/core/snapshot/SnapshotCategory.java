@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.snapshot;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Date;
 
 
@@ -49,7 +50,6 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     private final String prefix;
     private final String suffix;
     private final int preferredPosition;
-    private final SnapshotLoader loader;
 
     /**
      * Creates new instance of SnapshotCategory.
@@ -59,14 +59,13 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * @param prefix prefix of files containing the snapshots,
      * @param suffix suffix of files containing the snapshots.
      */
-    public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition, SnapshotLoader loader) {
+    public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition) {
         super();
         this.name = name;
         this.type = type;
         this.prefix = prefix;
         this.suffix = suffix;
         this.preferredPosition = preferredPosition;
-        this.loader = loader;
     }
 
     /**
@@ -95,10 +94,6 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     public int getPreferredPosition() {
         return preferredPosition;
     }
-    
-    public SnapshotLoader getLoader() {
-        return loader;
-    };
     
     /**
      * Returns prefix of files containing the snapshots.
@@ -158,5 +153,13 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
             else return fileName;
         }
         else return snapshot.toString();
+    }
+    
+    public FilenameFilter getFilenameFilter() {
+        return new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return isSnapshot(name);
+            }
+        };
     }
 }

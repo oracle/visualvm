@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.ThreadDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
 
 /**
  *
@@ -39,8 +38,8 @@ class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     private static final String PREFIX = "threaddump-";
     private static final String SUFFIX = ".tdump";
     
-    public ThreadDumpCategory(SnapshotLoader loader) {
-        super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10, loader);
+    public ThreadDumpCategory() {
+        super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10);
     }
     
     public String getDisplayName(ThreadDump snapshot) {

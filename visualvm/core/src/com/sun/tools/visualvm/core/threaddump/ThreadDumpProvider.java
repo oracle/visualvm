@@ -27,14 +27,15 @@ package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.CoreDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.tools.sa.SAAgent;
 import com.sun.tools.visualvm.core.tools.sa.SAAgentFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -55,13 +57,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
-    
-    public Snapshot loadSnapshot(File file, DataSource master) {
-        // TODO: check how to process registering/unregistering new DataSource
-        return new ThreadDumpImpl(file, master);
-    }
-    
+class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
     
     private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
         public void dataFinished(Application application) { removeThreadDumps(application, false); }
@@ -70,6 +66,32 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
     private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
         public void dataFinished(CoreDump coredump) { removeThreadDumps(coredump, false); }
     };
+    
+    private final DataFinishedListener<ApplicationSnapshot> snapshotFinishedListener = new DataFinishedListener<ApplicationSnapshot>() {
+        public void dataFinished(ApplicationSnapshot snapshot) { processFinishedSnapshot(snapshot); }
+    };
+    
+    
+    public void dataChanged(DataChangeEvent<ApplicationSnapshot> event) {
+        Set<ApplicationSnapshot> snapshots = event.getAdded();
+        for (ApplicationSnapshot snapshot : snapshots) processNewSnapshot(snapshot);
+    }
+    
+    
+    private void processNewSnapshot(ApplicationSnapshot snapshot) {
+        Set<ThreadDumpImpl> threadDumps = new HashSet();
+        File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
+        for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
+        snapshot.getRepository().addDataSources(threadDumps);
+        registerDataSources(threadDumps);
+        snapshot.notifyWhenFinished(snapshotFinishedListener);
+    }
+    
+    private void processFinishedSnapshot(ApplicationSnapshot snapshot) {
+        Set<ThreadDumpImpl> threadDumps = snapshot.getRepository().getDataSources(ThreadDumpImpl.class);
+        snapshot.getRepository().removeDataSources(threadDumps);
+        unregisterDataSources(threadDumps);
+    }
     
     
     void createThreadDump(final Application application, final boolean openView) {
@@ -91,7 +113,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        final ThreadDumpImpl threadDump = (ThreadDumpImpl)loadSnapshot(jvm.takeThreadDump(), application);
+                        final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
                         application.getRepository().addDataSource(threadDump);
                         registerDataSource(threadDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
@@ -136,7 +158,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                             OutputStream os = new FileOutputStream(dumpFile);
                             os.write(dump.getBytes("UTF-8"));
                             os.close();
-                            final ThreadDumpImpl threadDump = (ThreadDumpImpl)loadSnapshot(dumpFile, coreDump);
+                            final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);
                             registerDataSource(threadDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
@@ -177,6 +199,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
     
     void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
     }
     
 }

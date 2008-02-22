@@ -54,14 +54,6 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     }
     
     
-    public Snapshot loadSnapshot(File file, DataSource master) {
-        // TODO: check how to process registering/unregistering new DataSource
-        try {
-            return new CoreDumpImpl(file, file.getName(), CoreDumpSupport.getCurrentJDKHome());
-        } catch (Exception e) { return null; }
-    }
-    
-    
     void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {

@@ -25,14 +25,8 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
-import java.io.FilenameFilter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Support for snapshots in VisualVM.
@@ -42,7 +36,7 @@ import java.util.Set;
 public final class SnapshotsSupport {
     
     private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";
-    private static final String PERSISTENT_STORAGE_DIRNAME = "snapshots";
+    private static final String PERSISTENT_STORAGE_DIRNAME = "repository";
     
     private static SnapshotsSupport instance;
     
@@ -63,9 +57,9 @@ public final class SnapshotsSupport {
     }
     
     /**
-     * Returns default storage directory for temporary (runtime) DataSource snapshots
+     * Returns default storage directory for temporary (runtime) DataSource data
      * 
-     * @return default storage directory for temporary (runtime) DataSource snapshots
+     * @return default storage directory for temporary (runtime) DataSource data
      */
     public String getTemporaryStorageDirectoryString() {
         if (temporaryStorageDirectoryString == null)
@@ -74,9 +68,9 @@ public final class SnapshotsSupport {
     }
     
     /**
-     * Returns default storage directory for temporary (runtime) DataSource snapshots
+     * Returns default storage directory for temporary (runtime) DataSource data
      * 
-     * @return default storage directory for temporary (runtime) DataSource snapshots
+     * @return default storage directory for temporary (runtime) DataSource data
      */
     public File getTemporaryStorageDirectory() {
         if (temporaryStorageDirectory == null) {
@@ -93,9 +87,9 @@ public final class SnapshotsSupport {
     }
     
     /**
-     * Returns default storage directory for persistent (snapshots) DataSource snapshots
+     * Returns default storage directory for persistent DataSource data
      * 
-     * @return default storage directory for persistent (snapshots) DataSource snapshots
+     * @return default storage directory for persistent DataSource data
      */
     public String getPersistentStorageDirectoryString() {
         if (persistentStorageDirectoryString == null)
@@ -104,9 +98,9 @@ public final class SnapshotsSupport {
     }
     
     /**
-     * Returns default storage directory for persistent (snapshots) DataSource snapshots
+     * Returns default storage directory for persistent DataSource data
      * 
-     * @return default storage directory for persistent (snapshots) DataSource snapshots
+     * @return default storage directory for persistent DataSource data
      */
     public File getPersistentStorageDirectory() {
         if (persistentStorageDirectory == null) {
@@ -120,36 +114,6 @@ public final class SnapshotsSupport {
                 throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
         }
         return persistentStorageDirectory;
-    }
-    
-    
-    FilenameFilter getFilenameFilter(final SnapshotCategory category) {
-        return new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return category.isSnapshot(name);
-            }
-        };
-    }
-    
-    private Set<File> getCategoryFiles(File directory, SnapshotCategory category) {
-        File[] filesArr = directory.listFiles(getFilenameFilter(category));
-        Set<File> files = new HashSet();
-        for (File file : filesArr) files.add(file);
-        return files;
-    }
-    
-    public Set<Snapshot> getSnapshots(File directory, SnapshotCategory category, DataSource master) {
-        Set<Snapshot> snapshots = new HashSet();
-        Set<File> files = getCategoryFiles(directory, category);
-        for (File file : files) snapshots.add(category.getLoader().loadSnapshot(file, master));
-        return snapshots;
-    }
-    
-    public Set<Snapshot> getSnapshots(File directory, DataSource master) {
-        Set<Snapshot> snapshots = new HashSet();
-        List<SnapshotCategory> categories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
-        for (SnapshotCategory category : categories) snapshots.addAll(getSnapshots(directory, category, master));
-        return snapshots;
     }
     
     

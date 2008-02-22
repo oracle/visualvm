@@ -32,7 +32,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-final class ApplicationSnapshot extends AbstractSnapshot {
+public final class ApplicationSnapshot extends AbstractSnapshot {
 
     public ApplicationSnapshot(File file) {
         super(file);

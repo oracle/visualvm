@@ -35,7 +35,7 @@ import java.io.File;
  */
 public final class CoreDumpSupport {
     
-    private static CoreDumpCategory category;
+    private static CoreDumpCategory category = new CoreDumpCategory();
     private static CoreDumpProvider provider;
     private static String currentJDKHome;
     
@@ -60,11 +60,10 @@ public final class CoreDumpSupport {
 
     
     public static void register() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainerProvider.register();
         CoreDumpActionsProvider.register();
         provider = new CoreDumpProvider();
-        category = new CoreDumpCategory(provider);
-        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         provider.register();
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
     }

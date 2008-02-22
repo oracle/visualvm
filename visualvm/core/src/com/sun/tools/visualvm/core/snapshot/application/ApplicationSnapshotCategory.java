@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
 
 /**
  *
@@ -38,8 +37,8 @@ class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> 
     private static final String PREFIX = "datasource-";
     private static final String SUFFIX = ".snap";
     
-    public ApplicationSnapshotCategory(SnapshotLoader loader) {
-        super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE, loader);
+    public ApplicationSnapshotCategory() {
+        super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);
     }
     
 //    public String getDisplayName(Application application) {
