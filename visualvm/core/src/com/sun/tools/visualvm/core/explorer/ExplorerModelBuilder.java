@@ -290,6 +290,7 @@ class ExplorerModelBuilder {
     
     private ExplorerModelBuilder() {
         explorerRoot = new ExplorerNode(DataSource.ROOT);
+        explorerRoot.setAutoExpansionPolicy(DataSourceDescriptor.EXPAND_ON_EACH_FIRST_CHILD);
         explorerModel = new DefaultTreeModel(explorerRoot);
         
         nodes = Collections.synchronizedMap(new HashMap());
