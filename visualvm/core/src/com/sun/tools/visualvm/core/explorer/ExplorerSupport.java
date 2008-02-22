@@ -154,17 +154,17 @@ public class ExplorerSupport {
     }
     
     
-    private DataSource getDataSource(TreePath path) {
+    DataSource getDataSource(TreePath path) {
         if (path == null) return null;
         ExplorerNode node = (ExplorerNode)path.getLastPathComponent();
         return node.getUserObject();
     }
     
-    private ExplorerNode getNode(DataSource dataSource) {
+    ExplorerNode getNode(DataSource dataSource) {
         return ExplorerModelBuilder.getInstance().getNodeFor(dataSource);
     }
     
-    private TreePath getPath(ExplorerNode node) {
+    TreePath getPath(ExplorerNode node) {
         return new TreePath(node.getPath());
     }
             

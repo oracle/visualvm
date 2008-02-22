@@ -29,8 +29,11 @@ package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -111,6 +114,7 @@ class ExplorerUI extends JPanel {
         explorerTree.setRowHeight(getTreeRowHeight());
         explorerTree.setCellRenderer(new ExplorerNodeRenderer());
         explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        explorerTree.addKeyListener(new ExplorerTreeKeyAdapter());
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
         
         // explorerTreeScrollPane
@@ -151,6 +155,28 @@ class ExplorerUI extends JPanel {
     
     private JTree explorerTree;
     
+    
+    private class ExplorerTreeKeyAdapter extends KeyAdapter {
+        public void keyPressed(KeyEvent e) {
+            if ((e.getKeyCode() == KeyEvent.VK_CONTEXT_MENU)
+                            || ((e.getKeyCode() == KeyEvent.VK_F10) && (e.getModifiers() == InputEvent.SHIFT_MASK))) {
+                
+                e.consume();
+                
+                TreePath path = explorerTree.getSelectionPath();
+                if (path != null) {
+                    Rectangle pathRect = explorerTree.getPathBounds(path);
+                    JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(ExplorerSupport.sharedInstance().getDataSource(path));
+                    if (popupMenu != null) popupMenu.show(explorerTree, pathRect.x, pathRect.y);
+                } else {
+                    Point pathPoint = new Point(explorerTree.getWidth() / 3, explorerTree.getHeight() / 3);
+                    JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(DataSource.ROOT);
+                    if (popupMenu != null) popupMenu.show(explorerTree, pathPoint.x, pathPoint.y);
+                }
+                
+            }
+        }
+    }
     
     private class ExplorerTreeMouseAdapter extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
