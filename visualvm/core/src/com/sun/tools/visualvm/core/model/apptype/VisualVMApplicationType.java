@@ -36,24 +36,13 @@ import org.openide.util.Utilities;
  */
 public class VisualVMApplicationType extends ApplicationType {
   Application application;
-  String name;
-  boolean itself;
 
   VisualVMApplicationType(Application app) {
     application = app;
-    itself = Application.CURRENT_APPLICATION.equals(application);
   }
 
   public String getName() {
-    if (name == null) {
-      String applicationName = "VisualVM";
-      if (itself) {
-        name = applicationName;
-      } else {
-        name = applicationName + " (pid " + application.getPid() + ")";
-      }
-    }
-    return name;
+    return "VisualVM";
   }
 
   public String getVersion() {

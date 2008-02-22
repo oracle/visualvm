@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.core.ui;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -60,8 +60,8 @@ class ApplicationCaption extends JPanel implements DataFinishedListener<Applicat
         application.notifyWhenFinished(this);
         
         setRunning(application.getState() == DataSource.STATE_AVAILABLE);
-        setApplicationName(DataSourceDescriptorFactory.getDescriptor(application).getName());
-        setApplicationPid(-1); // TODO: provide PID once name doesn't contain it
+        setApplicationName(ApplicationTypeFactory.getApplicationTypeFor(application).getName());
+        setApplicationPid(application.getPid());
 //        setApplicationIcon(new ImageIcon(ApplicationTypeFactory.getApplicationTypeFor(application).getIcon()));
     }
     
@@ -112,7 +112,7 @@ class ApplicationCaption extends JPanel implements DataFinishedListener<Applicat
         Color textColor = isRunning ? UIManager.getColor("Label.foreground") : UIManager.getColor("Label.disabledForeground");
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
         
-        if (applicationPid == -1) {
+        if (applicationPid == Application.UNKNOWN_PID) {
             presenter.setText("<html><body style='font-size: 1.15em; color: " + colorText + ";'><nobr>" + "<b>" + applicationName + "</b>" + "</nobr></body></html>");
         } else {
             presenter.setText("<html><body style='font-size: 1.15em; color: " + colorText + ";'><nobr>" + "<b>" + applicationName + "</b>" + " (pid " + applicationPid + ")" + "</nobr></body></html>");

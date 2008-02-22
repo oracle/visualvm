@@ -57,7 +57,7 @@ public class DefaultApplicationType extends ApplicationType  {
       } else {
         applicationName = "<Unknown>";
       }
-      name = applicationName + " (pid " + application.getPid() + ")";      
+      name = applicationName;      
     }
     return name;
   }

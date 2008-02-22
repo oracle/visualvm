@@ -43,7 +43,7 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
 
     private final String description = "(domain = {0})";
     private String domainName = "UNKNOWN";
-    private final String typeName = "GlassFish/SJSAS (pid {0})";
+    private final String typeName = "GlassFish/SJSAS";
     private JVM gfJvm;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
 
     @Override
     public String getName() {
-        return MessageFormat.format(typeName, appPID);
+        return typeName;
     }
 
     @Override

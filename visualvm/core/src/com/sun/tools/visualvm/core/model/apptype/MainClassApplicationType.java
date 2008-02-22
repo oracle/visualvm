@@ -39,7 +39,7 @@ public class MainClassApplicationType extends ApplicationType  {
   String iconPath;
 
   MainClassApplicationType(Application app, String n,String path) {
-    name = n  + " (pid " + app.getPid() + ")";
+    name = n;
     iconPath = path;
   }
 

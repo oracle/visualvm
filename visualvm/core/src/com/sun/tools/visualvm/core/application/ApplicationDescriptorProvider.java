@@ -36,6 +36,7 @@ import java.awt.Image;
 /**
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
 class ApplicationDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
 
@@ -50,14 +51,17 @@ class ApplicationDescriptorProvider extends AbstractModelProvider<DataSourceDesc
     }
     
     private static class ApplicationDescriptor extends DataSourceDescriptor {
-        private ApplicationType appType;
+        private final ApplicationType appType;
+        private final int pid;
         
         ApplicationDescriptor(Application app) {
             appType = ApplicationTypeFactory.getApplicationTypeFor(app);
+            pid = app.getPid();
         }
         
         public String getName() {
-            return appType.getName();
+            String id = Application.CURRENT_APPLICATION.getPid() == pid || pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")";
+            return appType.getName() + id;
         }
 
         public String getDescription() {

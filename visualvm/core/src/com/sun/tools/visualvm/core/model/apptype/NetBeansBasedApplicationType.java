@@ -53,11 +53,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
   }
 
   public String getName() {
-    if (name == null) {
-      String applicationName = "NetBeans Platform based application";
-      name = applicationName + " (pid " + application.getPid() + ")";
-    }
-    return name;
+    return "NetBeans Platform application";
   }
 
   public String getVersion() {

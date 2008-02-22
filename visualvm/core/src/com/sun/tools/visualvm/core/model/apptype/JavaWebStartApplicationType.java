@@ -43,7 +43,7 @@ public class JavaWebStartApplicationType extends ApplicationType {
     }
 
     public String getName() {
-        return "Java Web Start (pid " + pid + ")";
+        return "Java Web Start";
     }
 
     public String getVersion() {

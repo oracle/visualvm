@@ -43,7 +43,7 @@ public class JavaPluginApplicationType extends ApplicationType {
     }
 
     public String getName() {
-        return "Java Plug-in " + version + " (pid " + pid + ")";
+        return "Java Plug-in " + version + ")";
     }
 
     public String getVersion() {
