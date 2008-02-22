@@ -23,30 +23,27 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.core.threaddump;
+package com.sun.tools.visualvm.core.snapshot.application;
 
-import com.sun.tools.visualvm.core.datasource.ThreadDump;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
+import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import java.io.File;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
-    
-    private static final String NAME = "Thread Dumps";
-    private static final String PREFIX = "threaddump-";
-    private static final String SUFFIX = ".tdump";
-    
-    public ThreadDumpCategory(SnapshotLoader loader) {
-        super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10, loader);
+final class ApplicationSnapshot extends AbstractSnapshot {
+
+    public ApplicationSnapshot(File file) {
+        super(file);
     }
     
-    public String getDisplayName(ThreadDump snapshot) {
-        String displayName = super.getDisplayName(snapshot);
-        if (isSnapshot(snapshot.getFile())) return "[threaddump] " + displayName;
-        else return displayName;
+    void delete() {
+        deleteFile();
     }
 
+    void removed() {
+        setState(STATE_FINISHED);
+    }
+    
 }

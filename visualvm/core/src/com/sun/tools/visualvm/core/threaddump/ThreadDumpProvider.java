@@ -27,7 +27,9 @@ package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
@@ -54,6 +56,12 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
+    
+    public Snapshot loadSnapshot(File file, DataSource master) {
+        // TODO: check how to process registering/unregistering new DataSource
+        return new ThreadDumpImpl(file, master);
+    }
+    
     
     private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
         public void dataFinished(Application application) { removeThreadDumps(application, false); }
@@ -83,7 +91,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
+                        final ThreadDumpImpl threadDump = (ThreadDumpImpl)loadSnapshot(jvm.takeThreadDump(), application);
                         application.getRepository().addDataSource(threadDump);
                         registerDataSource(threadDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
@@ -128,7 +136,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> {
                             OutputStream os = new FileOutputStream(dumpFile);
                             os.write(dump.getBytes("UTF-8"));
                             os.close();
-                            final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
+                            final ThreadDumpImpl threadDump = (ThreadDumpImpl)loadSnapshot(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);
                             registerDataSource(threadDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {

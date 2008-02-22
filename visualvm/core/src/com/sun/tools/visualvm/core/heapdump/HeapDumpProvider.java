@@ -27,7 +27,9 @@ package com.sun.tools.visualvm.core.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
@@ -52,6 +54,12 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
+    
+    public Snapshot loadSnapshot(File file, DataSource master) {
+        // TODO: check how to process registering/unregistering new DataSource
+        return new HeapDumpImpl(file, master);
+    }
+    
     
     private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
         public void dataFinished(Application application) { removeHeapDumps(application, false); }
@@ -81,7 +89,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
+                        final HeapDumpImpl heapDump = (HeapDumpImpl)loadSnapshot(jvm.takeHeapDump(), application);
                         application.getRepository().addDataSource(heapDump);
                         registerDataSource(heapDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
@@ -122,7 +130,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> {
                     SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
                     try {
                         if (saAget.takeHeapDump(dumpFile.getAbsolutePath())) {
-                            final HeapDumpImpl heapDump = new HeapDumpImpl(dumpFile, coreDump);
+                            final HeapDumpImpl heapDump = (HeapDumpImpl)loadSnapshot(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(heapDump);
                             registerDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {

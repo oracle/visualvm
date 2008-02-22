@@ -49,6 +49,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     private final String prefix;
     private final String suffix;
     private final int preferredPosition;
+    private final SnapshotLoader loader;
 
     /**
      * Creates new instance of SnapshotCategory.
@@ -58,13 +59,14 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * @param prefix prefix of files containing the snapshots,
      * @param suffix suffix of files containing the snapshots.
      */
-    public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition) {
+    public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition, SnapshotLoader loader) {
         super();
         this.name = name;
         this.type = type;
         this.prefix = prefix;
         this.suffix = suffix;
         this.preferredPosition = preferredPosition;
+        this.loader = loader;
     }
 
     /**
@@ -94,6 +96,10 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
         return preferredPosition;
     }
     
+    public SnapshotLoader getLoader() {
+        return loader;
+    };
+    
     /**
      * Returns prefix of files containing the snapshots.
      * 
@@ -113,8 +119,10 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     protected boolean isSnapshot(File file) {
-        if (!file.isFile()) return false;
-        String fileName = file.getName();
+        return isSnapshot(file.getName());
+    }
+    
+    protected boolean isSnapshot(String fileName) {
         return fileName.startsWith(getPrefix()) && fileName.endsWith(getSuffix());
     }
     

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.HeapDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
 
 /**
  *
@@ -36,10 +37,10 @@ class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     
     private static final String NAME = "Heap Dumps";
     private static final String PREFIX = "heapdump-";
-    public static final String SUFFIX = ".hprof";
+    private static final String SUFFIX = ".hprof";
     
-    public HeapDumpCategory() {
-        super(NAME, HeapDump.class, PREFIX, SUFFIX, 20);
+    public HeapDumpCategory(SnapshotLoader loader) {
+        super(NAME, HeapDump.class, PREFIX, SUFFIX, 20, loader);
     }
     
     public String getDisplayName(HeapDump snapshot) {

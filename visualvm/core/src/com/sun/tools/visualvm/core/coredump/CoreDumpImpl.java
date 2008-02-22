@@ -42,12 +42,12 @@ class CoreDumpImpl extends AbstractSnapshot implements CoreDump {
     public CoreDumpImpl(File file,String dName, String javaHomeName) throws IOException {
         super(file);
         if (!file.exists() || !file.isFile()) {
-            throw new IOException("File "+file.getAbsolutePath()+" does not exists");
+            throw new IOException("File "+file.getAbsolutePath()+" does not exist");
         }
         if (javaHomeName != null && javaHomeName.length()>0) {
             jdkHome = new File(javaHomeName).getCanonicalFile();
             if (!jdkHome.exists() || !jdkHome.isDirectory()) {
-                throw new IOException("Java Home "+javaHomeName+" does not exists");
+                throw new IOException("Java Home "+javaHomeName+" does not exist");
             }
         } else {
             jdkHome = new File(System.getProperty("java.home")).getCanonicalFile();

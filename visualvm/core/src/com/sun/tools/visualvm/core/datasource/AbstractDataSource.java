@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.snapshot.SnapshotSupport;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -119,7 +119,7 @@ public abstract class AbstractDataSource implements DataSource {
     }
     
     public File getStorage() {
-        return SnapshotSupport.getInstance().getTemporaryStorageDirectory();
+        return SnapshotsSupport.getInstance().getTemporaryStorageDirectory();
     }
 
     public DataSourceContainer getRepository() {

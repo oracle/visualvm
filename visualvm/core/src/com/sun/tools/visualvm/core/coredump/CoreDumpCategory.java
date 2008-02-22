@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.coredump;
 
 import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
 
 /**
  *
@@ -36,10 +37,10 @@ class CoreDumpCategory extends SnapshotCategory<CoreDump> {
     
     private static final String NAME = "Core Dumps";
     private static final String PREFIX = "coredump-";
-    public static final String SUFFIX = ".core";
+    private static final String SUFFIX = ".core";
     
-    public CoreDumpCategory() {
-        super(NAME, CoreDump.class, PREFIX, SUFFIX, POSITION_NONE);
+    public CoreDumpCategory(SnapshotLoader loader) {
+        super(NAME, CoreDump.class, PREFIX, SUFFIX, POSITION_NONE, loader);
     }
     
     public String getDisplayName(CoreDump coreDump) {

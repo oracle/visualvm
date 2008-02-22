@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.core.datasource;
 
 import java.io.File;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 
 /**
  * Abstract implementation of Snapshot.
@@ -86,7 +88,16 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
         
         File f = getFile();
         if (f != null) {
-            deleted = f.delete();
+            if (f.isFile()) deleted = f.delete();
+            else {
+                FileObject directory = FileUtil.toFileObject(f);
+                try {
+                    directory.delete();
+                    deleted = true;
+                } catch (Exception e) {
+                    deleted = false;
+                }
+            }
             setFile(null);
         }
         

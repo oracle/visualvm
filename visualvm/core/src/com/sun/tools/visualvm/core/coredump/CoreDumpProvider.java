@@ -25,7 +25,9 @@
 
 package com.sun.tools.visualvm.core.coredump;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import java.io.File;
@@ -39,6 +41,7 @@ import org.openide.util.RequestProcessor;
 /**
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
 // A provider for Coredumps
 class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
@@ -50,8 +53,14 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
         return sharedInstance;
     }
     
-    private CoreDumpProvider() {
+    
+    public Snapshot loadSnapshot(File file, DataSource master) {
+        // TODO: check how to process registering/unregistering new DataSource
+        try {
+            return new CoreDumpImpl(file, file.getName(), CoreDumpSupport.getCurrentJDKHome());
+        } catch (Exception e) { return null; }
     }
+    
     
     void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome) {
         RequestProcessor.getDefault().post(new Runnable() {
@@ -97,8 +106,11 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
         }
     }
     
-    static void register() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(CoreDumpProvider.sharedInstance());
+    CoreDumpProvider() {
+    }
+    
+    void register() {
+        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
     }
   
 }

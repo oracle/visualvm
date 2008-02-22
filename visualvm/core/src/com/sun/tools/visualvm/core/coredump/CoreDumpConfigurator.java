@@ -115,15 +115,8 @@ class CoreDumpConfigurator extends JPanel {
     displaynameCheckbox.setEnabled(true);
     coreDumpFileField.setText("");
     displaynameField.setText("");
-    javaHomeFileField.setText(getCurrentJDKHome());
+    javaHomeFileField.setText(CoreDumpSupport.getCurrentJDKHome());
     javaHomeFileField.setEnabled(true);
-  }
-  
-  private String getCurrentJDKHome() {
-      String javaHome = System.getProperty("java.home");
-      String jreSuffix = File.separator + "jre";
-      if (javaHome.endsWith(jreSuffix)) javaHome = javaHome.substring(0, javaHome.length() - jreSuffix.length());
-      return javaHome;
   }
   
   private void setupRenameCoreDump(CoreDump coreDump) {

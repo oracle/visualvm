@@ -33,7 +33,8 @@ import com.sun.tools.visualvm.core.host.HostsSupport;
 import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
 import com.sun.tools.visualvm.core.dataview.threads.ThreadsViewSupport;
 import com.sun.tools.visualvm.core.profiler.ProfilerSupport;
-import com.sun.tools.visualvm.core.snapshot.SnapshotSupport;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshotsSupport;
 import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.io.File;
 import org.openide.modules.ModuleInstall;
@@ -83,11 +84,14 @@ public class Install extends ModuleInstall {
  
         // Initialize heapdumps
         HeapDumpSupport.getInstance();
+        
+        // Initialize Application snapshots support
+        ApplicationSnapshotsSupport.getInstance();
 
     }
     
     private void cleanupPreviousSession() {
-        File defaultStorage = new File(SnapshotSupport.getInstance().getTemporaryStorageDirectoryString());
+        File defaultStorage = new File(SnapshotsSupport.getInstance().getTemporaryStorageDirectoryString());
         if (defaultStorage.exists() && defaultStorage.isDirectory()) deleteFolder(defaultStorage);
     }
     

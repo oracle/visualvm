@@ -41,9 +41,9 @@ public interface Snapshot extends DataSource {
     public static final String PROPERTY_FILE = "prop_file";
     
     /**
-     * Returns file context of this snapshot or null if the snapshot hasn't been saved yet.
+     * Returns file context of this snapshot.
      * 
-     * @return file context of this snapshot or null if the snapshot hasn't been saved.
+     * @return file context of this snapshot.
      */
     public File getFile();
     

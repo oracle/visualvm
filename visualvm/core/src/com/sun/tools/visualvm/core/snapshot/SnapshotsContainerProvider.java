@@ -23,30 +23,27 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.core.threaddump;
+package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.ThreadDump;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
+public class SnapshotsContainerProvider extends DefaultDataSourceProvider<SnapshotsContainer> {
     
-    private static final String NAME = "Thread Dumps";
-    private static final String PREFIX = "threaddump-";
-    private static final String SUFFIX = ".tdump";
-    
-    public ThreadDumpCategory(SnapshotLoader loader) {
-        super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10, loader);
+    private void initContainer() {
+        SnapshotsContainer container = SnapshotsContainer.sharedInstance();
+        DataSource.ROOT.getRepository().addDataSource(container);
+        registerDataSource(container);
     }
     
-    public String getDisplayName(ThreadDump snapshot) {
-        String displayName = super.getDisplayName(snapshot);
-        if (isSnapshot(snapshot.getFile())) return "[threaddump] " + displayName;
-        else return displayName;
+    void initialize() {
+        initContainer();
+        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
     }
 
 }

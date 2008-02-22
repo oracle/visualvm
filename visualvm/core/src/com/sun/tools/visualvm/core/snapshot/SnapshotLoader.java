@@ -23,30 +23,18 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.core.threaddump;
+package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.ThreadDump;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotLoader;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Snapshot;
+import java.io.File;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
+public interface SnapshotLoader {
     
-    private static final String NAME = "Thread Dumps";
-    private static final String PREFIX = "threaddump-";
-    private static final String SUFFIX = ".tdump";
-    
-    public ThreadDumpCategory(SnapshotLoader loader) {
-        super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10, loader);
-    }
-    
-    public String getDisplayName(ThreadDump snapshot) {
-        String displayName = super.getDisplayName(snapshot);
-        if (isSnapshot(snapshot.getFile())) return "[threaddump] " + displayName;
-        else return displayName;
-    }
+    public Snapshot loadSnapshot(File file, DataSource master);
 
 }

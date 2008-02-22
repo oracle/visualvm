@@ -39,8 +39,8 @@ public class AbstractSnapshotDescriptor<X extends Snapshot> extends MutableDataS
     public AbstractSnapshotDescriptor(X snapshot, SnapshotCategory<X> category, Image icon) {
         super(snapshot,
               category.getDisplayName(snapshot),
-              snapshot.getFile() == null ? category.getDisplayName(snapshot) + " without file" : snapshot.getFile().getAbsolutePath(),
-              icon, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+              snapshot.getFile().getAbsolutePath(),
+              icon, POSITION_AT_THE_END, EXPAND_NEVER);
     }
 
 }

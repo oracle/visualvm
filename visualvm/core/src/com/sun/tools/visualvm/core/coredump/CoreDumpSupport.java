@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.coredump;
 
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import java.io.File;
 
 /**
  *
@@ -34,20 +35,38 @@ import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
  */
 public final class CoreDumpSupport {
     
-    private static final CoreDumpCategory category = new CoreDumpCategory();
+    private static CoreDumpCategory category;
+    private static CoreDumpProvider provider;
+    private static String currentJDKHome;
     
     
     static CoreDumpCategory getCategory() {
         return category;
     }
+    
+    static CoreDumpProvider getProvider() {
+        return provider;
+    }
+    
+    // TODO: should be moved to some public Utils class
+    static String getCurrentJDKHome() {
+        if (currentJDKHome == null) {
+            currentJDKHome = System.getProperty("java.home");
+            String jreSuffix = File.separator + "jre";
+            if (currentJDKHome.endsWith(jreSuffix)) currentJDKHome = currentJDKHome.substring(0, currentJDKHome.length() - jreSuffix.length());
+        }
+        return currentJDKHome;
+    }
 
     
     public static void register() {
-        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
-        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainerProvider.register();
-        CoreDumpProvider.register();
         CoreDumpActionsProvider.register();
+        provider = new CoreDumpProvider();
+        category = new CoreDumpCategory(provider);
+        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
+        provider.register();
+        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
     }
 
 }

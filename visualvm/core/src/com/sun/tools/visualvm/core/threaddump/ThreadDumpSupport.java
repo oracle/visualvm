@@ -40,7 +40,7 @@ public final class ThreadDumpSupport {
 
     private static ThreadDumpSupport instance;
 
-    private final SnapshotCategory category = new ThreadDumpCategory();
+    private final SnapshotCategory category;
     private final ThreadDumpProvider threadDumpProvider;
     private final ThreadDumpViewProvider threadDumpViewProvider;
     private final ThreadDumpPluggableView threadDumpPluggableView;
@@ -98,17 +98,18 @@ public final class ThreadDumpSupport {
 
 
     private ThreadDumpSupport() {
-        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
-        DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorProvider());
-        
         threadDumpProvider = new ThreadDumpProvider();
         threadDumpProvider.initialize();
         
         threadDumpPluggableView = new ThreadDumpPluggableView();
         
         threadDumpViewProvider = new ThreadDumpViewProvider();
-        threadDumpViewProvider.initialize();
         
+        category = new ThreadDumpCategory(threadDumpProvider);
+        DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorProvider());
+        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        
+        threadDumpViewProvider.initialize();
         new ThreadDumpActionsProvider().initialize();
     }
 

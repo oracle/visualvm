@@ -26,18 +26,49 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
-import java.io.File;
-
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
- * A superclass for all SnapshotProvider instances.
  *
  * @author Jiri Sedlacek
  */
-public abstract class SnapshotProvider<A extends Snapshot> extends DefaultDataSourceProvider<A> implements SnapshotLoader {
+class SnapshotsContainerDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
     
-    public abstract Snapshot loadSnapshot(File file, DataSource master);
+    SnapshotsContainerDescriptorProvider() {
+    }
     
+    public DataSourceDescriptor createModelFor(DataSource ds) {
+        if (SnapshotsContainer.sharedInstance().equals(ds)) {
+            return new SnapshotsContainerDescriptor();
+        }
+        return null;
+    }
+    
+    private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
+        
+        public Image getIcon() {
+            return NODE_ICON;
+        }
+        
+        public String getName() {
+            return "Snapshots";
+        }
+        
+        public String getDescription() {
+            return null;
+        }
+        
+        public int getPreferredPosition() {
+            return 30;
+        }
+        
+        public int getAutoExpansionPolicy() {
+            return EXPAND_NEVER;
+        }
+        
+    }
 }
