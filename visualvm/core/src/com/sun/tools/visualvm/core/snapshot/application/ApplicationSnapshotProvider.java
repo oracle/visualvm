@@ -25,14 +25,16 @@
 
 package com.sun.tools.visualvm.core.snapshot.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
+import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -55,21 +57,20 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     private ApplicationSnapshotProvider() {
     }
     
-    void createSnapshot(final DataSource dataSource, final boolean interactive) {
+    void createSnapshot(final Application application, final boolean interactive) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                createSnapshotImpl(dataSource, interactive);
+                createSnapshotImpl(application, interactive);
             }
         });
     }
     
-    private void createSnapshotImpl(final DataSource dataSource, final boolean interactive) {
-        Set<Snapshot> snapshots = dataSource.getRepository().getDataSources(Snapshot.class);
+    private void createSnapshotImpl(final Application application, final boolean interactive) {
+        ApplicationSnapshotsSupport support = ApplicationSnapshotsSupport.getInstance();
+        Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
         if (snapshots.isEmpty()) return;
         
-        File snapshotDirectory = new File(ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory(),
-                ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
-        
+        File snapshotDirectory = new File(support.getSnapshotsStorageDirectory(), support.getCategory().createFileName());
         if (!snapshotDirectory.exists() && !snapshotDirectory.mkdir())
             throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
         
@@ -83,6 +84,13 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                 fileObject.copy(snapshotDirectoryObject, fileObject.getNameExt(), "");
             } catch (Exception e) { System.err.println("Unable to copy snapshot " + file.getAbsolutePath() + " to persistent storage " + snapshotDirectory); }
         }
+        
+        ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
+        Properties properties = new Properties();
+        properties.put(ApplicationSnapshotsSupport.DISPLAY_NAME, applicationType.getName());
+        File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshotsSupport.DISPLAY_ICON, "png", applicationType.getIcon());
+        if (iconFile != null) properties.put(ApplicationSnapshotsSupport.DISPLAY_ICON, iconFile.getName());
+        ApplicationSnapshotsSupport.storeProperties(properties, snapshotDirectory);
         
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
@@ -124,5 +132,5 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
             public void run() { loadSnapshots(); }
         });
     }
-  
+    
 }

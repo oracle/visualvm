@@ -71,7 +71,7 @@ final class ApplicationSnapshotActionProvider {
         }
         
         public void actionPerformed(ActionEvent e) {
-            DataSource dataSource = (DataSource)e.getSource();
+            Application dataSource = (Application)e.getSource();
             ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(dataSource, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
             
         }

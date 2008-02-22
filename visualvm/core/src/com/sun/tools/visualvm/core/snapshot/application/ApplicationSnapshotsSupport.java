@@ -29,7 +29,17 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+import javax.imageio.ImageIO;
 
 /**
  * Support for application snapshots in VisualVM.
@@ -41,6 +51,9 @@ public final class ApplicationSnapshotsSupport {
     private static ApplicationSnapshotsSupport instance;
     
     private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
+    static final String DISPLAY_NAME = "display_name";
+    static final String DISPLAY_ICON = "display_icon";
+    static final String PROPERTIES_FILE = "_display_properties.xml";
     
     private File snapshotsStorageDirectory;
     private String snapshotsStorageDirectoryString;
@@ -92,6 +105,80 @@ public final class ApplicationSnapshotsSupport {
                 throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString);
         }
         return snapshotsStorageDirectory;
+    }
+    
+    
+    static File saveImage(File directory, String prefix, String type, Image image) {
+        File file = getUniqueFile(directory, prefix, "." + type);
+        BufferedImage bImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        bImage.createGraphics().drawImage(image, null, null);
+        try {
+            ImageIO.write(bImage, type, file);
+        } catch(Exception e) {
+            return null;
+        }
+        return file;
+    }
+    
+    static Image loadImage(File file) {
+        try {
+            return ImageIO.read(file);
+        } catch(Exception e) {
+            System.err.println("Error reading image: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    private static File getUniqueFile(File directory, String prefix, String suffix) {
+        File file = new File(directory, prefix + suffix);
+        while (file.exists()) {
+            prefix = prefix + "_";
+            file = new File(directory, prefix + suffix);
+        }
+        return file;
+    }
+    
+    static void storeProperties(Properties properties, File directory) {
+        File file = new File(directory, PROPERTIES_FILE);
+        OutputStream os = null;
+        BufferedOutputStream bos = null;
+        try {
+            os = new FileOutputStream(file);
+            bos = new BufferedOutputStream(os);
+            properties.storeToXML(os, null);
+        } catch (Exception e) {
+            System.err.println("Error storing properties: " + e.getMessage());
+        } finally {
+            try {
+                if (bos != null) bos.close();
+                if (os != null) os.close();
+            } catch (Exception e) {
+                System.err.println("Problem closing output stream: " + e.getMessage());
+            }
+        }
+    }
+    
+    static Properties loadProperties(File directory) {
+        File file = new File(directory, PROPERTIES_FILE);
+        InputStream is = null;
+        BufferedInputStream bis = null;
+        try {
+            is = new FileInputStream(file);
+            bis = new BufferedInputStream(is);
+            Properties properties = new Properties();
+            properties.loadFromXML(bis);
+            return properties;
+        } catch (Exception e) {
+            System.err.println("Error loading properties: " + e.getMessage());
+            return null;
+        } finally {
+            try {
+                if (bis != null) bis.close();
+                if (is != null) is.close();
+            } catch (Exception e) {
+                System.err.println("Problem closing input stream: " + e.getMessage());
+            }
+        }
     }
     
     

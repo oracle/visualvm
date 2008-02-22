@@ -30,10 +30,11 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.Properties;
 import org.openide.util.Utilities;
 
 /**
@@ -56,7 +57,8 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
     }
     
     private static class ApplicationSnapshotDescriptor extends AbstractSnapshotDescriptor implements PropertyChangeListener {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshot.png", true);
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);
+        private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
         
         static ApplicationSnapshotDescriptor newInstance(ApplicationSnapshot snapshot) {
             ApplicationSnapshotDescriptor desc = new ApplicationSnapshotDescriptor(snapshot);
@@ -65,14 +67,30 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         
         private ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
             super(snapshot, ApplicationSnapshotsSupport.getInstance().getCategory(), NODE_ICON);
+            
+            String name = "[snapshot] " + super.getName();
+            Image icon = super.getIcon();
+            
+            Properties properties = ApplicationSnapshotsSupport.loadProperties(snapshot.getFile());
+            if (properties != null) {
+                // Load display name
+                String displayName = properties.getProperty(ApplicationSnapshotsSupport.DISPLAY_NAME);
+                if (displayName != null) name = displayName + " (" + super.getName() + ")";
+                
+                // Load icon
+                String iconFile = properties.getProperty(ApplicationSnapshotsSupport.DISPLAY_ICON);
+                if (iconFile != null) {
+                    Image image = ApplicationSnapshotsSupport.loadImage(new File(snapshot.getFile(), iconFile));
+                    if (image != null) icon = image;
+                }
+            }
+            
+            setName(name);
+            setIcon(Utilities.mergeImages(icon, NODE_BADGE, 0, 0));
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
             setName((String)evt.getNewValue());
-        }
-        
-        public String getName() {
-            return "[snapshot] " + super.getName();
         }
         
     }
