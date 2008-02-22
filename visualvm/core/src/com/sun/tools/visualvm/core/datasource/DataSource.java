@@ -73,7 +73,7 @@ public interface DataSource {
      * Virtual root of DataSource tree.
      * ROOT corresponds to invisible root of explorer tree.
      */
-    public static final DataSourceRoot ROOT = new DataSourceRoot();
+    public static final DataSource ROOT = new DataSourceRoot();
 
     /**
      * Sets owner of this DataSource.

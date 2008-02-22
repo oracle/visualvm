@@ -296,7 +296,7 @@ class ExplorerModelBuilder {
         nodes.put(DataSource.ROOT, explorerRoot);
         
         RequestProcessor.getDefault().post(new Runnable() {
-            public void run() { processAddedDataSources(Collections.singleton((DataSource)DataSource.ROOT)); }
+            public void run() { processAddedDataSources(Collections.singleton(DataSource.ROOT)); }
         });
     }
     
