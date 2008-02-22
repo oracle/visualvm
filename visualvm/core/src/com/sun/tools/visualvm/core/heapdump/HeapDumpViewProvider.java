@@ -25,9 +25,6 @@
 
 package com.sun.tools.visualvm.core.heapdump;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.CoreDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
@@ -47,8 +44,7 @@ class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
     
 
     public boolean supportsViewFor(HeapDump heapDump) {
-        DataSource master = heapDump.getMaster();
-        return (master != null && (master instanceof Application || master instanceof CoreDump));
+        return true;
     }
 
     public synchronized Set<? extends DataSourceView> getViews(final HeapDump heapDump) {

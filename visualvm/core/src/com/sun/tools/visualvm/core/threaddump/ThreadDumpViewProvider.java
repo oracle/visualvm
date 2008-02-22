@@ -25,9 +25,6 @@
 
 package com.sun.tools.visualvm.core.threaddump;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.CoreDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
@@ -47,8 +44,7 @@ class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
     
 
     public boolean supportsViewFor(ThreadDump threadDump) {
-        DataSource master = threadDump.getMaster();
-        return (master != null && (master instanceof Application || master instanceof CoreDump));
+        return true;
     }
     
     boolean hasCachedView(ThreadDump threadDump) {
