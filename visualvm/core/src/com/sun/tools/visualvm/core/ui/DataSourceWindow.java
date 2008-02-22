@@ -71,6 +71,7 @@ class DataSourceWindow extends TopComponent {
         });
             
         viewsCount--;
+        if (viewsCount == 0) close();
     }
     
     public void removeAllViews() {
