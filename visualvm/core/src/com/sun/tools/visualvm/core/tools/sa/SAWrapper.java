@@ -50,7 +50,11 @@ class SAWrapper {
 	System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true");
 	System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");
         URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
-        libraryPath = new File(jdkHome, "jre/lib/" + System.getProperty("os.arch"));
+        String osArch = System.getProperty("os.arch");
+        if ("x86".equals(osArch)) {
+            osArch = "i386";
+        }
+        libraryPath = new File(jdkHome, "jre/lib/" + osArch);
         System.out.println("Path " + libraryPath.getAbsolutePath());
         loader = new URLClassLoader(saJarUrls) {
             @Override
