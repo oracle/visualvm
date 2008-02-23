@@ -190,7 +190,7 @@ class CoreDumpConfigurator extends JPanel {
     
     // coreDumpFileField
     coreDumpFileField = new JTextField();
-    coreDumpFileField.setPreferredSize(new Dimension(250, coreDumpFileField.getPreferredSize().height));
+    coreDumpFileField.setPreferredSize(new Dimension(220, coreDumpFileField.getPreferredSize().height));
     coreDumpFileField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
       public void removeUpdate(DocumentEvent e)  { update(); }
@@ -199,6 +199,7 @@ class CoreDumpConfigurator extends JPanel {
     constraints = new GridBagConstraints();
     constraints.gridx = 1;
     constraints.gridy = 0;
+    constraints.weightx = 1;
     constraints.gridwidth = 1;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.anchor = GridBagConstraints.WEST;
@@ -215,8 +216,8 @@ class CoreDumpConfigurator extends JPanel {
     constraints = new GridBagConstraints();
     constraints.gridx = 2;
     constraints.gridy = 0;
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.gridwidth = 1;
+    constraints.fill = GridBagConstraints.NONE;
     constraints.anchor = GridBagConstraints.WEST;
     constraints.insets = new Insets(15, 5, 0, 10);
     add(coreDumpFileButton, constraints);    
@@ -234,7 +235,7 @@ class CoreDumpConfigurator extends JPanel {
     
     // javaHomeFileField
     javaHomeFileField = new JTextField();
-    javaHomeFileField.setPreferredSize(new Dimension(250, javaHomeFileField.getPreferredSize().height));
+    javaHomeFileField.setPreferredSize(new Dimension(220, javaHomeFileField.getPreferredSize().height));
     javaHomeFileField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
       public void removeUpdate(DocumentEvent e)  { update(); }
@@ -259,8 +260,8 @@ class CoreDumpConfigurator extends JPanel {
     constraints = new GridBagConstraints();
     constraints.gridx = 2;
     constraints.gridy = 1;
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.gridwidth = 1;
+    constraints.fill = GridBagConstraints.NONE;
     constraints.anchor = GridBagConstraints.WEST;
     constraints.insets = new Insets(8, 5, 0, 10);
     add(javaHomeFileButton, constraints);        
@@ -281,7 +282,7 @@ class CoreDumpConfigurator extends JPanel {
     
     // displaynameField
     displaynameField = new JTextField();
-    displaynameField.setPreferredSize(new Dimension(250, displaynameField.getPreferredSize().height));
+    displaynameField.setPreferredSize(new Dimension(220, displaynameField.getPreferredSize().height));
     displaynameField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
       public void removeUpdate(DocumentEvent e)  { update(); }
@@ -301,7 +302,6 @@ class CoreDumpConfigurator extends JPanel {
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 3;
-    constraints.weightx = 1;
     constraints.weighty = 1;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.BOTH;
