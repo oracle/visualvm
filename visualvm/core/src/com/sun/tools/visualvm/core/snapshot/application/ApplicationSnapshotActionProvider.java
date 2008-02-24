@@ -144,7 +144,7 @@ final class ApplicationSnapshotActionProvider {
         }
 
         public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
-            return Collections.singleton(new ExplorerActionDescriptor(addApplicationSnapshotAction, 30));
+            return Collections.singleton(new ExplorerActionDescriptor(addApplicationSnapshotAction, 40));
         }
         
     }

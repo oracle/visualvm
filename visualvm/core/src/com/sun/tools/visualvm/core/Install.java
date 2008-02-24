@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.core.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.core.host.HostsSupport;
 import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
 import com.sun.tools.visualvm.core.dataview.threads.ThreadsViewSupport;
+import com.sun.tools.visualvm.core.jmx.JmxConnectionSupport;
 import com.sun.tools.visualvm.core.profiler.ProfilerSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshotsSupport;
@@ -67,8 +68,11 @@ public class Install extends ModuleInstall {
         
         // Initialize applications
         ApplicationsSupport.getInstance();
+
+        // Initialize JMX`connections
+        JmxConnectionSupport.getInstance();
         
-        // Initialize Core dump 
+        // Initialize core dumps
         CoreDumpSupport.register();
         
         // Initialize views
@@ -79,10 +83,10 @@ public class Install extends ModuleInstall {
         // Initialize profiler
         ProfilerSupport.getInstance();
         
-        // Initialize threaddumps
+        // Initialize thread dumps
         ThreadDumpSupport.getInstance();
  
-        // Initialize heapdumps
+        // Initialize heap dumps
         HeapDumpSupport.getInstance();
         
         // Initialize Application snapshots support
