@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
  *
  * @author Jiri Sedlacek
  */
-public class SnapshotsContainer extends AbstractDataSource {
+public final class SnapshotsContainer extends AbstractDataSource {
     
     private static SnapshotsContainer sharedInstance;
     

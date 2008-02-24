@@ -30,12 +30,17 @@ import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.RequestProcessor;
@@ -58,9 +63,28 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     }
     
     void createSnapshot(final Application application, final boolean interactive) {
+        // TODO: open snapshot if interactive
+        
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                createSnapshotImpl(application, interactive);
+                ProgressHandle pHandle = null;
+                try {
+                    pHandle = ProgressHandleFactory.createHandle("Saving snapshot of " + DataSourceDescriptorFactory.getDescriptor(application).getName() + "...");
+                    pHandle.setInitialDelay(0);
+                    pHandle.start();
+                    createSnapshotImpl(application, interactive);
+                } finally {
+                    final ProgressHandle pHandleF = pHandle;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { if (pHandleF != null) pHandleF.finish(); }
+                    });
+                }
+            }
+        });
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                
             }
         });
     }
@@ -87,6 +111,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         
         ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
         Properties properties = new Properties();
+        properties.put(ApplicationSnapshotsSupport.SNAPSHOT_VERSION, "1.0");
         properties.put(ApplicationSnapshotsSupport.DISPLAY_NAME, applicationType.getName());
         File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshotsSupport.DISPLAY_ICON, "png", applicationType.getIcon());
         if (iconFile != null) properties.put(ApplicationSnapshotsSupport.DISPLAY_ICON, iconFile.getName());
@@ -95,6 +120,38 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         registerDataSource(snapshot);
+    }
+    
+    void addSnapshotArchive(final File archive, final boolean deleteArchive) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                ProgressHandle pHandle = null;
+                try {
+                    pHandle = ProgressHandleFactory.createHandle("Adding " + archive.getName() + "...");
+                    pHandle.setInitialDelay(0);
+                    pHandle.start();
+                    
+                    File snapshotDirectory = ApplicationSnapshotsSupport.extractArchive(archive, ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory());
+                    if (snapshotDirectory != null) {
+                        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
+                        SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
+                        registerDataSource(snapshot);
+                        if (deleteArchive) if (!archive.delete()) archive.deleteOnExit();
+                    } else {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                NetBeansProfiler.getDefaultNB().displayError("<html><b>Adding snapshot " + archive.getName() + " failed.</b><br><br>Make sure the file is not broken.</html>");
+                            }
+                        });
+                    }
+                } finally {
+                    final ProgressHandle pHandleF = pHandle;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { if (pHandleF != null) pHandleF.finish(); }
+                    });
+                }
+            }
+        });
     }
 
     void deleteSnapshot(ApplicationSnapshot snapshot, boolean interactive) {

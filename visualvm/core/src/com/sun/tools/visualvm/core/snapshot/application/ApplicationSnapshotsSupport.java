@@ -38,7 +38,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 
 /**
@@ -51,15 +55,18 @@ public final class ApplicationSnapshotsSupport {
     private static ApplicationSnapshotsSupport instance;
     
     private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
+    static final String SNAPSHOT_VERSION = "snapshot_version";
     static final String DISPLAY_NAME = "display_name";
     static final String DISPLAY_ICON = "display_icon";
-    static final String PROPERTIES_FILE = "_display_properties.xml";
+    static final String PROPERTIES_FILE = "_appsnapshot_properties.xml";
+    
+    private static final int COPY_PACKET_SIZE = 4096;
     
     private File snapshotsStorageDirectory;
     private String snapshotsStorageDirectoryString;
 
     private ApplicationSnapshotProvider snapshotProvider;
-    private SnapshotCategory snapshotCategory = new ApplicationSnapshotCategory();
+    private ApplicationSnapshotCategory snapshotCategory = new ApplicationSnapshotCategory();
 
 
     /**
@@ -81,6 +88,10 @@ public final class ApplicationSnapshotsSupport {
     public SnapshotCategory getCategory() {
         return snapshotCategory;
     }
+    
+    ApplicationSnapshotCategory getApplicationSnapshotCategory() {
+        return snapshotCategory;
+    } 
     
     
     ApplicationSnapshotProvider getSnapshotProvider() {
@@ -179,6 +190,73 @@ public final class ApplicationSnapshotsSupport {
                 System.err.println("Problem closing input stream: " + e.getMessage());
             }
         }
+    }
+    
+    static void createArchive(File directory, File archive) {        
+        ZipOutputStream zos = null;
+        FileInputStream fis = null;
+        
+        File[] contents = directory.listFiles();
+        
+        try {
+            zos = new ZipOutputStream(new FileOutputStream(archive));
+            for (File file : contents) {
+                if (file.isFile()) {
+                    zos.putNextEntry(new ZipEntry(file.getName()));
+                    try {
+                        fis = new FileInputStream(file);
+                        int bytes;
+                        byte[] packet = new byte[COPY_PACKET_SIZE];
+                        while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) zos.write(packet, 0, bytes);
+                    } finally {
+                        if (zos != null) zos.closeEntry();
+                        try { if (fis != null) fis.close(); } catch (Exception e) { System.err.println("Problem closing archived file stream: " + e.getMessage()); }
+                    }
+                } else {
+                    // TODO: process directory
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error archiving snapshot: " + e.getMessage());
+        } finally {
+            try { if (zos != null) zos.close(); } catch (Exception e) { System.err.println("Problem closing archive stream: " + e.getMessage()); }
+        }
+    }
+    
+    static File extractArchive(File archive, File destination) {
+        // TODO: implement extracting directories
+        
+        File directory = new File(destination, archive.getName());
+        ZipFile zipFile = null;
+        
+        try {
+            directory.mkdirs();
+            
+            zipFile = new ZipFile(archive);
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                FileOutputStream fos = null;
+                InputStream is = null;
+                try {
+                    is = zipFile.getInputStream(entry);
+                    fos = new FileOutputStream(new File(directory, entry.getName()));
+                    int bytes;
+                    byte[] packet = new byte[COPY_PACKET_SIZE];
+                    while ((bytes = is.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
+                } finally {
+                    try { if (fos != null) fos.close(); } catch (Exception e) { System.err.println("Problem closing extracted file stream: " + e.getMessage()); }
+                    try { if (is != null) is.close(); } catch (Exception e) { System.err.println("Problem closing zipentry stream: " + e.getMessage()); }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error extracting snapshot: " + e.getMessage());
+            return null;
+        } finally {
+            try { if (zipFile != null) zipFile.close(); } catch (Exception e) { System.err.println("Problem closing archive: " + e.getMessage()); }
+        }
+        
+        return directory;
     }
     
     

@@ -30,6 +30,10 @@ import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileView;
 
 
 /**
@@ -139,7 +143,12 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     public String getDisplayName(X snapshot) {
-        File file = snapshot.getFile();
+        String displayName = getDisplayName(snapshot.getFile());
+        if (displayName != null) return displayName;
+        else return snapshot.toString();
+    }
+    
+    private String getDisplayName(File file) {
         if (file != null) {
             String fileName = file.getName();
             if (isSnapshot(file)) {
@@ -152,7 +161,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
             }
             else return fileName;
         }
-        else return snapshot.toString();
+        else return null;
     }
     
     public FilenameFilter getFilenameFilter() {
@@ -162,4 +171,28 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
             }
         };
     }
+    
+    public FileFilter getFileFilter() {
+        return new FileFilter() {
+            public boolean accept(File f) {
+                return f.isDirectory() || isSnapshot(f);
+            }
+            public String getDescription() {
+                return getName() + " (" + getSuffix() + ")";
+            }
+        };
+    }
+    
+//    public FileView getFileView() {
+//        return new FileView() {
+////            public Icon getIcon(File f) {
+////                return new ImageIcon(SnapshotCategory.this.getI);
+////            }
+//            public String getName(File file) {
+//                if (isSnapshot(file)) return getDisplayName(file);
+//                else return null;
+//            }
+//        };
+//    }
+    
 }

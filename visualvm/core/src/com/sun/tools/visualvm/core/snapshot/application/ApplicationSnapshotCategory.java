@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import java.io.File;
 
 /**
  *
@@ -34,15 +35,15 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> {
     
     private static final String NAME = "Application Snapshots";
-    private static final String PREFIX = "datasource-";
-    private static final String SUFFIX = ".snap";
+    private static final String PREFIX = "application-";
+    private static final String SUFFIX = ".apps";
     
     public ApplicationSnapshotCategory() {
         super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);
     }
     
-//    public String getDisplayName(Application application) {
-//        return application.getDisplayName();
-//    }
+    boolean isSnapshotArchive(File file) {
+        return file.exists() && file.isFile() && isSnapshot(file);
+    }
 
 }

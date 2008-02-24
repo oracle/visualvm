@@ -26,7 +26,14 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -38,12 +45,51 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         super(file);
     }
     
+    
+    // Save to a file within given directory
+    public void save(DataSource container, File directory) {
+        saveArchive(new File(directory, getFile().getName()));
+    }
+    
+    // Custom save
+    public void saveAs() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Save Application Snapshot As");
+        chooser.setSelectedFile(new File(getFile().getName()));
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileFilter(ApplicationSnapshotsSupport.getInstance().getCategory().getFileFilter());
+//        chooser.setFileView(ApplicationSnapshotsSupport.getInstance().getCategory().getFileView());
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            final File file = chooser.getSelectedFile();
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    ProgressHandle pHandle = null;
+                    try {
+                        pHandle = ProgressHandleFactory.createHandle("Saving " + DataSourceDescriptorFactory.getDescriptor(ApplicationSnapshot.this).getName() + "...");
+                        pHandle.setInitialDelay(0);
+                        pHandle.start();
+                        saveArchive(file);
+                    } finally {
+                        final ProgressHandle pHandleF = pHandle;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { if (pHandleF != null) pHandleF.finish(); }
+                        });
+                    }
+                }
+            });
+        }
+    }
+    
     void delete() {
         deleteFile();
     }
 
     void removed() {
         setState(STATE_FINISHED);
+    }
+    
+    public void saveArchive(File archive) {
+        ApplicationSnapshotsSupport.createArchive(getFile(), archive);
     }
     
 }

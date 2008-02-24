@@ -26,10 +26,11 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.Collections;
@@ -45,7 +46,9 @@ final class ApplicationSnapshotActionProvider {
 
     private static ApplicationSnapshotActionProvider instance;
     
+    private final AddApplicationSnapshotAction addApplicationSnapshotAction = new AddApplicationSnapshotAction();
     private final SaveApplicationAction saveApplicationAction = new SaveApplicationAction();
+    private final SaveApplicationSnapshotAction saveApplicationSnapshotAction = new SaveApplicationSnapshotAction();
     private final DeleteApplicationSnapshotAction deleteApplicationSnapshotAction = new DeleteApplicationSnapshotAction();
 
 
@@ -56,13 +59,31 @@ final class ApplicationSnapshotActionProvider {
 
 
     void initialize() {
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new AddApplicationSnapshotActionProvider(), SnapshotsContainer.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new SaveApplicationActionProvider(), Application.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new DeleteApplicationSnapshotActionProvider(), ApplicationSnapshot.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationSnapshotActionsProvider(), ApplicationSnapshot.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new AddApplicationSnapshotRootActionProvider(), DataSourceRoot.class);
     }
     
     private ApplicationSnapshotActionProvider() {
     }
     
+    
+    private class AddApplicationSnapshotAction extends AbstractAction {
+        
+        public AddApplicationSnapshotAction() {
+            super("Add Application Snapshot...");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            ApplicationSnapshotConfigurator newSnapshotConfiguration = ApplicationSnapshotConfigurator.defineSnapshot();
+            if (newSnapshotConfiguration != null) {
+                ApplicationSnapshotProvider provider = ApplicationSnapshotsSupport.getInstance().getSnapshotProvider();
+                provider.addSnapshotArchive(newSnapshotConfiguration.getSnapshotFile(), newSnapshotConfiguration.deleteSourceFile());
+            }
+        }
+        
+    }
     
     private class SaveApplicationAction extends AbstractAction {
         
@@ -73,7 +94,19 @@ final class ApplicationSnapshotActionProvider {
         public void actionPerformed(ActionEvent e) {
             Application dataSource = (Application)e.getSource();
             ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(dataSource, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-            
+        }
+        
+    }
+    
+    private class SaveApplicationSnapshotAction extends AbstractAction {
+        
+        public SaveApplicationSnapshotAction() {
+            super("Save As...");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            ApplicationSnapshot snapshot = (ApplicationSnapshot)e.getSource();
+            snapshot.saveAs();
         }
         
     }
@@ -92,6 +125,30 @@ final class ApplicationSnapshotActionProvider {
     }
     
     
+    private class AddApplicationSnapshotActionProvider implements ExplorerActionsProvider<SnapshotsContainer> {
+        
+        public ExplorerActionDescriptor getDefaultAction(SnapshotsContainer container) {
+            return new ExplorerActionDescriptor(addApplicationSnapshotAction, 0);
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(SnapshotsContainer container) {
+            return Collections.EMPTY_SET;
+        }
+        
+    }
+    
+    private class AddApplicationSnapshotRootActionProvider implements ExplorerActionsProvider<DataSourceRoot> {
+        
+        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
+            return Collections.singleton(new ExplorerActionDescriptor(addApplicationSnapshotAction, 30));
+        }
+        
+    }
+    
     private class SaveApplicationActionProvider implements ExplorerActionsProvider<Application> {
         
         public ExplorerActionDescriptor getDefaultAction(Application application) {
@@ -106,7 +163,7 @@ final class ApplicationSnapshotActionProvider {
         
     }
     
-    private class DeleteApplicationSnapshotActionProvider implements ExplorerActionsProvider<ApplicationSnapshot> {
+    private class ApplicationSnapshotActionsProvider implements ExplorerActionsProvider<ApplicationSnapshot> {
         
         public ExplorerActionDescriptor getDefaultAction(ApplicationSnapshot snapshot) {
             return null;
@@ -114,8 +171,9 @@ final class ApplicationSnapshotActionProvider {
 
         public Set<ExplorerActionDescriptor> getActions(ApplicationSnapshot snapshot) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(deleteApplicationSnapshotAction, 10));
+    
+            actions.add(new ExplorerActionDescriptor(saveApplicationSnapshotAction, 10));
+            actions.add(new ExplorerActionDescriptor(deleteApplicationSnapshotAction, 20));
             
             return actions;
         }
