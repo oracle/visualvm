@@ -107,7 +107,6 @@ class ApplicationSnapshotConfigurator extends JPanel {
       chooser.setSelectedFile(getSnapshotFile());
       chooser.setAcceptAllFileFilterUsed(false);
       chooser.setFileFilter(ApplicationSnapshotsSupport.getInstance().getCategory().getFileFilter());
-//      chooser.setFileView(ApplicationSnapshotsSupport.getInstance().getCategory().getFileView());
       if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) snapshotFileField.setText(chooser.getSelectedFile().getAbsolutePath());
   }
   

@@ -28,19 +28,35 @@ package com.sun.tools.visualvm.core.snapshot;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.model.dsdescr.MutableDataSourceDescriptor;
 import java.awt.Image;
+import java.io.File;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class AbstractSnapshotDescriptor<X extends Snapshot> extends MutableDataSourceDescriptor {
+public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends MutableDataSourceDescriptor {
     
     
-    public AbstractSnapshotDescriptor(X snapshot, SnapshotCategory<X> category, Image icon) {
-        super(snapshot,
-              category.getDisplayName(snapshot),
+    public AbstractSnapshotDescriptor(X snapshot, Image icon) {
+        super(snapshot, getName(snapshot),
               snapshot.getFile().getAbsolutePath(),
               icon, POSITION_AT_THE_END, EXPAND_NEVER);
+    }
+    
+    private static String getName(Snapshot snapshot) {
+        File file = snapshot.getFile();
+        if (file == null) return snapshot.toString();
+        
+        String fileName = file.getName();
+        SnapshotCategory category = snapshot.getCategory();
+        String name = "[" + category.getPrefix() + "] " + fileName;
+        
+        if (category.isSnapshot(file)) {
+            String timeStamp = category.getTimeStamp(fileName);
+            if (timeStamp != null) name = "[" + category.getPrefix() + "] " + timeStamp;
+        }
+        
+        return name;
     }
 
 }

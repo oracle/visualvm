@@ -35,17 +35,11 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     
     private static final String NAME = "Heap Dumps";
-    private static final String PREFIX = "heapdump-";
+    private static final String PREFIX = "heapdump";
     private static final String SUFFIX = ".hprof";
     
     public HeapDumpCategory() {
         super(NAME, HeapDump.class, PREFIX, SUFFIX, 20);
-    }
-    
-    public String getDisplayName(HeapDump snapshot) {
-        String displayName = super.getDisplayName(snapshot);
-        if (isSnapshot(snapshot.getFile())) return "[heapdump] " + displayName;
-        else return displayName;
     }
 
 }

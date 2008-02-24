@@ -157,6 +157,7 @@ class CoreDumpConfigurator extends JPanel {
   
   private void chooseJavaHome() {
       JFileChooser chooser = new JFileChooser(new File(getJavaHome()));
+      chooser.setDialogTitle("Select JDK Home");
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       int returnVal = chooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -166,7 +167,9 @@ class CoreDumpConfigurator extends JPanel {
 
   private void chooseCoreDump() {
       JFileChooser chooser = new JFileChooser(new File(getCoreDumpFile()));
-      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      chooser.setDialogTitle("Select VM Coredump");
+      chooser.setAcceptAllFileFilterUsed(false);
+      chooser.setFileFilter(CoreDumpSupport.getCategory().getFileFilter());
       int returnVal = chooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
           coreDumpFileField.setText(chooser.getSelectedFile().getAbsolutePath());

@@ -66,7 +66,7 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
         }
         
         CoreDumpDescriptor(CoreDump coreDump) {
-            super(coreDump, CoreDumpSupport.getCategory(), ICON);
+            super(coreDump, ICON);
         }
         
         public void propertyChange(PropertyChangeEvent evt) {

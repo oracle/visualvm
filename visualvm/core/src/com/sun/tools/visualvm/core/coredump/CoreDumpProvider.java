@@ -25,9 +25,7 @@
 
 package com.sun.tools.visualvm.core.coredump;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import java.io.File;
@@ -65,7 +63,10 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     private void createCoreDumpImpl(final String coreDumpFile, final String displayName, final String jdkHome) {
         final CoreDumpImpl coreDump;
         try {
-            coreDump = new CoreDumpImpl(new File(coreDumpFile), displayName, jdkHome);
+            File jdkHomeFile = null;
+            if (jdkHome != null && jdkHome.length() > 0)
+                jdkHomeFile = new File(jdkHome).getCanonicalFile();
+            coreDump = new CoreDumpImpl(new File(coreDumpFile), displayName, jdkHomeFile);
         } catch (IOException ex) {
             ErrorManager.getDefault().notify(ex);
             return;

@@ -25,33 +25,19 @@
 
 package com.sun.tools.visualvm.core.coredump;
 
-import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
-import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.core.datasource.AbstractCoreDump;
 import java.io.File;
 import java.io.IOException;
-import org.openide.util.Utilities;
 
 /**
  *
  * @author Tomas Hurka
  */
-class CoreDumpImpl extends AbstractSnapshot implements CoreDump {
+class CoreDumpImpl extends AbstractCoreDump {
     private String displayName;
-    private final File jdkHome;
     
-    public CoreDumpImpl(File file,String dName, String javaHomeName) throws IOException {
-        super(file);
-        if (!file.exists() || !file.isFile()) {
-            throw new IOException("File "+file.getAbsolutePath()+" does not exist");
-        }
-        if (javaHomeName != null && javaHomeName.length()>0) {
-            jdkHome = new File(javaHomeName).getCanonicalFile();
-            if (!jdkHome.exists() || !jdkHome.isDirectory()) {
-                throw new IOException("Java Home "+javaHomeName+" does not exist");
-            }
-        } else {
-            jdkHome = new File(System.getProperty("java.home")).getCanonicalFile();
-        }
+    public CoreDumpImpl(File file, String dName, File javaHomeName) throws IOException {
+        super(file, javaHomeName);
         displayName = dName;
     }
     
@@ -77,23 +63,11 @@ class CoreDumpImpl extends AbstractSnapshot implements CoreDump {
         return false;
     }
     
-    String getId() {
-        return Integer.toString(getFile().hashCode());
-    }
+//    String getId() {
+//        return Integer.toString(getFile().hashCode());
+//    }
     
-    public String getExecutable() {
-        String home = getJDKHome();
-        
-        String exec = home+File.separatorChar+"bin"+File.separatorChar+"java";
-        if (Utilities.isWindows()) {
-            exec +=".exe";
-        }
-        return exec;
-    }
     
-    public String getJDKHome() {
-        return jdkHome.getAbsolutePath();
-    }
     
     void finished() {
         setState(STATE_FINISHED); 

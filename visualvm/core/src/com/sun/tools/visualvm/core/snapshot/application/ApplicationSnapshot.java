@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
 import javax.swing.JFileChooser;
@@ -42,23 +41,25 @@ import org.openide.util.RequestProcessor;
 public final class ApplicationSnapshot extends AbstractSnapshot {
 
     public ApplicationSnapshot(File file) {
-        super(file);
+        super(file, ApplicationSnapshotsSupport.getInstance().getCategory());
     }
     
     
     // Save to a file within given directory
-    public void save(DataSource container, File directory) {
+    public void save(File directory) {
         saveArchive(new File(directory, getFile().getName()));
     }
     
-    // Custom save
+    public boolean supportsSaveAs() {
+        return true;
+    }
+    
     public void saveAs() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Save Application Snapshot As");
         chooser.setSelectedFile(new File(getFile().getName()));
         chooser.setAcceptAllFileFilterUsed(false);
-        chooser.setFileFilter(ApplicationSnapshotsSupport.getInstance().getCategory().getFileFilter());
-//        chooser.setFileView(ApplicationSnapshotsSupport.getInstance().getCategory().getFileView());
+        chooser.setFileFilter(getCategory().getFileFilter());
         if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             final File file = chooser.getSelectedFile();
             RequestProcessor.getDefault().post(new Runnable() {

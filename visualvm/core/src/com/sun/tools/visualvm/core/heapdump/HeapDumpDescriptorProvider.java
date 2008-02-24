@@ -54,7 +54,7 @@ class HeapDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
         private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
         
         public HeapDumpDescriptor(HeapDump heapDump) {
-            super(heapDump, HeapDumpSupport.getInstance().getCategory(), ICON);
+            super(heapDump, ICON);
         }
         
     }

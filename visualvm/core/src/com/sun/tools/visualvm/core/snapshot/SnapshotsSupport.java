@@ -25,8 +25,17 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
+import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
+import java.util.Date;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.RequestProcessor;
 
 /**
  * Support for snapshots in VisualVM.
@@ -117,9 +126,58 @@ public final class SnapshotsSupport {
     }
     
     
+    public void saveAs(final AbstractSnapshot snapshot, String dialogTitle) {
+        final File file = snapshot.getFile();
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle(dialogTitle);
+        chooser.setSelectedFile(new File(snapshot.getFile().getName()));
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileFilter(snapshot.getCategory().getFileFilter());
+//        chooser.setFileView(category.getFileView());
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            final File copy = chooser.getSelectedFile();
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    ProgressHandle pHandle = null;
+                    try {
+                        pHandle = ProgressHandleFactory.createHandle("Saving " + DataSourceDescriptorFactory.getDescriptor(snapshot).getName() + "...");
+                        pHandle.setInitialDelay(0);
+                        pHandle.start();
+                        copyFile(file, copy);
+                    } finally {
+                        final ProgressHandle pHandleF = pHandle;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { if (pHandleF != null) pHandleF.finish(); }
+                        });
+                    }
+                }
+            });
+        }
+    }
+    
+    public boolean copyFile(File file, File copy) {
+        if (file == null || !file.isFile()) return false;
+        
+        FileObject fileO = FileUtil.toFileObject(file);
+        FileObject directoryO = FileUtil.toFileObject(FileUtil.normalizeFile(copy.getParentFile()));
+        try {
+            FileUtil.copyFile(fileO, directoryO, file.getName(), "");
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error copying snapshot to " + copy + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public String getTimeStamp(long time) {
+        return org.netbeans.lib.profiler.utils.StringUtils.formatUserDate(new Date(time));
+    }
+    
+    
     private SnapshotsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
         new SnapshotsContainerProvider().initialize();
+        SnapshotActionProvider.getInstance().initialize();
     }
 
 }

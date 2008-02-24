@@ -48,7 +48,7 @@ final class ApplicationSnapshotActionProvider {
     
     private final AddApplicationSnapshotAction addApplicationSnapshotAction = new AddApplicationSnapshotAction();
     private final SaveApplicationAction saveApplicationAction = new SaveApplicationAction();
-    private final SaveApplicationSnapshotAction saveApplicationSnapshotAction = new SaveApplicationSnapshotAction();
+//    private final SaveApplicationSnapshotAction saveApplicationSnapshotAction = new SaveApplicationSnapshotAction();
     private final DeleteApplicationSnapshotAction deleteApplicationSnapshotAction = new DeleteApplicationSnapshotAction();
 
 
@@ -98,18 +98,18 @@ final class ApplicationSnapshotActionProvider {
         
     }
     
-    private class SaveApplicationSnapshotAction extends AbstractAction {
-        
-        public SaveApplicationSnapshotAction() {
-            super("Save As...");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            ApplicationSnapshot snapshot = (ApplicationSnapshot)e.getSource();
-            snapshot.saveAs();
-        }
-        
-    }
+//    private class SaveApplicationSnapshotAction extends AbstractAction {
+//        
+//        public SaveApplicationSnapshotAction() {
+//            super("Save As...");
+//        }
+//        
+//        public void actionPerformed(ActionEvent e) {
+//            ApplicationSnapshot snapshot = (ApplicationSnapshot)e.getSource();
+//            snapshot.saveAs();
+//        }
+//        
+//    }
     
     private class DeleteApplicationSnapshotAction extends AbstractAction {
         
@@ -172,7 +172,7 @@ final class ApplicationSnapshotActionProvider {
         public Set<ExplorerActionDescriptor> getActions(ApplicationSnapshot snapshot) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
     
-            actions.add(new ExplorerActionDescriptor(saveApplicationSnapshotAction, 10));
+//            actions.add(new ExplorerActionDescriptor(saveApplicationSnapshotAction, 10));
             actions.add(new ExplorerActionDescriptor(deleteApplicationSnapshotAction, 20));
             
             return actions;

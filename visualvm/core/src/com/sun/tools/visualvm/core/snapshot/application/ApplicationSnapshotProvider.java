@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
@@ -112,7 +113,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
         Properties properties = new Properties();
         properties.put(ApplicationSnapshotsSupport.SNAPSHOT_VERSION, "1.0");
-        properties.put(ApplicationSnapshotsSupport.DISPLAY_NAME, applicationType.getName());
+        properties.put(ApplicationSnapshotsSupport.DISPLAY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
         File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshotsSupport.DISPLAY_ICON, "png", applicationType.getIcon());
         if (iconFile != null) properties.put(ApplicationSnapshotsSupport.DISPLAY_ICON, iconFile.getName());
         ApplicationSnapshotsSupport.storeProperties(properties, snapshotDirectory);
@@ -120,6 +121,15 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         registerDataSource(snapshot);
+    }
+    
+    private static String getDisplayNameSuffix(Application application) {
+        StringBuilder builder = new StringBuilder(" (");
+        int pid = application.getPid();
+        if (pid != Application.UNKNOWN_PID) builder.append("pid " + pid + ", ");
+        builder.append(SnapshotsSupport.getInstance().getTimeStamp(System.currentTimeMillis()));
+        builder.append(")");
+        return builder.toString();
     }
     
     void addSnapshotArchive(final File archive, final boolean deleteArchive) {

@@ -35,15 +35,11 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 class CoreDumpCategory extends SnapshotCategory<CoreDump> {
     
     private static final String NAME = "Core Dumps";
-    private static final String PREFIX = "coredump-";
-    private static final String SUFFIX = ".core";
+    private static final String PREFIX = null;
+    private static final String SUFFIX = null;
     
     public CoreDumpCategory() {
         super(NAME, CoreDump.class, PREFIX, SUFFIX, POSITION_NONE);
-    }
-    
-    public String getDisplayName(CoreDump coreDump) {
-        return coreDump.getDisplayName();
     }
 
 }

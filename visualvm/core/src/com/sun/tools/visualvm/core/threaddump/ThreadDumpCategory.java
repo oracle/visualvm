@@ -35,17 +35,11 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     
     private static final String NAME = "Thread Dumps";
-    private static final String PREFIX = "threaddump-";
+    private static final String PREFIX = "threaddump";
     private static final String SUFFIX = ".tdump";
     
     public ThreadDumpCategory() {
         super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10);
-    }
-    
-    public String getDisplayName(ThreadDump snapshot) {
-        String displayName = super.getDisplayName(snapshot);
-        if (isSnapshot(snapshot.getFile())) return "[threaddump] " + displayName;
-        else return displayName;
     }
 
 }

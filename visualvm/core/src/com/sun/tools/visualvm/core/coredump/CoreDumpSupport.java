@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.coredump;
 
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
 
 /**
@@ -40,7 +41,11 @@ public final class CoreDumpSupport {
     private static String currentJDKHome;
     
     
-    static CoreDumpCategory getCategory() {
+    public static SnapshotCategory getCategory() {
+        return category;
+    }
+    
+    static CoreDumpCategory getCoreDumpCategory() {
         return category;
     }
     

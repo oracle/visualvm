@@ -66,16 +66,16 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         }
         
         private ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
-            super(snapshot, ApplicationSnapshotsSupport.getInstance().getCategory(), NODE_ICON);
+            super(snapshot, NODE_ICON);
             
-            String name = "[snapshot] " + super.getName();
+            String name = super.getName();
             Image icon = super.getIcon();
             
             Properties properties = ApplicationSnapshotsSupport.loadProperties(snapshot.getFile());
             if (properties != null) {
                 // Load display name
                 String displayName = properties.getProperty(ApplicationSnapshotsSupport.DISPLAY_NAME);
-                if (displayName != null) name = displayName + " (" + super.getName() + ")";
+                if (displayName != null) name = displayName;
                 
                 // Load icon
                 String iconFile = properties.getProperty(ApplicationSnapshotsSupport.DISPLAY_ICON);

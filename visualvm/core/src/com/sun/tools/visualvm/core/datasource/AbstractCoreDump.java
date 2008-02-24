@@ -25,34 +25,53 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
-import com.sun.tools.visualvm.core.heapdump.HeapDumpSupport;
+import com.sun.tools.visualvm.core.coredump.CoreDumpSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
+import java.io.IOException;
+import org.openide.util.Utilities;
 
 /**
- * Abstract implementation of HeapDump.
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public abstract class AbstractHeapDump extends AbstractSnapshot implements HeapDump {
+public abstract class AbstractCoreDump extends AbstractSnapshot implements CoreDump {
     
-    /**
-     * Creates new instance of AbstractHeapDump with the data stored in a file.
-     * 
-     * @param file file where heap dump is saved.
-     */
-    public AbstractHeapDump(File file) {
-        this(file, null);
+    private final File jdkHome;
+    
+    
+    public AbstractCoreDump(File file, File jdkHome) throws IOException {
+        this(file, jdkHome, null);
     }
     
-    /**
-     * Creates new instance of AbstractHeapDump with the data stored in a file and defined master.
-     * 
-     * @param file file where heap dump is saved,
-     * @param master DataSource in whose window the heap dump will be displayed.
-     */
-    public AbstractHeapDump(File file, DataSource master) {
-        super(file, HeapDumpSupport.getInstance().getCategory(), master);
+    public AbstractCoreDump(File file, File jdkHome, DataSource master) throws IOException {
+        super(file, CoreDumpSupport.getCategory(), master);
+        
+        if (!file.exists() || !file.isFile())
+            throw new IOException("File " + file.getAbsolutePath() + " does not exist");
+        
+        if (jdkHome != null) {
+            if (!jdkHome.exists() || !jdkHome.isDirectory())
+                throw new IOException("Java Home " + jdkHome.getAbsolutePath() + " does not exist");
+            this.jdkHome = jdkHome;
+        } else {
+            this.jdkHome = new File(System.getProperty("java.home")).getCanonicalFile();
+        }
+    }
+    
+    public String getExecutable() {
+        String home = getJDKHome();
+        
+        String exec = home+File.separatorChar+"bin"+File.separatorChar+"java";
+        if (Utilities.isWindows()) {
+            exec +=".exe";
+        }
+        return exec;
+    }
+    
+    public String getJDKHome() {
+        return jdkHome.getAbsolutePath();
     }
     
     public boolean supportsSaveAs() {
@@ -60,7 +79,7 @@ public abstract class AbstractHeapDump extends AbstractSnapshot implements HeapD
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, "Save Heap Dump As");
+        SnapshotsSupport.getInstance().saveAs(this, "Save Core Dump As");
     }
 
 }

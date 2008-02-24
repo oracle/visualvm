@@ -29,11 +29,7 @@ import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Date;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileView;
 
 
 /**
@@ -43,6 +39,8 @@ import javax.swing.filechooser.FileView;
  * @author Jiri Sedlacek
  */
 public abstract class SnapshotCategory<X extends Snapshot> implements Positionable {
+    
+    private static final String PREFIX_DIVIDER = "-";
     
     /**
      * Category won't be displayed in UI.
@@ -60,8 +58,8 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * 
      * @param name name of the category,
      * @param type type of snapshots described by this category,
-     * @param prefix prefix of files containing the snapshots,
-     * @param suffix suffix of files containing the snapshots.
+     * @param prefix prefix of files containing the snapshots (can be null),
+     * @param suffix suffix of files containing the snapshots (can be null).
      */
     public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition) {
         super();
@@ -122,15 +120,30 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     protected boolean isSnapshot(String fileName) {
-        return fileName.startsWith(getPrefix()) && fileName.endsWith(getSuffix());
+        String pref = getPrefix();
+        String suff = getSuffix();
+        if (pref != null && !fileName.startsWith(pref + PREFIX_DIVIDER)) return false;
+        if (suff != null && !fileName.endsWith(suff)) return false;
+        return true;
     }
     
     protected String getBaseFileName(String fileName) {
         String pref = getPrefix();
         String suff = getSuffix();
-        if (pref != null && fileName.startsWith(pref)) fileName = fileName.substring(pref.length());
+        if (pref != null && fileName.startsWith(pref + PREFIX_DIVIDER)) fileName = fileName.substring(pref.length() + 1);
         if (suff != null && fileName.endsWith(suff)) fileName = fileName.substring(0, fileName.length() - suff.length());
         return fileName;
+    }
+    
+    protected String getTimeStamp(String fileName) {
+        String timeStamp = null;
+        
+        try {
+            long time = Long.parseLong(getBaseFileName(fileName));
+            return SnapshotsSupport.getInstance().getTimeStamp(time);
+        } catch (NumberFormatException e) {}
+        
+        return timeStamp;
     }
     
     /**
@@ -139,29 +152,12 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * @return unique name for a new snapshot.
      */
     public String createFileName() {
-        return getPrefix() + System.currentTimeMillis() + getSuffix();
-    }
-    
-    public String getDisplayName(X snapshot) {
-        String displayName = getDisplayName(snapshot.getFile());
-        if (displayName != null) return displayName;
-        else return snapshot.toString();
-    }
-    
-    private String getDisplayName(File file) {
-        if (file != null) {
-            String fileName = file.getName();
-            if (isSnapshot(file)) {
-                try {
-                    long timeStamp = Long.parseLong(getBaseFileName(fileName));
-                    return org.netbeans.lib.profiler.utils.StringUtils.formatUserDate(new Date(timeStamp));
-                } catch (NumberFormatException e) {
-                    return fileName;
-                }
-            }
-            else return fileName;
-        }
-        else return null;
+        String pref = getPrefix();
+        String suff = getSuffix();
+        String fileName = System.currentTimeMillis() + "";
+        if (pref != null) fileName = pref + PREFIX_DIVIDER + fileName;
+        if (suff != null) fileName = fileName + suff;
+        return fileName;
     }
     
     public FilenameFilter getFilenameFilter() {
@@ -178,7 +174,8 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
                 return f.isDirectory() || isSnapshot(f);
             }
             public String getDescription() {
-                return getName() + " (" + getSuffix() + ")";
+                String suff = getSuffix();
+                return getName() + (suff != null ? " (" + suff + ")" : "");
             }
         };
     }

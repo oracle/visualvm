@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
 
 
@@ -46,5 +47,35 @@ public interface Snapshot extends DataSource {
      * @return file context of this snapshot.
      */
     public File getFile();
+    
+    /**
+     * Returns category of this snapshot.
+     * 
+     * @return category of this snapshot.
+     */
+    public SnapshotCategory getCategory();
+    
+    /**
+     * Invoked when the snapshot should be saved into some location.
+     * This happens for example when saving ThreadDump to ApplicationSnapshot.
+     * 
+     * Note that saving snapshots into directories isn't currently supported,
+     * snapshot should always be saved into file/files.
+     * 
+     * @param directory directory where to save the snapshot.
+     */
+    public void save(File directory);
+    
+    /**
+     * Ivoked when Save As action has been invoked by the user.
+     */
+    public void saveAs();
+    
+    /**
+     * Returns true if the Save As... action should be available for this snapshot, false otherwise.
+     * 
+     * @return true if the Save As... action should be available for this snapshot, false otherwise.
+     */
+    public boolean supportsSaveAs();
     
 }

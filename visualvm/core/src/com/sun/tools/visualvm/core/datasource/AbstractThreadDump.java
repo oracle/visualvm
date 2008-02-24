@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.io.File;
 
 /**
@@ -50,7 +52,15 @@ public abstract class AbstractThreadDump extends AbstractSnapshot implements Thr
      * @param master DataSource in whose window the thread dump will be displayed.
      */
     public AbstractThreadDump(File file, DataSource master) {
-        super(file, master);
+        super(file, ThreadDumpSupport.getInstance().getCategory(), master);
+    }
+    
+    public boolean supportsSaveAs() {
+        return true;
+    }
+    
+    public void saveAs() {
+        SnapshotsSupport.getInstance().saveAs(this, "Save Thread Dump As");
     }
 
 }

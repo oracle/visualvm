@@ -54,7 +54,7 @@ class ThreadDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescr
         private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/threaddump.png", true);
         
         public ThreadDumpDescriptor(ThreadDump threadDump) {
-            super(threadDump, ThreadDumpSupport.getInstance().getCategory(), ICON);
+            super(threadDump, ICON);
         }
         
     }

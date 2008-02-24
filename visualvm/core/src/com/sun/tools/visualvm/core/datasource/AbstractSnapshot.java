@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -37,32 +39,40 @@ import org.openide.filesystems.FileUtil;
 public abstract class AbstractSnapshot extends AbstractDataSource implements Snapshot {
     
     private File file;
+    private final SnapshotCategory category;
     
     
     /**
      * Creates new instance of AbstractSnapshot with the data stored in a file.
      * 
-     * @param file file where snapshot is saved.
+     * @param file file where snapshot is saved,
+     * @param category category of the snapshot.
      */
-    public AbstractSnapshot(File file) {
-        this(file, null);
+    public AbstractSnapshot(File file, SnapshotCategory category) {
+        this(file, category, null);
     }
     
     /**
      * Creates new instance of AbstractSnapshot with the data stored in a file and defined master.
      * 
      * @param file file where snapshot is saved,
+     * @param category category of the snapshot,
      * @param master DataSource in whose window the snapshot will be displayed.
      */
-    public AbstractSnapshot(File file, DataSource master) {
+    public AbstractSnapshot(File file, SnapshotCategory category, DataSource master) {
         super(master);
         this.file = file;
+        this.category = category;
     }
     
 
     // NOTE: file can be null (snapshot not saved or doesn't support saving to file)
     public File getFile() {
         return file;
+    }
+    
+    public SnapshotCategory getCategory() {
+        return category;
     }
     
     /**
@@ -76,6 +86,20 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
         file = newFile;
         getChangeSupport().firePropertyChange(PROPERTY_FILE, oldFile, newFile);
     }
+    
+    public void save(File directory) {
+        File f = getFile();
+        if (f != null && f.isFile())
+            SnapshotsSupport.getInstance().copyFile(f, new File(directory, f.getName()));
+    }
+    
+    public void saveAs() {
+    }
+    
+    public boolean supportsSaveAs() {
+        return false;
+    }
+    
     
     /**
      * Deletes the file where data of this snapshot are stored.

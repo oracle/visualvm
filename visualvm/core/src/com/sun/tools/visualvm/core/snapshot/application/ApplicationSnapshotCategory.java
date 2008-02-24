@@ -35,7 +35,7 @@ import java.io.File;
 class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> {
     
     private static final String NAME = "Application Snapshots";
-    private static final String PREFIX = "application-";
+    private static final String PREFIX = "application";
     private static final String SUFFIX = ".apps";
     
     public ApplicationSnapshotCategory() {
