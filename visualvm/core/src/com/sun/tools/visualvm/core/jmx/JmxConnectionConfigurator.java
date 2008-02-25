@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.jmx;
 import com.sun.tools.visualvm.core.application.JmxApplication;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -57,7 +58,7 @@ class JmxConnectionConfigurator extends JPanel {
         JmxConnectionConfigurator hc = getDefault();
         hc.setupDefineJmxConnection();
 
-        final DialogDescriptor dd = new DialogDescriptor(hc, "Add JMX connection",
+        final DialogDescriptor dd = new DialogDescriptor(hc, "Add JMX Connection",
                 true, new Object[]{hc.okButton, DialogDescriptor.CANCEL_OPTION},
                 hc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
@@ -75,7 +76,7 @@ class JmxConnectionConfigurator extends JPanel {
         JmxConnectionConfigurator hc = getDefault();
         hc.setupRenameJmxConnection(app);
 
-        final DialogDescriptor dd = new DialogDescriptor(hc, "Rename JMX connection",
+        final DialogDescriptor dd = new DialogDescriptor(hc, "Rename JMX Connection",
                 true, new Object[]{hc.okButton, DialogDescriptor.CANCEL_OPTION},
                 hc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
@@ -145,7 +146,7 @@ class JmxConnectionConfigurator extends JPanel {
                 String displayname = getDisplayName();
                 displaynameField.setEnabled(displaynameCheckbox.isSelected());
 
-                okButton.setEnabled(displayname.length() > 0);
+                okButton.setEnabled(url.length() > 0 && displayname.length() > 0);
             }
         });
     }
@@ -155,7 +156,7 @@ class JmxConnectionConfigurator extends JPanel {
         GridBagConstraints constraints;
 
         // connectionLabel
-        connectionLabel = new JLabel("JMXServiceURL:");
+        connectionLabel = new JLabel("Connection:");
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -167,7 +168,8 @@ class JmxConnectionConfigurator extends JPanel {
 
         // connectionField
         connectionField = new JTextField();
-        connectionField.setPreferredSize(new Dimension(220, connectionField.getPreferredSize().height));
+        connectionField.setPreferredSize(
+                new Dimension(250, connectionField.getPreferredSize().height));
         connectionField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();
@@ -188,6 +190,21 @@ class JmxConnectionConfigurator extends JPanel {
         constraints.insets = new Insets(15, 5, 0, 10);
         add(connectionField, constraints);
 
+        // usageLabel
+        Font normalLabelFont = connectionLabel.getFont();
+        Font smallLabelFont =
+                normalLabelFont.deriveFont(normalLabelFont.getSize2D() - 1);
+        usageLabel = new JLabel("<html><b>Usage</b>: &lt;hostname&gt;:&lt;port&gt; OR service:jmx:&lt;protocol&gt;:&lt;sap&gt;</html>");
+        usageLabel.setFont(smallLabelFont);
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 5, 0, 10);
+        add(usageLabel, constraints);
+
         // displaynameCheckbox
         displaynameCheckbox = new JCheckBox("Display name:");
         displaynameCheckbox.addActionListener(new ActionListener() {
@@ -206,7 +223,8 @@ class JmxConnectionConfigurator extends JPanel {
 
         // displaynameField
         displaynameField = new JTextField();
-        displaynameField.setPreferredSize(new Dimension(220, displaynameField.getPreferredSize().height));
+        displaynameField.setPreferredSize(
+                new Dimension(250, displaynameField.getPreferredSize().height));
         displaynameField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();
@@ -232,6 +250,7 @@ class JmxConnectionConfigurator extends JPanel {
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 3;
+        constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.BOTH;
@@ -245,8 +264,10 @@ class JmxConnectionConfigurator extends JPanel {
         // UI tweaks
         displaynameCheckbox.setBorder(connectionLabel.getBorder());
     }
+
     private JLabel connectionLabel;
     private JTextField connectionField;
+    private JLabel usageLabel;
     private JCheckBox displaynameCheckbox;
     private JTextField displaynameField;
     private JButton okButton;
