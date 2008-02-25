@@ -57,6 +57,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LiveResultsWindow;
@@ -287,6 +288,7 @@ class ApplicationProfilerView extends DataSourceView {
         private void initSettings() {
           // Profiling settings defaults
           cpuSettings = ProfilingSettingsPresets.createCPUPreset();
+          cpuSettings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
           memorySettings = ProfilingSettingsPresets.createMemoryPreset();
 
           // Attach settings default
