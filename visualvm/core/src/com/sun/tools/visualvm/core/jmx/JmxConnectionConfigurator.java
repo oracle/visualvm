@@ -54,7 +54,7 @@ class JmxConnectionConfigurator extends JPanel {
 
     private boolean internalChange = false;
 
-    public static JmxConnectionConfigurator defineJmxConnection() {
+    public static JmxConnectionConfigurator addJmxConnection() {
         JmxConnectionConfigurator hc = getDefault();
         hc.setupDefineJmxConnection();
 

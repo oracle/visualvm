@@ -27,9 +27,11 @@ package com.sun.tools.visualvm.core.jmx;
 
 import com.sun.tools.visualvm.core.application.JmxApplication;
 import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
+import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.core.host.RemoteHostsContainer;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +50,9 @@ class JmxConnectionActionsProvider {
 
     static void initialize() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
-        explorer.addExplorerActionsProvider(new JmxConnectionActionProvider(), JmxApplication.class);
+        explorer.addExplorerActionsProvider(new HostActionProvider(), Host.class);
+        explorer.addExplorerActionsProvider(new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
+        explorer.addExplorerActionsProvider(new JmxApplicationActionProvider(), JmxApplication.class);
         explorer.addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
 
@@ -59,9 +63,9 @@ class JmxConnectionActionsProvider {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JmxConnectionConfigurator newJmxConnectionConfiguration =
-                    JmxConnectionConfigurator.defineJmxConnection();
-            if (newJmxConnectionConfiguration != null) {
+            JmxConnectionConfigurator addJmxConnectionConfiguration =
+                    JmxConnectionConfigurator.addJmxConnection();
+            if (addJmxConnectionConfiguration != null) {
                 // TODO: Not implemented yet
             }
         }
@@ -74,12 +78,41 @@ class JmxConnectionActionsProvider {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JmxApplication app = (JmxApplication)e.getSource();
+            JmxApplication app = (JmxApplication) e.getSource();
             // TODO: Not implemented yet
         }
     }
 
-    private static class JmxConnectionActionProvider
+    private static class HostActionProvider implements ExplorerActionsProvider<Host> {
+        
+        public ExplorerActionDescriptor getDefaultAction(Host host) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(Host host) {
+            Set<ExplorerActionDescriptor> actions =
+                    new HashSet<ExplorerActionDescriptor>();
+            actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 110));
+            return actions;
+        }
+    }
+    
+    private static class RemoteHostsContainerActionProvider
+            implements ExplorerActionsProvider<RemoteHostsContainer> {
+
+        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
+            Set<ExplorerActionDescriptor> actions =
+                    new HashSet<ExplorerActionDescriptor>();
+            actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 30));
+            return actions;
+        }        
+    }
+
+    private static class JmxApplicationActionProvider
             implements ExplorerActionsProvider<JmxApplication> {
 
         public ExplorerActionDescriptor getDefaultAction(JmxApplication app) {
@@ -89,8 +122,7 @@ class JmxConnectionActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(JmxApplication app) {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
-            actions.add(new ExplorerActionDescriptor(null, 30));
-            actions.add(new ExplorerActionDescriptor(removeJmxConnectionAction, 100));            
+            actions.add(new ExplorerActionDescriptor(removeJmxConnectionAction, 100));
             return actions;
         }
     }
