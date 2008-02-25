@@ -50,24 +50,8 @@ class SnapshotsContainerDescriptorProvider extends AbstractModelProvider<DataSou
     private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
         
-        public Image getIcon() {
-            return NODE_ICON;
-        }
-        
-        public String getName() {
-            return "Snapshots";
-        }
-        
-        public String getDescription() {
-            return null;
-        }
-        
-        public int getPreferredPosition() {
-            return 30;
-        }
-        
-        public int getAutoExpansionPolicy() {
-            return EXPAND_NEVER;
+        SnapshotsContainerDescriptor() {
+            super(SnapshotsContainer.sharedInstance(), "Snapshots", null, NODE_ICON, 30, EXPAND_NEVER);
         }
         
     }

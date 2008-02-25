@@ -29,10 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import java.awt.Image;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Properties;
 import org.openide.util.Utilities;
@@ -47,29 +44,21 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (SnapshotsContainer.sharedInstance().equals(ds)) {
-            return new SnapshotsContainerDescriptor();
-        }
         if (ds instanceof ApplicationSnapshot) {
             return ApplicationSnapshotDescriptor.newInstance((ApplicationSnapshot)ds);
         }
         return null;
     }
     
-    private static class ApplicationSnapshotDescriptor extends AbstractSnapshotDescriptor implements PropertyChangeListener {
+    private static class ApplicationSnapshotDescriptor extends AbstractSnapshotDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);
         private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
         
         static ApplicationSnapshotDescriptor newInstance(ApplicationSnapshot snapshot) {
             ApplicationSnapshotDescriptor desc = new ApplicationSnapshotDescriptor(snapshot);
-            return desc; 
-        }
-        
-        private ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
-            super(snapshot, NODE_ICON);
             
-            String name = super.getName();
-            Image icon = super.getIcon();
+            String name = desc.getName();
+            Image icon = desc.getIcon();
             
             Properties properties = ApplicationSnapshotsSupport.loadProperties(snapshot.getFile());
             if (properties != null) {
@@ -85,37 +74,18 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
                 }
             }
             
-            setName(name);
-            setIcon(Utilities.mergeImages(icon, NODE_BADGE, 0, 0));
-        }
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            setName((String)evt.getNewValue());
+            desc.setName(name);
+            desc.setIcon(Utilities.mergeImages(icon, NODE_BADGE, 0, 0));
+            
+            return desc; 
         }
         
-    }
-    
-    private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
-        
-        public Image getIcon() {
-            return NODE_ICON;
+        private ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
+            super(snapshot, NODE_ICON);
         }
         
-        public String getName() {
-            return "Snapshots";
-        }
-        
-        public String getDescription() {
-            return null;
-        }
-        
-        public int getPreferredPosition() {
-            return 30;
-        }
-        
-        public int getAutoExpansionPolicy() {
-            return EXPAND_NEVER;
+        protected boolean supportsRename() {
+            return true;
         }
         
     }

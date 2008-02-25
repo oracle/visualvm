@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.core.model.dsdescr;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
-import java.awt.Image;
 
 /**
  *
@@ -45,6 +44,7 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
         if (dsDescFactory == null) {
             dsDescFactory = new DataSourceDescriptorFactory();
             dsDescFactory.registerFactory(dsDescFactory);
+            DataSourceDescriptorActionProvider.getInstance().initialize();
         }
         return dsDescFactory;
     }
@@ -59,22 +59,8 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
     
     private static class DefaultDataSourceDescriptor extends DataSourceDescriptor {
         
-        private final String name;
-        
         DefaultDataSourceDescriptor(DataSource ds) {
-            name = ds.toString();
-        }
-        
-        public Image getIcon() {
-            return null;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public String getDescription() {
-            return null;
+            super(ds);
         }
                 
     }

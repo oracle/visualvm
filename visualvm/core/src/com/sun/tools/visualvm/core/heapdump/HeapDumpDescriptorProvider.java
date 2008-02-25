@@ -57,6 +57,10 @@ class HeapDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
             super(heapDump, ICON);
         }
         
+        protected boolean supportsRename() {
+            return true;
+        }
+        
     }
 
 }

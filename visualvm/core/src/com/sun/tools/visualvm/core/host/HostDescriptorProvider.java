@@ -29,10 +29,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.model.dsdescr.MutableDataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.awt.Image;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import org.openide.util.Utilities;
 
 /**
@@ -58,12 +56,11 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
         return null;
     }
     
-    private static class HostDescriptor extends MutableDataSourceDescriptor implements PropertyChangeListener {
+    private static class HostDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHost.png", true);
         
         static HostDescriptor newInstance(Host host) {
             HostDescriptor desc = new HostDescriptor(host);
-            host.addPropertyChangeListener(Host.PROPERTY_DISPLAYNAME,desc);
             desc.setName(host.getDisplayName());
             return desc; 
         }
@@ -72,8 +69,8 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
             super(host,host.getDisplayName(),null,NODE_ICON,POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
         }
 
-        public void propertyChange(PropertyChangeEvent evt) {
-            setName((String)evt.getNewValue());
+        protected boolean supportsRename() {
+            return true;
         }
         
     }
@@ -82,22 +79,7 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/localHost.png", true);
 
         LocalHostDescriptor() {
-        }
-        
-        public String getName() {
-            return Host.LOCALHOST.getDisplayName();
-        }
-        
-        public Image getIcon() {
-            return NODE_ICON;
-        }
-        
-        public int getPreferredPosition() {
-            return 0;
-        }
-
-        public String getDescription() {
-            return null;
+            super(Host.LOCALHOST, "Local", null, NODE_ICON, 0, EXPAND_ON_FIRST_CHILD);
         }
         
     }
@@ -105,24 +87,8 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
     private static class HostsContainerDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHosts.png", true);
         
-        public Image getIcon() {
-            return NODE_ICON;
-        }
-        
-        public String getName() {
-            return "Remote";
-        }
-        
-        public String getDescription() {
-            return null;
-        }
-        
-        public int getPreferredPosition() {
-            return 10;
-        }
-        
-        public int getAutoExpansionPolicy() {
-            return EXPAND_ON_EACH_NEW_CHILD;
+        HostsContainerDescriptor() {
+            super(RemoteHostsContainer.sharedInstance(), "Remote", null, NODE_ICON, 10, EXPAND_ON_EACH_NEW_CHILD);
         }
         
     }

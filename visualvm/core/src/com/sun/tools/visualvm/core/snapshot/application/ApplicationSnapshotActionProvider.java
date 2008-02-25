@@ -173,7 +173,7 @@ final class ApplicationSnapshotActionProvider {
             Set<ExplorerActionDescriptor> actions = new HashSet();
     
 //            actions.add(new ExplorerActionDescriptor(saveApplicationSnapshotAction, 10));
-            actions.add(new ExplorerActionDescriptor(deleteApplicationSnapshotAction, 20));
+            actions.add(new ExplorerActionDescriptor(deleteApplicationSnapshotAction, 100));
             
             return actions;
         }

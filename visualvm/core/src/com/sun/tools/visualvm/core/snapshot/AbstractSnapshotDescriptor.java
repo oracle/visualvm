@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.Snapshot;
-import com.sun.tools.visualvm.core.model.dsdescr.MutableDataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.awt.Image;
 import java.io.File;
 
@@ -34,7 +34,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends MutableDataSourceDescriptor {
+public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends DataSourceDescriptor {
     
     
     public AbstractSnapshotDescriptor(X snapshot, Image icon) {

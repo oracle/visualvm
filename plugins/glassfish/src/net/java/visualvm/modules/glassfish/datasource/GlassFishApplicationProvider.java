@@ -38,7 +38,6 @@ import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerExpansionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.model.dsdescr.MutableDataSourceDescriptor;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
@@ -65,7 +64,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
 
         @Override
         public DataSourceDescriptor getDescriptor() {
-            return new MutableDataSourceDescriptor(this) {
+            return new DataSourceDescriptor(this) {
                 @Override
                 public int getAutoExpansionPolicy() {
                     return EXPAND_NEVER;

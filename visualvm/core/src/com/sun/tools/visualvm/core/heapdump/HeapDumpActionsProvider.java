@@ -132,7 +132,7 @@ class HeapDumpActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(HeapDumpImpl heapDump) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            actions.add(new ExplorerActionDescriptor(deleteHeapDumpAction, 10));
+            actions.add(new ExplorerActionDescriptor(deleteHeapDumpAction, 100));
             
             return actions;
         }

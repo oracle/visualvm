@@ -132,7 +132,7 @@ class ThreadDumpActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(ThreadDumpImpl threadDump) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            actions.add(new ExplorerActionDescriptor(deleteThreadDumpAction, 10));
+            actions.add(new ExplorerActionDescriptor(deleteThreadDumpAction, 100));
             
             return actions;
         }

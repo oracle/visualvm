@@ -31,8 +31,6 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
 import java.awt.Image;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import org.openide.util.Utilities;
 
 /**
@@ -54,13 +52,12 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
         return null;
     }
     
-    private static class CoreDumpDescriptor extends AbstractSnapshotDescriptor<CoreDump> implements PropertyChangeListener {
+    private static class CoreDumpDescriptor extends AbstractSnapshotDescriptor<CoreDump> {
         
         private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredump.png", true);
         
         static CoreDumpDescriptor newInstance(CoreDump coreDump) {
             CoreDumpDescriptor desc = new CoreDumpDescriptor(coreDump);
-            coreDump.addPropertyChangeListener(CoreDump.PROPERTY_DISPLAYNAME,desc);
             desc.setName(coreDump.getDisplayName());
             return desc; 
         }
@@ -69,8 +66,8 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
             super(coreDump, ICON);
         }
         
-        public void propertyChange(PropertyChangeEvent evt) {
-            setName((String) evt.getNewValue());
+        protected boolean supportsRename() {
+            return true;
         }
         
     }
@@ -78,20 +75,8 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
     private static class CoreDumpsContainerDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredumps.png", true);
         
-        public Image getIcon() {
-            return NODE_ICON;
-        }
-        
-        public String getName() {
-            return "VM Coredumps";
-        }
-        
-        public String getDescription() {
-            return null;
-        }
-        
-        public int getPreferredPosition() {
-            return 20;
+        CoreDumpsContainerDescriptor() {
+            super(CoreDumpsContainer.sharedInstance(), "VM Coredumps", null, NODE_ICON, 20, EXPAND_ON_EACH_NEW_CHILD);
         }
         
     }

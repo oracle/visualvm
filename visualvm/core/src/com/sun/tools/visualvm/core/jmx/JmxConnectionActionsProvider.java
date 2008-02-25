@@ -43,6 +43,8 @@ class JmxConnectionActionsProvider {
 
     private static final AddJmxConnectionAction addJmxConnectionAction =
             new AddJmxConnectionAction();
+    private static final RemoveJmxConnectionAction removeJmxConnectionAction =
+            new RemoveJmxConnectionAction();
 
     static void initialize() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
@@ -65,24 +67,14 @@ class JmxConnectionActionsProvider {
         }
     }
 
-    private static class RenameJmxConnectionAction extends AbstractAction {
-
-        public RenameJmxConnectionAction(JmxApplication app) {
-            super("Rename...");
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            // Not implemented yet
-        }
-    }
-
     private static class RemoveJmxConnectionAction extends AbstractAction {
 
-        public RemoveJmxConnectionAction(JmxApplication app) {
+        public RemoveJmxConnectionAction() {
             super("Remove");
         }
 
         public void actionPerformed(ActionEvent e) {
+            JmxApplication app = (JmxApplication)e.getSource();
             // TODO: Not implemented yet
         }
     }
@@ -98,8 +90,7 @@ class JmxConnectionActionsProvider {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
             actions.add(new ExplorerActionDescriptor(null, 30));
-            actions.add(new ExplorerActionDescriptor(new RenameJmxConnectionAction(app), 40));
-            actions.add(new ExplorerActionDescriptor(new RemoveJmxConnectionAction(app), 50));            
+            actions.add(new ExplorerActionDescriptor(removeJmxConnectionAction, 100));            
             return actions;
         }
     }

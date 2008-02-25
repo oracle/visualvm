@@ -1,23 +1,23 @@
 /*
  *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
+ * 
  *  This code is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License version 2 only, as
  *  published by the Free Software Foundation.  Sun designates this
  *  particular file as subject to the "Classpath" exception as provided
  *  by Sun in the LICENSE file that accompanied this code.
- *
+ * 
  *  This code is distributed in the hope that it will be useful, but WITHOUT
  *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  version 2 for more details (a copy is included in the LICENSE file that
  *  accompanied this code).
- *
+ * 
  *  You should have received a copy of the GNU General Public License version
  *  2 along with this work; if not, write to the Free Software Foundation,
  *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
+ * 
  *  Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
@@ -25,11 +25,12 @@
 
 package com.sun.tools.visualvm.core.model.dsdescr;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
-
+import java.beans.PropertyChangeSupport;
 
 /**
  *
@@ -58,77 +59,109 @@ public abstract class DataSourceDescriptor extends Model implements Positionable
     
     public static final int EXPAND_ON_EACH_CHILD_CHANGE = 4;
     
-    public abstract Image getIcon();
+    private Image icon;
+    private String name;
+    private String description;
+    private int preferredPosition;
+    private int autoExpansionPolicy;
+    private final PropertyChangeSupport changeSupport;
     
-    public abstract String getName();
     
-    public abstract String getDescription();
+    public DataSourceDescriptor() {
+        this(null);
+    }
     
+    public DataSourceDescriptor(DataSource dataSource) {
+        this(dataSource, dataSource != null ? dataSource.toString() : null, null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+    }
+    
+    public DataSourceDescriptor(DataSource dataSource, String n, String desc, Image ic, int pos, int aep) {   
+        changeSupport = dataSource != null ? new PropertyChangeSupport(dataSource) : null;
+        name = n;
+        description = desc;
+        icon = ic;
+        preferredPosition = pos;
+        autoExpansionPolicy = aep;
+    }
+    
+
+    public Image getIcon() {
+        return icon;
+    }
+
+    public String getName() {
+        return name;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+
     public int getPreferredPosition() {
-        return POSITION_AT_THE_END;
+        return preferredPosition;
     }
     
     public int getAutoExpansionPolicy() {
-        return EXPAND_ON_FIRST_CHILD;
+        return autoExpansionPolicy;
     }
     
-    /**
-     * Add a PropertyChangeListener to the listener list.
-     * The listener is registered for all properties.
-     * The same listener object may be added more than once, and will be called
-     * as many times as it is added.
-     * If <code>listener</code> is null, no exception is thrown and no action
-     * is taken.
-     *
-     * @param listener  The PropertyChangeListener to be added
-     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(listener);
     }
-    
-    /**
-     * Add a PropertyChangeListener for a specific property.  The listener
-     * will be invoked only when a call on firePropertyChange names that
-     * specific property.
-     * The same listener object may be added more than once.  For each
-     * property,  the listener will be invoked the number of times it was added
-     * for that property.
-     * If <code>propertyName</code> or <code>listener</code> is null, no
-     * exception is thrown and no action is taken.
-     *
-     * @param propertyName  The name of the property to listen on.
-     * @param listener  The PropertyChangeListener to be added
-     */
+
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(propertyName, listener);
     }
-    
-    
-    /**
-     * Remove a PropertyChangeListener from the listener list.
-     * This removes a PropertyChangeListener that was registered
-     * for all properties.
-     * If <code>listener</code> was added more than once to the same event
-     * source, it will be notified one less time after being removed.
-     * If <code>listener</code> is null, or was never added, no exception is
-     * thrown and no action is taken.
-     *
-     * @param listener  The PropertyChangeListener to be removed
-     */
+
     public void removePropertyChangeListener(PropertyChangeListener listener) {
+        if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(propertyName, listener);
     }
     
-    /**
-     * Remove a PropertyChangeListener for a specific property.
-     * If <code>listener</code> was added more than once to the same event
-     * source for the specified property, it will be notified one less time
-     * after being removed.
-     * If <code>propertyName</code> is null,  no exception is thrown and no
-     * action is taken.
-     * If <code>listener</code> is null, or was never added for the specified
-     * property, no exception is thrown and no action is taken.
-     *
-     * @param propertyName  The name of the property that was listened on.
-     * @param listener  The PropertyChangeListener to be removed
-     */
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    
+    protected boolean supportsRename() {
+        return false;
     }
+    
+    protected void setName(String newName) {
+        if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor");
+        if (newName == null) throw new IllegalArgumentException("Name cannot be null");
+        String oldName = name;
+        name = newName;
+        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
+    }
+    
+    protected void setDescription(String newDescription) {
+        if (description == null && newDescription == null) return;
+        String oldDescription = description;
+        description = newDescription;
+        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, newDescription);
+    }
+    
+    protected void setIcon(Image newIcon) {
+        if (icon == null && newIcon == null) return;
+        Image oldIcon = icon;
+        icon = newIcon;
+        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_ICON, oldIcon, newIcon);
+    }
+    
+    protected void setPreferredPosition(int newPosition) {
+        int oldPosition = preferredPosition;
+        preferredPosition = newPosition;
+        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
+    }
+    
+    protected void getAutoExpansionPolicy(int newPolicy) {
+        int oldPolicy = autoExpansionPolicy;
+        autoExpansionPolicy = newPolicy;
+        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, newPolicy);
+    }
+    
+    protected PropertyChangeSupport getChangeSupport() {
+        return changeSupport;
+    }
+
 }
