@@ -48,19 +48,21 @@ public class JRockitFactory extends AbstractModelProvider<JVM,Application> {
             MonitoredVm vm = null;
             try {
                 vm = JVMFactory.getMonitoredVm(app);
-                StringMonitor name = (StringMonitor) vm.findByName("java.property.java.vm.name");   // NOI18N
-                
-                if (name != null && "BEA JRockit(R)".equals(name.stringValue())) {  // NOI18N
-                    JRockitVM jvm;
-                    StringMonitor vmVersion = (StringMonitor) vm.findByName("java.property.java.vm.version"); // NOI18N
-                    
-                    if (vmVersion != null && vmVersion.stringValue().contains("1.6.0")) {
-                        jvm = new JRockitVM_6(app,vm);
-                    } else {
-                        jvm = new JRockitVM(app,vm);
+                if (vm != null) {
+                    StringMonitor name = (StringMonitor) vm.findByName("java.property.java.vm.name");   // NOI18N
+
+                    if (name != null && "BEA JRockit(R)".equals(name.stringValue())) {  // NOI18N
+                        JRockitVM jvm;
+                        StringMonitor vmVersion = (StringMonitor) vm.findByName("java.property.java.vm.version"); // NOI18N
+
+                        if (vmVersion != null && vmVersion.stringValue().contains("1.6.0")) {
+                            jvm = new JRockitVM_6(app,vm);
+                        } else {
+                            jvm = new JRockitVM(app,vm);
+                        }
+                        app.notifyWhenFinished(jvm);
+                        return jvm;
                     }
-                    app.notifyWhenFinished(jvm);
-                    return jvm;
                 }
             } catch (MonitorException ex) {
                 ex.printStackTrace();
