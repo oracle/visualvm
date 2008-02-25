@@ -37,7 +37,7 @@ import java.util.Properties;
 class DefaultJVM extends JVM {
 
 
-  DefaultJVM(Application app) {
+  DefaultJVM() {
 
   }
 

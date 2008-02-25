@@ -130,6 +130,6 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
                 vm.detach();
             }
         }
-        return new DefaultJVM(app);
+        return new DefaultJVM();
     }
 }

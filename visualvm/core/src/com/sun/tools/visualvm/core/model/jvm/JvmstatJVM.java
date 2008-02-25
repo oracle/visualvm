@@ -74,7 +74,6 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
     private Map<String,String> valueCache;
     
     JvmstatJVM(JvmstatApplication app,MonitoredVm vm) {
-        super(app);
         application = app;
         monitoredVm = vm;
         valueCache = new HashMap();
