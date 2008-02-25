@@ -41,7 +41,7 @@ import org.openide.ErrorManager;
  *
  * @author Tomas Hurka
  */
-public class SAAgentFactory extends ModelFactory<SAAgent,DataSource> implements ModelProvider<SAAgent,DataSource> {
+public final class SAAgentFactory extends ModelFactory<SAAgent,DataSource> implements ModelProvider<SAAgent,DataSource> {
     private static final String SA_JAR = "lib/sa-jdi.jar";
 
     private static SAAgentFactory saAgentFactory;
