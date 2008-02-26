@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.SwingUtilities;
+import org.openide.ErrorManager;
 
 /**
  * Class responsible for creating UIs (windows, TopComponents) for DataSources.
@@ -119,7 +120,9 @@ public final class DataSourceWindowFactory {
                     window.setIcon(descriptor.getIcon());
                 }
             });
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,e);
+        }
 
         // Blocking notification that the view has been added
         for (DataSourceView view : views) view.added();
