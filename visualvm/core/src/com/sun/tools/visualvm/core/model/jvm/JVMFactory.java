@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.model.jvm;
 
-import com.sun.tools.visualvm.core.application.JmxApplication;
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.host.MonitoredHostDS;
 import com.sun.tools.visualvm.core.model.ModelFactory;
@@ -43,7 +42,6 @@ import sun.jvmstat.monitor.VmIdentifier;
  * {@link JVM} representation  for the {@link Application}.
  * 
  * @author Tomas Hurka
- * @author Luis-Miguel Alventosa
  */
 public final class JVMFactory extends ModelFactory<JVM,Application> implements ModelProvider<JVM,Application> {
 
@@ -61,6 +59,7 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
             jvmFactory = new JVMFactory();
             jvmFactory.registerFactory(jvmFactory);
             jvmFactory.registerFactory(new JRockitFactory());
+            jvmFactory.registerFactory(new JmxFactory());
         }
         return jvmFactory;
     }
@@ -92,47 +91,43 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
     /**
      * Default {@link ModelProvider} implementation, which creates 
      * dummy {@link JVM} instances. If you want to extend JVMFactory use 
-     * {@link JVMFactory.registerFactory()} to register the new instances
+     * {@link JVMFactory#registerFactory()} to register the new instances
      * of {@link ModelProvider} for the different types of {@link Application}.
      * @param app application
      * @return dummy instance of {@link JVM}
      */
     public JVM createModelFor(Application app) {
-        if (app instanceof JvmstatApplication) {
-            JvmstatApplication appl = (JvmstatApplication) app;
-            MonitoredVm vm = null;
-            try {
-                vm = getMonitoredVm(appl);
-                if (vm != null) {
-                    String vmVersion = MonitoredVmUtil.vmVersion(vm);
-                    if (vmVersion != null) {
-                        SunJVM_4 jvm = null;
-                        // Check for Sun VM (and maybe other?)
-                        if (vmVersion.startsWith("1.4.")) jvm = new SunJVM_4(appl,vm); // NOI18N
+        JvmstatApplication appl = (JvmstatApplication) app;
+        MonitoredVm vm = null;
+        try {
+            vm = getMonitoredVm(appl);
+            if (vm != null) {
+                String vmVersion = MonitoredVmUtil.vmVersion(vm);
+                if (vmVersion != null) {
+                    SunJVM_4 jvm = null;
+                    // Check for Sun VM (and maybe other?)
+                    if (vmVersion.startsWith("1.4.")) jvm = new SunJVM_4(appl,vm); // NOI18N
 
-                        else if (vmVersion.startsWith("1.5.")) jvm = new SunJVM_5(appl,vm); // NOI18N
+                    else if (vmVersion.startsWith("1.5.")) jvm = new SunJVM_5(appl,vm); // NOI18N
 
-                        else if (vmVersion.startsWith("1.6.")) jvm = new SunJVM_6(appl,vm); // NOI18N
-                        else if (vmVersion.startsWith("10.0")) jvm = new SunJVM_6(appl,vm); // NOI18N // Sun HotSpot Express
+                    else if (vmVersion.startsWith("1.6.")) jvm = new SunJVM_6(appl,vm); // NOI18N
+                    else if (vmVersion.startsWith("10.0")) jvm = new SunJVM_6(appl,vm); // NOI18N // Sun HotSpot Express
 
-                        else if (vmVersion.startsWith("1.7.")) jvm = new SunJVM_7(appl,vm); // NOI18N
-                        else if (vmVersion.startsWith("11.0")) jvm = new SunJVM_7(appl,vm); // NOI18N
-                        else if (vmVersion.startsWith("12.0")) jvm = new SunJVM_7(appl,vm); // NOI18N // Sun HotSpot Express
+                    else if (vmVersion.startsWith("1.7.")) jvm = new SunJVM_7(appl,vm); // NOI18N
+                    else if (vmVersion.startsWith("11.0")) jvm = new SunJVM_7(appl,vm); // NOI18N
+                    else if (vmVersion.startsWith("12.0")) jvm = new SunJVM_7(appl,vm); // NOI18N // Sun HotSpot Express
 
-                        if (jvm != null) {
-                            appl.notifyWhenFinished(jvm);
-                            return jvm;
-                        }
+                    if (jvm != null) {
+                        appl.notifyWhenFinished(jvm);
+                        return jvm;
                     }
                 }
-            } catch (MonitorException ex) {
-                ex.printStackTrace();
             }
-            if (vm != null) {
-                vm.detach();
-            }
-        } else if (app instanceof JmxApplication) {
-            new JmxJVM();
+        } catch (MonitorException ex) {
+            ex.printStackTrace();
+        }
+        if (vm != null) {
+            vm.detach();
         }
         return new DefaultJVM();
     }

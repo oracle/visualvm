@@ -25,137 +25,164 @@
 
 package com.sun.tools.visualvm.core.model.jvm;
 
+import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
  *
- * @author Luis-Miguel Alventosa
+ * @author Tomas Hurka
  */
-class JmxJVM extends JVM {
-
-    JmxJVM() {
-
+class JmxJVM extends DefaultJVM {
+    JvmJmxModel jmxModel;
+    Properties systemProperties;
+    String jvmArgs;
+    
+    JmxJVM(JvmJmxModel model) {
+        jmxModel = model;
     }
-
+    
     public boolean is14() {
-        return false;
+        return getVmVersion().startsWith("1.4.");
     }
-
+    
     public boolean is15() {
-        return false;
+        return getVmVersion().startsWith("1.5.");
     }
-
+    
     public boolean is16() {
-        return false;
+        return getVmVersion().startsWith("1.6.");
     }
-
+    
     public boolean is17() {
-        return false;
+        return getVmVersion().startsWith("1.7.");
     }
-
+    
     public boolean isAttachable() {
         return false;
     }
-
+    
     public String getCommandLine() {
-        return "";
+        return "Unknown";
     }
-
-    public String getJvmArgs() {
-        return "";
+    
+    public synchronized String getJvmArgs() {
+        if (jvmArgs == null) {
+            StringBuilder buf = new StringBuilder();
+            List<String> args = jmxModel.getRuntimeMXBean().getInputArguments();
+            for (String arg : args) {
+                buf.append(arg).append(' ');
+            }
+            jvmArgs = buf.toString();
+        }
+        return jvmArgs;
     }
-
+    
     public String getJvmFlags() {
-        return "";
+        return null;
     }
-
+    
     public String getMainArgs() {
-        return "";
+        return null;
     }
-
+    
     public String getMainClass() {
-        return "";
+        return null;
     }
-
+    
     public String getVmVersion() {
-        return "";
+        return findByName("java.vm.version");
     }
-
+    
     public String getJavaHome() {
-        return "";
+        return findByName("java.home");
     }
-
+    
     public String getVMInfo() {
-        return "";
+        return findByName("java.vm.info");
     }
-
+    
     public String getVMName() {
-        return "";
+        return findByName("java.vm.name");
     }
-
-    public Properties getSystemProperties() {
-        throw new UnsupportedOperationException();
+    
+    public synchronized Properties getSystemProperties() {
+        if (systemProperties == null) {
+            Map propMap = jmxModel.getRuntimeMXBean().getSystemProperties();
+            systemProperties = new Properties();
+            systemProperties.putAll(propMap);
+        }
+        return systemProperties;
     }
-
+    
     public synchronized void addMonitoredDataListener(MonitoredDataListener l) {
         throw new UnsupportedOperationException();
     }
-
+    
     public synchronized void removeMonitoredDataListener(MonitoredDataListener l) {
         throw new UnsupportedOperationException();
     }
-
+    
     public boolean isDumpOnOOMEnabled() {
-        throw new UnsupportedOperationException();
+        return false;
     }
-
+    
     public void setDumpOnOOMEnabled(boolean enabled) {
         throw new UnsupportedOperationException();
     }
-
+    
     public File takeHeapDump() throws IOException {
         throw new UnsupportedOperationException();
     }
-
+    
     public File takeThreadDump() throws IOException {
         throw new UnsupportedOperationException();
     }
-
+    
     public boolean isBasicInfoSupported() {
-        return false;
+        return true;
     }
-
+    
     public boolean isMonitoringSupported() {
         return isClassMonitoringSupported() || isThreadMonitoringSupported() || isMemoryMonitoringSupported();
     }
-
+    
     public boolean isClassMonitoringSupported() {
         return false;
     }
-
+    
     public boolean isThreadMonitoringSupported() {
         return false;
     }
-
+    
     public boolean isMemoryMonitoringSupported() {
         return false;
     }
-
+    
     public boolean isGetSystemPropertiesSupported() {
-        return false;
+        return true;
     }
-
+    
     public boolean isDumpOnOOMEnabledSupported() {
         return false;
     }
-
+    
     public boolean isTakeHeapDumpSupported() {
         return false;
     }
-
+    
     public boolean isTakeThreadDumpSupported() {
         return false;
     }
+    
+    private String findByName(String key) {
+        Properties p = getSystemProperties();
+        if (p == null)
+            return null;
+        return p.getProperty(key);
+    }
+    
 }
