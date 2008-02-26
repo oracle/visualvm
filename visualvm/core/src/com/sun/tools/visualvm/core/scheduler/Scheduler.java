@@ -246,8 +246,16 @@ public class Scheduler implements PropertyChangeListener {
         }
     }
 
-    private void reschedule(DefaultScheduledTask task, Quantum oldInterval, Quantum newInterval) {
+    private void reschedule(final DefaultScheduledTask task, Quantum oldInterval, Quantum newInterval) {
         remove(task, oldInterval);
+        // when rescehduling from suspended state execute the task out of order
+        if (oldInterval.equals(Quantum.SUSPENDED)) {
+            intermediateTaskService.submit(new Runnable() {
+                public void run() {
+                    task.onSchedule(System.currentTimeMillis());
+                }
+            });
+        }
         add(task, newInterval);
     }
 }
