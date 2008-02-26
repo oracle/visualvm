@@ -34,16 +34,14 @@ import org.openide.util.Utilities;
  */
 public class JavaPluginApplicationType extends ApplicationType {
 
-    private int pid;
     private String version;
 
-    public JavaPluginApplicationType(int pid, String version) {
-        this.pid = pid;
+    public JavaPluginApplicationType(String version) {
         this.version = version;
     }
 
     public String getName() {
-        return "Java Plug-in " + version + ")";
+        return "Java Plug-in " + version;
     }
 
     public String getVersion() {

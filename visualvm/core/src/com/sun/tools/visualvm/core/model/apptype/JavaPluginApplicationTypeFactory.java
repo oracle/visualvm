@@ -57,7 +57,7 @@ public class JavaPluginApplicationTypeFactory
                     } else {
                         version = args.substring(version_index);
                     }
-                    return new JavaPluginApplicationType(app.getPid(), version);
+                    return new JavaPluginApplicationType(version);
                 }
             }
         }

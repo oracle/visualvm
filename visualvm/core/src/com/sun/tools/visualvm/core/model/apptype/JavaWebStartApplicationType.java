@@ -34,11 +34,9 @@ import org.openide.util.Utilities;
  */
 public class JavaWebStartApplicationType extends ApplicationType {
 
-    private int pid;
     private String version;
 
-    public JavaWebStartApplicationType(int pid, String version) {
-        this.pid = pid;
+    public JavaWebStartApplicationType(String version) {
         this.version = version;
     }
 

@@ -49,7 +49,7 @@ public class JavaWebStartApplicationTypeFactory
                 String args = jvm.getJvmArgs();
                 int jws_index = args.indexOf(JWS);
                 if (jws_index != -1) {
-                    return new JavaWebStartApplicationType(app.getPid(), "");
+                    return new JavaWebStartApplicationType("");
                 }
             }
         }
