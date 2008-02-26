@@ -234,11 +234,9 @@ public class JmxModel extends Model {
             JMXServiceURL url = app.getJMXServiceURL();
             ProxyClient proxyClient =
                     new ProxyClient(this, url.toString(), username, password);
-            if (proxyClient != null) {
-                client = proxyClient;
-                proxyClient.connect();
-                // TODO: try-catch: if security exception show popup connection dialog
-            }
+            client = proxyClient;
+            proxyClient.connect();
+            // TODO: try-catch: if security exception show popup connection dialog
         } catch (Exception e) {
             client = null;
             e.printStackTrace();
