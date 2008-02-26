@@ -1,8 +1,4 @@
 /*
- * Model.java
- *
- * Created on December 18, 2007, 6:13 PM
- *
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
