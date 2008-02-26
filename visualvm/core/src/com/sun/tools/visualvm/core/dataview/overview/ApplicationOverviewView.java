@@ -61,7 +61,7 @@ class ApplicationOverviewView extends DataSourceView {
     protected void willBeAdded() {
         JVMFactory.getJVMFor(application); 
     }
-        
+    
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent(application);
@@ -133,8 +133,9 @@ class ApplicationOverviewView extends DataSourceView {
           data.append("<b>Host:</b> " + application.getHost().getHostName() + "<br>");
           if (jvm.isBasicInfoSupported()) {
             String mainArgs = jvm.getMainArgs();
-
-            data.append("<b>Main class:</b> " + jvm.getMainClass().replace("/", ".") + "<br>");
+            String mainClass = jvm.getMainClass();
+            
+            data.append("<b>Main class:</b> " + (mainClass == null ? "<Unknown>": mainClass.replace("/", ".")) + "<br>");
             data.append("<b>Arguments:</b> " + (mainArgs == null ? "none" : mainArgs) + "<br>");
           }
 
