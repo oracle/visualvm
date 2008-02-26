@@ -37,10 +37,9 @@ import javax.management.MBeanServerConnection;
  *   cached. Every subsequent time getAttribute is called for that attribute
  *   the cached result is returned.
  *
- * - When the Refresh button in the Attributes table is pressed down the
- *   attributes cache is flushed. Then any subsequent call to getAttribute
- *   will retrieve all the values for the attributes that are known to the
- *   cache.
+ * - When the {@link CachedMBeanServerConnection.flush()} method is invoked the
+ *   attributes cache is flushed. Then any subsequent call to getAttribute will
+ *   retrieve all the values for the attributes that are known to the cache.
  *
  * - The attributes cache uses a learning approach and only the attributes
  *   that are in the cache will be retrieved between two subsequent updates.
