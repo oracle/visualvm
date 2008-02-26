@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import com.sun.tools.visualvm.core.datasupport.PropertiesSupport;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
 import java.util.Properties;
@@ -45,11 +46,16 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
     static final String DISPLAY_NAME = "display_name";
     static final String DISPLAY_ICON = "display_icon";
     
-    private Properties properties;
-    
+    private final PropertiesSupport propertiesSupport;
 
+    
     public ApplicationSnapshot(File file) {
+       this(file, null);
+    }
+
+    public ApplicationSnapshot(File file, Properties properties) {
         super(file, ApplicationSnapshotsSupport.getInstance().getCategory());
+        propertiesSupport = new PropertiesSupport(new File(file, ApplicationSnapshotsSupport.PROPERTIES_FILE), properties);
     }
     
     
@@ -97,27 +103,12 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         setState(STATE_FINISHED);
     }
     
-    Object[] getProperties(String[] keys) {
-        Object[] values = new Object[keys.length];
-        Properties prop = getProperties();
-        if (prop != null) for (int i = 0; i < keys.length; i++) values[i] = prop.get(keys[i]);
-        return values;
+    String[] getProperties(String[] keys) {
+        return propertiesSupport.getProperties(keys);
     }
     
-    void setProperties(String[] keys, Object[] values) {
-        Properties prop = getProperties();
-        if (prop != null)
-            for (int i = 0; i < keys.length; i++) properties.put(keys[i], values[i]);
-        storeProperties();
-    }
-    
-    private Properties getProperties() {
-        if (properties == null) properties = ApplicationSnapshotsSupport.loadProperties(getFile());
-        return properties;
-    }
-    
-    private void storeProperties() {
-        if (properties != null) ApplicationSnapshotsSupport.storeProperties(properties, getFile());
+    void setProperties(String[] keys, String[] values) {
+        propertiesSupport.setProperties(keys, values);
     }
     
     private void saveArchive(File archive) {

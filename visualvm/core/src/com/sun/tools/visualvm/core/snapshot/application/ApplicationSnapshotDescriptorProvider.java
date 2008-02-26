@@ -59,10 +59,10 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
             String name = desc.getName();
             Image icon = desc.getIcon();
             
-            Object[] properties = snapshot.getProperties(new String[] { ApplicationSnapshot.DISPLAY_NAME, ApplicationSnapshot.DISPLAY_ICON });
-            if (properties[0] != null) name = (String)properties[0];
+            String[] properties = snapshot.getProperties(new String[] { ApplicationSnapshot.DISPLAY_NAME, ApplicationSnapshot.DISPLAY_ICON });
+            if (properties[0] != null) name = properties[0];
             if (properties[1] != null) {
-                Image image = ApplicationSnapshotsSupport.loadImage(new File(snapshot.getFile(), (String)properties[1]));
+                Image image = ApplicationSnapshotsSupport.loadImage(new File(snapshot.getFile(), properties[1]));
                 if (image != null) icon = image;
             }
             
@@ -78,7 +78,7 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         
         protected void setName(String newName) {
             super.setName(newName);
-            getDataSource().setProperties(new String[] { ApplicationSnapshot.DISPLAY_NAME }, new Object[] { newName });
+            getDataSource().setProperties(new String[] { ApplicationSnapshot.DISPLAY_NAME }, new String[] { newName });
         }
         
         protected boolean supportsRename() {

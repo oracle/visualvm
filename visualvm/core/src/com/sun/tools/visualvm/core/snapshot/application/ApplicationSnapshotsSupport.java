@@ -31,15 +31,11 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -55,7 +51,7 @@ public final class ApplicationSnapshotsSupport {
     private static ApplicationSnapshotsSupport instance;
     
     private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
-    private static final String PROPERTIES_FILE = "_application_snapshot.properties";
+    static final String PROPERTIES_FILE = "_application_snapshot.properties";
     
     private static final int COPY_PACKET_SIZE = 4096;
     
@@ -144,49 +140,6 @@ public final class ApplicationSnapshotsSupport {
             file = new File(directory, prefix + suffix);
         }
         return file;
-    }
-    
-    static void storeProperties(Properties properties, File directory) {
-        File file = new File(directory, PROPERTIES_FILE);
-        OutputStream os = null;
-        BufferedOutputStream bos = null;
-        try {
-            os = new FileOutputStream(file);
-            bos = new BufferedOutputStream(os);
-            properties.storeToXML(os, null);
-        } catch (Exception e) {
-            System.err.println("Error storing properties: " + e.getMessage());
-        } finally {
-            try {
-                if (bos != null) bos.close();
-                if (os != null) os.close();
-            } catch (Exception e) {
-                System.err.println("Problem closing output stream: " + e.getMessage());
-            }
-        }
-    }
-    
-    static Properties loadProperties(File directory) {
-        File file = new File(directory, PROPERTIES_FILE);
-        InputStream is = null;
-        BufferedInputStream bis = null;
-        try {
-            is = new FileInputStream(file);
-            bis = new BufferedInputStream(is);
-            Properties properties = new Properties();
-            properties.loadFromXML(bis);
-            return properties;
-        } catch (Exception e) {
-            System.err.println("Error loading properties: " + e.getMessage());
-            return null;
-        } finally {
-            try {
-                if (bis != null) bis.close();
-                if (is != null) is.close();
-            } catch (Exception e) {
-                System.err.println("Problem closing input stream: " + e.getMessage());
-            }
-        }
     }
     
     static void createArchive(File directory, File archive) {        

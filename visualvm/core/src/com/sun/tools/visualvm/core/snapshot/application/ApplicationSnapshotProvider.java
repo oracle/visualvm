@@ -116,9 +116,8 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         properties.put(ApplicationSnapshot.DISPLAY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
         File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshot.DISPLAY_ICON, "png", applicationType.getIcon());
         if (iconFile != null) properties.put(ApplicationSnapshot.DISPLAY_ICON, iconFile.getName());
-        ApplicationSnapshotsSupport.storeProperties(properties, snapshotDirectory);
         
-        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
+        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, properties);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         registerDataSource(snapshot);
     }
