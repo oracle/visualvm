@@ -57,13 +57,13 @@ public final class PropertiesSupport {
     public String[] getProperties(String[] keys) {
         String[] values = new String[keys.length];
         Properties prop = getProperties();
-        if (prop != null) for (int i = 0; i < keys.length; i++) values[i] = prop.getProperty(keys[i]);
+        for (int i = 0; i < keys.length; i++) values[i] = prop.getProperty(keys[i]);
         return values;
     }
     
     public void setProperties(String[] keys, String[] values) {
         Properties prop = getProperties();
-        if (prop != null) for (int i = 0; i < keys.length; i++) properties.put(keys[i], values[i]);
+        for (int i = 0; i < keys.length; i++) prop.put(keys[i], values[i]);
         storeProperties();
     }
     
@@ -76,22 +76,26 @@ public final class PropertiesSupport {
         for (String propName : props.stringPropertyNames()) {
             keys[index] = propName;
             values[index] = props.getProperty(propName);
+            index++;
         }
         
         setProperties(keys, values);
     }
     
-    void storeProperties() {
-        if (properties != null) storeProperties(properties, file);
-    }
     
+    private void storeProperties() {
+        storeProperties(getProperties(), file);
+    }
     
     private Properties getProperties() {
         if (properties == null) properties = loadProperties(file);
+        if (properties == null) properties = new Properties();
         return properties;
     }
     
     private static Properties loadProperties(File file) {
+        if (!file.exists() || !file.isFile()) return null;
+            
         InputStream is = null;
         BufferedInputStream bis = null;
         try {
