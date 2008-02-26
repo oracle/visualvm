@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -55,55 +54,54 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
 
     private class DiscoveryTask implements SchedulerTask {
 
+        private static final int STATE_NEW = 0;
+        private static final int STATE_DISCOVERED = 1;
         private Host host;
-        final private AtomicBoolean hostAvailable = new AtomicBoolean(false);
-        final private AtomicBoolean hostRunning = new AtomicBoolean(false);
+        private int state = STATE_NEW;
 
         public DiscoveryTask(Host host) {
             this.host = host;
         }
 
         public void onSchedule(long timeStamp) {
-            if (!hostRunning.get()) {
-                if (MonitoredHostDS.isAvailableFor(host) && isRegistered(host)) {
-                    if (hostAvailable.compareAndSet(false, true)) {
-                        processNewHost(host, new Runnable() {
-
-                            public void run() {
-                                hostRunning.set(false);
-                            }
-                        });
-                        hostRunning.set(true);
+            switch (state) {
+                case STATE_NEW: {
+                    if (!MonitoredHostDS.isAvailableFor(host)) {
+                        return; // stay in NEW; no jvmstat detected
                     }
-                } else {
-                    if (hostAvailable.compareAndSet(true, false)) {
-//                    processFinishedHost(host);
+                    processNewHost(host);
+                    state = STATE_DISCOVERED;
+                    break;
+                }
+                case STATE_DISCOVERED: {
+                    if (MonitoredHostDS.isAvailableFor(host)) {
+                        // jvmstat detected; no need to remain scheduled -> unschedule
+                        removeWatchedHost(host);
+                        state = STATE_NEW;
                     }
+                    break;
                 }
             }
         }
     }
-//    private static final RequestProcessor processor = new RequestProcessor("MonitoredHostProvider Processor");
-    private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap<Host, HostListener>());
-    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
 
+    private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap<Host, HostListener>());
+    private final Map<Host, ScheduledTask> watchedHosts = new HashMap<Host, ScheduledTask>();
+    
+    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
         public void dataFinished(Host host) {
-            ScheduledTask task = watchedHosts.remove(host);
-            if (task != null) {
-                Scheduler.sharedInstance().unschedule(task);
-            }
+            removeWatchedHost(host);
             processFinishedHost(host);
         }
     };
-    final private Map<Host, ScheduledTask> watchedHosts = Collections.synchronizedMap(new HashMap<Host, ScheduledTask>());
 
     public void dataChanged(final DataChangeEvent<Host> event) {
         for (Host host : event.getAdded()) {
-            watchedHosts.put(host, Scheduler.sharedInstance().schedule(new DiscoveryTask(host), Quantum.seconds(3)));
+            addWatchedHost(host, Quantum.seconds(3));
         }
     }
 
-    private void processNewHost(final Host host, final Runnable onHostUnavailable) {
+    private void processNewHost(final Host host) {
         try {
             MonitoredHostDS monitoredHostDS = new MonitoredHostDS(host);
             host.getRepository().addDataSource(monitoredHostDS);
@@ -116,9 +114,7 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
 
                 public void disconnected(HostEvent e) {
                     processFinishedHost(host);
-                    if (onHostUnavailable != null) {
-                        onHostUnavailable.run();
-                    }
+                    addWatchedHost(host, Quantum.seconds(3));
                 }
             };
             mapping.put(host, monitoredHostListener);
@@ -127,12 +123,12 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
             host.notifyWhenFinished(hostFinishedListener);
 
         } catch (Exception e) {
-        // Host doesn't support jvmstat monitoring (jstatd not running)
-        // TODO: maybe display a hint that by running jstatd on that host applications can be discovered automatically
+            // Host doesn't support jvmstat monitoring (jstatd not running)
+            // TODO: maybe display a hint that by running jstatd on that host applications can be discovered automatically
         }
     }
 
-    private void processFinishedHost(final Host host) {
+    private synchronized void processFinishedHost(final Host host) {
         Set<MonitoredHostDS> monitoredHosts = host.getRepository().getDataSources(MonitoredHostDS.class);
         host.getRepository().removeDataSources(monitoredHosts);
         unregisterDataSources(monitoredHosts);
@@ -145,17 +141,30 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
         }
     }
 
+    @Override
     protected <Y extends MonitoredHostDS> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
         for (MonitoredHostDS monitoredHost : removed) {
             monitoredHost.finished();
         }
     }
-
-    private boolean isRegistered(Host host) {
-        return watchedHosts.containsKey(host);
+    
+    private void removeWatchedHost(Host host) {
+        synchronized(watchedHosts) {
+            if (watchedHosts.containsKey(host)) {
+                Scheduler.sharedInstance().unschedule(watchedHosts.remove(host));
+            }
+        }
     }
-
+    
+    private void addWatchedHost(Host host, Quantum interval) {
+        ScheduledTask task = Scheduler.sharedInstance().schedule(new DiscoveryTask(host), Quantum.SUSPENDED);
+        synchronized(watchedHosts)  {
+            watchedHosts.put(host, task);
+            task.setInterval(interval);
+        }
+    }
+    
     void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(MonitoredHostProvider.this, Host.class);
