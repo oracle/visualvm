@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.model.apptype;
 
-import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
@@ -42,23 +41,20 @@ public class JavaPluginApplicationTypeFactory
 
     @Override
     public ApplicationType createModelFor(Application application) {
-        if (application instanceof JvmstatApplication) {
-            JvmstatApplication app = (JvmstatApplication) application;
-            JVM jvm = JVMFactory.getJVMFor(app);
-            if (jvm.isBasicInfoSupported()) {
-                String args = jvm.getJvmArgs();
-                int plugin_index = args.indexOf(JAVA_PLUGIN);
-                if (plugin_index != -1) {
-                    String version;
-                    int version_index = plugin_index + JAVA_PLUGIN.length();
-                    int space_index = args.indexOf(' ', version_index);
-                    if (space_index != -1) {
-                        version = args.substring(version_index, space_index);
-                    } else {
-                        version = args.substring(version_index);
-                    }
-                    return new JavaPluginApplicationType(version);
+        JVM jvm = JVMFactory.getJVMFor(application);
+        if (jvm.isBasicInfoSupported()) {
+            String args = jvm.getJvmArgs();
+            int plugin_index = args.indexOf(JAVA_PLUGIN);
+            if (plugin_index != -1) {
+                String version;
+                int version_index = plugin_index + JAVA_PLUGIN.length();
+                int space_index = args.indexOf(' ', version_index);
+                if (space_index != -1) {
+                    version = args.substring(version_index, space_index);
+                } else {
+                    version = args.substring(version_index);
                 }
+                return new JavaPluginApplicationType(version);
             }
         }
         return null;

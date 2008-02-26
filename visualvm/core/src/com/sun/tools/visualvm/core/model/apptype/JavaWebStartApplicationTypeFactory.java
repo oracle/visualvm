@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.model.apptype;
 
-import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
@@ -42,15 +41,12 @@ public class JavaWebStartApplicationTypeFactory
 
     @Override
     public ApplicationType createModelFor(Application application) {
-        if (application instanceof JvmstatApplication) {
-            JvmstatApplication app = (JvmstatApplication) application;
-            JVM jvm = JVMFactory.getJVMFor(app);
-            if (jvm.isBasicInfoSupported()) {
-                String args = jvm.getJvmArgs();
-                int jws_index = args.indexOf(JWS);
-                if (jws_index != -1) {
-                    return new JavaWebStartApplicationType("");
-                }
+        JVM jvm = JVMFactory.getJVMFor(application);
+        if (jvm.isBasicInfoSupported()) {
+            String args = jvm.getJvmArgs();
+            int jws_index = args.indexOf(JWS);
+            if (jws_index != -1) {
+                return new JavaWebStartApplicationType("");
             }
         }
         return null;

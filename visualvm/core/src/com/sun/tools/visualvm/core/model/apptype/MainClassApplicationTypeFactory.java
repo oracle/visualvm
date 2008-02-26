@@ -90,8 +90,6 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
     }
     
     public ApplicationType createModelFor(Application appl) {
-//        if (appl instanceof JvmstatApplication) {
-//            JvmstatApplication app = (JvmstatApplication) appl;
         JVM jvm = JVMFactory.getJVMFor(appl);
             
         if (jvm.isBasicInfoSupported()) {
