@@ -54,11 +54,19 @@ public final class PropertiesSupport {
     }
     
     
+    public String getProperty(String key) {
+        return getProperties(new String[] { key })[0];
+    }
+    
     public String[] getProperties(String[] keys) {
         String[] values = new String[keys.length];
         Properties prop = getProperties();
         for (int i = 0; i < keys.length; i++) values[i] = prop.getProperty(keys[i]);
         return values;
+    }
+    
+    public void setProperty(String key, String value) {
+        setProperties(new String[] { key }, new String[] { value });
     }
     
     public void setProperties(String[] keys, String[] values) {
