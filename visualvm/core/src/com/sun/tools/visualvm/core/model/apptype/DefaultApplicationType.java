@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.core.model.apptype;
 
-import com.sun.tools.visualvm.core.application.JvmstatApplication;
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.Image;
@@ -35,12 +35,13 @@ import org.openide.util.Utilities;
 /**
  *
  * @author Tomas Hurka
+ * @author Luis-Miguel Alventosa
  */
 public class DefaultApplicationType extends ApplicationType  {
   String name;
-  JvmstatApplication application;
+  Application application;
 
-  DefaultApplicationType(JvmstatApplication app) {
+  DefaultApplicationType(Application app) {
     application = app;
   }
 

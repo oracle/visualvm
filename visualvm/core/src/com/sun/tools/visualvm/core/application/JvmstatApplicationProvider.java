@@ -54,10 +54,10 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
 /**
+ * A provider for Applications discovered by jvmstat.
  *
  * @author Jiri Sedlacek
  */
-// A provider for Applications discovered by jvmstat
 class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplication> implements DataChangeListener<MonitoredHostDS> {
     
     private final Map<Integer, JvmstatApplication> applications = new HashMap();

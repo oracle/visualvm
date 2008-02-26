@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.jmx;
 
 import com.sun.tools.visualvm.core.application.JmxApplication;
+import com.sun.tools.visualvm.core.application.JmxApplicationProvider;
 import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
@@ -33,9 +34,12 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.core.host.RemoteHostsContainer;
 import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Set;
+import javax.management.remote.JMXServiceURL;
 import javax.swing.AbstractAction;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -66,7 +70,15 @@ class JmxConnectionActionsProvider {
             JmxConnectionConfigurator addJmxConnectionConfiguration =
                     JmxConnectionConfigurator.addJmxConnection();
             if (addJmxConnectionConfiguration != null) {
-                // TODO: Not implemented yet
+                try {
+                    String url = addJmxConnectionConfiguration.getConnection();
+                    if (!url.startsWith("service:jmx:")) {
+                        url = "service:jmx:rmi:///jndi/rmi://" + url + "/jmxrmi";
+                    }
+                    new JmxApplicationProvider().processNewJmxApplication(Host.LOCALHOST, new JMXServiceURL(url));
+                } catch (MalformedURLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
     }
@@ -79,12 +91,12 @@ class JmxConnectionActionsProvider {
 
         public void actionPerformed(ActionEvent e) {
             JmxApplication app = (JmxApplication) e.getSource();
-            // TODO: Not implemented yet
+        // TODO: Not implemented yet
         }
     }
 
     private static class HostActionProvider implements ExplorerActionsProvider<Host> {
-        
+
         public ExplorerActionDescriptor getDefaultAction(Host host) {
             return null;
         }
@@ -96,7 +108,7 @@ class JmxConnectionActionsProvider {
             return actions;
         }
     }
-    
+
     private static class RemoteHostsContainerActionProvider
             implements ExplorerActionsProvider<RemoteHostsContainer> {
 
@@ -109,7 +121,7 @@ class JmxConnectionActionsProvider {
                     new HashSet<ExplorerActionDescriptor>();
             actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 30));
             return actions;
-        }        
+        }
     }
 
     private static class JmxApplicationActionProvider

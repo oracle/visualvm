@@ -25,19 +25,30 @@
 
 package com.sun.tools.visualvm.core.application;
 
+import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
-
-
+import com.sun.tools.visualvm.core.datasource.Host;
+import java.util.HashSet;
+import java.util.Set;
+import javax.management.remote.JMXServiceURL;
 
 /**
+ * A provider for Applications added as JMX connections.
  *
  * @author Jiri Sedlacek
+ * @author Luis-Miguel Alventosa
  */
-// A provider for Applications added as JMX connections
-class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
+public class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
 
-    void initialize() {
-
+    public void processNewJmxApplication(Host host, JMXServiceURL url) {
+        JmxApplication jmxapp = new JmxApplication(url);
+        Set<JmxApplication> jmxapps = new HashSet<JmxApplication>();
+        jmxapps.add(jmxapp);
+        host.getRepository().addDataSources(jmxapps);
+        registerDataSources(jmxapps);
     }
 
+    void initialize() {
+        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+    }
 }

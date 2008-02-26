@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.model.apptype;
 
+import com.sun.tools.visualvm.core.application.JmxApplication;
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
@@ -33,6 +34,7 @@ import com.sun.tools.visualvm.core.datasource.Application;
 /**
  *
  * @author Tomas Hurka
+ * @author Luis-Miguel Alventosa
  */
 public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,Application> implements ModelProvider<ApplicationType,Application> {
 
@@ -58,8 +60,8 @@ public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,A
   }
   
   public ApplicationType createModelFor(Application app) {
-    if (app instanceof JvmstatApplication) {
-        return new DefaultApplicationType((JvmstatApplication)app);
+    if (app instanceof JvmstatApplication || app instanceof JmxApplication) {
+        return new DefaultApplicationType(app);
     }
     return null;
   }

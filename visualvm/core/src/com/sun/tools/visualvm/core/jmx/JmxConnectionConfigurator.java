@@ -90,7 +90,7 @@ class JmxConnectionConfigurator extends JPanel {
         }
     }
 
-    public String getJMXServiceURL() {
+    public String getConnection() {
         return connectionField.getText().trim();
     }
 
@@ -135,7 +135,7 @@ class JmxConnectionConfigurator extends JPanel {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                String url = getJMXServiceURL();
+                String url = getConnection();
 
                 if (!displaynameCheckbox.isSelected()) {
                     internalChange = true;

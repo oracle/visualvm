@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.model.jvm;
 
+import com.sun.tools.visualvm.core.application.JmxApplication;
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.host.MonitoredHostDS;
 import com.sun.tools.visualvm.core.model.ModelFactory;
@@ -42,6 +43,7 @@ import sun.jvmstat.monitor.VmIdentifier;
  * {@link JVM} representation  for the {@link Application}.
  * 
  * @author Tomas Hurka
+ * @author Luis-Miguel Alventosa
  */
 public final class JVMFactory extends ModelFactory<JVM,Application> implements ModelProvider<JVM,Application> {
 
@@ -129,6 +131,8 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
             if (vm != null) {
                 vm.detach();
             }
+        } else if (app instanceof JmxApplication) {
+            new JmxJVM();
         }
         return new DefaultJVM();
     }
