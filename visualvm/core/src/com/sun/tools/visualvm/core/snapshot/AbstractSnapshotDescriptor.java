@@ -34,7 +34,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends DataSourceDescriptor {
+public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends DataSourceDescriptor<X> {
     
     
     public AbstractSnapshotDescriptor(X snapshot, Image icon) {

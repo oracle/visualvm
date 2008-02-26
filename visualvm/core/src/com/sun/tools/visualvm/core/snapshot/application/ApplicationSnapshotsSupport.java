@@ -55,10 +55,7 @@ public final class ApplicationSnapshotsSupport {
     private static ApplicationSnapshotsSupport instance;
     
     private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
-    static final String SNAPSHOT_VERSION = "snapshot_version";
-    static final String DISPLAY_NAME = "display_name";
-    static final String DISPLAY_ICON = "display_icon";
-    static final String PROPERTIES_FILE = "_appsnapshot_properties.xml";
+    private static final String PROPERTIES_FILE = "_application_snapshot.properties";
     
     private static final int COPY_PACKET_SIZE = 4096;
     

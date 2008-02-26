@@ -112,10 +112,10 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         
         ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
         Properties properties = new Properties();
-        properties.put(ApplicationSnapshotsSupport.SNAPSHOT_VERSION, "1.0");
-        properties.put(ApplicationSnapshotsSupport.DISPLAY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
-        File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshotsSupport.DISPLAY_ICON, "png", applicationType.getIcon());
-        if (iconFile != null) properties.put(ApplicationSnapshotsSupport.DISPLAY_ICON, iconFile.getName());
+        properties.put(ApplicationSnapshot.SNAPSHOT_VERSION, "1.0");
+        properties.put(ApplicationSnapshot.DISPLAY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
+        File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshot.DISPLAY_ICON, "png", applicationType.getIcon());
+        if (iconFile != null) properties.put(ApplicationSnapshot.DISPLAY_ICON, iconFile.getName());
         ApplicationSnapshotsSupport.storeProperties(properties, snapshotDirectory);
         
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);

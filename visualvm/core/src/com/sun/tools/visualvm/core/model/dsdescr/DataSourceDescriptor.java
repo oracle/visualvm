@@ -37,7 +37,7 @@ import java.beans.PropertyChangeSupport;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public abstract class DataSourceDescriptor extends Model implements Positionable {
+public abstract class DataSourceDescriptor<X extends DataSource> extends Model implements Positionable {
     
     public static final String PROPERTY_ICON = "prop_icon";
     
@@ -59,6 +59,7 @@ public abstract class DataSourceDescriptor extends Model implements Positionable
     
     public static final int EXPAND_ON_EACH_CHILD_CHANGE = 4;
     
+    private X dataSource;
     private Image icon;
     private String name;
     private String description;
@@ -71,11 +72,12 @@ public abstract class DataSourceDescriptor extends Model implements Positionable
         this(null);
     }
     
-    public DataSourceDescriptor(DataSource dataSource) {
+    public DataSourceDescriptor(X dataSource) {
         this(dataSource, dataSource != null ? dataSource.toString() : null, null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
     }
     
-    public DataSourceDescriptor(DataSource dataSource, String n, String desc, Image ic, int pos, int aep) {   
+    public DataSourceDescriptor(X ds, String n, String desc, Image ic, int pos, int aep) {   
+        dataSource = ds;
         changeSupport = dataSource != null ? new PropertyChangeSupport(dataSource) : null;
         name = n;
         description = desc;
@@ -121,6 +123,10 @@ public abstract class DataSourceDescriptor extends Model implements Positionable
         if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(propertyName, listener);
     }
     
+    
+    protected X getDataSource() {
+        return dataSource;
+    }
     
     protected boolean supportsRename() {
         return false;

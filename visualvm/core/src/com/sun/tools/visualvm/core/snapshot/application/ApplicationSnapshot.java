@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.snapshot.application;
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
+import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -39,6 +40,13 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 public final class ApplicationSnapshot extends AbstractSnapshot {
+    
+    static final String SNAPSHOT_VERSION = "snapshot_version";
+    static final String DISPLAY_NAME = "display_name";
+    static final String DISPLAY_ICON = "display_icon";
+    
+    private Properties properties;
+    
 
     public ApplicationSnapshot(File file) {
         super(file, ApplicationSnapshotsSupport.getInstance().getCategory());
@@ -89,7 +97,30 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         setState(STATE_FINISHED);
     }
     
-    public void saveArchive(File archive) {
+    Object[] getProperties(String[] keys) {
+        Object[] values = new Object[keys.length];
+        Properties prop = getProperties();
+        if (prop != null) for (int i = 0; i < keys.length; i++) values[i] = prop.get(keys[i]);
+        return values;
+    }
+    
+    void setProperties(String[] keys, Object[] values) {
+        Properties prop = getProperties();
+        if (prop != null)
+            for (int i = 0; i < keys.length; i++) properties.put(keys[i], values[i]);
+        storeProperties();
+    }
+    
+    private Properties getProperties() {
+        if (properties == null) properties = ApplicationSnapshotsSupport.loadProperties(getFile());
+        return properties;
+    }
+    
+    private void storeProperties() {
+        if (properties != null) ApplicationSnapshotsSupport.storeProperties(properties, getFile());
+    }
+    
+    private void saveArchive(File archive) {
         ApplicationSnapshotsSupport.createArchive(getFile(), archive);
     }
     
