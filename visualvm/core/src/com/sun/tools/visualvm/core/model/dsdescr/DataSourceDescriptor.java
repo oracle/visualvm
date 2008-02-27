@@ -90,6 +90,18 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     public Image getIcon() {
         return icon;
     }
+    
+    public boolean supportsRename() {
+        return false;
+    }
+    
+    public void setName(String newName) {
+        if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor");
+        if (newName == null) throw new IllegalArgumentException("Name cannot be null");
+        String oldName = name;
+        name = newName;
+        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
+    }
 
     public String getName() {
         return name;
@@ -126,18 +138,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     
     protected X getDataSource() {
         return dataSource;
-    }
-    
-    protected boolean supportsRename() {
-        return false;
-    }
-    
-    protected void setName(String newName) {
-        if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor");
-        if (newName == null) throw new IllegalArgumentException("Name cannot be null");
-        String oldName = name;
-        name = newName;
-        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
     }
     
     protected void setDescription(String newDescription) {

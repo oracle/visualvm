@@ -76,12 +76,12 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
             super(snapshot, NODE_ICON);
         }
         
-        protected void setName(String newName) {
+        public void setName(String newName) {
             super.setName(newName);
             getDataSource().setProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
         }
         
-        protected boolean supportsRename() {
+        public boolean supportsRename() {
             return true;
         }
         

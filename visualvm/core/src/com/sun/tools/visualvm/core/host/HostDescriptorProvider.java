@@ -69,7 +69,7 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
             super(host,host.getDisplayName(),null,NODE_ICON,POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
         }
 
-        protected boolean supportsRename() {
+        public boolean supportsRename() {
             return true;
         }
         

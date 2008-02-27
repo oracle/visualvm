@@ -66,7 +66,7 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
             super(coreDump, ICON);
         }
         
-        protected boolean supportsRename() {
+        public boolean supportsRename() {
             return true;
         }
         

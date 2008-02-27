@@ -85,7 +85,7 @@ class ApplicationDescriptorProvider extends
         }
 
         @Override
-        protected boolean supportsRename() {
+        public boolean supportsRename() {
             return (getDataSource() instanceof JmxApplication);
         }
     }
