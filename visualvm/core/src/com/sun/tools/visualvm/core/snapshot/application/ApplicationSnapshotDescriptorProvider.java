@@ -26,11 +26,11 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
 import java.awt.Image;
-import java.io.File;
 import org.openide.util.Utilities;
 
 /**
@@ -59,10 +59,10 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
             String name = desc.getName();
             Image icon = desc.getIcon();
             
-            String[] properties = snapshot.getProperties(new String[] { ApplicationSnapshot.DISPLAY_NAME, ApplicationSnapshot.DISPLAY_ICON });
+            String[] properties = snapshot.getProperties(new String[] { PROPERTY_NAME, PROPERTY_ICON });
             if (properties[0] != null) name = properties[0];
             if (properties[1] != null) {
-                Image image = ApplicationSnapshotsSupport.loadImage(new File(snapshot.getFile(), properties[1]));
+                Image image = Utils.stringToImage(properties[1]);
                 if (image != null) icon = image;
             }
             
@@ -78,7 +78,7 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         
         protected void setName(String newName) {
             super.setName(newName);
-            getDataSource().setProperties(new String[] { ApplicationSnapshot.DISPLAY_NAME }, new String[] { newName });
+            getDataSource().setProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
         }
         
         protected boolean supportsRename() {

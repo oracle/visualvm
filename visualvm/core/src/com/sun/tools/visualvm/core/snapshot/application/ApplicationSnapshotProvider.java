@@ -28,8 +28,10 @@ package com.sun.tools.visualvm.core.snapshot.application;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
@@ -51,6 +53,12 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> {
+    
+    static final String SNAPSHOT_VERSION = "snapshot_version";
+    static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
     private static ApplicationSnapshotProvider sharedInstance;
     
@@ -112,10 +120,10 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         
         ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
         Properties properties = new Properties();
-        properties.put(ApplicationSnapshot.SNAPSHOT_VERSION, "1.0");
-        properties.put(ApplicationSnapshot.DISPLAY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
-        File iconFile = ApplicationSnapshotsSupport.saveImage(snapshotDirectory, "_" + ApplicationSnapshot.DISPLAY_ICON, "png", applicationType.getIcon());
-        if (iconFile != null) properties.put(ApplicationSnapshot.DISPLAY_ICON, iconFile.getName());
+        properties.put(SNAPSHOT_VERSION, CURRENT_SNAPSHOT_VERSION);
+        properties.put(DataSourceDescriptor.PROPERTY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
+        properties.put(DataSourceDescriptor.PROPERTY_ICON, Utils.imageToString(applicationType.getIcon(), "png"));
+        // properties.put(DataSourceDescriptor.PROPERTY_PREFERRED_POSITION, ExplorerSupport.getCurrentPosition(application)); ???
         
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, properties);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
@@ -140,7 +148,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     
-                    File snapshotDirectory = ApplicationSnapshotsSupport.extractArchive(archive, ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory());
+                    File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory());
                     if (snapshotDirectory != null) {
                         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
                         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);

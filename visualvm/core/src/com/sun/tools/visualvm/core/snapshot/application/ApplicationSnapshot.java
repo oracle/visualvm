@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
 import com.sun.tools.visualvm.core.datasupport.PropertiesSupport;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
 import java.util.Properties;
@@ -41,10 +42,6 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 public final class ApplicationSnapshot extends AbstractSnapshot {
-    
-    static final String SNAPSHOT_VERSION = "snapshot_version";
-    static final String DISPLAY_NAME = "display_name";
-    static final String DISPLAY_ICON = "display_icon";
     
     private final PropertiesSupport propertiesSupport;
 
@@ -103,6 +100,8 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         setState(STATE_FINISHED);
     }
     
+    
+    
     String[] getProperties(String[] keys) {
         return propertiesSupport.getProperties(keys);
     }
@@ -112,7 +111,7 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
     }
     
     private void saveArchive(File archive) {
-        ApplicationSnapshotsSupport.createArchive(getFile(), archive);
+        Utils.createArchive(getFile(), archive);
     }
     
 }
