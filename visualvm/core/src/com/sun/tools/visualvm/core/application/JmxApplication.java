@@ -27,6 +27,9 @@ package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractApplication;
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JvmJmxModelFactory;
+import java.lang.management.RuntimeMXBean;
 import javax.management.remote.JMXServiceURL;
 
 /**
@@ -37,6 +40,7 @@ import javax.management.remote.JMXServiceURL;
  */
 public final class JmxApplication extends AbstractApplication {
 
+    private int pid = -1;
     private final JMXServiceURL url;
 
     public JmxApplication(Host host, String name, JMXServiceURL url) {
@@ -46,5 +50,23 @@ public final class JmxApplication extends AbstractApplication {
 
     public JMXServiceURL getJMXServiceURL() {
         return url;
+    }
+
+    @Override
+    public int getPid() {
+        if (pid == -1) {
+            JvmJmxModel jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(this);
+            if (jmxModel != null) {
+                RuntimeMXBean rt = jmxModel.getRuntimeMXBean();
+                if (rt != null) {
+                    String name = rt.getName();
+                    if (name != null && name.indexOf("@") != -1) {
+                        name = name.substring(0, name.indexOf("@"));
+                        pid = Integer.parseInt(name);
+                    }
+                }
+            }
+        }
+        return pid;
     }
 }
