@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.model.apptype;
 
+import com.sun.tools.visualvm.core.application.JmxApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
@@ -55,6 +56,8 @@ public class DefaultApplicationType extends ApplicationType  {
       String applicationName;
       if (mainClassName != null && mainClassName.length() > 0) {
         applicationName = mainClassName.replace("/", ".");
+      } else if (application instanceof JmxApplication) {
+        applicationName = ((JmxApplication) application).getId();
       } else {
         applicationName = "<Unknown>";
       }
