@@ -68,9 +68,8 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
         public void dataFinished(MonitoredHostDS host) { processFinishedHost(host); }
     };
     
-    
     // Not to be called from user code, use Application.CURRENT_APPLICATION instead
-    synchronized Application getCurrentApplication() {    
+    static synchronized Application getCurrentApplication() {    
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
         Set<JvmstatApplication> localApplications = Host.LOCALHOST.getRepository().getDataSources(JvmstatApplication.class);
         for (JvmstatApplication localApplication : localApplications)
@@ -80,7 +79,6 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
             }
         return null;
     }
-    
     
     public void dataChanged(DataChangeEvent<MonitoredHostDS> event) {
         Set<MonitoredHostDS> newHosts = event.getAdded();
@@ -126,8 +124,7 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
 //                    });
                 }
 
-                public void disconnected(HostEvent e) {}
-                
+                public void disconnected(HostEvent e) {}                
             };
             monitoredHost.addHostListener(hostListener);
         } catch (MonitorException e) {
@@ -193,39 +190,44 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
     protected <Y extends JvmstatApplication> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
         for (JvmstatApplication application : removed) application.removed();
-    }
-    
+    }    
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
-      private void checkForBrokenJps(MonitoredHost monitoredHost) {
-          try { if (monitoredHost.activeVms().size() != 0) return; } catch (Exception e) { return; }
-          
-          String message = DesktopUtils.isBrowseAvailable() ? "<html><b>Local Java applications cannot be detected.</b><br><br>" +
-                    "Please see the Troubleshooting guide for VisualVM for more<br>" +
-                    "information and steps to fix the problem.<br><br>" +
-                    "<a href=\"https://visualvm.dev.java.net/troubleshooting.html#jpswin\">https://visualvm.dev.java.net/troubleshooting.html#jpswin</a></html>" :
-                "<html><b>Local applications cannot be detected.</b><br><br>" +
-                    "Please see the Troubleshooting guide for VisualVM for more<br>" +
-                    "information and steps to fix the problem.<br><br>" +
-                    "<nobr>https://visualvm.dev.java.net/troubleshooting.html#jpswin</nobr></html>";
-          final HTMLLabel label = new HTMLLabel(message) {
-              protected void showURL(URL url) {
-                 try { DesktopUtils.browse(url.toURI()); } catch (Exception e) {}
-             }
-          };
-          
-          SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                  NotifyDescriptor nd = new NotifyDescriptor.Message(label, NotifyDescriptor.ERROR_MESSAGE);
-                  DialogDisplayer.getDefault().notify(nd);
-              }
-          });
-      }
-    
-    
-    void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
-        DataSourceRepository.sharedInstance().addDataChangeListener(JvmstatApplicationProvider.this, MonitoredHostDS.class);
+    private void checkForBrokenJps(MonitoredHost monitoredHost) {
+        try {
+            if (monitoredHost.activeVms().size() != 0) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+
+        String message = DesktopUtils.isBrowseAvailable() ? "<html><b>Local Java applications cannot be detected.</b><br><br>" +
+                "Please see the Troubleshooting guide for VisualVM for more<br>" +
+                "information and steps to fix the problem.<br><br>" +
+                "<a href=\"https://visualvm.dev.java.net/troubleshooting.html#jpswin\">https://visualvm.dev.java.net/troubleshooting.html#jpswin</a></html>" : "<html><b>Local applications cannot be detected.</b><br><br>" +
+                "Please see the Troubleshooting guide for VisualVM for more<br>" +
+                "information and steps to fix the problem.<br><br>" +
+                "<nobr>https://visualvm.dev.java.net/troubleshooting.html#jpswin</nobr></html>";
+        final HTMLLabel label = new HTMLLabel(message) {
+            protected void showURL(URL url) {
+                try {
+                    DesktopUtils.browse(url.toURI());
+                } catch (Exception e) {
+                }
+            }
+        };
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                NotifyDescriptor nd = new NotifyDescriptor.Message(label, NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+            }
+        });
     }
 
+    void initialize() {
+        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, MonitoredHostDS.class);
+    }
 }

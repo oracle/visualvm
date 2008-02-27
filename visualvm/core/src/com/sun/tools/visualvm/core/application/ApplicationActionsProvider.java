@@ -98,7 +98,7 @@ class ApplicationActionsProvider {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JmxApplicationConfigurator appConfig =
+            final JmxApplicationConfigurator appConfig =
                     JmxApplicationConfigurator.addJmxConnection();
             if (appConfig != null) {
                 try {
@@ -106,10 +106,14 @@ class ApplicationActionsProvider {
                     if (!urlStr.startsWith("service:jmx:")) {
                         urlStr = "service:jmx:rmi:///jndi/rmi://" + urlStr + "/jmxrmi";
                     }
-                    JMXServiceURL url = new JMXServiceURL(urlStr);
+                    final JMXServiceURL url = new JMXServiceURL(urlStr);
                     // TODO: Compute Host and add new remote host node if necessary
-                    new JmxApplicationProvider().processNewJmxApplication(
-                            Host.LOCALHOST, appConfig.getDisplayName(), url);
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            JmxApplicationProvider.sharedInstance().processNewJmxApplication(
+                                    Host.LOCALHOST, appConfig.getDisplayName(), url);
+                        }
+                    });
                 } catch (MalformedURLException ex) {
                     Exceptions.printStackTrace(ex);
                 }
@@ -124,8 +128,13 @@ class ApplicationActionsProvider {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JmxApplication app = (JmxApplication) e.getSource();
-            // TODO: Not implemented yet
+            final JmxApplication app = (JmxApplication) e.getSource();
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    JmxApplicationProvider.sharedInstance().processRemoveJmxApplication(
+                            Host.LOCALHOST, app);
+                }
+            });
         }
     }
 

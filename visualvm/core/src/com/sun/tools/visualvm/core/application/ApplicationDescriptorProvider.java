@@ -37,41 +37,56 @@ import java.awt.Image;
  *
  * @author Tomas Hurka
  * @author Jiri Sedlacek
+ * @author Luis-Miguel Alventosa
  */
-class ApplicationDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+class ApplicationDescriptorProvider extends
+        AbstractModelProvider<DataSourceDescriptor, DataSource> {
 
     ApplicationDescriptorProvider() {
     }
-    
+
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (ds instanceof Application) {            
+        if (ds instanceof Application) {
             return new ApplicationDescriptor((Application) ds);
         }
         return null;
     }
-    
-    private static class ApplicationDescriptor extends DataSourceDescriptor {
+
+    private static class ApplicationDescriptor
+            extends DataSourceDescriptor<Application> {
+
         private final ApplicationType appType;
         private final int pid;
-        
+
         ApplicationDescriptor(Application app) {
+            super(app, null, null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
             appType = ApplicationTypeFactory.getApplicationTypeFor(app);
             pid = app.getPid();
         }
-        
+
+        @Override
         public String getName() {
-            String id = Application.CURRENT_APPLICATION.getPid() == pid || pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")";
+            if (supportsRename() && super.getName() != null) {
+                return super.getName();
+            }
+            String id = Application.CURRENT_APPLICATION.getPid() == pid ||
+                    pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")";
             return appType.getName() + id;
         }
 
+        @Override
         public String getDescription() {
             return appType.getDescription();
         }
 
+        @Override
         public Image getIcon() {
             return appType.getIcon();
         }
 
+        @Override
+        protected boolean supportsRename() {
+            return (getDataSource() instanceof JmxApplication);
+        }
     }
-    
 }

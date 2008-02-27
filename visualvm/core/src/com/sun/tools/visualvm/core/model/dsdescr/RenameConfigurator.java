@@ -64,6 +64,7 @@ class RenameConfigurator extends JPanel {
     else return null;
   }
   
+  @Override
   public String getName() {
       return nameField.getText().trim();
   }

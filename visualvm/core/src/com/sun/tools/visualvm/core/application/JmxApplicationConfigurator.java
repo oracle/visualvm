@@ -71,24 +71,6 @@ class JmxApplicationConfigurator extends JPanel {
         }
     }
 
-    public static JmxApplicationConfigurator renameJmxConnection(JmxApplication app) {
-        JmxApplicationConfigurator hc = getDefault();
-        hc.setupRenameJmxConnection(app);
-
-        final DialogDescriptor dd = new DialogDescriptor(hc, "Rename JMX Connection",
-                true, new Object[]{hc.okButton, DialogDescriptor.CANCEL_OPTION},
-                hc.okButton, 0, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
-        d.pack();
-        d.setVisible(true);
-
-        if (dd.getValue() == hc.okButton) {
-            return hc;
-        } else {
-            return null;
-        }
-    }
-
     public String getConnection() {
         return connectionField.getText().trim();
     }
@@ -117,15 +99,6 @@ class JmxApplicationConfigurator extends JPanel {
         displaynameCheckbox.setEnabled(true);
         connectionField.setText("");
         displaynameField.setText("");
-    }
-
-    private void setupRenameJmxConnection(JmxApplication app) {
-        connectionField.setEnabled(false);
-        displaynameCheckbox.setSelected(true);
-        displaynameCheckbox.setEnabled(false);
-        displaynameField.setText(app.getJMXServiceURL().toString());
-        displaynameField.requestFocusInWindow();
-        displaynameField.selectAll();
     }
 
     private void update() {

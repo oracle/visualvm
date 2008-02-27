@@ -28,8 +28,6 @@ package com.sun.tools.visualvm.core.application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
-import java.util.HashSet;
-import java.util.Set;
 import javax.management.remote.JMXServiceURL;
 
 /**
@@ -38,17 +36,28 @@ import javax.management.remote.JMXServiceURL;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-public class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
+class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
 
-    public void processNewJmxApplication(Host host, String name, JMXServiceURL url) {
-        JmxApplication jmxapp = new JmxApplication(host, name, url);
-        Set<JmxApplication> jmxapps = new HashSet<JmxApplication>();
-        jmxapps.add(jmxapp);
-        host.getRepository().addDataSources(jmxapps);
-        registerDataSources(jmxapps);
+    private static JmxApplicationProvider sharedInstance;
+    
+    public synchronized static JmxApplicationProvider sharedInstance() {
+        if (sharedInstance == null) sharedInstance = new JmxApplicationProvider();
+        return sharedInstance;
     }
 
-    void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+    public void processNewJmxApplication(Host host, String name, JMXServiceURL url) {
+        JmxApplication app = new JmxApplication(host, name, url);
+        host.getRepository().addDataSource(app);
+        registerDataSource(app);
+    }
+
+    public void processRemoveJmxApplication(Host host, JmxApplication app) {
+        host.getRepository().removeDataSource(app);
+        unregisterDataSource(app);
+    }
+
+    static void initialize() {
+        DataSourceRepository.sharedInstance().addDataSourceProvider(
+                JmxApplicationProvider.sharedInstance());
     }
 }
