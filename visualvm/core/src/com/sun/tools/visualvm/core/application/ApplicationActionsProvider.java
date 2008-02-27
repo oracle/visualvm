@@ -26,66 +26,173 @@
 package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
+import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.core.host.RemoteHostsContainer;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Set;
+import javax.management.remote.JMXServiceURL;
 import javax.swing.AbstractAction;
+import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  * @author Tomas Hurka
+ * @author Luis-Miguel Alventosa
  */
-class ApplicationActionsProvider implements ExplorerActionsProvider<Application> {
-    
-    private final HeapDumpOnOOMEAction heapDumpOnOOMEAction = new HeapDumpOnOOMEAction();
-    
-    
-    public ExplorerActionDescriptor getDefaultAction(Application application) {
-        return null;
+class ApplicationActionsProvider {
+
+    private static final HeapDumpOnOOMEAction heapDumpOnOOMEAction =
+            new HeapDumpOnOOMEAction();
+    private static final AddJmxConnectionAction addJmxConnectionAction =
+            new AddJmxConnectionAction();
+    private static final RemoveJmxConnectionAction removeJmxConnectionAction =
+            new RemoveJmxConnectionAction();
+
+    static void initialize() {
+        ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
+        explorer.addExplorerActionsProvider(
+                new ApplicationActionProvider(), Application.class);
+        explorer.addExplorerActionsProvider(
+                new HostActionProvider(), Host.class);
+        explorer.addExplorerActionsProvider(
+                new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
+        explorer.addExplorerActionsProvider(
+                new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
-    
-    public Set<ExplorerActionDescriptor> getActions(Application application) {
-        Set<ExplorerActionDescriptor> actions = new HashSet();
-        JVM jvm = JVMFactory.getJVMFor(application);
-        if (jvm.isDumpOnOOMEnabledSupported()) {
-            actions.add(new ExplorerActionDescriptor(null, 40));
-            actions.add(new ExplorerActionDescriptor(heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
-        }
-        return actions;
-        
-    }
-    
-    
-    void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(this, Application.class);
-    }
-    
-    
+
     private static class HeapDumpOnOOMEAction extends AbstractAction {
-        
+
         boolean oomeEnabled;
-        
+
         public HeapDumpOnOOMEAction refresh(boolean oomeEnabled) {
             this.oomeEnabled = oomeEnabled;
-            putValue(NAME, oomeEnabled ? "Enable Heap Dump on OOME" : "Disable Heap Dump on OOME");
+            putValue(NAME, oomeEnabled ?
+                "Enable Heap Dump on OOME" : "Disable Heap Dump on OOME");
             return this;
         }
-        
+
         public void actionPerformed(final ActionEvent e) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    JVM jvm = JVMFactory.getJVMFor((Application)e.getSource());
+                    JVM jvm = JVMFactory.getJVMFor((Application) e.getSource());
                     jvm.setDumpOnOOMEnabled(oomeEnabled);
                 }
             });
         }
     }
-    
+
+    private static class AddJmxConnectionAction extends AbstractAction {
+
+        public AddJmxConnectionAction() {
+            super("Add JMX Connection...");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            JmxApplicationConfigurator appConfig =
+                    JmxApplicationConfigurator.addJmxConnection();
+            if (appConfig != null) {
+                try {
+                    String urlStr = appConfig.getConnection();
+                    if (!urlStr.startsWith("service:jmx:")) {
+                        urlStr = "service:jmx:rmi:///jndi/rmi://" + urlStr + "/jmxrmi";
+                    }
+                    JMXServiceURL url = new JMXServiceURL(urlStr);
+                    // TODO: Compute Host and add new remote host node if necessary
+                    new JmxApplicationProvider().processNewJmxApplication(
+                            Host.LOCALHOST, appConfig.getDisplayName(), url);
+                } catch (MalformedURLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        }
+    }
+
+    private static class RemoveJmxConnectionAction extends AbstractAction {
+
+        public RemoveJmxConnectionAction() {
+            super("Remove");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            JmxApplication app = (JmxApplication) e.getSource();
+            // TODO: Not implemented yet
+        }
+    }
+
+    private static class ApplicationActionProvider
+            implements ExplorerActionsProvider<Application> {
+
+        public ExplorerActionDescriptor getDefaultAction(Application app) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(Application app) {
+            Set<ExplorerActionDescriptor> actions =
+                    new HashSet<ExplorerActionDescriptor>();
+            JVM jvm = JVMFactory.getJVMFor(app);
+            if (jvm.isDumpOnOOMEnabledSupported()) {
+                actions.add(new ExplorerActionDescriptor(null, 40));
+                actions.add(new ExplorerActionDescriptor(
+                        heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
+            }
+            if (app instanceof JmxApplication) {
+                actions.add(new ExplorerActionDescriptor(removeJmxConnectionAction, 100));
+            }
+            return actions;
+        }
+    }
+
+    private static class HostActionProvider implements ExplorerActionsProvider<Host> {
+
+        public ExplorerActionDescriptor getDefaultAction(Host host) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(Host host) {
+            Set<ExplorerActionDescriptor> actions =
+                    new HashSet<ExplorerActionDescriptor>();
+            actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 110));
+            return actions;
+        }
+    }
+
+    private static class RemoteHostsContainerActionProvider
+            implements ExplorerActionsProvider<RemoteHostsContainer> {
+
+        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
+            Set<ExplorerActionDescriptor> actions =
+                    new HashSet<ExplorerActionDescriptor>();
+            actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 30));
+            return actions;
+        }
+    }
+
+    private static class DataSourceRootActionProvider
+            implements ExplorerActionsProvider<DataSourceRoot> {
+
+        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) {
+            return null;
+        }
+
+        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
+            Set<ExplorerActionDescriptor> actions =
+                    new HashSet<ExplorerActionDescriptor>();
+            actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 20));
+            return actions;
+        }
+    }
 }

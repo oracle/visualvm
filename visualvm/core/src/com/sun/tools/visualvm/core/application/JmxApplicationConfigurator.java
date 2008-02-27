@@ -23,9 +23,8 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.jmx;
+package com.sun.tools.visualvm.core.application;
 
-import com.sun.tools.visualvm.core.application.JmxApplication;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -50,12 +49,12 @@ import org.openide.DialogDescriptor;
  *
  * @author Luis-Miguel Alventosa
  */
-class JmxConnectionConfigurator extends JPanel {
+class JmxApplicationConfigurator extends JPanel {
 
     private boolean internalChange = false;
 
-    public static JmxConnectionConfigurator addJmxConnection() {
-        JmxConnectionConfigurator hc = getDefault();
+    public static JmxApplicationConfigurator addJmxConnection() {
+        JmxApplicationConfigurator hc = getDefault();
         hc.setupDefineJmxConnection();
 
         final DialogDescriptor dd = new DialogDescriptor(hc, "Add JMX Connection",
@@ -72,8 +71,8 @@ class JmxConnectionConfigurator extends JPanel {
         }
     }
 
-    public static JmxConnectionConfigurator renameJmxConnection(JmxApplication app) {
-        JmxConnectionConfigurator hc = getDefault();
+    public static JmxApplicationConfigurator renameJmxConnection(JmxApplication app) {
+        JmxApplicationConfigurator hc = getDefault();
         hc.setupRenameJmxConnection(app);
 
         final DialogDescriptor dd = new DialogDescriptor(hc, "Rename JMX Connection",
@@ -98,16 +97,16 @@ class JmxConnectionConfigurator extends JPanel {
         return displaynameField.getText().trim();
     }
 
-    private static JmxConnectionConfigurator defaultInstance;
+    private static JmxApplicationConfigurator defaultInstance;
 
-    private JmxConnectionConfigurator() {
+    private JmxApplicationConfigurator() {
         initComponents();
         update();
     }
 
-    private static JmxConnectionConfigurator getDefault() {
+    private static JmxApplicationConfigurator getDefault() {
         if (defaultInstance == null) {
-            defaultInstance = new JmxConnectionConfigurator();
+            defaultInstance = new JmxApplicationConfigurator();
         }
         return defaultInstance;
     }

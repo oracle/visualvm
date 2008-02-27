@@ -35,12 +35,12 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 public final class ApplicationsSupport {
 
     private static ApplicationsSupport instance;
-
     private final JvmstatApplicationProvider jvmstatApplicationProvider;
 
-
     public static synchronized ApplicationsSupport getInstance() {
-        if (instance == null) instance = new ApplicationsSupport();
+        if (instance == null) {
+            instance = new ApplicationsSupport();
+        }
         return instance;
     }
 
@@ -50,13 +50,12 @@ public final class ApplicationsSupport {
 
     public ApplicationsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
-        
+
         jvmstatApplicationProvider = new JvmstatApplicationProvider();
         jvmstatApplicationProvider.initialize();
 
-        new ApplicationActionsProvider().initialize();
-        
         new JmxApplicationProvider().initialize();
-    }
 
+        ApplicationActionsProvider.initialize();
+    }
 }
