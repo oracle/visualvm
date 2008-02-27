@@ -52,7 +52,7 @@ class RenameConfigurator extends JPanel {
 
   public static RenameConfigurator defineName(DataSource dataSource) {
     RenameConfigurator hc = getDefault();
-    hc.setupDefineCoreDump(dataSource);
+    hc.setupDefineName(dataSource);
     
     final DialogDescriptor dd = new DialogDescriptor(hc, "Rename", true, new Object[] {
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
@@ -80,7 +80,7 @@ class RenameConfigurator extends JPanel {
     return defaultInstance;
   }
   
-  private void setupDefineCoreDump(DataSource dataSource) {
+  private void setupDefineName(DataSource dataSource) {
     nameField.setText(DataSourceDescriptorFactory.getDescriptor(dataSource).getName());
     nameField.selectAll();
   }
@@ -97,8 +97,8 @@ class RenameConfigurator extends JPanel {
     setLayout(new GridBagLayout());
     GridBagConstraints constraints;
     
-    // coreDumpFileLabel
-    coreDumpFileLabel = new JLabel("New Name:");
+    // nameLabel
+    nameLabel = new JLabel("New Name:");
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -106,7 +106,7 @@ class RenameConfigurator extends JPanel {
     constraints.fill = GridBagConstraints.NONE;
     constraints.anchor = GridBagConstraints.EAST;
     constraints.insets = new Insets(15, 10, 0, 0);
-    add(coreDumpFileLabel, constraints);
+    add(nameLabel, constraints);
     
     // coreDumpFileField
     nameField = new JTextField();
@@ -142,7 +142,7 @@ class RenameConfigurator extends JPanel {
     okButton = new JButton("OK");
   }
   
-  private JLabel coreDumpFileLabel;
+  private JLabel nameLabel;
   private JTextField nameField;
   
   private JButton okButton;
