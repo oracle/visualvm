@@ -27,73 +27,106 @@ package com.sun.tools.visualvm.core.model;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.ClassNameComparator;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.datasupport.DataChangeSupport;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 
 /**
  *
  * @author Tomas Hurka
  */
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
-
-  private SortedSet<ModelProvider<M, D>> factories = new TreeSet(new ModelProviderComparator());
-  private Map<D, Reference<M>> modelMap = new WeakHashMap();
-
-  public final synchronized M getModel(D dataSource) {
-    Reference<M> modelRef = modelMap.get(dataSource);
-    if (modelRef != null) {
-      M model = modelRef.get();
-      if (model != null) {
+    
+    private SortedSet<ModelProvider<M, D>> factories = new TreeSet(new ModelProviderComparator());
+    private Map<D,M> modelMap = new HashMap();
+    private DataChangeSupport<ModelProvider<M, D>> factoryChange = new DataChangeSupport();
+    
+    public final synchronized M getModel(D dataSource) {
+        M model = modelMap.get(dataSource);
+        if (model != null) {
+            return model;
+        }
+        for (ModelProvider<M, D> factory : factories) {
+            model = factory.createModelFor(dataSource);
+            if (model != null) {
+                modelMap.put(dataSource,model);
+                break;
+            }
+        }
         return model;
-      }
     }
-    for (ModelProvider<M, D> factory : factories) {
-      M model = factory.createModelFor(dataSource);
-      if (model != null) {
-        modelMap.put(dataSource,new SoftReference(model));
-        return model;
-      }
+    
+    public final synchronized boolean registerFactory(ModelProvider<M, D> newFactory) {
+//        System.out.println("Registering Class "+newFactory.getClass().getName());
+//        Class superClass = newFactory.getClass();
+//        ParameterizedType type = null;
+//        while(!superClass.equals(Object.class)) {
+//            Type genType =  superClass.getGenericSuperclass();
+//            if (genType instanceof ParameterizedType) {
+//                type = (ParameterizedType) genType;
+//                break;
+//            } else if (genType instanceof Class) {
+//                superClass = (Class) genType;
+//            }
+//        }
+//        if (type != null) {
+//            Type[] types = type.getActualTypeArguments();
+//            for (int i = 0; i < types.length; i++) {
+//                System.out.println("Type "+types[i]);
+//            }
+//        }
+        boolean added = factories.add(newFactory);
+        if (added) {
+            clearCache();
+            factoryChange.fireChange(factories,Collections.singleton(newFactory),null);
+        }
+        return added;
     }
-    return null;
-  }
-  
-  public final synchronized void registerFactory(ModelProvider<M, D> newFactory) {
-    clearCache();
-    factories.add(newFactory);
-  }
-  
-  public final synchronized boolean unregisterFactory(ModelProvider<M, D> oldFactory) {
-   clearCache();
-   return factories.remove(oldFactory);
-  }
-  
-  public int depth() {
-    return -1;
-  }
-  
-  private void clearCache() {
-    if (!modelMap.isEmpty()) modelMap = new WeakHashMap();
-  }
-  
-  private class ModelProviderComparator implements Comparator<ModelProvider<M,D>> {
+    
+    public final synchronized boolean unregisterFactory(ModelProvider<M, D> oldFactory) {
+        boolean removed = factories.remove(oldFactory);
+        if (removed) {
+            clearCache();
+            factoryChange.fireChange(factories,null,Collections.singleton(oldFactory));
+        }
+        return removed;
+    }
+    
+    public void addFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
+        factoryChange.addChangeListener(listener);
+    }
+    
+    public void removeFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
+        factoryChange.removeChangeListener(listener);
+    }
 
-    public int compare(ModelProvider<M, D> factory1, ModelProvider<M, D> factory2) {
-      int thisVal = factory1.depth();
-      int anotherVal = factory2.depth();
-
-      if (thisVal<anotherVal) {
-        return 1;
-      }
-      if (thisVal>anotherVal) {
+    public int depth() {
         return -1;
-      }
-      // same depth -> use class name to create artifical ordering
-      return ClassNameComparator.INSTANCE.compare(factory1, factory2);
     }
-  }
+    
+    private void clearCache() {
+        if (!modelMap.isEmpty()) modelMap = new HashMap();
+    }
+    
+    private class ModelProviderComparator implements Comparator<ModelProvider<M,D>> {
+        
+        public int compare(ModelProvider<M, D> factory1, ModelProvider<M, D> factory2) {
+            int thisVal = factory1.depth();
+            int anotherVal = factory2.depth();
+            
+            if (thisVal<anotherVal) {
+                return 1;
+            }
+            if (thisVal>anotherVal) {
+                return -1;
+            }
+            // same depth -> use class name to create artifical ordering
+            return ClassNameComparator.INSTANCE.compare(factory1, factory2);
+        }
+    }
 }
