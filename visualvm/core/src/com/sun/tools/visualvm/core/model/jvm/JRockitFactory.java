@@ -40,14 +40,14 @@ import sun.jvmstat.monitor.StringMonitor;
  *
  * @author Tomas Hurka
  */
-public class JRockitFactory extends AbstractModelProvider<JVM,Application> {
+public class JRockitFactory extends SunFactory {
 
     public JVM createModelFor(Application appl) {
         if (appl instanceof JvmstatApplication) {
             JvmstatApplication app = (JvmstatApplication) appl;
             MonitoredVm vm = null;
             try {
-                vm = JVMFactory.getMonitoredVm(app);
+                vm = SunFactory.getMonitoredVm(app);
                 if (vm != null) {
                     StringMonitor name = (StringMonitor) vm.findByName("java.property.java.vm.name");   // NOI18N
 
