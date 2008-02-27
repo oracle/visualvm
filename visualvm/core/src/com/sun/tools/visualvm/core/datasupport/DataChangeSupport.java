@@ -68,7 +68,7 @@ public final class DataChangeSupport<X> {
         });
     }
     
-    private class ChangeSupport<X> {
+    private static class ChangeSupport<X> {
         
         private Set<DataChangeListener<X>> listeners = new HashSet();
         private Set<X> currentSet;
@@ -77,8 +77,10 @@ public final class DataChangeSupport<X> {
             if (!listeners.add(listener)) {
                 throw new IllegalArgumentException("Listener " + listener + " already registed");     // NOI18N
             }
-            if (currentSet != null)
-                fireChange(currentSet, null, null);
+            if (currentSet != null) {
+                DataChangeEvent<X> event = new DataChangeEvent(currentSet, currentSet, null);
+                listener.dataChanged(event);
+            }
         }
         
         private void removeChangeListener(DataChangeListener<X> listener) {
