@@ -71,11 +71,13 @@ class JmxConnectionActionsProvider {
                     JmxConnectionConfigurator.addJmxConnection();
             if (addJmxConnectionConfiguration != null) {
                 try {
-                    String url = addJmxConnectionConfiguration.getConnection();
-                    if (!url.startsWith("service:jmx:")) {
-                        url = "service:jmx:rmi:///jndi/rmi://" + url + "/jmxrmi";
+                    String urlStr = addJmxConnectionConfiguration.getConnection();
+                    if (!urlStr.startsWith("service:jmx:")) {
+                        urlStr = "service:jmx:rmi:///jndi/rmi://" + urlStr + "/jmxrmi";
                     }
-                    new JmxApplicationProvider().processNewJmxApplication(Host.LOCALHOST, new JMXServiceURL(url));
+                    JMXServiceURL url = new JMXServiceURL(urlStr);
+                    // TODO: Compute Host and add new remote host node if necessary
+                    new JmxApplicationProvider().processNewJmxApplication(Host.LOCALHOST, addJmxConnectionConfiguration.getDisplayName(), url);
                 } catch (MalformedURLException ex) {
                     Exceptions.printStackTrace(ex);
                 }

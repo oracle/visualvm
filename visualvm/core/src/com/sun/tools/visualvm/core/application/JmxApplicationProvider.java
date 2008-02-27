@@ -40,8 +40,8 @@ import javax.management.remote.JMXServiceURL;
  */
 public class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
 
-    public void processNewJmxApplication(Host host, JMXServiceURL url) {
-        JmxApplication jmxapp = new JmxApplication(url);
+    public void processNewJmxApplication(Host host, String name, JMXServiceURL url) {
+        JmxApplication jmxapp = new JmxApplication(host, name, url);
         Set<JmxApplication> jmxapps = new HashSet<JmxApplication>();
         jmxapps.add(jmxapp);
         host.getRepository().addDataSources(jmxapps);
