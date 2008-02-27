@@ -419,8 +419,8 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     protected int lastRow = -1;
     private AbstractTreeTableModel treeTableModel;
     private CustomSortableHeaderRenderer headerRenderer;
-    private ImageIcon sortAscIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/sortAsc.png")); //NOI18N
-    private ImageIcon sortDescIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/sortDesc.png")); //NOI18N
+    private ImageIcon sortAscIcon = new ImageIcon(JTreeTable.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortAsc.png")); //NOI18N
+    private ImageIcon sortDescIcon = new ImageIcon(JTreeTable.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortDesc.png")); //NOI18N
     private JTableHeader tableHeader;
     private String internalFindString;
 
