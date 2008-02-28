@@ -62,6 +62,20 @@ public class ExplorerSupport {
         return sharedInstance;
     }
 
+    
+    /**
+     * Returns current DataSource position within its owner DataSource in explorer tree or -1 if the position cannot be determined.
+     * 
+     * @param dataSource DataSource for which to get the position.
+     * @return current DataSource position within its owner DataSource in explorer tree or -1 if the position cannot be determined.
+     */
+    public int getDataSourcePosition(DataSource dataSource) {
+        ExplorerNode node = getNode(dataSource);
+        if (node == null) return -1;
+        ExplorerNode parentNode = (ExplorerNode)node.getParent();
+        if (parentNode == null) return -1;
+        return parentNode.getIndex(node);
+    }
 
     /**
      * Selects DataSource in explorer tree.
