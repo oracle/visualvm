@@ -29,8 +29,15 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -44,6 +51,12 @@ import org.openide.util.RequestProcessor;
  */
 // A provider for Hosts
 class HostProvider extends DefaultDataSourceProvider<HostImpl> {
+    
+    static final String SNAPSHOT_VERSION = "snapshot_version";
+    static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
 
     private HostImpl LOCALHOST = null;
 
@@ -78,7 +91,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     
     private void createHostImpl(HostProperties hostDescriptor, boolean interactive) {
         final String hostName = hostDescriptor.getHostName();
-        HostImpl newHost = null;
+        InetAddress inetAddress = null;
         ProgressHandle pHandle = null;
 
         try {
@@ -86,7 +99,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             pHandle.setInitialDelay(0);
             pHandle.start();
             try {
-                newHost = new HostImpl(hostName, hostDescriptor.getDisplayName());
+                inetAddress = InetAddress.getByName(hostName);
             } catch (UnknownHostException e) {
                 if (interactive) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -103,25 +116,50 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             });
         }
 
-        if (newHost != null) {
-            final Set<HostImpl> knownHosts = getDataSources(HostImpl.class);
-            if (knownHosts.contains(newHost)) {
+        if (inetAddress != null) {
+            final HostImpl knownHost = getHostByAddress(inetAddress);
+            if (knownHost != null) {
                 if (interactive) {
-                    final HostImpl newHostF = newHost;
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            HostImpl existingHost = null;
-                            for (HostImpl knownHost : knownHosts) if (knownHost.equals(newHostF)) { existingHost = knownHost; break; }
-                            ExplorerSupport.sharedInstance().selectDataSource(existingHost);
-                            NetBeansProfiler.getDefaultNB().displayWarning("<html>Host " + hostName + " already monitored as " + existingHost.getDisplayName() + "</html>");
+                            ExplorerSupport.sharedInstance().selectDataSource(knownHost);
+                            NetBeansProfiler.getDefaultNB().displayWarning("<html>Host " + hostName + " already monitored as " + DataSourceDescriptorFactory.getDescriptor(knownHost).getName() + "</html>");
                         }
                     });
                 }
             } else {
-                RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
-                registerDataSource(newHost);
+                String ipString = inetAddress.getHostAddress();
+                
+                String[] propNames = new String[] { SNAPSHOT_VERSION,
+                    HostImpl.PROPERTY_IP,
+                    DataSourceDescriptor.PROPERTY_NAME };
+                String[] propValues = new String[] { CURRENT_SNAPSHOT_VERSION,
+                    ipString,
+                    hostDescriptor.getDisplayName() };
+                
+                Storage storage = new Storage(HostsSupport.getStorageDirectory(), ipString + Storage.DEFAULT_PROPERTIES_EXT);
+                storage.setCustomProperties(propNames, propValues);
+                
+                HostImpl newHost = null;
+                try {
+                    newHost = new HostImpl(storage);
+                } catch (Exception e) {
+                    System.err.println("Error creating host: " + e.getMessage()); // Should never happen
+                }
+                
+                if (newHost != null) {
+                    RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
+                    registerDataSource(newHost);
+                }
             }
         }
+    }
+    
+    private HostImpl getHostByAddress(InetAddress inetAddress) {
+        Set<HostImpl> knownHosts = getDataSources(HostImpl.class);
+        for (HostImpl knownHost : knownHosts)
+            if (knownHost.getInetAddress().equals(inetAddress)) return knownHost;
+        return null;
     }
     
     // Here the Host instances for localhost and persisted remote hosts should be created
@@ -136,7 +174,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     
     private void initLocalHost() {
         try {
-            LOCALHOST = new HostImpl("localhost", "Local");
+            LOCALHOST = new HostImpl();
             DataSource.ROOT.getRepository().addDataSource(LOCALHOST);
             registerDataSource(LOCALHOST);
         } catch (UnknownHostException e) {
@@ -146,11 +184,31 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     }
     
     private void initPersistedHosts() {
-//        HostDescriptor localhostDescriptor = new HostDescriptor("msedliak-ws.czech.sun.com", "sedlak");
-//        createHostImpl(localhostDescriptor, false);
-//        HostDescriptor localhostDescriptor2 = new HostDescriptor("129.157.21.26", "sedlak2");
-//        createHostImpl(localhostDescriptor2, false);
-        // TODO: read persisted hosts from some persistent storage/nbpreferences
+        if (!HostsSupport.storageDirectoryExists()) return;
+        
+        File hostsStorageDirectory = HostsSupport.getStorageDirectory();
+        File[] files = hostsStorageDirectory.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(Storage.DEFAULT_PROPERTIES_EXT);
+            }
+        });
+        
+        Set<HostImpl> hosts = new HashSet();
+        for (File file : files) {
+            Storage storage = new Storage(hostsStorageDirectory, file.getName());
+            HostImpl persistedHost = null;
+            
+            try {
+                persistedHost = new HostImpl(storage);
+            } catch (Exception e) {
+                System.err.println("Error loading persisted host: " + e.getMessage());
+            }
+            
+            if (persistedHost != null) hosts.add(persistedHost);
+        }
+        
+        RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);
+        registerDataSources(hosts);
     }
     
     

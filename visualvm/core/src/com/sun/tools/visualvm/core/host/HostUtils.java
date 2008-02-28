@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.host;
 
-import com.sun.tools.visualvm.core.datasource.Host;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -67,20 +66,6 @@ class HostUtils extends JPanel {
     else return null;
   }
   
-  public static HostProperties renameHost(Host host) {
-    HostUtils hc = getInstance();
-    hc.setupRenameHost(host);
-    
-    final DialogDescriptor dd = new DialogDescriptor(hc, "Rename Host", true, new Object[] {
-      hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
-    final Dialog d = ProfilerDialogs.createDialog(dd);
-    d.pack();
-    d.setVisible(true);
-    
-    if (dd.getValue() == hc.okButton) return new HostProperties(hc.getHostName(), hc.getDisplayName());
-    else return null;
-  }
-  
   
   private static HostUtils instance;
   
@@ -108,16 +93,6 @@ class HostUtils extends JPanel {
     displaynameCheckbox.setEnabled(true);
     hostnameField.setText("");
     displaynameField.setText("");
-  }
-  
-  private void setupRenameHost(Host host) {
-    hostnameField.setEnabled(false);
-    displaynameCheckbox.setSelected(true);
-    displaynameCheckbox.setEnabled(false);
-    hostnameField.setText(host.getHostName());
-    displaynameField.setText(host.getDisplayName());
-    displaynameField.requestFocusInWindow();
-    displaynameField.selectAll();
   }
   
   private void update() {

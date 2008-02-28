@@ -51,7 +51,7 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
             if (Host.LOCALHOST.equals(ds)) {
                 return new LocalHostDescriptor();
             }
-            return HostDescriptor.newInstance(host);
+            return new HostDescriptor(host);
         }
         return null;
     }
@@ -59,18 +59,23 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
     private static class HostDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHost.png", true);
         
-        static HostDescriptor newInstance(Host host) {
-            HostDescriptor desc = new HostDescriptor(host);
-            desc.setName(host.getDisplayName());
-            return desc; 
-        }
-        
         private HostDescriptor(Host host) {
-            super(host,host.getDisplayName(),null,NODE_ICON,POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+            super(host, resolveName(host), null, NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+        }
+
+        public static String resolveName(Host host) {
+            String persistedName = host.getStorage().getCustomProperty(PROPERTY_NAME);
+            if (persistedName != null) return persistedName;
+            else return host.getHostName();
         }
 
         public boolean supportsRename() {
             return true;
+        }
+
+        public void setName(String newName) {
+            super.setName(newName);
+            getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
         }
         
     }

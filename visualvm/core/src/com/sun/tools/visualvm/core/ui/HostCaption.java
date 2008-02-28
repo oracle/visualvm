@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -59,7 +60,7 @@ class HostCaption extends JPanel implements DataFinishedListener<Host> {
 
         //setAlive(host.isAlive());
         setAlive(true);
-        setHostName(host.getDisplayName());
+        setHostName(DataSourceDescriptorFactory.getDescriptor(host).getName());
         setHostIP(-1); // TODO: provide IP once available
 //        setHostIcon(new ImageIcon(HostTypeFactory.getHostTypeFor(host).getIcon()));
         

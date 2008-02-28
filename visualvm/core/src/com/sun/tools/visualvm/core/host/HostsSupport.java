@@ -26,7 +26,9 @@
 package com.sun.tools.visualvm.core.host;
 
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import java.io.File;
 
 /**
  *
@@ -34,6 +36,11 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
  */
 public final class HostsSupport {
 
+    private static final String HOSTS_STORAGE_DIRNAME = "hosts";
+    
+    private static File hostsStorageDirectory;
+    private static String hostsStorageDirectoryString;
+    
     private static HostsSupport instance;
 
     private final HostProvider hostProvider;
@@ -52,6 +59,32 @@ public final class HostsSupport {
 
     HostProvider getHostProvider() {
         return hostProvider;
+    }
+    
+    
+    static String getStorageDirectoryString() {
+        if (hostsStorageDirectoryString == null)
+            hostsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + HOSTS_STORAGE_DIRNAME;
+        return hostsStorageDirectoryString;
+    }
+    
+    // TODO: should be package-private!!!
+    public static File getStorageDirectory() {
+        if (hostsStorageDirectory == null) {
+            String snapshotsStorageString = getStorageDirectoryString();
+            hostsStorageDirectory = new File(snapshotsStorageString);
+            if (hostsStorageDirectory.exists() && hostsStorageDirectory.isFile())
+                throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");
+            if (hostsStorageDirectory.exists() && (!hostsStorageDirectory.canRead() || !hostsStorageDirectory.canWrite()))
+                throw new IllegalStateException("Cannot access hosts storage directory " + snapshotsStorageString + ", read&write permission required");
+            if (!hostsStorageDirectory.exists() && !hostsStorageDirectory.mkdirs())
+                throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString);
+        }
+        return hostsStorageDirectory;
+    }
+    
+    static boolean storageDirectoryExists() {
+        return new File(getStorageDirectoryString()).isDirectory();
     }
 
 

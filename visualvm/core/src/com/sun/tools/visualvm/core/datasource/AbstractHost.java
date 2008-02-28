@@ -37,7 +37,6 @@ import java.util.Set;
 public abstract class AbstractHost extends AbstractDataSource implements Host {
 
     private final String hostName;
-    private String displayName;
     private InetAddress inetAddress;
 
 
@@ -48,18 +47,7 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
      * @throws java.net.UnknownHostException if host cannot be resolved using provided hostName/IP.
      */
     public AbstractHost(String hostName) throws UnknownHostException {
-        this(hostName, hostName);
-    }
-
-    /**
-     * Creates new instance of Host defined by hostName and displayName.
-     * 
-     * @param hostName name or IP of the host,
-     * @param displayName string which represents this Host instance in UI or null (hostName will be used instead).
-     * @throws java.net.UnknownHostException if host cannot be resolved using provided hostName/IP.
-     */
-    public AbstractHost(String hostName, String displayName) throws UnknownHostException {
-        this(hostName, displayName, InetAddress.getByName(hostName));
+        this(hostName, InetAddress.getByName(hostName));
     }
 
     /**
@@ -69,12 +57,11 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
      * @param displayName string which represents this Host instance in UI or null (hostName will be used instead),
      * @param inetAddress InetAddress instance for the host.
      */
-    public AbstractHost(String hostName, String displayName, InetAddress inetAddress) {
+    public AbstractHost(String hostName, InetAddress inetAddress) {
         if (hostName == null) throw new IllegalArgumentException("Host name cannot be null");
         if (inetAddress == null) throw new IllegalArgumentException("InetAddress cannot be null");
         
         this.hostName = hostName;
-        this.displayName = displayName == null ? hostName : displayName;
         this.inetAddress = inetAddress;
     }
     
@@ -82,19 +69,8 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     public String getHostName() {
         return hostName;
     }
-
-    public void setDisplayName(String newDisplayName) {
-        if (newDisplayName == null) throw new IllegalArgumentException("Display name cannot be null");
-        String oldDisplayName = displayName;
-        displayName = newDisplayName;
-        getChangeSupport().firePropertyChange(PROPERTY_DISPLAYNAME, oldDisplayName, newDisplayName);
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
     
-    public InetAddress getInetAddress() {
+    public final InetAddress getInetAddress() {
         return inetAddress;
     }
     
@@ -105,8 +81,8 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     
     public int hashCode() {
         InetAddress address = getInetAddress();
-        if (this == Host.LOCALHOST) return address.hashCode();
-        if (address.isAnyLocalAddress()) return Host.LOCALHOST.hashCode();
+        if (this == LOCALHOST) return address.hashCode();
+        if (address.isAnyLocalAddress()) return LOCALHOST.hashCode();
         else return getInetAddress().hashCode();
     }
 
@@ -120,7 +96,7 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     }
 
     public String toString() {
-        return getHostName() + " [display name: " + getDisplayName() + (getInetAddress() != null ? ", IP: " + getInetAddress().getHostAddress() : "") + "]";
+        return getHostName() + " [IP: " + getInetAddress().getHostAddress() + "]";
     }
 
 }

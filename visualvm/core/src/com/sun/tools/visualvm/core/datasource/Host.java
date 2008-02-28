@@ -40,10 +40,6 @@ public interface Host extends DataSource {
      * Instance representing the localhost.
      */
     public static final Host LOCALHOST = HostsSupport.getInstance().getLocalHost();
-    /**
-     * Named property for host display name
-     */
-    public static final String PROPERTY_DISPLAYNAME = "prop_displayname";
 
     /**
      * Returns host name or IP of the host.
@@ -52,22 +48,6 @@ public interface Host extends DataSource {
      * @return host name or IP of the host.
      */
     public String getHostName();
-
-    /**
-     * Sets display name of this host.
-     * This name is used everywhere in VisualVM UI when referring to this host instance.
-     * 
-     * @param displayName display name of this host.
-     */
-    public void setDisplayName(String displayName);
-
-    /**
-     * Returns display name of this host.
-     * This name is used everywhere in VisualVM UI when referring to this host instance.
-     * 
-     * @return display name of this host.
-     */
-    public String getDisplayName();
 
     /**
      * Returns an InetAddress instance for this hist.

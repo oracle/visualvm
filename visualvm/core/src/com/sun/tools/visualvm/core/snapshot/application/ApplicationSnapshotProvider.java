@@ -93,7 +93,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         Set<Snapshot> snapshots = application.getSnapshots();
         if (snapshots.isEmpty()) return;
         
-        File snapshotDirectory = new File(ApplicationSnapshotsSupport.getSnapshotsStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
+        File snapshotDirectory = new File(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
         if (!snapshotDirectory.exists() && !snapshotDirectory.mkdir())
             throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
         
@@ -137,7 +137,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     
-                    File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getSnapshotsStorageDirectory());
+                    File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getStorageDirectory());
                     if (snapshotDirectory != null) {
                         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
                         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
@@ -177,9 +177,9 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     
         
     private void loadSnapshots() {
-        if (!ApplicationSnapshotsSupport.snapshotsStorageDirectoryExists()) return;
+        if (!ApplicationSnapshotsSupport.storageDirectoryExists()) return;
         
-        File[] files = ApplicationSnapshotsSupport.getSnapshotsStorageDirectory().listFiles(
+        File[] files = ApplicationSnapshotsSupport.getStorageDirectory().listFiles(
                 ApplicationSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
         
         Set<ApplicationSnapshot> snapshots = new HashSet();

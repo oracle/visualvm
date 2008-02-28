@@ -78,15 +78,15 @@ public final class ApplicationSnapshotsSupport {
         return snapshotProvider;
     }
     
-    static String getSnapshotsStorageDirectoryString() {
+    static String getStorageDirectoryString() {
         if (snapshotsStorageDirectoryString == null)
             snapshotsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + SNAPSHOTS_STORAGE_DIRNAME;
         return snapshotsStorageDirectoryString;
     }
     
-    static File getSnapshotsStorageDirectory() {
+    static File getStorageDirectory() {
         if (snapshotsStorageDirectory == null) {
-            String snapshotsStorageString = getSnapshotsStorageDirectoryString();
+            String snapshotsStorageString = getStorageDirectoryString();
             snapshotsStorageDirectory = new File(snapshotsStorageString);
             if (snapshotsStorageDirectory.exists() && snapshotsStorageDirectory.isFile())
                 throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString + ", file in the way");
@@ -98,8 +98,8 @@ public final class ApplicationSnapshotsSupport {
         return snapshotsStorageDirectory;
     }
     
-    static boolean snapshotsStorageDirectoryExists() {
-        return new File(getSnapshotsStorageDirectoryString()).isDirectory();
+    static boolean storageDirectoryExists() {
+        return new File(getStorageDirectoryString()).isDirectory();
     }
     
     
