@@ -49,7 +49,7 @@ class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Applica
     public boolean supportsViewFor(Application application) {
         if (Application.CURRENT_APPLICATION.equals(application) || application.getHost() != Host.LOCALHOST) return false;
         JVM jvm = JVMFactory.getJVMFor(application);
-        return jvm.isAttachable();
+        return jvm.isAttachable() && !jvm.is14() && !jvm.is15();
     }
 
     public synchronized Set<? extends DataSourceView> getViews(final Application application) {

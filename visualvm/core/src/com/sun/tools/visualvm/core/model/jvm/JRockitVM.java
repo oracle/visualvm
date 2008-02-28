@@ -26,6 +26,13 @@
 package com.sun.tools.visualvm.core.model.jvm;
 
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
+import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
+import com.sun.tools.visualvm.core.tools.StackTrace;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -35,59 +42,89 @@ import sun.jvmstat.monitor.MonitoredVm;
  * @author Tomas Hurka
  */
 public class JRockitVM extends JvmstatJVM {
-  private static final String PERM_GEN_PREFIX = "bea.cls.memory.";
-
-  JRockitVM(JvmstatApplication app,MonitoredVm vm) {
-    super(app,vm);
-  }
-
-  public boolean is14() {
-    return getVmVersion().contains("1.4.2");
-  }
-
-  public boolean is15() {
-    return getVmVersion().contains("1.5.0");
-  }
-
-  String getPermGenPrefix() {
-    return PERM_GEN_PREFIX;
-  }
-
-  public boolean isAttachable() {
-    return false;
-  }
-
-  public boolean isMemoryMonitoringSupported() {
-    return true;
-  }
-
-  public boolean isClassMonitoringSupported() {
-    return true;
-  }
-
-  public boolean isThreadMonitoringSupported() {
-    return true;
-  }
-  
-  void initListeners() {
-    try {
-      loadedClasses = (LongMonitor) monitoredVm.findByName("java.cls.loadedClasses");
-      unloadedClasses = (LongMonitor) monitoredVm.findByName("java.cls.unloadedClasses");
-      applicationTime = (LongMonitor) monitoredVm.findByName("sun.rt.applicationTime");
-      threadsDaemon = (LongMonitor) monitoredVm.findByName("java.threads.daemon");
-      threadsLive = (LongMonitor) monitoredVm.findByName("java.threads.live");
-      threadsLivePeak = (LongMonitor) monitoredVm.findByName("java.threads.livePeak");
-      threadsStarted = (LongMonitor) monitoredVm.findByName("java.threads.started");
-      upTime = (LongMonitor) monitoredVm.findByName("bea.rt.ticks");
-      LongMonitor osFrequencyMon = ((LongMonitor)monitoredVm.findByName("bea.rt.counterFrequency"));
-      osFrequency = osFrequencyMon.longValue();
-      genCapacity = monitoredVm.findByPattern("bea.((gc.heap)|(cls.memory)).committed");
-      genUsed = monitoredVm.findByPattern("bea.((gc.heap)|(gc.nursery)|(cls.memory)).used");
-      genMaxCapacity = getGenerationSum(monitoredVm.findByPattern("bea.((gc.heap)|(cls.memory)).max"));
-      monitoredVm.addVmListener(this);
-    } catch (MonitorException ex) {
-      ex.printStackTrace();
+    private static final String PERM_GEN_PREFIX = "bea.cls.memory.";
+    
+    protected Boolean attachAvailable;
+    
+    JRockitVM(JvmstatApplication app,MonitoredVm vm) {
+        super(app,vm);
     }
-  }
-  
+    
+    public boolean is14() {
+        return getVmVersion().contains("1.4.2");
+    }
+    
+    public boolean is15() {
+        return getVmVersion().contains("1.5.0");
+    }
+    
+    String getPermGenPrefix() {
+        return PERM_GEN_PREFIX;
+    }
+    
+    public boolean isMemoryMonitoringSupported() {
+        return true;
+    }
+    
+    public boolean isClassMonitoringSupported() {
+        return true;
+    }
+    
+    public boolean isThreadMonitoringSupported() {
+        return true;
+    }
+    
+    void initListeners() {
+        try {
+            loadedClasses = (LongMonitor) monitoredVm.findByName("java.cls.loadedClasses");
+            unloadedClasses = (LongMonitor) monitoredVm.findByName("java.cls.unloadedClasses");
+            applicationTime = (LongMonitor) monitoredVm.findByName("sun.rt.applicationTime");
+            threadsDaemon = (LongMonitor) monitoredVm.findByName("java.threads.daemon");
+            threadsLive = (LongMonitor) monitoredVm.findByName("java.threads.live");
+            threadsLivePeak = (LongMonitor) monitoredVm.findByName("java.threads.livePeak");
+            threadsStarted = (LongMonitor) monitoredVm.findByName("java.threads.started");
+            upTime = (LongMonitor) monitoredVm.findByName("bea.rt.ticks");
+            LongMonitor osFrequencyMon = ((LongMonitor)monitoredVm.findByName("bea.rt.counterFrequency"));
+            osFrequency = osFrequencyMon.longValue();
+            genCapacity = monitoredVm.findByPattern("bea.((gc.heap)|(cls.memory)).committed");
+            genUsed = monitoredVm.findByPattern("bea.((gc.heap)|(gc.nursery)|(cls.memory)).used");
+            genMaxCapacity = getGenerationSum(monitoredVm.findByPattern("bea.((gc.heap)|(cls.memory)).max"));
+            monitoredVm.addVmListener(this);
+        } catch (MonitorException ex) {
+            ex.printStackTrace();
+        }
+    }    
+    
+    protected String getStackTrace() {
+        try {
+            return StackTrace.runThreadDump(application.getPid());
+        }  catch (Exception ex) {
+            ex.printStackTrace();
+            return "Cannot get thread dump "+ex.getLocalizedMessage(); // NOI18N
+        }
+    }
+    
+    protected boolean isAttachAvailable() {
+        if (attachAvailable == null) {
+            boolean canAttach = Host.LOCALHOST.equals(application.getHost()) && isAttachable();
+            attachAvailable = Boolean.valueOf(canAttach);
+        }
+        return attachAvailable.booleanValue();
+    }
+    
+    public boolean isTakeThreadDumpSupported() {
+        return isAttachAvailable();
+    }
+    
+    public File takeThreadDump() throws IOException {
+        String dump = getStackTrace();
+        File snapshotDir = application.getStorage();
+        String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
+        File dumpFile = new File(snapshotDir,name);
+        OutputStream os = new FileOutputStream(dumpFile);
+        os.write(dump.getBytes("UTF-8"));
+        os.close();
+        return dumpFile;
+    }
+    
 }

@@ -43,7 +43,6 @@ import sun.jvmstat.monitor.MonitoredVm;
  * @author Tomas Hurka
  */
 public class JRockitVM_6 extends JRockitVM {
-  private Boolean attachAvailable;
 
   JRockitVM_6(JvmstatApplication app,MonitoredVm vm) {
     super(app,vm);
@@ -65,36 +64,5 @@ public class JRockitVM_6 extends JRockitVM {
       return null;
     }
   }
-  
-  String getStackTrace() {
-    try {
-      return StackTrace.runThreadDump(application.getPid());
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Cannot get thread dump "+ex.getLocalizedMessage(); // NOI18N
-    }
-  }
-  
-  public boolean isTakeThreadDumpSupported() {
-    return isAttachAvailable();
-  }
 
-  public File takeThreadDump() throws IOException {
-    String dump = getStackTrace();
-    File snapshotDir = application.getStorage();
-    String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
-    File dumpFile = new File(snapshotDir,name);
-    OutputStream os = new FileOutputStream(dumpFile);
-    os.write(dump.getBytes("UTF-8"));
-    os.close();
-    return dumpFile;
-  }
-  
-  boolean isAttachAvailable() {
-    if (attachAvailable == null) {
-      boolean canAttach = Host.LOCALHOST.equals(application.getHost()) && isAttachable();
-      attachAvailable = Boolean.valueOf(canAttach);
-    }
-    return attachAvailable.booleanValue();
-  }
 }
