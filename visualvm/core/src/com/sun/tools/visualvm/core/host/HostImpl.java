@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.host;
 
 import com.sun.tools.visualvm.core.datasource.AbstractHost;
 import com.sun.tools.visualvm.core.datasupport.Storage;
+import java.io.File;
 import java.net.UnknownHostException;
 
 /**
@@ -38,15 +39,17 @@ final class HostImpl extends AbstractHost {
     static final String PROPERTY_IP = "prop_ip";
     
     private Storage givenStorage;
+    private File customPropertiesStorage;
     
     
     HostImpl() throws UnknownHostException {
         super("localhost");
     }
 
-    HostImpl(Storage givenStorage) throws UnknownHostException {
+    HostImpl(Storage givenStorage, File customPropertiesStorage) throws UnknownHostException {
         super(givenStorage.getCustomProperty(PROPERTY_IP));
         this.givenStorage = givenStorage;
+        this.customPropertiesStorage = customPropertiesStorage;
     }
     
     
@@ -55,6 +58,10 @@ final class HostImpl extends AbstractHost {
         return givenStorage;
     }
     
+    
+    File getCustomPropertiesStorage() {
+        return customPropertiesStorage;
+    }
 
     void finished() {
         setState(STATE_FINISHED);

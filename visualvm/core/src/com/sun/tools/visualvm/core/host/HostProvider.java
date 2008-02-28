@@ -77,6 +77,8 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     void removeHost(HostImpl host, boolean interactive) {
         // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
         unregisterDataSource(host);
+        File customPropertiesStorage = host.getCustomPropertiesStorage();
+        if (!customPropertiesStorage.delete()) customPropertiesStorage.deleteOnExit();
     }
     
     
@@ -137,12 +139,13 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                     ipString,
                     hostDescriptor.getDisplayName() };
                 
-                Storage storage = new Storage(HostsSupport.getStorageDirectory(), ipString + Storage.DEFAULT_PROPERTIES_EXT);
+                File customPropertiesStorage = new File(HostsSupport.getStorageDirectory(), ipString + Storage.DEFAULT_PROPERTIES_EXT);
+                Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
                 storage.setCustomProperties(propNames, propValues);
                 
                 HostImpl newHost = null;
                 try {
-                    newHost = new HostImpl(storage);
+                    newHost = new HostImpl(storage, customPropertiesStorage);
                 } catch (Exception e) {
                     System.err.println("Error creating host: " + e.getMessage()); // Should never happen
                 }
@@ -186,8 +189,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     private void initPersistedHosts() {
         if (!HostsSupport.storageDirectoryExists()) return;
         
-        File hostsStorageDirectory = HostsSupport.getStorageDirectory();
-        File[] files = hostsStorageDirectory.listFiles(new FilenameFilter() {
+        File[] files = HostsSupport.getStorageDirectory().listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(Storage.DEFAULT_PROPERTIES_EXT);
             }
@@ -195,11 +197,11 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
         
         Set<HostImpl> hosts = new HashSet();
         for (File file : files) {
-            Storage storage = new Storage(hostsStorageDirectory, file.getName());
+            Storage storage = new Storage(file.getParentFile(), file.getName());
             HostImpl persistedHost = null;
             
             try {
-                persistedHost = new HostImpl(storage);
+                persistedHost = new HostImpl(storage, file);
             } catch (Exception e) {
                 System.err.println("Error loading persisted host: " + e.getMessage());
             }
