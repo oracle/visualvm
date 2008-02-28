@@ -70,6 +70,15 @@ public final class Utils {
     }
     
     
+    public static File getUniqueFile(File directory, String fileName, String fileExt) {
+        File newFile = new File(directory, fileName + fileExt);
+        while (newFile.exists()) {
+            fileName = fileName + "_";
+            newFile = new File(directory, fileName + fileExt);
+        }
+        return newFile;
+    }
+    
     public static boolean copyFile(File file, File copy) {
         if (file == null || !file.isFile()) return false;
         
@@ -146,7 +155,7 @@ public final class Utils {
     public static File extractArchive(File archive, File destination) {
         // TODO: implement extracting directories
         
-        File directory = new File(destination, archive.getName());
+        File directory = getUniqueFile(destination, archive.getName(), "");
         ZipFile zipFile = null;
         
         try {

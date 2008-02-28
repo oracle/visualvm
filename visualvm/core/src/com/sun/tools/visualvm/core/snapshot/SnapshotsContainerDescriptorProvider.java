@@ -51,7 +51,7 @@ class SnapshotsContainerDescriptorProvider extends AbstractModelProvider<DataSou
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
         
         SnapshotsContainerDescriptor() {
-            super(SnapshotsContainer.sharedInstance(), "Snapshots", null, NODE_ICON, 30, EXPAND_NEVER);
+            super(SnapshotsContainer.sharedInstance(), "Snapshots", null, NODE_ICON, 30, EXPAND_ON_FIRST_CHILD);
         }
         
     }

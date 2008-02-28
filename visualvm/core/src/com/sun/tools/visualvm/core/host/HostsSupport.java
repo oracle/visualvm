@@ -68,8 +68,7 @@ public final class HostsSupport {
         return hostsStorageDirectoryString;
     }
     
-    // TODO: should be package-private!!!
-    public static File getStorageDirectory() {
+    static File getStorageDirectory() {
         if (hostsStorageDirectory == null) {
             String snapshotsStorageString = getStorageDirectoryString();
             hostsStorageDirectory = new File(snapshotsStorageString);

@@ -71,20 +71,6 @@ class CoreDumpConfigurator extends JPanel {
     else return null;
   }
   
-  public static CoreDumpConfigurator renameCoreDump(CoreDump coreDump) {
-    CoreDumpConfigurator hc = getDefault();
-    hc.setupRenameCoreDump(coreDump);
-    
-    final DialogDescriptor dd = new DialogDescriptor(hc, "Rename VM Coredump", true, new Object[] {
-      hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
-    final Dialog d = ProfilerDialogs.createDialog(dd);
-    d.pack();
-    d.setVisible(true);
-    
-    if (dd.getValue() == hc.okButton) return hc;
-    else return null;
-  }
-  
   public String getCoreDumpFile() {
     return coreDumpFileField.getText().trim();
   }
@@ -119,17 +105,6 @@ class CoreDumpConfigurator extends JPanel {
     javaHomeFileField.setEnabled(true);
   }
   
-  private void setupRenameCoreDump(CoreDump coreDump) {
-    coreDumpFileField.setEnabled(false);
-    displaynameCheckbox.setSelected(true);
-    displaynameCheckbox.setEnabled(false);
-    javaHomeFileField.setEnabled(false);
-    coreDumpFileField.setText(coreDump.getFile().getAbsolutePath());
-    displaynameField.setText(coreDump.getDisplayName());
-    displaynameField.requestFocusInWindow();
-    displaynameField.selectAll();
-  }
-  
   private void update() {
     if (internalChange) return;
     SwingUtilities.invokeLater(new Runnable() {
@@ -142,7 +117,8 @@ class CoreDumpConfigurator extends JPanel {
         
         if (!displaynameCheckbox.isSelected()) {
           internalChange = true;
-          displaynameField.setText(coreDumpname);
+          File file = new File(coreDumpname);
+          if (file.isFile()) displaynameField.setText(file.getName());
           internalChange = false;
         }
         

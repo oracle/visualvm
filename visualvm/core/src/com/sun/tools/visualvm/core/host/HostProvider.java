@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
@@ -139,7 +140,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                     ipString,
                     hostDescriptor.getDisplayName() };
                 
-                File customPropertiesStorage = new File(HostsSupport.getStorageDirectory(), ipString + Storage.DEFAULT_PROPERTIES_EXT);
+                File customPropertiesStorage = Utils.getUniqueFile(HostsSupport.getStorageDirectory(), ipString, Storage.DEFAULT_PROPERTIES_EXT);
                 Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
                 storage.setCustomProperties(propNames, propValues);
                 

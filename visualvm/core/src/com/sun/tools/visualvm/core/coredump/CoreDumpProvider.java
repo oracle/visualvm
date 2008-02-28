@@ -26,14 +26,19 @@
 package com.sun.tools.visualvm.core.coredump;
 
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import java.io.File;
-import java.io.IOException;
+import java.io.FilenameFilter;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -44,12 +49,11 @@ import org.openide.util.RequestProcessor;
 // A provider for Coredumps
 class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     
-    private static CoreDumpProvider sharedInstance;
-    
-    public synchronized static CoreDumpProvider sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new CoreDumpProvider();
-        return sharedInstance;
-    }
+    static final String SNAPSHOT_VERSION = "snapshot_version";
+    static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
     
     void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome) {
@@ -61,33 +65,54 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     }
     
     private void createCoreDumpImpl(final String coreDumpFile, final String displayName, final String jdkHome) {
-        final CoreDumpImpl coreDump;
-        try {
-            File jdkHomeFile = null;
-            if (jdkHome != null && jdkHome.length() > 0)
-                jdkHomeFile = new File(jdkHome).getCanonicalFile();
-            coreDump = new CoreDumpImpl(new File(coreDumpFile), displayName, jdkHomeFile);
-        } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ex);
-            return;
-        }
-        final Set<CoreDumpImpl> knownCoreDumps = getDataSources(CoreDumpImpl.class);
-        if (knownCoreDumps.contains(coreDump)) {
+        
+        final CoreDumpImpl knownCoreDump = getCoreDumpByFile(new File(coreDumpFile));
+        if (knownCoreDump != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ExplorerSupport.sharedInstance().selectDataSource(coreDump);
-                    NetBeansProfiler.getDefaultNB().displayWarning("<html>Core dump " + displayName + " already added </html>");
+                    ExplorerSupport.sharedInstance().selectDataSource(knownCoreDump);
+                    NetBeansProfiler.getDefaultNB().displayWarning("<html>Core dump " + displayName + " already added as " + DataSourceDescriptorFactory.getDescriptor(knownCoreDump).getName() + "</html>");
                 }
             });
-        } else {
-            CoreDumpsContainer.sharedInstance().getRepository().addDataSource(coreDump);
-            registerDataSource(coreDump);
+            return;
         }
+        
+        String[] propNames = new String[] { SNAPSHOT_VERSION,
+            Snapshot.PROPERTY_FILE, DataSourceDescriptor.PROPERTY_NAME, CoreDumpImpl.PROPERTY_JAVA_HOME };
+        String[] propValues = new String[] { CURRENT_SNAPSHOT_VERSION,
+            coreDumpFile, displayName, jdkHome };
+
+        File customPropertiesStorage = Utils.getUniqueFile(CoreDumpSupport.getStorageDirectory(), new File(coreDumpFile).getName(), Storage.DEFAULT_PROPERTIES_EXT);
+        Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
+        storage.setCustomProperties(propNames, propValues);
+
+        CoreDumpImpl newCoreDump = null;
+        try {
+            newCoreDump = new CoreDumpImpl(storage, customPropertiesStorage);
+        } catch (Exception e) {
+            System.err.println("Error creating coredump: " + e.getMessage());
+            return;
+        }
+
+        if (newCoreDump != null) {
+            CoreDumpsContainer.sharedInstance().getRepository().addDataSource(newCoreDump);
+            registerDataSource(newCoreDump);
+        }
+    }
+    
+    private CoreDumpImpl getCoreDumpByFile(File file) {
+        if (!file.isFile()) return null;
+        Set<CoreDumpImpl> knownCoredumps = getDataSources(CoreDumpImpl.class);
+        for (CoreDumpImpl knownCoredump : knownCoredumps)
+            if (knownCoredump.getFile().equals(file)) return knownCoredump;
+        return null;
     }
 
     void removeCoreDump(CoreDumpImpl coreDump, boolean interactive) {
         // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
         unregisterDataSource(coreDump);
+        File customPropertiesStorage = coreDump.getCustomPropertiesStorage();
+        if (!customPropertiesStorage.delete()) customPropertiesStorage.deleteOnExit();
     }
     
     
@@ -99,10 +124,43 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
         }
     }
     
+    private void initPersistedCoreDumps() {
+        if (!CoreDumpSupport.storageDirectoryExists()) return;
+        
+        File[] files = CoreDumpSupport.getStorageDirectory().listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(Storage.DEFAULT_PROPERTIES_EXT);
+            }
+        });
+        
+        Set<CoreDumpImpl> coredumps = new HashSet();
+        for (File file : files) {
+            Storage storage = new Storage(file.getParentFile(), file.getName());
+            CoreDumpImpl persistedCoredump = null;
+            
+            try {
+                persistedCoredump = new CoreDumpImpl(storage, file);
+            } catch (Exception e) {
+                System.err.println("Error loading persisted host: " + e.getMessage());
+            }
+            
+            if (persistedCoredump != null) coredumps.add(persistedCoredump);
+        }
+        
+        CoreDumpsContainer.sharedInstance().getRepository().addDataSources(coredumps);
+        registerDataSources(coredumps);
+    }
+    
+    
     CoreDumpProvider() {
     }
     
     void register() {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                initPersistedCoreDumps();
+            }
+        });
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
     }
   

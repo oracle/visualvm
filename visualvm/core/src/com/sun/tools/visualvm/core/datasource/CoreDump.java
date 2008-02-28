@@ -33,27 +33,6 @@ package com.sun.tools.visualvm.core.datasource;
 public interface CoreDump extends Snapshot {
     
     /**
-     * Named property for display name of the coredump.
-     */
-    public static final String PROPERTY_DISPLAYNAME = "prop_displayname";
-    
-    /**
-     * Returns display name of this core dump.
-     * This name is used everywhere in VisualVM UI when referring to this core dump instance.
-     * 
-     * @return display name of this core dump.
-     */
-    public String getDisplayName();
-    
-    /**
-     * Sets display name of this core dump.
-     * This name is used everywhere in VisualVM UI when referring to this core dump instance.
-     * 
-     * @param string display name of this core dump.
-     */
-    public void setDisplayName(String string);
-    
-    /**
      * Returns java executable which will be used to retrieve data from this core dump.
      * This executable must be compatible with the executable which was running the application
      * when the core dump was created.

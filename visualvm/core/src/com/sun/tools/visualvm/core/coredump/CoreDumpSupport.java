@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.coredump;
 
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
@@ -35,6 +36,11 @@ import java.io.File;
  * @author Tomas Hurka
  */
 public final class CoreDumpSupport {
+    
+    private static final String COREDUMPS_STORAGE_DIRNAME = "coredumps";
+    
+    private static File coredumpsStorageDirectory;
+    private static String coredumpsStorageDirectoryString;
     
     private static CoreDumpCategory category = new CoreDumpCategory();
     private static CoreDumpProvider provider;
@@ -61,6 +67,30 @@ public final class CoreDumpSupport {
             if (currentJDKHome.endsWith(jreSuffix)) currentJDKHome = currentJDKHome.substring(0, currentJDKHome.length() - jreSuffix.length());
         }
         return currentJDKHome;
+    }
+    
+    static String getStorageDirectoryString() {
+        if (coredumpsStorageDirectoryString == null)
+            coredumpsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + COREDUMPS_STORAGE_DIRNAME;
+        return coredumpsStorageDirectoryString;
+    }
+    
+    static File getStorageDirectory() {
+        if (coredumpsStorageDirectory == null) {
+            String snapshotsStorageString = getStorageDirectoryString();
+            coredumpsStorageDirectory = new File(snapshotsStorageString);
+            if (coredumpsStorageDirectory.exists() && coredumpsStorageDirectory.isFile())
+                throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString + ", file in the way");
+            if (coredumpsStorageDirectory.exists() && (!coredumpsStorageDirectory.canRead() || !coredumpsStorageDirectory.canWrite()))
+                throw new IllegalStateException("Cannot access coredumps storage directory " + snapshotsStorageString + ", read&write permission required");
+            if (!coredumpsStorageDirectory.exists() && !coredumpsStorageDirectory.mkdirs())
+                throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString);
+        }
+        return coredumpsStorageDirectory;
+    }
+    
+    static boolean storageDirectoryExists() {
+        return new File(getStorageDirectoryString()).isDirectory();
     }
 
     

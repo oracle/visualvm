@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -54,7 +55,7 @@ class CoreDumpCaption extends JPanel {
     public CoreDumpCaption(CoreDump core) {
         initComponents();
 
-        setApplicationName("Core dump "+core.getDisplayName());
+        setApplicationName("Core dump " + DataSourceDescriptorFactory.getDescriptor(core).getName());
     }
 
     public static void setAnimate(boolean animate) {

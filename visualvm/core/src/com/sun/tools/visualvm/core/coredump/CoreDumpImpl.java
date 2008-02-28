@@ -26,30 +26,28 @@
 package com.sun.tools.visualvm.core.coredump;
 
 import com.sun.tools.visualvm.core.datasource.AbstractCoreDump;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import java.io.File;
 import java.io.IOException;
 
 /**
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
 class CoreDumpImpl extends AbstractCoreDump {
-    private String displayName;
     
-    public CoreDumpImpl(File file, String dName, File javaHomeName) throws IOException {
-        super(file, javaHomeName);
-        displayName = dName;
-    }
+    static final String PROPERTY_JAVA_HOME = "prop_java_home";
     
-    public String getDisplayName() {
-        return displayName;
-    }
+    private Storage givenStorage;
+    private File customPropertiesStorage;
     
-    public void setDisplayName(String newDisplayName) {
-        if (displayName == null && newDisplayName == null) return;
-        String oldDisplayName = displayName;
-        displayName = newDisplayName;
-        getChangeSupport().firePropertyChange(PROPERTY_DISPLAYNAME, oldDisplayName, newDisplayName);
+    
+    public CoreDumpImpl(Storage givenStorage, File customPropertiesStorage) throws IOException {
+        super(new File(givenStorage.getCustomProperty(PROPERTY_FILE)),
+                new File(givenStorage.getCustomProperty(PROPERTY_JAVA_HOME)));
+        this.givenStorage = givenStorage;
+        this.customPropertiesStorage = customPropertiesStorage;
     }
     
     public int hashCode() {
@@ -63,11 +61,22 @@ class CoreDumpImpl extends AbstractCoreDump {
         return false;
     }
     
+    public boolean supportsDelete() {
+        return false;
+    }
+    
+    
+    protected Storage createStorage() {
+        return givenStorage;
+    }
+    
 //    String getId() {
 //        return Integer.toString(getFile().hashCode());
 //    }
     
-    
+    File getCustomPropertiesStorage() {
+        return customPropertiesStorage;
+    }
     
     void finished() {
         setState(STATE_FINISHED); 

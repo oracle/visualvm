@@ -47,7 +47,7 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
             return new CoreDumpsContainerDescriptor();
         }
         if (ds instanceof CoreDump) {
-            return CoreDumpDescriptor.newInstance((CoreDump) ds);
+            return new CoreDumpDescriptor((CoreDump) ds);
         }
         return null;
     }
@@ -55,12 +55,6 @@ class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
     private static class CoreDumpDescriptor extends AbstractSnapshotDescriptor<CoreDump> {
         
         private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredump.png", true);
-        
-        static CoreDumpDescriptor newInstance(CoreDump coreDump) {
-            CoreDumpDescriptor desc = new CoreDumpDescriptor(coreDump);
-            desc.setName(coreDump.getDisplayName());
-            return desc; 
-        }
         
         CoreDumpDescriptor(CoreDump coreDump) {
             super(coreDump, ICON);
