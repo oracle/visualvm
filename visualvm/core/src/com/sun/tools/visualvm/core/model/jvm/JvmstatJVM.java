@@ -26,13 +26,14 @@
 package com.sun.tools.visualvm.core.model.jvm;
 
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,7 @@ import sun.management.counter.Variability;
  *
  * @author Tomas Hurka
  */
-public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataFinishedListener {
+public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataFinishedListener<Application> {
     JvmstatApplication application;
     Boolean isDumpOnOOMEnabled;
     MonitoredVm monitoredVm;
@@ -77,6 +78,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         application = app;
         monitoredVm = vm;
         valueCache = new HashMap();
+        listeners = new HashSet();
     }
     
     public boolean is14() {
@@ -175,18 +177,22 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         return isDumpOnOOMEnabled.booleanValue();
     }
     
-    public synchronized void addMonitoredDataListener(MonitoredDataListener l) {
-        if (listeners == null) {
-            initListeners();
+    public void addMonitoredDataListener(MonitoredDataListener l) {
+        synchronized (listeners) {
+            if (listeners.isEmpty()) {
+                initListeners();
+            }
+            listeners.add(l);
         }
-        listeners.add(l);
     }
     
-    public synchronized void removeMonitoredDataListener(MonitoredDataListener l) {
-        if (listeners != null) {
-            listeners.remove(l);
-            if (listeners.isEmpty()) {
-                disableListeners();
+    public void removeMonitoredDataListener(MonitoredDataListener l) {
+        synchronized (listeners) {
+            if (!listeners.isEmpty()) {
+                listeners.remove(l);
+                if (listeners.isEmpty()) {
+                    disableListeners();
+                }
             }
         }
     }
@@ -232,7 +238,6 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         } catch (MonitorException ex) {
             ex.printStackTrace();
         }
-        listeners = null;
     }
     
     long[] getGenerationSum(List<LongMonitor> counters) {
@@ -323,11 +328,13 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
      */
     public void monitorsUpdated(VmEvent event) {
         assert event.getMonitoredVm().equals(monitoredVm);
-        assert !listeners.isEmpty();
-        Iterator<MonitoredDataListener> it = listeners.iterator();
         MonitoredData data = new MonitoredData(this);
-        while(it.hasNext()) {
-            it.next().monitoredDataEvent(data);
+        List<MonitoredDataListener> listenersCopy;
+        synchronized  (listeners) {
+            listenersCopy = new ArrayList(listeners);
+        }
+        for (MonitoredDataListener listener : listenersCopy) {
+            listener.monitoredDataEvent(data);
         }
     }
     
@@ -342,7 +349,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         disableListeners();
     }
     
-    public void dataFinished(Object dataSource) {
+    public void dataFinished(Application dataSource) {
         disableListeners();
     }
     

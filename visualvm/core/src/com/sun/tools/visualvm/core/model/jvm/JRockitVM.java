@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.model.jvm;
 
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
-import java.util.HashSet;
 import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -85,7 +84,6 @@ public class JRockitVM extends JvmstatJVM {
       genCapacity = monitoredVm.findByPattern("bea.((gc.heap)|(cls.memory)).committed");
       genUsed = monitoredVm.findByPattern("bea.((gc.heap)|(gc.nursery)|(cls.memory)).used");
       genMaxCapacity = getGenerationSum(monitoredVm.findByPattern("bea.((gc.heap)|(cls.memory)).max"));
-      listeners = new HashSet();
       monitoredVm.addVmListener(this);
     } catch (MonitorException ex) {
       ex.printStackTrace();

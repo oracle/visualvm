@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.model.jvm;
 
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
-import java.util.HashSet;
 import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -75,7 +74,6 @@ public class SunJVM_5 extends SunJVM_4 {
       genCapacity = monitoredVm.findByPattern("sun.gc.generation.[0-9]+.capacity");
       genUsed = monitoredVm.findByPattern("sun.gc.generation.[0-9]+.space.[0-9]+.used");
       genMaxCapacity=getGenerationSum(monitoredVm.findByPattern("sun.gc.generation.[0-9]+.maxCapacity"));
-      listeners = new HashSet();
       monitoredVm.addVmListener(this);
     } catch (MonitorException ex) {
       ex.printStackTrace();
