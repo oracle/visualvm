@@ -70,6 +70,20 @@ public final class Utils {
     }
     
     
+    public static String getFileBase(File file) {
+        String fileBase = file.getName();
+        int extIndex = fileBase.lastIndexOf(".");
+        if (extIndex != -1) fileBase = fileBase.substring(0, extIndex);
+        return fileBase;
+    }
+    
+    public static String getFileExt(File file) {
+        String fileBase = file.getName();
+        int extIndex = fileBase.lastIndexOf(".");
+        if (extIndex != -1) fileBase = fileBase.substring(extIndex);
+        return fileBase;
+    }
+    
     public static File getUniqueFile(File directory, String fileName, String fileExt) {
         File newFile = new File(directory, fileName + fileExt);
         while (newFile.exists()) {
@@ -155,7 +169,7 @@ public final class Utils {
     public static File extractArchive(File archive, File destination) {
         // TODO: implement extracting directories
         
-        File directory = getUniqueFile(destination, archive.getName(), "");
+        File directory = getUniqueFile(destination, getFileBase(archive), getFileExt(archive));
         ZipFile zipFile = null;
         
         try {

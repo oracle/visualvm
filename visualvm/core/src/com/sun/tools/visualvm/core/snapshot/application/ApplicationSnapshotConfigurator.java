@@ -88,8 +88,8 @@ class ApplicationSnapshotConfigurator extends JPanel {
   }
   
   private void setupDefineCoreDump() {
-    snapshotFileField.setEnabled(true);
-    deleteSourceCheckbox.setSelected(true);
+    snapshotFileField.setText("");
+    deleteSourceCheckbox.setSelected(false);
   }
   
   private void update() {
