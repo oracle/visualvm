@@ -83,6 +83,10 @@ class CoreDumpConfigurator extends JPanel {
     return javaHomeFileField.getText().trim();
   }
   
+  public boolean deleteSourceFile() {
+      return deleteSourceCheckbox.isSelected();
+  }
+  
   private static CoreDumpConfigurator defaultInstance;
   
   private CoreDumpConfigurator() {
@@ -103,6 +107,7 @@ class CoreDumpConfigurator extends JPanel {
     displaynameField.setText("");
     javaHomeFileField.setText(CoreDumpSupport.getCurrentJDKHome());
     javaHomeFileField.setEnabled(true);
+    deleteSourceCheckbox.setSelected(false);
   }
   
   private void update() {
@@ -255,7 +260,7 @@ class CoreDumpConfigurator extends JPanel {
     constraints.gridy = 2;
     constraints.gridwidth = 1;
     constraints.fill = GridBagConstraints.NONE;
-    constraints.anchor = GridBagConstraints.EAST;
+    constraints.anchor = GridBagConstraints.WEST;
     constraints.insets = new Insets(8, 10, 0, 0);
     add(displaynameCheckbox, constraints);
     
@@ -276,11 +281,22 @@ class CoreDumpConfigurator extends JPanel {
     constraints.insets = new Insets(8, 5, 0, 10);
     add(displaynameField, constraints);
     
+    // deleteSourceCheckbox
+    deleteSourceCheckbox = new JCheckBox("Delete source file");
+    constraints = new GridBagConstraints();
+    constraints.gridx = 0;
+    constraints.gridy = 3;
+    constraints.gridwidth = GridBagConstraints.REMAINDER;
+    constraints.fill = GridBagConstraints.NONE;
+    constraints.anchor = GridBagConstraints.WEST;
+    constraints.insets = new Insets(18, 10, 0, 0);
+    add(deleteSourceCheckbox, constraints);
+    
     // spacer
     JPanel spacer = Utils.createFillerPanel();
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
-    constraints.gridy = 3;
+    constraints.gridy = 4;
     constraints.weighty = 1;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.BOTH;
@@ -293,6 +309,7 @@ class CoreDumpConfigurator extends JPanel {
     
     // UI tweaks
     displaynameCheckbox.setBorder(coreDumpFileLabel.getBorder());
+    deleteSourceCheckbox.setBorder(coreDumpFileLabel.getBorder());
   }
   
   private JLabel coreDumpFileLabel;
@@ -303,6 +320,7 @@ class CoreDumpConfigurator extends JPanel {
   private JButton javaHomeFileButton;
   private JCheckBox displaynameCheckbox;
   private JTextField displaynameField;
+  private JCheckBox deleteSourceCheckbox;
   
   private JButton okButton;
   

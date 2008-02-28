@@ -38,6 +38,8 @@ import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.RequestProcessor;
 
@@ -46,7 +48,6 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-// A provider for Coredumps
 class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     
     static final String SNAPSHOT_VERSION = "snapshot_version";
@@ -56,15 +57,17 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
     
-    void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome) {
+    void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome, final boolean deleteCoreDump) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                createCoreDumpImpl(coreDumpFile, displayName, jdkHome);
+                createCoreDumpImpl(coreDumpFile, displayName, jdkHome, deleteCoreDump);
             }
         });
     }
     
-    private void createCoreDumpImpl(final String coreDumpFile, final String displayName, final String jdkHome) {
+    private void createCoreDumpImpl(String coreDumpFile, final String displayName, String jdkHome, boolean deleteCoreDump) {
+        
+        // TODO: check if the same coredump isn't already imported (can happen for moved coredumps)
         
         final CoreDumpImpl knownCoreDump = getCoreDumpByFile(new File(coreDumpFile));
         if (knownCoreDump != null) {
@@ -75,6 +78,27 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
                 }
             });
             return;
+        }
+        
+        if (deleteCoreDump) {
+            ProgressHandle pHandle = null;
+            try {
+                pHandle = ProgressHandleFactory.createHandle("Adding " + displayName + "...");
+                pHandle.setInitialDelay(0);
+                pHandle.start();
+                
+                File file = new File(coreDumpFile);
+                File copy = Utils.getUniqueFile(CoreDumpSupport.getStorageDirectory(), Utils.getFileBase(file), Utils.getFileExt(file));
+                if (Utils.copyFile(file, copy)) {
+                    coreDumpFile = copy.getAbsolutePath();
+                    if (!file.delete()) file.deleteOnExit();
+                }
+            } finally {
+                final ProgressHandle pHandleF = pHandle;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { if (pHandleF != null) pHandleF.finish(); }
+                });
+            }
         }
         
         String[] propNames = new String[] { SNAPSHOT_VERSION,

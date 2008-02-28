@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.AbstractThreadDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.host.*;
 import java.io.File;
 
 /**

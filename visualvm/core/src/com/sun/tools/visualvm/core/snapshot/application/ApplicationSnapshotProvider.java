@@ -129,6 +129,9 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     }
     
     void addSnapshotArchive(final File archive, final boolean deleteArchive) {
+        
+        // TODO: check if the same snapshot isn't already imported
+        
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;

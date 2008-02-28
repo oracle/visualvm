@@ -161,9 +161,6 @@ class ApplicationSnapshotConfigurator extends JPanel {
     
     // deleteSourceCheckbox
     deleteSourceCheckbox = new JCheckBox("Delete source file");
-    deleteSourceCheckbox.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) { update(); };
-    });
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;

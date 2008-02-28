@@ -50,29 +50,19 @@ class CoreDumpImpl extends AbstractCoreDump {
         this.customPropertiesStorage = customPropertiesStorage;
     }
     
-    public int hashCode() {
-        return getFile().hashCode();
-    }
-    
-    public boolean equals(Object obj) {
-        if (obj instanceof CoreDumpImpl) {
-            return getFile().equals(((CoreDumpImpl) obj).getFile());
-        }
-        return false;
-    }
-    
     public boolean supportsDelete() {
-        return false;
+        return CoreDumpSupport.getStorageDirectory().equals(getFile().getParentFile());
+    }
+    
+    public void delete() {
+        super.delete();
+        CoreDumpSupport.getProvider().removeCoreDump(this, true);
     }
     
     
     protected Storage createStorage() {
         return givenStorage;
     }
-    
-//    String getId() {
-//        return Integer.toString(getFile().hashCode());
-//    }
     
     File getCustomPropertiesStorage() {
         return customPropertiesStorage;
