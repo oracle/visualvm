@@ -25,24 +25,38 @@
 
 package com.sun.tools.visualvm.core.model.jvm;
 
+import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import javax.swing.Timer;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Tomas Hurka
  */
-class JmxJVM extends DefaultJVM {
-    JvmJmxModel jmxModel;
-    Properties systemProperties;
-    String jvmArgs;
+class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
+    private static final int DEFAULT_REFRESH = 2000;
+    
+    private JvmJmxModel jmxModel;
+    private Properties systemProperties;
+    private String jvmArgs;
+    private Set<MonitoredDataListener> listeners;
+    private Timer timer;
     
     JmxJVM(JvmJmxModel model) {
         jmxModel = model;
+        listeners = new HashSet();
     }
     
     public boolean is14() {
@@ -118,12 +132,22 @@ class JmxJVM extends DefaultJVM {
         return systemProperties;
     }
     
-    public synchronized void addMonitoredDataListener(MonitoredDataListener l) {
-        throw new UnsupportedOperationException();
+    public void addMonitoredDataListener(MonitoredDataListener l) {
+        synchronized(listeners) {
+            if (listeners.isEmpty()) {
+                initTimer();
+            }
+            listeners.add(l);
+        }
     }
     
-    public synchronized void removeMonitoredDataListener(MonitoredDataListener l) {
-        throw new UnsupportedOperationException();
+    public void removeMonitoredDataListener(MonitoredDataListener l) {
+        synchronized (listeners) {
+            listeners.remove(l);
+            if (listeners.isEmpty()) {
+                disableTimer();
+            }
+        }
     }
     
     public boolean isDumpOnOOMEnabled() {
@@ -151,11 +175,11 @@ class JmxJVM extends DefaultJVM {
     }
     
     public boolean isClassMonitoringSupported() {
-        return false;
+        return true;
     }
     
     public boolean isThreadMonitoringSupported() {
-        return false;
+        return true;
     }
     
     public boolean isMemoryMonitoringSupported() {
@@ -183,6 +207,43 @@ class JmxJVM extends DefaultJVM {
         if (p == null)
             return null;
         return p.getProperty(key);
+    }
+    
+    private void initTimer() {
+        timer = new Timer(DEFAULT_REFRESH, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        computeMonitoredData();
+                    }
+                });
+            }
+        });
+        timer.setCoalesce(true);
+        timer.start();
+    }
+    
+    private void disableTimer() {
+        timer.stop();
+    }
+    
+    private void computeMonitoredData() {
+        MonitoredData data = new MonitoredData(this);
+        List<MonitoredDataListener> listenersCopy;
+        synchronized  (listeners) {
+            listenersCopy = new ArrayList(listeners);
+        }
+        for (MonitoredDataListener listener : listenersCopy) {
+            listener.monitoredDataEvent(data);
+        }
+    }
+    
+    JvmJmxModel getJmxModel() {
+        return jmxModel;
+    }
+
+    public void dataFinished(Application dataSource) {
+        disableTimer();
     }
     
 }

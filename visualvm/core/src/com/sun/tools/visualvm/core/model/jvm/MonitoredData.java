@@ -25,6 +25,10 @@
 
 package com.sun.tools.visualvm.core.model.jvm;
 
+import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
+import java.lang.management.ClassLoadingMXBean;
+import java.lang.management.RuntimeMXBean;
+import java.lang.management.ThreadMXBean;
 import sun.jvmstat.monitor.LongMonitor;
 
 /**
@@ -45,7 +49,8 @@ public class MonitoredData {
   final private long upTime;
   final private long[] genCapacity;
   final private long[] genUsed;
-  final private JvmstatJVM monitoredVm;
+  final private long[] genMaxCapacity;
+  final private JVM monitoredVm;
 
   MonitoredData(JvmstatJVM jvm) {
     loadedClasses = getLongValue(jvm.getLoadedClasses());
@@ -60,6 +65,29 @@ public class MonitoredData {
     upTime = 1000*getLongValue(jvm.getUpTime())/jvm.getOsFrequency();
     genCapacity = jvm.getGenerationSum(jvm.getGenCapacity());
     genUsed = jvm.getGenerationSum(jvm.getGenUsed());
+    genMaxCapacity = jvm.getGenMaxCapacity();
+    monitoredVm = jvm;
+  }
+
+  MonitoredData(JmxJVM jvm) {
+    JvmJmxModel jvmModel = jvm.getJmxModel();
+    ClassLoadingMXBean classBean = jvmModel.getClassLoadingMXBean();
+    ThreadMXBean threadBean = jvmModel.getThreadMXBean();
+    RuntimeMXBean runtimeBean = jvmModel.getRuntimeMXBean();
+
+    loadedClasses = classBean.getLoadedClassCount();
+    sharedLoadedClasses = 0;
+    sharedUnloadedClasses = 0;
+    unloadedClasses = classBean.getUnloadedClassCount();
+    threadsDaemon = threadBean.getDaemonThreadCount();
+    threadsLive = threadBean.getThreadCount();
+    threadsLivePeak = threadBean.getPeakThreadCount();
+    threadsStarted = threadBean.getTotalStartedThreadCount();
+    applicationTime = 0;
+    upTime = runtimeBean.getUptime();
+    genCapacity = null;
+    genUsed = null;
+    genMaxCapacity = null;
     monitoredVm = jvm;
   }
   
@@ -123,6 +151,6 @@ public class MonitoredData {
   }
   
   public long[] getGenMaxCapacity() {
-    return monitoredVm.getGenMaxCapacity();
+    return genMaxCapacity;
   }
 }
