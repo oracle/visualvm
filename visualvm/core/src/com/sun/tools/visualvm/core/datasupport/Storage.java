@@ -149,10 +149,14 @@ public final class Storage {
                 throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way");
             if (persistentStorageDirectory.exists() && (!persistentStorageDirectory.canRead() || !persistentStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");
-            if (!persistentStorageDirectory.exists() && !persistentStorageDirectory.mkdir())
+            if (!persistentStorageDirectory.exists() && !persistentStorageDirectory.mkdirs())
                 throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
         }
         return persistentStorageDirectory;
+    }
+    
+    public static boolean persistentStorageDirectoryExists() {
+        return new File(getPersistentStorageDirectoryString()).isDirectory();
     }
     
     

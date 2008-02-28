@@ -42,8 +42,8 @@ public final class ApplicationSnapshotsSupport {
     
     private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
     
-    private File snapshotsStorageDirectory;
-    private String snapshotsStorageDirectoryString;
+    private static File snapshotsStorageDirectory;
+    private static String snapshotsStorageDirectoryString;
 
     private ApplicationSnapshotProvider snapshotProvider;
     private ApplicationSnapshotCategory snapshotCategory = new ApplicationSnapshotCategory();
@@ -78,13 +78,13 @@ public final class ApplicationSnapshotsSupport {
         return snapshotProvider;
     }
     
-    String getSnapshotsStorageDirectoryString() {
+    static String getSnapshotsStorageDirectoryString() {
         if (snapshotsStorageDirectoryString == null)
-            snapshotsStorageDirectoryString = new File(Storage.getPersistentStorageDirectory(), SNAPSHOTS_STORAGE_DIRNAME).getAbsolutePath();
+            snapshotsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + SNAPSHOTS_STORAGE_DIRNAME;
         return snapshotsStorageDirectoryString;
     }
     
-    File getSnapshotsStorageDirectory() {
+    static File getSnapshotsStorageDirectory() {
         if (snapshotsStorageDirectory == null) {
             String snapshotsStorageString = getSnapshotsStorageDirectoryString();
             snapshotsStorageDirectory = new File(snapshotsStorageString);
@@ -92,10 +92,14 @@ public final class ApplicationSnapshotsSupport {
                 throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString + ", file in the way");
             if (snapshotsStorageDirectory.exists() && (!snapshotsStorageDirectory.canRead() || !snapshotsStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access snapshots storage directory " + snapshotsStorageString + ", read&write permission required");
-            if (!snapshotsStorageDirectory.exists() && !snapshotsStorageDirectory.mkdir())
+            if (!snapshotsStorageDirectory.exists() && !snapshotsStorageDirectory.mkdirs())
                 throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString);
         }
         return snapshotsStorageDirectory;
+    }
+    
+    static boolean snapshotsStorageDirectoryExists() {
+        return new File(getSnapshotsStorageDirectoryString()).isDirectory();
     }
     
     

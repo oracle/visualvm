@@ -43,8 +43,6 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -92,11 +90,10 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     }
     
     private void createSnapshotImpl(final Application application, final boolean interactive) {
-        ApplicationSnapshotsSupport support = ApplicationSnapshotsSupport.getInstance();
         Set<Snapshot> snapshots = application.getSnapshots();
         if (snapshots.isEmpty()) return;
         
-        File snapshotDirectory = new File(support.getSnapshotsStorageDirectory(), support.getCategory().createFileName());
+        File snapshotDirectory = new File(ApplicationSnapshotsSupport.getSnapshotsStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
         if (!snapshotDirectory.exists() && !snapshotDirectory.mkdir())
             throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
         
@@ -140,7 +137,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     
-                    File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory());
+                    File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getSnapshotsStorageDirectory());
                     if (snapshotDirectory != null) {
                         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
                         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
@@ -180,7 +177,9 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     
         
     private void loadSnapshots() {
-        File[] files = ApplicationSnapshotsSupport.getInstance().getSnapshotsStorageDirectory().listFiles(
+        if (!ApplicationSnapshotsSupport.snapshotsStorageDirectoryExists()) return;
+        
+        File[] files = ApplicationSnapshotsSupport.getSnapshotsStorageDirectory().listFiles(
                 ApplicationSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
         
         Set<ApplicationSnapshot> snapshots = new HashSet();
