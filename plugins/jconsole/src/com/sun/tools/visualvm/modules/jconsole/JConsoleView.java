@@ -67,7 +67,7 @@ class JConsoleView extends DataSourceView {
     private DataViewComponent view;
 
     public JConsoleView(Application application) {
-        super("JConsole", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60);
+        super("JConsole Plugins", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60);
         this.application = application;
         view = createViewComponent();
     }
@@ -202,7 +202,7 @@ class JConsoleView extends DataSourceView {
             jconsoleView = new JLabel("\n\nUnexpected error: " + e.getMessage());
         }
         return new DataViewComponent(
-                new DataViewComponent.MasterView("JConsole", null, jconsoleView),
+                new DataViewComponent.MasterView("JConsole Plugins", null, jconsoleView),
                 new DataViewComponent.MasterViewConfiguration(true));
     }
 }
