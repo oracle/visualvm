@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -66,10 +66,10 @@ public abstract class AbstractDataSource implements DataSource {
     private DataSource master;
     private int state = STATE_AVAILABLE;
     private boolean visible = true;
-    private final DataSourceContainer<DataSource> repository = new DefaultDataSourceContainer(this);
-    private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    private final Set<WeakReferenceX<DataFinishedListener>> removedListeners = Collections.synchronizedSet(new HashSet());
+    private Storage storage;
+    private DataSourceContainer<DataSource> repository;
+    private PropertyChangeSupport changeSupport;
+    private Set<WeakReferenceX<DataFinishedListener>> removedListeners;
 
 
     /**
@@ -118,11 +118,21 @@ public abstract class AbstractDataSource implements DataSource {
         return master;
     }
     
-    public File getStorage() {
-        return SnapshotsSupport.getInstance().getTemporaryStorageDirectory();
+    public final Storage getStorage() {
+        if (storage == null) {
+            storage = createStorage();
+            if (storage == null) throw new NullPointerException("Storage cannot be null");
+            File directory = storage.getDirectory();
+            if (!directory.exists() && !directory.mkdir()) throw new IllegalStateException("Cannot create storage directory " + directory);
+        }
+        return storage;
     }
 
-    public DataSourceContainer getRepository() {
+    public final DataSourceContainer getRepository() {
+        if (repository == null) {
+            repository = createRepository();
+            if (repository == null) throw new NullPointerException("Repository cannot be null");
+        }
         return repository;
     }
 
@@ -146,7 +156,7 @@ public abstract class AbstractDataSource implements DataSource {
     public void notifyWhenFinished(DataFinishedListener listener) {
         if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
         if (isFinished()) listener.dataFinished(this);
-        else removedListeners.add(new WeakReferenceX(listener));
+        else getRemovedListeners().add(new WeakReferenceX(listener));
     }
     
     public boolean isFinished() {
@@ -167,14 +177,35 @@ public abstract class AbstractDataSource implements DataSource {
         state = newState;
         getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
         if (newState == STATE_FINISHED) {
-            for (WeakReference<DataFinishedListener> listenerReference : removedListeners) {
+            Set<WeakReferenceX<DataFinishedListener>> listeners = getRemovedListeners();
+            for (WeakReference<DataFinishedListener> listenerReference : listeners) {
                 DataFinishedListener listener = listenerReference.get();
                 if (listener != null) listener.dataFinished(this);
             }
-            removedListeners.clear();
+            getRemovedListeners().clear();
         }
     }
     
+    
+    /**
+     * Creates Storage instance for this DataSource.
+     * This method should never return null.
+     * 
+     * @return Storage instance for this DataSource.
+     */
+    protected Storage createStorage() {
+        return new Storage(Storage.getTemporaryStorageDirectory());
+    }
+    
+    /**
+     * Creates repository for this DataSource.
+     * This method should never return null.
+     * 
+     * @return repository for this DataSource.
+     */
+    protected DataSourceContainer createRepository() {
+        return new DefaultDataSourceContainer(this);
+    }
     
     /**
      * Returns instance of PropertyChangeSupport used for processing property changes.
@@ -182,7 +213,14 @@ public abstract class AbstractDataSource implements DataSource {
      * @return instance of PropertyChangeSupport used for processing property changes.
      */
     protected final PropertyChangeSupport getChangeSupport() {
+        if (changeSupport == null) changeSupport = new PropertyChangeSupport(this);
         return changeSupport;
+    }
+    
+    
+    private Set<WeakReferenceX<DataFinishedListener>> getRemovedListeners() {
+        if (removedListeners == null) removedListeners = Collections.synchronizedSet(new HashSet());
+        return removedListeners;
     }
 
 }

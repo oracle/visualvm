@@ -38,7 +38,6 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -90,42 +89,35 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                 }
             }
         });
-        
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                
-            }
-        });
     }
     
     private void createSnapshotImpl(final Application application, final boolean interactive) {
         ApplicationSnapshotsSupport support = ApplicationSnapshotsSupport.getInstance();
-        Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
+        Set<Snapshot> snapshots = application.getSnapshots();
         if (snapshots.isEmpty()) return;
         
         File snapshotDirectory = new File(support.getSnapshotsStorageDirectory(), support.getCategory().createFileName());
         if (!snapshotDirectory.exists() && !snapshotDirectory.mkdir())
             throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
         
-        FileObject snapshotDirectoryObject = FileUtil.toFileObject(snapshotDirectory);
-        
         for (Snapshot snapshot : snapshots) {
-            File file = snapshot.getFile();
-            if (file == null) continue;
-            FileObject fileObject = FileUtil.toFileObject(file);
             try {
-                fileObject.copy(snapshotDirectoryObject, fileObject.getNameExt(), "");
-            } catch (Exception e) { System.err.println("Unable to copy snapshot " + file.getAbsolutePath() + " to persistent storage " + snapshotDirectory); }
+                snapshot.save(snapshotDirectory);
+            } catch (Exception e) {
+                System.err.println("Error saving snapshot to application snapshot: " + e.getMessage());
+            }
         }
         
+        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
         ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
-        Properties properties = new Properties();
-        properties.put(SNAPSHOT_VERSION, CURRENT_SNAPSHOT_VERSION);
-        properties.put(DataSourceDescriptor.PROPERTY_NAME, applicationType.getName() + getDisplayNameSuffix(application));
-        properties.put(DataSourceDescriptor.PROPERTY_ICON, Utils.imageToString(applicationType.getIcon(), "png"));
-        // properties.put(DataSourceDescriptor.PROPERTY_PREFERRED_POSITION, ExplorerSupport.getCurrentPosition(application)); ???
+        String[] propNames = new String[] { SNAPSHOT_VERSION,
+            DataSourceDescriptor.PROPERTY_NAME,
+            DataSourceDescriptor.PROPERTY_ICON };
+        String[] propValues = new String[] { CURRENT_SNAPSHOT_VERSION,
+            applicationType.getName() + getDisplayNameSuffix(application),
+            Utils.imageToString(applicationType.getIcon(), "png")};
+        snapshot.getStorage().setCustomProperties(propNames, propValues);
         
-        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, properties);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         registerDataSource(snapshot);
     }
@@ -175,7 +167,6 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
         if (snapshot.getOwner() != null) snapshot.getOwner().getRepository().removeDataSource(snapshot);
         unregisterDataSource(snapshot);
-        snapshot.delete();
     }
     
     

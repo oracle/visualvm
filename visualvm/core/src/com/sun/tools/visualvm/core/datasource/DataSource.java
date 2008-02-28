@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 
 /**
  * DataSource is a general object representing a data unit within the VisualVM.
@@ -123,12 +123,11 @@ public interface DataSource {
     public DataSource getMaster();
     
     /**
-     * Returns directory where all data relevant to this DataSource will be stored.
-     * This is used for example for saving thread dumps or heap dumps of an application.
+     * Returns Storage instance for this DataSource.
      * 
-     * @return directory where all data relevant to this DataSource will be stored.
+     * @return Storage instance for this DataSource.
      */
-    public File getStorage();
+    public Storage getStorage();
 
     /**
      * Repository of this DataSource which can contain any other DataSources.

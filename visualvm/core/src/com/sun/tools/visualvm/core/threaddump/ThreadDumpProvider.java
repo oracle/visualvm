@@ -148,7 +148,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
                     pHandle = ProgressHandleFactory.createHandle("Creating Thread Dump...");
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    File snapshotDir = coreDump.getStorage();
+                    File snapshotDir = coreDump.getStorage().getDirectory();
                     String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
                     SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
@@ -189,7 +189,6 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
     void deleteThreadDump(ThreadDumpImpl threadDump) {
         if (threadDump.getOwner() != null) threadDump.getOwner().getRepository().removeDataSource(threadDump);
         unregisterDataSource(threadDump);
-        threadDump.delete();
     }
     
     protected <Y extends ThreadDumpImpl> void unregisterDataSources(final Set<Y> removed) {

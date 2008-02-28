@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
 import java.util.Date;
@@ -33,8 +34,6 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -44,15 +43,7 @@ import org.openide.util.RequestProcessor;
  */
 public final class SnapshotsSupport {
     
-    private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";
-    private static final String PERSISTENT_STORAGE_DIRNAME = "repository";
-    
     private static SnapshotsSupport instance;
-    
-    private File temporaryStorageDirectory;
-    private String temporaryStorageDirectoryString;
-    private File persistentStorageDirectory;
-    private String persistentStorageDirectoryString;
 
 
     /**
@@ -63,66 +54,6 @@ public final class SnapshotsSupport {
     public static synchronized SnapshotsSupport getInstance() {
         if (instance == null) instance = new SnapshotsSupport();
         return instance;
-    }
-    
-    /**
-     * Returns default storage directory for temporary (runtime) DataSource data
-     * 
-     * @return default storage directory for temporary (runtime) DataSource data
-     */
-    public String getTemporaryStorageDirectoryString() {
-        if (temporaryStorageDirectoryString == null)
-            temporaryStorageDirectoryString = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + File.separator + TEMPORARY_STORAGE_DIRNAME;
-        return temporaryStorageDirectoryString;
-    }
-    
-    /**
-     * Returns default storage directory for temporary (runtime) DataSource data
-     * 
-     * @return default storage directory for temporary (runtime) DataSource data
-     */
-    public File getTemporaryStorageDirectory() {
-        if (temporaryStorageDirectory == null) {
-            String temporaryStorageString = getTemporaryStorageDirectoryString();
-            temporaryStorageDirectory = new File(temporaryStorageString);
-            if (temporaryStorageDirectory.exists() && temporaryStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");
-            if (temporaryStorageDirectory.exists() && (!temporaryStorageDirectory.canRead() || !temporaryStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");
-            if (!temporaryStorageDirectory.exists() && !temporaryStorageDirectory.mkdir())
-                throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString);
-        }
-        return temporaryStorageDirectory;
-    }
-    
-    /**
-     * Returns default storage directory for persistent DataSource data
-     * 
-     * @return default storage directory for persistent DataSource data
-     */
-    public String getPersistentStorageDirectoryString() {
-        if (persistentStorageDirectoryString == null)
-            persistentStorageDirectoryString = new File(System.getProperty("netbeans.user")).getAbsolutePath() + File.separator + PERSISTENT_STORAGE_DIRNAME;
-        return persistentStorageDirectoryString;
-    }
-    
-    /**
-     * Returns default storage directory for persistent DataSource data
-     * 
-     * @return default storage directory for persistent DataSource data
-     */
-    public File getPersistentStorageDirectory() {
-        if (persistentStorageDirectory == null) {
-            String persistentStorageString = getPersistentStorageDirectoryString();
-            persistentStorageDirectory = new File(persistentStorageString);
-            if (persistentStorageDirectory.exists() && persistentStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way");
-            if (persistentStorageDirectory.exists() && (!persistentStorageDirectory.canRead() || !persistentStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");
-            if (!persistentStorageDirectory.exists() && !persistentStorageDirectory.mkdir())
-                throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
-        }
-        return persistentStorageDirectory;
     }
     
     
@@ -143,7 +74,7 @@ public final class SnapshotsSupport {
                         pHandle = ProgressHandleFactory.createHandle("Saving " + DataSourceDescriptorFactory.getDescriptor(snapshot).getName() + "...");
                         pHandle.setInitialDelay(0);
                         pHandle.start();
-                        copyFile(file, copy);
+                        Utils.copyFile(file, copy);
                     } finally {
                         final ProgressHandle pHandleF = pHandle;
                         SwingUtilities.invokeLater(new Runnable() {
@@ -152,20 +83,6 @@ public final class SnapshotsSupport {
                     }
                 }
             });
-        }
-    }
-    
-    public boolean copyFile(File file, File copy) {
-        if (file == null || !file.isFile()) return false;
-        
-        FileObject fileO = FileUtil.toFileObject(file);
-        FileObject directoryO = FileUtil.toFileObject(FileUtil.normalizeFile(copy.getParentFile()));
-        try {
-            FileUtil.copyFile(fileO, directoryO, file.getName(), "");
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error copying snapshot to " + copy + ": " + e.getMessage());
-            return false;
         }
     }
     

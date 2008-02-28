@@ -46,13 +46,11 @@ class ThreadDumpActionsProvider {
     
     private final TakeApplicationThreadDumpAction takeApplicationThreadDumpAction = new TakeApplicationThreadDumpAction();
     private final TakeCoreDumpThreadDumpAction takeCoreDumpThreadDumpAction = new TakeCoreDumpThreadDumpAction();
-    private final DeleteThreadDumpAction deleteThreadDumpAction = new DeleteThreadDumpAction();
     
 
     void initialize() {
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationNodeActionProvider(), Application.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpNodeActionProvider(), CoreDump.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ThreadDumpNodeActionProvider(), ThreadDumpImpl.class);
     }    
     
     
@@ -82,19 +80,6 @@ class ThreadDumpActionsProvider {
         
     }
     
-    private class DeleteThreadDumpAction extends AbstractAction {
-        
-        public DeleteThreadDumpAction() {
-            super("Delete");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            ThreadDumpImpl threadDump = (ThreadDumpImpl)e.getSource();
-            ThreadDumpSupport.getInstance().getThreadDumpProvider().deleteThreadDump(threadDump);
-        }
-        
-    }
-    
     private class ApplicationNodeActionProvider implements ExplorerActionsProvider<Application> {
 
         public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
@@ -119,20 +104,6 @@ class ThreadDumpActionsProvider {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(takeCoreDumpThreadDumpAction, 10));
-            
-            return actions;
-        }
-        
-    }
-    
-    private class ThreadDumpNodeActionProvider implements ExplorerActionsProvider<ThreadDumpImpl> {
-
-        public ExplorerActionDescriptor getDefaultAction(ThreadDumpImpl threadDump) { return null; }
-
-        public Set<ExplorerActionDescriptor> getActions(ThreadDumpImpl threadDump) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(deleteThreadDumpAction, 100));
             
             return actions;
         }

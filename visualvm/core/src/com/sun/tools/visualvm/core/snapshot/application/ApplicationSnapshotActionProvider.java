@@ -34,7 +34,6 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
 
@@ -48,8 +47,6 @@ final class ApplicationSnapshotActionProvider {
     
     private final AddApplicationSnapshotAction addApplicationSnapshotAction = new AddApplicationSnapshotAction();
     private final SaveApplicationAction saveApplicationAction = new SaveApplicationAction();
-//    private final SaveApplicationSnapshotAction saveApplicationSnapshotAction = new SaveApplicationSnapshotAction();
-    private final DeleteApplicationSnapshotAction deleteApplicationSnapshotAction = new DeleteApplicationSnapshotAction();
 
 
     public static synchronized ApplicationSnapshotActionProvider getInstance() {
@@ -61,7 +58,6 @@ final class ApplicationSnapshotActionProvider {
     void initialize() {
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new AddApplicationSnapshotActionProvider(), SnapshotsContainer.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new SaveApplicationActionProvider(), Application.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationSnapshotActionsProvider(), ApplicationSnapshot.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new AddApplicationSnapshotRootActionProvider(), DataSourceRoot.class);
     }
     
@@ -94,32 +90,6 @@ final class ApplicationSnapshotActionProvider {
         public void actionPerformed(ActionEvent e) {
             Application dataSource = (Application)e.getSource();
             ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(dataSource, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-        }
-        
-    }
-    
-//    private class SaveApplicationSnapshotAction extends AbstractAction {
-//        
-//        public SaveApplicationSnapshotAction() {
-//            super("Save As...");
-//        }
-//        
-//        public void actionPerformed(ActionEvent e) {
-//            ApplicationSnapshot snapshot = (ApplicationSnapshot)e.getSource();
-//            snapshot.saveAs();
-//        }
-//        
-//    }
-    
-    private class DeleteApplicationSnapshotAction extends AbstractAction {
-        
-        public DeleteApplicationSnapshotAction() {
-            super("Delete");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            ApplicationSnapshot snapshot = (ApplicationSnapshot)e.getSource();
-            ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().deleteSnapshot(snapshot, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
         }
         
     }
@@ -159,23 +129,6 @@ final class ApplicationSnapshotActionProvider {
 
         public Set<ExplorerActionDescriptor> getActions(Application application) {
             return Collections.EMPTY_SET;
-        }
-        
-    }
-    
-    private class ApplicationSnapshotActionsProvider implements ExplorerActionsProvider<ApplicationSnapshot> {
-        
-        public ExplorerActionDescriptor getDefaultAction(ApplicationSnapshot snapshot) {
-            return null;
-        }
-
-        public Set<ExplorerActionDescriptor> getActions(ApplicationSnapshot snapshot) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-    
-//            actions.add(new ExplorerActionDescriptor(saveApplicationSnapshotAction, 10));
-            actions.add(new ExplorerActionDescriptor(deleteApplicationSnapshotAction, 100));
-            
-            return actions;
         }
         
     }

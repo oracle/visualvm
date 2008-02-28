@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
 
@@ -43,6 +43,7 @@ final class SnapshotActionProvider {
     private static SnapshotActionProvider instance;
     
     private final SaveSnapshotAction saveSnapshotAction = new SaveSnapshotAction();
+    private final DeleteSnapshotAction deleteSnapshotAction = new DeleteSnapshotAction();
     
 
     public static synchronized SnapshotActionProvider getInstance() {
@@ -72,6 +73,20 @@ final class SnapshotActionProvider {
         
     }
     
+    private class DeleteSnapshotAction extends AbstractAction {
+        
+        public DeleteSnapshotAction() {
+            super("Delete");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            Snapshot snapshot = (Snapshot)e.getSource();
+            snapshot.delete();
+        }
+        
+    }
+    
+    
     private class SnapshotActionsProvider implements ExplorerActionsProvider<Snapshot> {
         
         public ExplorerActionDescriptor getDefaultAction(Snapshot snapshot) {
@@ -81,7 +96,12 @@ final class SnapshotActionProvider {
         }
 
         public Set<ExplorerActionDescriptor> getActions(Snapshot snapshot) {
-            return Collections.EMPTY_SET;
+            Set<ExplorerActionDescriptor> actions = new HashSet();
+            
+            if (snapshot.supportsDelete())
+                actions.add(new ExplorerActionDescriptor(deleteSnapshotAction, 100));
+            
+            return actions;
         }
         
     }

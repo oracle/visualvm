@@ -46,13 +46,11 @@ class HeapDumpActionsProvider {
     
     private final TakeApplicationHeapDumpAction takeApplicationHeapDumpAction = new TakeApplicationHeapDumpAction();
     private final TakeCoreDumpHeapDumpAction takeCoreDumpHeapDumpAction = new TakeCoreDumpHeapDumpAction();
-    private final DeleteHeapDumpAction deleteHeapDumpAction = new DeleteHeapDumpAction();
     
 
     void initialize() {
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationActionProvider(), Application.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDump.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HeapDumpActionProvider(), HeapDumpImpl.class);
     }    
     
     
@@ -82,19 +80,6 @@ class HeapDumpActionsProvider {
         
     }
     
-    private class DeleteHeapDumpAction extends AbstractAction {
-        
-        public DeleteHeapDumpAction() {
-            super("Delete");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            HeapDumpImpl heapDump = (HeapDumpImpl)e.getSource();
-            HeapDumpSupport.getInstance().getHeapDumpProvider().deleteHeapDump(heapDump);
-        }
-        
-    }
-    
     private class ApplicationActionProvider implements ExplorerActionsProvider<Application> {
 
         public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
@@ -119,20 +104,6 @@ class HeapDumpActionsProvider {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(takeCoreDumpHeapDumpAction, 20));
-            
-            return actions;
-        }
-        
-    }
-    
-    private class HeapDumpActionProvider implements ExplorerActionsProvider<HeapDumpImpl> {
-
-        public ExplorerActionDescriptor getDefaultAction(HeapDumpImpl heapDump) { return null; }
-
-        public Set<ExplorerActionDescriptor> getActions(HeapDumpImpl heapDump) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(deleteHeapDumpAction, 100));
             
             return actions;
         }

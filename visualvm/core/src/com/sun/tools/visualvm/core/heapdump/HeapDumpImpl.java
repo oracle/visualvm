@@ -39,8 +39,9 @@ final class HeapDumpImpl extends AbstractHeapDump {
         super(file, master);
     }
     
-    void delete() {
-        deleteFile();
+    public void delete() {
+        super.delete();
+        HeapDumpSupport.getInstance().getHeapDumpProvider().deleteHeapDump(this);
     }
 
     void removed() {

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import java.io.File;
 import java.util.Set;
 
@@ -96,13 +97,6 @@ public abstract class AbstractApplication extends AbstractDataSource implements 
         return getRepository().getDataSources(Snapshot.class);
     }
     
-    public File getStorage() {
-        File storage = super.getStorage();
-        File applicationStorage = new File(storage, getId());
-        if (!applicationStorage.exists() && !applicationStorage.mkdir()) throw new IllegalStateException("Cannot create storage directory for " + toString());
-        return applicationStorage;
-    }
-    
     
     public int hashCode() {
         return getId().hashCode();
@@ -116,6 +110,13 @@ public abstract class AbstractApplication extends AbstractDataSource implements 
     
     public String toString() {
         return "Application [id: " + getId() + ", pid: " + getPid() + ", host: " + getHost().getHostName() + "]";
+    }
+    
+    
+    // <system_temp>/visualvm.dat/<application_id>
+    protected Storage createStorage() {
+        File directory = new File(Storage.getTemporaryStorageDirectory(), getId());
+        return new Storage(directory);
     }
 
 }

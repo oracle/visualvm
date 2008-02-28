@@ -146,7 +146,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
                     pHandle = ProgressHandleFactory.createHandle("Creating Heap Dump...");
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    File snapshotDir = coreDump.getStorage();
+                    File snapshotDir = coreDump.getStorage().getDirectory();
                     String name = HeapDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
                     SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
@@ -183,7 +183,6 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
     void deleteHeapDump(HeapDumpImpl heapDump) {
         if (heapDump.getOwner() != null) heapDump.getOwner().getRepository().removeDataSource(heapDump);
         unregisterDataSource(heapDump);
-        heapDump.delete();
     }
     
     protected <Y extends HeapDumpImpl> void unregisterDataSources(final Set<Y> removed) {

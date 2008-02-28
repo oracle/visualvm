@@ -25,11 +25,10 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 
 /**
  * Abstract implementation of Snapshot.
@@ -40,6 +39,7 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     
     private File file;
     private final SnapshotCategory category;
+    private String customPropertiesFileName;
     
     
     /**
@@ -90,42 +90,52 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     public void save(File directory) {
         File f = getFile();
         if (f != null && f.isFile())
-            SnapshotsSupport.getInstance().copyFile(f, new File(directory, f.getName()));
-    }
-    
-    public void saveAs() {
+            Utils.copyFile(f, new File(directory, f.getName()));
+        if (customPropertiesFileName != null) {
+            File customPropertiesFile = new File(getStorage().getDirectory(), customPropertiesFileName);
+            if (customPropertiesFile.exists()) Utils.copyFile(customPropertiesFile, new File(directory, customPropertiesFile.getName()));
+        }
     }
     
     public boolean supportsSaveAs() {
         return false;
     }
     
+    public void saveAs() {
+    }
     
-    /**
-     * Deletes the file where data of this snapshot are stored.
-     * Note that this method only deletes the file, not the Snapshot instance.
-     * 
-     * @return true if the file has been successfully deleted, false otherwise.
-     */
-    protected boolean deleteFile() {
-        boolean deleted = false;
-        
+    public boolean supportsDelete() {
+        return true;
+    }
+    
+    public void delete() {
         File f = getFile();
-        if (f != null) {
-            if (f.isFile()) deleted = f.delete();
-            else {
-                FileObject directory = FileUtil.toFileObject(f);
-                try {
-                    directory.delete();
-                    deleted = true;
-                } catch (Exception e) {
-                    deleted = false;
-                }
-            }
-            setFile(null);
+        if (f != null) if (!Utils.deleteFile(f)) f.deleteOnExit();
+        setFile(null);
+        if (customPropertiesFileName != null) {
+            File customPropertiesFile = new File(getStorage().getDirectory(), customPropertiesFileName);
+            if (customPropertiesFile != null) if (!Utils.deleteFile(customPropertiesFile)) customPropertiesFile.deleteOnExit();
+        }
+    }
+    
+    // Default storage (with .properties where possible):
+    // getFile().isDirectory(): <getFile()>/<getFile().getName()>.properties
+    // getFile().isFile(): <getFile().getParentFile()>/<getFile().getName()>.properties
+    // otherwise: <system_temp>/visualvm.dat, no properties
+    //
+    // NOTE: should be overriden by snapshots saving file only on demand
+    protected Storage createStorage() {
+        File f = getFile();
+        
+        if (f.isDirectory()) {
+            customPropertiesFileName = f.getName() + Storage.DEFAULT_PROPERTIES_EXT;
+            return new Storage(f, customPropertiesFileName);
+        } else if (f.isFile()) {
+            customPropertiesFileName = f.getName() + Storage.DEFAULT_PROPERTIES_EXT;
+            return new Storage(f.getParentFile(), customPropertiesFileName);
         }
         
-        return deleted;
+        return super.createStorage();
     }
 
 }

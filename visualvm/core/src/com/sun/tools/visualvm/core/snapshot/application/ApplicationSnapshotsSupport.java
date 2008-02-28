@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.core.snapshot.application;
 
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 
 /**
@@ -41,7 +41,6 @@ public final class ApplicationSnapshotsSupport {
     private static ApplicationSnapshotsSupport instance;
     
     private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
-    static final String PROPERTIES_FILE = "_application_snapshot.properties";
     
     private File snapshotsStorageDirectory;
     private String snapshotsStorageDirectoryString;
@@ -81,7 +80,7 @@ public final class ApplicationSnapshotsSupport {
     
     String getSnapshotsStorageDirectoryString() {
         if (snapshotsStorageDirectoryString == null)
-            snapshotsStorageDirectoryString = new File(SnapshotsSupport.getInstance().getPersistentStorageDirectory(), SNAPSHOTS_STORAGE_DIRNAME).getAbsolutePath();
+            snapshotsStorageDirectoryString = new File(Storage.getPersistentStorageDirectory(), SNAPSHOTS_STORAGE_DIRNAME).getAbsolutePath();
         return snapshotsStorageDirectoryString;
     }
     
@@ -100,14 +99,14 @@ public final class ApplicationSnapshotsSupport {
     }
     
     
-    private static File getUniqueFile(File directory, String prefix, String suffix) {
-        File file = new File(directory, prefix + suffix);
-        while (file.exists()) {
-            prefix = prefix + "_";
-            file = new File(directory, prefix + suffix);
-        }
-        return file;
-    }
+//    private static File getUniqueFile(File directory, String prefix, String suffix) {
+//        File file = new File(directory, prefix + suffix);
+//        while (file.exists()) {
+//            prefix = prefix + "_";
+//            file = new File(directory, prefix + suffix);
+//        }
+//        return file;
+//    }
     
     private ApplicationSnapshotsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationSnapshotDescriptorProvider());

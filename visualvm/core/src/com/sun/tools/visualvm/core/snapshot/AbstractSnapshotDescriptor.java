@@ -38,12 +38,15 @@ public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends Dat
     
     
     public AbstractSnapshotDescriptor(X snapshot, Image icon) {
-        super(snapshot, getName(snapshot),
+        super(snapshot, resolveName(snapshot),
               snapshot.getFile().getAbsolutePath(),
               icon, POSITION_AT_THE_END, EXPAND_NEVER);
     }
     
-    private static String getName(Snapshot snapshot) {
+    public static String resolveName(Snapshot snapshot) {
+        String persistedName = snapshot.getStorage().getCustomProperty(PROPERTY_NAME);
+        if (persistedName != null) return persistedName;
+        
         File file = snapshot.getFile();
         if (file == null) return snapshot.toString();
         
@@ -57,6 +60,15 @@ public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends Dat
         }
         
         return name;
+    }
+    
+    public boolean supportsRename() {
+        return true;
+    }
+    
+    public void setName(String newName) {
+        super.setName(newName);
+        getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
     }
 
 }

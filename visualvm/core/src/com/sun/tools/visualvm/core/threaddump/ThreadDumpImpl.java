@@ -40,8 +40,9 @@ final class ThreadDumpImpl extends AbstractThreadDump {
         super(file, master);
     }
     
-    void delete() {
-        deleteFile();
+    public void delete() {
+        super.delete();
+        ThreadDumpSupport.getInstance().getThreadDumpProvider().deleteThreadDump(this);
     }
 
     void removed() {

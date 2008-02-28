@@ -57,10 +57,6 @@ class ThreadDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescr
             super(threadDump, ICON);
         }
         
-        public boolean supportsRename() {
-            return true;
-        }
-        
     }
 
 }

@@ -44,45 +44,30 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
         if (ds instanceof ApplicationSnapshot) {
-            return ApplicationSnapshotDescriptor.newInstance((ApplicationSnapshot)ds);
+            return new ApplicationSnapshotDescriptor((ApplicationSnapshot)ds);
         }
         return null;
     }
     
     private static class ApplicationSnapshotDescriptor extends AbstractSnapshotDescriptor<ApplicationSnapshot> {
+        
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);
         private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
         
-        static ApplicationSnapshotDescriptor newInstance(ApplicationSnapshot snapshot) {
-            ApplicationSnapshotDescriptor desc = new ApplicationSnapshotDescriptor(snapshot);
+        private ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
+            super(snapshot, resolveIcon(snapshot));
+        }
+        
+        private static Image resolveIcon(ApplicationSnapshot snapshot) {
+            Image icon = NODE_ICON;
             
-            String name = desc.getName();
-            Image icon = desc.getIcon();
-            
-            String[] properties = snapshot.getProperties(new String[] { PROPERTY_NAME, PROPERTY_ICON });
-            if (properties[0] != null) name = properties[0];
-            if (properties[1] != null) {
-                Image image = Utils.stringToImage(properties[1]);
-                if (image != null) icon = image;
+            String persistedIconString = snapshot.getStorage().getCustomProperty(PROPERTY_ICON);
+            if (persistedIconString != null) {
+                Image persistedIcon = Utils.stringToImage(persistedIconString);
+                if (persistedIcon != null) icon = persistedIcon;
             }
             
-            desc.setName(name);
-            desc.setIcon(Utilities.mergeImages(icon, NODE_BADGE, 0, 0));
-            
-            return desc; 
-        }
-        
-        private ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
-            super(snapshot, NODE_ICON);
-        }
-        
-        public void setName(String newName) {
-            super.setName(newName);
-            getDataSource().setProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
-        }
-        
-        public boolean supportsRename() {
-            return true;
+            return Utilities.mergeImages(icon, NODE_BADGE, 0, 0);
         }
         
     }

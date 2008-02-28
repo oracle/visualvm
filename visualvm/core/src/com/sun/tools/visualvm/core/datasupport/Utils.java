@@ -40,6 +40,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
@@ -67,6 +69,48 @@ public final class Utils {
         return filteredSet;
     }
     
+    
+    public static boolean copyFile(File file, File copy) {
+        if (file == null || !file.isFile()) return false;
+        
+        // TODO: implement more efficient algorithm for files
+        
+        FileObject fileO = FileUtil.toFileObject(file);
+        FileObject directoryO = FileUtil.toFileObject(FileUtil.normalizeFile(copy.getParentFile()));
+        try {
+            FileUtil.copyFile(fileO, directoryO, file.getName(), "");
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error copying snapshot to " + copy + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Deletes the file where data of this snapshot are stored.
+     * Note that this method only deletes the file, not the Snapshot instance.
+     * 
+     * @return true if the file has been successfully deleted, false otherwise.
+     */
+    public static boolean deleteFile(File file) {
+        boolean deleted = false;
+        
+        if (file.isFile()) deleted = file.delete();
+        
+        else {
+            FileObject directory = FileUtil.toFileObject(file);
+            try {
+                directory.delete();
+                deleted = true;
+            } catch (Exception e) {
+                deleted = false;
+            }
+        }
+        
+        if (!deleted) file.deleteOnExit(); // TODO: should be only on request (introduce parameter deleteOnExit)
+        
+        return deleted;
+    }
     
     public static void createArchive(File directory, File archive) {        
         ZipOutputStream zos = null;

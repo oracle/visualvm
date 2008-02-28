@@ -26,11 +26,10 @@
 package com.sun.tools.visualvm.core.snapshot.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
-import com.sun.tools.visualvm.core.datasupport.PropertiesSupport;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
-import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -43,16 +42,11 @@ import org.openide.util.RequestProcessor;
  */
 public final class ApplicationSnapshot extends AbstractSnapshot {
     
-    private final PropertiesSupport propertiesSupport;
+    private static final String PROPERTIES_FILENAME = "application_snapshot";
 
     
-    public ApplicationSnapshot(File file) {
-       this(file, null);
-    }
-
-    public ApplicationSnapshot(File file, Properties properties) {
-        super(file, ApplicationSnapshotsSupport.getInstance().getCategory());
-        propertiesSupport = new PropertiesSupport(new File(file, ApplicationSnapshotsSupport.PROPERTIES_FILE), properties);
+    public ApplicationSnapshot(File directory) {
+        super(directory, ApplicationSnapshotsSupport.getInstance().getCategory());
     }
     
     
@@ -92,23 +86,21 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         }
     }
     
-    void delete() {
-        deleteFile();
+    
+    protected Storage createStorage() {
+        return new Storage(getFile(), PROPERTIES_FILENAME + Storage.DEFAULT_PROPERTIES_EXT);
+    }
+    
+        
+    public void delete() {
+        super.delete();
+        ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().deleteSnapshot(this, true);
     }
 
     void removed() {
         setState(STATE_FINISHED);
     }
     
-    
-    
-    String[] getProperties(String[] keys) {
-        return propertiesSupport.getProperties(keys);
-    }
-    
-    void setProperties(String[] keys, String[] values) {
-        propertiesSupport.setProperties(keys, values);
-    }
     
     private void saveArchive(File archive) {
         Utils.createArchive(getFile(), archive);

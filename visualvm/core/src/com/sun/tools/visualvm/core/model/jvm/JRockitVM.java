@@ -118,7 +118,7 @@ public class JRockitVM extends JvmstatJVM {
     
     public File takeThreadDump() throws IOException {
         String dump = getStackTrace();
-        File snapshotDir = application.getStorage();
+        File snapshotDir = application.getStorage().getDirectory();
         String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
         File dumpFile = new File(snapshotDir,name);
         OutputStream os = new FileOutputStream(dumpFile);
