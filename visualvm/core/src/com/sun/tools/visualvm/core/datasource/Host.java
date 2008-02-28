@@ -50,9 +50,9 @@ public interface Host extends DataSource {
     public String getHostName();
 
     /**
-     * Returns an InetAddress instance for this hist.
+     * Returns an InetAddress instance for this host.
      * 
-     * @return InetAddress instance for this hist.
+     * @return InetAddress instance for this host.
      */
     public InetAddress getInetAddress();
 
