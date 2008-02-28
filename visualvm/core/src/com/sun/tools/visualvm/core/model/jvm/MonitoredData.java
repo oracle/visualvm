@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.model.jvm;
 
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
 import java.lang.management.ClassLoadingMXBean;
+import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import sun.jvmstat.monitor.LongMonitor;
@@ -74,7 +75,8 @@ public class MonitoredData {
     ClassLoadingMXBean classBean = jvmModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jvmModel.getThreadMXBean();
     RuntimeMXBean runtimeBean = jvmModel.getRuntimeMXBean();
-
+    MemoryUsage mem = jvmModel.getMemoryMXBean().getHeapMemoryUsage();
+    MemoryUsage perm = jvm.getPermGenPool().getUsage();
     loadedClasses = classBean.getLoadedClassCount();
     sharedLoadedClasses = 0;
     sharedUnloadedClasses = 0;
@@ -85,9 +87,15 @@ public class MonitoredData {
     threadsStarted = threadBean.getTotalStartedThreadCount();
     applicationTime = 0;
     upTime = runtimeBean.getUptime();
-    genCapacity = null;
-    genUsed = null;
-    genMaxCapacity = null;
+    genCapacity = new long[2];
+    genUsed = new long[2];
+    genMaxCapacity = new long[2];
+    genCapacity[0] = mem.getCommitted();
+    genUsed[0] = mem.getUsed();
+    genMaxCapacity[0] = mem.getMax();
+    genCapacity[1] = perm.getCommitted();
+    genUsed[1] = perm.getUsed();
+    genMaxCapacity[1] = perm.getMax();
     monitoredVm = jvm;
   }
   

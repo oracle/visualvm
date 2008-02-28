@@ -32,7 +32,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +50,14 @@ import org.openide.util.RequestProcessor;
  */
 class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     private static final int DEFAULT_REFRESH = 2000;
+    private static final String PERM_GEN = "Perm Gen";
     
     private JvmJmxModel jmxModel;
     private Properties systemProperties;
     private String jvmArgs;
     private Set<MonitoredDataListener> listeners;
     private Timer timer;
+    private MemoryPoolMXBean permGenPool;
     
     JmxJVM(JvmJmxModel model) {
         jmxModel = model;
@@ -183,7 +188,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     }
     
     public boolean isMemoryMonitoringSupported() {
-        return false;
+        return true;
     }
     
     public boolean isGetSystemPropertiesSupported() {
@@ -244,6 +249,19 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
 
     public void dataFinished(Application dataSource) {
         disableTimer();
+    }
+
+    MemoryPoolMXBean getPermGenPool() {
+        if (permGenPool == null) {
+            Collection<MemoryPoolMXBean> pools = getJmxModel().getMemoryPoolMXBeans();
+            for (MemoryPoolMXBean pool : pools) {
+                if (pool.getType().equals(MemoryType.NON_HEAP) && PERM_GEN.equals(pool.getName())) {
+                    permGenPool = pool;
+                    break;
+                }
+            }
+        }
+        return permGenPool;
     }
     
 }
