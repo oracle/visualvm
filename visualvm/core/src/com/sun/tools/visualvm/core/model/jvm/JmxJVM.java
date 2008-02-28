@@ -51,6 +51,7 @@ import org.openide.util.RequestProcessor;
 class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     private static final int DEFAULT_REFRESH = 2000;
     private static final String PERM_GEN = "Perm Gen";
+    private static final String PS_PERM_GEN = "PS Perm Gen";
     
     private JvmJmxModel jmxModel;
     private Properties systemProperties;
@@ -255,7 +256,9 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         if (permGenPool == null) {
             Collection<MemoryPoolMXBean> pools = getJmxModel().getMemoryPoolMXBeans();
             for (MemoryPoolMXBean pool : pools) {
-                if (pool.getType().equals(MemoryType.NON_HEAP) && PERM_GEN.equals(pool.getName())) {
+                if (pool.getType().equals(MemoryType.NON_HEAP) &&
+                        (PERM_GEN.equals(pool.getName()) ||
+                        PS_PERM_GEN.equals(pool.getName()))) {
                     permGenPool = pool;
                     break;
                 }
