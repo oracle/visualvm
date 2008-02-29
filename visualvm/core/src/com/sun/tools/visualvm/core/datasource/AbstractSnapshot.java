@@ -122,12 +122,14 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
         if (f != null) {
             String customPropertiesFileName = f.getName() + Storage.DEFAULT_PROPERTIES_EXT;
             if (f.isDirectory()) {
-                if (new File(f, customPropertiesFileName).exists()) return new Storage(f, customPropertiesFileName);
-                else return new Storage(f);
+                return new Storage(f, customPropertiesFileName);
+//                if (new File(f, customPropertiesFileName).exists()) return new Storage(f, customPropertiesFileName);
+//                else return new Storage(f);
             } else if (f.isFile()) {
                 File directory = f.getParentFile();
-                if (new File(directory, customPropertiesFileName).exists()) return new Storage(directory, customPropertiesFileName);
-                else return new Storage(directory);
+                return new Storage(directory, customPropertiesFileName);
+//                if (new File(directory, customPropertiesFileName).exists()) return new Storage(directory, customPropertiesFileName);
+//                else return new Storage(directory);
             }
         }
         
