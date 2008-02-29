@@ -102,13 +102,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
  * Utilities for interaction with the NetBeans IDE, specifically related to Projects
  *
  * @author Ian Formanek
+ * @deprecated 
  */
+@Deprecated
 public final class ProjectUtilities {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 

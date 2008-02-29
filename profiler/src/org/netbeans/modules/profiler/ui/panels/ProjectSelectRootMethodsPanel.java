@@ -38,115 +38,44 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui.wizards.framework.steps;
+package org.netbeans.modules.profiler.ui.panels;
 
-import org.netbeans.modules.profiler.ui.wizards.framework.WizardContext;
-import org.netbeans.modules.profiler.ui.wizards.framework.screen.NullWizardScreen;
-import org.netbeans.modules.profiler.ui.wizards.framework.screen.WizardScreen;
-import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class NullWizardStep implements WizardStep {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+public class ProjectSelectRootMethodsPanel extends AbstractSelectRootMethodsPanel {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private String title;
+    private static ProjectSelectRootMethodsPanel instance = null;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public NullWizardStep() {
-        this.title = ""; // NOI18N
-    }
-
-    public NullWizardStep(String title) {
-        this.title = title;
+    private ProjectSelectRootMethodsPanel() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public WizardScreen getAttachedScreen() {
-        return new NullWizardScreen();
+    public static synchronized ProjectSelectRootMethodsPanel getDefault() {
+        if (instance == null) {
+            instance = new ProjectSelectRootMethodsPanel();
+        }
+
+        return instance;
     }
 
-    public boolean isBegin() {
+    @Override
+    protected NodeFilter<RootSelectorNode> getNodeFilter() {
+        return RootSelectorTree.DEFAULT_FILTER;
+    }
+
+    @Override
+    protected boolean isShowAllProjectsEnabled() {
         return true;
-    }
-
-    public void setCurrent() {
-    }
-
-    public boolean isCurrent() {
-        return false;
-    }
-
-    public boolean isEnd() {
-        return true;
-    }
-
-    public void setFirst() {
-    }
-
-    public boolean isFirst() {
-        return true;
-    }
-
-    public void setLast() {
-    }
-
-    public boolean isLast() {
-        return true;
-    }
-
-    public void setNext() {
-    }
-
-    public void setPrevious() {
-    }
-
-    public int getStepIndex() {
-        return 0;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public void setWizardContext(WizardContext context) {
-    }
-
-    public void accept(WizardStepVisitor visitor, WizardContext context, int level) {
-        //        visitor.visit(this, context, 0);
-    }
-
-    public void addChangeListener(ChangeListener listener) {
-    }
-
-    public boolean canBack() {
-        return true;
-    }
-
-    public boolean canFinish() {
-        return true;
-    }
-
-    public boolean canHandle() {
-        return false;
-    }
-
-    public boolean canNext() {
-        return true;
-    }
-
-    public boolean onCancel() {
-        return true;
-    }
-
-    public void onFinish() {
-    }
-
-    public void removeChangeListener(ChangeListener listener) {
     }
 }
