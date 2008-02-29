@@ -48,8 +48,12 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.ui.ManualMethodSelect;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -138,12 +142,12 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         if (e.getSource() == addFromProjectButton) {
             RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
-                        final ClientUtils.SourceCodeSelection[] sel = SelectRootMethodsPanel.getDefault()
-                                                                                            .getRootMethods(project,
-                                                                                                            (ClientUtils.SourceCodeSelection[]) selectedRoots
-                                                                                                                                            .toArray(new ClientUtils.SourceCodeSelection[] {
-                                                                                                                                                         
-                                                                                                                                                     }));
+                        final ClientUtils.SourceCodeSelection[] sel = ProjectSelectRootMethodsPanel.getDefault()
+                                                                                                   .getRootMethods(project,
+                                                                                                                   (ClientUtils.SourceCodeSelection[]) selectedRoots
+                                                                                                                                                   .toArray(new ClientUtils.SourceCodeSelection[] {
+                                                                                                                                                                
+                                                                                                                                                            }));
 
                         if (sel != null) {
                             addNewRootMethods(sel, true);
