@@ -137,8 +137,8 @@ public abstract class SortableTableModel extends AbstractTableModel {
 
     private CustomSortableHeaderRenderer headerRenderer;
     private HeaderListener headerListener;
-    private ImageIcon sortAscIcon = new ImageIcon(SortableTableModel.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortAsc.png")); //NOI18N
-    private ImageIcon sortDescIcon = new ImageIcon(SortableTableModel.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortDesc.png")); //NOI18N
+    private ImageIcon sortAscIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/sortAsc.png")); //NOI18N
+    private ImageIcon sortDescIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/sortDesc.png")); //NOI18N
     private JTableHeader tableHeader;
     private int lastFocusedColumn = -1;
 
