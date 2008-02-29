@@ -45,17 +45,9 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilder;
-import org.netbeans.modules.profiler.selector.api.SelectorChildren;
-import org.netbeans.modules.profiler.selector.api.SelectorNode;
-import org.netbeans.modules.profiler.selector.api.nodes.ContainerNode;
-import org.netbeans.modules.profiler.selector.api.nodes.GreedySelectorChildren;
-import org.netbeans.modules.profiler.selector.api.nodes.ProjectNode;
-import org.netbeans.modules.profiler.selector.api.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import java.awt.Color;
 import java.awt.Container;
@@ -64,20 +56,16 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
+import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator;
+
 
 
 /**
@@ -97,7 +85,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
     private JButton okButton;
     private Project currentProject;
     private RootSelectorTree advancedLogicalPackageTree;
-    private SelectionTreeBuilder defaultBuilder = null;
     private String assignedClassName;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -122,7 +109,6 @@ public class SelectRootMethodsForClassPanel extends JPanel {
         this.assignedClassName = demaskInnerClass(className);
         this.currentProject = project;
 
-        refreshDefaultBuilder();
         updateSelector(new Runnable() {
                 public void run() {
                     advancedLogicalPackageTree.setup(new Project[] { currentProject }, currentSelection);
@@ -154,51 +140,42 @@ public class SelectRootMethodsForClassPanel extends JPanel {
 
         okButton = new JButton("OK");
 
-        advancedLogicalPackageTree = new RootSelectorTree() {
-                protected SelectionTreeBuilder getBuilder() {
-                    return defaultBuilder;
+        advancedLogicalPackageTree = new RootSelectorTree(new ProgressDisplayer() {
+            ProfilerProgressDisplayer pd = null;
+            
+            public synchronized void showProgress(String message) {
+                pd = ProfilerProgressDisplayer.showProgress(message);
+            }
+
+            public synchronized void showProgress(String message, ProgressController controller) {
+                pd = ProfilerProgressDisplayer.showProgress(message, controller);
+            }
+
+            public synchronized void showProgress(String caption, String message, ProgressController controller) {
+                pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
+            }
+
+            public synchronized boolean isOpened() {
+                return pd != null;
+            }
+
+            public synchronized void close() {
+                if (pd != null) {
+                    pd.close();
+                    pd = null;
                 }
+            }
+        });
+        
+        advancedLogicalPackageTree.setNodeFilter(new TreeDecimator.NodeFilter<RootSelectorNode>() {
+            public boolean match(RootSelectorNode node) {
+                return node.getSignature().toFlattened().equals(assignedClassName);
+            }
 
-                @Override
-                protected TreeNode customizeRoot(final DefaultMutableTreeNode root) {
-                    assert(root.getChildAt(0) instanceof ProjectNode);
-                    final Project project = ((ProjectNode) root.getChildAt(0)).getProject();
-                    final SelectorChildren<SelectorNode> children = new GreedySelectorChildren() {
-                        protected List<SelectorNode> prepareChildren(SelectorNode parent) {
-                            List<SelectorNode> nodes = new ArrayList<SelectorNode>();
-                            Enumeration chldrn = root.children();
-
-                            while (chldrn.hasMoreElements()) {
-                                SelectorNode child = (SelectorNode) chldrn.nextElement();
-                                SelectorNode[] foundNodes = findElligibleNodes(child);
-
-                                for (SelectorNode node : foundNodes) {
-                                    node.setParent(parent);
-                                }
-
-                                nodes.addAll(Arrays.asList(foundNodes));
-                            }
-
-                            return nodes;
-                        }
-                    };
-
-                    final ContainerNode newRoot = new ContainerNode() {
-                        protected SelectorChildren getChildren() {
-                            return children;
-                        }
-
-                        @Override
-                        public Project getProject() {
-                            return project;
-                        }
-                    };
-
-                    children.setParent(newRoot);
-
-                    return newRoot;
-                }
-            };
+            public boolean maymatch(RootSelectorNode node) {
+                return assignedClassName.startsWith(node.getSignature().toFlattened());
+            }
+        });
 
         container.setLayout(new GridBagLayout());
 
@@ -267,40 +244,40 @@ public class SelectRootMethodsForClassPanel extends JPanel {
 //        return className.replace('$', '.'); // NOI18N
     }
 
-    private SelectorNode[] findElligibleNodes(SelectorNode currentRoot) {
-        ClientUtils.SourceCodeSelection signature = currentRoot.getSignature();
-
-        if ((signature != null) && signature.getClassName().equals(assignedClassName)) {
-            return new SelectorNode[] { currentRoot };
-        }
-
-        Set<SelectorNode> foundNodes = new HashSet<SelectorNode>();
-
-        if ((signature == null) || assignedClassName.startsWith(signature.toFlattened())) {
-            Enumeration chldrn = currentRoot.children();
-
-            while (chldrn.hasMoreElements()) {
-                SelectorNode[] nodes = findElligibleNodes((SelectorNode) chldrn.nextElement());
-                foundNodes.addAll(Arrays.asList(nodes));
-            }
-        }
-
-        return foundNodes.toArray(new SelectorNode[foundNodes.size()]);
-    }
-
-    private void refreshDefaultBuilder() {
-        Collection<?extends SelectionTreeBuilder> allBuilders = Lookup.getDefault().lookupAll(SelectionTreeBuilder.class);
-
-        for (SelectionTreeBuilder builder : allBuilders) {
-            if (builder.supports(currentProject)) {
-                if (builder.isDefault()) {
-                    defaultBuilder = builder;
-
-                    break;
-                }
-            }
-        }
-    }
+//    private SelectorNode[] findElligibleNodes(SelectorNode currentRoot) {
+//        ClientUtils.SourceCodeSelection signature = currentRoot.getSignature();
+//
+//        if ((signature != null) && signature.getClassName().equals(assignedClassName)) {
+//            return new SelectorNode[] { currentRoot };
+//        }
+//
+//        Set<SelectorNode> foundNodes = new HashSet<SelectorNode>();
+//
+//        if ((signature == null) || assignedClassName.startsWith(signature.toFlattened())) {
+//            Enumeration chldrn = currentRoot.children();
+//
+//            while (chldrn.hasMoreElements()) {
+//                SelectorNode[] nodes = findElligibleNodes((SelectorNode) chldrn.nextElement());
+//                foundNodes.addAll(Arrays.asList(nodes));
+//            }
+//        }
+//
+//        return foundNodes.toArray(new SelectorNode[foundNodes.size()]);
+//    }
+//
+//    private void refreshDefaultBuilder() {
+//        Collection<?extends SelectionTreeBuilder> allBuilders = Lookup.getDefault().lookupAll(SelectionTreeBuilder.class);
+//
+//        for (SelectionTreeBuilder builder : allBuilders) {
+//            if (builder.supports(currentProject)) {
+//                if (builder.isDefault()) {
+//                    defaultBuilder = builder;
+//
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     private void updateSelector(Runnable updater) {
         ProgressHandle ph = IDEUtils.indeterminateProgress(NbBundle.getMessage(this.getClass(),

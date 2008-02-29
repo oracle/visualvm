@@ -58,7 +58,6 @@ import org.netbeans.modules.profiler.ProfilerModule;
 import org.netbeans.modules.profiler.actions.JavaPlatformSelector;
 import org.netbeans.modules.profiler.actions.ProfilingSupport;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -69,7 +68,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import javax.swing.*;
+import org.netbeans.modules.profiler.utils.ProjectUtilities;
 
 
 /**
