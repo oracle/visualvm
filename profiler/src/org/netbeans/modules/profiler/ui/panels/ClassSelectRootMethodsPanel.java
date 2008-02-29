@@ -38,19 +38,61 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui.wizards.framework.functors;
+package org.netbeans.modules.profiler.ui.panels;
 
-import org.netbeans.modules.profiler.ui.wizards.framework.WizardContext;
+import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class TrueConditionalFunctor implements ConditionalFunctor {
+public class ClassSelectRootMethodsPanel extends AbstractSelectRootMethodsPanel {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+
+    private static ClassSelectRootMethodsPanel instance = null;
+
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+
+    private volatile String assignedClassName;
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public boolean evaluate(WizardContext context) {
-        return true;
+    public static synchronized ClassSelectRootMethodsPanel getDefault() {
+        if (instance == null) {
+            instance = new ClassSelectRootMethodsPanel();
+        }
+
+        return instance;
+    }
+
+    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project, final String className,
+                                                            final ClientUtils.SourceCodeSelection[] currentSelection) {
+        assignedClassName = className;
+
+        return super.getRootMethods(project, currentSelection);
+    }
+
+    @Override
+    protected NodeFilter<RootSelectorNode> getNodeFilter() {
+        return new TreeDecimator.NodeFilter<RootSelectorNode>() {
+                public boolean match(RootSelectorNode node) {
+                    return (node.getSignature() != null) && node.getSignature().toFlattened().equals(assignedClassName);
+                }
+
+                public boolean maymatch(RootSelectorNode node) {
+                    return (node.getSignature() == null) || assignedClassName.startsWith(node.getSignature().toFlattened());
+                }
+            };
+    }
+
+    @Override
+    protected boolean isShowAllProjectsEnabled() {
+        return false;
     }
 }
