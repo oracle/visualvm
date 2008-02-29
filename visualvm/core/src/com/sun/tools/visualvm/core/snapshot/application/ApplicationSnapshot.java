@@ -94,7 +94,7 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         
     public void delete() {
         super.delete();
-        ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().deleteSnapshot(this, true);
+        ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().unregisterSnapshot(this);
     }
 
     void removed() {

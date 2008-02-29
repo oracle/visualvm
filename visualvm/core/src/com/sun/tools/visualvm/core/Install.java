@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core;
 import com.sun.tools.visualvm.core.application.ApplicationsSupport;
 import com.sun.tools.visualvm.core.coredump.CoreDumpSupport;
 import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.dataview.monitor.MonitorViewSupport;
 import com.sun.tools.visualvm.core.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.core.host.HostsSupport;
@@ -96,17 +97,7 @@ public class Install extends ModuleInstall {
     
     private void cleanupPreviousSession() {
         File temporaryStorage = new File(Storage.getTemporaryStorageDirectoryString());
-        if (temporaryStorage.exists() && temporaryStorage.isDirectory()) deleteFolder(temporaryStorage);
+        Utils.delete(temporaryStorage, false);
     }
-    
-    private void deleteFolder(File dir) {
-        File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File f = files[i];
-            if (f.isDirectory()) deleteFolder(f);
-            else f.delete();
-        }
-        dir.delete();
-  }
     
 }

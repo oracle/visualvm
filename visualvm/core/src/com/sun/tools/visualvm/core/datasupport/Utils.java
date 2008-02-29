@@ -40,8 +40,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -49,7 +48,7 @@ import org.openide.filesystems.FileUtil;
  */
 public final class Utils {
     
-    private static final int COPY_PACKET_SIZE = 4096;
+    private static final int COPY_PACKET_SIZE = 16384;
     
 
     public static <X, Y> boolean containsSubclass(Set<? extends Class<? extends Y>> classes, X superclassInstance) {
@@ -70,18 +69,20 @@ public final class Utils {
     }
     
     
-    public static String getFileBase(File file) {
-        String fileBase = file.getName();
-        int extIndex = fileBase.lastIndexOf(".");
-        if (extIndex != -1) fileBase = fileBase.substring(0, extIndex);
-        return fileBase;
+    public static String getFileBase(String fileName) {
+        int extIndex = fileName.lastIndexOf(".");
+        if (extIndex == -1) return fileName;
+        return fileName.substring(0, extIndex);
     }
     
-    public static String getFileExt(File file) {
-        String fileBase = file.getName();
-        int extIndex = fileBase.lastIndexOf(".");
-        if (extIndex != -1) fileBase = fileBase.substring(extIndex);
-        return fileBase;
+    public static String getFileExt(String fileName) {
+        int extIndex = fileName.lastIndexOf(".");
+        if (extIndex == -1) return "";
+        return fileName.substring(extIndex);
+    }
+    
+    public static File getUniqueFile(File directory, String file) {
+        return getUniqueFile(directory, getFileBase(file), getFileExt(file));
     }
     
     public static File getUniqueFile(File directory, String fileName, String fileExt) {
@@ -94,45 +95,61 @@ public final class Utils {
     }
     
     public static boolean copyFile(File file, File copy) {
-        if (file == null || !file.isFile()) return false;
+        if (file == null || copy == null) throw new NullPointerException("File cannot be null");
+        if (!file.isFile() || copy.isDirectory()) throw new IllegalArgumentException("Not a valid file");        
         
-        // TODO: implement more efficient algorithm for files
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
         
-        FileObject fileO = FileUtil.toFileObject(file);
-        FileObject directoryO = FileUtil.toFileObject(FileUtil.normalizeFile(copy.getParentFile()));
         try {
-            FileUtil.copyFile(fileO, directoryO, file.getName(), "");
+            fis = new FileInputStream(file);
+            fos = new FileOutputStream(copy);
+            
+            int bytes;
+            byte[] packet = new byte[COPY_PACKET_SIZE];
+            while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
             return true;
         } catch (Exception e) {
-            System.err.println("Error copying snapshot to " + copy + ": " + e.getMessage());
+            System.err.println("Error copying file: " + e.getMessage());
             return false;
+        } finally {
+            try { if (fos != null) fos.close(); } catch (Exception e) { System.err.println("Problem closing target stream: " + e.getMessage()); }
+            try { if (fis != null) fis.close(); } catch (Exception e) { System.err.println("Problem closing source stream: " + e.getMessage()); }
         }
     }
     
+    
     /**
-     * Deletes the file where data of this snapshot are stored.
-     * Note that this method only deletes the file, not the Snapshot instance.
+     * Deletes file or folder.
+     * Optionally invokes deleteOnExit if necessary.
      * 
-     * @return true if the file has been successfully deleted, false otherwise.
+     * @param file file or folder to be deleted,
+     * @param deleteOnExit true if deleteOnExit should be invoked on not deleted file or directory.
+     * @return true if the file or folder has been completely deleted, false otherwise.
      */
-    public static boolean deleteFile(File file) {
-        boolean deleted = false;
+    public static boolean delete(File file, boolean deleteOnExit) {
         
-        if (file.isFile()) deleted = file.delete();
+        if (file == null) throw new NullPointerException("File cannot be null");
+        if (!file.exists()) return true;
         
-        else {
-            FileObject directory = FileUtil.toFileObject(file);
-            try {
-                directory.delete();
-                deleted = true;
-            } catch (Exception e) {
-                deleted = false;
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) delete(files[i], deleteOnExit);
+        }
+
+        if (!file.delete()) {
+            if (Utilities.isWindows() && file.isFile()) {
+                for (int i = 0; i < 5; i++) {
+                    System.gc();
+                    if (file.delete()) return true;
+                }
             }
+            if (deleteOnExit) file.deleteOnExit();
+            return false;
         }
         
-        if (!deleted) file.deleteOnExit(); // TODO: should be only on request (introduce parameter deleteOnExit)
+        return true;
         
-        return deleted;
     }
     
     public static void createArchive(File directory, File archive) {        
@@ -153,14 +170,14 @@ public final class Utils {
                         while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) zos.write(packet, 0, bytes);
                     } finally {
                         if (zos != null) zos.closeEntry();
-                        try { if (fis != null) fis.close(); } catch (Exception e) { System.err.println("Problem closing archived file stream: " + e.getMessage()); }
+                        try { if (fis != null) fis.close(); } catch (Exception e) { System.err.println("Problem closing archive entry stream: " + e.getMessage()); }
                     }
                 } else {
                     // TODO: process directory
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error archiving snapshot: " + e.getMessage());
+            System.err.println("Error creating archive: " + e.getMessage());
         } finally {
             try { if (zos != null) zos.close(); } catch (Exception e) { System.err.println("Problem closing archive stream: " + e.getMessage()); }
         }
@@ -169,7 +186,7 @@ public final class Utils {
     public static File extractArchive(File archive, File destination) {
         // TODO: implement extracting directories
         
-        File directory = getUniqueFile(destination, getFileBase(archive), getFileExt(archive));
+        File directory = getUniqueFile(destination, archive.getName());
         ZipFile zipFile = null;
         
         try {
@@ -193,7 +210,7 @@ public final class Utils {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error extracting snapshot: " + e.getMessage());
+            System.err.println("Error extracting archive: " + e.getMessage());
             return null;
         } finally {
             try { if (zipFile != null) zipFile.close(); } catch (Exception e) { System.err.println("Problem closing archive: " + e.getMessage()); }

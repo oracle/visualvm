@@ -39,33 +39,34 @@ class CoreDumpImpl extends AbstractCoreDump {
     
     static final String PROPERTY_JAVA_HOME = "prop_java_home";
     
-    private Storage givenStorage;
-    private File customPropertiesStorage;
+    private Storage storage;
     
     
-    public CoreDumpImpl(Storage givenStorage, File customPropertiesStorage) throws IOException {
-        super(new File(givenStorage.getCustomProperty(PROPERTY_FILE)),
-                new File(givenStorage.getCustomProperty(PROPERTY_JAVA_HOME)));
-        this.givenStorage = givenStorage;
-        this.customPropertiesStorage = customPropertiesStorage;
+    public CoreDumpImpl(Storage storage) throws IOException {
+        super(new File(storage.getCustomProperty(PROPERTY_FILE)),
+                new File(storage.getCustomProperty(PROPERTY_JAVA_HOME)));
+        this.storage = storage;
     }
     
     public boolean supportsDelete() {
         return CoreDumpSupport.getStorageDirectory().equals(getFile().getParentFile());
     }
     
+    // removes link to coredump on the filesystem
+    public void remove() {
+        getStorage().deleteCustomPropertiesStorage();
+        CoreDumpSupport.getProvider().unregisterCoreDump(this);
+    }
+    
+    // deletes coredump stored in VisualVM persistent storage
     public void delete() {
         super.delete();
-        CoreDumpSupport.getProvider().removeCoreDump(this, true);
+        CoreDumpSupport.getProvider().unregisterCoreDump(this);
     }
     
     
     protected Storage createStorage() {
-        return givenStorage;
-    }
-    
-    File getCustomPropertiesStorage() {
-        return customPropertiesStorage;
+        return storage;
     }
     
     void finished() {

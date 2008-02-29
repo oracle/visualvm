@@ -39,7 +39,6 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     
     private File file;
     private final SnapshotCategory category;
-    private String customPropertiesFileName;
     
     
     /**
@@ -89,11 +88,12 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     
     public void save(File directory) {
         File f = getFile();
-        if (f != null && f.isFile())
-            Utils.copyFile(f, new File(directory, f.getName()));
-        if (customPropertiesFileName != null) {
-            File customPropertiesFile = new File(getStorage().getDirectory(), customPropertiesFileName);
-            if (customPropertiesFile.exists()) Utils.copyFile(customPropertiesFile, new File(directory, customPropertiesFile.getName()));
+        if (f != null && f.isFile()) {  
+            // File is not null and will be copied to the directory
+            File saveFile = Utils.getUniqueFile(directory, f.getName());    
+            Utils.copyFile(f, saveFile);
+            // If there are any custom properties defined, store them to <file>.properties
+            getStorage().saveCustomPropertiesTo(new File(saveFile.getAbsolutePath() + Storage.DEFAULT_PROPERTIES_EXT));
         }
     }
     
@@ -109,30 +109,26 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     }
     
     public void delete() {
+        getStorage().deleteCustomPropertiesStorage();
         File f = getFile();
-        if (f != null) if (!Utils.deleteFile(f)) f.deleteOnExit();
+        if (f != null) Utils.delete(f, true);
         setFile(null);
-        if (customPropertiesFileName != null) {
-            File customPropertiesFile = new File(getStorage().getDirectory(), customPropertiesFileName);
-            if (customPropertiesFile != null) if (!Utils.deleteFile(customPropertiesFile)) customPropertiesFile.deleteOnExit();
-        }
     }
+            
     
-    // Default storage (with .properties where possible):
-    // getFile().isDirectory(): <getFile()>/<getFile().getName()>.properties
-    // getFile().isFile(): <getFile().getParentFile()>/<getFile().getName()>.properties
-    // otherwise: <system_temp>/visualvm.dat, no properties
-    //
-    // NOTE: should be overriden by snapshots saving file only on demand
     protected Storage createStorage() {
         File f = getFile();
         
-        if (f.isDirectory()) {
-            customPropertiesFileName = f.getName() + Storage.DEFAULT_PROPERTIES_EXT;
-            return new Storage(f, customPropertiesFileName);
-        } else if (f.isFile()) {
-            customPropertiesFileName = f.getName() + Storage.DEFAULT_PROPERTIES_EXT;
-            return new Storage(f.getParentFile(), customPropertiesFileName);
+        if (f != null) {
+            String customPropertiesFileName = f.getName() + Storage.DEFAULT_PROPERTIES_EXT;
+            if (f.isDirectory()) {
+                if (new File(f, customPropertiesFileName).exists()) return new Storage(f, customPropertiesFileName);
+                else return new Storage(f);
+            } else if (f.isFile()) {
+                File directory = f.getParentFile();
+                if (new File(directory, customPropertiesFileName).exists()) return new Storage(directory, customPropertiesFileName);
+                else return new Storage(directory);
+            }
         }
         
         return super.createStorage();

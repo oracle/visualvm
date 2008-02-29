@@ -62,7 +62,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
     };
     
     private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
-        public void dataFinished(CoreDump coredump) { removeHeapDumps(coredump, false); }
+        public void dataFinished(CoreDump coredump) { removeHeapDumps(coredump); }
     };
     
     private final DataFinishedListener<ApplicationSnapshot> snapshotFinishedListener = new DataFinishedListener<ApplicationSnapshot>() {
@@ -173,14 +173,13 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
         });
     }
     
-    private void removeHeapDumps(CoreDump coreDump, boolean delete) {
+    private void removeHeapDumps(CoreDump coreDump) {
         Set<HeapDumpImpl> heapDumps = coreDump.getRepository().getDataSources(HeapDumpImpl.class);
         coreDump.getRepository().removeDataSources(heapDumps);
         unregisterDataSources(heapDumps);
-        if (delete) for (HeapDumpImpl heapDump : heapDumps) heapDump.delete();
     }
     
-    void deleteHeapDump(HeapDumpImpl heapDump) {
+    void unregisterHeapDump(HeapDumpImpl heapDump) {
         if (heapDump.getOwner() != null) heapDump.getOwner().getRepository().removeDataSource(heapDump);
         unregisterDataSource(heapDump);
     }

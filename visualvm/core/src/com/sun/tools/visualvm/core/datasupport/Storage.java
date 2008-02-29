@@ -61,6 +61,8 @@ public final class Storage {
     }
     
     public Storage(File directory, String propertiesFile) {
+        if (directory == null) throw new NullPointerException("Directory cannot be null");
+        if (directory.isFile()) throw new IllegalArgumentException("Not a valid directory: " + directory);
         this.directory = directory;
         this.propertiesFile = propertiesFile != null ? new File(directory, propertiesFile) : null;
     }
@@ -89,6 +91,19 @@ public final class Storage {
         Properties prop = getCustomProperties();
         for (int i = 0; i < keys.length; i++) prop.put(keys[i], values[i]);
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
+    }
+    
+    public void saveCustomPropertiesTo(File file) {
+        if (file == null) throw new NullPointerException("File cannot be null");
+        if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);
+        
+        Properties prop = getCustomProperties();
+        if (!prop.isEmpty()) storeProperties(prop, file);
+    }
+    
+    public void deleteCustomPropertiesStorage() {
+        if (propertiesFile != null && propertiesFile.exists())
+            if (!propertiesFile.delete()) propertiesFile.deleteOnExit();
     }
     
     
@@ -161,7 +176,7 @@ public final class Storage {
     
     
     private void storeCustomProperties() {
-        if (propertiesFile != null) storeProperties(getCustomProperties(), propertiesFile);
+        if (properties != null && propertiesFile != null) storeProperties(properties, propertiesFile);
     }
     
     private Properties getCustomProperties() {

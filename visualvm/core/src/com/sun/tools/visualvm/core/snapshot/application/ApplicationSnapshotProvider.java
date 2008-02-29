@@ -163,9 +163,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         });
     }
 
-    void deleteSnapshot(ApplicationSnapshot snapshot, boolean interactive) {
-        // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
-        if (snapshot.getOwner() != null) snapshot.getOwner().getRepository().removeDataSource(snapshot);
+    void unregisterSnapshot(ApplicationSnapshot snapshot) {
         unregisterDataSource(snapshot);
     }
     
@@ -173,7 +171,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     protected <Y extends ApplicationSnapshot> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
         for (ApplicationSnapshot snapshot : removed) {
-            SnapshotsContainer.sharedInstance().getRepository().removeDataSource(snapshot);
+            if (snapshot.getOwner() != null) snapshot.getOwner().getRepository().removeDataSource(snapshot);
             snapshot.removed();
         }
     }

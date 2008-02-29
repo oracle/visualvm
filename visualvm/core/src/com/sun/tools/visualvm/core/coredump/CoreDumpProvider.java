@@ -88,7 +88,7 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
                 pHandle.start();
                 
                 File file = new File(coreDumpFile);
-                File copy = Utils.getUniqueFile(CoreDumpSupport.getStorageDirectory(), Utils.getFileBase(file), Utils.getFileExt(file));
+                File copy = Utils.getUniqueFile(CoreDumpSupport.getStorageDirectory(), file.getName());
                 if (Utils.copyFile(file, copy)) {
                     coreDumpFile = copy.getAbsolutePath();
                     if (!file.delete()) file.deleteOnExit();
@@ -112,7 +112,7 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
 
         CoreDumpImpl newCoreDump = null;
         try {
-            newCoreDump = new CoreDumpImpl(storage, customPropertiesStorage);
+            newCoreDump = new CoreDumpImpl(storage);
         } catch (Exception e) {
             System.err.println("Error creating coredump: " + e.getMessage());
             return;
@@ -132,18 +132,15 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
         return null;
     }
 
-    void removeCoreDump(CoreDumpImpl coreDump, boolean interactive) {
-        // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
+    void unregisterCoreDump(CoreDumpImpl coreDump) {
         unregisterDataSource(coreDump);
-        File customPropertiesStorage = coreDump.getCustomPropertiesStorage();
-        if (!customPropertiesStorage.delete()) customPropertiesStorage.deleteOnExit();
     }
     
     
     protected <Y extends CoreDumpImpl> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
         for (CoreDumpImpl coreDump : removed) {
-            CoreDumpsContainer.sharedInstance().getRepository().removeDataSource(coreDump);
+            if (coreDump.getOwner() != null) coreDump.getOwner().getRepository().removeDataSource(coreDump);
             coreDump.finished();
         }
     }
@@ -163,7 +160,7 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
             CoreDumpImpl persistedCoredump = null;
             
             try {
-                persistedCoredump = new CoreDumpImpl(storage, file);
+                persistedCoredump = new CoreDumpImpl(storage);
             } catch (Exception e) {
                 System.err.println("Error loading persisted host: " + e.getMessage());
             }

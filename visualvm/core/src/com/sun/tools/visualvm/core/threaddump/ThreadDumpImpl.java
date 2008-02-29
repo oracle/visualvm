@@ -41,7 +41,7 @@ final class ThreadDumpImpl extends AbstractThreadDump {
     
     public void delete() {
         super.delete();
-        ThreadDumpSupport.getInstance().getThreadDumpProvider().deleteThreadDump(this);
+        ThreadDumpSupport.getInstance().getThreadDumpProvider().unregisterThreadDump(this);
     }
 
     void removed() {

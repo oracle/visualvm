@@ -58,10 +58,6 @@ final class HostImpl extends AbstractHost {
         return givenStorage;
     }
     
-    
-    File getCustomPropertiesStorage() {
-        return customPropertiesStorage;
-    }
 
     void finished() {
         setState(STATE_FINISHED);

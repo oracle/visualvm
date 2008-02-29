@@ -64,7 +64,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
     };
     
     private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
-        public void dataFinished(CoreDump coredump) { removeThreadDumps(coredump, false); }
+        public void dataFinished(CoreDump coredump) { removeThreadDumps(coredump); }
     };
     
     private final DataFinishedListener<ApplicationSnapshot> snapshotFinishedListener = new DataFinishedListener<ApplicationSnapshot>() {
@@ -179,14 +179,13 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
         });
     }
     
-    private void removeThreadDumps(CoreDump coreDump, boolean delete) {
+    private void removeThreadDumps(CoreDump coreDump) {
         Set<ThreadDumpImpl> threadDumps = coreDump.getRepository().getDataSources(ThreadDumpImpl.class);
         coreDump.getRepository().removeDataSources(threadDumps);
         unregisterDataSources(threadDumps);
-        if (delete) for (ThreadDumpImpl threadDump : threadDumps) threadDump.delete();
     }
     
-    void deleteThreadDump(ThreadDumpImpl threadDump) {
+    void unregisterThreadDump(ThreadDumpImpl threadDump) {
         if (threadDump.getOwner() != null) threadDump.getOwner().getRepository().removeDataSource(threadDump);
         unregisterDataSource(threadDump);
     }

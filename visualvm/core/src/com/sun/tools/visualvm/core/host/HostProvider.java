@@ -140,8 +140,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     void removeHost(HostImpl host, boolean interactive) {
         // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
         unregisterDataSource(host);
-        File customPropertiesStorage = host.getCustomPropertiesStorage();
-        if (!customPropertiesStorage.delete()) customPropertiesStorage.deleteOnExit();
+        host.getStorage().deleteCustomPropertiesStorage();
     }
     
     
