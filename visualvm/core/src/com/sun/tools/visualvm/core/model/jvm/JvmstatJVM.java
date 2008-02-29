@@ -138,7 +138,8 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
                     ex.printStackTrace();
                 }
             }
-        } else if (mainClassName.endsWith(".jar")) {
+        }
+        if (mainClassName.endsWith(".jar")) {
             mainClassName = mainClassName.replace('\\', '/');
             int index = mainClassName.lastIndexOf("/");
             if (index != -1) {
