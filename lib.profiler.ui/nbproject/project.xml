@@ -58,8 +58,13 @@ made subject to such option by the copyright holder.
             </module-dependencies>
             <friend-packages>
                 <friend>org.netbeans.modules.profiler</friend>
+                <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.selector.spi</friend>
+                <friend>org.netbeans.modules.profiler.selector.ui</friend>
+                <friend>org.netbeans.modules.profiler.utilities</friend>
                 <package>org.netbeans.lib.profiler.ui</package>
                 <package>org.netbeans.lib.profiler.ui.charts</package>
                 <package>org.netbeans.lib.profiler.ui.components</package>
@@ -72,7 +77,6 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.ui.graphs</package>
                 <package>org.netbeans.lib.profiler.ui.memory</package>
                 <package>org.netbeans.lib.profiler.ui.monitor</package>
-                <package>org.netbeans.lib.profiler.ui.resources</package>
                 <package>org.netbeans.lib.profiler.ui.threads</package>
             </friend-packages>
         </data>
