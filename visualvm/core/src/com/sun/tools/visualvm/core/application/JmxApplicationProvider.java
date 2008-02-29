@@ -82,7 +82,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
 
     private void computeHost(String hostname, JMXServiceURL url, String displayName) {
         Set<Host> hosts = RemoteHostsContainer.sharedInstance().getRepository().getDataSources(Host.class);
-        // Try to compute the Host instance from a hostname.
+        // Try to compute the Host instance from the <hostname>:<port>.
         if (hostname != null) {
             if (hostname.isEmpty() || isLocalHost(hostname)) {
                 addHost(Host.LOCALHOST, url, hostname, displayName);
@@ -104,7 +104,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                 }
             }
         }
-        // Try to compute the Host instance from the JMXServiceURL.
+        // Try to compute the Host instance from the host in the JMXServiceURL.
         String urlHost = url.getHost();
         if (urlHost != null && !urlHost.isEmpty()) {
             if (isLocalHost(urlHost)) {
@@ -127,9 +127,48 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                 }
             }
         }
-        // TODO: Try to compute the Host instance from the JMXServiceURL
-        //       using the RMIRegistry/COSNaming info in urlPath
+        // Try to compute the Host instance from the JNDI/RMI
+        // Registry Service urlPath in the JMXServiceURL.
+        if ("rmi".equals(url.getProtocol()) &&
+                url.getURLPath().startsWith("/jndi/rmi://")) {
+            String urlPath = url.getURLPath().substring("/jndi/rmi://".length());
+            String registryURLHost = null;
+            if ("/".equals(urlPath.charAt(0))) {
+                registryURLHost = "localhost";
+            } else {
+                int colonIndex = urlPath.indexOf(":");
+                int slashIndex = urlPath.indexOf("/");
+                int min = Math.min(colonIndex, slashIndex);
+                registryURLHost = urlPath.substring(0, min);
+                if (registryURLHost.isEmpty()) {
+                    registryURLHost = "localhost";                    
+                }
+            }
+            if (isLocalHost(registryURLHost)) {
+                addHost(Host.LOCALHOST, url, registryURLHost, displayName);
+                return;
+            } else {
+                try {
+                    InetAddress addr = InetAddress.getByName(registryURLHost);
+                    for (Host host : hosts) {
+                        if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
+                            addHost(host, url, registryURLHost, displayName);
+                            return;
+                        }
+                    }
+                    addHost(null, url, registryURLHost, displayName);
+                    return;
+                } catch (Exception e) {
+                    Exceptions.printStackTrace(e);
+                    return;
+                }
+            }
+        }
+
         // TODO: Connect to the agent and try to get the hostname
+
+        // WARNING: If a hostname could not be found the JMX application
+        //          is added under the Local host tree node.
         addHost(Host.LOCALHOST, url, urlHost, displayName);
         return;
     }
