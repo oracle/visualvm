@@ -122,7 +122,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 
                 HostImpl newHost = null;
                 try {
-                    newHost = new HostImpl(storage, customPropertiesStorage);
+                    newHost = new HostImpl(storage);
                 } catch (Exception e) {
                     System.err.println("Error creating host: " + e.getMessage()); // Should never happen
                 }
@@ -195,7 +195,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             HostImpl persistedHost = null;
             
             try {
-                persistedHost = new HostImpl(storage, file);
+                persistedHost = new HostImpl(storage);
             } catch (Exception e) {
                 System.err.println("Error loading persisted host: " + e.getMessage());
             }
