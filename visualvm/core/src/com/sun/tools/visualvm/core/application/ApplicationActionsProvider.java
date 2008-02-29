@@ -35,12 +35,9 @@ import com.sun.tools.visualvm.core.host.RemoteHostsContainer;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
-import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Set;
-import javax.management.remote.JMXServiceURL;
 import javax.swing.AbstractAction;
-import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -101,22 +98,8 @@ class ApplicationActionsProvider {
             final JmxApplicationConfigurator appConfig =
                     JmxApplicationConfigurator.addJmxConnection();
             if (appConfig != null) {
-                try {
-                    String urlStr = appConfig.getConnection();
-                    if (!urlStr.startsWith("service:jmx:")) {
-                        urlStr = "service:jmx:rmi:///jndi/rmi://" + urlStr + "/jmxrmi";
-                    }
-                    final JMXServiceURL url = new JMXServiceURL(urlStr);
-                    // TODO: Compute Host and add new remote host node if necessary
-                    RequestProcessor.getDefault().post(new Runnable() {
-                        public void run() {
-                            JmxApplicationProvider.sharedInstance().processNewJmxApplication(
-                                    Host.LOCALHOST, appConfig.getDisplayName(), url);
-                        }
-                    });
-                } catch (MalformedURLException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                JmxApplicationProvider.sharedInstance().addJmxApplication(
+                        appConfig.getConnection(), appConfig.getDisplayName());
             }
         }
     }
@@ -128,13 +111,8 @@ class ApplicationActionsProvider {
         }
 
         public void actionPerformed(ActionEvent e) {
-            final JmxApplication app = (JmxApplication) e.getSource();
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    JmxApplicationProvider.sharedInstance().processRemoveJmxApplication(
-                            Host.LOCALHOST, app);
-                }
-            });
+            JmxApplication app = (JmxApplication) e.getSource();
+            JmxApplicationProvider.sharedInstance().removeJmxApplication(app);
         }
     }
 

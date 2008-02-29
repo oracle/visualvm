@@ -67,32 +67,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     }
 
 
-    public void createHost(final HostProperties hostDescriptor, final boolean interactive) {
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                createHostImpl(hostDescriptor, interactive);
-            }
-        });
-    }
-    
-    void removeHost(HostImpl host, boolean interactive) {
-        // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
-        unregisterDataSource(host);
-        File customPropertiesStorage = host.getCustomPropertiesStorage();
-        if (!customPropertiesStorage.delete()) customPropertiesStorage.deleteOnExit();
-    }
-    
-    
-    protected <Y extends HostImpl> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
-        for (HostImpl host : removed) {
-            RemoteHostsContainer.sharedInstance().getRepository().removeDataSource(host);
-            host.finished();
-        }
-    }
-    
-    
-    private void createHostImpl(HostProperties hostDescriptor, boolean interactive) {
+    public Host createHost(final HostProperties hostDescriptor, final boolean interactive) {
         final String hostName = hostDescriptor.getHostName();
         InetAddress inetAddress = null;
         ProgressHandle pHandle = null;
@@ -130,6 +105,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                         }
                     });
                 }
+                return knownHost;
             } else {
                 String ipString = inetAddress.getHostAddress();
                 
@@ -155,7 +131,25 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                     RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
                     registerDataSource(newHost);
                 }
+                return newHost;
             }
+        }
+        return null;
+    }
+    
+    void removeHost(HostImpl host, boolean interactive) {
+        // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
+        unregisterDataSource(host);
+        File customPropertiesStorage = host.getCustomPropertiesStorage();
+        if (!customPropertiesStorage.delete()) customPropertiesStorage.deleteOnExit();
+    }
+    
+    
+    protected <Y extends HostImpl> void unregisterDataSources(final Set<Y> removed) {
+        super.unregisterDataSources(removed);
+        for (HostImpl host : removed) {
+            RemoteHostsContainer.sharedInstance().getRepository().removeDataSource(host);
+            host.finished();
         }
     }
     

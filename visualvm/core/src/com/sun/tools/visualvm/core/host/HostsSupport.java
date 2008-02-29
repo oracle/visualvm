@@ -56,6 +56,9 @@ public final class HostsSupport {
         return getHostProvider().getLocalhost();
     }
 
+    public Host createHost(String hostname) {
+        return getHostProvider().createHost(new HostProperties(hostname, hostname), true);
+    }
 
     HostProvider getHostProvider() {
         return hostProvider;
