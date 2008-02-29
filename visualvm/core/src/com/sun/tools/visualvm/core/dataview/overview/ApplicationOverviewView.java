@@ -135,7 +135,7 @@ class ApplicationOverviewView extends DataSourceView {
             String mainArgs = jvm.getMainArgs();
             String mainClass = jvm.getMainClass();
             
-            data.append("<b>Main class:</b> " + (mainClass == null ? "<Unknown>": mainClass.replace("/", ".")) + "<br>");
+            data.append("<b>Main class:</b> " + (mainClass == null ? "<Unknown>": mainClass) + "<br>");
             data.append("<b>Arguments:</b> " + (mainArgs == null ? "none" : mainArgs) + "<br>");
           }
 

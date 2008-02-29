@@ -132,15 +132,21 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
             if (jarFile.exists()) {
                 try {
                     JarFile jf = new JarFile(jarFile);
-                    
                     mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                     assert mainClassName!=null;
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
+        } else if (mainClassName.endsWith(".jar")) {
+            mainClassName = mainClassName.replace('\\', '/');
+            int index = mainClassName.lastIndexOf("/");
+            if (index != -1) {
+                mainClassName = mainClassName.substring(index + 1);
+            }
         }
-        return mainClassName.replace('/','.');
+        mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
+        return mainClassName;
     }
     
     public String getVmVersion() {

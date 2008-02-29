@@ -95,7 +95,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         if (jvm.isBasicInfoSupported()) {
             String mainClass = jvm.getMainClass();
             if (mainClass != null) {
-                return createApplicationTypeFor(appl,jvm,mainClass.trim().replace('/', '.'));
+                return createApplicationTypeFor(appl,jvm,mainClass);
             }
         }
         return null;

@@ -55,7 +55,7 @@ public class DefaultApplicationType extends ApplicationType  {
       }
       String applicationName;
       if (mainClassName != null && mainClassName.length() > 0) {
-        applicationName = mainClassName.replace("/", ".");
+        applicationName = mainClassName;
       } else if (application instanceof JmxApplication) {
         applicationName = ((JmxApplication) application).getId();
       } else {
