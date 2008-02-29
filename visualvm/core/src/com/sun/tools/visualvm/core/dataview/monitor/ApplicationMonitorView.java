@@ -162,7 +162,7 @@ class ApplicationMonitorView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Overview", null, this);
+            return new DataViewComponent.MasterView("Monitor", null, this);
         }
         
         public void refresh(MonitoredData data) {
