@@ -118,8 +118,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private CPUSelectionHandler selectionHandler;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
     private ExtendedTreeTableModel treeTableModel;
-    private ImageIcon leafIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/leaf.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/node.png")); // NOI18N
+    private ImageIcon leafIcon = new ImageIcon(CCTDisplay.class.getResource("/org/netbeans/lib/profiler/ui/resources/leaf.png")); // NOI18N
+    private ImageIcon nodeIcon = new ImageIcon(CCTDisplay.class.getResource("/org/netbeans/lib/profiler/ui/resources/node.png")); // NOI18N
     private JButton cornerButton;
     private int minNamesColumnWidth; // minimal width of classnames columns
 
