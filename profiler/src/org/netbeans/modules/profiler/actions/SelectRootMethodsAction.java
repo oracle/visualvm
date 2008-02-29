@@ -49,7 +49,6 @@ import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.panels.SelectRootMethodsForClassPanel;
 import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.netbeans.modules.profiler.utils.SourceUtils;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.util.HelpCtx;
@@ -57,6 +56,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.NodeAction;
 import java.util.ArrayList;
 import java.util.List;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
