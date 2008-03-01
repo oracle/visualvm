@@ -179,8 +179,8 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         // TODO: Connect to the agent and try to get the hostname
 
         // WARNING: If a hostname could not be found the JMX application
-        //          is added under the Local host tree node.
-        return Host.LOCALHOST;
+        //          is added under the <Unknown Host> tree node.
+        return Host.UNKNOWN_HOST;
     }
     
     public void createJmxApplication(String connectionName, final String displayName) {
