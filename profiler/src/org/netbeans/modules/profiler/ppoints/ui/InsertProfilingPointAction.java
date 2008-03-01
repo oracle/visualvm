@@ -46,9 +46,7 @@ import org.netbeans.modules.profiler.ppoints.GlobalProfilingPoint;
 import org.netbeans.modules.profiler.ppoints.ProfilingPoint;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointWizard;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
-import org.netbeans.modules.profiler.ppoints.Utils;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.WizardDescriptor;
 import org.openide.nodes.Node;
 import org.openide.util.HelpCtx;
@@ -56,6 +54,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.NodeAction;
 import java.awt.Dialog;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
 /**
