@@ -47,10 +47,6 @@ class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
         return true;
     }
     
-    boolean hasCachedView(ThreadDump threadDump) {
-        return viewsCache.get(threadDump) != null;
-    }
-
     public synchronized Set<? extends DataSourceView> getViews(final ThreadDump threadDump) {
         DataSourceView view = viewsCache.get(threadDump);
         if (view == null) {
