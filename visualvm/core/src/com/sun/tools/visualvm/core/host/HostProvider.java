@@ -53,11 +53,13 @@ import org.openide.util.RequestProcessor;
 // A provider for Hosts
 class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     
-    static final String SNAPSHOT_VERSION = "snapshot_version";
-    static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
-    static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    private static final String SNAPSHOT_VERSION = "snapshot_version";
+    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    
+    private static final String PROPERTY_IP = "prop_ip";
 
     private HostImpl LOCALHOST = null;
 
@@ -109,10 +111,12 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             } else {
                 String ipString = inetAddress.getHostAddress();
                 
-                String[] propNames = new String[] { SNAPSHOT_VERSION,
-                    HostImpl.PROPERTY_IP,
+                String[] propNames = new String[] {
+                    SNAPSHOT_VERSION,
+                    PROPERTY_IP,
                     DataSourceDescriptor.PROPERTY_NAME };
-                String[] propValues = new String[] { CURRENT_SNAPSHOT_VERSION,
+                String[] propValues = new String[] {
+                    CURRENT_SNAPSHOT_VERSION,
                     ipString,
                     hostDescriptor.getDisplayName() };
                 
@@ -122,7 +126,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 
                 HostImpl newHost = null;
                 try {
-                    newHost = new HostImpl(storage);
+                    newHost = new HostImpl(ipString, storage);
                 } catch (Exception e) {
                     System.err.println("Error creating host: " + e.getMessage()); // Should never happen
                 }
@@ -192,10 +196,11 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
         Set<HostImpl> hosts = new HashSet();
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
-            HostImpl persistedHost = null;
+            String hostName = storage.getCustomProperty(PROPERTY_IP);
             
+            HostImpl persistedHost = null;
             try {
-                persistedHost = new HostImpl(storage);
+                persistedHost = new HostImpl(hostName, storage);
             } catch (Exception e) {
                 System.err.println("Error loading persisted host: " + e.getMessage());
             }

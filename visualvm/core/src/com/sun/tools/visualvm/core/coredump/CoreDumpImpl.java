@@ -37,14 +37,11 @@ import java.io.IOException;
  */
 class CoreDumpImpl extends AbstractCoreDump {
     
-    static final String PROPERTY_JAVA_HOME = "prop_java_home";
-    
     private Storage storage;
     
     
-    public CoreDumpImpl(Storage storage) throws IOException {
-        super(new File(storage.getCustomProperty(PROPERTY_FILE)),
-                new File(storage.getCustomProperty(PROPERTY_JAVA_HOME)));
+    public CoreDumpImpl(File file, File javaHomeName, Storage storage) throws IOException {
+        super(file, javaHomeName);
         this.storage = storage;
     }
     

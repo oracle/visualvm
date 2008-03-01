@@ -59,6 +59,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
     private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    
     private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";
     private static final String PROPERTY_USERNAME = "prop_username";

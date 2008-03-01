@@ -35,8 +35,6 @@ import java.net.UnknownHostException;
  */
 final class HostImpl extends AbstractHost {
     
-    static final String PROPERTY_IP = "prop_ip";
-    
     private Storage givenStorage;
     
     
@@ -44,8 +42,8 @@ final class HostImpl extends AbstractHost {
         super("localhost");
     }
 
-    HostImpl(Storage givenStorage) throws UnknownHostException {
-        super(givenStorage.getCustomProperty(PROPERTY_IP));
+    HostImpl(String hostName, Storage givenStorage) throws UnknownHostException {
+        super(hostName);
         this.givenStorage = givenStorage;
     }
     

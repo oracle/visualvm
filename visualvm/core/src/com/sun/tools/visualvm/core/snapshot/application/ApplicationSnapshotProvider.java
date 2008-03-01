@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.snapshot.application;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
@@ -51,11 +52,13 @@ import org.openide.util.RequestProcessor;
  */
 class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> {
     
-    static final String SNAPSHOT_VERSION = "snapshot_version";
-    static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
-    static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    private static final String SNAPSHOT_VERSION = "snapshot_version";
+    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    
+    private static final String PROPERTIES_FILENAME = "application_snapshot" + Storage.DEFAULT_PROPERTIES_EXT;
     
     private static ApplicationSnapshotProvider sharedInstance;
     
@@ -93,7 +96,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         Set<Snapshot> snapshots = application.getSnapshots();
         if (snapshots.isEmpty()) return;
         
-        File snapshotDirectory = new File(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
+        File snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
         if (!snapshotDirectory.exists() && !snapshotDirectory.mkdir())
             throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
         
@@ -105,16 +108,22 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
             }
         }
         
-        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
         ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
-        String[] propNames = new String[] { SNAPSHOT_VERSION,
+        String[] propNames = new String[] {
+            SNAPSHOT_VERSION,
             DataSourceDescriptor.PROPERTY_NAME,
-            DataSourceDescriptor.PROPERTY_ICON };
-        String[] propValues = new String[] { CURRENT_SNAPSHOT_VERSION,
+            DataSourceDescriptor.PROPERTY_ICON
+        };
+        String[] propValues = new String[] {
+            CURRENT_SNAPSHOT_VERSION,
             applicationType.getName() + getDisplayNameSuffix(application),
-            Utils.imageToString(applicationType.getIcon(), "png")};
-        snapshot.getStorage().setCustomProperties(propNames, propValues);
+            Utils.imageToString(applicationType.getIcon(), "png")
+        };
         
+        Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
+        storage.setCustomProperties(propNames, propValues);
+        
+        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         registerDataSource(snapshot);
     }
@@ -142,7 +151,8 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                     
                     File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getStorageDirectory());
                     if (snapshotDirectory != null) {
-                        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory);
+                        Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
+                        ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
                         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
                         registerDataSource(snapshot);
                         if (deleteArchive) if (!archive.delete()) archive.deleteOnExit();
@@ -184,7 +194,12 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                 ApplicationSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
         
         Set<ApplicationSnapshot> snapshots = new HashSet();
-        for (File file : files) snapshots.add(new ApplicationSnapshot(file));
+        for (File file : files) {
+            if (file.isDirectory()) { // NOTE: once archived snapshots are implemented, this is not necessary
+                Storage storage = new Storage(file, PROPERTIES_FILENAME);
+                snapshots.add(new ApplicationSnapshot(file, storage));
+            }
+        }
         
         SnapshotsContainer.sharedInstance().getRepository().addDataSources(snapshots);
         registerDataSources(snapshots);

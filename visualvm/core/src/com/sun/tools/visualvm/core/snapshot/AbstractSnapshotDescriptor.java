@@ -43,7 +43,7 @@ public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends Dat
               icon, POSITION_AT_THE_END, EXPAND_NEVER);
     }
     
-    public static String resolveName(Snapshot snapshot) {
+    private static String resolveName(Snapshot snapshot) {
         String persistedName = snapshot.getStorage().getCustomProperty(PROPERTY_NAME);
         if (persistedName != null) return persistedName;
         

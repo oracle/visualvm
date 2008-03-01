@@ -42,11 +42,12 @@ import org.openide.util.RequestProcessor;
  */
 public final class ApplicationSnapshot extends AbstractSnapshot {
     
-    private static final String PROPERTIES_FILENAME = "application_snapshot";
-
+    private Storage storage;
     
-    public ApplicationSnapshot(File directory) {
+    
+    public ApplicationSnapshot(File directory, Storage storage) {
         super(directory, ApplicationSnapshotsSupport.getInstance().getCategory());
+        this.storage = storage;
     }
     
     
@@ -88,7 +89,7 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
     
     
     protected Storage createStorage() {
-        return new Storage(getFile(), PROPERTIES_FILENAME + Storage.DEFAULT_PROPERTIES_EXT);
+        return storage;
     }
     
         

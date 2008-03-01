@@ -50,11 +50,13 @@ import org.openide.util.RequestProcessor;
  */
 class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     
-    static final String SNAPSHOT_VERSION = "snapshot_version";
-    static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
-    static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    private static final String SNAPSHOT_VERSION = "snapshot_version";
+    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    
+    private static final String PROPERTY_JAVA_HOME = "prop_java_home";
     
     
     void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome, final boolean deleteCoreDump) {
@@ -101,10 +103,17 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
             }
         }
         
-        String[] propNames = new String[] { SNAPSHOT_VERSION,
-            Snapshot.PROPERTY_FILE, DataSourceDescriptor.PROPERTY_NAME, CoreDumpImpl.PROPERTY_JAVA_HOME };
-        String[] propValues = new String[] { CURRENT_SNAPSHOT_VERSION,
-            coreDumpFile, displayName, jdkHome };
+        String[] propNames = new String[] {
+            SNAPSHOT_VERSION,
+            Snapshot.PROPERTY_FILE,
+            DataSourceDescriptor.PROPERTY_NAME,
+            PROPERTY_JAVA_HOME };
+        String[] propValues = new String[] {
+            CURRENT_SNAPSHOT_VERSION,
+            coreDumpFile,
+            displayName,
+            jdkHome
+        };
 
         File customPropertiesStorage = Utils.getUniqueFile(CoreDumpSupport.getStorageDirectory(), new File(coreDumpFile).getName(), Storage.DEFAULT_PROPERTIES_EXT);
         Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
@@ -112,7 +121,7 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
 
         CoreDumpImpl newCoreDump = null;
         try {
-            newCoreDump = new CoreDumpImpl(storage);
+            newCoreDump = new CoreDumpImpl(new File(coreDumpFile), new File(jdkHome), storage);
         } catch (Exception e) {
             System.err.println("Error creating coredump: " + e.getMessage());
             return;
@@ -157,10 +166,15 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
         Set<CoreDumpImpl> coredumps = new HashSet();
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
+            String[] propNames = new String[] {
+                Snapshot.PROPERTY_FILE,
+                PROPERTY_JAVA_HOME
+            };
+            String[] propValues = storage.getCustomProperties(propNames);
+                
             CoreDumpImpl persistedCoredump = null;
-            
             try {
-                persistedCoredump = new CoreDumpImpl(storage);
+                persistedCoredump = new CoreDumpImpl(new File(propValues[0]), new File(propValues[1]), storage);
             } catch (Exception e) {
                 System.err.println("Error loading persisted host: " + e.getMessage());
             }
