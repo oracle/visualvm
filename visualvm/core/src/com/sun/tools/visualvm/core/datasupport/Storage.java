@@ -69,6 +69,7 @@ public final class Storage {
     
     
     public File getDirectory() {
+        if (!directory.exists() && !directory.mkdirs()) throw new IllegalStateException("Cannot create storage directory " + directory);
         return directory;
     }
     
@@ -133,9 +134,8 @@ public final class Storage {
                 throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");
             if (temporaryStorageDirectory.exists() && (!temporaryStorageDirectory.canRead() || !temporaryStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");
-            if (!temporaryStorageDirectory.exists() && !temporaryStorageDirectory.mkdir())
+            if (!temporaryStorageDirectory.exists() && !temporaryStorageDirectory.mkdirs())
                 throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString);
-            temporaryStorageDirectory.deleteOnExit();
         }
         return temporaryStorageDirectory;
     }

@@ -115,7 +115,7 @@ public abstract class AbstractApplication extends AbstractDataSource implements 
     
     // <system_temp>/visualvm.dat/<application_id>
     protected Storage createStorage() {
-        File directory = new File(Storage.getTemporaryStorageDirectory(), getId());
+        File directory = new File(Storage.getTemporaryStorageDirectoryString() + File.separator + getId());
         return new Storage(directory);
     }
 

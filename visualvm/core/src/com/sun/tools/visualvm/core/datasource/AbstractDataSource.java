@@ -122,8 +122,6 @@ public abstract class AbstractDataSource implements DataSource {
         if (storage == null) {
             storage = createStorage();
             if (storage == null) throw new NullPointerException("Storage cannot be null");
-            File directory = storage.getDirectory();
-            if (!directory.exists() && !directory.mkdir()) throw new IllegalStateException("Cannot create storage directory " + directory);
         }
         return storage;
     }
