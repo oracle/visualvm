@@ -181,7 +181,7 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
         INSTANCE.viewMap.clear();
     }
 
-    public boolean supportsViewFor(GlassFishServlet dataSource) {
+    public boolean supportsViewsFor(GlassFishServlet dataSource) {
         return true;
     }
 }

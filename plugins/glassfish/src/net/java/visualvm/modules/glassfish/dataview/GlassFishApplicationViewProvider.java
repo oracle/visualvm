@@ -140,7 +140,7 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
         INSTANCE.transServiceViewMap.clear();
     }
 
-    public boolean supportsViewFor(Application dataSource) {
+    public boolean supportsViewsFor(Application dataSource) {
         return (ApplicationTypeFactory.getApplicationTypeFor(dataSource) instanceof GlassFishApplicationType);
     }
 }

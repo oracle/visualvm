@@ -43,7 +43,7 @@ class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
     private final Map<ThreadDump, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(ThreadDump threadDump) {
+    public boolean supportsViewsFor(ThreadDump threadDump) {
         return true;
     }
     

@@ -45,7 +45,7 @@ class CoreDumpOverviewViewProvider implements DataSourceViewsProvider<CoreDump>{
     private CoreDumpOverviewViewProvider() {
     }
     
-    public boolean supportsViewFor(CoreDump coreDump) {
+    public boolean supportsViewsFor(CoreDump coreDump) {
         return true;
     }
 

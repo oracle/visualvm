@@ -45,7 +45,7 @@ class ApplicationMonitorViewProvider implements DataSourceViewsProvider<Applicat
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(Application application) {
+    public boolean supportsViewsFor(Application application) {
         JVM jvm = JVMFactory.getJVMFor(application);
         return jvm.isMonitoringSupported();
     }

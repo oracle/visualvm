@@ -36,12 +36,12 @@ import java.util.Set;
 public interface DataSourceViewsProvider<X extends DataSource> {
 
     /**
-     * Returns true if the provider provides a view for given DataSource instance, false otherwise.
+     * Returns true if the provider provides at least one view for given DataSource instance, false otherwise.
      * 
      * @param dataSource DataSource to create the views for.
-     * @return true if the provider provides a view for given DataSource instance, false otherwise.
+     * @return true if the provider provides at least one view for given DataSource instance, false otherwise.
      */
-    public boolean supportsViewFor(X dataSource);
+    public boolean supportsViewsFor(X dataSource);
 
     /**
      * Returns set of DataSourceView instances provided by this provider for given DataSource instance.

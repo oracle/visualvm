@@ -45,7 +45,7 @@ class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Applicat
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(Application application) {
+    public boolean supportsViewsFor(Application application) {
         JvmJmxModel jmx = JvmJmxModelFactory.getJvmJmxModelFor(application);
         return jmx != null && jmx.getThreadMXBean() != null;
     }

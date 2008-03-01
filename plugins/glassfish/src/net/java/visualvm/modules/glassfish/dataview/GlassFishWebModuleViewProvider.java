@@ -306,7 +306,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
         INSTANCE.viewMap.clear();
     }
 
-    public boolean supportsViewFor(GlassFishWebModule dataSource) {
+    public boolean supportsViewsFor(GlassFishWebModule dataSource) {
         return true;
     }
 }

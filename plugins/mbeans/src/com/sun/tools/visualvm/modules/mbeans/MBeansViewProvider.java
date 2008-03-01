@@ -49,7 +49,7 @@ class MBeansViewProvider implements DataSourceViewsProvider<Application> {
     private MBeansViewProvider() {
     }
 
-    public boolean supportsViewFor(Application application) {
+    public boolean supportsViewsFor(Application application) {
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
         return mbsc != null;

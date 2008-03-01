@@ -46,7 +46,7 @@ class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Applica
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(Application application) {
+    public boolean supportsViewsFor(Application application) {
         if (Application.CURRENT_APPLICATION.equals(application) || application.getHost() != Host.LOCALHOST) return false;
         JVM jvm = JVMFactory.getJVMFor(application);
         return jvm.isAttachable() && !jvm.is14() && !jvm.is15();

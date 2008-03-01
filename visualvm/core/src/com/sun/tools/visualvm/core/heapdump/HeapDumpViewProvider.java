@@ -43,7 +43,7 @@ class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
     private Map<HeapDump, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(HeapDump heapDump) {
+    public boolean supportsViewsFor(HeapDump heapDump) {
         return true;
     }
 

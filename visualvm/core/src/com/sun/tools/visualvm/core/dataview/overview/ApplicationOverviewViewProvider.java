@@ -43,7 +43,7 @@ class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Applica
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(Application application) {
+    public boolean supportsViewsFor(Application application) {
         return true;
     }
 

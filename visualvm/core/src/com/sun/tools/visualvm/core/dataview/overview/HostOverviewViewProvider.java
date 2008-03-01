@@ -44,7 +44,7 @@ class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
     private final Map<Host, DataSourceView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewFor(Host host) {
+    public boolean supportsViewsFor(Host host) {
         return HostOverviewFactory.getSystemOverviewFor(host) != null;
     }
 

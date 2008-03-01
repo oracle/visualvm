@@ -93,7 +93,7 @@ public final class DataSourceWindowFactory {
         Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
         for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewFor(dataSource)) return true;
+            if (compatibleProvider.supportsViewsFor(dataSource)) return true;
         return false;
     }
     
@@ -135,7 +135,7 @@ public final class DataSourceWindowFactory {
         List<DataSourceView> views = new ArrayList();
         Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
         for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewFor(dataSource))
+            if (compatibleProvider.supportsViewsFor(dataSource))
                 views.addAll(compatibleProvider.getViews(dataSource));
         Collections.sort(views, Positionable.COMPARATOR);
         return views;
