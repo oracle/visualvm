@@ -53,7 +53,7 @@ class CoreDumpImpl extends AbstractCoreDump {
     }
     
     // removes link to coredump on the filesystem
-    public void remove() {
+    void remove() {
         getStorage().deleteCustomPropertiesStorage();
         CoreDumpSupport.getProvider().unregisterCoreDump(this);
     }
