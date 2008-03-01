@@ -40,6 +40,8 @@ public interface Host extends DataSource {
      * Instance representing the localhost.
      */
     public static final Host LOCALHOST = HostsSupport.getInstance().getLocalHost();
+    
+    public static final Host UNKNOWN_HOST = HostsSupport.getInstance().getUnknownHost();
 
     /**
      * Returns host name or IP of the host.

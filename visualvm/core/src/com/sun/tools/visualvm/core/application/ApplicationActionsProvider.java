@@ -148,7 +148,8 @@ class ApplicationActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(Host host) {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
-            actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 110));
+            if (host != Host.UNKNOWN_HOST)
+                actions.add(new ExplorerActionDescriptor(addJmxConnectionAction, 110));
             return actions;
         }
     }

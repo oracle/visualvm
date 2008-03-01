@@ -51,6 +51,9 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
             if (Host.LOCALHOST.equals(ds)) {
                 return new LocalHostDescriptor();
             }
+            if (Host.UNKNOWN_HOST.equals(ds)) {
+                return new UnknownHostDescriptor();
+            }
             return new HostDescriptor(host);
         }
         return null;
@@ -80,6 +83,15 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
 
         LocalHostDescriptor() {
             super(Host.LOCALHOST, "Local", null, NODE_ICON, 0, EXPAND_ON_FIRST_CHILD);
+        }
+        
+    }
+    
+    private static class UnknownHostDescriptor extends DataSourceDescriptor {
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHosts.png", true);
+
+        UnknownHostDescriptor() {
+            super(Host.LOCALHOST, "<Unknown Host>", null, NODE_ICON, POSITION_LAST, EXPAND_ON_FIRST_CHILD);
         }
         
     }

@@ -25,10 +25,13 @@
 
 package com.sun.tools.visualvm.core.host;
 
+import com.sun.tools.visualvm.core.datasource.AbstractHost;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
@@ -44,6 +47,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -62,10 +66,15 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     private static final String PROPERTY_IP = "prop_ip";
 
     private HostImpl LOCALHOST = null;
+    private Host UNKNOWN_HOST = createUnknownHost();
 
 
     public Host getLocalhost() {
         return LOCALHOST;
+    }
+    
+    public Host getUnknownHost() {
+        return UNKNOWN_HOST;
     }
 
 
@@ -216,6 +225,33 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     void initialize() {
         initHosts();
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+    }
+    
+    private Host createUnknownHost() {
+        try {
+            // Create a "placeholder" InetAddress instance
+            // TODO: should be implemented differently!!!
+            InetAddress address = InetAddress.getLocalHost(); 
+            
+            // Create host instance
+            final Host host = new AbstractHost("unknown", address) {};
+            
+            // Only show the host when there's some DataSource in repository
+            host.getRepository().addDataChangeListener(new DataChangeListener() {
+                public void dataChanged(DataChangeEvent event) {
+                    host.setVisible(!event.getCurrent().isEmpty());
+                }
+            }, DataSource.class);
+            
+            // Host will appear under Remote container
+            RemoteHostsContainer.sharedInstance().getRepository().addDataSource(host);
+            
+            // Return host instance
+            return host;
+        } catch (UnknownHostException ex) {
+            Exceptions.printStackTrace(ex); // Should never happen
+            return null;
+        }
     }
 
 }

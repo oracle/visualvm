@@ -35,9 +35,14 @@ import java.util.Comparator;
 public interface Positionable {
     
     /**
+     * Entity will be placed before first entity with POSITION_LAST position or at the current last position if there's no entity with POSITION_LAST position.
+     */
+    public static final int POSITION_AT_THE_END = Integer.MAX_VALUE - 1;
+    
+    /**
      * Entity will be placed at the current last position.
      */
-    public static final int POSITION_AT_THE_END = Integer.MAX_VALUE;
+    public static final int POSITION_LAST = Integer.MAX_VALUE;
     
     /**
      * Comparator based on getPreferredPosition() value.

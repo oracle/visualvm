@@ -80,6 +80,7 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     
     
     public int hashCode() {
+        if (Host.UNKNOWN_HOST == this) return super.hashCode();
         InetAddress address = getInetAddress();
         if (this == LOCALHOST) return address.hashCode();
         if (address.isAnyLocalAddress()) return LOCALHOST.hashCode();
@@ -88,6 +89,7 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
 
     public boolean equals(Object obj) {
         if (!(obj instanceof Host)) return false;
+        if (Host.UNKNOWN_HOST == this) return obj == this;
         Host host = (Host)obj;
         InetAddress thisAddress = getInetAddress();
         InetAddress otherAddress = host.getInetAddress();
