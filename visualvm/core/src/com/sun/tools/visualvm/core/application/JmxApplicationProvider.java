@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.host.HostsSupport;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -72,111 +73,51 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         return sharedInstance;
     }
 
-    private static boolean isLocalHost(String hostname) {
-        try {
-            InetAddress remoteAddr = InetAddress.getByName(hostname);
-            // Retrieve all the network interfaces on this host.
-            Enumeration<NetworkInterface> nis =
-                    NetworkInterface.getNetworkInterfaces();
-            // Walk through the network interfaces to see
-            // if any of them matches the client's address.
-            // If true, then the client's address is local.
-            while (nis.hasMoreElements()) {
-                NetworkInterface ni = nis.nextElement();
-                Enumeration<InetAddress> addrs = ni.getInetAddresses();
-                while (addrs.hasMoreElements()) {
-                    InetAddress localAddr = addrs.nextElement();
-                    if (localAddr.equals(remoteAddr)) {
-                        return true;
-                    }
+    private static boolean isLocalHost(String hostname) throws IOException {
+        InetAddress remoteAddr = InetAddress.getByName(hostname);
+        // Retrieve all the network interfaces on this host.
+        Enumeration<NetworkInterface> nis =
+                NetworkInterface.getNetworkInterfaces();
+        // Walk through the network interfaces to see
+        // if any of them matches the client's address.
+        // If true, then the client's address is local.
+        while (nis.hasMoreElements()) {
+            NetworkInterface ni = nis.nextElement();
+            Enumeration<InetAddress> addrs = ni.getInetAddresses();
+            while (addrs.hasMoreElements()) {
+                InetAddress localAddr = addrs.nextElement();
+                if (localAddr.equals(remoteAddr)) {
+                    return true;
                 }
             }
-            return false;
-        } catch (Exception e) {
-            Exceptions.printStackTrace(e);
-            return false;
         }
+        return false;
     }
 
-    // Resolves existing host based on hostname or JMXServiceURL
-    private Host getExistingHost(String hostname, JMXServiceURL url) {
+    // Resolves existing host based on hostname, JMXServiceURL
+    // or by using the JMXServiceURL to connect to the agent
+    // and retrieve the hostname information.
+    private Host getHost(String hostname, JMXServiceURL url)
+            throws IOException {
         Set<Host> hosts = DataSourceRepository.sharedInstance().getDataSources(Host.class);
-        // Try to compute the Host instance from the <hostname>:<port>.
+        // Try to compute the Host instance from hostname
         if (hostname != null) {
             if (hostname.isEmpty() || isLocalHost(hostname)) {
                 return Host.LOCALHOST;
             } else {
-                try {
-                    InetAddress addr = InetAddress.getByName(hostname);
-                    for (Host host : hosts) {
-                        if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                            return host;
-                        }
+                InetAddress addr = InetAddress.getByName(hostname);
+                for (Host host : hosts) {
+                    if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
+                        return host;
                     }
-                    return null;
-                } catch (Exception e) {
-                    Exceptions.printStackTrace(e);
-                    return null;
                 }
-            }
-        }
-        // Try to compute the Host instance from the host in the JMXServiceURL.
-        String urlHost = url.getHost();
-        if (urlHost != null && !urlHost.isEmpty()) {
-            if (isLocalHost(urlHost)) {
-                return Host.LOCALHOST;
-            } else {
-                try {
-                    InetAddress addr = InetAddress.getByName(urlHost);
-                    for (Host host : hosts) {
-                        if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                            return host;
-                        }
-                    }
-                    return null;
-                } catch (Exception e) {
-                    Exceptions.printStackTrace(e);
-                    return null;
-                }
-            }
-        }
-        // Try to compute the Host instance from the JNDI/RMI
-        // Registry Service urlPath in the JMXServiceURL.
-        if ("rmi".equals(url.getProtocol()) &&
-                url.getURLPath().startsWith("/jndi/rmi://")) {
-            String urlPath = url.getURLPath().substring("/jndi/rmi://".length());
-            String registryURLHost = null;
-            if ("/".equals(urlPath.charAt(0))) {
-                registryURLHost = "localhost";
-            } else {
-                int colonIndex = urlPath.indexOf(":");
-                int slashIndex = urlPath.indexOf("/");
-                int min = Math.min(colonIndex, slashIndex); // NOTE: can be -1!!!
-                if (min == -1) min = 0;
-                registryURLHost = urlPath.substring(0, min);
-                if (registryURLHost.isEmpty()) {
-                    registryURLHost = "localhost";                    
-                }
-            }
-            if (isLocalHost(registryURLHost)) {
-                return Host.LOCALHOST;
-            } else {
-                try {
-                    InetAddress addr = InetAddress.getByName(registryURLHost);
-                    for (Host host : hosts) {
-                        if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                            return host;
-                        }
-                    }
-                    return null;
-                } catch (Exception e) {
-                    Exceptions.printStackTrace(e);
-                    return null;
-                }
+                return HostsSupport.getInstance().createHost(hostname);
             }
         }
 
-        // TODO: Connect to the agent and try to get the hostname
+        // TODO: Connect to the agent and try to get the hostname.
+        //       app = JmxApplication(Host.UNKNOWN_HOST, url, storage);
+        //       JmxModelFactory.getJmxModelFor(app);
 
         // WARNING: If a hostname could not be found the JMX application
         //          is added under the <Unknown Host> tree node.
@@ -186,13 +127,12 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     public void createJmxApplication(String connectionName, final String displayName) {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionName);
-        final String hostName = getHostName(connectionName);
         final JMXServiceURL serviceURL = getServiceURL(normalizedConnectionName);
         if (serviceURL == null) {
-            NetBeansProfiler.getDefaultNB().displayError("Cannot resolve service based on provided connection.");
+            NetBeansProfiler.getDefaultNB().displayError("Invalid JMX connection: " + normalizedConnectionName);
             return;
         }
-        
+
         // Create Host & JmxApplication in separate thread
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -213,7 +153,8 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                         PROPERTY_PASSWORD,
                         DataSourceDescriptor.PROPERTY_NAME
                     };
-                    
+
+                    String hostName = getHostName(serviceURL);
                     String[] values = new String[] {
                         CURRENT_SNAPSHOT_VERSION,
                         normalizedConnectionName,
@@ -235,20 +176,29 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         });
     }
 
-    private void addJmxApplication(JMXServiceURL serviceURL, String connectionName, String hostName, Storage storage) {
+    private void addJmxApplication(JMXServiceURL serviceURL, final String connectionName, final String hostName, Storage storage) {
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) serviceURL = getServiceURL(connectionName);
         if (serviceURL == null) {
-            System.err.println("Cannot resolve JMXServiceURL for " + connectionName);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    NetBeansProfiler.getDefaultNB().displayError("<html>Invalid JMX connection: " + connectionName + "</html>");
+                }
+            });
             return;
         }
         
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
-        Host host = getExistingHost(hostName, serviceURL);
-        if (host == null && hostName != null) host = HostsSupport.getInstance().createHost(hostName);
-        if (host == null) {
-            System.err.println("Cannot resolve host " + hostName);
-            return;
+        Host host;
+        try {
+            host = getHost(hostName, serviceURL);
+        } catch (Exception e) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    NetBeansProfiler.getDefaultNB().displayError("<html>Cannot resolve host " + hostName + "</html>");
+                }
+            });
+            return;            
         }
         
         // Create the JmxApplication
@@ -262,7 +212,6 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         unregisterDataSource(app);
     }
     
-    
     protected <Y extends JmxApplication> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
         for (JmxApplication app : removed) {
@@ -271,18 +220,42 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         }
     }
     
-    
     private String normalizeConnectionName(String connectionName) {
         if (connectionName.startsWith("service:jmx:")) return connectionName;
         return "service:jmx:rmi:///jndi/rmi://" + connectionName + "/jmxrmi"; // hostname:port
     }
     
-    private String getHostName(String connectionName) {
-        if (connectionName.startsWith("service:jmx:")) return null;
-        int index = connectionName.indexOf(":");
-        return index == -1 ? null : connectionName.substring(0, index); // hostname:port
+    private String getHostName(JMXServiceURL serviceURL) {
+        // Try to compute the hostname instance
+        // from the host in the JMXServiceURL.
+        String hostname = serviceURL.getHost();
+        if (hostname == null || hostname.isEmpty()) {
+            hostname = null;
+            // Try to compute the Host instance from the JNDI/RMI
+            // Registry Service urlPath in the JMXServiceURL.
+            if ("rmi".equals(serviceURL.getProtocol()) &&
+                    serviceURL.getURLPath().startsWith("/jndi/rmi://")) {
+                String urlPath =
+                        serviceURL.getURLPath().substring("/jndi/rmi://".length());
+                if ("/".equals(urlPath.charAt(0))) {
+                    hostname = "localhost";
+                } else {
+                    int colonIndex = urlPath.indexOf(":");
+                    int slashIndex = urlPath.indexOf("/");
+                    int min = Math.min(colonIndex, slashIndex); // NOTE: can be -1!!!
+                    if (min == -1) {
+                        min = 0;
+                    }
+                    hostname = urlPath.substring(0, min);
+                    if (hostname.isEmpty()) {
+                        hostname = "localhost";
+                    }
+                }
+            }
+        }
+        return hostname;
     }
-    
+
     private JMXServiceURL getServiceURL(String connectionString) {
         try {
             return new JMXServiceURL(connectionString);
@@ -291,7 +264,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
             return null;
         }
     }
-    
+
     private void initPersistedApplications() {
         if (!JmxApplicationsSupport.storageDirectoryExists()) return;
         
@@ -315,7 +288,6 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
             addJmxApplication(null, values[0], values[1].length() == 0 ? null : values[1], storage);
         }
     }
-    
 
     static void initialize() {
         RequestProcessor.getDefault().post(new Runnable() {

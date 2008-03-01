@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
+import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -92,7 +93,11 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     public synchronized String getJvmArgs() {
         if (jvmArgs == null) {
             StringBuilder buf = new StringBuilder();
-            List<String> args = jmxModel.getRuntimeMXBean().getInputArguments();
+            RuntimeMXBean runtimeMXBean = jmxModel.getRuntimeMXBean();
+            if (runtimeMXBean == null) {
+                return "";
+            }
+            List<String> args = runtimeMXBean.getInputArguments();
             for (String arg : args) {
                 buf.append(arg).append(' ');
             }
