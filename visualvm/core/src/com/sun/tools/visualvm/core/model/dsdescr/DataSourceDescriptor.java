@@ -100,6 +100,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (newName == null) throw new IllegalArgumentException("Name cannot be null");
         String oldName = name;
         name = newName;
+        getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
         if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
     }
 

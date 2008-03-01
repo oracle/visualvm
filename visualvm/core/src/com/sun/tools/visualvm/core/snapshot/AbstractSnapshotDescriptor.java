@@ -65,10 +65,5 @@ public abstract class AbstractSnapshotDescriptor<X extends Snapshot> extends Dat
     public boolean supportsRename() {
         return true;
     }
-    
-    public void setName(String newName) {
-        super.setName(newName);
-        getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
-    }
 
 }

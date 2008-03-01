@@ -78,10 +78,5 @@ class ApplicationDescriptorProvider extends
         public boolean supportsRename() {
             return getDataSource() instanceof JmxApplication;
         }
-
-        public void setName(String newName) {
-            super.setName(newName);
-            getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
-        }
     }
 }
