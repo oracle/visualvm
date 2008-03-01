@@ -149,7 +149,8 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
             } else {
                 int colonIndex = urlPath.indexOf(":");
                 int slashIndex = urlPath.indexOf("/");
-                int min = Math.min(colonIndex, slashIndex);
+                int min = Math.min(colonIndex, slashIndex); // NOTE: can be -1!!!
+                if (min == -1) min = 0;
                 registryURLHost = urlPath.substring(0, min);
                 if (registryURLHost.isEmpty()) {
                     registryURLHost = "localhost";                    
@@ -233,7 +234,6 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     private void addJmxApplication(JMXServiceURL serviceURL, String connectionName, String hostName, Storage storage) {
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) serviceURL = getServiceURL(connectionName);
-        System.err.println(">>> Resolved service url: " + serviceURL);
         if (serviceURL == null) {
             System.err.println("Cannot resolve JMXServiceURL for " + connectionName);
             return;
@@ -241,7 +241,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
         Host host = getExistingHost(hostName, serviceURL);
-        if (host == null) host = HostsSupport.getInstance().createHost(hostName);
+        if (host == null && hostName != null) host = HostsSupport.getInstance().createHost(hostName);
         if (host == null) {
             System.err.println("Cannot resolve host " + hostName);
             return;
@@ -275,7 +275,8 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     
     private String getHostName(String connectionName) {
         if (connectionName.startsWith("service:jmx:")) return null;
-        return connectionName.substring(0, connectionName.indexOf(":")); // hostname:port
+        int index = connectionName.indexOf(":");
+        return index == -1 ? null : connectionName.substring(0, index); // hostname:port
     }
     
     private JMXServiceURL getServiceURL(String connectionString) {
