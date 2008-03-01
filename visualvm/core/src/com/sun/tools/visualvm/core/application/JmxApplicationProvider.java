@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.host.HostsSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.InetAddress;
@@ -208,7 +209,8 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                         PROPERTY_CONNECTION_STRING,
                         PROPERTY_HOSTNAME,
                         PROPERTY_USERNAME,
-                        PROPERTY_PASSWORD
+                        PROPERTY_PASSWORD,
+                        DataSourceDescriptor.PROPERTY_NAME
                     };
                     
                     String[] values = new String[] {
@@ -217,6 +219,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                         hostName == null ? "" : hostName,
                         "", // TODO: will be eventually populated from dialog defining the JmxApplication
                         "", // TODO: will be eventually populated from dialog defining the JmxApplication
+                        displayName
                     };
 
                     storage.setCustomProperties(keys, values);

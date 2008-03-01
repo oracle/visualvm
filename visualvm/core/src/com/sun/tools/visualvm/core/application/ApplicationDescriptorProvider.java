@@ -30,8 +30,7 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.dsdescr.*;
-import java.awt.Image;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 
 /**
  *
@@ -55,38 +54,34 @@ class ApplicationDescriptorProvider extends
     private static class ApplicationDescriptor
             extends DataSourceDescriptor<Application> {
 
-        private final ApplicationType appType;
-        private final int pid;
-
-        ApplicationDescriptor(Application app) {
-            super(app, null, null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
-            appType = ApplicationTypeFactory.getApplicationTypeFor(app);
-            pid = app.getPid();
+        ApplicationDescriptor(Application application) {
+            this(application, ApplicationTypeFactory.getApplicationTypeFor(application));
+        }
+        
+        private ApplicationDescriptor(Application application, ApplicationType type) {
+            super(application, resolveName(application, type), type.getDescription(),
+                    type.getIcon(), POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
         }
 
-        @Override
-        public String getName() {
-            if (supportsRename() && super.getName() != null) {
-                return super.getName();
-            }
+        private static String resolveName(Application application, ApplicationType type) {
+            // Check for persisted displayname (currently only for JmxApplications)
+            String persistedName = application.getStorage().getCustomProperty(PROPERTY_NAME);
+            if (persistedName != null) return persistedName;
+            
+            // Provide generic displayname
+            int pid = application.getPid();
             String id = Application.CURRENT_APPLICATION.getPid() == pid ||
-                    pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")";
-            return appType.getName() + id;
+                pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")";
+            return type.getName() + id;
         }
 
-        @Override
-        public String getDescription() {
-            return appType.getDescription();
-        }
-
-        @Override
-        public Image getIcon() {
-            return appType.getIcon();
-        }
-
-        @Override
         public boolean supportsRename() {
-            return (getDataSource() instanceof JmxApplication);
+            return getDataSource() instanceof JmxApplication;
+        }
+
+        public void setName(String newName) {
+            super.setName(newName);
+            getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
         }
     }
 }
