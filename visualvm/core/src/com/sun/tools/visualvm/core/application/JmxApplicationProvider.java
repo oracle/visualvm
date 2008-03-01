@@ -28,16 +28,22 @@ package com.sun.tools.visualvm.core.application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.host.HostsSupport;
-import com.sun.tools.visualvm.core.host.RemoteHostsContainer;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.Set;
 import javax.management.remote.JMXServiceURL;
-import javax.swing.SwingWorker;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Exceptions;
+import org.openide.util.RequestProcessor;
 
 /**
  * A provider for Applications added as JMX connections.
@@ -46,6 +52,16 @@ import org.openide.util.Exceptions;
  * @author Luis-Miguel Alventosa
  */
 class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
+    
+    private static final String SNAPSHOT_VERSION = "snapshot_version";
+    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
+    private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";
+    private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";
+    private static final String PROPERTY_USERNAME = "prop_username";
+    private static final String PROPERTY_PASSWORD = "prop_password";
 
     private static JmxApplicationProvider sharedInstance;
     
@@ -80,27 +96,25 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         }
     }
 
-    private void computeHost(String hostname, JMXServiceURL url, String displayName) {
-        Set<Host> hosts = RemoteHostsContainer.sharedInstance().getRepository().getDataSources(Host.class);
+    // Resolves existing host based on hostname or JMXServiceURL
+    private Host getExistingHost(String hostname, JMXServiceURL url) {
+        Set<Host> hosts = DataSourceRepository.sharedInstance().getDataSources(Host.class);
         // Try to compute the Host instance from the <hostname>:<port>.
         if (hostname != null) {
             if (hostname.isEmpty() || isLocalHost(hostname)) {
-                addHost(Host.LOCALHOST, url, hostname, displayName);
-                return;
+                return Host.LOCALHOST;
             } else {
                 try {
                     InetAddress addr = InetAddress.getByName(hostname);
                     for (Host host : hosts) {
                         if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                            addHost(host, url, hostname, displayName);
-                            return;
+                            return host;
                         }
                     }
-                    addHost(null, url, hostname, displayName);
-                    return;
+                    return null;
                 } catch (Exception e) {
                     Exceptions.printStackTrace(e);
-                    return;
+                    return null;
                 }
             }
         }
@@ -108,22 +122,19 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         String urlHost = url.getHost();
         if (urlHost != null && !urlHost.isEmpty()) {
             if (isLocalHost(urlHost)) {
-                addHost(Host.LOCALHOST, url, urlHost, displayName);
-                return;
+                return Host.LOCALHOST;
             } else {
                 try {
                     InetAddress addr = InetAddress.getByName(urlHost);
                     for (Host host : hosts) {
                         if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                            addHost(host, url, urlHost, displayName);
-                            return;
+                            return host;
                         }
                     }
-                    addHost(null, url, urlHost, displayName);
-                    return;
+                    return null;
                 } catch (Exception e) {
                     Exceptions.printStackTrace(e);
-                    return;
+                    return null;
                 }
             }
         }
@@ -145,22 +156,19 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                 }
             }
             if (isLocalHost(registryURLHost)) {
-                addHost(Host.LOCALHOST, url, registryURLHost, displayName);
-                return;
+                return Host.LOCALHOST;
             } else {
                 try {
                     InetAddress addr = InetAddress.getByName(registryURLHost);
                     for (Host host : hosts) {
                         if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                            addHost(host, url, registryURLHost, displayName);
-                            return;
+                            return host;
                         }
                     }
-                    addHost(null, url, registryURLHost, displayName);
-                    return;
+                    return null;
                 } catch (Exception e) {
                     Exceptions.printStackTrace(e);
-                    return;
+                    return null;
                 }
             }
         }
@@ -169,55 +177,147 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
 
         // WARNING: If a hostname could not be found the JMX application
         //          is added under the Local host tree node.
-        addHost(Host.LOCALHOST, url, urlHost, displayName);
-        return;
+        return Host.LOCALHOST;
     }
-
-    private void addHost(final Host host, final JMXServiceURL url,
-            final String hostname, final String displayName) {
-        new SwingWorker<JmxApplication, Void>() {
-            @Override
-            public JmxApplication doInBackground() {
-                if (host == null) {
-                    Host newHost = HostsSupport.getInstance().createHost(hostname);
-                    return new JmxApplication(newHost, displayName, url);
-                } else {
-                    return new JmxApplication(host, displayName, url);
-                }
-            }
-            @Override
-            protected void done() {
-                try {
-                    JmxApplication app = get();
-                    app.getHost().getRepository().addDataSource(app);
-                    registerDataSource(app);
-                } catch (Exception e) {
-                    Exceptions.printStackTrace(e);
-                }
-            }
-        }.execute();
-    }
-
-    public void addJmxApplication(String connectionName, String displayName) {
-        try {
-            String hostname = null;
-            if (!connectionName.startsWith("service:jmx:")) { // hostname:port
-                hostname = connectionName.substring(0, connectionName.indexOf(":"));
-                connectionName = "service:jmx:rmi:///jndi/rmi://" +
-                        connectionName + "/jmxrmi";
-            }
-            computeHost(hostname, new JMXServiceURL(connectionName), displayName);
-        } catch (MalformedURLException e) {
-            Exceptions.printStackTrace(e);
+    
+    public void createJmxApplication(String connectionName, final String displayName) {
+        // Initial check if the provided connectionName can be used for resolving the host/application
+        final String normalizedConnectionName = normalizeConnectionName(connectionName);
+        final String hostName = getHostName(connectionName);
+        final JMXServiceURL serviceURL = getServiceURL(normalizedConnectionName);
+        if (serviceURL == null) {
+            NetBeansProfiler.getDefaultNB().displayError("Cannot resolve service based on provided connection.");
+            return;
         }
+        
+        // Create Host & JmxApplication in separate thread
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                ProgressHandle pHandle = null;
+                try {
+                    pHandle = ProgressHandleFactory.createHandle("Adding " + displayName + "...");
+                    pHandle.setInitialDelay(0);
+                    pHandle.start();
+                    
+                    Storage storage = new Storage(JmxApplicationsSupport.getStorageDirectory(),
+                            System.currentTimeMillis() + Storage.DEFAULT_PROPERTIES_EXT);
+            
+                    String[] keys = new String[] {
+                        SNAPSHOT_VERSION,
+                        PROPERTY_CONNECTION_STRING,
+                        PROPERTY_HOSTNAME,
+                        PROPERTY_USERNAME,
+                        PROPERTY_PASSWORD
+                    };
+                    
+                    String[] values = new String[] {
+                        CURRENT_SNAPSHOT_VERSION,
+                        normalizedConnectionName,
+                        hostName == null ? "" : hostName,
+                        "", // TODO: will be eventually populated from dialog defining the JmxApplication
+                        "", // TODO: will be eventually populated from dialog defining the JmxApplication
+                    };
+
+                    storage.setCustomProperties(keys, values);
+                    addJmxApplication(serviceURL, normalizedConnectionName, hostName, storage);
+                } finally {
+                    final ProgressHandle pHandleF = pHandle;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { if (pHandleF != null) pHandleF.finish(); }
+                    });
+                }
+            }
+        });
+    }
+
+    private void addJmxApplication(JMXServiceURL serviceURL, String connectionName, String hostName, Storage storage) {
+        // Resolve JMXServiceURL, finish if not resolved
+        if (serviceURL == null) serviceURL = getServiceURL(connectionName);
+        System.err.println(">>> Resolved service url: " + serviceURL);
+        if (serviceURL == null) {
+            System.err.println("Cannot resolve JMXServiceURL for " + connectionName);
+            return;
+        }
+        
+        // Resolve existing Host or create new Host, finish if Host cannot be resolved
+        Host host = getExistingHost(hostName, serviceURL);
+        if (host == null) host = HostsSupport.getInstance().createHost(hostName);
+        if (host == null) {
+            System.err.println("Cannot resolve host " + hostName);
+            return;
+        }
+        
+        // Create the JmxApplication
+        JmxApplication application = new JmxApplication(host, serviceURL, storage);
+        host.getRepository().addDataSource(application);
+        registerDataSource(application);
     }
 
     public void removeJmxApplication(JmxApplication app) {
-        app.getHost().getRepository().removeDataSource(app);
+        app.getStorage().deleteCustomPropertiesStorage();
         unregisterDataSource(app);
     }
+    
+    
+    protected <Y extends JmxApplication> void unregisterDataSources(final Set<Y> removed) {
+        super.unregisterDataSources(removed);
+        for (JmxApplication app : removed) {
+            if (app.getOwner() != null) app.getOwner().getRepository().removeDataSource(app);
+            app.finished();
+        }
+    }
+    
+    
+    private String normalizeConnectionName(String connectionName) {
+        if (connectionName.startsWith("service:jmx:")) return connectionName;
+        return "service:jmx:rmi:///jndi/rmi://" + connectionName + "/jmxrmi"; // hostname:port
+    }
+    
+    private String getHostName(String connectionName) {
+        if (connectionName.startsWith("service:jmx:")) return null;
+        return connectionName.substring(0, connectionName.indexOf(":")); // hostname:port
+    }
+    
+    private JMXServiceURL getServiceURL(String connectionString) {
+        try {
+            return new JMXServiceURL(connectionString);
+        } catch (MalformedURLException e) {
+            Exceptions.printStackTrace(e);
+            return null;
+        }
+    }
+    
+    private void initPersistedApplications() {
+        if (!JmxApplicationsSupport.storageDirectoryExists()) return;
+        
+        File[] files = JmxApplicationsSupport.getStorageDirectory().listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(Storage.DEFAULT_PROPERTIES_EXT);
+            }
+        });
+        
+        for (File file : files) {
+            Storage storage = new Storage(file.getParentFile(), file.getName());
+            
+            String[] keys = new String[] {
+                PROPERTY_CONNECTION_STRING,
+                PROPERTY_HOSTNAME,
+                PROPERTY_USERNAME,
+                PROPERTY_PASSWORD
+            };
+            
+            String[] values = storage.getCustomProperties(keys);
+            addJmxApplication(null, values[0], values[1].length() == 0 ? null : values[1], storage);
+        }
+    }
+    
 
     static void initialize() {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                JmxApplicationProvider.sharedInstance().initPersistedApplications();
+            }
+        });
         DataSourceRepository.sharedInstance().addDataSourceProvider(
                 JmxApplicationProvider.sharedInstance());
     }

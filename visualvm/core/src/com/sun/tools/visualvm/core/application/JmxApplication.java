@@ -26,7 +26,9 @@
 package com.sun.tools.visualvm.core.application;
 
 import com.sun.tools.visualvm.core.datasource.AbstractApplication;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModelFactory;
 import java.lang.management.RuntimeMXBean;
@@ -39,13 +41,15 @@ import javax.management.remote.JMXServiceURL;
  * @author Luis-Miguel Alventosa
  */
 public final class JmxApplication extends AbstractApplication {
-
+    
     private int pid = -1;
     private final JMXServiceURL url;
+    private final Storage storage;
 
-    public JmxApplication(Host host, String name, JMXServiceURL url) {
-        super(host, name);
+    public JmxApplication(Host host, JMXServiceURL url, Storage storage) {
+        super(host, url.toString());
         this.url = url;
+        this.storage = storage;
     }
 
     public JMXServiceURL getJMXServiceURL() {
@@ -68,5 +72,15 @@ public final class JmxApplication extends AbstractApplication {
             }
         }
         return pid;
+    }
+    
+    
+    protected Storage createStorage() {
+        return storage;
+    }
+    
+    
+    void finished() {
+        setState(DataSource.STATE_FINISHED);
     }
 }

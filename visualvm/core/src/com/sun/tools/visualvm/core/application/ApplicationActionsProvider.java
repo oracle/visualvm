@@ -98,7 +98,7 @@ class ApplicationActionsProvider {
             final JmxApplicationConfigurator appConfig =
                     JmxApplicationConfigurator.addJmxConnection();
             if (appConfig != null) {
-                JmxApplicationProvider.sharedInstance().addJmxApplication(
+                JmxApplicationProvider.sharedInstance().createJmxApplication(
                         appConfig.getConnection(), appConfig.getDisplayName());
             }
         }
