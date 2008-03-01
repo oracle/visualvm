@@ -59,11 +59,11 @@ class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,
     private static class HostDescriptor extends DataSourceDescriptor {
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHost.png", true);
         
-        private HostDescriptor(Host host) {
+        HostDescriptor(Host host) {
             super(host, resolveName(host), null, NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
         }
 
-        public static String resolveName(Host host) {
+        private static String resolveName(Host host) {
             String persistedName = host.getStorage().getCustomProperty(PROPERTY_NAME);
             if (persistedName != null) return persistedName;
             else return host.getHostName();
