@@ -11,4 +11,12 @@
         <unzip src="dist/${app.name}.zip" dest="${visualvm-platform}"/>
     </target>
 
+    <target name="-post-build-launchers">
+        <copy file="launcher/visualvm.exe" overwrite="true" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm_w.exe" overwrite="true" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm" overwrite="true" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm.conf" overwrite="true" todir="${build.launcher.dir}/etc/"/>
+    </target>
+    <target name="build-launchers" depends="suite.build-launchers,-post-build-launchers"/>
+    
 </project>
