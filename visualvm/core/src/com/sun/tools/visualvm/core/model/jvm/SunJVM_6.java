@@ -45,142 +45,145 @@ import sun.jvmstat.monitor.MonitoredVm;
  * @author Tomas Hurka
  */
 public class SunJVM_6 extends SunJVM_5 {
-  private Boolean attachAvailable;
-
-  SunJVM_6(JvmstatApplication app, MonitoredVm vm) {
-    super(app,vm);
-  }
-
-  public boolean is16() {
-    return true;
-  }
-
-  public boolean is15() {
-    return false;
-  }
-
-  public boolean isGetSystemPropertiesSupported() {
-    return isAttachAvailable();
-  }
-  
-  public Properties getSystemProperties() {
-    try {
-      return SystemProperties.getSystemProperties(application.getPid());
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return null;
+    private Boolean attachAvailable;
+    
+    SunJVM_6(JvmstatApplication app, MonitoredVm vm) {
+        super(app,vm);
     }
-  }
-
-  String getStackTrace() {
-    try {
-      return StackTrace.runThreadDump(application.getPid());
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Cannot get thread dump"+ex.getLocalizedMessage(); // NOI18N
-    }
-  }
-  
-  String takeHeapDump(String fileName) {
-    try {
-      return HeapDump.takeHeapDump(application.getPid(),fileName);
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Cannot get heap dump"+ex.getLocalizedMessage(); // NOI18N
-    }
-  }
-  
-  String enableHeapDumpOnOOMErrorFlag(boolean enable) {
-    try {
-      return VMOption.setFlag(application.getPid(),"HeapDumpOnOutOfMemoryError",enable?"1":"0");
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Cannot get enableHeapDumpOnOOMErrorFlag"+ex.getLocalizedMessage(); // NOI18N
-    }
-  }
-  
-  String getHeapDumpOnOOMErrorFlag() {
-    try {
-      return VMOption.getFlag(application.getPid(),"HeapDumpOnOutOfMemoryError");
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return null; // NOI18N
-    }
-  }  
-  
-  String setHeapDumpPath(String path) {
-    try {
-      return VMOption.setFlag(application.getPid(),"HeapDumpPath",path);
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Cannot get setHeapDumpPath"+ex.getLocalizedMessage(); // NOI18N
-    }
-  }
-
-  public boolean isDumpOnOOMEnabledSupported() {
-    return isAttachAvailable();
-  }
-
-  public boolean isDumpOnOOMEnabled() {
-    if (isAttachAvailable()) {
-      String val = getHeapDumpOnOOMErrorFlag().trim();
-      if ("-XX:-HeapDumpOnOutOfMemoryError".equals(val)) {
-        return false;
-      }
-      if ("-XX:+HeapDumpOnOutOfMemoryError".equals(val)) {
+    
+    public boolean is16() {
         return true;
-      }
-      System.out.println("Invalid return value "+val);
-      return false;
     }
-    return super.isDumpOnOOMEnabled();
-  }
-
-  public void setDumpOnOOMEnabled(boolean enabled) {
-    String err="";
-    if (enabled) {
-      err=setHeapDumpPath(application.getStorage().getDirectory().getAbsolutePath());
+    
+    public boolean is15() {
+        return false;
     }
-    err=err.concat(enableHeapDumpOnOOMErrorFlag(enabled));
-    if (err.length()!=0) {
-      System.out.println("setDumpOnOOMEnabled "+err);
+    
+    public boolean isGetSystemPropertiesSupported() {
+        return isAttachAvailable();
     }
-  }
-
-  public boolean isTakeHeapDumpSupported() {
-    return isAttachAvailable();
-  }
-
-  public File takeHeapDump() throws IOException {
-    File snapshotDir = application.getStorage().getDirectory();
-    String name = HeapDumpSupport.getInstance().getCategory().createFileName();
-    File dumpFile = new File(snapshotDir,name);
-    String dump = takeHeapDump(dumpFile.getAbsolutePath());
-    System.out.println("Dump "+dump);
-    return dumpFile;
-  }
-  
-  public boolean isTakeThreadDumpSupported() {
-    return isAttachAvailable();
-  }
-
-  public File takeThreadDump() throws IOException {
-    String dump = getStackTrace();
-    File snapshotDir = application.getStorage().getDirectory();
-    String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
-    File dumpFile = new File(snapshotDir,name);
-    OutputStream os = new FileOutputStream(dumpFile);
-    os.write(dump.getBytes("UTF-8"));
-    os.close();
-    return dumpFile;
-  }
-  
-  boolean isAttachAvailable() {
-    if (attachAvailable == null) {
-      boolean canAttach = Host.LOCALHOST.equals(application.getHost()) && isAttachable();
-      attachAvailable = Boolean.valueOf(canAttach);
+    
+    public Properties getSystemProperties() {
+        try {
+            return SystemProperties.getSystemProperties(application.getPid());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
-    return attachAvailable.booleanValue();
-  }
-
+    
+    String getStackTrace() {
+        try {
+            return StackTrace.runThreadDump(application.getPid());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Cannot get thread dump"+ex.getLocalizedMessage(); // NOI18N
+        }
+    }
+    
+    String takeHeapDump(String fileName) {
+        try {
+            return HeapDump.takeHeapDump(application.getPid(),fileName);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Cannot get heap dump"+ex.getLocalizedMessage(); // NOI18N
+        }
+    }
+    
+    String enableHeapDumpOnOOMErrorFlag(boolean enable) {
+        try {
+            return VMOption.setFlag(application.getPid(),"HeapDumpOnOutOfMemoryError",enable?"1":"0");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Cannot get enableHeapDumpOnOOMErrorFlag"+ex.getLocalizedMessage(); // NOI18N
+        }
+    }
+    
+    String getHeapDumpOnOOMErrorFlag() {
+        try {
+            return VMOption.getFlag(application.getPid(),"HeapDumpOnOutOfMemoryError");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null; // NOI18N
+        }
+    }
+    
+    String setHeapDumpPath(String path) {
+        try {
+            return VMOption.setFlag(application.getPid(),"HeapDumpPath",path);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Cannot get setHeapDumpPath"+ex.getLocalizedMessage(); // NOI18N
+        }
+    }
+    
+    public boolean isDumpOnOOMEnabledSupported() {
+        return isAttachAvailable();
+    }
+    
+    public boolean isDumpOnOOMEnabled() {
+        if (isAttachAvailable()) {
+            String dumpFlag = getHeapDumpOnOOMErrorFlag();
+            if (dumpFlag != null) {
+                dumpFlag = dumpFlag.trim();
+                if ("-XX:-HeapDumpOnOutOfMemoryError".equals(dumpFlag)) {
+                    return false;
+                }
+                if ("-XX:+HeapDumpOnOutOfMemoryError".equals(dumpFlag)) {
+                    return true;
+                }
+                System.out.println("Invalid return value "+dumpFlag);
+            }
+            return false;
+        }
+        return super.isDumpOnOOMEnabled();
+    }
+    
+    public void setDumpOnOOMEnabled(boolean enabled) {
+        String err="";
+        if (enabled) {
+            err=setHeapDumpPath(application.getStorage().getDirectory().getAbsolutePath());
+        }
+        err=err.concat(enableHeapDumpOnOOMErrorFlag(enabled));
+        if (err.length()!=0) {
+            System.out.println("setDumpOnOOMEnabled "+err);
+        }
+    }
+    
+    public boolean isTakeHeapDumpSupported() {
+        return isAttachAvailable();
+    }
+    
+    public File takeHeapDump() throws IOException {
+        File snapshotDir = application.getStorage().getDirectory();
+        String name = HeapDumpSupport.getInstance().getCategory().createFileName();
+        File dumpFile = new File(snapshotDir,name);
+        String dump = takeHeapDump(dumpFile.getAbsolutePath());
+        System.out.println("Dump "+dump);
+        return dumpFile;
+    }
+    
+    public boolean isTakeThreadDumpSupported() {
+        return isAttachAvailable();
+    }
+    
+    public File takeThreadDump() throws IOException {
+        String dump = getStackTrace();
+        File snapshotDir = application.getStorage().getDirectory();
+        String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
+        File dumpFile = new File(snapshotDir,name);
+        OutputStream os = new FileOutputStream(dumpFile);
+        os.write(dump.getBytes("UTF-8"));
+        os.close();
+        return dumpFile;
+    }
+    
+    boolean isAttachAvailable() {
+        if (attachAvailable == null) {
+            boolean canAttach = Host.LOCALHOST.equals(application.getHost()) && isAttachable();
+            attachAvailable = Boolean.valueOf(canAttach);
+        }
+        return attachAvailable.booleanValue();
+    }
+    
 }
