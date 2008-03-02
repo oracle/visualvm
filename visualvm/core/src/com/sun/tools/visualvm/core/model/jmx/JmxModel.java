@@ -187,7 +187,7 @@ public class JmxModel extends Model {
                     proxyClient = new ProxyClient(this, urls.get(0), null, null);
                     if ("true".equals(auths.get(0))) {
                         final ProxyClient pc = proxyClient;
-                        EventQueue.invokeAndWait(new Runnable() {
+                        invokeAndWait(new Runnable() {
                             public void run() {
                                 // Ask for security credentials
                                 ApplicationSecurityConfigurator jsc =
@@ -218,7 +218,7 @@ public class JmxModel extends Model {
                                 app.getHost().getHostName(), port, null, null);
                         if (authenticate) {
                             final ProxyClient pc = proxyClient;
-                            EventQueue.invokeAndWait(new Runnable() {
+                            invokeAndWait(new Runnable() {
                                 public void run() {
                                     // Ask for security credentials
                                     ApplicationSecurityConfigurator jsc =
@@ -236,7 +236,7 @@ public class JmxModel extends Model {
                     proxyClient.connect();
                 } catch (SecurityException e) {
                     final ProxyClient pc = proxyClient;
-                    EventQueue.invokeAndWait(new Runnable() {
+                    invokeAndWait(new Runnable() {
                         public void run() {
                             // Ask for security credentials
                             ApplicationSecurityConfigurator jsc =
@@ -268,7 +268,7 @@ public class JmxModel extends Model {
             try {
                 proxyClient.connect();
             } catch (SecurityException e) {
-                EventQueue.invokeAndWait(new Runnable() {
+                invokeAndWait(new Runnable() {
                     public void run() {
                         // Ask for security credentials
                         ApplicationSecurityConfigurator jsc =
@@ -377,6 +377,13 @@ public class JmxModel extends Model {
         return null;
     }
 
+    private static void invokeAndWait(Runnable runnable) throws InterruptedException, InvocationTargetException {
+        if (EventQueue.isDispatchThread()) {
+            runnable.run();
+        } else {
+            EventQueue.invokeAndWait(runnable);
+        }
+    }
     static class ProxyClient implements NotificationListener {
 
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;
