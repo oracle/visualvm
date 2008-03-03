@@ -46,12 +46,14 @@ import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.selector.ui.SelectionTreeView;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.trees.TreeDecimator;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.awt.Color;
@@ -69,11 +71,7 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -83,29 +81,27 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
-import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class SelectRootMethodsPanel extends JPanel {
+public abstract class AbstractSelectRootMethodsPanel extends JPanel {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
     // I18N String constants
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(SelectRootMethodsPanel.class,
+    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(AbstractSelectRootMethodsPanel.class,
                                                                      "SelectRootMethodsPanel_OkButtonText"); // NOI18N
-    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(SelectRootMethodsPanel.class,
+    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(AbstractSelectRootMethodsPanel.class,
                                                                                 "SelectRootMethodsPanel_RemoveSelectedItemText"); // NOI18N
-    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(SelectRootMethodsPanel.class,
+    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(AbstractSelectRootMethodsPanel.class,
                                                                            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
-    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(SelectRootMethodsPanel.class,
+    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(AbstractSelectRootMethodsPanel.class,
                                                                            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
                                                                                                                         // -----
     protected static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
-    private static SelectRootMethodsPanel instance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -116,25 +112,20 @@ public class SelectRootMethodsPanel extends JPanel {
     private Project currentProject;
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
     private RootSelectorTree advancedLogicalPackageTree;
-
     private volatile boolean changingBuilderList = false;
     private boolean globalMode;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Creates a new instance of SelectRootMethodsPanel */
-    public SelectRootMethodsPanel() {
+    /** Creates a new instance of AbstractSelectRootMethodsPanel */
+    public AbstractSelectRootMethodsPanel() {
         initComponents(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static synchronized SelectRootMethodsPanel getDefault() {
-        if (instance == null) {
-            instance = new SelectRootMethodsPanel();
-        }
-
-        return instance;
+    public static boolean canBeShown() {
+        return RootSelectorTree.canBeShown();
     }
 
     public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project,
@@ -187,46 +178,46 @@ public class SelectRootMethodsPanel extends JPanel {
         //    return rootMethods;
     }
 
+    protected abstract TreeDecimator.NodeFilter<RootSelectorNode> getNodeFilter();
+
+    protected abstract boolean isShowAllProjectsEnabled();
+
     protected void initComponents(final Container container) {
         GridBagConstraints gridBagConstraints;
 
         okButton = new JButton(OK_BUTTON_TEXT);
 
-        //        advancedLogicalPackageTree = new RootSelectorTree() {
-        //                protected SelectionTreeBuilder getBuilder() {
-        //                    return (SelectionTreeBuilder) treeBuilderList.getSelectedItem();
-        //                }
-        //            };
-//        advancedLogicalPackageTree = new RootSelectorTree();
-                
         advancedLogicalPackageTree = new RootSelectorTree(new ProgressDisplayer() {
-            ProfilerProgressDisplayer pd = null;
-            
-            public synchronized void showProgress(String message) {
-                pd = ProfilerProgressDisplayer.showProgress(message);
-            }
+                ProfilerProgressDisplayer pd = null;
 
-            public synchronized void showProgress(String message, ProgressController controller) {
-                pd = ProfilerProgressDisplayer.showProgress(message, controller);
-            }
-
-            public synchronized void showProgress(String caption, String message, ProgressController controller) {
-                pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
-            }
-
-            public synchronized boolean isOpened() {
-                return pd != null;
-            }
-
-            public synchronized void close() {
-                if (pd != null) {
-                    pd.close();
-                    pd = null;
+                public synchronized void showProgress(String message) {
+                    pd = ProfilerProgressDisplayer.showProgress(message);
                 }
-            }
-        });
+
+                public synchronized void showProgress(String message, ProgressController controller) {
+                    pd = ProfilerProgressDisplayer.showProgress(message, controller);
+                }
+
+                public synchronized void showProgress(String caption, String message, ProgressController controller) {
+                    pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
+                }
+
+                public synchronized boolean isOpened() {
+                    return pd != null;
+                }
+
+                public synchronized void close() {
+                    if (pd != null) {
+                        pd.close();
+                        pd = null;
+                    }
+                }
+            });
+        advancedLogicalPackageTree.setNodeFilter(getNodeFilter());
 
         advancedShowAllProjectsCheckBox = new JCheckBox();
+        advancedShowAllProjectsCheckBox.setVisible(isShowAllProjectsEnabled());
+
         treeBuilderList = new JComboBox();
         treeBuilderList.addItemListener(new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -358,7 +349,7 @@ public class SelectRootMethodsPanel extends JPanel {
             treeBuilderList.setModel(new DefaultComboBoxModel(usedTreeViews.toArray(new SelectionTreeView[usedTreeViews.size()])));
 
             treeBuilderList.setSelectedIndex(0);
-            advancedLogicalPackageTree.setSelectionTreeView((SelectionTreeView)treeBuilderList.getItemAt(0));
+            advancedLogicalPackageTree.setSelectionTreeView((SelectionTreeView) treeBuilderList.getItemAt(0));
         } finally {
             changingBuilderList = false;
         }
