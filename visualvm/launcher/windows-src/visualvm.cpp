@@ -42,6 +42,7 @@ static void parseArgs(int argc, char *argv[]);
 static int readClusterFile(const char* path);
 static int dirExists(const char* path);
 static void ErrorExit(LPTSTR lpszMessage, LPTSTR lpszFunction);
+static boolean checkConfigFile(char *topdir,char *appname);
 
 static char userdir[MAX_PATH] = "c:\\nbuser";
 static char options[4098] = "";
@@ -94,11 +95,11 @@ int WINAPI
     pc = strrchr(buf, '\\');
     if (pc != NULL && ((0 == stricmp("\\bin", pc)) || (0 == stricmp("\\launchers", pc))))
         *pc = '\0';
-    configFile = checkConfigFile(buf, appname);
     if (!checkConfigFile(buf, appname)) {
         strcat(buf,"\\lib\\visualvm");
         if (!checkConfigFile(buf, appname)) {
             ErrorExit("Cannot read config file!", "checkConfigFile");
+        }
     }
     strcpy(branding, appname);
     strcpy(topdir, buf);
@@ -550,7 +551,7 @@ boolean checkConfigFile(char *topdir,char *appname) {
     sprintf(buf, "%s\\etc\\%s.conf", topdir, appname);
     FILE* fin = fopen(buf, "r");
     if (fin == NULL)
-        return NO;
-    return YES;
+        return FALSE;
+    return TRUE;
 }
 

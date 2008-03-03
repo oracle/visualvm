@@ -34,7 +34,7 @@ CFLAGS = -s -mno-cygwin
 
 all : visualvm.exe visualvm_w.exe
 
-visialvm.exe : visualvm.cpp visualvm.res
+visualvm.exe : visualvm.cpp visualvm.res
 	gcc $(CFLAGS) $(LIBS) -mwindows -DWINMAIN visualvm.cpp -o visualvm.exe visualvm.res
 	mv visualvm.exe ../
 
