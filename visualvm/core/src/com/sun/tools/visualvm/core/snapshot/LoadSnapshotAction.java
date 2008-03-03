@@ -64,6 +64,7 @@ public final class LoadSnapshotAction extends AbstractAction {
         if (lastFile != null) chooser.setSelectedFile(new File(lastFile));
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileFilter fileFilter : fileFilters) chooser.addChoosableFileFilter(fileFilter);
+        chooser.setFileFilter(fileFilters.get(0));
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
             lastFile = selectedFile.getAbsolutePath();

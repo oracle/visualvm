@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.core.profiler;
 
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
@@ -43,12 +45,18 @@ public final class ProfilerSupport {
     private static ProfilerSupport instance;
     
     private Application profiledApplication;
+    private ProfilerSnapshotCategory category;
     private ApplicationProfilerViewProvider profilerViewProvider;
 
 
     public static synchronized ProfilerSupport getInstance() {
         if (instance == null) instance = new ProfilerSupport();
         return instance;
+    }
+    
+    
+    public SnapshotCategory getCategory() {
+        return category;
     }
     
     
@@ -136,6 +144,9 @@ public final class ProfilerSupport {
     private ProfilerSupport() {
         profilerViewProvider = new ApplicationProfilerViewProvider();
         profilerViewProvider.initialize();
+        
+        category = new ProfilerSnapshotCategory();
+        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
         
         checkCalibration();
     }

@@ -27,17 +27,16 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
     <folder name="Actions">
+        <file name="Edit_hidden"/>
         <folder name="Help">
             <file name="com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
+            <file name="master-help.xml_hidden"/>
+            <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
+            <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
         </folder>
     </folder>
     <folder name="Menu">
-        <folder name="Edit">
-            <file name="Separator3.instance_hidden"/>
-            <file name="org-netbeans-core-actions-JumpNextAction.shadow_hidden"/>
-            <file name="org-netbeans-core-actions-JumpPrevAction.shadow_hidden"/>
-            <file name="org-openide-actions-ReplaceAction.instance_hidden"/>
-        </folder>
+        <file name="Edit_hidden"/>
         <folder name="File">
             <file name="Separator2.instance_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance" url="org-netbeans-modules-profiler-actions-CompareSnapshotsAction_1.instance">
@@ -59,29 +58,7 @@
                 <attr name="position" intvalue="1200"/>
             </file>
         </folder>
-        <folder name="Profile">
-            <file name="Advanced_hidden"/>
-            <file name="Help_hidden"/>
-            <file name="View_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance" url="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-StopAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance_hidden"/>
-            <file name="profiler-sep1.instance_hidden"/>
-            <file name="profiler-sep2.instance_hidden"/>
-            <file name="profiler-sep3.instance_hidden"/>
-            <file name="profiler-sep4.instance_hidden"/>
-            <file name="profiler-sep5.instance_hidden"/>
-            <file name="profiler-sep6.instance_hidden"/>
-            <file name="profiler-sep7.instance_hidden"/>
-        </folder>
+        <file name="Profile_hidden"/>
         <folder name="Tools">
             <file name="Separator1.instance_hidden"/>
             <file name="Separator2.instance_hidden"/>
@@ -109,6 +86,12 @@
             <file name="ViewFavoritesTabAction.shadow_hidden"/>
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.shadow_hidden"/>
         </folder>
+    </folder>
+    <folder name="Services">
+        <folder name="NoOps">
+            <file name="NoIndentEngine.instance_hidden"/>
+        </folder>
+        <file name="org-openide-text-PrintSettings.settings_hidden"/>
     </folder>
     <folder name="Toolbars">
         <file name="Edit_hidden"/>
