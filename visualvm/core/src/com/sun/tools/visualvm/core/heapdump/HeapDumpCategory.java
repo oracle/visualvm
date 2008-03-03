@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.core.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.HeapDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import java.io.File;
 
 /**
  *
@@ -40,6 +42,14 @@ class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     
     public HeapDumpCategory() {
         super(NAME, HeapDump.class, PREFIX, SUFFIX, 20);
+    }
+    
+    public boolean supportsOpenSnapshot() {
+        return true;
+    }
+    
+    public void openSnapshot(File file) {
+        DataSourceWindowManager.sharedInstance().openWindow(new HeapDumpImpl(file, null)); // TODO: instance should be created by HeapDumpProvider!
     }
 
 }

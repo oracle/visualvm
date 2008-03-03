@@ -62,6 +62,7 @@ public final class RegisteredSnapshotCategories {
      */
     public void addCategory(SnapshotCategory category) {
         categories.add(category);
+        LoadSnapshotAction.getInstance().updateEnabled();
     }
 
     /**
@@ -71,6 +72,7 @@ public final class RegisteredSnapshotCategories {
      */
     public void removeCategory(SnapshotCategory category) {
         categories.remove(category);
+        LoadSnapshotAction.getInstance().updateEnabled();
     }
 
     /**
@@ -86,8 +88,17 @@ public final class RegisteredSnapshotCategories {
                 visibleCategories.add(category);
         
         Collections.sort(visibleCategories, Positionable.COMPARATOR);
-        
         return visibleCategories;
+    }
+    
+    public List<SnapshotCategory> getOpenSnapshotCategories() {
+        List<SnapshotCategory> allCategories = new ArrayList(categories);
+        List<SnapshotCategory> openSnapshotCategories = new ArrayList();
+        for (SnapshotCategory category : allCategories)
+            if (category.supportsOpenSnapshot()) openSnapshotCategories.add(category);
+        
+        Collections.sort(openSnapshotCategories, Positionable.COMPARATOR);
+        return openSnapshotCategories;
     }
     
     /**

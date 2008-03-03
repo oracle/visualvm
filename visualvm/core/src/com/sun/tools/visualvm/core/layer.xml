@@ -24,10 +24,14 @@
  CA 95054 USA or visit www.sun.com if you need additional information or
  have any questions.
 -->
-
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
     <folder name="Actions">
+        <folder name="Other">
+            <file name="com-sun-tools-visualvm-core-snapshot-LoadSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.LoadSnapshotAction.getInstance"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.ExplorerTopComponentAction.getInstance"/>
@@ -35,6 +39,12 @@
         </folder>
     </folder>
     <folder name="Menu">
+        <folder name="File">
+            <file name="com-sun-tools-visualvm-core-snapshot-OpenSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-LoadSnapshotAction.instance"/>
+                <attr name="position" intvalue="1400"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="ExplorerTopComponentAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
@@ -49,6 +59,14 @@
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
                 <attr name="url_key" stringvalue="com_sun_tools_visualvm_core_update_center"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Toolbars">
+        <folder name="File">
+            <file name="com-sun-tools-visualvm-core-snapshot-OpenSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-LoadSnapshotAction.instance"/>
+                <attr name="position" intvalue="300"/>
             </file>
         </folder>
     </folder>

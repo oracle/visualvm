@@ -97,6 +97,15 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
         return preferredPosition;
     }
     
+    
+    public boolean supportsOpenSnapshot() {
+        return false;
+    }
+    
+    public void openSnapshot(File file) {
+    }
+    
+    
     /**
      * Returns prefix of files containing the snapshots.
      * 
@@ -171,11 +180,12 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     public FileFilter getFileFilter() {
         return new FileFilter() {
             public boolean accept(File f) {
-                return f.isDirectory() || isSnapshot(f);
+                String suff = getSuffix();
+                return f.isDirectory() || (suff != null ? f.getName().endsWith(suff) : true);
             }
             public String getDescription() {
                 String suff = getSuffix();
-                return getName() + (suff != null ? " (" + suff + ")" : "");
+                return getName() + (suff != null ? " (*" + suff + ")" : "");
             }
         };
     }

@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.core.threaddump;
 
 import com.sun.tools.visualvm.core.datasource.ThreadDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import java.io.File;
 
 /**
  *
@@ -40,6 +42,14 @@ class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     
     public ThreadDumpCategory() {
         super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10);
+    }
+    
+    public boolean supportsOpenSnapshot() {
+        return true;
+    }
+    
+    public void openSnapshot(File file) {
+        DataSourceWindowManager.sharedInstance().openWindow(new ThreadDumpImpl(file, null)); // TODO: instance should be created by ThreadDumpProvider!
     }
 
 }
