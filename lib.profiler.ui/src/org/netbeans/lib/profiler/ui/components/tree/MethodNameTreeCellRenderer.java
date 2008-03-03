@@ -58,7 +58,7 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
 
     private ImageIcon allThreadsIcon = new ImageIcon(MethodNameTreeCellRenderer.class
                                                          .getResource("/org/netbeans/lib/profiler/ui/resources/allThreads.png")); //NOI18N
-    private ImageIcon threadIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/thread.png")); //NOI18N
+    private ImageIcon threadIcon = new ImageIcon(MethodNameTreeCellRenderer.class.getResource("/org/netbeans/lib/profiler/ui/resources/thread.png")); //NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
