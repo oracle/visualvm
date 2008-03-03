@@ -71,41 +71,39 @@ int WINAPI
 
     char topdir[MAX_PATH];
     char buf[MAX_PATH * 10], *pc;
-  
+    char *configFile;
+    
     GetModuleFileName(0, buf, sizeof buf);
-
     pc = strrchr(buf, '\\');
     if (pc != NULL) {             // always holds
         strlwr(pc + 1);
         strcpy(appname, pc + 1);  // store the app name
         *pc = '\0';	// remove .exe filename
     }
-
     pc = strrchr(appname, '.');
     if (pc != NULL) {
         *pc = '\0';
     }
-
     // printf("appname = %s\n", appname);
-
     pc = strrchr(appname, '_');
     if (pc != NULL) {
       if (!strcmp(pc, "_w")) {
 	*pc = '\0';
       }
     }
-
-    
-
     pc = strrchr(buf, '\\');
     if (pc != NULL && ((0 == stricmp("\\bin", pc)) || (0 == stricmp("\\launchers", pc))))
         *pc = '\0';
-    strcpy(topdir, buf);
-
+    configFile = checkConfigFile(buf, appname);
+    if (!checkConfigFile(buf, appname)) {
+        strcat(buf,"\\lib\\visualvm");
+        if (!checkConfigFile(buf, appname)) {
+            ErrorExit("Cannot read config file!", "checkConfigFile");
+    }
     strcpy(branding, appname);
-
-    sprintf(buf, "%s\\etc\\%s.conf", topdir, appname);
-    parseConfigFile(buf);
+    strcpy(topdir, buf);
+    sprintf(configFile, "%s\\etc\\%s.conf", topdir, appname);
+    parseConfigFile(configFile);
 
 #ifdef WINMAIN
     parseCommandLine(cmdline);
@@ -118,10 +116,8 @@ int WINAPI
     sprintf(buf, "%s\\etc\\%s.conf", userdir, appname);
     parseConfigFile(buf);
     strcpy(userdir, olduserdir);
-
     char clusterFileName[MAX_PATH];
     sprintf(clusterFileName, "%s\\etc\\%s.clusters", topdir, appname);
-
     if (!readClusterFile(clusterFileName)) {
         ErrorExit("Cannot read cluster file!", NULL);
     }
@@ -143,7 +139,6 @@ int WINAPI
     char *q = NULL;
 
     // printf("extradirs = %s\n", extradirs);
-
     p = extradirs;
     while (*p != '\0') {
       if ((q = strchr(p, ';')) != NULL) {
@@ -170,7 +165,6 @@ int WINAPI
     BOOL bNext = TRUE;
 
     sprintf(pattern, "%s\\platform*", topdir);
-
     hFind = FindFirstFile(pattern, &ffd);
     do {
         if (hFind == INVALID_HANDLE_VALUE || bNext == FALSE) {
@@ -182,7 +176,6 @@ int WINAPI
         }
         bNext = FindNextFile(hFind, &ffd);
     } while (1);   
-
     sprintf(cmdline2, "\"%s\" %s --branding %s --clusters \"%s\" --userdir \"%s\" %s %s",
             nbexec,
             jdkswitch,
@@ -194,7 +187,7 @@ int WINAPI
 
     STARTUPINFO start;
     PROCESS_INFORMATION pi;
-
+    
     memset (&start, 0, sizeof (start));
     start.cb = sizeof (start);
 
@@ -240,7 +233,6 @@ char* getUserHomeFromRegistry(char* userhome)
 
     char *path = GetStringValue(key, "AppData");
     RegCloseKey(key);
-    
     strcpy(userhome, path);
     return userhome;
 }
@@ -293,15 +285,12 @@ void parseConfigFile(const char* path) {
             pc = line + strlen(line) - 1;
             while (*pc == '\n' || *pc == '\r' || *pc == '\t' || *pc == ' ')
                 pc--;
-
             if (*q == '"' && *pc == '"') {
                 q++;
                 pc--;
             }
-                
             *(pc+1) = '\0';
 	    *userdir = '\0';
-
             if (strstr(q, "${HOME}") == q) {
                 char userhome[MAX_PATH];
                 strcpy(userdir, getUserHomeFromRegistry(userhome));
@@ -319,12 +308,10 @@ void parseConfigFile(const char* path) {
             pc = line + strlen(line) - 1;
             while (*pc == '\n' || *pc == '\r' || *pc == '\t' || *pc == ' ')
                 pc--;
-            
             if (*q == '"' && *pc == '"') {
                 q++;
                 pc--;
             }
-            
             *(pc+1) = '\0';
             strcpy(options, q);
         } else if (strstr(pc, "extra_clusters=") == pc) {
@@ -332,12 +319,10 @@ void parseConfigFile(const char* path) {
             pc = line + strlen(line) - 1;
             while (*pc == '\n' || *pc == '\r' || *pc == '\t' || *pc == ' ')
                 pc--;
-            
             if (*q == '"' && *pc == '"') {
                 q++;
                 pc--;
             }
-            
             *(pc+1) = '\0';
             strcpy(extradirs, q);
         } else if (strstr(pc, "jdkhome=") == pc) {
@@ -345,12 +330,10 @@ void parseConfigFile(const char* path) {
             pc = line + strlen(line) - 1;
             while (*pc == '\n' || *pc == '\r' || *pc == '\t' || *pc == ' ')
                 pc--;
-            
             if (*q == '"' && *pc == '"') {
                 q++;
                 pc--;
             }
-            
             *(pc+1) = '\0';
             sprintf(jdkswitch, "--jdkhome \"%s\"", q);
         }
@@ -378,11 +361,9 @@ void parseCommandLine(char *argstr) {
     p = token;
     state = START;
     eof = 0;
-  
     while (!eof) {
         if (*q == '\0')
             eof = 1;
-    
         switch (state) {
             case START:
                 if (*q == ' ' || *q == '\r' || *q == '\n' || *q == '\t') {
@@ -403,10 +384,8 @@ void parseCommandLine(char *argstr) {
                     q++;
                     continue;
                 }
-      
                 state = NORMAL;
                 continue;
-
             case NORMAL:
                 if (*q == ' ' || *q == '\r' || *q == '\n' || *q == '\t' || *q == '\0') {
                     *p = '\0';
@@ -417,7 +396,6 @@ void parseCommandLine(char *argstr) {
                     *p++ = *q++;
                 }
                 break;
-
             case IN_QUOTES:
                 if (*q == '"') {
                     if (*(q+1) == '"') {
@@ -425,10 +403,8 @@ void parseCommandLine(char *argstr) {
                         q += 2;
                     } else {
                         *p = '\0';
-          
                         argv[argc] = strdup(token);
                         argc++;
-
                         q++;
                         state = START;
                     }
@@ -441,7 +417,6 @@ void parseCommandLine(char *argstr) {
                     *p++ = *q++;
                 }
                 break;
-      
             case IN_APOS:
                 if (*q == '\'') {
                     if (*(q+1) == '\'') {
@@ -449,10 +424,8 @@ void parseCommandLine(char *argstr) {
                         q += 2;
                     } else {
                         *p = '\0';
-          
                         argv[argc] = strdup(token);
                         argc++;
-
                         q++;
                         state = START;
                     }
@@ -467,9 +440,7 @@ void parseCommandLine(char *argstr) {
                 break;
         }
     }
-  
     parseArgs(argc, argv);
-
 }
 #endif // WINMAIN
 
@@ -479,7 +450,6 @@ void parseArgs(int argc, char *argv[]) {
     while (argc > 0 && (arg = *argv) != 0) {
         argv++;
         argc--;
-
         if (0 == strcmp("--userdir", arg)) {
             if (argc > 0) {
                 arg = *argv;
@@ -496,8 +466,8 @@ void parseArgs(int argc, char *argv[]) {
 int readClusterFile(const char* path) {
 
     char **dirs = defaultDirs;
-
     FILE* fin = fopen(path, "r");
+    
     if (fin == NULL)
         return 0;
     
@@ -508,20 +478,15 @@ int readClusterFile(const char* path) {
             ;
         if (*pc == '#')
             continue;
-
         char *s = pc;
-
 	while (*pc != '\0' && *pc != '\t' && *pc != '\n' && *pc != '\r')
 	    pc++;
-
 	*pc = '\0';
-
 	*dirs = strdup(s);
 	dirs++;
     }
     *dirs = NULL;
     fclose(fin);
-
     return 1;
 }
 
@@ -558,7 +523,6 @@ void ErrorExit(LPTSTR lpszMessage, LPTSTR lpszFunction)
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &lpMsgBuf,
         0, NULL );
-
     if (lpszFunction != NULL ) {
         lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
             (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
@@ -573,11 +537,20 @@ void ErrorExit(LPTSTR lpszMessage, LPTSTR lpszFunction)
             TEXT("%s"), 
             lpszMessage); 
     }
-    	
     MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_ICONSTOP | MB_OK); 
-
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
     ExitProcess( (dw != 0)? dw: 1); 
+}
+
+// check that conif file exists in topdir directory
+boolean checkConfigFile(char *topdir,char *appname) {
+    char buf[MAX_PATH];
+    
+    sprintf(buf, "%s\\etc\\%s.conf", topdir, appname);
+    FILE* fin = fopen(buf, "r");
+    if (fin == NULL)
+        return NO;
+    return YES;
 }
 
