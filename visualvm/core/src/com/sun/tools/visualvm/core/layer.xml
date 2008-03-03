@@ -31,6 +31,12 @@
             <file name="com-sun-tools-visualvm-core-snapshot-LoadSnapshotAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.LoadSnapshotAction.getInstance"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-SaveSnapshotAsAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.SaveSnapshotAsAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-DeleteSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.DeleteSnapshotAction.getInstance"/>
+            </file>
         </folder>
         <folder name="Window">
             <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
@@ -43,6 +49,14 @@
             <file name="com-sun-tools-visualvm-core-snapshot-OpenSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-SaveSnapshotAsAction.instance"/>
+                <attr name="position" intvalue="1500"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-DeleteSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-DeleteSnapshotAction.instance"/>
+                <attr name="position" intvalue="1600"/>
             </file>
         </folder>
         <folder name="Window">
@@ -67,6 +81,10 @@
             <file name="com-sun-tools-visualvm-core-snapshot-OpenSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="300"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-SaveSnapshotAsAction.instance"/>
+                <attr name="position" intvalue="400"/>
             </file>
         </folder>
     </folder>

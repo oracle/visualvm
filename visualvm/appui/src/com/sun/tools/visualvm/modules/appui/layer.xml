@@ -24,7 +24,6 @@
  CA 95054 USA or visit www.sun.com if you need additional information or
  have any questions.
 -->
-
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
     <folder name="Actions">
@@ -41,6 +40,14 @@
         </folder>
         <folder name="File">
             <file name="Separator2.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance" url="org-netbeans-modules-profiler-actions-CompareSnapshotsAction_1.instance">
+                <attr name="position" intvalue="2150"/>
+            </file>
+            <file name="org-openide-actions-PageSetupAction.instance_hidden"/>
+            <file name="org-openide-actions-PrintAction.instance_hidden"/>
+            <file name="org-openide-actions-SaveAction.instance_hidden"/>
+            <file name="org-openide-actions-SaveAllAction.instance_hidden"/>
+            <file name="org-openide-actions-SaveAsAction.shadow_hidden"/>
         </folder>
         <file name="GoTo_hidden"/>
         <folder name="Help">
@@ -57,6 +64,8 @@
             <file name="Help_hidden"/>
             <file name="View_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-AttachAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance" url="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-RerunAction.instance_hidden"/>
@@ -64,6 +73,7 @@
             <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-StopAction.instance_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance_hidden"/>
             <file name="profiler-sep1.instance_hidden"/>
             <file name="profiler-sep2.instance_hidden"/>
             <file name="profiler-sep3.instance_hidden"/>
@@ -101,6 +111,10 @@
         </folder>
     </folder>
     <folder name="Toolbars">
+        <file name="Edit_hidden"/>
+        <folder name="File">
+            <file name="org-openide-actions-SaveAllAction.instance_hidden"/>
+        </folder>
         <file name="Profile_hidden"/>
     </folder>
 </filesystem>

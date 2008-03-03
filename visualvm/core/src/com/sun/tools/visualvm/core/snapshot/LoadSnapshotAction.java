@@ -82,7 +82,7 @@ public final class LoadSnapshotAction extends AbstractAction {
     
     private LoadSnapshotAction() {
         putValue(Action.NAME, "Load...");
-        putValue(Action.SHORT_DESCRIPTION, "Loads saved file");
+        putValue(Action.SHORT_DESCRIPTION, "Load Snapshot");
         putValue(Action.SMALL_ICON, new ImageIcon(ICON_16));
         putValue("iconBase", new ImageIcon(ICON_24));
         
