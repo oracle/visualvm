@@ -82,6 +82,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
 
 
 /**
@@ -364,14 +365,15 @@ public final class IDEUtils {
 
     public static FileObject getSettingsFolder(final boolean create)
                                         throws IOException {
-        final FileObject folder = Repository.getDefault().getDefaultFileSystem().findResource("Services"); //NOI18N
-        FileObject settingsFolder = folder.getFileObject(SETTINGS_DIR, null);
-
-        if ((settingsFolder == null) && create) {
-            settingsFolder = folder.createFolder(SETTINGS_DIR);
-        }
-
-        return settingsFolder;
+        return SettingsFolderQuery.getDefault().getSettingsFolder(create);
+//        final FileObject folder = Repository.getDefault().getDefaultFileSystem().findResource("Services"); //NOI18N
+//        FileObject settingsFolder = folder.getFileObject(SettingsFolderQuery.getDefault().getSettingsFolder(), null);
+//
+//        if ((settingsFolder == null) && create) {
+//            settingsFolder = folder.createFolder(SettingsFolderQuery.getDefault().getSettingsFolder());
+//        }
+//
+//        return settingsFolder;
     }
 
     /**
