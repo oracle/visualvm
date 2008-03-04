@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -96,7 +97,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
     
     
     private DataViewComponent createViewComponent() {
-        timer = new Timer(DEFAULT_REFRESH, new ActionListener() {
+        timer = new Timer(GlobalPreferences.sharedInstance().getThreadsPoll() * 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) { threadsManager.refreshThreads(); }
         });
         timer.setCoalesce(true);

@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import java.util.prefs.PreferenceChangeEvent;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.event.HostEvent;
 import sun.jvmstat.monitor.event.HostListener;
@@ -36,6 +37,7 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
 
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
@@ -44,6 +46,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
 
 /**
  *
@@ -68,6 +72,7 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
                 case STATE_NEW: {
                     if (!MonitoredHostDS.isAvailableFor(host)) {
                         return; // stay in NEW; no jvmstat detected
+
                     }
                     processNewHost(host);
                     state = STATE_DISCOVERED;
@@ -84,21 +89,47 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
             }
         }
     }
-
     private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap<Host, HostListener>());
     private final Map<Host, ScheduledTask> watchedHosts = new HashMap<Host, ScheduledTask>();
-    
     private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
+
         public void dataFinished(Host host) {
             removeWatchedHost(host);
             processFinishedHost(host);
         }
     };
+    final private Object pollIntervalLock = new Object();
+    // @GuardedBy pollIntervalLock
+    private Quantum pollInterval = null;
+    private final PreferenceChangeListener reschedulingListener = new PreferenceChangeListener() {
+
+        public void preferenceChange(PreferenceChangeEvent evt) {
+            int seconds = Integer.parseInt(evt.getNewValue());
+            synchronized (pollIntervalLock) {
+                pollInterval = Quantum.seconds(seconds);
+                for (Map.Entry<Host, ScheduledTask> entry : watchedHosts.entrySet()) {
+                    entry.getValue().setInterval(pollInterval);
+                }
+            }
+        }
+    };
 
     public void dataChanged(final DataChangeEvent<Host> event) {
         for (Host host : event.getAdded()) {
-            addWatchedHost(host, Quantum.seconds(3));
+            addWatchedHost(host, getPollInterval());
         }
+    }
+
+    private Quantum getPollInterval() {
+        synchronized (pollIntervalLock) {
+            if (pollInterval == null) {
+                GlobalPreferences.sharedInstance().watchMonitoredHostPoll(reschedulingListener);
+                pollInterval = Quantum.seconds(GlobalPreferences.sharedInstance().getMonitoredHostPoll());
+
+            }
+        }
+
+        return pollInterval;
     }
 
     private void processNewHost(final Host host) {
@@ -109,12 +140,15 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
             final MonitoredHost monitoredHost = monitoredHostDS.getMonitoredHost();
             HostListener monitoredHostListener = new HostListener() {
 
-                public void vmStatusChanged(final VmStatusChangeEvent e) {
+                public void vmStatusChanged(
+                        final VmStatusChangeEvent e) {
                 }
 
                 public void disconnected(HostEvent e) {
                     processFinishedHost(host);
-                    addWatchedHost(host, Quantum.seconds(3));
+                    addWatchedHost(
+                            host,
+                            getPollInterval());
                 }
             };
             mapping.put(host, monitoredHostListener);
@@ -148,23 +182,23 @@ class MonitoredHostProvider extends DefaultDataSourceProvider<MonitoredHostDS> i
             monitoredHost.finished();
         }
     }
-    
+
     private void removeWatchedHost(Host host) {
-        synchronized(watchedHosts) {
+        synchronized (watchedHosts) {
             if (watchedHosts.containsKey(host)) {
                 Scheduler.sharedInstance().unschedule(watchedHosts.remove(host));
             }
         }
     }
-    
+
     private void addWatchedHost(Host host, Quantum interval) {
         ScheduledTask task = Scheduler.sharedInstance().schedule(new DiscoveryTask(host), Quantum.SUSPENDED);
-        synchronized(watchedHosts)  {
+        synchronized (watchedHosts) {
             watchedHosts.put(host, task);
             task.setInterval(interval);
         }
     }
-    
+
     void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(MonitoredHostProvider.this, Host.class);

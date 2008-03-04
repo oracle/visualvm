@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -53,10 +54,12 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -115,6 +118,7 @@ class ApplicationProfilerView extends DataSourceView {
         private int state = -1;
 
         private boolean internalChange = false;
+        private SimpleFilter javaCoreClassesFilter;
     
         
         public MasterViewSupport(Application application, ProfilingResultsViewSupport profilingResultsView) {
@@ -153,6 +157,11 @@ class ApplicationProfilerView extends DataSourceView {
           if (internalChange) return;
 
           if (cpuButton.isSelected())  {
+            if (!GlobalPreferences.sharedInstance().isProfilerInstrFilter()) {
+                cpuSettings.setSelectedInstrumentationFilter(javaCoreClassesFilter);
+            } else {
+                cpuSettings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+            }
             internalChange = true;
             memoryButton.setSelected(false);
             internalChange = false;
@@ -181,7 +190,10 @@ class ApplicationProfilerView extends DataSourceView {
             internalChange = false;
             if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
               IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() { NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettings); }
+                public void run() { 
+                    
+                    NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettings); 
+                }
               });
             } else {
               disableControlButtons();
@@ -287,8 +299,10 @@ class ApplicationProfilerView extends DataSourceView {
 
         private void initSettings() {
           // Profiling settings defaults
+          javaCoreClassesFilter = new SimpleFilter("Exclude Java Core Classes", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, "com.apple., com.sun., java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa.");
           cpuSettings = ProfilingSettingsPresets.createCPUPreset();
           cpuSettings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
+          
           memorySettings = ProfilingSettingsPresets.createMemoryPreset();
 
           // Attach settings default

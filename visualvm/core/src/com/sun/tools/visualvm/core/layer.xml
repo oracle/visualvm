@@ -69,6 +69,12 @@
             </file>
         </folder>
     </folder>
+    <folder name="OptionsDialog">
+        <folder name="General.instance_hidden"/>
+        <file name="Advanced.instance_hidden"/>
+        <file name="ProfilerOptionsCategory.instance_hidden"/>
+        <file name="com-sun-tools-visualvm-core-options-GeneralOptionsCategory.instance"/>
+    </folder>
     <folder name="Services">
         <folder name="AutoupdateType">
             <file name="com_sun_tools_visualvm_core_update_center.instance">

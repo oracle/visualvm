@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.host;
 import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import java.net.URISyntaxException;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
@@ -37,7 +38,6 @@ import sun.jvmstat.monitor.MonitoredHost;
  * @author Jiri Sedlacek
  */
 public class MonitoredHostDS extends AbstractDataSource {
-
     private final MonitoredHost monitoredHost;
     private final Host host;
 
@@ -45,6 +45,7 @@ public class MonitoredHostDS extends AbstractDataSource {
     MonitoredHostDS(Host host) throws MonitorException, URISyntaxException {
         this.host = host;
         monitoredHost = MonitoredHost.getMonitoredHost(host.getHostName());
+        monitoredHost.setInterval(GlobalPreferences.sharedInstance().getMonitoredHostPoll() * 1000);
         setVisible(false);
     }
 
@@ -68,5 +69,4 @@ public class MonitoredHostDS extends AbstractDataSource {
     public Host getHost() {
         return host;
     }
-
 }

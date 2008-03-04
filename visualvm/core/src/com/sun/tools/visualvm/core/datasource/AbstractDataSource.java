@@ -27,10 +27,9 @@ package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.tools.WeakReferenceX;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,26 +41,6 @@ import java.util.Set;
  */
 // TODO: synchronize using RequestProcessor??
 public abstract class AbstractDataSource implements DataSource {
-    private class WeakReferenceX<T> extends WeakReference<T> {
-        public WeakReferenceX(T referent, ReferenceQueue<? super T> q) {
-            super(referent, q);
-        }
-
-        public WeakReferenceX(T referent) {
-            super(referent);
-        }
-        
-        public int hashCode() {
-            return this.get() != null ? this.get().hashCode() : 0;
-        }
-        
-        public boolean equals(Object o) {
-            if (this.get() == null && o == null) return true;
-            if (o == null) return false;
-            if (!(o instanceof WeakReferenceX)) return false;
-            return this.get().equals(((WeakReferenceX)o).get());
-        }
-    }
     private DataSource owner;
     private DataSource master;
     private int state = STATE_AVAILABLE;

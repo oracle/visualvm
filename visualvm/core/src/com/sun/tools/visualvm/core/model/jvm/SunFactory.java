@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.host.MonitoredHostDS;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import java.net.URISyntaxException;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -47,7 +48,9 @@ public class SunFactory extends AbstractModelProvider<JVM,Application> {
         String vmId = "//" + app.getPid() + "?mode=r";
         try {
             MonitoredHostDS monitoredHostDs = app.getMonitoredHost();
-            return monitoredHostDs.getMonitoredHost().getMonitoredVm(new VmIdentifier(vmId));
+            MonitoredVm mvm = monitoredHostDs.getMonitoredHost().getMonitoredVm(new VmIdentifier(vmId));
+            mvm.setInterval(GlobalPreferences.sharedInstance().getMonitoredDataPoll());
+            return mvm;
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
             return null;
@@ -60,6 +63,12 @@ public class SunFactory extends AbstractModelProvider<JVM,Application> {
             MonitoredVm vm = null;
             try {
                 vm = getMonitoredVm(appl);
+                final MonitoredVm usingVm = vm;
+//                GlobalPreferences.sharedInstance().watchMonitoredDataPoll(new PreferenceChangeListener() {
+//                    public void preferenceChange(PreferenceChangeEvent evt) {
+//                        usingVm.setInterval(Integer.parseInt(evt.getNewValue()));
+//                    }
+//                });
                 if (vm != null) {
                     String vmVersion = MonitoredVmUtil.vmVersion(vm);
                     if (vmVersion != null) {
