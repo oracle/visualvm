@@ -77,7 +77,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
     }
 
     public String getPassword() {
-        return passwordField.getText().trim();
+        return new String(passwordField.getPassword());
     }
 
     private static ApplicationSecurityConfigurator defaultInstance;
