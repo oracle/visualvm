@@ -39,7 +39,6 @@ import org.openide.util.Utilities;
 public final class SaveSnapshotAsAction extends AbstractAction {
     
     private static SaveSnapshotAsAction instance;
-    private static SaveSnapshotAsAction noIconInstance;
     
     private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png");
     private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot24.png");
@@ -48,15 +47,6 @@ public final class SaveSnapshotAsAction extends AbstractAction {
     public static synchronized SaveSnapshotAsAction getInstance() {
         if (instance == null) instance = new SaveSnapshotAsAction();
         return instance;
-    }
-    
-    public static synchronized SaveSnapshotAsAction getNoIconInstance() {
-        if (noIconInstance == null) {
-            noIconInstance = new SaveSnapshotAsAction();
-            noIconInstance.putValue(Action.SMALL_ICON, null);
-            noIconInstance.putValue("iconBase", null);
-        }
-        return noIconInstance;
     }
     
     public void actionPerformed(ActionEvent e) {

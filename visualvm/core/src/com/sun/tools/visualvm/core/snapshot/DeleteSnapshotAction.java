@@ -36,7 +36,6 @@ import javax.swing.SwingUtilities;
 public final class DeleteSnapshotAction extends AbstractAction {
     
     private static DeleteSnapshotAction instance;
-//    private static DeleteSnapshotAction noIconInstance;
     
 //    private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png");
 //    private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot24.png");
@@ -46,15 +45,6 @@ public final class DeleteSnapshotAction extends AbstractAction {
         if (instance == null) instance = new DeleteSnapshotAction();
         return instance;
     }
-    
-//    public static synchronized DeleteSnapshotAction getNoIconInstance() {
-//        if (noIconInstance == null) {
-//            noIconInstance = new DeleteSnapshotAction();
-//            noIconInstance.putValue(Action.SMALL_ICON, null);
-//            noIconInstance.putValue("iconBase", null);
-//        }
-//        return noIconInstance;
-//    }
     
     public void actionPerformed(ActionEvent e) {
         Snapshot selectedSnapshot = getSelectedSnapshot();

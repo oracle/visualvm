@@ -187,6 +187,7 @@ public final class ExplorerContextMenuFactory {
         
         public DataSourceItem(DataSource dataSource, Action action) {
             super(action);
+            this.setIcon(null);
             this.dataSource = dataSource;
         }
         

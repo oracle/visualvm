@@ -59,7 +59,7 @@ final class SnapshotActionProvider {
         
         public ExplorerActionDescriptor getDefaultAction(Snapshot snapshot) {
             if (snapshot.supportsSaveAs())
-                return new ExplorerActionDescriptor(SaveSnapshotAsAction.getNoIconInstance(), 20);
+                return new ExplorerActionDescriptor(SaveSnapshotAsAction.getInstance(), 20);
             else return null;
         }
 
