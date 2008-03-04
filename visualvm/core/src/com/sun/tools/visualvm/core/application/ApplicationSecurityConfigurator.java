@@ -50,19 +50,23 @@ import org.openide.DialogDescriptor;
 public final class ApplicationSecurityConfigurator extends JPanel {
 
     public static ApplicationSecurityConfigurator supplyCredentials(String url) {
-        ApplicationSecurityConfigurator hc = getDefault();
-        hc.setupDefineCredentials();
+        ApplicationSecurityConfigurator asc = getDefault();
+        asc.setupDefineCredentials();
 
+        final String title = "Supply Security Credentials: " + url;
+        final JLabel titleLabel = new JLabel(title);
         final DialogDescriptor dd = new DialogDescriptor(
-                hc, "Supply Security Credentials: " + url, true,
-                new Object[]{hc.okButton, DialogDescriptor.CANCEL_OPTION},
-                hc.okButton, 0, null, null);
+                asc, title, true,
+                new Object[]{asc.okButton, DialogDescriptor.CANCEL_OPTION},
+                asc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
         d.pack();
+        d.setSize(titleLabel.getPreferredSize().width + 120,
+                d.getPreferredSize().height);
         d.setVisible(true);
 
-        if (dd.getValue() == hc.okButton) {
-            return hc;
+        if (dd.getValue() == asc.okButton) {
+            return asc;
         } else {
             return null;
         }
@@ -93,7 +97,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
     private void setupDefineCredentials() {
         usernameField.setEnabled(true);
         usernameField.setText("");
-        usernameField.setEnabled(true);
+        passwordField.setEnabled(true);
         passwordField.setText("");
     }
 
@@ -125,7 +129,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         // usernameField
         usernameField = new JTextField();
         usernameField.setPreferredSize(
-                new Dimension(250, usernameField.getPreferredSize().height));
+                new Dimension(200, usernameField.getPreferredSize().height));
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();
@@ -160,7 +164,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         // passwordField
         passwordField = new JPasswordField();
         passwordField.setPreferredSize(
-                new Dimension(250, passwordField.getPreferredSize().height));
+                new Dimension(200, passwordField.getPreferredSize().height));
         passwordField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();
