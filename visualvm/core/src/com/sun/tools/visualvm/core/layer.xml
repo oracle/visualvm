@@ -37,6 +37,33 @@
             <file name="com-sun-tools-visualvm-core-snapshot-DeleteSnapshotAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.DeleteSnapshotAction.getInstance"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-host-AddRemoteHostAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.host.AddRemoteHostAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-application-AddJMXConnectionAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.application.AddJMXConnectionAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-coredump-AddVMCoredumpAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.coredump.AddVMCoredumpAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-application-AddApplicationSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.application.AddApplicationSnapshotAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.threaddump.ThreadDumpAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-heapdump-HeapDumpAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.heapdump.HeapDumpAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-explorer-OpenDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.OpenDataSourceAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-model-dsdescr-RenameDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.model.dsdescr.RenameDataSourceAction.getInstance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshotAction.getInstance"/>
+            </file>
         </folder>
         <folder name="Window">
             <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
@@ -62,6 +89,50 @@
          <folder name="Applications">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
             <attr name="position" intvalue="200"/>
+            <file name="com-sun-tools-visualvm-core-host-AddRemoteHostAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-host-AddRemoteHostAction.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-application-AddJMXConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-application-AddJMXConnectionAction.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-coredump-AddVMCoredumpAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-coredump-AddVMCoredumpAction.instance"/>
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-application-AddApplicationSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-application-AddApplicationSnapshotAction.instance"/>
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="applications-separator1.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-explorer-OpenDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-explorer-OpenDataSourceAction.instance"/>
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-model-dsdescr-RenameDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-model-dsdescr-RenameDataSourceAction.instance"/>
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="applications-separator2.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.instance"/>
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-heapdump-HeapDumpAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-heapdump-HeapDumpAction.instance"/>
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.instance"/>
+                <attr name="position" intvalue="1100"/>
+            </file>
         </folder>
         <folder name="Window">
             <file name="ExplorerTopComponentAction.shadow">

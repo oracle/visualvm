@@ -26,12 +26,8 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -41,9 +37,7 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSource>
 
     private static OpenDataSourceSupport instance;
     
-    private final OpenDataSourceAction openDataSourceAction = new OpenDataSourceAction(); 
-
-
+    
     public static synchronized OpenDataSourceSupport getInstance() {
         if (instance == null) instance = new OpenDataSourceSupport();
         return instance;
@@ -59,30 +53,13 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSource>
     
 
     public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) {
-        if (DataSourceWindowFactory.sharedInstance().canCreateWindowFor(dataSource))
-            return new ExplorerActionDescriptor(openDataSourceAction, 0);
+        if (OpenDataSourceAction.getInstance().isEnabled())
+            return new ExplorerActionDescriptor(OpenDataSourceAction.getInstance(), 0);
         else return null;
     }
 
     public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
         return Collections.EMPTY_SET;
-    }
-    
-    
-    private class OpenDataSourceAction extends AbstractAction {
-        
-        public OpenDataSourceAction() {
-            super("Open");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            DataSource dataSource = (DataSource)e.getSource();
-            DataSource viewMaster = dataSource.getMaster();
-            if (viewMaster != null) DataSourceWindowManager.sharedInstance().addViews(viewMaster, dataSource);
-            else DataSourceWindowManager.sharedInstance().openWindow(dataSource);
-            
-        }
-        
     }
 
 }

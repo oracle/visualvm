@@ -29,10 +29,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -41,8 +39,6 @@ import javax.swing.AbstractAction;
 final class DataSourceDescriptorActionProvider {
 
     private static DataSourceDescriptorActionProvider instance;
-    
-    private final RenameDataSourceAction renameDataSourceAction = new RenameDataSourceAction();
     
 
     public static synchronized DataSourceDescriptorActionProvider getInstance() {
@@ -59,20 +55,6 @@ final class DataSourceDescriptorActionProvider {
     }
     
     
-    private class RenameDataSourceAction extends AbstractAction {
-        
-        public RenameDataSourceAction() {
-            super("Rename...");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            DataSource dataSource = (DataSource)e.getSource();
-            RenameConfigurator configurator = RenameConfigurator.defineName(dataSource);
-            if (configurator != null) DataSourceDescriptorFactory.getDescriptor(dataSource).setName(configurator.getName());
-        }
-        
-    }
-    
     private class DataSourceActionsProvider implements ExplorerActionsProvider<DataSource> {
         
         public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) {
@@ -80,8 +62,8 @@ final class DataSourceDescriptorActionProvider {
         }
 
         public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
-            if (DataSourceDescriptorFactory.getDescriptor(dataSource).supportsRename())
-                return Collections.singleton(new ExplorerActionDescriptor(renameDataSourceAction, 90));
+            if (RenameDataSourceAction.getInstance().isEnabled())
+                return Collections.singleton(new ExplorerActionDescriptor(RenameDataSourceAction.getInstance(), 90));
             else return Collections.EMPTY_SET;
         }
         

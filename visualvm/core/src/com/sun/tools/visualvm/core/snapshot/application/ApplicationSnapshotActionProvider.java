@@ -31,11 +31,9 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -44,9 +42,6 @@ import javax.swing.AbstractAction;
 final class ApplicationSnapshotActionProvider {
 
     private static ApplicationSnapshotActionProvider instance;
-    
-    private final AddApplicationSnapshotAction addApplicationSnapshotAction = new AddApplicationSnapshotAction();
-    private final SaveApplicationAction saveApplicationAction = new SaveApplicationAction();
 
 
     public static synchronized ApplicationSnapshotActionProvider getInstance() {
@@ -65,40 +60,10 @@ final class ApplicationSnapshotActionProvider {
     }
     
     
-    private class AddApplicationSnapshotAction extends AbstractAction {
-        
-        public AddApplicationSnapshotAction() {
-            super("Add Application Snapshot...");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            ApplicationSnapshotConfigurator newSnapshotConfiguration = ApplicationSnapshotConfigurator.defineSnapshot();
-            if (newSnapshotConfiguration != null) {
-                ApplicationSnapshotProvider provider = ApplicationSnapshotsSupport.getInstance().getSnapshotProvider();
-                provider.addSnapshotArchive(newSnapshotConfiguration.getSnapshotFile(), newSnapshotConfiguration.deleteSourceFile());
-            }
-        }
-        
-    }
-    
-    private class SaveApplicationAction extends AbstractAction {
-        
-        public SaveApplicationAction() {
-            super("Save Snapshot");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            Application dataSource = (Application)e.getSource();
-            ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(dataSource, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-        }
-        
-    }
-    
-    
     private class AddApplicationSnapshotActionProvider implements ExplorerActionsProvider<SnapshotsContainer> {
         
         public ExplorerActionDescriptor getDefaultAction(SnapshotsContainer container) {
-            return new ExplorerActionDescriptor(addApplicationSnapshotAction, 0);
+            return new ExplorerActionDescriptor(AddApplicationSnapshotAction.getInstance(), 0);
         }
 
         public Set<ExplorerActionDescriptor> getActions(SnapshotsContainer container) {
@@ -114,7 +79,7 @@ final class ApplicationSnapshotActionProvider {
         }
 
         public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
-            return Collections.singleton(new ExplorerActionDescriptor(addApplicationSnapshotAction, 40));
+            return Collections.singleton(new ExplorerActionDescriptor(AddApplicationSnapshotAction.getInstance(), 40));
         }
         
     }
@@ -122,13 +87,16 @@ final class ApplicationSnapshotActionProvider {
     private class SaveApplicationActionProvider implements ExplorerActionsProvider<Application> {
         
         public ExplorerActionDescriptor getDefaultAction(Application application) {
-            if (!application.getSnapshots().isEmpty())
-                return new ExplorerActionDescriptor(saveApplicationAction, 10);
-            else return null;
+            return null;
         }
 
         public Set<ExplorerActionDescriptor> getActions(Application application) {
-            return Collections.EMPTY_SET;
+            Set<ExplorerActionDescriptor> actions = new HashSet();
+            
+            if (ApplicationSnapshotAction.getInstance().isEnabled())
+                actions.add(new ExplorerActionDescriptor(ApplicationSnapshotAction.getInstance(), 30));
+            
+            return actions;
         }
         
     }

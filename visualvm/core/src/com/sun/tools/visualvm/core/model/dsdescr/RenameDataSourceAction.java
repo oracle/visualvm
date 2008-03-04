@@ -22,69 +22,56 @@
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
-package com.sun.tools.visualvm.core.snapshot;
+package com.sun.tools.visualvm.core.model.dsdescr;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import org.openide.util.Utilities;
 
-public final class SaveSnapshotAsAction extends AbstractAction {
+public final class RenameDataSourceAction extends AbstractAction {
     
-    private static SaveSnapshotAsAction instance;
-    private static SaveSnapshotAsAction noIconInstance;
-    
-    private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png");
-    private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot24.png");
+    private static RenameDataSourceAction instance;
     
     
-    public static synchronized SaveSnapshotAsAction getInstance() {
-        if (instance == null) instance = new SaveSnapshotAsAction();
+    public static synchronized RenameDataSourceAction getInstance() {
+        if (instance == null) instance = new RenameDataSourceAction();
         return instance;
     }
     
-    public static synchronized SaveSnapshotAsAction getNoIconInstance() {
-        if (noIconInstance == null) {
-            noIconInstance = new SaveSnapshotAsAction();
-            noIconInstance.putValue(Action.SMALL_ICON, null);
-            noIconInstance.putValue("iconBase", null);
-        }
-        return noIconInstance;
-    }
-    
     public void actionPerformed(ActionEvent e) {
-        Snapshot selectedSnapshot = getSelectedSnapshot();
-        if (selectedSnapshot != null && selectedSnapshot.supportsSaveAs()) selectedSnapshot.saveAs();
+        DataSource selectedDataSource = getSelectedDataSource();
+        DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
+        if (descriptor != null && descriptor.supportsRename()) {
+            RenameConfigurator configurator = RenameConfigurator.defineName(selectedDataSource);
+            if (configurator != null) descriptor.setName(configurator.getName());
+        } else {
+            System.err.println("Cannot rename DataSource " + selectedDataSource);
+        }
     }
     
-    void updateEnabled() {
-        final Snapshot selectedSnapshot = getSelectedSnapshot();
+    private void updateEnabled() {
+        DataSource selectedDataSource = getSelectedDataSource();
+        final DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                setEnabled(selectedSnapshot != null && selectedSnapshot.supportsSaveAs());
+                setEnabled(descriptor != null && descriptor.supportsRename());
             }
         });
     }
     
-    private Snapshot getSelectedSnapshot() {
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
-        if (selectedDataSource == null) return null;
-        return selectedDataSource instanceof Snapshot ? (Snapshot)selectedDataSource : null;
+    private DataSource getSelectedDataSource() {
+        return ExplorerSupport.sharedInstance().getSelectedDataSource();
     }
     
     
-    private SaveSnapshotAsAction() {
-        putValue(Action.NAME, "Save As...");
-        putValue(Action.SHORT_DESCRIPTION, "Save Snapshot As");
-        putValue(Action.SMALL_ICON, new ImageIcon(ICON_16));
-        putValue("iconBase", new ImageIcon(ICON_24));
+    private RenameDataSourceAction() {
+        putValue(Action.NAME, "Rename...");
+        putValue(Action.SHORT_DESCRIPTION, "Rename");
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {

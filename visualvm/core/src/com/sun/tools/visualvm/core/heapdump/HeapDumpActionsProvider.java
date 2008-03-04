@@ -25,18 +25,12 @@
 
 package com.sun.tools.visualvm.core.heapdump;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVM;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -44,70 +38,58 @@ import javax.swing.AbstractAction;
  */
 class HeapDumpActionsProvider {
     
-    private final TakeApplicationHeapDumpAction takeApplicationHeapDumpAction = new TakeApplicationHeapDumpAction();
-    private final TakeCoreDumpHeapDumpAction takeCoreDumpHeapDumpAction = new TakeCoreDumpHeapDumpAction();
-    
 
     void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationActionProvider(), Application.class);
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDump.class);
-    }    
-    
-    
-    private class TakeApplicationHeapDumpAction extends AbstractAction {
-        
-        public TakeApplicationHeapDumpAction() {
-            super("Heap Dump");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            Application application = (Application)e.getSource();
-            HeapDumpSupport.getInstance().getHeapDumpProvider().createHeapDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-        }
-        
+//        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationActionProvider(), Application.class);
+//        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDump.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HeapDumpActionProvider(), DataSource.class);
     }
     
-    private class TakeCoreDumpHeapDumpAction extends AbstractAction {
-        
-        public TakeCoreDumpHeapDumpAction() {
-            super("Heap Dump");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            CoreDump coreDump = (CoreDump)e.getSource();
-            HeapDumpSupport.getInstance().getHeapDumpProvider().createHeapDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-        }
-        
-    }
     
-    private class ApplicationActionProvider implements ExplorerActionsProvider<Application> {
+    private class HeapDumpActionProvider implements ExplorerActionsProvider<DataSource> {
 
-        public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) { return null; }
 
-        public Set<ExplorerActionDescriptor> getActions(Application application) {
+        public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            JVM jvm = JVMFactory.getJVMFor(application);
-            if (jvm.isTakeHeapDumpSupported())
-                actions.add(new ExplorerActionDescriptor(takeApplicationHeapDumpAction, 20));
+            if (HeapDumpAction.getInstance().isEnabled())
+                actions.add(new ExplorerActionDescriptor(HeapDumpAction.getInstance(), 20));
             
             return actions;
         }
         
     }
     
-    private class CoreDumpActionProvider implements ExplorerActionsProvider<CoreDump> {
-
-        public ExplorerActionDescriptor getDefaultAction(CoreDump coreDump) { return null; }
-
-        public Set<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(takeCoreDumpHeapDumpAction, 20));
-            
-            return actions;
-        }
-        
-    }
+    
+//    private class ApplicationActionProvider implements ExplorerActionsProvider<Application> {
+//
+//        public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
+//
+//        public Set<ExplorerActionDescriptor> getActions(Application application) {
+//            Set<ExplorerActionDescriptor> actions = new HashSet();
+//            
+//            JVM jvm = JVMFactory.getJVMFor(application);
+//            if (jvm.isTakeHeapDumpSupported())
+//                actions.add(new ExplorerActionDescriptor(takeApplicationHeapDumpAction, 20));
+//            
+//            return actions;
+//        }
+//        
+//    }
+//    
+//    private class CoreDumpActionProvider implements ExplorerActionsProvider<CoreDump> {
+//
+//        public ExplorerActionDescriptor getDefaultAction(CoreDump coreDump) { return null; }
+//
+//        public Set<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
+//            Set<ExplorerActionDescriptor> actions = new HashSet();
+//            
+//            actions.add(new ExplorerActionDescriptor(takeCoreDumpHeapDumpAction, 20));
+//            
+//            return actions;
+//        }
+//        
+//    }
 
 }
