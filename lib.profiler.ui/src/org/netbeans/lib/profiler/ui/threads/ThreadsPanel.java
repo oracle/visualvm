@@ -619,7 +619,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         if (e.getSource() == scaleToFitButton) {
             if (!scaleToFit) {
                 scrollBar.setVisible(true);
-                scaleToFitButton.setIcon(new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/zoom.png"))); // NOI18N
+                scaleToFitButton.setIcon(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoom.png"))); // NOI18N
                 scaleToFit = true;
             } else {
                 scaleToFit = false;
