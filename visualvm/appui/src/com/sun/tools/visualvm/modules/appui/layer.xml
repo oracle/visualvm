@@ -100,4 +100,7 @@
         </folder>
         <file name="Profile_hidden"/>
     </folder>
+    <folder name="Windows2">
+        <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
+    </folder>
 </filesystem>
