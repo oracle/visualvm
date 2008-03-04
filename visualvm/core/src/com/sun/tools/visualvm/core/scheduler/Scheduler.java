@@ -158,7 +158,9 @@ public class Scheduler implements PropertyChangeListener {
                                     System.out.println("Finished");
                                 }
                             } catch (Exception e) {
-                                LOGGER.log(Level.SEVERE, "Exception in scheduler", e);
+                                if (LOGGER.isLoggable(Level.WARNING)) {
+                                    LOGGER.log(Level.WARNING, "Exception in scheduler", e);
+                                }
                             }
                         }
                     }, 0, interval.interval, interval.unit);
