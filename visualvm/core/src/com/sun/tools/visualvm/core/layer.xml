@@ -59,6 +59,10 @@
                 <attr name="position" intvalue="1600"/>
             </file>
         </folder>
+         <folder name="Applications">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
+            <attr name="position" intvalue="200"/>
+        </folder>
         <folder name="Window">
             <file name="ExplorerTopComponentAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
