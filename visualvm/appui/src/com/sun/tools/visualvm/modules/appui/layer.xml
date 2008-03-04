@@ -39,7 +39,7 @@
         <file name="Edit_hidden"/>
         <folder name="File">
             <file name="Separator2.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance" url="org-netbeans-modules-profiler-actions-CompareSnapshotsAction_1.instance">
+            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance">
                 <attr name="position" intvalue="2150"/>
             </file>
             <file name="org-openide-actions-PageSetupAction.instance_hidden"/>
