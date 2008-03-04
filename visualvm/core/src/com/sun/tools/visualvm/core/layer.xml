@@ -61,6 +61,9 @@
             <file name="com-sun-tools-visualvm-core-model-dsdescr-RenameDataSourceAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.model.dsdescr.RenameDataSourceAction.getInstance"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-profiler-ProfileApplicationAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.profiler.ProfileApplicationAction.getInstance"/>
+            </file>
             <file name="com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshotAction.getInstance"/>
             </file>
@@ -129,9 +132,13 @@
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-heapdump-HeapDumpAction.instance"/>
                 <attr name="position" intvalue="1000"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-profiler-ProfileApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-profiler-ProfileApplicationAction.instance"/>
+                <attr name="position" intvalue="1100"/>
+            </file>
             <file name="com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.instance"/>
-                <attr name="position" intvalue="1100"/>
+                <attr name="position" intvalue="1200"/>
             </file>
         </folder>
         <folder name="Window">

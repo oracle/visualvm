@@ -69,10 +69,14 @@ public final class ProfilerSupport {
     }
     
     void selectActiveProfilerView() {
-        if (profiledApplication == null) return;
-        Set<? extends DataSourceView> activeViewSet = profilerViewProvider.getViews(profiledApplication);
+        selectProfilerView(profiledApplication);
+    }
+    
+    void selectProfilerView(Application application) {
+        if (application == null) return;
+        Set<? extends DataSourceView> activeViewSet = profilerViewProvider.getViews(application);
         if (activeViewSet.isEmpty()) return;
-        DataSourceWindowManager.sharedInstance().addView(profiledApplication, activeViewSet.iterator().next());
+        DataSourceWindowManager.sharedInstance().addView(application, activeViewSet.iterator().next());
     }
     
     
@@ -147,6 +151,8 @@ public final class ProfilerSupport {
         
         category = new ProfilerSnapshotCategory();
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        
+        ProfilerActionsProvider.getInstance().initialize();
         
         checkCalibration();
     }
