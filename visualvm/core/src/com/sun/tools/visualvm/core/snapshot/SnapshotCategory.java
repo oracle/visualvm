@@ -103,6 +103,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     public void openSnapshot(File file) {
+        throw new UnsupportedOperationException("Open snapshot not supported");
     }
     
     

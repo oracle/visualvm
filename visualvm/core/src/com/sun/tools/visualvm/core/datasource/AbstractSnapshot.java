@@ -102,6 +102,7 @@ public abstract class AbstractSnapshot extends AbstractDataSource implements Sna
     }
     
     public void saveAs() {
+        throw new UnsupportedOperationException("Save as not supported");
     }
     
     public boolean supportsDelete() {
