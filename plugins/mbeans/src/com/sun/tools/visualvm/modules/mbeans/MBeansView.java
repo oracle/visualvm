@@ -95,6 +95,7 @@ class MBeansView extends DataSourceView {
         mbeansDisplayArea.addTab(new DisplayArea.Tab("Operations", mbeansOperationsView));
         mbeansDisplayArea.addTab(new DisplayArea.Tab("Notifications", mbeansNotificationsView));
         mbeansDisplayArea.addTab(new DisplayArea.Tab("Metadata", mbeansMetadataView));
+        mbeansTab.setDisplayArea(mbeansDisplayArea);
 
         JExtendedSplitPane contentsSplitPane = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, mbeansTreeView, mbeansDisplayArea);
         tweakSplitPaneUI(contentsSplitPane);

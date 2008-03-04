@@ -177,6 +177,7 @@ class XSheet extends JPanel
             return;
         }
         currentNode = node;
+        clearNotifications();
         Object userObject = node.getUserObject();
         if (userObject instanceof XNodeInfo) {
             XNodeInfo uo = (XNodeInfo) userObject;
@@ -476,7 +477,7 @@ class XSheet extends JPanel
                     if (isBroadcaster != null && isBroadcaster.booleanValue()) {
                         if (!isSelectedNode(node, currentNode)) return;
                         mbeanNotifications.loadNotifications(mbean);
-//                        updateNotifications();
+                        updateNotifications();
                         invalidate();
                         topPanelNotifications.removeAll();
                         JPanel borderPanel = new JPanel(new BorderLayout());
@@ -517,13 +518,22 @@ class XSheet extends JPanel
     // Call on EDT
     private void displayEmptyNode() {
         invalidate();
+        topPanelAttributes.invalidate();
         topPanelAttributes.removeAll();
+        topPanelAttributes.validate();
+        topPanelAttributes.repaint();
         topPanelOperations.invalidate();
         topPanelOperations.removeAll();
         topPanelOperations.validate();
         topPanelOperations.repaint();
+        topPanelNotifications.invalidate();
         topPanelNotifications.removeAll();
+        topPanelNotifications.validate();
+        topPanelNotifications.repaint();
+        topPanelMetadata.invalidate();
         topPanelMetadata.removeAll();
+        topPanelMetadata.validate();
+        topPanelMetadata.repaint();
         validate();
         repaint();
     }
@@ -543,7 +553,7 @@ class XSheet extends JPanel
             protected void done() {
                 try {
                     get();
-//                    updateNotifications();
+                    updateNotifications();
                     validate();
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
@@ -569,7 +579,7 @@ class XSheet extends JPanel
             protected void done() {
                 try {
                     if (get()) {
-//                        updateNotifications();
+                        updateNotifications();
                         validate();
                     }
                 } catch (Exception e) {
@@ -594,7 +604,7 @@ class XSheet extends JPanel
     private void updateNotifications() {
         if (mbeanNotifications.isListenerRegistered(mbean)) {
             long received = mbeanNotifications.getReceivedNotifications(mbean);
-            updateReceivedNotifications(currentNode, received, false);
+            updateReceivedNotifications(currentNode, received);
         } else {
             clearNotifications();
         }
@@ -605,13 +615,8 @@ class XSheet extends JPanel
      */
     // Call on EDT
     private void updateReceivedNotifications(
-            DefaultMutableTreeNode emitter, long received, boolean bold) {
+            DefaultMutableTreeNode emitter, long received) {
         String text = Resources.getText("Notifications") + "[" + received + "]";
-        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)
-        mbeansTab.getTree().getLastSelectedPathComponent();
-        if (bold && emitter != selectedNode) {
-            text = "<html><b>" + text + "</b></html>";
-        }
         updateNotificationsNodeLabel(emitter, text);
     }
     
@@ -639,19 +644,20 @@ class XSheet extends JPanel
     // Call on EDT
     private void updateNotificationsNodeLabel(
             DefaultMutableTreeNode node, String label) {
-        synchronized (mbeansTab.getTree()) {
-            invalidate();
-            XNodeInfo oldUserObject = (XNodeInfo) node.getUserObject();
-            XNodeInfo newUserObject = new XNodeInfo(
-                    oldUserObject.getType(), oldUserObject.getData(),
-                    label, oldUserObject.getToolTipText());
-            node.setUserObject(newUserObject);
-            DefaultTreeModel model =
-                    (DefaultTreeModel) mbeansTab.getTree().getModel();
-            model.nodeChanged(node);
-            validate();
-            repaint();
+        // Find Notifications TabButton and update text
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)
+                mbeansTab.getTree().getLastSelectedPathComponent();
+        if (node != selectedNode) {
+            return;
         }
+        invalidate();
+        JComponent captionArea = (JComponent) mbeansTab.getDisplayArea().getComponent(0);
+        JComponent tabsContainer = (JComponent) captionArea.getComponent(0);
+        JComponent tabButtonContainer = (JComponent) tabsContainer.getComponent(2);
+        JButton tabButton = (JButton) tabButtonContainer.getComponent(0);
+        tabButton.setText(label);
+        validate();
+        repaint();
     }
     
     /**
@@ -660,21 +666,21 @@ class XSheet extends JPanel
     // Call on EDT
     private void clearCurrentNotifications() {
         mbeanNotifications.clearCurrentNotifications();
-//        if (mbeanNotifications.isListenerRegistered(mbean)) {
-//            // Update notifs in MBean tree "Notifications[0]".
-//            //
-//            // Notification buffer has been cleared with a listener been
-//            // registered so add "[0]" at the end of the node label.
-//            //
-//            clearNotifications0();
-//        } else {
-//            // Update notifs in MBean tree "Notifications".
-//            //
-//            // Notification buffer has been cleared without a listener been
-//            // registered so don't add "[0]" at the end of the node label.
-//            //
-//            clearNotifications();
-//        }
+        if (mbeanNotifications.isListenerRegistered(mbean)) {
+            // Update notifs in MBean tree "Notifications[0]".
+            //
+            // Notification buffer has been cleared with a listener been
+            // registered so add "[0]" at the end of the node label.
+            //
+            clearNotifications0();
+        } else {
+            // Update notifs in MBean tree "Notifications".
+            //
+            // Notification buffer has been cleared without a listener been
+            // registered so don't add "[0]" at the end of the node label.
+            //
+            clearNotifications();
+        }
     }
     
     // Call on EDT
@@ -743,7 +749,7 @@ class XSheet extends JPanel
                 XMBeanNotifications.NOTIFICATION_RECEIVED_EVENT)) {
             DefaultMutableTreeNode emitter = (DefaultMutableTreeNode) handback;
             Long received = (Long) e.getUserData();
-//            updateReceivedNotifications(emitter, received.longValue(), true);
+            updateReceivedNotifications(emitter, received.longValue());
         }
     }
     

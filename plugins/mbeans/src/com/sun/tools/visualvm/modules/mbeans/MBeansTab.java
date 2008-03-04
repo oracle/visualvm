@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.model.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.core.ui.components.DisplayArea;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.*;
@@ -45,6 +46,7 @@ class MBeansTab extends JPanel implements
         TreeSelectionListener, TreeWillExpandListener {
     
     private Application application;
+    private DisplayArea displayArea;
     private XTree tree;
     private XSheet sheet;
     private XDataViewer viewer;
@@ -94,6 +96,14 @@ class MBeansTab extends JPanel implements
     
     public JPanel getMetadataPanel() {
         return sheet.getMetadata();
+    }
+    
+    public DisplayArea getDisplayArea() {
+        return displayArea;
+    }
+    
+    public void setDisplayArea(DisplayArea displayArea) {
+        this.displayArea = displayArea;
     }
     
     public void dispose() {
