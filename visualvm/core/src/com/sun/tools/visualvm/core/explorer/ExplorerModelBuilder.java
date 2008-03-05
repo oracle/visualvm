@@ -83,90 +83,98 @@ class ExplorerModelBuilder {
     
     
     private void processAddedDataSources(final Set<DataSource> added) {
-        final Set<ExplorerNode> addedNodes = new HashSet();
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                final Set<ExplorerNode> addedNodes = new HashSet();
 
-        for (DataSource dataSource : added) {
+                for (DataSource dataSource : added) {
 
-            if (dataSource.isVisible()) {
-                // Process DataSource
-                if (dataSource != DataSource.ROOT) {
-                    final ExplorerNode node = new ExplorerNode(dataSource);
-                    addedNodes.add(node);
+                    if (dataSource.isVisible()) {
+                        // Process DataSource
+                        if (dataSource != DataSource.ROOT) {
+                            final ExplorerNode node = new ExplorerNode(dataSource);
+                            addedNodes.add(node);
 
-                    DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-                    PropertyChangeListener descriptorListener = new PropertyChangeListener() {
+                            DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+                            PropertyChangeListener descriptorListener = new PropertyChangeListener() {
+                                public void propertyChange(PropertyChangeEvent evt) {
+                                    updateNode(node, evt);
+                                }
+                            };
+                            descriptor.addPropertyChangeListener(descriptorListener);
+                            descriptorListeners.put(descriptor, descriptorListener);
+                            updateNode(node, descriptor);
+                        }
+
+                        // Process repository of the DataSource
+                        DataSourceContainer repository = dataSource.getRepository();
+                        DataChangeListener repositoryListener = new DataChangeListener() {
+                            public void dataChanged(DataChangeEvent event) {
+                                processRemovedDataSources(event.getRemoved());
+                                processAddedDataSources(event.getAdded());
+                            }
+                        };
+                        repository.addDataChangeListener(repositoryListener, DataSource.class);
+                        repositoryListeners.put(repository, repositoryListener);
+                    }
+
+                    // Track visibility of the DataSource
+                    PropertyChangeListener visibilityListener = new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
-                            updateNode(node, evt);
+                            processRemovedDataSources(Collections.singleton((DataSource)evt.getSource()));
+                            processAddedDataSources(Collections.singleton((DataSource)evt.getSource()));
                         }
                     };
-                    descriptor.addPropertyChangeListener(descriptorListener);
-                    descriptorListeners.put(descriptor, descriptorListener);
-                    updateNode(node, descriptor);
+                    dataSource.addPropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
+                    visibilityListeners.put(dataSource, visibilityListener);
+
                 }
 
-                // Process repository of the DataSource
-                DataSourceContainer repository = dataSource.getRepository();
-                DataChangeListener repositoryListener = new DataChangeListener() {
-                    public void dataChanged(DataChangeEvent event) {
-                        processRemovedDataSources(event.getRemoved());
-                        processAddedDataSources(event.getAdded());
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        addNodes(addedNodes);
                     }
-                };
-                repository.addDataChangeListener(repositoryListener, DataSource.class);
-                repositoryListeners.put(repository, repositoryListener);
-            }
-
-            // Track visibility of the DataSource
-            PropertyChangeListener visibilityListener = new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    processRemovedDataSources(Collections.singleton((DataSource)evt.getSource()));
-                    processAddedDataSources(Collections.singleton((DataSource)evt.getSource()));
-                }
-            };
-            dataSource.addPropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
-            visibilityListeners.put(dataSource, visibilityListener);
-
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                addNodes(addedNodes);
+                });
             }
         });
     }
     
     private void processRemovedDataSources(final Set<DataSource> removed) {
-        final Set<ExplorerNode> removedNodes = new HashSet();
-
-        for (DataSource dataSource : removed) {
-
-            // Track visibility of the DataSource
-            PropertyChangeListener visibilityListener = visibilityListeners.get(dataSource);
-            dataSource.removePropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
-            visibilityListeners.remove(dataSource);
-
-            // Process repository of the DataSource
-            DataSourceContainer repository = dataSource.getRepository();
-            DataChangeListener repositoryListener = repositoryListeners.get(repository);
-            if (repositoryListener != null) {
-                repository.removeDataChangeListener(repositoryListener);
-                repositoryListeners.remove(repository);
-                processRemovedDataSources(repository.getDataSources());
-
-                // Process DataSource
-                ExplorerNode node = getNodeFor(dataSource);
-                removedNodes.add(node);
-
-                DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-                descriptor.removePropertyChangeListener(descriptorListeners.get(descriptor));
-                descriptorListeners.remove(descriptor);
-            }
-
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
+        RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                removeNodes(removedNodes);
+                final Set<ExplorerNode> removedNodes = new HashSet();
+
+                for (DataSource dataSource : removed) {
+
+                    // Track visibility of the DataSource
+                    PropertyChangeListener visibilityListener = visibilityListeners.get(dataSource);
+                    dataSource.removePropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
+                    visibilityListeners.remove(dataSource);
+
+                    // Process repository of the DataSource
+                    DataSourceContainer repository = dataSource.getRepository();
+                    DataChangeListener repositoryListener = repositoryListeners.get(repository);
+                    if (repositoryListener != null) {
+                        repository.removeDataChangeListener(repositoryListener);
+                        repositoryListeners.remove(repository);
+                        processRemovedDataSources(repository.getDataSources());
+
+                        // Process DataSource
+                        ExplorerNode node = getNodeFor(dataSource);
+                        removedNodes.add(node);
+
+                        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+                        descriptor.removePropertyChangeListener(descriptorListeners.get(descriptor));
+                        descriptorListeners.remove(descriptor);
+                    }
+
+                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeNodes(removedNodes);
+                    }
+                });
             }
         });
     }
