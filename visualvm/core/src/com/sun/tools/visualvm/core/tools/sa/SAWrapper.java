@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.logging.Logger;
 
 /**
  *
@@ -39,6 +40,8 @@ import java.net.URLClassLoader;
  * @author Luis-Miguel Alventosa
  */
 class SAWrapper {
+    private static final Logger LOGGER = Logger.getLogger(SAWrapper.class.getName());
+    
     URLClassLoader loader;
     File libraryPath;
 
@@ -55,13 +58,13 @@ class SAWrapper {
             osArch = "i386";
         }
         libraryPath = new File(jdkHome, "jre/lib/" + osArch);
-        System.out.println("Path " + libraryPath.getAbsolutePath());
+        LOGGER.fine("Path " + libraryPath.getAbsolutePath());
         loader = new URLClassLoader(saJarUrls) {
             @Override
             protected String findLibrary(String libname) {
                 String name = System.mapLibraryName(libname);
                 File library = new File(libraryPath, name);
-                System.out.println("Library " + library.getAbsolutePath());
+                LOGGER.fine("Library " + library.getAbsolutePath());
                 if (library.exists() && library.canRead()) {
                     String absPath = temporaryLibrary(library);
                     if (absPath != null) {
@@ -95,7 +98,7 @@ class SAWrapper {
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("WARNING: Failed to load library (" +
+                    LOGGER.warning("Failed to load library (" +
                             library.getName() + "): " + e);
                     return null;
                 }

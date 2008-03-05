@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
@@ -352,7 +353,9 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
      * @param event the object describing the event.
      */
     public void disconnected(VmEvent event) {
-        System.out.println("Disconnect "+event.getMonitoredVm().getVmIdentifier());
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Disconnect "+event.getMonitoredVm().getVmIdentifier());
+        }
         disableListeners();
     }
     

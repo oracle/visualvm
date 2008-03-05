@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.model.Model;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * This class encapsulates functionality of the target Java application. Use
@@ -36,7 +37,8 @@ import java.util.Properties;
  * @author Tomas Hurka
  */
 public abstract class JVM extends Model {
-
+    protected static final Logger LOGGER = Logger.getLogger(JVM.class.getName());
+    
     /**
      * Tests if target JVM is JRE 1.4.
      * @return <CODE>true</CODE> if JVM is JRE 1.4, <CODE>false</CODE> otherwise

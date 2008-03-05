@@ -38,6 +38,7 @@ import com.sun.tools.visualvm.core.tools.HeapDump;
 import com.sun.tools.visualvm.core.tools.StackTrace;
 import com.sun.tools.visualvm.core.tools.SystemProperties;
 import com.sun.tools.visualvm.core.tools.VMOption;
+import java.util.logging.Level;
 import sun.jvmstat.monitor.MonitoredVm;
 
 /**
@@ -132,7 +133,7 @@ public class SunJVM_6 extends SunJVM_5 {
                 if ("-XX:+HeapDumpOnOutOfMemoryError".equals(dumpFlag)) {
                     return true;
                 }
-                System.out.println("Invalid return value "+dumpFlag);
+                LOGGER.warning("Invalid return value "+dumpFlag);
             }
             return false;
         }
@@ -146,7 +147,7 @@ public class SunJVM_6 extends SunJVM_5 {
         }
         err=err.concat(enableHeapDumpOnOOMErrorFlag(enabled));
         if (err.length()!=0) {
-            System.out.println("setDumpOnOOMEnabled "+err);
+            LOGGER.warning("setDumpOnOOMEnabled "+err);
         }
     }
     
@@ -159,7 +160,9 @@ public class SunJVM_6 extends SunJVM_5 {
         String name = HeapDumpSupport.getInstance().getCategory().createFileName();
         File dumpFile = new File(snapshotDir,name);
         String dump = takeHeapDump(dumpFile.getAbsolutePath());
-        System.out.println("Dump "+dump);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Dump "+dump);
+        }
         return dumpFile;
     }
     

@@ -155,7 +155,7 @@ public class Scheduler implements PropertyChangeListener {
                                     }
                                 }
                                 if (LOGGER.isLoggable(Level.FINEST)) {
-                                    System.out.println("Finished");
+                                    LOGGER.finest("Finished");
                                 }
                             } catch (Exception e) {
                                 if (LOGGER.isLoggable(Level.WARNING)) {
