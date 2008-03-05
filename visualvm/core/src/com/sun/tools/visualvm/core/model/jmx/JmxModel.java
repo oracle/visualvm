@@ -161,8 +161,11 @@ public class JmxModel extends Model {
      * @param application the {@link JvmstatApplication}.
      */
     public JmxModel(JvmstatApplication application) {
-        JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
         try {
+            JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
+            Storage storage = application.getStorage();
+            String username = storage.getCustomProperty(PROPERTY_USERNAME);
+            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
             ProxyClient proxyClient = null;
             if (Application.CURRENT_APPLICATION.equals(application)) {
@@ -192,8 +195,8 @@ public class JmxModel extends Model {
                 List<String> urls = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
                 if (urls.size() != 0) {
                     List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
-                    proxyClient = new ProxyClient(this, urls.get(0), null, null);
-                    if ("true".equals(auths.get(0))) {
+                    proxyClient = new ProxyClient(this, urls.get(0), username, password);
+                    if (username != null && "true".equals(auths.get(0))) {
                         supplyCredentials(application, proxyClient);
                     }
                 } else {
@@ -215,8 +218,9 @@ public class JmxModel extends Model {
                     }
                     if (port != -1) {
                         proxyClient = new ProxyClient(this,
-                                application.getHost().getHostName(), port, null, null);
-                        if (authenticate) {
+                                application.getHost().getHostName(),
+                                port, username, password);
+                        if (username != null && authenticate) {
                             supplyCredentials(application, proxyClient);
                         }
                     }
@@ -224,12 +228,7 @@ public class JmxModel extends Model {
             }
             if (proxyClient != null) {
                 client = proxyClient;
-                try {
-                    proxyClient.connect();
-                } catch (SecurityException e) {
-                    supplyCredentials(application, proxyClient);
-                    proxyClient.connect();
-                }
+                connect(application, proxyClient);
             }
         } catch (Exception e) {
             client = null;
@@ -251,28 +250,40 @@ public class JmxModel extends Model {
             final ProxyClient proxyClient =
                     new ProxyClient(this, url.toString(), username, password);
             client = proxyClient;
-            try {
-                proxyClient.connect();
-            } catch (SecurityException e) {
-                supplyCredentials(application, proxyClient);
-                proxyClient.connect();
-            }
+            connect(application, proxyClient);
         } catch (Exception e) {
             client = null;
             e.printStackTrace();
         }
     }
 
+    private void connect(Application application, ProxyClient proxyClient) {
+        while (true) {
+            try {
+                proxyClient.connect();
+                break;
+            } catch (SecurityException e) {
+                if (supplyCredentials(application, proxyClient) == null) {
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      *  Ask for security credentials.
      */
-    private void supplyCredentials(Application application, ProxyClient proxyClient) {
+    private ApplicationSecurityConfigurator supplyCredentials(
+            Application application, ProxyClient proxyClient) {
         ApplicationSecurityConfigurator jsc =
                 ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
-        proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
-        Storage storage = application.getStorage();
-        storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
-        storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+        if (jsc != null) {
+            proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
+            Storage storage = application.getStorage();
+            storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
+            storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+        }
+        return jsc;
     }
 
     /**
