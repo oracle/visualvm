@@ -94,7 +94,7 @@ final class ApplicationSnapshotActionProvider {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
             if (ApplicationSnapshotAction.getInstance().isEnabled())
-                actions.add(new ExplorerActionDescriptor(ApplicationSnapshotAction.getInstance(), 30));
+                actions.add(new ExplorerActionDescriptor(ApplicationSnapshotAction.getInstance(), 40));
             
             return actions;
         }
