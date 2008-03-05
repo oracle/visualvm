@@ -31,13 +31,13 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataChangeSupport;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 
 /**
  *
@@ -46,7 +46,7 @@ import java.util.WeakHashMap;
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
     
     private SortedSet<ModelProvider<M, D>> factories = new TreeSet(new ModelProviderComparator());
-    private Map<DataSourceKey<D>,Reference<M>> modelMap = new WeakHashMap();
+    private Map<DataSourceKey<D>,Reference<M>> modelMap = new HashMap();
     private DataChangeSupport<ModelProvider<M, D>> factoryChange = new DataChangeSupport();
     
     public final synchronized M getModel(D dataSource) {
@@ -71,24 +71,24 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     }
     
     public final synchronized boolean registerFactory(ModelProvider<M, D> newFactory) {
-//        System.out.println("Registering Class "+newFactory.getClass().getName());
-//        Class superClass = newFactory.getClass();
-//        ParameterizedType type = null;
-//        while(!superClass.equals(Object.class)) {
-//            Type genType =  superClass.getGenericSuperclass();
-//            if (genType instanceof ParameterizedType) {
-//                type = (ParameterizedType) genType;
-//                break;
-//            } else if (genType instanceof Class) {
-//                superClass = (Class) genType;
-//            }
-//        }
-//        if (type != null) {
-//            Type[] types = type.getActualTypeArguments();
-//            for (int i = 0; i < types.length; i++) {
-//                System.out.println("Type "+types[i]);
-//            }
-//        }
+        //        System.out.println("Registering Class "+newFactory.getClass().getName());
+        //        Class superClass = newFactory.getClass();
+        //        ParameterizedType type = null;
+        //        while(!superClass.equals(Object.class)) {
+        //            Type genType =  superClass.getGenericSuperclass();
+        //            if (genType instanceof ParameterizedType) {
+        //                type = (ParameterizedType) genType;
+        //                break;
+        //            } else if (genType instanceof Class) {
+        //                superClass = (Class) genType;
+        //            }
+        //        }
+        //        if (type != null) {
+        //            Type[] types = type.getActualTypeArguments();
+        //            for (int i = 0; i < types.length; i++) {
+        //                System.out.println("Type "+types[i]);
+        //            }
+        //        }
         boolean added = factories.add(newFactory);
         if (added) {
             clearCache();
@@ -113,7 +113,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     public void removeFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
         factoryChange.removeChangeListener(listener);
     }
-
+    
     public int depth() {
         return -1;
     }
@@ -140,25 +140,32 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     }
     
     private static class DataSourceKey<D extends DataSource>  {
-        D dataSource;
+        Reference<D> weakReference;
         
         DataSourceKey(D ds) {
-            dataSource = ds;
+            weakReference = new WeakReference(ds);
         }
-
+        
         public int hashCode() {
-            return dataSource.hashCode();
+            D ds = weakReference.get();
+            if (ds != null) {
+                return ds.hashCode();
+            }
+            return 0;
         }
-
+        
         public boolean equals(Object obj) {
             if (obj instanceof DataSourceKey) {
-                return dataSource == ((DataSourceKey)obj).dataSource;
+                D ds = weakReference.get();
+                D otherDs = ((DataSourceKey<D>)obj).weakReference.get();
+                
+                return ds != null && ds == otherDs;
             }
             throw new IllegalArgumentException(obj.getClass().getName());
         }
-
+        
         public String toString() {
-            return "DataSourceKey for "+dataSource.toString();
+            return "DataSourceKey for "+weakReference.toString();
         }
     }
 }
