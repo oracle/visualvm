@@ -144,6 +144,7 @@
         <folder name="Window">
             <file name="ExplorerTopComponentAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
+                <attr name="position" intvalue="1900"/>
             </file>
         </folder>
     </folder>
