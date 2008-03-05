@@ -49,7 +49,7 @@ class JConsoleViewProvider implements DataSourceViewsProvider<Application> {
     JConsoleViewProvider() {
     }
 
-    public boolean supportsViewFor(Application application) {
+    public boolean supportsViewsFor(Application application) {
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
         return mbsc != null;
