@@ -40,8 +40,8 @@ public final class SaveSnapshotAsAction extends AbstractAction {
     
     private static SaveSnapshotAsAction instance;
     
-    private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png");
-    private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot24.png");
+    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png";
+    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
     
     public static synchronized SaveSnapshotAsAction getInstance() {
@@ -73,8 +73,8 @@ public final class SaveSnapshotAsAction extends AbstractAction {
     private SaveSnapshotAsAction() {
         putValue(Action.NAME, "Save As...");
         putValue(Action.SHORT_DESCRIPTION, "Save Snapshot As");
-        putValue(Action.SMALL_ICON, new ImageIcon(ICON_16));
-        putValue("iconBase", new ImageIcon(ICON_24));
+        putValue(Action.SMALL_ICON, new ImageIcon(ICON));
+        putValue("iconBase", ICON_PATH);
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {

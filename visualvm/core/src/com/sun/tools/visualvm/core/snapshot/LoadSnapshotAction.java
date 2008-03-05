@@ -41,8 +41,8 @@ public final class LoadSnapshotAction extends AbstractAction {
     
     private static LoadSnapshotAction instance;
     
-    private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/loadSnapshot.png");
-    private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/loadSnapshot24.png");
+    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/loadSnapshot.png";
+    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
     private String lastFile = null;
     
@@ -84,8 +84,8 @@ public final class LoadSnapshotAction extends AbstractAction {
     private LoadSnapshotAction() {
         putValue(Action.NAME, "Load...");
         putValue(Action.SHORT_DESCRIPTION, "Load Snapshot");
-        putValue(Action.SMALL_ICON, new ImageIcon(ICON_16));
-        putValue("iconBase", new ImageIcon(ICON_24));
+        putValue(Action.SMALL_ICON, new ImageIcon(ICON));
+        putValue("iconBase", ICON_PATH);
         
         updateEnabled();
     }
