@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.core.datasupport;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -37,7 +37,6 @@ import org.openide.util.RequestProcessor;
  */
 public final class DataChangeSupport<X> {
 
-    private static final RequestProcessor queue = RequestProcessorFactory.getRequestProcessor();
     private ChangeSupport<X> changeSupport;
 
     public DataChangeSupport() {
@@ -45,7 +44,7 @@ public final class DataChangeSupport<X> {
     }
 
     public void addChangeListener(final DataChangeListener<X> listener) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 changeSupport.addChangeListener(listener);
             }
@@ -53,7 +52,7 @@ public final class DataChangeSupport<X> {
     }
 
     public void removeChangeListener(final DataChangeListener<X> listener) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 changeSupport.removeChangeListener(listener);
             }
@@ -61,7 +60,7 @@ public final class DataChangeSupport<X> {
     }
     
     public void fireChange(final Set<X> current, final Set<X> added, final Set<X> removed) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 changeSupport.fireChange(current, added, removed);
             }

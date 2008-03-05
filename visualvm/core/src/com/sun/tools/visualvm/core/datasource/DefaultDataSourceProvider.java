@@ -27,14 +27,12 @@ package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.RequestProcessorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.openide.util.RequestProcessor;
 
 /**
  * Default implementation of DataSourceProvider.
@@ -45,7 +43,6 @@ import org.openide.util.RequestProcessor;
  */
 public class DefaultDataSourceProvider<X extends DataSource> implements DataSourceProvider<X> {
 
-    private final RequestProcessor queue = RequestProcessorFactory.getRequestProcessor();
     private final Set<X> dataSources = Collections.synchronizedSet(new HashSet());
     private final Map<DataChangeListener<? extends X>, Class<? extends X>> listeners = new HashMap();
     private final DataSource owner;
@@ -64,7 +61,7 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
     
 
     public <Y extends X> void addDataChangeListener(final DataChangeListener<Y> listener, final Class<Y> scope) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 if (listeners.containsKey(listener)) throw new IllegalArgumentException("Listener " + listener + " already registered"); // NOI18N
                 listeners.put(listener, scope);
@@ -74,7 +71,7 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
     }
 
     public <Y extends X> void removeDataChangeListener(final DataChangeListener<Y> listener) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 if (!listeners.containsKey(listener)) throw new IllegalArgumentException("Listener " + listener + " not registered"); // NOI18N
                 listeners.remove(listener);
@@ -106,7 +103,7 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
      * @param added added DataSources to register.
      */
     protected <Y extends X> void registerDataSources(final Set<Y> added) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 dataSources.addAll(added);
                 if (owner != null) for (Y dataSource : added) {
@@ -136,7 +133,7 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
      * @param removed removed DataSources to unregister.
      */
     protected <Y extends X> void unregisterDataSources(final Set<Y> removed) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 dataSources.removeAll(removed);
                 if (owner != null) for (Y dataSource : removed) dataSource.setOwner(null);
@@ -152,7 +149,7 @@ public class DefaultDataSourceProvider<X extends DataSource> implements DataSour
      * @param removed removed DataSources to unregister.
      */
     protected <Y extends X> void updateDataSources(final Set<Y> added, final Set<Y> removed) {
-        queue.post(new Runnable() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 dataSources.addAll(added);
                 dataSources.removeAll(removed);

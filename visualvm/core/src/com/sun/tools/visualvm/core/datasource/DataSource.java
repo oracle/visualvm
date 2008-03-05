@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.datasource;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.datasupport.Storage;
 import java.beans.PropertyChangeListener;
+import org.openide.util.RequestProcessor;
 
 /**
  * DataSource is a general object representing a data unit within the VisualVM.
@@ -35,6 +36,8 @@ import java.beans.PropertyChangeListener;
  * @author Jiri Sedlacek
  */
 public interface DataSource {
+    
+    public static final RequestProcessor EVENT_QUEUE = new RequestProcessor("DataSource Event Queue");
 
     /**
      * Named property for DataSource owner.
