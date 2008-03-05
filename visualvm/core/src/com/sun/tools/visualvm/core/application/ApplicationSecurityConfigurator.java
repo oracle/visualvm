@@ -50,7 +50,7 @@ import org.openide.DialogDescriptor;
 public final class ApplicationSecurityConfigurator extends JPanel {
 
     public static ApplicationSecurityConfigurator supplyCredentials(String url) {
-        ApplicationSecurityConfigurator asc = getDefault();
+        ApplicationSecurityConfigurator asc = new ApplicationSecurityConfigurator();
         asc.setupDefineCredentials();
 
         final String title = "Supply Security Credentials: " + url;
@@ -80,18 +80,9 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         return new String(passwordField.getPassword());
     }
 
-    private static ApplicationSecurityConfigurator defaultInstance;
-
     private ApplicationSecurityConfigurator() {
         initComponents();
         update();
-    }
-
-    private static ApplicationSecurityConfigurator getDefault() {
-        if (defaultInstance == null) {
-            defaultInstance = new ApplicationSecurityConfigurator();
-        }
-        return defaultInstance;
     }
 
     private void setupDefineCredentials() {
