@@ -22,7 +22,6 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package com.sun.tools.visualvm.core.model.jmx;
 
 import com.sun.tools.attach.AgentInitializationException;
@@ -39,8 +38,10 @@ import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
@@ -64,6 +65,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -119,11 +122,10 @@ import sun.rmi.transport.LiveRef;
  */
 public class JmxModel extends Model {
 
+    private final static Logger LOGGER = Logger.getLogger(JmxModel.class.getName());
     private ProxyClient client;
-
     private SwingPropertyChangeSupport propertyChangeSupport =
             new SwingPropertyChangeSupport(this, true);
-
     /**
      * The {@link ConnectionState ConnectionState} bound property name.
      */
@@ -134,6 +136,7 @@ public class JmxModel extends Model {
      * <i>ConnectionState</i>} bound property.
      */
     public enum ConnectionState {
+
         /**
          * The connection has been successfully established.
          */
@@ -162,6 +165,7 @@ public class JmxModel extends Model {
             if (Application.CURRENT_APPLICATION.equals(app)) {
                 // Monitor self
                 proxyClient = new ProxyClient(this, "localhost", 0, null, null);   // NOI18N
+
             } else if (app.isLocalApplication()) {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvm.findByName("sun.management.JMXConnectorServer.address");
@@ -170,9 +174,11 @@ public class JmxModel extends Model {
                     if (lvm.isAttachable()) {
                         proxyClient = new ProxyClient(this, lvm);
                     } else {
-                        System.err.println("WARNING: The JMX management agent " +
-                                "cannot be enabled in this application (pid " +
-                                app.getPid() + ")");
+                        if (LOGGER.isLoggable(Level.WARNING)) {
+                            LOGGER.warning("The JMX management agent " +
+                                    "cannot be enabled in this application (pid " +
+                                    app.getPid() + ")");
+                        }
                     }
                 } else {
                     proxyClient = new ProxyClient(this, lvm);
@@ -188,6 +194,7 @@ public class JmxModel extends Model {
                     if ("true".equals(auths.get(0))) {
                         final ProxyClient pc = proxyClient;
                         invokeAndWait(new Runnable() {
+
                             public void run() {
                                 // Ask for security credentials
                                 ApplicationSecurityConfigurator jsc =
@@ -208,6 +215,7 @@ public class JmxModel extends Model {
                     while (st.hasMoreTokens()) {
                         String token = st.nextToken();
                         if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) {   // NOI18N
+
                             port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
                         } else if (token.equals("-Dcom.sun.management.jmxremote.authenticate=true")) {
                             authenticate = true;
@@ -219,6 +227,7 @@ public class JmxModel extends Model {
                         if (authenticate) {
                             final ProxyClient pc = proxyClient;
                             invokeAndWait(new Runnable() {
+
                                 public void run() {
                                     // Ask for security credentials
                                     ApplicationSecurityConfigurator jsc =
@@ -237,6 +246,7 @@ public class JmxModel extends Model {
                 } catch (SecurityException e) {
                     final ProxyClient pc = proxyClient;
                     invokeAndWait(new Runnable() {
+
                         public void run() {
                             // Ask for security credentials
                             ApplicationSecurityConfigurator jsc =
@@ -269,6 +279,7 @@ public class JmxModel extends Model {
                 proxyClient.connect();
             } catch (SecurityException e) {
                 invokeAndWait(new Runnable() {
+
                     public void run() {
                         // Ask for security credentials
                         ApplicationSecurityConfigurator jsc =
@@ -384,6 +395,7 @@ public class JmxModel extends Model {
             EventQueue.invokeAndWait(runnable);
         }
     }
+
     static class ProxyClient implements NotificationListener {
 
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;
@@ -502,6 +514,7 @@ public class JmxModel extends Model {
         private static final String rmiServerImplStubClassName =
                 "javax.management.remote.rmi.RMIServerImpl_Stub";
         private static final Class<? extends Remote> rmiServerImplStubClass;
+        
 
         static {
             Class<? extends Remote> serverStubClass = null;
@@ -958,11 +971,14 @@ public class JmxModel extends Model {
 
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
-            // Check if MBeanServerConnection call is performed on EDT
-            if (EventQueue.isDispatchThread()) {
-                System.err.println("WARNING: MBeanServerConnection call " +
-                        "performed on Event Dispatch Thread!");
-                Thread.dumpStack();
+            if (LOGGER.isLoggable(Level.FINE)) {
+                // Check if MBeanServerConnection call is performed on EDT
+                if (EventQueue.isDispatchThread()) {
+                    Throwable thrwbl = new Throwable();
+
+                    LOGGER.log(Level.FINE, createTracedMessage("MBeanServerConnection call " +
+                            "performed on Event Dispatch Thread!", thrwbl));
+                }
             }
             // Invoke MBeanServerConnection call
             try {
@@ -970,6 +986,15 @@ public class JmxModel extends Model {
             } catch (InvocationTargetException e) {
                 throw e.getCause();
             }
+        }
+
+        private String createTracedMessage(String message, Throwable thrwbl) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintWriter pw = new PrintWriter(baos);
+            pw.println(message);
+            thrwbl.printStackTrace(pw);
+            pw.flush();
+            return baos.toString();
         }
     }
 
