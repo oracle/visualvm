@@ -47,7 +47,7 @@ public final class RenameDataSourceAction extends AbstractAction {
         DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
         if (descriptor != null && descriptor.supportsRename()) {
             RenameConfigurator configurator = RenameConfigurator.defineName(selectedDataSource);
-            if (configurator != null) descriptor.setName(configurator.getName());
+            if (configurator != null) descriptor.setName(configurator.getDisplayName());
         } else {
             System.err.println("Cannot rename DataSource " + selectedDataSource);
         }

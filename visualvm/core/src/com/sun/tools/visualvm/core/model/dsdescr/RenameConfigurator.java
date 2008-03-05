@@ -64,8 +64,7 @@ class RenameConfigurator extends JPanel {
     else return null;
   }
   
-  @Override
-  public String getName() {
+  public String getDisplayName() {
       return nameField.getText().trim();
   }
   
@@ -89,7 +88,7 @@ class RenameConfigurator extends JPanel {
   private void update() {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        okButton.setEnabled(getName().length() > 0);
+        okButton.setEnabled(getDisplayName().length() > 0);
       }
     });
   }
