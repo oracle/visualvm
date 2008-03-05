@@ -5,18 +5,24 @@
 package com.sun.tools.visualvm.core.options;
 
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 final class GeneralOptionsPanel extends javax.swing.JPanel {
 
     final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");
     private final GeneralOptionsPanelController controller;
 
+    private final ChangeListener changeListener = new ChangeListener() {
+        public void stateChanged(ChangeEvent e) {
+            controller.changed();
+        }
+    };
+    
     GeneralOptionsPanel(GeneralOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
-    // TODO listen to changes in form fields and call controller.changed()
+        startTrackingChanges();
     }
 
     /** This method is called from within the constructor to
@@ -167,10 +173,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         return false;
     }
 
-    private Preferences getPreferences() {
-        return NbPreferences.forModule(GeneralOptionsPanel.class);
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner dataRefresh;
     private javax.swing.JCheckBox instrFilter;
@@ -184,4 +186,10 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JSpinner mhRefresh;
     private javax.swing.JSpinner thrdRefresh;
     // End of variables declaration//GEN-END:variables
+
+    private void startTrackingChanges() {
+        mhRefresh.getModel().addChangeListener(changeListener);
+        thrdRefresh.getModel().addChangeListener(changeListener);
+        dataRefresh.getModel().addChangeListener(changeListener);
+    }
 }
