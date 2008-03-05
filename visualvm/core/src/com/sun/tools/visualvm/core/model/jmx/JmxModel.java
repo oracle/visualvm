@@ -192,16 +192,10 @@ public class JmxModel extends Model {
                     List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate");
                     proxyClient = new ProxyClient(this, urls.get(0), null, null);
                     if ("true".equals(auths.get(0))) {
-                        final ProxyClient pc = proxyClient;
-                        invokeAndWait(new Runnable() {
-
-                            public void run() {
-                                // Ask for security credentials
-                                ApplicationSecurityConfigurator jsc =
-                                        ApplicationSecurityConfigurator.supplyCredentials(pc.getUrl().toString());
-                                pc.setParameters(pc.getUrl(), jsc.getUsername(), jsc.getPassword());
-                            }
-                        });
+                        // Ask for security credentials
+                        ApplicationSecurityConfigurator jsc =
+                                ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
+                        proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
                     }
                 } else {
                     // Create a ProxyClient for the remote out-of-the-box
@@ -226,15 +220,10 @@ public class JmxModel extends Model {
                                 app.getHost().getHostName(), port, null, null);
                         if (authenticate) {
                             final ProxyClient pc = proxyClient;
-                            invokeAndWait(new Runnable() {
-
-                                public void run() {
-                                    // Ask for security credentials
-                                    ApplicationSecurityConfigurator jsc =
-                                            ApplicationSecurityConfigurator.supplyCredentials(pc.getUrl().toString());
-                                    pc.setParameters(pc.getUrl(), jsc.getUsername(), jsc.getPassword());
-                                }
-                            });
+                            // Ask for security credentials
+                            ApplicationSecurityConfigurator jsc =
+                                    ApplicationSecurityConfigurator.supplyCredentials(pc.getUrl().toString());
+                            pc.setParameters(pc.getUrl(), jsc.getUsername(), jsc.getPassword());
                         }
                     }
                 }
@@ -244,16 +233,10 @@ public class JmxModel extends Model {
                 try {
                     proxyClient.connect();
                 } catch (SecurityException e) {
-                    final ProxyClient pc = proxyClient;
-                    invokeAndWait(new Runnable() {
-
-                        public void run() {
-                            // Ask for security credentials
-                            ApplicationSecurityConfigurator jsc =
-                                    ApplicationSecurityConfigurator.supplyCredentials(pc.getUrl().toString());
-                            pc.setParameters(pc.getUrl(), jsc.getUsername(), jsc.getPassword());
-                        }
-                    });
+                    // Ask for security credentials
+                    ApplicationSecurityConfigurator jsc =
+                            ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
+                    proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
                     proxyClient.connect();
                 }
             }
@@ -278,16 +261,11 @@ public class JmxModel extends Model {
             try {
                 proxyClient.connect();
             } catch (SecurityException e) {
-                invokeAndWait(new Runnable() {
-
-                    public void run() {
                         // Ask for security credentials
                         ApplicationSecurityConfigurator jsc =
                                 ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
                         proxyClient.setParameters(proxyClient.getUrl(),
                                 jsc.getUsername(), jsc.getPassword());
-                    }
-                });
                 proxyClient.connect();
             }
         } catch (Exception e) {
@@ -386,14 +364,6 @@ public class JmxModel extends Model {
             return client.getCachedMBeanServerConnection();
         }
         return null;
-    }
-
-    private static void invokeAndWait(Runnable runnable) throws InterruptedException, InvocationTargetException {
-        if (EventQueue.isDispatchThread()) {
-            runnable.run();
-        } else {
-            EventQueue.invokeAndWait(runnable);
-        }
     }
 
     static class ProxyClient implements NotificationListener {
