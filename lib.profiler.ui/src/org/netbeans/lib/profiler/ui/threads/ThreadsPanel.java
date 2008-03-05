@@ -275,8 +275,8 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
             }); // NOI18N
 
         scrollBar = new ThreadsScrollBar();
-        zoomInButton = new JButton(new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/zoomIn.png"))); // NOI18N
-        zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/zoomOut.png"))); // NOI18N
+        zoomInButton = new JButton(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoomIn.png"))); // NOI18N
+        zoomOutButton = new JButton(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoomOut.png"))); // NOI18N
         scaleToFitButton = new JButton(new ImageIcon(getClass()
                                                          .getResource(scaleToFit
                                                                       ? "/org/netbeans/lib/profiler/ui/resources/zoom.png"
@@ -619,7 +619,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         if (e.getSource() == scaleToFitButton) {
             if (!scaleToFit) {
                 scrollBar.setVisible(true);
-                scaleToFitButton.setIcon(new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/zoom.png"))); // NOI18N
+                scaleToFitButton.setIcon(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoom.png"))); // NOI18N
                 scaleToFit = true;
             } else {
                 scaleToFit = false;
