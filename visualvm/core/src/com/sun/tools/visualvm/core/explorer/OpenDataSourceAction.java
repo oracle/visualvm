@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class OpenDataSourceAction extends AbstractAction {
     
@@ -55,13 +55,12 @@ public final class OpenDataSourceAction extends AbstractAction {
     }
     
     private void updateEnabled() {
-        final DataSource selectedDataSource = getSelectedDataSource();
+        DataSource selectedDataSource = getSelectedDataSource();
+        final boolean isEnabled = selectedDataSource != null &&
+                        DataSourceWindowFactory.sharedInstance().canCreateWindowFor(selectedDataSource);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(selectedDataSource != null &&
-                        DataSourceWindowFactory.sharedInstance().canCreateWindowFor(selectedDataSource));
-            }
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

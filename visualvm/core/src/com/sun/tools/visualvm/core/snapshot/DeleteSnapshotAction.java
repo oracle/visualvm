@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class DeleteSnapshotAction extends AbstractAction {
     
@@ -52,11 +52,11 @@ public final class DeleteSnapshotAction extends AbstractAction {
     }
     
     void updateEnabled() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Snapshot selectedSnapshot = getSelectedSnapshot();
-                setEnabled(selectedSnapshot != null && selectedSnapshot.supportsDelete());
-            }
+        Snapshot selectedSnapshot = getSelectedSnapshot();
+        final boolean isEnabled = selectedSnapshot != null && selectedSnapshot.supportsDelete();
+        
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

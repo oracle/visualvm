@@ -36,7 +36,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class ThreadDumpAction extends AbstractAction {
     
@@ -83,10 +83,8 @@ public final class ThreadDumpAction extends AbstractAction {
             isEnabled = false;
         }
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(isEnabled);
-            }
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

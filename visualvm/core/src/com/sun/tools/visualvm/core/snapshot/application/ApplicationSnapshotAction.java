@@ -35,7 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class ApplicationSnapshotAction extends AbstractAction implements DataChangeListener {
     
@@ -56,11 +56,11 @@ public final class ApplicationSnapshotAction extends AbstractAction implements D
     }
     
     void updateEnabled() {
-        final Application selectedApplication = getSelectedApplication();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(selectedApplication != null && !selectedApplication.getSnapshots().isEmpty());
-            }
+        Application selectedApplication = getSelectedApplication();
+        final boolean isEnabled = selectedApplication != null && !selectedApplication.getSnapshots().isEmpty();
+        
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

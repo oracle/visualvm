@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class ProfileApplicationAction extends AbstractAction {
     
@@ -52,26 +52,24 @@ public final class ProfileApplicationAction extends AbstractAction {
     }
     
     void updateEnabled() {
-        final Application selectedApplication = getSelectedApplication();
-        final boolean enabled;
+        Application selectedApplication = getSelectedApplication();
+        final boolean isEnabled;
         
         if (selectedApplication == null) {
-            enabled = false;
+            isEnabled = false;
         } else if (Application.CURRENT_APPLICATION.equals(selectedApplication)) {
-            enabled = false;
+            isEnabled = false;
         } else if (selectedApplication.getHost() != Host.LOCALHOST) {
-            enabled = false;
+            isEnabled = false;
         } else if (selectedApplication.isFinished()) {
-            enabled = false;
+            isEnabled = false;
         } else {
             JVM jvm = JVMFactory.getJVMFor(selectedApplication);
-            enabled = jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
+            isEnabled = jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
         }
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(enabled);
-            }
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

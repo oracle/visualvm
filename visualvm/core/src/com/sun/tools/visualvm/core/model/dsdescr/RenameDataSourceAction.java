@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class RenameDataSourceAction extends AbstractAction {
     
@@ -55,12 +55,11 @@ public final class RenameDataSourceAction extends AbstractAction {
     
     private void updateEnabled() {
         DataSource selectedDataSource = getSelectedDataSource();
-        final DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
+        DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
+        final boolean isEnabled = descriptor != null && descriptor.supportsRename();
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(descriptor != null && descriptor.supportsRename());
-            }
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

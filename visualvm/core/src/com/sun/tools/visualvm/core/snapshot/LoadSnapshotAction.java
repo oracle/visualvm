@@ -33,8 +33,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Utilities;
 
 public final class LoadSnapshotAction extends AbstractAction {
@@ -73,10 +73,10 @@ public final class LoadSnapshotAction extends AbstractAction {
     }
     
     void updateEnabled() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(!RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories().isEmpty());
-            }
+        final boolean isEnabled = !RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories().isEmpty();
+        
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     

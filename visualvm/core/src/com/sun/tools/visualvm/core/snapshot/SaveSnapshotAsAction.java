@@ -33,7 +33,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Utilities;
 
 public final class SaveSnapshotAsAction extends AbstractAction {
@@ -56,10 +56,10 @@ public final class SaveSnapshotAsAction extends AbstractAction {
     
     void updateEnabled() {
         final Snapshot selectedSnapshot = getSelectedSnapshot();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setEnabled(selectedSnapshot != null && selectedSnapshot.supportsSaveAs());
-            }
+        final boolean isEnabled = selectedSnapshot != null && selectedSnapshot.supportsSaveAs();
+        
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() { setEnabled(isEnabled); }
         });
     }
     
