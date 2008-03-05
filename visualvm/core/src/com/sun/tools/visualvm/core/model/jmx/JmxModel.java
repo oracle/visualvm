@@ -22,6 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package com.sun.tools.visualvm.core.model.jmx;
 
 import com.sun.tools.attach.AgentInitializationException;
@@ -32,6 +33,7 @@ import com.sun.tools.visualvm.core.application.ApplicationSecurityConfigurator;
 import com.sun.tools.visualvm.core.application.JmxApplication;
 import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.Model;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
@@ -122,6 +124,8 @@ import sun.rmi.transport.LiveRef;
  */
 public class JmxModel extends Model {
 
+    private static final String PROPERTY_USERNAME = "prop_username";
+    private static final String PROPERTY_PASSWORD = "prop_password";
     private final static Logger LOGGER = Logger.getLogger(JmxModel.class.getName());
     private ProxyClient client;
     private SwingPropertyChangeSupport propertyChangeSupport =
@@ -157,19 +161,17 @@ public class JmxModel extends Model {
      * @param application the {@link JvmstatApplication}.
      */
     public JmxModel(JvmstatApplication application) {
-        JvmstatApplication app = application;
-        JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(app);
+        JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
         try {
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
             ProxyClient proxyClient = null;
-            if (Application.CURRENT_APPLICATION.equals(app)) {
+            if (Application.CURRENT_APPLICATION.equals(application)) {
                 // Monitor self
-                proxyClient = new ProxyClient(this, "localhost", 0, null, null);   // NOI18N
-
-            } else if (app.isLocalApplication()) {
+                proxyClient = new ProxyClient(this, "localhost", 0, null, null); // NOI18N
+            } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
-                String connectorAddress = jvm.findByName("sun.management.JMXConnectorServer.address");
-                LocalVirtualMachine lvm = new LocalVirtualMachine(app.getPid(), jvm.isAttachable(), connectorAddress);
+                String connectorAddress = jvm.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
+                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvm.isAttachable(), connectorAddress);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
                         proxyClient = new ProxyClient(this, lvm);
@@ -177,7 +179,7 @@ public class JmxModel extends Model {
                         if (LOGGER.isLoggable(Level.WARNING)) {
                             LOGGER.warning("The JMX management agent " +
                                     "cannot be enabled in this application (pid " +
-                                    app.getPid() + ")");
+                                    application.getPid() + ")"); // NOI18N
                         }
                     }
                 } else {
@@ -187,15 +189,12 @@ public class JmxModel extends Model {
                 // Create a ProxyClient for the remote out-of-the-box
                 // JMX management agent using the port and security
                 // related information retrieved through jvmstat.
-                List<String> urls = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address");
+                List<String> urls = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
                 if (urls.size() != 0) {
-                    List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate");
+                    List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
                     proxyClient = new ProxyClient(this, urls.get(0), null, null);
                     if ("true".equals(auths.get(0))) {
-                        // Ask for security credentials
-                        ApplicationSecurityConfigurator jsc =
-                                ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
-                        proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
+                        supplyCredentials(application, proxyClient);
                     }
                 } else {
                     // Create a ProxyClient for the remote out-of-the-box
@@ -208,22 +207,17 @@ public class JmxModel extends Model {
                     boolean authenticate = false;
                     while (st.hasMoreTokens()) {
                         String token = st.nextToken();
-                        if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) {   // NOI18N
-
+                        if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) { // NOI18N
                             port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
-                        } else if (token.equals("-Dcom.sun.management.jmxremote.authenticate=true")) {
+                        } else if (token.equals("-Dcom.sun.management.jmxremote.authenticate=true")) { // NOI18N
                             authenticate = true;
                         }
                     }
                     if (port != -1) {
                         proxyClient = new ProxyClient(this,
-                                app.getHost().getHostName(), port, null, null);
+                                application.getHost().getHostName(), port, null, null);
                         if (authenticate) {
-                            final ProxyClient pc = proxyClient;
-                            // Ask for security credentials
-                            ApplicationSecurityConfigurator jsc =
-                                    ApplicationSecurityConfigurator.supplyCredentials(pc.getUrl().toString());
-                            pc.setParameters(pc.getUrl(), jsc.getUsername(), jsc.getPassword());
+                            supplyCredentials(application, proxyClient);
                         }
                     }
                 }
@@ -233,10 +227,7 @@ public class JmxModel extends Model {
                 try {
                     proxyClient.connect();
                 } catch (SecurityException e) {
-                    // Ask for security credentials
-                    ApplicationSecurityConfigurator jsc =
-                            ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
-                    proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
+                    supplyCredentials(application, proxyClient);
                     proxyClient.connect();
                 }
             }
@@ -252,26 +243,36 @@ public class JmxModel extends Model {
      * @param application the {@link JmxApplication}.
      */
     public JmxModel(JmxApplication application) {
-        JmxApplication app = application;
         try {
-            JMXServiceURL url = app.getJMXServiceURL();
+            JMXServiceURL url = application.getJMXServiceURL();
+            Storage storage = application.getStorage();
+            String username = storage.getCustomProperty(PROPERTY_USERNAME);
+            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
             final ProxyClient proxyClient =
-                    new ProxyClient(this, url.toString(), null, null);
+                    new ProxyClient(this, url.toString(), username, password);
             client = proxyClient;
             try {
                 proxyClient.connect();
             } catch (SecurityException e) {
-                        // Ask for security credentials
-                        ApplicationSecurityConfigurator jsc =
-                                ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
-                        proxyClient.setParameters(proxyClient.getUrl(),
-                                jsc.getUsername(), jsc.getPassword());
+                supplyCredentials(application, proxyClient);
                 proxyClient.connect();
             }
         } catch (Exception e) {
             client = null;
             e.printStackTrace();
         }
+    }
+
+    /**
+     *  Ask for security credentials.
+     */
+    private void supplyCredentials(Application application, ProxyClient proxyClient) {
+        ApplicationSecurityConfigurator jsc =
+                ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
+        proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
+        Storage storage = application.getStorage();
+        storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
+        storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
     }
 
     /**

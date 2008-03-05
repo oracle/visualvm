@@ -168,8 +168,8 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                 CURRENT_SNAPSHOT_VERSION,
                 normalizedConnectionName,
                 hostName == null ? "" : hostName,
-                "", // TODO: will be eventually populated from dialog defining the JmxApplication
-                "", // TODO: will be eventually populated from dialog defining the JmxApplication
+                "", // Populated from dialog defining the JmxApplication if security is enabled
+                "", // Populated from dialog defining the JmxApplication if security is enabled
                 displayName
             };
 
