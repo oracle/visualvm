@@ -22,11 +22,13 @@
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
+
 package com.sun.tools.visualvm.core.application;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.openide.util.RequestProcessor;
 
 public final class AddJMXConnectionAction extends AbstractAction {
     
@@ -41,11 +43,14 @@ public final class AddJMXConnectionAction extends AbstractAction {
         final JmxApplicationConfigurator appConfig =
                 JmxApplicationConfigurator.addJmxConnection();
         if (appConfig != null) {
-            JmxApplicationProvider.sharedInstance().createJmxApplication(
-                    appConfig.getConnection(), appConfig.getDisplayName());
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    JmxApplicationProvider.sharedInstance().createJmxApplication(
+                            appConfig.getConnection(), appConfig.getDisplayName());
+                }
+            });
         }
     }
-    
     
     private AddJMXConnectionAction() {
         putValue(Action.NAME, "Add JMX Connection...");
