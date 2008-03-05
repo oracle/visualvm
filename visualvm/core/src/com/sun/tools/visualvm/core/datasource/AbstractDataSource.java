@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.datasupport.Storage;
-import com.sun.tools.visualvm.core.tools.WeakReferenceX;
+import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.ref.WeakReference;
@@ -48,7 +48,7 @@ public abstract class AbstractDataSource implements DataSource {
     private Storage storage;
     private DataSourceContainer<DataSource> repository;
     private PropertyChangeSupport changeSupport;
-    private Set<WeakReferenceX<DataFinishedListener>> removedListeners;
+    private Set<ComparableWeakReference<DataFinishedListener>> removedListeners;
 
 
     /**
@@ -133,7 +133,7 @@ public abstract class AbstractDataSource implements DataSource {
     public void notifyWhenFinished(DataFinishedListener listener) {
         if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
         if (isFinished()) listener.dataFinished(this);
-        else getRemovedListeners().add(new WeakReferenceX(listener));
+        else getRemovedListeners().add(new ComparableWeakReference(listener));
     }
     
     public boolean isFinished() {
@@ -154,7 +154,7 @@ public abstract class AbstractDataSource implements DataSource {
         state = newState;
         getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
         if (newState == STATE_FINISHED) {
-            Set<WeakReferenceX<DataFinishedListener>> listeners = getRemovedListeners();
+            Set<ComparableWeakReference<DataFinishedListener>> listeners = getRemovedListeners();
             for (WeakReference<DataFinishedListener> listenerReference : listeners) {
                 DataFinishedListener listener = listenerReference.get();
                 if (listener != null) listener.dataFinished(this);
@@ -195,7 +195,7 @@ public abstract class AbstractDataSource implements DataSource {
     }
     
     
-    private Set<WeakReferenceX<DataFinishedListener>> getRemovedListeners() {
+    private Set<ComparableWeakReference<DataFinishedListener>> getRemovedListeners() {
         if (removedListeners == null) removedListeners = Collections.synchronizedSet(new HashSet());
         return removedListeners;
     }

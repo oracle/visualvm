@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package com.sun.tools.visualvm.core.tools;
+package com.sun.tools.visualvm.core.datasupport;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -31,13 +31,13 @@ import java.lang.ref.WeakReference;
  *
  * @author Jaroslav Bachorik
  */
-public class WeakReferenceX<T> extends WeakReference<T> {
+public class ComparableWeakReference<T> extends WeakReference<T> {
 
-    public WeakReferenceX(T referent, ReferenceQueue<? super T> q) {
+    public ComparableWeakReference(T referent, ReferenceQueue<? super T> q) {
         super(referent, q);
     }
 
-    public WeakReferenceX(T referent) {
+    public ComparableWeakReference(T referent) {
         super(referent);
     }
 
@@ -52,11 +52,11 @@ public class WeakReferenceX<T> extends WeakReference<T> {
         if (o == null) {
             return false;
         }
-        if (!(o instanceof WeakReferenceX)) {
+        if (!(o instanceof ComparableWeakReference)) {
             return false;
         }
         try {
-            return this.get().equals(((WeakReferenceX) o).get());
+            return this.get().equals(((ComparableWeakReference) o).get());
         } catch (Exception e) {}
         return false;
     }

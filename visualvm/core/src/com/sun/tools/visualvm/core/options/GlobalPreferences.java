@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.core.options;
 
-import com.sun.tools.visualvm.core.tools.WeakReferenceX;
+import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class GlobalPreferences implements PreferenceChangeListener {
     
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
     private final Preferences prefs;
-    private final Map<String, Set<WeakReferenceX<PreferenceChangeListener>>> listenerMap = new HashMap<String, Set<WeakReferenceX<PreferenceChangeListener>>>();
+    private final Map<String, Set<ComparableWeakReference<PreferenceChangeListener>>> listenerMap = new HashMap<String, Set<ComparableWeakReference<PreferenceChangeListener>>>();
 
     private final ExecutorService dispatcher = Executors.newCachedThreadPool();
     
@@ -74,11 +74,11 @@ public class GlobalPreferences implements PreferenceChangeListener {
 
     public void preferenceChange(final PreferenceChangeEvent evt) {
         synchronized(listenerMap) {
-            Set<WeakReferenceX<PreferenceChangeListener>> set = listenerMap.get(evt.getKey());
+            Set<ComparableWeakReference<PreferenceChangeListener>> set = listenerMap.get(evt.getKey());
             if (set != null) {
                 final Set<PreferenceChangeListener> tmpListeners = new HashSet<PreferenceChangeListener>();
-                Collection<WeakReferenceX<PreferenceChangeListener>> deadRefs = new ArrayList<WeakReferenceX<PreferenceChangeListener>>();
-                for(WeakReferenceX<PreferenceChangeListener> pclRef : set) {
+                Collection<ComparableWeakReference<PreferenceChangeListener>> deadRefs = new ArrayList<ComparableWeakReference<PreferenceChangeListener>>();
+                for(ComparableWeakReference<PreferenceChangeListener> pclRef : set) {
                     if (pclRef.get() != null) {
                         tmpListeners.add(pclRef.get());
                     } else {
@@ -162,11 +162,11 @@ public class GlobalPreferences implements PreferenceChangeListener {
     private void addListener(String property, PreferenceChangeListener pcl) {
         synchronized(listenerMap) {
             if (listenerMap.containsKey(property)) {
-                Set<WeakReferenceX<PreferenceChangeListener>> set = listenerMap.get(property);
-                set.add(new WeakReferenceX<PreferenceChangeListener>(pcl));
+                Set<ComparableWeakReference<PreferenceChangeListener>> set = listenerMap.get(property);
+                set.add(new ComparableWeakReference<PreferenceChangeListener>(pcl));
             } else {
-                Set<WeakReferenceX<PreferenceChangeListener>> set = new HashSet<WeakReferenceX<PreferenceChangeListener>>();
-                set.add(new WeakReferenceX<PreferenceChangeListener>(pcl));
+                Set<ComparableWeakReference<PreferenceChangeListener>> set = new HashSet<ComparableWeakReference<PreferenceChangeListener>>();
+                set.add(new ComparableWeakReference<PreferenceChangeListener>(pcl));
                 listenerMap.put(property, set);
             }
         }
