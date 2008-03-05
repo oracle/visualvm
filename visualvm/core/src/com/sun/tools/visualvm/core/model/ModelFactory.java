@@ -29,12 +29,15 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.ClassNameComparator;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataChangeSupport;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 
 /**
  *
@@ -43,18 +46,24 @@ import java.util.TreeSet;
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
     
     private SortedSet<ModelProvider<M, D>> factories = new TreeSet(new ModelProviderComparator());
-    private Map<D,M> modelMap = new HashMap();
+    private Map<DataSourceKey<D>,Reference<M>> modelMap = new WeakHashMap();
     private DataChangeSupport<ModelProvider<M, D>> factoryChange = new DataChangeSupport();
     
     public final synchronized M getModel(D dataSource) {
-        M model = modelMap.get(dataSource);
-        if (model != null) {
-            return model;
+        DataSourceKey<D> key = new DataSourceKey(dataSource);
+        Reference<M> modelRef = modelMap.get(key);
+        M model = null;
+        
+        if (modelRef != null) {
+            model = modelRef.get();
+            if (model != null) {
+                return model;
+            }
         }
         for (ModelProvider<M, D> factory : factories) {
             model = factory.createModelFor(dataSource);
             if (model != null) {
-                modelMap.put(dataSource,model);
+                modelMap.put(key,new SoftReference(model));
                 break;
             }
         }
@@ -127,6 +136,29 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
             }
             // same depth -> use class name to create artifical ordering
             return ClassNameComparator.INSTANCE.compare(factory1, factory2);
+        }
+    }
+    
+    private static class DataSourceKey<D extends DataSource>  {
+        D dataSource;
+        
+        DataSourceKey(D ds) {
+            dataSource = ds;
+        }
+
+        public int hashCode() {
+            return dataSource.hashCode();
+        }
+
+        public boolean equals(Object obj) {
+            if (obj instanceof DataSourceKey) {
+                return dataSource == ((DataSourceKey)obj).dataSource;
+            }
+            throw new IllegalArgumentException(obj.getClass().getName());
+        }
+
+        public String toString() {
+            return "DataSourceKey for "+dataSource.toString();
         }
     }
 }
