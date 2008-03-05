@@ -7,19 +7,17 @@
 <windowmanager version="2.1">
     <main-window> 
         <joined-properties centered-horizontally="true" centered-vertically="true"
-                           relative-width="0.9" relative-height="0.9" />
-        <separated-properties centered-horizontally="true" relative-y="0.1"
-                           relative-width="0.8" relative-height="0.08" />
+                           width="900" height="590" />
+        <separated-properties centered-horizontally="true" centered-vertically="true"
+                           width="900" height="590" />
     </main-window>
     <editor-area state="joined">
         <constraints>
             <path orientation="vertical" number="20" weight="0.7" />
-            <path orientation="horizontal" number="40" weight="0.55" />
+            <path orientation="horizontal" number="40" weight="0.68" />
             <path orientation="vertical" number="40" weight="0.7" />
         </constraints>
-        <relative-bounds x="33" y="24" width="42" height="44"/>
     </editor-area>
-    <screen width="1280" height="1024" />
     <active-mode name="explorer" />
     <maximized-mode name="" />
     <toolbar configuration="Standard" preferred-icon-size="16" />

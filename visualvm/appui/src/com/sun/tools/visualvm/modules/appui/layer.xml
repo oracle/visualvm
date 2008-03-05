@@ -103,4 +103,7 @@
     <folder name="Windows2">
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
     </folder>
+    <!--folder name="Windows2Local">
+        <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
+    </folder-->
 </filesystem>
