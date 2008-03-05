@@ -49,7 +49,7 @@ public class SunFactory extends AbstractModelProvider<JVM,Application> {
         try {
             MonitoredHostDS monitoredHostDs = app.getMonitoredHost();
             MonitoredVm mvm = monitoredHostDs.getMonitoredHost().getMonitoredVm(new VmIdentifier(vmId));
-            mvm.setInterval(GlobalPreferences.sharedInstance().getMonitoredDataPoll());
+            mvm.setInterval(GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000);
             return mvm;
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
