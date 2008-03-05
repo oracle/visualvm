@@ -44,6 +44,9 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         instrFilter = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
 
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
@@ -57,12 +60,18 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel3.setLabelFor(dataRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Monitored Data:");
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "Polling [s]");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "Polling");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Profiler");
 
         instrFilter.setMnemonic('p');
         org.openide.awt.Mnemonics.setLocalizedText(instrFilter, "Profile Java Core Classes");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, "sec.");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "sec.");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel8, "sec.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -75,34 +84,37 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                         .add(12, 12, 12)
                         .add(instrFilter)
                         .addContainerGap())
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                .add(layout.createSequentialGroup()
-                                    .add(jLabel4)
-                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                    .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
-                                .add(layout.createSequentialGroup()
-                                    .add(12, 12, 12)
-                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                        .add(layout.createSequentialGroup()
-                                            .add(jLabel3)
-                                            .add(18, 18, 18)
-                                            .add(dataRefresh))
-                                        .add(layout.createSequentialGroup()
-                                            .add(jLabel2)
-                                            .add(66, 66, 66)
-                                            .add(thrdRefresh))
-                                        .add(layout.createSequentialGroup()
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(layout.createSequentialGroup()
+                                        .add(jLabel4)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                                    .add(layout.createSequentialGroup()
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                             .add(jLabel1)
-                                            .add(18, 18, 18)
-                                            .add(mhRefresh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 84, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))
-                            .add(12, 12, 12))
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                            .add(jLabel5)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
-                            .addContainerGap()))))
+                                            .add(jLabel2)
+                                            .add(jLabel3))
+                                        .add(35, 35, 35)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                            .add(dataRefresh)
+                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, thrdRefresh)
+                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, mhRefresh, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE))
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(jLabel6)
+                                            .add(jLabel8)
+                                            .add(jLabel7))))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .add(jLabel5)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -114,14 +126,17 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
+                    .add(jLabel6)
                     .add(mhRefresh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
+                    .add(jLabel7)
                     .add(thrdRefresh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
+                    .add(jLabel8)
                     .add(dataRefresh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
@@ -181,6 +196,9 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSpinner mhRefresh;
