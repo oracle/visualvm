@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.host;
 
+import com.sun.tools.visualvm.core.Install;
 import com.sun.tools.visualvm.core.datasource.AbstractHost;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
@@ -48,7 +49,6 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Exceptions;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -175,7 +175,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     // Here the Host instances for localhost and persisted remote hosts should be created
     private void initHosts() {
         initLocalHost();
-        RequestProcessor.getDefault().post(new Runnable() {
+        Install.LAZY_INIT_QUEUE.post(new Runnable() {
             public void run() {
                 initPersistedHosts();
             }

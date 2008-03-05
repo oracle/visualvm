@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.application;
 
+import com.sun.tools.visualvm.core.Install;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
@@ -47,7 +48,6 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Exceptions;
-import org.openide.util.RequestProcessor;
 
 /**
  * A provider for Applications added as JMX connections.
@@ -320,12 +320,12 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     }
 
     static void initialize() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        DataSourceRepository.sharedInstance().addDataSourceProvider(
+                JmxApplicationProvider.sharedInstance());
+        Install.LAZY_INIT_QUEUE.post(new Runnable() {
             public void run() {
                 JmxApplicationProvider.sharedInstance().initPersistedApplications();
             }
         });
-        DataSourceRepository.sharedInstance().addDataSourceProvider(
-                JmxApplicationProvider.sharedInstance());
     }
 }
