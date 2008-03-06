@@ -40,8 +40,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.openide.util.Utilities;
@@ -69,46 +71,56 @@ class MBeansView extends DataSourceView {
     }
 
     private DataViewComponent createViewComponent() {
-        // MBeansTab
-        MBeansTab mbeansTab = new MBeansTab(application);
+        JComponent mbeansView = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-        jmx.addPropertyChangeListener(mbeansTab);
+        if (jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+            JTextArea textArea = new JTextArea("\n\nData not available in " +
+                    "this tab because JMX connection to the JMX agent couldn't " +
+                    "be established.");
+            textArea.setEditable(false);
+            mbeansView = textArea;
+        } else {
+            // MBeansTab
+            MBeansTab mbeansTab = new MBeansTab(application);
+            jmx.addPropertyChangeListener(mbeansTab);
 
-        // MBeansTreeView
-        MBeansTreeView mbeansTreeView = new MBeansTreeView(mbeansTab);
+            // MBeansTreeView
+            MBeansTreeView mbeansTreeView = new MBeansTreeView(mbeansTab);
 
-        // MBeansAttributesView
-        MBeansAttributesView mbeansAttributesView = new MBeansAttributesView(mbeansTab);
+            // MBeansAttributesView
+            MBeansAttributesView mbeansAttributesView = new MBeansAttributesView(mbeansTab);
 
-        // MBeansOperationsView
-        MBeansOperationsView mbeansOperationsView = new MBeansOperationsView(mbeansTab);
+            // MBeansOperationsView
+            MBeansOperationsView mbeansOperationsView = new MBeansOperationsView(mbeansTab);
 
-        // MBeansNotificationsView
-        MBeansNotificationsView mbeansNotificationsView = new MBeansNotificationsView(mbeansTab);
+            // MBeansNotificationsView
+            MBeansNotificationsView mbeansNotificationsView = new MBeansNotificationsView(mbeansTab);
 
-        // MBeansMetadataView
-        MBeansMetadataView mbeansMetadataView = new MBeansMetadataView(mbeansTab);
+            // MBeansMetadataView
+            MBeansMetadataView mbeansMetadataView = new MBeansMetadataView(mbeansTab);
 
-        DisplayArea mbeansDisplayArea = new DisplayArea();
-        mbeansDisplayArea.setClosable(false);
-        mbeansDisplayArea.addTab(new DisplayArea.Tab("Attributes", mbeansAttributesView));
-        mbeansDisplayArea.addTab(new DisplayArea.Tab("Operations", mbeansOperationsView));
-        mbeansDisplayArea.addTab(new DisplayArea.Tab("Notifications", mbeansNotificationsView));
-        mbeansDisplayArea.addTab(new DisplayArea.Tab("Metadata", mbeansMetadataView));
-        mbeansTab.setDisplayArea(mbeansDisplayArea);
+            DisplayArea mbeansDisplayArea = new DisplayArea();
+            mbeansDisplayArea.setClosable(false);
+            mbeansDisplayArea.addTab(new DisplayArea.Tab("Attributes", mbeansAttributesView));
+            mbeansDisplayArea.addTab(new DisplayArea.Tab("Operations", mbeansOperationsView));
+            mbeansDisplayArea.addTab(new DisplayArea.Tab("Notifications", mbeansNotificationsView));
+            mbeansDisplayArea.addTab(new DisplayArea.Tab("Metadata", mbeansMetadataView));
+            mbeansTab.setDisplayArea(mbeansDisplayArea);
 
-        JExtendedSplitPane contentsSplitPane = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, mbeansTreeView, mbeansDisplayArea);
-        tweakSplitPaneUI(contentsSplitPane);
-        contentsSplitPane.setDividerLocation(0.3);
-        contentsSplitPane.setResizeWeight(0);
+            JExtendedSplitPane contentsSplitPane = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, mbeansTreeView, mbeansDisplayArea);
+            tweakSplitPaneUI(contentsSplitPane);
+            contentsSplitPane.setDividerLocation(0.3);
+            contentsSplitPane.setResizeWeight(0);
 
-        JPanel contentsPanel = new JPanel(new BorderLayout());
-        contentsPanel.setOpaque(false);
-        contentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        contentsPanel.add(contentsSplitPane, BorderLayout.CENTER);
-
+            JPanel contentsPanel = new JPanel(new BorderLayout());
+            contentsPanel.setOpaque(false);
+            contentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+            contentsPanel.add(contentsSplitPane, BorderLayout.CENTER);
+            
+            mbeansView = contentsPanel;
+        }
         return new DataViewComponent(
-                new DataViewComponent.MasterView("MBeans", null, contentsPanel),
+                new DataViewComponent.MasterView("MBeans", null, mbeansView),
                 new DataViewComponent.MasterViewConfiguration(true));
     }
 

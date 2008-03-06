@@ -26,8 +26,6 @@
 package com.sun.tools.visualvm.modules.jconsole;
 
 import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
@@ -35,7 +33,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.management.MBeanServerConnection;
 
 /**
  *
@@ -50,9 +47,7 @@ class JConsoleViewProvider implements DataSourceViewsProvider<Application> {
     }
 
     public boolean supportsViewsFor(Application application) {
-        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-        MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
-        return mbsc != null;
+        return true;
     }
 
     public synchronized Set<? extends DataSourceView> getViews(Application application) {

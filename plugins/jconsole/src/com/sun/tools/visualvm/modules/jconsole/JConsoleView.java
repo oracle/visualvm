@@ -29,6 +29,8 @@ import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -79,127 +81,136 @@ class JConsoleView extends DataSourceView {
 
     private DataViewComponent createViewComponent() {
         JComponent jconsoleView = null;
-        try {
-            // Enable JConsole debugging
-            Field debugField = JConsole.class.getDeclaredField("debug");   // NOI18N
-            debugField.setAccessible(true);
-            debugField.setBoolean(null, true);
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
+        if (jmx.getMBeanServerConnection() == null) {
+            JTextArea textArea = new JTextArea("\n\nData not available in " +
+                    "this tab because JMX connection to the JMX agent couldn't " +
+                    "be established.");
+            textArea.setEditable(false);
+            jconsoleView = textArea;
+        } else {
+            try {
+                // Enable JConsole debugging
+                Field debugField = JConsole.class.getDeclaredField("debug");   // NOI18N
+                debugField.setAccessible(true);
+                debugField.setBoolean(null, true);
 
-            // Set JConsole plugin path and plugin service
-            String pluginPath = System.getProperty("jconsole.plugin.path");   // NOI18N
-            boolean availablePlugins = false;
-            if (pluginPath != null && !pluginPath.isEmpty()) {
-                Field pluginPathField = JConsole.class.getDeclaredField("pluginPath");   // NOI18N
-                pluginPathField.setAccessible(true);
-                pluginPathField.set(null, pluginPath);
-                Method pathToURLs = JConsole.class.getDeclaredMethod("pathToURLs", String.class);   // NOI18N
-                pathToURLs.setAccessible(true);
-                ClassLoader pluginCL = new URLClassLoader(
-                        (URL[]) pathToURLs.invoke(null, pluginPath),
-                        JConsole.class.getClassLoader());
-                ServiceLoader<JConsolePlugin> plugins =
-                        ServiceLoader.load(JConsolePlugin.class, pluginCL);
-                availablePlugins = plugins.iterator().hasNext();
-                Field pluginServiceField = JConsole.class.getDeclaredField("pluginService");   // NOI18N
-                pluginServiceField.setAccessible(true);
-                pluginServiceField.set(null, plugins);
-            }
-
-            if (availablePlugins) {
-                // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
-                JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
-                ProxyClient proxyClient = null;
-                if (Application.CURRENT_APPLICATION.equals(application)) {
-                    // Monitor self
-                    proxyClient = ProxyClient.getProxyClient("localhost", 0, null, null);   // NOI18N
-                } else if (application.isLocalApplication()) {
-                    // Create a ProxyClient from local pid
-                    String connectorAddress = jvm.findByName(
-                            "sun.management.JMXConnectorServer.address");
-                    LocalVirtualMachine lvm = new LocalVirtualMachine(
-                            application.getPid(), "Dummy command line",
-                            jvm.isAttachable(), connectorAddress);
-                    proxyClient = ProxyClient.getProxyClient(lvm);
-                } else {
-                    // TODO: Remove the following two lines when Connection Dialog is implemented.
-                    String username = System.getProperty("jconsole.username");
-                    String password = System.getProperty("jconsole.password");
-                    // Create a ProxyClient for the remote out-of-the-box
-                    // JMX management agent using the port and security
-                    // related information retrieved through jvmstat.
-                    List<String> urls = jvm.findByPattern(
-                            "sun.management.JMXConnectorServer.[0-9]+.address");
-                    if (urls.size() != 0) {
-                        proxyClient = ProxyClient.getProxyClient(urls.get(0), username, password);
-                    // TODO: if security needed show popup connection dialog
-                    } else {
-                        // Create a ProxyClient for the remote out-of-the-box
-                        // JMX management agent using the port specified in
-                        // the -Dcom.sun.management.jmxremote.port=<port>
-                        // system property
-                        String jvmArgs = jvm.getJvmArgs();
-                        StringTokenizer st = new StringTokenizer(jvmArgs);
-                        int port = -1;
-                        while (st.hasMoreTokens()) {
-                            String token = st.nextToken();
-                            if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) {   // NOI18N
-                                port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
-                                break;
-                            }
-                        }
-                        if (port != -1) {
-                            proxyClient = ProxyClient.getProxyClient(
-                                    application.getHost().getHostName(), port, username, password);
-                        // TODO: if security needed show popup connection dialog
-                        }
-                    }
+                // Set JConsole plugin path and plugin service
+                String pluginPath = System.getProperty("jconsole.plugin.path");   // NOI18N
+                boolean availablePlugins = false;
+                if (pluginPath != null && !pluginPath.isEmpty()) {
+                    Field pluginPathField = JConsole.class.getDeclaredField("pluginPath");   // NOI18N
+                    pluginPathField.setAccessible(true);
+                    pluginPathField.set(null, pluginPath);
+                    Method pathToURLs = JConsole.class.getDeclaredMethod("pathToURLs", String.class);   // NOI18N
+                    pathToURLs.setAccessible(true);
+                    ClassLoader pluginCL = new URLClassLoader(
+                            (URL[]) pathToURLs.invoke(null, pluginPath),
+                            JConsole.class.getClassLoader());
+                    ServiceLoader<JConsolePlugin> plugins =
+                            ServiceLoader.load(JConsolePlugin.class, pluginCL);
+                    availablePlugins = plugins.iterator().hasNext();
+                    Field pluginServiceField = JConsole.class.getDeclaredField("pluginService");   // NOI18N
+                    pluginServiceField.setAccessible(true);
+                    pluginServiceField.set(null, plugins);
                 }
 
-                // Remove static list of VMPanel core tabs before they're instantiated
-                Field tabInfosField = VMPanel.class.getDeclaredField("tabInfos");
-                tabInfosField.setAccessible(true);
-                ArrayList tabInfos = ((ArrayList) tabInfosField.get(null));
-                tabInfos.clear();
-
-                // Create a VMPanel
-                Constructor vmPanelConstructor = VMPanel.class.getDeclaredConstructors()[0];
-                vmPanelConstructor.setAccessible(true);
-                final VMPanel vmPanel = (VMPanel) vmPanelConstructor.newInstance(
-                        new Object[]{ proxyClient, 4000 });
-
-                // Take over handling of connections events, mostly to avoid
-                // activating the SheetDialog (which would require a JConsole object).
-                proxyClient.removePropertyChangeListener(vmPanel);
-                proxyClient.addPropertyChangeListener(new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent e) {
-                        if (JConsoleContext.CONNECTION_STATE_PROPERTY.equals(e.getPropertyName())) {
-                            ConnectionState newState = (ConnectionState) e.getNewValue();
-                            switch (newState) {
-                                case CONNECTED:
-                                    vmPanel.propertyChange(e);
+                if (availablePlugins) {
+                    // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
+                    JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
+                    ProxyClient proxyClient = null;
+                    if (Application.CURRENT_APPLICATION.equals(application)) {
+                        // Monitor self
+                        proxyClient = ProxyClient.getProxyClient("localhost", 0, null, null);   // NOI18N
+                    } else if (application.isLocalApplication()) {
+                        // Create a ProxyClient from local pid
+                        String connectorAddress = jvm.findByName(
+                                "sun.management.JMXConnectorServer.address");
+                        LocalVirtualMachine lvm = new LocalVirtualMachine(
+                                application.getPid(), "Dummy command line",
+                                jvm.isAttachable(), connectorAddress);
+                        proxyClient = ProxyClient.getProxyClient(lvm);
+                    } else {
+                        // TODO: Remove the following two lines when Connection Dialog is implemented.
+                        String username = System.getProperty("jconsole.username");
+                        String password = System.getProperty("jconsole.password");
+                        // Create a ProxyClient for the remote out-of-the-box
+                        // JMX management agent using the port and security
+                        // related information retrieved through jvmstat.
+                        List<String> urls = jvm.findByPattern(
+                                "sun.management.JMXConnectorServer.[0-9]+.address");
+                        if (urls.size() != 0) {
+                            proxyClient = ProxyClient.getProxyClient(urls.get(0), username, password);
+                            // TODO: if security needed show popup connection dialog
+                        } else {
+                            // Create a ProxyClient for the remote out-of-the-box
+                            // JMX management agent using the port specified in
+                            // the -Dcom.sun.management.jmxremote.port=<port>
+                            // system property
+                            String jvmArgs = jvm.getJvmArgs();
+                            StringTokenizer st = new StringTokenizer(jvmArgs);
+                            int port = -1;
+                            while (st.hasMoreTokens()) {
+                                String token = st.nextToken();
+                                if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) {   // NOI18N
+                                    port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
                                     break;
+                                }
+                            }
+                            if (port != -1) {
+                                proxyClient = ProxyClient.getProxyClient(
+                                        application.getHost().getHostName(), port, username, password);
+                                // TODO: if security needed show popup connection dialog
                             }
                         }
                     }
-                });
-                vmPanel.connect();
-                // TODO: if security needed show popup connection dialog
 
-                jconsoleView = vmPanel;
-            } else {
-                JTextArea jTextArea = new JTextArea(
-                        "\n\nJConsole Plugins not available.\n\nUsage:\n\n" +
-                        "$ visualvm -J-Djconsole.plugin.path=<plugin-path>" +
-                        "\n\nwhere <plugin-path> specifies the paths " +
-                        "to the jar files of the\nJConsole plugins to look up." +
-                        " Multiple paths are separated by\nthe path separator " +
-                        "character of the platform.");
-                jTextArea.setEditable(false);
-                jconsoleView = jTextArea;
+                    // Remove static list of VMPanel core tabs before they're instantiated
+                    Field tabInfosField = VMPanel.class.getDeclaredField("tabInfos");
+                    tabInfosField.setAccessible(true);
+                    ArrayList tabInfos = ((ArrayList) tabInfosField.get(null));
+                    tabInfos.clear();
+
+                    // Create a VMPanel
+                    Constructor vmPanelConstructor = VMPanel.class.getDeclaredConstructors()[0];
+                    vmPanelConstructor.setAccessible(true);
+                    final VMPanel vmPanel = (VMPanel) vmPanelConstructor.newInstance(
+                            new Object[]{ proxyClient, 4000 });
+
+                    // Take over handling of connections events, mostly to avoid
+                    // activating the SheetDialog (which would require a JConsole object).
+                    proxyClient.removePropertyChangeListener(vmPanel);
+                    proxyClient.addPropertyChangeListener(new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent e) {
+                            if (JConsoleContext.CONNECTION_STATE_PROPERTY.equals(e.getPropertyName())) {
+                                ConnectionState newState = (ConnectionState) e.getNewValue();
+                                switch (newState) {
+                                    case CONNECTED:
+                                        vmPanel.propertyChange(e);
+                                        break;
+                                }
+                            }
+                        }
+                    });
+                    vmPanel.connect();
+                    // TODO: if security needed show popup connection dialog
+
+                    jconsoleView = vmPanel;
+                } else {
+                    JTextArea textArea = new JTextArea(
+                            "\n\nJConsole Plugins not available.\n\nUsage:\n\n" +
+                            "$ visualvm -J-Djconsole.plugin.path=<plugin-path>" +
+                            "\n\nwhere <plugin-path> specifies the paths " +
+                            "to the jar files of the\nJConsole plugins to look up." +
+                            " Multiple paths are separated by\nthe path separator " +
+                            "character of the platform.");
+                    textArea.setEditable(false);
+                    jconsoleView = textArea;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                jconsoleView = new JLabel("\n\nUnexpected error: " + e.getMessage());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            jconsoleView = new JLabel("\n\nUnexpected error: " + e.getMessage());
         }
         return new DataViewComponent(
                 new DataViewComponent.MasterView("JConsole Plugins", null, jconsoleView),
