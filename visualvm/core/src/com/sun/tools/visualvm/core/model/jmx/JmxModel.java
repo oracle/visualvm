@@ -614,6 +614,10 @@ public class JmxModel extends Model {
             } catch (Exception e) {
                 e.printStackTrace();
                 setConnectionState(ConnectionState.DISCONNECTED);
+                // Workaround for GlassFish's LoginException class not found
+                if (e.toString().contains("com.sun.enterprise.security.LoginException")) {
+                    throw new SecurityException("Authentication failed! Invalid username or password");
+                }
             }
         }
 
