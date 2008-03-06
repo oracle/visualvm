@@ -24,13 +24,16 @@
  */
 package com.sun.tools.visualvm.core.model.dsdescr;
 
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.RequestProcessor;
 
 public final class RenameDataSourceAction extends AbstractAction {
     
@@ -43,24 +46,43 @@ public final class RenameDataSourceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        DataSource selectedDataSource = getSelectedDataSource();
-        DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
-        if (descriptor != null && descriptor.supportsRename()) {
-            RenameConfigurator configurator = RenameConfigurator.defineName(selectedDataSource);
-            if (configurator != null) descriptor.setName(configurator.getDisplayName());
-        } else {
-            System.err.println("Cannot rename DataSource " + selectedDataSource);
-        }
+        final DataSource selectedDataSource = getSelectedDataSource();
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                if (isAvailable(selectedDataSource)) {
+                    RenameConfigurator configurator = RenameConfigurator.defineName(selectedDataSource);
+                    if (configurator != null)
+                        DataSourceDescriptorFactory.getDescriptor(selectedDataSource).setName(configurator.getDisplayName());
+                } else {
+                    NetBeansProfiler.getDefaultNB().displayError("Cannot rename " + DataSourceDescriptorFactory.getDescriptor(selectedDataSource).getName());
+                }
+            }
+        });
     }
     
     private void updateEnabled() {
-        DataSource selectedDataSource = getSelectedDataSource();
-        DataSourceDescriptor descriptor = selectedDataSource != null ? DataSourceDescriptorFactory.getDescriptor(selectedDataSource) : null;
-        final boolean isEnabled = descriptor != null && descriptor.supportsRename();
+        final DataSource selectedDataSource = getSelectedDataSource();
         
         IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() { setEnabled(isEnabled); }
+            public void run() {
+                setEnabled(isEnabled(selectedDataSource));
+            }
         });
+    }
+    
+    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
+    private static boolean isEnabled(DataSource dataSource) {
+        if (dataSource == null) return false;
+        return true;
+    }
+    
+    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
+    static boolean isAvailable(DataSource dataSource) {
+        if (!isEnabled(dataSource)) return false;
+        
+        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+        return descriptor != null && descriptor.supportsRename();
     }
     
     private DataSource getSelectedDataSource() {

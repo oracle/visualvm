@@ -64,7 +64,7 @@ final class ProfilerActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(Application application) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (ProfileApplicationAction.getInstance().isEnabled())
+            if (ProfileApplicationAction.isAvailable(application))
                 actions.add(new ExplorerActionDescriptor(ProfileApplicationAction.getInstance(), 30));
             
             return actions;

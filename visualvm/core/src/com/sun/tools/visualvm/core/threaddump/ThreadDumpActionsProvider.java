@@ -52,7 +52,7 @@ class ThreadDumpActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (ThreadDumpAction.getInstance().isEnabled())
+            if (ThreadDumpAction.isAvailable(dataSource))
                 actions.add(new ExplorerActionDescriptor(ThreadDumpAction.getInstance(), 10));
             
             return actions;

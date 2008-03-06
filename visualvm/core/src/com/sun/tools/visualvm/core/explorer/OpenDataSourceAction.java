@@ -24,13 +24,17 @@
  */
 package com.sun.tools.visualvm.core.explorer;
 
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.RequestProcessor;
 
 public final class OpenDataSourceAction extends AbstractAction {
     
@@ -43,25 +47,42 @@ public final class OpenDataSourceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        DataSource selectedDataSource = getSelectedDataSource();
-        if (selectedDataSource != null &&
-                DataSourceWindowFactory.sharedInstance().canCreateWindowFor(selectedDataSource)) {
-            DataSource viewMaster = selectedDataSource.getMaster();
-            if (viewMaster != null) DataSourceWindowManager.sharedInstance().addViews(viewMaster, selectedDataSource);
-            else DataSourceWindowManager.sharedInstance().openWindow(selectedDataSource);
-        } else {
-            System.err.println("Cannot open DataSource " + selectedDataSource);
-        }
+        final DataSource selectedDataSource = getSelectedDataSource();
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                if (isAvailable(selectedDataSource)) {
+                    DataSource viewMaster = selectedDataSource.getMaster();
+                    if (viewMaster != null) DataSourceWindowManager.sharedInstance().addViews(viewMaster, selectedDataSource);
+                    else DataSourceWindowManager.sharedInstance().openWindow(selectedDataSource);
+                } else {
+                    NetBeansProfiler.getDefaultNB().displayError("Cannot open " + DataSourceDescriptorFactory.getDescriptor(selectedDataSource).getName());
+                }
+            }
+        });
     }
     
     private void updateEnabled() {
-        DataSource selectedDataSource = getSelectedDataSource();
-        final boolean isEnabled = selectedDataSource != null &&
-                        DataSourceWindowFactory.sharedInstance().canCreateWindowFor(selectedDataSource);
+        final DataSource selectedDataSource = getSelectedDataSource();
         
         IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() { setEnabled(isEnabled); }
+            public void run() {
+                setEnabled(isEnabled(selectedDataSource));
+            }
         });
+    }
+    
+    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
+    private static boolean isEnabled(DataSource dataSource) {
+        if (dataSource == null) return false;
+        return true;
+    }
+    
+    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
+    static boolean isAvailable(DataSource dataSource) {
+        if (!isEnabled(dataSource)) return false;
+        
+        return DataSourceWindowFactory.sharedInstance().canCreateWindowFor(dataSource);
     }
     
     private DataSource getSelectedDataSource() {

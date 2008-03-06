@@ -29,12 +29,15 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.RequestProcessor;
 
 public final class ProfileApplicationAction extends AbstractAction {
     
@@ -48,29 +51,44 @@ public final class ProfileApplicationAction extends AbstractAction {
     
     public void actionPerformed(ActionEvent e) {
         final Application selectedApplication = getSelectedApplication();
-        ProfilerSupport.getInstance().selectProfilerView(selectedApplication);
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                if (isAvailable(selectedApplication)) {
+                    ProfilerSupport.getInstance().selectProfilerView(selectedApplication);
+                } else {
+                    NetBeansProfiler.getDefaultNB().displayError("Cannot profile " + DataSourceDescriptorFactory.getDescriptor(selectedApplication).getName());
+                }
+            }
+        });
     }
     
-    void updateEnabled() {
-        Application selectedApplication = getSelectedApplication();
-        final boolean isEnabled;
-        
-        if (selectedApplication == null) {
-            isEnabled = false;
-        } else if (Application.CURRENT_APPLICATION.equals(selectedApplication)) {
-            isEnabled = false;
-        } else if (selectedApplication.getHost() != Host.LOCALHOST) {
-            isEnabled = false;
-        } else if (selectedApplication.isFinished()) {
-            isEnabled = false;
-        } else {
-            JVM jvm = JVMFactory.getJVMFor(selectedApplication);
-            isEnabled = jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
-        }
+    private void updateEnabled() {
+        final Application selectedApplication = getSelectedApplication();
         
         IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() { setEnabled(isEnabled); }
+            public void run() {
+                setEnabled(isEnabled(selectedApplication));
+            }
         });
+    }
+    
+    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
+    private static boolean isEnabled(Application application) {
+        if (application == null) return false;
+        if (application.getHost() != Host.LOCALHOST) return false;
+        if (Application.CURRENT_APPLICATION.equals(application)) return false;
+        if (application.getState() != DataSource.STATE_AVAILABLE) return false;
+        
+        return true;
+    }
+    
+    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
+    static boolean isAvailable(Application application) {
+        if (!isEnabled(application)) return false;
+        
+        JVM jvm = JVMFactory.getJVMFor(application);
+        return jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
     }
     
     private Application getSelectedApplication() {

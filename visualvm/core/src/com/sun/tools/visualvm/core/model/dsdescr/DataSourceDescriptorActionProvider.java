@@ -62,7 +62,7 @@ final class DataSourceDescriptorActionProvider {
         }
 
         public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
-            if (RenameDataSourceAction.getInstance().isEnabled())
+            if (RenameDataSourceAction.isAvailable(dataSource))
                 return Collections.singleton(new ExplorerActionDescriptor(RenameDataSourceAction.getInstance(), 90));
             else return Collections.EMPTY_SET;
         }

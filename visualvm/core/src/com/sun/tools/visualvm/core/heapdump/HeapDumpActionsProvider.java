@@ -53,7 +53,7 @@ class HeapDumpActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (HeapDumpAction.getInstance().isEnabled())
+            if (HeapDumpAction.isAvailable(dataSource))
                 actions.add(new ExplorerActionDescriptor(HeapDumpAction.getInstance(), 20));
             
             return actions;

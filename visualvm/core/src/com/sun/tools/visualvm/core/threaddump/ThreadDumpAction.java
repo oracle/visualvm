@@ -30,13 +30,16 @@ import com.sun.tools.visualvm.core.snapshot.*;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.RequestProcessor;
 
 public final class ThreadDumpAction extends AbstractAction {
     
@@ -48,44 +51,52 @@ public final class ThreadDumpAction extends AbstractAction {
         return instance;
     }
     
-    public void actionPerformed(ActionEvent e) {
-        DataSource dataSource = getSelectedDataSource();
+    public void actionPerformed(final ActionEvent e) {
+        final DataSource dataSource = getSelectedDataSource();
         
-        if (dataSource.getState() != DataSource.STATE_AVAILABLE) {
-            System.err.println("Tried to take thread dump on unavailable " + dataSource);
-        }
-        
-        if (dataSource instanceof Application) {
-            Application application = (Application)dataSource;
-            ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-        } else if (dataSource instanceof CoreDump) {
-            CoreDump coreDump = (CoreDump)dataSource;
-            ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-        } else {
-            throw new UnsupportedOperationException("Cannot take thread dump from " + dataSource);
-        }
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                if (isAvailable(dataSource)) {
+                    if (dataSource instanceof Application) {
+                        Application application = (Application)dataSource;
+                        ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                    } else if (dataSource instanceof CoreDump) {
+                        CoreDump coreDump = (CoreDump)dataSource;
+                        ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                    }
+                } else {
+                    NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for " + DataSourceDescriptorFactory.getDescriptor(dataSource).getName());
+                }
+            }
+        });
     }
     
-    void updateEnabled() {
-        final boolean isEnabled;
-        DataSource selectedDataSource = getSelectedDataSource();
-        if (selectedDataSource == null) {
-            isEnabled = false;
-        } else if (selectedDataSource.getState() != DataSource.STATE_AVAILABLE) {
-            isEnabled = false;
-        } else if (selectedDataSource instanceof Application) {
-            Application application = (Application)selectedDataSource;
-            JVM jvm = JVMFactory.getJVMFor(application);
-            isEnabled = jvm != null && jvm.isTakeThreadDumpSupported();
-        } else if (selectedDataSource instanceof CoreDump) {
-            isEnabled = true;
-        } else {
-            isEnabled = false;
-        }
+    private void updateEnabled() {
+        final DataSource selectedDataSource = getSelectedDataSource();
         
         IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() { setEnabled(isEnabled); }
+            public void run() {
+                setEnabled(isEnabled(selectedDataSource));
+            }
         });
+    }
+    
+    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
+    private static boolean isEnabled(DataSource dataSource) {
+        if (dataSource == null) return false;
+        if (dataSource.getState() != DataSource.STATE_AVAILABLE) return false;
+        if (dataSource instanceof CoreDump || dataSource instanceof Application) return true;
+        return false;
+    }
+    
+    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
+    static boolean isAvailable(DataSource dataSource) {
+        if (!isEnabled(dataSource)) return false;
+        if (dataSource instanceof CoreDump) return true;
+        
+        Application application = (Application) dataSource;
+        JVM jvm = JVMFactory.getJVMFor(application);
+        return jvm != null && jvm.isTakeThreadDumpSupported();
     }
     
     private DataSource getSelectedDataSource() {
