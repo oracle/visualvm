@@ -28,7 +28,10 @@ package com.sun.tools.visualvm.modules.jconsole;
 import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
+import com.sun.tools.visualvm.core.application.JmxApplication;
+import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
@@ -46,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
+import javax.management.remote.JMXServiceURL;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -64,6 +68,8 @@ import sun.tools.jconsole.VMPanel;
  */
 class JConsoleView extends DataSourceView {
 
+    private static final String PROPERTY_USERNAME = "prop_username";
+    private static final String PROPERTY_PASSWORD = "prop_password";
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole.png"; // NOI18N
     private Application application;
     private DataViewComponent view;
@@ -116,53 +122,67 @@ class JConsoleView extends DataSourceView {
                 }
 
                 if (availablePlugins) {
-                    // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
-                    JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
                     ProxyClient proxyClient = null;
-                    if (Application.CURRENT_APPLICATION.equals(application)) {
-                        // Monitor self
-                        proxyClient = ProxyClient.getProxyClient("localhost", 0, null, null);   // NOI18N
-                    } else if (application.isLocalApplication()) {
-                        // Create a ProxyClient from local pid
-                        String connectorAddress = jvm.findByName(
-                                "sun.management.JMXConnectorServer.address");
-                        LocalVirtualMachine lvm = new LocalVirtualMachine(
-                                application.getPid(), "Dummy command line",
-                                jvm.isAttachable(), connectorAddress);
-                        proxyClient = ProxyClient.getProxyClient(lvm);
-                    } else {
-                        // TODO: Remove the following two lines when Connection Dialog is implemented.
-                        String username = System.getProperty("jconsole.username");
-                        String password = System.getProperty("jconsole.password");
-                        // Create a ProxyClient for the remote out-of-the-box
-                        // JMX management agent using the port and security
-                        // related information retrieved through jvmstat.
-                        List<String> urls = jvm.findByPattern(
-                                "sun.management.JMXConnectorServer.[0-9]+.address");
-                        if (urls.size() != 0) {
-                            proxyClient = ProxyClient.getProxyClient(urls.get(0), username, password);
-                            // TODO: if security needed show popup connection dialog
+                    if (application instanceof JvmstatApplication) {
+                        JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
+                        Storage storage = application.getStorage();
+                        String username = storage.getCustomProperty(PROPERTY_USERNAME);
+                        String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+                        // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
+                        if (Application.CURRENT_APPLICATION.equals(application)) {
+                            // Monitor self
+                            proxyClient = ProxyClient.getProxyClient("localhost", 0, null, null); // NOI18N
+                        } else if (application.isLocalApplication()) {
+                            // Create a ProxyClient from local pid
+                            String connectorAddress = jvm.findByName(
+                                    "sun.management.JMXConnectorServer.address"); // NOI18N
+                            LocalVirtualMachine lvm = new LocalVirtualMachine(
+                                    application.getPid(), "Dummy command line",
+                                    jvm.isAttachable(), connectorAddress);
+                            proxyClient = ProxyClient.getProxyClient(lvm);
                         } else {
                             // Create a ProxyClient for the remote out-of-the-box
-                            // JMX management agent using the port specified in
-                            // the -Dcom.sun.management.jmxremote.port=<port>
-                            // system property
-                            String jvmArgs = jvm.getJvmArgs();
-                            StringTokenizer st = new StringTokenizer(jvmArgs);
-                            int port = -1;
-                            while (st.hasMoreTokens()) {
-                                String token = st.nextToken();
-                                if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) {   // NOI18N
-                                    port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
-                                    break;
+                            // JMX management agent using the port and security
+                            // related information retrieved through jvmstat.
+                            List<String> urls = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
+                            if (urls.size() != 0) {
+                                List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
+                                proxyClient = ProxyClient.getProxyClient(urls.get(0), username, password);
+//                                if (username != null && "true".equals(auths.get(0))) {
+//                                    supplyCredentials(application, proxyClient);
+//                                }
+                            } else {
+                                // Create a ProxyClient for the remote out-of-the-box
+                                // JMX management agent using the port specified in
+                                // the -Dcom.sun.management.jmxremote.port=<port>
+                                // system property
+                                String jvmArgs = jvm.getJvmArgs();
+                                StringTokenizer st = new StringTokenizer(jvmArgs);
+                                int port = -1;
+                                boolean authenticate = false;
+                                while (st.hasMoreTokens()) {
+                                    String token = st.nextToken();
+                                    if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) { // NOI18N
+                                        port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
+                                    } else if (token.equals("-Dcom.sun.management.jmxremote.authenticate=true")) { // NOI18N
+                                        authenticate = true;
+                                    }
+                                }
+                                if (port != -1) {
+                                    proxyClient = ProxyClient.getProxyClient(
+                                            application.getHost().getHostName(), port, username, password);
+//                                    if (username != null && authenticate) {
+//                                        supplyCredentials(application, proxyClient);
+//                                    }
                                 }
                             }
-                            if (port != -1) {
-                                proxyClient = ProxyClient.getProxyClient(
-                                        application.getHost().getHostName(), port, username, password);
-                                // TODO: if security needed show popup connection dialog
-                            }
                         }
+                    } else if (application instanceof JmxApplication) {
+                        JMXServiceURL url = ((JmxApplication) application).getJMXServiceURL();
+                        Storage storage = application.getStorage();
+                        String username = storage.getCustomProperty(PROPERTY_USERNAME);
+                        String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+                        proxyClient = ProxyClient.getProxyClient(url.toString(), username, password);
                     }
 
                     // Remove static list of VMPanel core tabs before they're instantiated
