@@ -235,7 +235,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     }
     
     private void disableTimer() {
-        timer.stop();
+        if (timer != null) timer.stop();
     }
     
     private void computeMonitoredData() {
