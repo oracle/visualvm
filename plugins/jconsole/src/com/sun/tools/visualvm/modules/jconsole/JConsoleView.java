@@ -38,6 +38,7 @@ import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Constructor;
@@ -102,7 +103,7 @@ class JConsoleView extends DataSourceView {
                 debugField.setBoolean(null, true);
 
                 // Set JConsole plugin path and plugin service
-                String pluginPath = System.getProperty("jconsole.plugin.path");   // NOI18N
+                String pluginPath = JConsoleSettings.getDefault().getPluginsPath();
                 boolean availablePlugins = false;
                 if (pluginPath != null && !pluginPath.isEmpty()) {
                     Field pluginPathField = JConsole.class.getDeclaredField("pluginPath");   // NOI18N
@@ -195,7 +196,7 @@ class JConsoleView extends DataSourceView {
                     Constructor vmPanelConstructor = VMPanel.class.getDeclaredConstructors()[0];
                     vmPanelConstructor.setAccessible(true);
                     final VMPanel vmPanel = (VMPanel) vmPanelConstructor.newInstance(
-                            new Object[]{ proxyClient, 4000 });
+                            new Object[]{ proxyClient, JConsoleSettings.getDefault().getPolling() * 1000 });
 
                     // Take over handling of connections events, mostly to avoid
                     // activating the SheetDialog (which would require a JConsole object).
@@ -213,7 +214,6 @@ class JConsoleView extends DataSourceView {
                         }
                     });
                     vmPanel.connect();
-                    // TODO: if security needed show popup connection dialog
 
                     jconsoleView = vmPanel;
                 } else {

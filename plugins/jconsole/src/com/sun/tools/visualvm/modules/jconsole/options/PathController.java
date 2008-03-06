@@ -23,7 +23,6 @@
  * have any questions.
  */
 
-
 package com.sun.tools.visualvm.modules.jconsole.options;
 
 import java.awt.event.ActionEvent;
@@ -44,9 +43,10 @@ import javax.swing.event.ListSelectionListener;
 
 /**
  *
- * @author jfdenise
+ * @author Jean-Francois Denise
  */
 public class PathController implements ActionListener, ListSelectionListener, ListDataListener {
+
     private JList l;
     private JButton add;
     private JButton remove;
@@ -56,13 +56,15 @@ public class PathController implements ActionListener, ListSelectionListener, Li
     private DefaultListModel model;
     private JLabel label;
     private ListDataListener lstnr;
+
     public PathController(JList l, JLabel label, JButton add, JFileChooser chooser, JButton remove, JButton up, JButton down, ListDataListener lstnr) {
-        this(l,label, createModel(""),add,chooser,remove,up,down, lstnr);
+        this(l, label, createModel(""), add, chooser, remove, up, down, lstnr);
     }
+
     public PathController(JList l, JLabel label, String items, JButton add, JFileChooser chooser, JButton remove, JButton up, JButton down, ListDataListener lstnr) {
-        this(l,label,createModel(items),add,chooser,remove,up,down, lstnr);
+        this(l, label, createModel(items), add, chooser, remove, up, down, lstnr);
     }
-    
+
     /** Creates a new instance of PathController */
     public PathController(JList l, JLabel label, DefaultListModel model, JButton add, JFileChooser chooser, JButton remove, JButton up, JButton down, ListDataListener lstnr) {
         this.l = l;
@@ -73,11 +75,11 @@ public class PathController implements ActionListener, ListSelectionListener, Li
         this.up = up;
         this.down = down;
         this.chooser = chooser;
-        
+
         this.lstnr = lstnr;
-        
+
         l.setModel(model);
-        if(model != null) {
+        if (model != null) {
             model.addListDataListener(this);
         }
         add.setActionCommand("add");// NOI18N
@@ -89,12 +91,12 @@ public class PathController implements ActionListener, ListSelectionListener, Li
         up.addActionListener(this);
         down.addActionListener(this);
         l.addListSelectionListener(this);
-        
+
         remove.setEnabled(false);
         up.setEnabled(false);
         down.setEnabled(false);
     }
-    
+
     public void setEnabled(boolean b) {
         l.setEnabled(b);
         label.setEnabled(b);
@@ -103,6 +105,7 @@ public class PathController implements ActionListener, ListSelectionListener, Li
         up.setEnabled(up.isEnabled() && b);
         down.setEnabled(down.isEnabled() && b);
     }
+
     public void setVisible(boolean b) {
         l.setVisible(b);
         label.setVisible(b);
@@ -111,37 +114,37 @@ public class PathController implements ActionListener, ListSelectionListener, Li
         up.setVisible(b);
         down.setVisible(b);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals( "add")) {// NOI18N
+        if (e.getActionCommand().equals("add")) {// NOI18N
             int returnVal = chooser.showOpenDialog(null);
-            if(returnVal == JFileChooser.APPROVE_OPTION) {
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File[] selection = chooser.getSelectedFiles();
                 int size = selection.length;
-                StringBuffer buff = new StringBuffer();
                 int end = l.getModel().getSize();
-                for(int i = 0; i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     String path = selection[i].getAbsolutePath();
-                    if(!model.contains(path))
+                    if (!model.contains(path)) {
                         model.add(end + i, path);
+                    }
                 }
             }
             return;
         }
-        if (e.getActionCommand().equals( "remove")) {// NOI18N
+        if (e.getActionCommand().equals("remove")) {// NOI18N
             Object[] values = l.getSelectedValues();
-            
-            for(int i = 0; i < values.length; i++) {
+
+            for (int i = 0; i < values.length; i++) {
                 model.removeElement(values[i]);
             }
-            if(model.getSize() == 0) {
+            if (model.getSize() == 0) {
                 up.setEnabled(false);
                 down.setEnabled(false);
                 remove.setEnabled(false);
             }
             l.setSelectedIndex(0);
         }
-        
+
         if (e.getActionCommand().equals("up")) {// NOI18N
             int selectedI = l.getSelectedIndex();
             Object selected = l.getSelectedValue();
@@ -152,7 +155,7 @@ public class PathController implements ActionListener, ListSelectionListener, Li
             l.setSelectedIndex(newIndex);
             return;
         }
-        
+
         if (e.getActionCommand().equals("down")) {// NOI18N
             int selectedI = l.getSelectedIndex();
             Object selected = l.getSelectedValue();
@@ -164,46 +167,49 @@ public class PathController implements ActionListener, ListSelectionListener, Li
             return;
         }
     }
-    
+
     // return the list of selected items
+    @Override
     public String toString() {
         Enumeration pluginsPath = model.elements();
         StringBuffer buffer = new StringBuffer();
-        while(pluginsPath.hasMoreElements()) {
+        while (pluginsPath.hasMoreElements()) {
             Object path = pluginsPath.nextElement();
             buffer.append(path.toString());
-            if(pluginsPath.hasMoreElements())
-                buffer.append(",");// NOI18N
+            if (pluginsPath.hasMoreElements()) {
+                buffer.append(File.pathSeparator);
+            }
         }
         return buffer.toString();
     }
-    
+
     public synchronized void updateModel(String items) {
-        if(items == null)
+        if (items == null) {
             return;
+        }
         ListModel m = l.getModel();
-        if(m != null) {
+        if (m != null) {
             m.removeListDataListener(this);
         }
-        
+
         model = createModel(items);
         model.addListDataListener(this);
         l.setModel(model);
     }
-    
+
     public static DefaultListModel createModel(String items) {
-        StringTokenizer tk = new StringTokenizer(items,",");// NOI18N
+        StringTokenizer tk = new StringTokenizer(items, File.pathSeparator);
         DefaultListModel model = new DefaultListModel();
-        while(tk.hasMoreTokens()) {
+        while (tk.hasMoreTokens()) {
             String path = tk.nextToken();
             model.addElement(path);
         }
         return model;
     }
-    
+
     public void valueChanged(ListSelectionEvent e) {
         int[] indices = l.getSelectedIndices();
-        if(indices.length != 1) {
+        if (indices.length != 1) {
             up.setEnabled(false);
             down.setEnabled(false);
             return;
@@ -211,36 +217,41 @@ public class PathController implements ActionListener, ListSelectionListener, Li
         int single = l.getSelectedIndex();
         up.setEnabled(true);
         down.setEnabled(true);
-        
-        if(model.getSize() > 0)
+
+        if (model.getSize() > 0) {
             remove.setEnabled(true);
-        
-        if(single == 0) {
-            up.setEnabled(false);
-            if(model.getSize() == 1)
-                down.setEnabled(false);
         }
-        
-        if(single == model.getSize() -1)
+
+        if (single == 0) {
+            up.setEnabled(false);
+            if (model.getSize() == 1) {
+                down.setEnabled(false);
+            }
+        }
+
+        if (single == model.getSize() - 1) {
             down.setEnabled(false);
+        }
     }
-    
+
     public void intervalAdded(ListDataEvent arg0) {
-        if(lstnr == null)
+        if (lstnr == null) {
             return;
+        }
         lstnr.intervalAdded(arg0);
     }
-    
+
     public void intervalRemoved(ListDataEvent arg0) {
-        if(lstnr == null)
+        if (lstnr == null) {
             return;
+        }
         lstnr.intervalRemoved(arg0);
     }
-    
+
     public void contentsChanged(ListDataEvent arg0) {
-        if(lstnr == null)
+        if (lstnr == null) {
             return;
+        }
         lstnr.contentsChanged(arg0);
     }
-    
 }

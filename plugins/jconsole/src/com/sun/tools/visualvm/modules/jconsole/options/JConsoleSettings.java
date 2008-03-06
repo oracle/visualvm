@@ -23,7 +23,6 @@
  * have any questions.
  */
 
-
 package com.sun.tools.visualvm.modules.jconsole.options;
 
 import java.util.prefs.Preferences;
@@ -31,62 +30,39 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.util.NbPreferences;
 
-
 public class JConsoleSettings implements ChangeListener {
-    static final long serialVersionUID = -1055706114162507505L;
-    
-    private static final String PROP_POLLING     = "POLLING"; // NOI18N
-    private static final String PROP_TILE   = "TILE"; // NOI18N
-    private static final String PROP_CLASSPATH  = "CLASSPATH"; // NOI18N
-    private static final String PROP_PLUGINSPATH  = "PLUGINS"; // NOI18N
-    
+
+    private static final String PROP_POLLING = "POLLING"; // NOI18N
+    private static final String PROP_PLUGINSPATH = "PLUGINS"; // NOI18N
     private Preferences pref;
-    
-    private static Boolean greater;
     private static JConsoleSettings INSTANCE;
-    
+
     JConsoleSettings() {
         pref = NbPreferences.forModule(JConsoleSettings.class);
     }
-    
+
     public static synchronized JConsoleSettings getDefault() {
         if (INSTANCE == null) {
             INSTANCE = new JConsoleSettings();
         }
         return INSTANCE;
     }
-    
+
     public void stateChanged(ChangeEvent e) {
     }
-    
-    public Boolean getTile() {
-        return pref.getBoolean(PROP_TILE,Boolean.TRUE);
-    }
-    
-    public void setTile(Boolean tile) {
-        pref.putBoolean(PROP_TILE, tile);
-    }
-    
-    public String getClassPath() {
-        return pref.get(PROP_CLASSPATH,null);
-    }
-    
-    public void setClassPath(String value) {
-        pref.put(PROP_CLASSPATH, value);
-    }
-    
+
     public String getPluginsPath() {
-        return pref.get(PROP_PLUGINSPATH,null);
+        return pref.get(PROP_PLUGINSPATH, null);
     }
-    
+
     public void setPluginsPath(String value) {
         pref.put(PROP_PLUGINSPATH, value);
     }
-    
+
     public Integer getPolling() {
-        return pref.getInt(PROP_POLLING,4);
+        return pref.getInt(PROP_POLLING, 4);
     }
-    
+
     public void setPolling(Integer polling) {
         pref.putInt(PROP_POLLING, polling);
     }

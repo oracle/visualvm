@@ -40,79 +40,82 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  *
- * @author  jfdenise
+ * @author  Jean-Francois Denise
  */
 public class JConsoleCustomizer extends JPanel {
+
     private boolean initialized;
     private PathController pluginsController;
-    private PathController classpathController;
-    private JFileChooser classPathchooser;
     private JFileChooser pluginsChooser;
     private JconsoleOptionsPanelController controler;
-    
+
     private static class CustomizerFileFilter extends FileFilter {
+
         private String type;
+
         CustomizerFileFilter(String type) {
             this.type = type;
         }
+
         public boolean accept(File f) {
-            if(f != null) {
-                if(f.isDirectory()) {
+            if (f != null) {
+                if (f.isDirectory()) {
                     return true;
                 }
                 String extension = getExtension(f);
-                if(extension != null && extension.equals( "jar")) {// NOI18N
+                if (extension != null && extension.equals("jar")) { // NOI18N
                     return true;
-                };
+                }
             }
             return false;
         }
-        
+
         public static String getExtension(File f) {
-            if(f != null) {
+            if (f != null) {
                 String filename = f.getName();
                 int i = filename.lastIndexOf('.');
-                if(i>0 && i<filename.length()-1) {
-                    return filename.substring(i+1).toLowerCase();
-                };
+                if (i > 0 && i < filename.length() - 1) {
+                    return filename.substring(i + 1).toLowerCase();
+                }
             }
             return null;
         }
-        
+
         public String getDescription() {
-            return  "JConsole "+ type + " path (jar or dir)";// NOI18N
+            return "JConsole " + type + " path (jar or dir)"; // NOI18N
         }
     }
-    
+
     private class ChangedListener implements ListDataListener, KeyListener {
+
         public void intervalAdded(ListDataEvent arg0) {
         }
-        
+
         public void intervalRemoved(ListDataEvent arg0) {
         }
-        
+
         public void contentsChanged(ListDataEvent arg0) {
             changed();
         }
-    
+
         public void keyTyped(KeyEvent arg0) {
             changed();
         }
 
         public void keyPressed(KeyEvent arg0) {
-            
+
         }
 
         public void keyReleased(KeyEvent arg0) {
-            
+
         }
-}
-    
+    }
+
     private class KeyLstnr implements KeyListener {
-        
+
         KeyLstnr() {
         }
-        
+
         public void keyTyped(KeyEvent e) {
             changed();
             char c = e.getKeyChar();
@@ -122,106 +125,91 @@ public class JConsoleCustomizer extends JPanel {
                 e.consume();
             }
         }
-        
+
         public void keyPressed(KeyEvent e) {
         }
-        
+
         public void keyReleased(KeyEvent e) {
         }
-        
+
         public void focusGained(FocusEvent e) {
             Object source = e.getSource();
             Component opposite = e.getOppositeComponent();
-            
+
             if (!e.isTemporary() &&
                     source instanceof JTextField &&
-                    opposite instanceof JComponent ) {
-                
-                ((JTextField)source).selectAll();
+                    opposite instanceof JComponent) {
+
+                ((JTextField) source).selectAll();
             }
         }
-        
+
         public void focusLost(FocusEvent e) {
-            
+
         }
     }
-    
+
     /** Creates new form JConsoleCustomizer */
     public JConsoleCustomizer(JconsoleOptionsPanelController contr) {
         this.controler = contr;
         initComponents();
-        
-        classPathchooser = new JFileChooser();
-        classPathchooser.setMultiSelectionEnabled(true);
-        classPathchooser.setFileFilter(new CustomizerFileFilter("Class"));// NOI18N
-        classPathchooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
         pluginsChooser = new JFileChooser();
         pluginsChooser.setMultiSelectionEnabled(true);
-        pluginsChooser.setFileFilter(new CustomizerFileFilter("Plugins"));// NOI18N
+        pluginsChooser.setFileFilter(new CustomizerFileFilter("Plugins")); // NOI18N
         pluginsChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        
+
         ChangedListener changedListener = new ChangedListener();
-        
+
         pluginsController = new PathController(jList1, pathLabel, jButtonAddJarC,
                 pluginsChooser,
                 jButtonRemoveC,
-                jButtonMoveUpC,jButtonMoveDownC, changedListener);
-        
-        classpathController = new PathController(jList2, pathLabel1, jButtonAddJarC1,
-                classPathchooser,
-                jButtonRemoveC1,
-                jButtonMoveUpC1,jButtonMoveDownC1, changedListener);
-        
+                jButtonMoveUpC, jButtonMoveDownC, changedListener);
+
         pluginsController.setVisible(true);
-        
+
         KeyLstnr listener = new KeyLstnr();
         period.addKeyListener(listener);
-        
+
     }
-    
+
     synchronized void changed() {
         controler.changed();
     }
-    
+
     synchronized void load() {
-        String path = JConsoleSettings.getDefault().getClassPath();
         String plugins = JConsoleSettings.getDefault().getPluginsPath();
         Integer polling = JConsoleSettings.getDefault().getPolling();
-        Boolean tileVal = JConsoleSettings.getDefault().getTile();
-        
-        classpathController.updateModel(path);
         pluginsController.updateModel(plugins);
         period.setText(polling.toString());
-        tile.setSelected(tileVal);
         initialized = true;
     }
-    
+
     synchronized void store() {
-        if(!initialized) return;
-        JConsoleSettings.getDefault().setClassPath(classpathController.toString());
+        if (!initialized) {
+            return;
+        }
         JConsoleSettings.getDefault().setPluginsPath(pluginsController.toString());
         JConsoleSettings.getDefault().setPolling(Integer.valueOf(period.getText()));
-        JConsoleSettings.getDefault().setTile(tile.isSelected());
     }
-    
+
     void cancel() {
-        
+
     }
-    
+
     boolean valid() {
         return true;
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        tile = new javax.swing.JCheckBox();
         period = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -231,14 +219,6 @@ public class JConsoleCustomizer extends JPanel {
         jButtonMoveDownC = new javax.swing.JButton();
         jButtonRemoveC = new javax.swing.JButton();
         pathLabel = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList();
-        jButtonAddJarC1 = new javax.swing.JButton();
-        jButtonMoveUpC1 = new javax.swing.JButton();
-        jButtonMoveDownC1 = new javax.swing.JButton();
-        jButtonRemoveC1 = new javax.swing.JButton();
-        pathLabel1 = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.border.title"))); // NOI18N
 
@@ -246,11 +226,6 @@ public class JConsoleCustomizer extends JPanel {
         jLabel1.setLabelFor(period);
         jLabel1.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jLabel1.text")); // NOI18N
         jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "PROPERTY_POLLING_PERIOD_DESCRIPTION")); // NOI18N
-
-        tile.setMnemonic('T');
-        tile.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.tile.text")); // NOI18N
-        tile.setToolTipText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "PROPERTY_TILE_WINDOWS_DESCRIPTION")); // NOI18N
-        tile.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         period.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.period.text")); // NOI18N
 
@@ -311,61 +286,6 @@ public class JConsoleCustomizer extends JPanel {
         jButtonRemoveC.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemoveC.AccessibleContext.accessibleDescription")); // NOI18N
         pathLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.pathLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
-        jScrollPane2.setViewportView(jList2);
-        jList2.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jList2.AccessibleContext.accessibleName")); // NOI18N
-        jList2.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jList2.AccessibleContext.accessibleDescription")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonAddJarC1, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonAddJarC1.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonMoveUpC1, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveUpC1.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonMoveDownC1, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveDownC1.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonRemoveC1, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemoveC1.text")); // NOI18N
-
-        pathLabel1.setDisplayedMnemonic('C');
-        pathLabel1.setLabelFor(jList2);
-        pathLabel1.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.pathLabel1.text")); // NOI18N
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 295, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jButtonRemoveC1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButtonAddJarC1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButtonMoveUpC1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButtonMoveDownC1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-            .add(pathLabel1)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(9, 9, 9)
-                .add(pathLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(jButtonAddJarC1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButtonRemoveC1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButtonMoveUpC1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButtonMoveDownC1))
-                    .add(jScrollPane2, 0, 0, Short.MAX_VALUE))
-                .addContainerGap(12, Short.MAX_VALUE))
-        );
-
-        jButtonAddJarC1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonAddJarC1.AccessibleContext.accessibleDescription")); // NOI18N
-        jButtonMoveUpC1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveUpC1.AccessibleContext.accessibleDescription")); // NOI18N
-        jButtonMoveDownC1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveDownC1.AccessibleContext.accessibleDescription")); // NOI18N
-        jButtonRemoveC1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemoveC1.AccessibleContext.accessibleDescription")); // NOI18N
-        pathLabel1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.pathLabel1.AccessibleContext.accessibleDescription")); // NOI18N
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -373,61 +293,40 @@ public class JConsoleCustomizer extends JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(tile)
-                        .addContainerGap(563, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
-                        .add(22, 22, 22)
+                        .add(18, 18, 18)
                         .add(period, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 138, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(384, Short.MAX_VALUE))
+                        .addContainerGap())
                     .add(layout.createSequentialGroup()
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(24, 24, 24))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(tile)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(period, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(16, 16, 16)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(period, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(132, Short.MAX_VALUE))
+                .add(0, 0, Short.MAX_VALUE))
         );
 
         period.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.period.AccessibleContext.accessibleName")); // NOI18N
         period.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.period.AccessibleContext.accessibleDescription")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
-        
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAddJarC;
-    private javax.swing.JButton jButtonAddJarC1;
     private javax.swing.JButton jButtonMoveDownC;
-    private javax.swing.JButton jButtonMoveDownC1;
     private javax.swing.JButton jButtonMoveUpC;
-    private javax.swing.JButton jButtonMoveUpC1;
     private javax.swing.JButton jButtonRemoveC;
-    private javax.swing.JButton jButtonRemoveC1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
-    private javax.swing.JList jList2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel pathLabel;
-    private javax.swing.JLabel pathLabel1;
     private javax.swing.JTextField period;
-    private javax.swing.JCheckBox tile;
     // End of variables declaration//GEN-END:variables
-    
 }
-

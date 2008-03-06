@@ -48,7 +48,8 @@ class JConsoleClassLoader extends URLClassLoader {
 
     @Override
     protected Class loadClass(String className, boolean resolve) throws ClassNotFoundException {
-        if (className.startsWith(PACKAGE_NAME)) {
+        if (className.startsWith(PACKAGE_NAME) &&
+                !className.startsWith("com.sun.tools.visualvm.modules.jconsole.options")) {
             // Do not delegate to parent classloader
             Class clazz = findLoadedClass(className);
             if (clazz != null) {
