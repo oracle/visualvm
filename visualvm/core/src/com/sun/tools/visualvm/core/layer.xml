@@ -149,10 +149,9 @@
         </folder>
     </folder>
     <folder name="OptionsDialog">
-        <folder name="General.instance_hidden"/>
-        <file name="Advanced.instance_hidden"/>
-        <file name="ProfilerOptionsCategory.instance_hidden"/>
-        <file name="com-sun-tools-visualvm-core-options-GeneralOptionsCategory.instance"/>
+        <file name="com-sun-tools-visualvm-core-options-GeneralOptionsCategory.instance">
+            <attr name="position" intvalue="790"/>
+        </file>
     </folder>
     <folder name="Services">
         <folder name="AutoupdateType">

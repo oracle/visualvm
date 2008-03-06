@@ -87,6 +87,10 @@
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.shadow_hidden"/>
         </folder>
     </folder>
+    <folder name="OptionsDialog">
+        <folder name="Advanced.instance_hidden"/>
+        <folder name="General.instance_hidden"/>
+    </folder>
     <folder name="Services">
         <folder name="NoOps">
             <file name="NoIndentEngine.instance_hidden"/>
