@@ -24,7 +24,9 @@
  CA 95054 USA or visit www.sun.com if you need additional information or
  have any questions.
 -->
-
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    <folder name="OptionsDialog">
+        <file name="com-sun-tools-visualvm-modules-mbeans-options-MBeansOptionsCategory.instance"/>
+    </folder>
 </filesystem>

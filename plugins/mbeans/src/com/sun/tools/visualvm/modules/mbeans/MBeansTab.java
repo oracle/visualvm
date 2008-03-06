@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.components.DisplayArea;
+import com.sun.tools.visualvm.modules.mbeans.options.GlobalPreferences;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.*;
@@ -114,7 +115,7 @@ class MBeansTab extends JPanel implements
     }
     
     public int getUpdateInterval() {
-        return 4000;
+        return GlobalPreferences.sharedInstance().getPlottersPoll() * 1000;
     }
     
     public void buildMBeanServerView() {
