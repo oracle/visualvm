@@ -72,7 +72,7 @@ int WINAPI
 
     char topdir[MAX_PATH];
     char buf[MAX_PATH * 10], *pc;
-    char *configFile;
+    char configFile[MAX_PATH];
     
     GetModuleFileName(0, buf, sizeof buf);
     pc = strrchr(buf, '\\');
