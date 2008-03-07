@@ -64,7 +64,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
-    private static final String PROPERTY_IP = "prop_ip";
+    private static final String PROPERTY_HOSTNAME = "prop_hostname";
 
     private HostImpl LOCALHOST = null;
     private Host UNKNOWN_HOST = null;
@@ -128,11 +128,11 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 
                 String[] propNames = new String[] {
                     SNAPSHOT_VERSION,
-                    PROPERTY_IP,
+                    PROPERTY_HOSTNAME,
                     DataSourceDescriptor.PROPERTY_NAME };
                 String[] propValues = new String[] {
                     CURRENT_SNAPSHOT_VERSION,
-                    ipString,
+                    hostName,
                     hostDescriptor.getDisplayName() };
                 
                 File customPropertiesStorage = Utils.getUniqueFile(HostsSupport.getStorageDirectory(), ipString, Storage.DEFAULT_PROPERTIES_EXT);
@@ -141,7 +141,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 
                 HostImpl newHost = null;
                 try {
-                    newHost = new HostImpl(ipString, storage);
+                    newHost = new HostImpl(hostName, storage);
                 } catch (Exception e) {
                     System.err.println("Error creating host: " + e.getMessage()); // Should never happen
                 }
@@ -237,7 +237,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             Set<HostImpl> hosts = new HashSet();
             for (File file : files) {
                 Storage storage = new Storage(file.getParentFile(), file.getName());
-                String hostName = storage.getCustomProperty(PROPERTY_IP);
+                String hostName = storage.getCustomProperty(PROPERTY_HOSTNAME);
 
                 HostImpl persistedHost = null;
                 try {

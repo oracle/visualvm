@@ -25,6 +25,9 @@
 
 package com.sun.tools.visualvm.core.application;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -99,6 +102,11 @@ class JmxApplicationConfigurator extends JPanel {
         displaynameCheckbox.setEnabled(true);
         connectionField.setText("");
         displaynameField.setText("");
+        
+        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
+        if (selectedDataSource == null || !(selectedDataSource instanceof Host)) return;
+        Host host = (Host)selectedDataSource;
+        connectionField.setText(host.getHostName() + ":");
     }
 
     private void update() {

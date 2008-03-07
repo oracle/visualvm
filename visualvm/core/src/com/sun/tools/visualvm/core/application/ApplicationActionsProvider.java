@@ -59,8 +59,8 @@ class ApplicationActionsProvider {
                 new ApplicationActionProvider(), Application.class);
         explorer.addExplorerActionsProvider(
                 new HostActionProvider(), Host.class);
-        explorer.addExplorerActionsProvider(
-                new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
+//        explorer.addExplorerActionsProvider(
+//                new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
         explorer.addExplorerActionsProvider(
                 new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
@@ -136,20 +136,20 @@ class ApplicationActionsProvider {
         }
     }
 
-    private static class RemoteHostsContainerActionProvider
-            implements ExplorerActionsProvider<RemoteHostsContainer> {
-
-        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
-            return null;
-        }
-
-        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
-            Set<ExplorerActionDescriptor> actions =
-                    new HashSet<ExplorerActionDescriptor>();
-            actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 30));
-            return actions;
-        }
-    }
+//    private static class RemoteHostsContainerActionProvider
+//            implements ExplorerActionsProvider<RemoteHostsContainer> {
+//
+//        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
+//            return null;
+//        }
+//
+//        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
+//            Set<ExplorerActionDescriptor> actions =
+//                    new HashSet<ExplorerActionDescriptor>();
+//            actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 30));
+//            return actions;
+//        }
+//    }
 
     private static class DataSourceRootActionProvider
             implements ExplorerActionsProvider<DataSourceRoot> {
