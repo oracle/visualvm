@@ -59,6 +59,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
                 <friend>org.netbeans.modules.profiler.utilities</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <package>org.netbeans.lib.profiler</package>
                 <package>org.netbeans.lib.profiler.classfile</package>
                 <package>org.netbeans.lib.profiler.client</package>
