@@ -54,7 +54,6 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
      * Creates new instance of Host defined by hostName, displayName and InetAddress instance for the host.
      * 
      * @param hostName name or IP of the host,
-     * @param displayName string which represents this Host instance in UI or null (hostName will be used instead),
      * @param inetAddress InetAddress instance for the host.
      */
     public AbstractHost(String hostName, InetAddress inetAddress) {
