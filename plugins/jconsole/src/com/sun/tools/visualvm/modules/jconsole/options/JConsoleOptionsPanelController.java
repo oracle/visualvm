@@ -35,7 +35,7 @@ import org.openide.util.Lookup;
 /**
  * @author Tomas Hurka
  */
-final class JconsoleOptionsPanelController extends OptionsPanelController {
+final class JConsoleOptionsPanelController extends OptionsPanelController {
 
     private JConsoleCustomizer panel;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);

@@ -35,14 +35,14 @@ import org.openide.util.Utilities;
 /**
  * @author Tomas Hurka
  */
-public final class JconsoleOption extends OptionsCategory {
+public final class JConsoleOptionsCategory extends OptionsCategory {
 
     public String getCategoryName() {
-        return NbBundle.getMessage(JconsoleOption.class, "AdvancedOption_DisplayName_Jconsole");
+        return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Name_JConsole");
     }
 
     public String getTitle() {
-        return NbBundle.getMessage(JconsoleOption.class, "AdvancedOption_Tooltip_Jconsole");
+        return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Title_JConsole");
     }
 
     public Icon getIcon() {
@@ -50,6 +50,6 @@ public final class JconsoleOption extends OptionsCategory {
     }
 
     public OptionsPanelController create() {
-        return new JconsoleOptionsPanelController();
+        return new JConsoleOptionsPanelController();
     }
 }

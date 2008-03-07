@@ -47,7 +47,7 @@ public class JConsoleCustomizer extends JPanel {
     private boolean initialized;
     private PathController pluginsController;
     private JFileChooser pluginsChooser;
-    private JconsoleOptionsPanelController controler;
+    private JConsoleOptionsPanelController controler;
 
     private static class CustomizerFileFilter extends FileFilter {
 
@@ -150,7 +150,7 @@ public class JConsoleCustomizer extends JPanel {
     }
 
     /** Creates new form JConsoleCustomizer */
-    public JConsoleCustomizer(JconsoleOptionsPanelController contr) {
+    public JConsoleCustomizer(JConsoleOptionsPanelController contr) {
         this.controler = contr;
         initComponents();
 
@@ -161,10 +161,10 @@ public class JConsoleCustomizer extends JPanel {
 
         ChangedListener changedListener = new ChangedListener();
 
-        pluginsController = new PathController(jList1, pathLabel, jButtonAddJarC,
+        pluginsController = new PathController(jList1, pathLabel, jButtonAddJar,
                 pluginsChooser,
-                jButtonRemoveC,
-                jButtonMoveUpC, jButtonMoveDownC, changedListener);
+                jButtonRemove,
+                jButtonMoveUp, jButtonMoveDown, changedListener);
 
         pluginsController.setVisible(true);
 
@@ -209,38 +209,33 @@ public class JConsoleCustomizer extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        periodLabel = new javax.swing.JLabel();
         period = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
-        jButtonAddJarC = new javax.swing.JButton();
-        jButtonMoveUpC = new javax.swing.JButton();
-        jButtonMoveDownC = new javax.swing.JButton();
-        jButtonRemoveC = new javax.swing.JButton();
+        jButtonAddJar = new javax.swing.JButton();
+        jButtonMoveUp = new javax.swing.JButton();
+        jButtonMoveDown = new javax.swing.JButton();
+        jButtonRemove = new javax.swing.JButton();
         pathLabel = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.border.title"))); // NOI18N
 
-        jLabel1.setDisplayedMnemonic('P');
-        jLabel1.setLabelFor(period);
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jLabel1.text")); // NOI18N
-        jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "PROPERTY_POLLING_PERIOD_DESCRIPTION")); // NOI18N
-
-        period.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.period.text")); // NOI18N
+        periodLabel.setDisplayedMnemonic('P');
+        periodLabel.setLabelFor(period);
+        periodLabel.setText(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.periodLabel.text")); // NOI18N
 
         jScrollPane1.setViewportView(jList1);
-        jList1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jList1.AccessibleContext.accessibleName")); // NOI18N
-        jList1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jList1.AccessibleContext.accessibleDescription")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonAddJarC, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonAddJarC.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jButtonAddJar, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonAddJar.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonMoveUpC, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveUpC.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jButtonMoveUp, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveUp.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonMoveDownC, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveDownC.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jButtonMoveDown, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveDown.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonRemoveC, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemoveC.text")); // NOI18N
-        jButtonRemoveC.setActionCommand(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemoveC.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jButtonRemove, org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemove.text")); // NOI18N
+        jButtonRemove.setActionCommand(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemove.actionCommand")); // NOI18N
 
         pathLabel.setDisplayedMnemonic('l');
         pathLabel.setLabelFor(jList1);
@@ -254,10 +249,10 @@ public class JConsoleCustomizer extends JPanel {
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 295, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jButtonRemoveC, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButtonAddJarC, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButtonMoveUpC, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButtonMoveDownC, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .add(jButtonRemove, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jButtonAddJar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jButtonMoveUp, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jButtonMoveDown, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .add(pathLabel)
         );
         jPanel1Layout.setVerticalGroup(
@@ -268,23 +263,18 @@ public class JConsoleCustomizer extends JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(jButtonAddJarC)
+                        .add(jButtonAddJar)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButtonRemoveC)
+                        .add(jButtonRemove)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButtonMoveUpC)
+                        .add(jButtonMoveUp)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButtonMoveDownC))
+                        .add(jButtonMoveDown))
                     .add(jScrollPane1, 0, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
-        jButtonAddJarC.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonAddJarC.AccessibleContext.accessibleDescription")); // NOI18N
-        jButtonMoveUpC.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveUpC.AccessibleContext.accessibleDescription")); // NOI18N
-        jButtonMoveDownC.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonMoveDownC.AccessibleContext.accessibleDescription")); // NOI18N
-        jButtonMoveDownC.getAccessibleContext().setAccessibleParent(jButtonAddJarC);
-        jButtonRemoveC.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.jButtonRemoveC.AccessibleContext.accessibleDescription")); // NOI18N
-        pathLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.pathLabel.AccessibleContext.accessibleDescription")); // NOI18N
+        jButtonMoveDown.getAccessibleContext().setAccessibleParent(jButtonAddJar);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -294,7 +284,7 @@ public class JConsoleCustomizer extends JPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(periodLabel)
                         .add(18, 18, 18)
                         .add(period, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 138, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
@@ -308,25 +298,22 @@ public class JConsoleCustomizer extends JPanel {
                 .add(16, 16, 16)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(period, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
+                    .add(periodLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(0, 0, Short.MAX_VALUE))
         );
-
-        period.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.period.AccessibleContext.accessibleName")); // NOI18N
-        period.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(JConsoleCustomizer.class, "JConsoleCustomizer.period.AccessibleContext.accessibleDescription")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonAddJarC;
-    private javax.swing.JButton jButtonMoveDownC;
-    private javax.swing.JButton jButtonMoveUpC;
-    private javax.swing.JButton jButtonRemoveC;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jButtonAddJar;
+    private javax.swing.JButton jButtonMoveDown;
+    private javax.swing.JButton jButtonMoveUp;
+    private javax.swing.JButton jButtonRemove;
     private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel pathLabel;
     private javax.swing.JTextField period;
+    private javax.swing.JLabel periodLabel;
     // End of variables declaration//GEN-END:variables
 }

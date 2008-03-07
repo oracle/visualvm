@@ -27,7 +27,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <Component id="periodLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Component id="period" min="-2" pref="138" max="-2" attributes="1"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -46,7 +46,7 @@
               <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="period" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="periodLabel" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
@@ -56,34 +56,18 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="periodLabel">
       <Properties>
         <Property name="displayedMnemonic" type="int" value="80"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="period"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="PROPERTY_POLLING_PERIOD_DESCRIPTION" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.periodLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="period">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.period.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-      <AccessibilityProperties>
-        <Property name="AccessibleContext.accessibleName" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.period.AccessibleContext.accessibleName" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.period.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </AccessibilityProperties>
     </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
 
@@ -94,10 +78,10 @@
                   <Component id="jScrollPane1" min="-2" pref="295" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="jButtonRemoveC" alignment="0" max="32767" attributes="1"/>
-                      <Component id="jButtonAddJarC" alignment="0" max="32767" attributes="1"/>
-                      <Component id="jButtonMoveUpC" alignment="0" max="32767" attributes="1"/>
-                      <Component id="jButtonMoveDownC" alignment="0" max="32767" attributes="1"/>
+                      <Component id="jButtonRemove" alignment="0" max="32767" attributes="1"/>
+                      <Component id="jButtonAddJar" alignment="0" max="32767" attributes="1"/>
+                      <Component id="jButtonMoveUp" alignment="0" max="32767" attributes="1"/>
+                      <Component id="jButtonMoveDown" alignment="0" max="32767" attributes="1"/>
                   </Group>
               </Group>
               <Component id="pathLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -111,13 +95,13 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jButtonAddJarC" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonAddJar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButtonRemoveC" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonRemove" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButtonMoveUpC" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonMoveUp" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButtonMoveDownC" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonMoveDown" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="jScrollPane1" alignment="1" min="0" pref="0" max="32767" attributes="1"/>
                   </Group>
@@ -137,79 +121,53 @@
                   <StringArray count="0"/>
                 </Property>
               </Properties>
-              <AccessibilityProperties>
-                <Property name="AccessibleContext.accessibleName" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jList1.AccessibleContext.accessibleName" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                </Property>
-                <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jList1.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                </Property>
-              </AccessibilityProperties>
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="jButtonAddJarC">
+        <Component class="javax.swing.JButton" name="jButtonAddJar">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonAddJarC.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonAddJar.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonAddJarC.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-          </AccessibilityProperties>
           <AuxValues>
             <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JButton" name="jButtonMoveUpC">
+        <Component class="javax.swing.JButton" name="jButtonMoveUp">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonMoveUpC.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonMoveUp.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonMoveUpC.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-          </AccessibilityProperties>
           <AuxValues>
             <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JButton" name="jButtonMoveDownC">
+        <Component class="javax.swing.JButton" name="jButtonMoveDown">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonMoveDownC.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonMoveDown.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonMoveDownC.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
             <Property name="AccessibleContext.accessibleParent" type="javax.accessibility.Accessible" editor="org.netbeans.modules.form.RADVisualComponent$AccessibleParentEditor">
-              <ComponentRef name="jButtonAddJarC"/>
+              <ComponentRef name="jButtonAddJar"/>
             </Property>
           </AccessibilityProperties>
           <AuxValues>
             <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JButton" name="jButtonRemoveC">
+        <Component class="javax.swing.JButton" name="jButtonRemove">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonRemoveC.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonRemove.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonRemoveC.actionCommand" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonRemove.actionCommand" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.jButtonRemoveC.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-          </AccessibilityProperties>
           <AuxValues>
             <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
           </AuxValues>
@@ -224,11 +182,6 @@
               <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.pathLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/jconsole/options/Bundle.properties" key="JConsoleCustomizer.pathLabel.AccessibleContext.accessibleDescription" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-          </AccessibilityProperties>
         </Component>
       </SubComponents>
     </Container>
