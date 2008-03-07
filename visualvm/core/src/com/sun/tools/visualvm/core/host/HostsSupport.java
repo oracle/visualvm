@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.io.File;
+import java.net.InetAddress;
 
 /**
  *
@@ -62,6 +63,10 @@ public final class HostsSupport {
 
     public Host createHost(String hostname) {
         return getHostProvider().createHost(new HostProperties(hostname, hostname), true);
+    }
+    
+    public Host getHostByAddress(InetAddress inetAddress) {
+        return getHostProvider().getHostByAddress(inetAddress);
     }
 
     HostProvider getHostProvider() {
@@ -97,10 +102,10 @@ public final class HostsSupport {
     private HostsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorProvider());
         
+        new RemoteHostsContainerProvider().initialize();
+        
         hostProvider = new HostProvider();
         hostProvider.initialize();
-        
-        new RemoteHostsContainerProvider().initialize();
 
         new HostActionsProvider().initialize();
         

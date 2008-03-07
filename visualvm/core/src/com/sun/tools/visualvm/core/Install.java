@@ -48,9 +48,6 @@ import org.openide.util.RequestProcessor;
  */
 // Class implementing logic on VisualVM module install
 public class Install extends ModuleInstall {
-    
-    // TODO: needs to be implemented differently!!!
-    public static final RequestProcessor LAZY_INIT_QUEUE = new RequestProcessor("Lazy Init Queue");
 
     public void restored() {
         // NOTE: this has to be called before any of DataSourceProviders initializes

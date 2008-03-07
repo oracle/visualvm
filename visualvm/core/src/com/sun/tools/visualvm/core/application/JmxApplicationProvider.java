@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.application;
 
-import com.sun.tools.visualvm.core.Install;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Host;
@@ -48,6 +47,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Exceptions;
+import org.openide.util.RequestProcessor;
 
 /**
  * A provider for Applications added as JMX connections.
@@ -104,19 +104,15 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     // and retrieve the hostname information.
     private Host getHost(String hostname, JMXServiceURL url)
             throws IOException {
-        Set<Host> hosts = DataSourceRepository.sharedInstance().getDataSources(Host.class);
         // Try to compute the Host instance from hostname
         if (hostname != null) {
             if (hostname.isEmpty() || isLocalHost(hostname)) {
                 return Host.LOCALHOST;
             } else {
                 InetAddress addr = InetAddress.getByName(hostname);
-                for (Host host : hosts) {
-                    if (addr.getHostAddress().equals(host.getInetAddress().getHostAddress())) {
-                        return host;
-                    }
-                }
-                return HostsSupport.getInstance().createHost(hostname);
+                Host host = HostsSupport.getInstance().getHostByAddress(addr);
+                if (host == null) host = HostsSupport.getInstance().createHost(hostname);
+                return host;
             }
         }
 
@@ -322,7 +318,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     static void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(
                 JmxApplicationProvider.sharedInstance());
-        Install.LAZY_INIT_QUEUE.post(new Runnable() {
+        RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 JmxApplicationProvider.sharedInstance().initPersistedApplications();
             }
