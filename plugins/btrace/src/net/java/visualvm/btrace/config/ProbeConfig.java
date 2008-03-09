@@ -26,6 +26,8 @@
 package net.java.visualvm.btrace.config;
 
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -37,6 +39,43 @@ public class ProbeConfig {
     private String clazz;
     private String category;
     private URL baseURL;
+    final private Set<ProbeConnection> connections = new  HashSet<ProbeConfig.ProbeConnection>();
+    
+    public static class ProbeConnection {
+        final public String name;
+        final public String jvmStatVar;
+        
+        public ProbeConnection(String name, String var) {
+            this.name = name;
+            this.jvmStatVar = var;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ProbeConnection other = (ProbeConnection) obj;
+            if (this.name != other.name && (this.name == null || !this.name.equals(other.name))) {
+                return false;
+            }
+            if (this.jvmStatVar != other.jvmStatVar && (this.jvmStatVar == null || !this.jvmStatVar.equals(other.jvmStatVar))) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
+            hash = 17 * hash + (this.jvmStatVar != null ? this.jvmStatVar.hashCode() : 0);
+            return hash;
+        }
+    }
     
     public String getDescription() {
         return description;
@@ -76,6 +115,10 @@ public class ProbeConfig {
 
     public void setClazz(String clazz) {
         this.clazz = clazz;
+    }
+    
+    public Set<ProbeConnection> getConnections() {
+        return connections;
     }
 
     @Override

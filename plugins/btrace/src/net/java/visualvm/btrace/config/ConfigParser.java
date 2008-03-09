@@ -123,6 +123,10 @@ public class ConfigParser implements ContentHandler {
         }
         if (qName.equals("displayName") || qName.equals("description") || qName.equals("category")) {
             textContent = new StringBuilder();
+        } else if (qName.equals("connection")) {
+            if (currentConfig != null) {
+                currentConfig.getConnections().add(new ProbeConfig.ProbeConnection(atts.getValue("name"), atts.getValue("access")));
+            }
         }
     }
 

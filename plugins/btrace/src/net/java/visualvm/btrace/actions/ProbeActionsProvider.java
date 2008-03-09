@@ -49,7 +49,7 @@ public class ProbeActionsProvider implements ExplorerActionsProvider<ProbeDataSo
                 add(new ExplorerActionDescriptor(new AbstractAction("Undeploy") {
 
                     public void actionPerformed(ActionEvent e) {
-                        ProbeDataSourceProvider.sharedInstance().undeploy(probe);
+                        ProbeDataSourceProvider.sharedInstance().stopProbe(probe);
                     }
                 }, 10));
             }

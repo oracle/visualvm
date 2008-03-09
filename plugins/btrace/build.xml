@@ -5,4 +5,8 @@
 <project name="net.java.visualvm.btrace" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project net.java.visualvm.btrace.</description>
     <import file="nbproject/build-impl.xml"/>
+    
+    <target name="setup">
+        <ant dir="${basedir}/runtime" target="checkout"/>
+    </target>
 </project>

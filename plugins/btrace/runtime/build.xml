@@ -5,4 +5,46 @@
 <project name="com.sun.btrace" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project com.sun.btrace.</description>
     <import file="nbproject/build-impl.xml"/>
+    
+    <target name="clean" depends="projectized-common.clean">
+        <delete>
+            <fileset dir="${basedir}/release/modules/ext" includes="**/btrace*.jar" />
+        </delete>
+    </target>
+    
+    <target name="init" depends="basic-init,files-init,build-init,-post-init"/>
+    <target name="-post-init" if="btrace.home" depends="check-available, setup-btrace-home, build-libs"/>
+
+    <target name="check-available">
+        <available property="libs.available" filepath="${basedir}/release/modules/ext" file="btrace-agent.jar"/>
+        <available property="btrace.available" filepath="${btrace.home}/make" file="build.xml"/>
+    </target>
+
+    <target name="build-libs" unless="libs.available">
+        <antcall target="update.btrace"/>
+        <ant dir="${btrace.home}/make"/>
+        <copy todir="${basedir}/release/modules/ext">
+            <fileset dir="${btrace.home}/build/" includes="**/*btrace*.jar"/>
+        </copy>
+    </target>
+
+    <target name="checkout" unless="btrace.available" depends="basic-init">
+        <echo>Checking out BTrace sources as "guest" user</echo>
+        <cvs cvsroot=":pserver:guest@cvs.dev.java.net:/cvs" command="login"/>
+        <cvs cvsroot=":pserver:guest@cvs.dev.java.net:/cvs" command="checkout btrace"/>
+    </target>
+    
+    <target name="setup-btrace-home" unless="btrace.available">
+        <antcall target="checkout"/>
+        <property name="btrace.home" value="${basedir}/btrace"/>
+        <echo>Storing btrace.home=${btrace.home} in ${basedir}/nbproject/private/private.properties</echo>
+        <propertyfile file="${basedir}/nbproject/private/private.properties">
+            <entry key="btrace.home" value="${btrace.home}"/>
+        </propertyfile>        
+    </target>
+    
+    <target name="update.btrace" if="btrace.available">
+        <echo>Updating BTrace runtime from CVS</echo>
+        <cvs dest="${btrace.home}" command="update -APd"/>
+    </target>
 </project>

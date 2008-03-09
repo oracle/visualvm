@@ -24,12 +24,34 @@
  */
 package net.java.visualvm.btrace.views;
 
+import com.sun.tools.visualvm.core.application.JvmstatApplication;
+import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
+import com.sun.tools.visualvm.core.model.jvm.MonitoredData;
+import com.sun.tools.visualvm.core.model.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.awt.Color;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.border.BevelBorder;
+import net.java.visualvm.btrace.config.ProbeConfig.ProbeConnection;
 import net.java.visualvm.btrace.datasource.ProbeDataSource;
+import net.java.visualvm.btrace.ui.components.graph.DynamicGraph;
+import net.java.visualvm.btrace.ui.components.graph.DynamicLineGraph;
+import net.java.visualvm.btrace.ui.components.graph.ValueProvider;
 import net.java.visualvm.btrace.utils.HTMLTextArea;
+import org.openide.util.Exceptions;
+import sun.jvmstat.monitor.Monitor;
+import sun.jvmstat.monitor.MonitorException;
+import sun.jvmstat.monitor.MonitoredVm;
+import sun.jvmstat.monitor.VmIdentifier;
 
 /**
  *
@@ -38,10 +60,25 @@ import net.java.visualvm.btrace.utils.HTMLTextArea;
 public class ProbeView extends DataSourceView {
     private DataViewComponent dataView = null;
     private ProbeDataSource probe;
+    volatile private ProbeStatsPanel statsPanel = null;
+    volatile private DynamicGraph graph = null;
+    
+    private MonitoredDataListener mdl = new MonitoredDataListener() {
 
+        public void monitoredDataEvent(MonitoredData data) {
+            if (statsPanel != null) {
+                statsPanel.refresh(data);
+            }
+            if (graph != null) {
+                graph.update();
+            }
+        }
+    };
+    
     public ProbeView(ProbeDataSource probe) {
         super(DataSourceDescriptorFactory.getDescriptor(probe).getName(), DataSourceDescriptorFactory.getDescriptor(probe).getIcon(), POSITION_AT_THE_END);
         this.probe = probe;
+        JVMFactory.getJVMFor(probe.getApplication()).addMonitoredDataListener(mdl);
     }
 
     @Override
@@ -52,6 +89,35 @@ public class ProbeView extends DataSourceView {
         return dataView;
     }
 
+    private List<ValueProvider> getValueProviders() {
+        Application app = probe.getApplication();
+        String vmId = "//" + app.getPid() + "?mode=r";
+        if (app instanceof JvmstatApplication) {
+            try {
+                MonitoredVm mvm = ((JvmstatApplication) app).getMonitoredHost().getMonitoredHost().getMonitoredVm(new VmIdentifier(vmId));
+                List<ValueProvider> providers = new ArrayList<ValueProvider>();
+                for(ProbeConnection connection : probe.getConfig().getConnections()) {
+                    final Monitor mntr = mvm.findByName(connection.jvmStatVar);
+                    providers.add(new ValueProvider(connection.jvmStatVar, connection.name) {
+
+                        @Override
+                        public long getValue() {
+                            Object value = mntr.getValue();
+                            if (value == null) return 0L;
+                            return Long.parseLong(value.toString());
+                        }
+                    });
+                }
+                return providers;
+            } catch (MonitorException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (URISyntaxException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+        return new ArrayList<ValueProvider>();
+    }
+    
     private void initialize() {
         HTMLTextArea generalDataArea = new HTMLTextArea();
         generalDataArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
@@ -60,13 +126,22 @@ public class ProbeView extends DataSourceView {
         DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("", null, generalDataArea);
         DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
 
-        dataView = new DataViewComponent(masterView, masterConfiguration);
+        dataView = new DataViewComponent(masterView, masterConfiguration);      
+        
+        ProbeOutputPanel pvp = new ProbeOutputPanel();
+        statsPanel = new ProbeStatsPanel(probe.getConfig().getConnections());
 
-        ProbeViewPanel pvp = new ProbeViewPanel();
+        graph = new DynamicLineGraph(getValueProviders(), 10);
+        graph.setBackground(Color.WHITE);
+        graph.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        
         dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Console Output", true), DataViewComponent.BOTTOM_LEFT);
         dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, pvp, null), DataViewComponent.BOTTOM_LEFT);
+        
+        dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Monitored Data", true), DataViewComponent.TOP_RIGHT);
+        dataView.addDetailsView(new DataViewComponent.DetailsView("Monitored Data", null, graph, null), DataViewComponent.TOP_RIGHT);
 
-        pvp.setInputStream(probe.getInputStream());
+        pvp.setReader(probe.getReader());
     }
 
     @Override
@@ -79,13 +154,13 @@ public class ProbeView extends DataSourceView {
         sb.append("<html>");
         sb.append("<h1>").append(probe.getConfig().getName()).append(" (").append(probe.getConfig().getCategory()).append(")").append("</h1>");;
         sb.append("<b>").append("Description:").append("</b><br/>");
-        sb.append(cleanse(probe.getConfig().getDescription()));
+        sb.append(cleanseHtml(probe.getConfig().getDescription()));
         sb.append("</html>");
         
         return sb.toString();
     }
     
-    private static String cleanse(String html) {
+    private static String cleanseHtml(String html) {
         String cleansed = html.replace("<html>","").replace("</html>", "").replace("<br>", "").replace("<br/>", "").replace("\n", " ").replace("\r", " ").replace("  ", " ").trim();
         return cleansed;
     }

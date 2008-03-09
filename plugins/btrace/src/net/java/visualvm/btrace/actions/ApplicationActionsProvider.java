@@ -85,7 +85,11 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
             dialog.toFront();
             boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
             if (!cancelled) {
-                ProbeDataSourceProvider.sharedInstance().deploy((ProbeConfig) wizardDescriptor.getProperty("probe"), app);
+                try {
+                    ProbeDataSourceProvider.sharedInstance().startProbe((ProbeConfig) wizardDescriptor.getProperty("probe"), app);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
     }

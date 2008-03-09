@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -19,13 +20,13 @@ import javax.swing.SwingUtilities;
  *
  * @author  Jaroslav Bachorik
  */
-public class ProbeViewPanel extends javax.swing.JPanel {
+public class ProbeOutputPanel extends javax.swing.JPanel {
 
     final static private ScheduledExecutorService probeOutputReader = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
     private ScheduledFuture scheduled = null;
 
     /** Creates new form ProbeViewPanel */
-    public ProbeViewPanel() {
+    public ProbeOutputPanel() {
         initComponents();
     }
 
@@ -58,13 +59,14 @@ public class ProbeViewPanel extends javax.swing.JPanel {
     private net.java.visualvm.btrace.utils.HTMLTextArea consoleOutput;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
-    public void setInputStream(final InputStream input) {
+    
+    public void setReader(final Reader input) {
         if (input == null && scheduled != null) {
             scheduled.cancel(false);
             scheduled = null;
             return;
         }
-        final BufferedReader br = new BufferedReader(new InputStreamReader(input));
+        final BufferedReader br = new BufferedReader(input);
         
         scheduled = probeOutputReader.scheduleWithFixedDelay(new Runnable() {
             private StringBuilder outputText = new StringBuilder();

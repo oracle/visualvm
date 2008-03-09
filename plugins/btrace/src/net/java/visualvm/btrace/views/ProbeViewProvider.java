@@ -58,7 +58,7 @@ public class ProbeViewProvider implements DataSourceViewsProvider<ProbeDataSourc
         }
     }
 
-    public boolean supportsViewFor(ProbeDataSource dataSource) {
+    public boolean supportsViewsFor(ProbeDataSource dataSource) {
         return true;
     }
     
