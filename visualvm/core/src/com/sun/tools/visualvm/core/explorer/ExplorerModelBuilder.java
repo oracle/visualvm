@@ -52,6 +52,8 @@ import org.openide.util.RequestProcessor;
  */
 class ExplorerModelBuilder {
     
+    private static final RequestProcessor queue = new RequestProcessor("Explorer Builder Processor");
+    
     private static ExplorerModelBuilder instance;
     
     private final ExplorerNode explorerRoot;
@@ -83,7 +85,7 @@ class ExplorerModelBuilder {
     
     
     private void processAddedDataSources(final Set<DataSource> added) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        queue.post(new Runnable() {
             public void run() {
                 final Set<ExplorerNode> addedNodes = new HashSet();
 
@@ -140,7 +142,7 @@ class ExplorerModelBuilder {
     }
     
     private void processRemovedDataSources(final Set<DataSource> removed) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        queue.post(new Runnable() {
             public void run() {
                 final Set<ExplorerNode> removedNodes = new HashSet();
 
@@ -300,9 +302,7 @@ class ExplorerModelBuilder {
         nodes = Collections.synchronizedMap(new HashMap());
         nodes.put(DataSource.ROOT, explorerRoot);
         
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() { processAddedDataSources(Collections.singleton(DataSource.ROOT)); }
-        });
+        processAddedDataSources(Collections.singleton(DataSource.ROOT));
     }
     
     
