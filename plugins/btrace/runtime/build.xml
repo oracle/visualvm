@@ -22,7 +22,7 @@
         <available property="btrace.available" filepath="${btrace.home}/make" file="build.xml"/>
     </target>
 
-    <target name="build-libs" unless="libs.available">
+    <target name="build-libs" unless="libs.available" if="btrace.home">
         <ant dir="${btrace.home}/make"/>
         <copy todir="${basedir}/release/modules/ext">
             <fileset dir="${btrace.home}/build/" includes="**/*btrace*.jar"/>
