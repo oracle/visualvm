@@ -15,13 +15,14 @@
     <target name="init" depends="basic-init,files-init,build-init,-post-init"/>
     <target name="-post-init" if="btrace.home" depends="check-available, setup-btrace-home, build-libs"/>
 
+    <target name="fetch-btrace" depends="check-available,setup-btrace-home"/>
+
     <target name="check-available">
         <available property="libs.available" filepath="${basedir}/release/modules/ext" file="btrace-agent.jar"/>
         <available property="btrace.available" filepath="${btrace.home}/make" file="build.xml"/>
     </target>
 
     <target name="build-libs" unless="libs.available">
-        <antcall target="update.btrace"/>
         <ant dir="${btrace.home}/make"/>
         <copy todir="${basedir}/release/modules/ext">
             <fileset dir="${btrace.home}/build/" includes="**/*btrace*.jar"/>
@@ -44,7 +45,7 @@
         </propertyfile>        
     </target>
     
-    <target name="update.btrace" if="btrace.available">
+    <target name="update-btrace" if="btrace.available" depends="check-available">
         <echo>Updating BTrace runtime from CVS</echo>
         <cvs dest="${btrace.home}" command="update -APd"/>
     </target>

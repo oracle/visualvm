@@ -7,6 +7,6 @@
     <import file="nbproject/build-impl.xml"/>
     
     <target name="setup">
-        <ant dir="${basedir}/runtime" target="checkout"/>
+        <ant dir="${basedir}/runtime" target="fetch-btrace"/>
     </target>
 </project>
