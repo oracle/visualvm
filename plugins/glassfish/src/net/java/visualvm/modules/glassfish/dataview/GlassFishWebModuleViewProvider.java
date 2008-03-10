@@ -41,9 +41,9 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
@@ -122,7 +122,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             appLink.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    DataSourceWindowManager.sharedInstance().openWindow(module.getGlassFishRoot().getApplication());
+                    DataSourceWindowManager.sharedInstance().openDataSource(module.getGlassFishRoot().getApplication());
                 }
             });
             masterPanel.add(generalDataScroll, BorderLayout.CENTER);
@@ -298,11 +298,11 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     }
 
     public static void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
+        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
     }
     
     public static void shutdown() {
-        DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 

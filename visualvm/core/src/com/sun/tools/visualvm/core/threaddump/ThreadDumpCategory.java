@@ -49,7 +49,7 @@ class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     }
     
     public void openSnapshot(File file) {
-        DataSourceWindowManager.sharedInstance().openWindow(new ThreadDumpImpl(file, null)); // TODO: instance should be created by ThreadDumpProvider!
+        DataSourceWindowManager.sharedInstance().openDataSource(new ThreadDumpImpl(file, null)); // TODO: instance should be created by ThreadDumpProvider!
     }
 
 }

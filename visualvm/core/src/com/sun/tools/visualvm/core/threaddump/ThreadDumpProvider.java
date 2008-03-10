@@ -117,7 +117,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
                         application.getRepository().addDataSource(threadDump);
                         registerDataSource(threadDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { DataSourceWindowManager.sharedInstance().addViews(application, threadDump); }
+                            public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                         });
                         application.notifyWhenFinished(applicationFinishedListener);
                     } catch (IOException ex) {
@@ -162,7 +162,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
                             coreDump.getRepository().addDataSource(threadDump);
                             registerDataSource(threadDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceWindowManager.sharedInstance().addViews(coreDump, threadDump); }
+                                public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                             });
                             coreDump.notifyWhenFinished(coredumpFinishedListener);
                         } catch (Exception ex) {

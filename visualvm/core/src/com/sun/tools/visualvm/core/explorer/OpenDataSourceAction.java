@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.core.explorer;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -52,9 +52,7 @@ public final class OpenDataSourceAction extends AbstractAction {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 if (isAvailable(selectedDataSource)) {
-                    DataSource viewMaster = selectedDataSource.getMaster();
-                    if (viewMaster != null) DataSourceWindowManager.sharedInstance().addViews(viewMaster, selectedDataSource);
-                    else DataSourceWindowManager.sharedInstance().openWindow(selectedDataSource);
+                    DataSourceWindowManager.sharedInstance().openDataSource(selectedDataSource);
                 } else {
                     NetBeansProfiler.getDefaultNB().displayError("Cannot open " + DataSourceDescriptorFactory.getDescriptor(selectedDataSource).getName());
                 }
@@ -82,7 +80,7 @@ public final class OpenDataSourceAction extends AbstractAction {
     static boolean isAvailable(DataSource dataSource) {
         if (!isEnabled(dataSource)) return false;
         
-        return DataSourceWindowFactory.sharedInstance().canCreateWindowFor(dataSource);
+        return DataSourceViewsFactory.sharedInstance().canCreateWindowFor(dataSource);
     }
     
     private DataSource getSelectedDataSource() {

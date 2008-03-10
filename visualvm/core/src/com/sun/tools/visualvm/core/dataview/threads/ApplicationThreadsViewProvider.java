@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +65,7 @@ class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Applicat
     }
 
     void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }

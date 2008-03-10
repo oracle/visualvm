@@ -26,10 +26,14 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
@@ -37,18 +41,34 @@ import org.openide.windows.TopComponent;
  *
  * @author Jiri Sedlacek
  */
-class DataSourceWindow extends TopComponent {
+class DataSourceWindow extends TopComponent implements PropertyChangeListener {
 
     private int viewsCount = 0;
 
     private DataSource dataSource;
+    private DataSourceDescriptor dataSourceDescriptor;
 
 
+    // Doesn't need to be called from EDT
     public DataSourceWindow(DataSource dataSource) {
-        initComponents();
         this.dataSource = dataSource;
+        
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    initAppearance();
+                    initComponents();
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Failed to create window for " + dataSource);
+        }
     }
-
+    
+    
+    public DataSource getDataSource() {
+        return dataSource;
+    }
 
     public void addView(DataSourceView view) {
         tabbedContainer.addViewTab(dataSource, view);
@@ -71,7 +91,7 @@ class DataSourceWindow extends TopComponent {
         });
             
         viewsCount--;
-        if (viewsCount == 0) close();
+        if (viewsCount == 0 && isOpened()) close();
     }
     
     public void removeAllViews() {
@@ -94,20 +114,43 @@ class DataSourceWindow extends TopComponent {
     
     
     protected final void componentClosed() {
+        dataSourceDescriptor.removePropertyChangeListener(this);
+        removeAllViews();
         DataSourceWindowManager.sharedInstance().unregisterClosedWindow(this);
     }
     
+    
+    public void propertyChange(final PropertyChangeEvent evt) {
+        String propertyName = evt.getPropertyName();
+        if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { setName((String)evt.getNewValue()); }
+            });
+        } else if (DataSourceDescriptor.PROPERTY_ICON.equals(propertyName)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { setIcon((Image)evt.getNewValue()); }
+            });
+        } else if ("close".equals(propertyName)) {
+            removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.DataSourceViewContainer)evt.getNewValue()));
+        }
+    }
+    
+    
+    private void initAppearance() {
+        dataSourceDescriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+        
+        dataSourceDescriptor.addPropertyChangeListener(this);
+        
+        setName(dataSourceDescriptor.getName());
+        setIcon(dataSourceDescriptor.getIcon());
+    }
     
     private void initComponents() {
         setLayout(new BorderLayout());
 
         // tabbedContainer
         tabbedContainer = new DataSourceWindowTabbedPane();
-        tabbedContainer.addPropertyChangeListener("close", new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.DataSourceViewContainer)evt.getNewValue()));
-            }
-        });
+        tabbedContainer.addPropertyChangeListener("close", this);
         add(tabbedContainer, BorderLayout.CENTER);
     }
     

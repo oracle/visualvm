@@ -27,8 +27,8 @@ package com.sun.tools.visualvm.modules.jconsole;
 
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +59,6 @@ class JConsoleViewProvider implements DataSourceViewsProvider<Application> {
     }
 
     static void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(new JConsoleViewProvider(), Application.class);
+        DataSourceViewsFactory.sharedInstance().addViewProvider(new JConsoleViewProvider(), Application.class);
     }
 }

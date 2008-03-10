@@ -115,7 +115,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
                         application.getRepository().addDataSource(heapDump);
                         registerDataSource(heapDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { DataSourceWindowManager.sharedInstance().addViews(application, heapDump); }
+                            public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                         });
                         application.notifyWhenFinished(applicationFinishedListener);
                     } catch (IOException ex) {
@@ -156,7 +156,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
                             coreDump.getRepository().addDataSource(heapDump);
                             registerDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { DataSourceWindowManager.sharedInstance().addViews(coreDump, heapDump); }
+                                public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                             });
                             coreDump.notifyWhenFinished(coredumpFinishedListener);
                         }

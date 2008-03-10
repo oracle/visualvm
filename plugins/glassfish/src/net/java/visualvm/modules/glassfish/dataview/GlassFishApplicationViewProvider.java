@@ -33,8 +33,8 @@ import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
 import java.util.Collections;
@@ -131,11 +131,11 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
     }
     
     public static void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, Application.class);
+        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, Application.class);
     }
 
     public static void shutdown() {
-        DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.httpServiceViewMap.clear();
         INSTANCE.transServiceViewMap.clear();
     }

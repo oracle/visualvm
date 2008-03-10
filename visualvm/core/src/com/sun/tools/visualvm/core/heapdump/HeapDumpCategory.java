@@ -49,7 +49,7 @@ class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     }
     
     public void openSnapshot(File file) {
-        DataSourceWindowManager.sharedInstance().openWindow(new HeapDumpImpl(file, null)); // TODO: instance should be created by HeapDumpProvider!
+        DataSourceWindowManager.sharedInstance().openDataSource(new HeapDumpImpl(file, null));
     }
 
 }

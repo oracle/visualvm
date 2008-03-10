@@ -27,8 +27,6 @@ package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,30 +34,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.SwingUtilities;
-import org.openide.ErrorManager;
 
 /**
- * Class responsible for creating UIs (windows, TopComponents) for DataSources.
+ * Class responsible for resolving DataSourceViews for DataSources.
  *
  * @author Jiri Sedlacek
  */
-// TODO: synchronize!!!
-public final class DataSourceWindowFactory {
+public final class DataSourceViewsFactory {
 
-    private static DataSourceWindowFactory sharedInstance;
+    private static DataSourceViewsFactory sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
     private final Map<DataSourceViewsProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
     
     
     /**
-     * Returns singleton instance of DataSourceWindowFactory.
+     * Returns singleton instance of DataSourceViewsFactory.
      * 
-     * @return singleton instance of DataSourceWindowFactory.
+     * @return singleton instance of DataSourceViewsFactory.
      */
-    public static synchronized DataSourceWindowFactory sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new DataSourceWindowFactory();
+    public static synchronized DataSourceViewsFactory sharedInstance() {
+        if (sharedInstance == null) sharedInstance = new DataSourceViewsFactory();
         return sharedInstance;
     }
     
@@ -97,40 +92,6 @@ public final class DataSourceWindowFactory {
         return false;
     }
     
-    
-    DataSourceWindow createWindowFor(final DataSource dataSource) {
-        // Create window for the DataSource
-        final DataSourceWindow window = new DataSourceWindow(dataSource);
-
-        // Resolve all views to be displayed
-        final List<? extends DataSourceView> views = getViews(dataSource);
-
-        // Blocking notification that the view will be added
-        for (DataSourceView view : views) view.willBeAdded();
-
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    // Blocking adding of views to the window
-                    for (DataSourceView view : views) window.addView(view);
-
-                    // Decorate the window according to the DataSource
-                    DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-                    window.setName(descriptor.getName());
-                    window.setIcon(descriptor.getIcon());
-                }
-            });
-        } catch (Exception e) {
-            ErrorManager.getDefault().notify(ErrorManager.WARNING,e);
-        }
-
-        // Blocking notification that the view has been added
-        for (DataSourceView view : views) view.added();
-
-        // Return window with all views
-        return window;
-    }
-    
     List<? extends DataSourceView> getViews(DataSource dataSource) {
         List<DataSourceView> views = new ArrayList();
         Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
@@ -151,7 +112,7 @@ public final class DataSourceWindowFactory {
     }
     
     
-    private DataSourceWindowFactory() {
+    private DataSourceViewsFactory() {
     }
 
 }
