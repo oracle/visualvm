@@ -38,6 +38,7 @@
         <antcall target="checkout"/>
         <property name="btrace.home" value="${basedir}/btrace"/>
         <echo>Storing btrace.home=${btrace.home} in ${basedir}/nbproject/private/private.properties</echo>
+        <mkdir dir="${basedir}/nbproject/private"/>
         <propertyfile file="${basedir}/nbproject/private/private.properties">
             <entry key="btrace.home" value="${btrace.home}"/>
         </propertyfile>        
