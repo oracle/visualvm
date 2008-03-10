@@ -34,6 +34,18 @@
             <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
         </folder>
+        <folder name="Window">
+            <file name="SelectDocumentNode_hidden"/>
+            <file name="org-netbeans-core-actions-GlobalPropertiesAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-ViewRuntimeTabAction.instance_hidden"/>
+            <file name="org-netbeans-core-output2-OutputWindowAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-SwitchToRecentDocumentAction.instance_hidden"/>
+            <file name="org-netbeans-modules-favorites-Add.instance_hidden"/>
+            <file name="org-netbeans-modules-favorites-Remove.instance_hidden"/>
+            <file name="org-netbeans-modules-favorites-View.instance_hidden"/>
+            <file name="org-netbeans-modules-options-keymap-ExportShortcutsToHTMLAction.instance_hidden"/>
+            <file name="org-netbeans-progress-module-ProgressListAction.instance_hidden"/>
+        </folder>
     </folder>
     <folder name="Menu">
         <file name="Edit_hidden"/>
@@ -79,11 +91,13 @@
             <file name="CloseAllButThisAction.shadow_hidden"/>
             <file name="CloseAllDocumentsAction.shadow_hidden"/>
             <file name="DocumentsAction.shadow_hidden"/>
+            <file name="Output_hidden"/>
             <file name="Profile_hidden"/>
             <file name="ProgressListAction.shadow_hidden"/>
             <file name="Separator4.instance_hidden"/>
             <file name="SwitchToRecentDocumentAction.shadow_hidden"/>
             <file name="ViewFavoritesTabAction.shadow_hidden"/>
+            <file name="ViewRuntimeTabAction.shadow_hidden"/>
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.shadow_hidden"/>
         </folder>
     </folder>
@@ -104,7 +118,19 @@
         </folder>
         <file name="Profile_hidden"/>
     </folder>
+    <folder name="UI">
+        <file name="Runtime_hidden"/>
+    </folder>
     <folder name="Windows2">
+        <folder name="Components">
+            <file name="runtime.settings_hidden"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="explorer">
+                <file name="favorites.wstcref_hidden"/>
+                <file name="runtime.wstcref_hidden"/>
+            </folder>
+        </folder>
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
     </folder>
     <!--folder name="Windows2Local">
