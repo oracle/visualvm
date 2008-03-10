@@ -1,0 +1,58 @@
+/*
+ *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ * 
+ *  This code is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License version 2 only, as
+ *  published by the Free Software Foundation.  Sun designates this
+ *  particular file as subject to the "Classpath" exception as provided
+ *  by Sun in the LICENSE file that accompanied this code.
+ * 
+ *  This code is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  version 2 for more details (a copy is included in the LICENSE file that
+ *  accompanied this code).
+ * 
+ *  You should have received a copy of the GNU General Public License version
+ *  2 along with this work; if not, write to the Free Software Foundation,
+ *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ *  Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ *  CA 95054 USA or visit www.sun.com if you need additional information or
+ *  have any questions.
+ */
+package com.sun.tools.visualvm.host.impl;
+
+import com.sun.tools.visualvm.core.host.*;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import org.openide.util.RequestProcessor;
+
+public final class AddRemoteHostAction extends AbstractAction {
+    
+    private static AddRemoteHostAction instance;
+    
+    public static synchronized AddRemoteHostAction getInstance() {
+        if (instance == null) instance = new AddRemoteHostAction();
+        return instance;
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        final HostProperties hostDescriptor = HostCustomizer.defineHost();
+        if (hostDescriptor != null) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    HostsSupport.getInstance().getHostProvider().createHost(hostDescriptor, true);
+                }
+            });
+        }
+    }
+    
+    
+    private AddRemoteHostAction() {
+        putValue(Action.NAME, "Add Remote Host...");
+        putValue(Action.SHORT_DESCRIPTION, "Add Remote Host");
+    }
+}

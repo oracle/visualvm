@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

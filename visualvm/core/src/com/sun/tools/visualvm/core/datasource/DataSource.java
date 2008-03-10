@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import java.beans.PropertyChangeListener;
 import org.openide.util.RequestProcessor;
 

@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.CoreDump;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.coredump.CoreDump;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;

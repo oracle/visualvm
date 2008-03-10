@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
-import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 
 
 /**

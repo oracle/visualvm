@@ -25,9 +25,9 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.io.File;
 import java.util.Date;
 import javax.swing.JFileChooser;

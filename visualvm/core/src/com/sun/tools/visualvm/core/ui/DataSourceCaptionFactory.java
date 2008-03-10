@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.CoreDump;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Host;
+import com.sun.tools.visualvm.host.Host;
 import javax.swing.JComponent;
 
 /**
