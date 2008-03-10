@@ -70,7 +70,7 @@ public class ConfigParser implements ContentHandler {
         LOGGER.finest("endElement");
         if (qName.equals("BTrace")) {
             // notify config ready
-        } else if (qName.equals("probe")) {
+        } else if (qName.equals("script")) {
             configList.add(currentConfig);
             currentConfig = null;
         } else if (qName.equals("displayName")) {
@@ -115,7 +115,7 @@ public class ConfigParser implements ContentHandler {
     }
 
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-        if (qName.equals("probe")) {
+        if (qName.equals("script")) {
             currentConfig = new ProbeConfig();
             currentConfig.setClazz(atts.getValue("class"));
             currentConfig.setBaseURL(baseURL);

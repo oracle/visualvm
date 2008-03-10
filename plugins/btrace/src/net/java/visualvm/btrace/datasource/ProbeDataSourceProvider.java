@@ -142,11 +142,6 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
     }
 
     private static void openProbeWindow(ProbeDataSource pds) {
-        DataSource viewMaster = pds.getMaster();
-        if (viewMaster != null) {
-            DataSourceWindowManager.sharedInstance().addViews(viewMaster, pds);
-        } else {
-            DataSourceWindowManager.sharedInstance().openWindow(pds);
-        }
+        DataSourceWindowManager.sharedInstance().openDataSource(pds);
     }
 }

@@ -28,7 +28,6 @@ import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
 import com.sun.tools.visualvm.core.model.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.model.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -36,9 +35,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Color;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import net.java.visualvm.btrace.config.ProbeConfig.ProbeConnection;
@@ -50,6 +47,7 @@ import net.java.visualvm.btrace.utils.HTMLTextArea;
 import org.openide.util.Exceptions;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
+import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
 import sun.jvmstat.monitor.VmIdentifier;
 
@@ -94,7 +92,7 @@ public class ProbeView extends DataSourceView {
         String vmId = "//" + app.getPid() + "?mode=r";
         if (app instanceof JvmstatApplication) {
             try {
-                MonitoredVm mvm = ((JvmstatApplication) app).getMonitoredHost().getMonitoredHost().getMonitoredVm(new VmIdentifier(vmId));
+                MonitoredVm mvm = MonitoredHost.getMonitoredHost(app.getHost().getHostName()).getMonitoredVm(new VmIdentifier(vmId));
                 List<ValueProvider> providers = new ArrayList<ValueProvider>();
                 for(ProbeConnection connection : probe.getConfig().getConnections()) {
                     final Monitor mntr = mvm.findByName(connection.jvmStatVar);

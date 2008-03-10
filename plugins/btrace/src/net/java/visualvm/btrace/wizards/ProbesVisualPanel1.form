@@ -22,12 +22,12 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="130" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="131" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" alignment="0" pref="209" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" alignment="0" pref="210" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -45,8 +45,8 @@
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" pref="118" max="32767" attributes="2"/>
-                  <Component id="jScrollPane1" alignment="0" pref="118" max="32767" attributes="2"/>
+                  <Component id="jScrollPane2" pref="116" max="32767" attributes="2"/>
+                  <Component id="jScrollPane1" alignment="0" pref="116" max="32767" attributes="2"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" max="32767" attributes="0"/>
@@ -103,7 +103,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Probes:"/>
+        <Property name="text" type="java.lang.String" value="Scripts:"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
@@ -123,7 +123,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jScrollPane3" alignment="0" pref="56" max="32767" attributes="0"/>
+              <Component id="jScrollPane3" alignment="0" pref="54" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

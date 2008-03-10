@@ -69,7 +69,7 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
         private Application app;
 
         public DeployAction(Application app) {
-            super("Deploy Probe");
+            super("Deploy BTrace Script");
             this.app = app;
         }
 
@@ -79,7 +79,7 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
             // {1} will be replaced by WizardDescriptor.Iterator.name()
             wizardDescriptor.setTitleFormat(new MessageFormat("{0} ({1})"));
-            wizardDescriptor.setTitle("Deploy BTrace Probe");
+            wizardDescriptor.setTitle("Deploy BTrace Script");
             Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
             dialog.setVisible(true);
             dialog.toFront();

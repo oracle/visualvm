@@ -26,8 +26,8 @@
 package net.java.visualvm.btrace.views;
 
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,11 +63,11 @@ public class ProbeViewProvider implements DataSourceViewsProvider<ProbeDataSourc
     }
     
     public static void initialize() {
-        DataSourceWindowFactory.sharedInstance().addViewProvider(INSTANCE, ProbeDataSource.class);
+        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, ProbeDataSource.class);
     }
     
     public static void shutdown() {
-        DataSourceWindowFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 }
