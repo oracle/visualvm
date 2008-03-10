@@ -34,11 +34,24 @@
             <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
         </folder>
+        <file name="Profile_hidden"/>
+        <file name="System_hidden"/>
         <folder name="Window">
             <file name="SelectDocumentNode_hidden"/>
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-NextViewCallbackAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-PreviousViewCallbackAction.instance_hidden"/>
             <file name="org-netbeans-core-actions-ViewRuntimeTabAction.instance_hidden"/>
             <file name="org-netbeans-core-output2-OutputWindowAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-CloneDocumentAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-CloseAllButThisAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-CloseAllDocumentsAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-CloseWindowAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-DocumentsAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-MaximizeWindowAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-NextTabAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-PreviousTabAction.instance_hidden"/>
+            <file name="org-netbeans-core-windows-actions-RecentViewListAction.instance_hidden"/>
             <file name="org-netbeans-core-windows-actions-SwitchToRecentDocumentAction.instance_hidden"/>
             <file name="org-netbeans-modules-favorites-Add.instance_hidden"/>
             <file name="org-netbeans-modules-favorites-Remove.instance_hidden"/>
@@ -47,6 +60,7 @@
             <file name="org-netbeans-progress-module-ProgressListAction.instance_hidden"/>
         </folder>
     </folder>
+    <file name="Favorites_hidden"/>
     <folder name="Menu">
         <file name="Edit_hidden"/>
         <folder name="File">
@@ -103,7 +117,9 @@
     </folder>
     <folder name="OptionsDialog">
         <folder name="Advanced.instance_hidden"/>
+        <file name="Advanced_hidden"/>
         <folder name="General.instance_hidden"/>
+        <file name="Keymaps.instance_hidden"/>
     </folder>
     <folder name="Services">
         <folder name="NoOps">
@@ -118,9 +134,7 @@
         </folder>
         <file name="Profile_hidden"/>
     </folder>
-    <folder name="UI">
-        <file name="Runtime_hidden"/>
-    </folder>
+    <file name="UI_hidden"/>
     <folder name="Windows2">
         <folder name="Components">
             <file name="runtime.settings_hidden"/>
