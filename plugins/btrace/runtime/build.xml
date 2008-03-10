@@ -17,7 +17,7 @@
 
     <target name="fetch-btrace" depends="check-available,setup-btrace-home"/>
 
-    <target name="check-available">
+    <target name="check-available" if="btrace.home">
         <available property="libs.available" filepath="${basedir}/release/modules/ext" file="btrace-agent.jar"/>
         <available property="btrace.available" filepath="${btrace.home}/make" file="build.xml"/>
     </target>
