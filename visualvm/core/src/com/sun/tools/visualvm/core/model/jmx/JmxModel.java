@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.core.application.JvmstatApplication;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.model.Model;
+import com.sun.tools.visualvm.core.model.jvm.JVM;
 import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
 import java.awt.EventQueue;
@@ -162,7 +163,7 @@ public class JmxModel extends Model {
      */
     public JmxModel(JvmstatApplication application) {
         try {
-            JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
+            JVM jvm = JVMFactory.getJVMFor(application);
             Storage storage = application.getStorage();
             String username = storage.getCustomProperty(PROPERTY_USERNAME);
             String password = storage.getCustomProperty(PROPERTY_PASSWORD);
@@ -173,7 +174,15 @@ public class JmxModel extends Model {
                 proxyClient = new ProxyClient(this, "localhost", 0, null, null); // NOI18N
             } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
-                String connectorAddress = jvm.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
+                if (!(jvm instanceof JvmstatJVM)) {
+                    if (LOGGER.isLoggable(Level.WARNING)) {
+                        LOGGER.warning("The JMX connector address for application " +
+                                "(pid " + application.getPid() + ") cannot be " +
+                                "discovered because jvmstat is not supported"); // NOI18N
+                        return;
+                    }
+                }
+                String connectorAddress = ((JvmstatJVM) jvm).findByName("sun.management.JMXConnectorServer.address"); // NOI18N
                 LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvm.isAttachable(), connectorAddress);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
@@ -192,18 +201,21 @@ public class JmxModel extends Model {
                 // Create a ProxyClient for the remote out-of-the-box
                 // JMX management agent using the port and security
                 // related information retrieved through jvmstat.
-                List<String> urls = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
-                if (urls.size() != 0) {
-                    List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
-                    proxyClient = new ProxyClient(this, urls.get(0), username, password);
-                    if (username != null && "true".equals(auths.get(0))) {
-                        supplyCredentials(application, proxyClient);
+                if (jvm instanceof JvmstatJVM) {
+                    List<String> urls = ((JvmstatJVM) jvm).findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
+                    if (urls.size() != 0) {
+                        List<String> auths = ((JvmstatJVM) jvm).findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
+                        proxyClient = new ProxyClient(this, urls.get(0), username, password);
+                        if (username != null && "true".equals(auths.get(0))) {
+                            supplyCredentials(application, proxyClient);
+                        }
                     }
-                } else {
-                    // Create a ProxyClient for the remote out-of-the-box
-                    // JMX management agent using the port specified in
-                    // the -Dcom.sun.management.jmxremote.port=<port>
-                    // system property
+                }
+                // Create a ProxyClient for the remote out-of-the-box
+                // JMX management agent using the port specified in
+                // the -Dcom.sun.management.jmxremote.port=<port>
+                // system property
+                if (proxyClient == null) {
                     String jvmArgs = jvm.getJvmArgs();
                     StringTokenizer st = new StringTokenizer(jvmArgs);
                     int port = -1;
