@@ -94,6 +94,13 @@ public class BTraceClientCache implements DataChangeListener<Application> {
             java_home = java_home.replace(File.separator + "jre", "");
             toolsJarPath = java_home + "/lib/tools.jar";
         }
+        if (! new File(toolsJarPath).exists()) {
+            // may be the target app is running on a JRE. Let us hope
+            // VisualVM is running on a JDK!
+            String java_home = System.getProperty("java.home");
+            java_home = java_home.replace(File.separator + "jre", "");
+            toolsJarPath = java_home + "/lib/tools.jar";
+        }
         return toolsJarPath;
     }
 }
