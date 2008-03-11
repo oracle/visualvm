@@ -97,7 +97,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private boolean draggedOut = false;
   
   public void addViewTab(DataSource dataSource, DataSourceView view) {
-    DataSourceViewContainer container = new DataSourceViewContainer(DataSourceCaptionFactory.getInstance().getDataSourcePresenter(dataSource), view.getView());
+    DataSourceViewContainer container = new DataSourceViewContainer(new DataSourceCaption(dataSource), view.getView());
     mapping.put(container, view);
     super.add(container);
     setTitleAt(getComponentCount() - 1, view.getName() + (view.isClosable() ? "  " : ""));
@@ -107,6 +107,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   public void removeTabAt(int index) {
       DataSourceViewContainer container = (DataSourceViewContainer)getComponentAt(index);
       super.removeTabAt(index);
+      container.getCaption().finish();
       mapping.remove(container);
   }
   
@@ -508,9 +509,11 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   
   static class DataSourceViewContainer extends JPanel {
       
+      private DataSourceCaption caption;
       private DataViewComponent view;
       
-      public DataSourceViewContainer(JComponent caption, DataViewComponent view) {
+      public DataSourceViewContainer(DataSourceCaption caption, DataViewComponent view) {
+          this.caption = caption;
           this.view = view;
           setLayout(new BorderLayout());
           setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
@@ -523,6 +526,8 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
               add(caption, BorderLayout.NORTH);
           }
       }
+      
+      public DataSourceCaption getCaption() { return caption; }
       
       public DataViewComponent getView() { return view; }
   }

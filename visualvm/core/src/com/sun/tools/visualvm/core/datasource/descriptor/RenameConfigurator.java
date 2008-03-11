@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.datasource.descriptor;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.application.*;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
