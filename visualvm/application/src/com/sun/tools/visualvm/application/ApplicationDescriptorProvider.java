@@ -29,8 +29,8 @@ import com.sun.tools.visualvm.application.jmx.JmxApplication;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.apptype.ApplicationType;
-import com.sun.tools.visualvm.apptype.ApplicationTypeFactory;
+import com.sun.tools.visualvm.application.type.ApplicationType;
+import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 
 /**
