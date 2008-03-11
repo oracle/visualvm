@@ -364,6 +364,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
