@@ -57,7 +57,7 @@ public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDesc
     }
     
     private static class HostDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHost.png", true);
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHost.png", true);
         
         HostDescriptor(Host host) {
             super(host, resolveName(host), null, NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
@@ -76,7 +76,7 @@ public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDesc
     }
     
     private static class LocalHostDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/localHost.png", true);
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/localHost.png", true);
 
         LocalHostDescriptor() {
             super(Host.LOCALHOST, "Local", null, NODE_ICON, 0, EXPAND_ON_FIRST_CHILD);
@@ -85,7 +85,7 @@ public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDesc
     }
     
     private static class UnknownHostDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHosts.png", true);
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);
 
         UnknownHostDescriptor() {
             super(Host.LOCALHOST, "<Unknown Host>", null, NODE_ICON, POSITION_LAST, EXPAND_ON_FIRST_CHILD);
@@ -94,7 +94,7 @@ public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDesc
     }
     
     private static class HostsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/remoteHosts.png", true);
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);
         
         HostsContainerDescriptor() {
             super(RemoteHostsContainer.sharedInstance(), "Remote", null, NODE_ICON, 10, EXPAND_ON_EACH_NEW_CHILD);
