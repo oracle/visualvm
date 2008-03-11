@@ -31,7 +31,6 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.temporary.Support;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
@@ -46,7 +45,7 @@ import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.text.JTextComponent;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
  * A public entrypoint to the Overview subtab.
@@ -105,7 +104,7 @@ public final class OverviewViewSupport {
         private void initComponents(final DataSource ds) {
             setLayout(new BorderLayout());
             
-            final JTextComponent area = Support.HTMLTextArea();
+            final HTMLTextArea area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             setBackground(area.getBackground());
             
@@ -149,7 +148,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (jvmargs != null) {
-                JTextComponent area = Support.HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 setBackground(area.getBackground());
@@ -206,7 +205,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (properties != null) {
-                JTextComponent area = Support.HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 setBackground(area.getBackground());

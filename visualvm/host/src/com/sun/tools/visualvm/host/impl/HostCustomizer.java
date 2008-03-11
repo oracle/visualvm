@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.temporary.Support;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -42,6 +41,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 
 /**
@@ -58,7 +58,7 @@ class HostCustomizer extends JPanel {
     
     final DialogDescriptor dd = new DialogDescriptor(hc, "Add Remote Host", true, new Object[] {
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
-    final Dialog d = Support.createDialog(dd);
+    final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
     d.setVisible(true);
     

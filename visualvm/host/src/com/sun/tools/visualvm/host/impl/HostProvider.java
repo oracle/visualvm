@@ -39,7 +39,6 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.temporary.Support;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.InetAddress;
@@ -52,6 +51,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 
 /**
  *
@@ -101,7 +101,7 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 if (interactive) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            Support.displayError("<html><b>Cannot resolve host " + hostName + "</b><br><br>Make sure you have entered correct<br>host name or address.</html>");
+                            NetBeansProfiler.getDefaultNB().displayError("<html><b>Cannot resolve host " + hostName + "</b><br><br>Make sure you have entered correct<br>host name or address.</html>");
                         }
                     });
                 }
@@ -120,7 +120,7 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             ExplorerSupport.sharedInstance().selectDataSource(knownHost);
-                            Support.displayWarning("<html>Host " + hostName + " already monitored as " + DataSourceDescriptorFactory.getDescriptor(knownHost).getName() + "</html>");
+                            NetBeansProfiler.getDefaultNB().displayWarning("<html>Host " + hostName + " already monitored as " + DataSourceDescriptorFactory.getDescriptor(knownHost).getName() + "</html>");
                         }
                     });
                 }
@@ -202,7 +202,7 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             registerDataSource(LOCALHOST);
         } catch (UnknownHostException e) {
             System.err.println("Critical failure: cannot resolve localhost");
-            Support.displayError("Unable to resolve localhost!");
+            NetBeansProfiler.getDefaultNB().displayError("Unable to resolve localhost!");
         }
     }
     
