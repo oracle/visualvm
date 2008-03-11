@@ -59,11 +59,8 @@ import org.netbeans.lib.profiler.results.cpu.marking.Mark;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.stp.DefaultSettingsConfigurator;
 import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
-import org.netbeans.modules.profiler.utils.SourceUtils;
 import org.netbeans.spi.project.support.ant.GeneratedFilesHelper;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Lookup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,6 +75,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.swing.JComponent;
+import org.netbeans.lib.profiler.common.filters.FilterUtils;
+import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
@@ -145,7 +145,33 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     }
 
     public float getProfilingOverhead(ProfilingSettings settings) {
-        return ProjectUtilities.getProfilingOverhead(settings);
+         float o = 0.0f;
+
+        if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
+            //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
+        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
+            if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
+                o += 0.5f; // entire app
+            } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
+                o += 0.2f; // part of app
+            }
+
+            if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
+                o += 0.5f; // profile all classes
+            }
+        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
+            if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
+                o += 0.5f; // object allocations
+            } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
+                o += 0.7f; // object liveness
+            }
+
+            if (settings.getAllocStackTraceLimit() != 0) {
+                o += 0.3f; // record allocation stack traces
+            }
+        }
+
+        return o;
     }
 
     public FileObject getProjectBuildScript(Project project) {
