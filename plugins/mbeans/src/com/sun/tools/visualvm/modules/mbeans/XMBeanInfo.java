@@ -28,11 +28,9 @@ package com.sun.tools.visualvm.modules.mbeans;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridLayout;
 import java.util.*;
 import javax.management.*;
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
@@ -41,6 +39,7 @@ import static com.sun.tools.visualvm.modules.mbeans.Utilities.*;
 @SuppressWarnings("serial")
 class XMBeanInfo extends JPanel {
     
+    private static final Color lightSalmon = new Color(255, 160, 122);
     private static final Color lightYellow = new Color(255, 255, 128);
     
     private final int NAME_COLUMN = 0;
@@ -52,9 +51,6 @@ class XMBeanInfo extends JPanel {
     };
     
     private JTable infoTable = new JTable();
-    private JTable descTable = new JTable();
-    private JPanel infoBorderPanel = new JPanel(new BorderLayout());
-    private JPanel descBorderPanel = new JPanel(new BorderLayout());
     
     private static class ReadOnlyDefaultTableModel extends DefaultTableModel {
         @Override
@@ -64,10 +60,13 @@ class XMBeanInfo extends JPanel {
     
     private static class TableRowDivider {
         
-        private String tableRowDividerText;
+        public String tableRowDividerText;
+        public Color tableRowDividerColor;
         
-        public TableRowDivider(String tableRowDividerText) {
+        public TableRowDivider(
+                String tableRowDividerText, Color tableRowDividerColor) {
             this.tableRowDividerText = tableRowDividerText;
+            this.tableRowDividerColor = tableRowDividerColor;
         }
         
         @Override
@@ -88,8 +87,10 @@ class XMBeanInfo extends JPanel {
             Component comp = super.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
             if (value instanceof TableRowDivider) {
-                JLabel label = new JLabel(value.toString());
-                label.setBackground(ensureContrast(lightYellow,
+                JLabel label = new JLabel(
+                        "<html><b>" + value.toString() + "</b></html>");
+                label.setBackground(ensureContrast(
+                        ((TableRowDivider) value).tableRowDividerColor,
                         label.getForeground()));
                 label.setOpaque(true);
                 return label;
@@ -113,8 +114,10 @@ class XMBeanInfo extends JPanel {
             Component comp = super.getTableCellEditorComponent(
                     table, value, isSelected, row, column);
             if (value instanceof TableRowDivider) {
-                JLabel label = new JLabel(value.toString());
-                label.setBackground(ensureContrast(lightYellow,
+                JLabel label = new JLabel(
+                        "<html><b>" + value.toString() + "</b></html>");
+                label.setBackground(ensureContrast(
+                        ((TableRowDivider) value).tableRowDividerColor,
                         label.getForeground()));
                 label.setOpaque(true);
                 return label;
@@ -124,11 +127,8 @@ class XMBeanInfo extends JPanel {
     }
     
     public XMBeanInfo() {
-        // Use the grid layout to display the two tables
-        //
-        super(new GridLayout(2, 1));
-        // MBean*Info table
-        //
+        super(new BorderLayout());
+        setBorder(BorderFactory.createTitledBorder(Resources.getText("MBeanInfo")));
         infoTable.setModel(new ReadOnlyDefaultTableModel());
         infoTable.setRowSelectionAllowed(false);
         infoTable.setColumnSelectionAllowed(false);
@@ -143,32 +143,7 @@ class XMBeanInfo extends JPanel {
         infoTable.addKeyListener(new Utils.CopyKeyAdapter());
         infoTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         JScrollPane infoTableScrollPane = new JScrollPane(infoTable);
-        infoBorderPanel.setBorder(
-                BorderFactory.createTitledBorder("MBeanInfoPlaceHolder"));
-        infoBorderPanel.add(infoTableScrollPane);
-        // Descriptor table
-        //
-        descTable.setModel(new ReadOnlyDefaultTableModel());
-        descTable.setRowSelectionAllowed(false);
-        descTable.setColumnSelectionAllowed(false);
-        descTable.getTableHeader().setReorderingAllowed(false);
-        ((DefaultTableModel) descTable.getModel()).setColumnIdentifiers(columnNames);
-        descTable.getColumnModel().getColumn(NAME_COLUMN).setPreferredWidth(140);
-        descTable.getColumnModel().getColumn(NAME_COLUMN).setMaxWidth(140);
-        descTable.getColumnModel().getColumn(NAME_COLUMN).setCellRenderer(renderer);
-        descTable.getColumnModel().getColumn(VALUE_COLUMN).setCellRenderer(renderer);
-        descTable.getColumnModel().getColumn(NAME_COLUMN).setCellEditor(editor);
-        descTable.getColumnModel().getColumn(VALUE_COLUMN).setCellEditor(editor);
-        descTable.addKeyListener(new Utils.CopyKeyAdapter());
-        descTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        JScrollPane descTableScrollPane = new JScrollPane(descTable);
-        descBorderPanel.setBorder(
-                BorderFactory.createTitledBorder(Resources.getText("Descriptor")));
-        descBorderPanel.add(descTableScrollPane);
-        // Add the two tables to the grid
-        //
-        add(infoBorderPanel);
-        add(descBorderPanel);
+        add(infoTableScrollPane);
     }
     
     // Call on EDT
@@ -180,20 +155,13 @@ class XMBeanInfo extends JPanel {
     }
     
     // Call on EDT
-    public void emptyDescTable() {
-        DefaultTableModel tableModel = (DefaultTableModel) descTable.getModel();
-        while (tableModel.getRowCount() > 0) {
-            tableModel.removeRow(0);
-        }
-    }
-    
-    // Call on EDT
     private void addDescriptor(Descriptor desc, String text) {
         if (desc != null && desc.getFieldNames().length > 0) {
-            DefaultTableModel tableModel = (DefaultTableModel) descTable.getModel();
+            DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
             Object rowData[] = new Object[2];
-            rowData[0] = new TableRowDivider(text);
-            rowData[1] = new TableRowDivider("");
+            rowData[0] = new TableRowDivider(
+                    text + " " + Resources.getText("Descriptor") + ":", lightYellow);
+            rowData[1] = new TableRowDivider("", lightYellow);
             tableModel.addRow(rowData);
             for (String fieldName : desc.getFieldNames()) {
                 rowData[0] = fieldName;
@@ -226,16 +194,16 @@ class XMBeanInfo extends JPanel {
     }
     
     // Call on EDT
-    public void addMBeanInfo(XMBean mbean, MBeanInfo mbeanInfo) {
-        emptyInfoTable();
-        emptyDescTable();
-        ((TitledBorder) infoBorderPanel.getBorder()).setTitle(
-                Resources.getText("MBeanInfo"));
-        String text = Resources.getText("Info") + ":";
+    private void addMBeanInfo(XMBean mbean, MBeanInfo mbeanInfo) {
+        String border = Resources.getText("MBeanInfo");
+        String text = Resources.getText("Info");
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text);
-        rowData[1] = new TableRowDivider("");
+        rowData[0] = new TableRowDivider(border, lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon);
+        tableModel.addRow(rowData);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow);
+        rowData[1] = new TableRowDivider("", lightYellow);
         tableModel.addRow(rowData);
         rowData[0] = Resources.getText("ObjectName");
         rowData[1] = mbean.getObjectName();
@@ -252,13 +220,13 @@ class XMBeanInfo extends JPanel {
         int i = 0;
         for (MBeanConstructorInfo mbci : mbeanInfo.getConstructors()) {
             addMBeanConstructorInfo(mbci,
-                    Resources.getText("Constructor") + "-" + i + ":");
+                    Resources.getText("Constructor") + "-" + i);
             // MBeanParameterInfo
             //
             int j = 0;
             for (MBeanParameterInfo mbpi : mbci.getSignature()) {
                 addMBeanParameterInfo(mbpi,
-                        Resources.getText("Parameter") + "-" + i + "-" + j + ":");
+                        Resources.getText("Parameter") + "-" + i + "-" + j);
                 j++;
             }
             i++;
@@ -267,16 +235,16 @@ class XMBeanInfo extends JPanel {
     }
     
     // Call on EDT
-    public void addMBeanAttributeInfo(MBeanAttributeInfo mbai) {
-        emptyInfoTable();
-        emptyDescTable();
-        ((TitledBorder) infoBorderPanel.getBorder()).setTitle(
-                Resources.getText("MBeanAttributeInfo"));
-        String text = Resources.getText("Attribute") + ":";
+    private void addMBeanAttributeInfo(MBeanAttributeInfo mbai) {
+        String border = Resources.getText("MBeanAttributeInfo");
+        String text = Resources.getText("Attribute");
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text);
-        rowData[1] = new TableRowDivider("");
+        rowData[0] = new TableRowDivider(border, lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon);
+        tableModel.addRow(rowData);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow);
+        rowData[1] = new TableRowDivider("", lightYellow);
         tableModel.addRow(rowData);
         rowData[0] = Resources.getText("Name");
         rowData[1] = mbai.getName();
@@ -301,16 +269,16 @@ class XMBeanInfo extends JPanel {
     }
     
     // Call on EDT
-    public void addMBeanOperationInfo(MBeanOperationInfo mboi) {
-        emptyInfoTable();
-        emptyDescTable();
-        ((TitledBorder) infoBorderPanel.getBorder()).setTitle(
-                Resources.getText("MBeanOperationInfo"));
-        String text = Resources.getText("Operation") + ":";
+    private void addMBeanOperationInfo(MBeanOperationInfo mboi) {
+        String border = Resources.getText("MBeanOperationInfo");
+        String text = Resources.getText("Operation");
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text);
-        rowData[1] = new TableRowDivider("");
+        rowData[0] = new TableRowDivider(border, lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon);
+        tableModel.addRow(rowData);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow);
+        rowData[1] = new TableRowDivider("", lightYellow);
         tableModel.addRow(rowData);
         rowData[0] = Resources.getText("Name");
         rowData[1] = mboi.getName();
@@ -343,22 +311,22 @@ class XMBeanInfo extends JPanel {
         int i = 0;
         for (MBeanParameterInfo mbpi : mboi.getSignature()) {
             addMBeanParameterInfo(mbpi,
-                    Resources.getText("Parameter") + "-" + i++ + ":");
+                    Resources.getText("Parameter") + "-" + i++);
         }
         tableModel.newDataAvailable(new TableModelEvent(tableModel));
     }
     
     // Call on EDT
-    public void addMBeanNotificationInfo(MBeanNotificationInfo mbni) {
-        emptyInfoTable();
-        emptyDescTable();
-        ((TitledBorder) infoBorderPanel.getBorder()).setTitle(
-                Resources.getText("MBeanNotificationInfo"));
-        String text = Resources.getText("Notification") + ":";
+    private void addMBeanNotificationInfo(MBeanNotificationInfo mbni) {
+        String border = Resources.getText("MBeanNotificationInfo") + ":";
+        String text = Resources.getText("Notification");
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text);
-        rowData[1] = new TableRowDivider("");
+        rowData[0] = new TableRowDivider(border, lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon);
+        tableModel.addRow(rowData);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow);
+        rowData[1] = new TableRowDivider("", lightYellow);
         tableModel.addRow(rowData);
         rowData[0] = Resources.getText("Name");
         rowData[1] = mbni.getName();
@@ -377,8 +345,8 @@ class XMBeanInfo extends JPanel {
     private void addMBeanConstructorInfo(MBeanConstructorInfo mbci, String text) {
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text);
-        rowData[1] = new TableRowDivider("");
+        rowData[0] = new TableRowDivider(text + ":", lightYellow);
+        rowData[1] = new TableRowDivider("", lightYellow);
         tableModel.addRow(rowData);
         rowData[0] = Resources.getText("Name");
         rowData[1] = mbci.getName();
@@ -394,8 +362,8 @@ class XMBeanInfo extends JPanel {
     private void addMBeanParameterInfo(MBeanParameterInfo mbpi, String text) {
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text);
-        rowData[1] = new TableRowDivider("");
+        rowData[0] = new TableRowDivider(text + ":", lightYellow);
+        rowData[1] = new TableRowDivider("", lightYellow);
         tableModel.addRow(rowData);
         rowData[0] = Resources.getText("Name");
         rowData[1] = mbpi.getName();
@@ -408,5 +376,36 @@ class XMBeanInfo extends JPanel {
         tableModel.addRow(rowData);
         addDescriptor(mbpi.getDescriptor(), text);
         tableModel.newDataAvailable(new TableModelEvent(tableModel));
+    }
+
+    // Call on EDT
+    public void loadMBeanInfo(XMBean mbean, MBeanInfo mbeanInfo) {
+        // MBeanInfo
+        //
+        addMBeanInfo(mbean, mbeanInfo);
+        // MBeanAttributeInfo
+        //
+        MBeanAttributeInfo[] ai = mbeanInfo.getAttributes();
+        if (ai != null && ai.length > 0) {
+            for (MBeanAttributeInfo mbai : ai) {
+                addMBeanAttributeInfo(mbai);
+            }
+        }
+        // MBeanOperationInfo
+        //
+        MBeanOperationInfo[] oi = mbeanInfo.getOperations();
+        if (oi != null && oi.length > 0) {
+            for (MBeanOperationInfo mboi : oi) {
+                addMBeanOperationInfo(mboi);
+            }
+        }
+        // MBeanNotificationInfo
+        //
+        MBeanNotificationInfo[] ni = mbeanInfo.getNotifications();
+        if (ni != null && ni.length > 0) {
+            for (MBeanNotificationInfo mbni : ni) {
+                addMBeanNotificationInfo(mbni);
+            }
+        }
     }
 }
