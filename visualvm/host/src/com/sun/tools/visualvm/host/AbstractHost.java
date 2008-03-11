@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Set;
+import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
 
 /**
  * Abstract implementation of Host.
@@ -72,10 +72,6 @@ public abstract class AbstractHost extends AbstractDataSource implements Host {
     
     public final InetAddress getInetAddress() {
         return inetAddress;
-    }
-    
-    public Set<Application> getApplications() {
-        return getRepository().getDataSources(Application.class);
     }
     
     

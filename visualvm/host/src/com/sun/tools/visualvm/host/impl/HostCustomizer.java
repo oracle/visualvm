@@ -25,7 +25,8 @@
 
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.host.impl.HostProperties;
+import com.sun.tools.visualvm.core.temporary.Support;
+import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -41,8 +42,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
 
 /**
@@ -59,7 +58,7 @@ class HostCustomizer extends JPanel {
     
     final DialogDescriptor dd = new DialogDescriptor(hc, "Add Remote Host", true, new Object[] {
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
-    final Dialog d = ProfilerDialogs.createDialog(dd);
+    final Dialog d = Support.createDialog(dd);
     d.pack();
     d.setVisible(true);
     
@@ -180,7 +179,7 @@ class HostCustomizer extends JPanel {
     add(displaynameField, constraints);
     
     // spacer
-    JPanel spacer = Utils.createFillerPanel();
+    JPanel spacer = new JPanel(new BorderLayout(0, 0));
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 2;

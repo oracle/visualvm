@@ -29,7 +29,7 @@ package com.sun.tools.visualvm.host.impl;
  *
  * @author Jiri Sedlacek
  */
-class HostProperties {
+public class HostProperties {
 
     private String hostName;
     private String displayName;

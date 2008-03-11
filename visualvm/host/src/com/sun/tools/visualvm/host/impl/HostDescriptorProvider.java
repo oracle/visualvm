@@ -25,12 +25,11 @@
 
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.host.*;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.host.RemoteHostsContainer;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -38,10 +37,7 @@ import org.openide.util.Utilities;
  *
  * @author Tomas Hurka
  */
-class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
-    
-    HostDescriptorProvider() {
-    }
+public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
         if (RemoteHostsContainer.sharedInstance().equals(ds)) {

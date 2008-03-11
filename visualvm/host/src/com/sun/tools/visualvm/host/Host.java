@@ -25,10 +25,8 @@
 
 package com.sun.tools.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.*;
-import com.sun.tools.visualvm.core.host.HostsSupport;
 import java.net.InetAddress;
-import java.util.Set;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
  * DataSource representing a host.
@@ -58,12 +56,5 @@ public interface Host extends DataSource {
      * @return InetAddress instance for this host.
      */
     public InetAddress getInetAddress();
-
-    /**
-     * Returns set of applications known to be running on this host.
-     * 
-     * @return set of applications known to be running on this host.
-     */
-    public Set<Application> getApplications();
 
 }

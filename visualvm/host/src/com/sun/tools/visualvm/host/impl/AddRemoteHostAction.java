@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.host.*;
+import com.sun.tools.visualvm.host.HostsSupport;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;

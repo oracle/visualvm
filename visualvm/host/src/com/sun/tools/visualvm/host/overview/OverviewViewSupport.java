@@ -25,16 +25,13 @@
 
 package com.sun.tools.visualvm.host.overview;
 
-import com.sun.tools.visualvm.host.overview.HostOverviewViewProvider;
-import com.sun.tools.visualvm.host.overview.HostOverviewPluggableView;
-import com.sun.tools.visualvm.application.overview.ApplicationOverviewViewProvider;
-import com.sun.tools.visualvm.application.overview.ApplicationOverviewPluggableView;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.temporary.Support;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
@@ -49,7 +46,7 @@ import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import javax.swing.text.JTextComponent;
 
 /**
  * A public entrypoint to the Overview subtab.
@@ -62,8 +59,6 @@ public final class OverviewViewSupport {
     private static OverviewViewSupport instance;
 
     private HostOverviewPluggableView hostPluggableView;
-    private ApplicationOverviewPluggableView applicationPluggableView;
-    private CoreDumpOverviewPluggableView coreDumpPluggableView;
 
 
     /**
@@ -90,40 +85,9 @@ public final class OverviewViewSupport {
         return hostPluggableView;
     }
     
-    /**
-     * Returns PluggableView instance to be used to customize the Overview view of an application.
-     * 
-     * @return PluggableView instance to be used to customize the Overview view of an application.
-     */
-    public PluggableViewSupport getApplicationPluggableView() {
-        return getApplicationOverviewPluggableView();
-    }
-
-    ApplicationOverviewPluggableView getApplicationOverviewPluggableView() {
-        return applicationPluggableView;
-    }
-    
-    /**
-     * Returns PluggableView instance to be used to customize the Overview view of a core dump.
-     * 
-     * @return PluggableView instance to be used to customize the Overview view of a core dump.
-     */
-    public PluggableViewSupport getCoreDumpPluggableView() {
-        return getCoreDumpOverviewPluggableView();
-    }
-    
-    CoreDumpOverviewPluggableView getCoreDumpOverviewPluggableView() {
-        return coreDumpPluggableView;
-    }
-    
     private OverviewViewSupport() {
         hostPluggableView = new HostOverviewPluggableView();
         new HostOverviewViewProvider().initialize();
-        
-        applicationPluggableView = new ApplicationOverviewPluggableView();
-        coreDumpPluggableView = new CoreDumpOverviewPluggableView();
-        new ApplicationOverviewViewProvider().initialize();
-        CoreDumpOverviewViewProvider.register();
     }
 
  // --- Snapshots -----------------------------------------------------------
@@ -141,7 +105,7 @@ public final class OverviewViewSupport {
         private void initComponents(final DataSource ds) {
             setLayout(new BorderLayout());
             
-            final HTMLTextArea area = new HTMLTextArea();
+            final JTextComponent area = Support.HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             setBackground(area.getBackground());
             
@@ -185,7 +149,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (jvmargs != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
+                JTextComponent area = Support.HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 setBackground(area.getBackground());
@@ -242,7 +206,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (properties != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
+                JTextComponent area = Support.HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 setBackground(area.getBackground());

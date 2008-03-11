@@ -25,14 +25,12 @@
 
 package com.sun.tools.visualvm.host;
 
-import com.sun.tools.visualvm.core.host.*;
-import com.sun.tools.visualvm.host.impl.HostProperties;
-import com.sun.tools.visualvm.host.impl.MonitoredHostProvider;
-import com.sun.tools.visualvm.host.impl.HostDescriptorProvider;
-import com.sun.tools.visualvm.host.impl.HostActionsProvider;
-import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.host.impl.HostActionsProvider;
+import com.sun.tools.visualvm.host.impl.HostDescriptorProvider;
+import com.sun.tools.visualvm.host.impl.HostProperties;
+import com.sun.tools.visualvm.host.impl.HostProvider;
 import java.io.File;
 import java.net.InetAddress;
 
@@ -74,18 +72,18 @@ public final class HostsSupport {
         return getHostProvider().getHostByAddress(inetAddress);
     }
 
-    HostProvider getHostProvider() {
+    public HostProvider getHostProvider() {
         return hostProvider;
     }
     
     
-    static String getStorageDirectoryString() {
+    public static String getStorageDirectoryString() {
         if (hostsStorageDirectoryString == null)
             hostsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + HOSTS_STORAGE_DIRNAME;
         return hostsStorageDirectoryString;
     }
     
-    static File getStorageDirectory() {
+    public static File getStorageDirectory() {
         if (hostsStorageDirectory == null) {
             String snapshotsStorageString = getStorageDirectoryString();
             hostsStorageDirectory = new File(snapshotsStorageString);
@@ -99,7 +97,7 @@ public final class HostsSupport {
         return hostsStorageDirectory;
     }
     
-    static boolean storageDirectoryExists() {
+    public static boolean storageDirectoryExists() {
         return new File(getStorageDirectoryString()).isDirectory();
     }
 
@@ -113,8 +111,6 @@ public final class HostsSupport {
         hostProvider.initialize();
 
         new HostActionsProvider().initialize();
-        
-        new MonitoredHostProvider().initialize();
     }
 
 }

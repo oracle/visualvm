@@ -27,8 +27,6 @@ package com.sun.tools.visualvm.host.impl;
 
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
-import com.sun.tools.visualvm.host.impl.HostProperties;
-import com.sun.tools.visualvm.host.impl.HostImpl;
 import com.sun.tools.visualvm.host.AbstractHost;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
@@ -41,6 +39,7 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.temporary.Support;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.InetAddress;
@@ -51,7 +50,6 @@ import java.util.concurrent.Semaphore;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
@@ -60,7 +58,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 // A provider for Hosts
-class HostProvider extends DefaultDataSourceProvider<HostImpl> {
+public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -103,7 +101,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 if (interactive) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError("<html><b>Cannot resolve host " + hostName + "</b><br><br>Make sure you have entered correct<br>host name or address.</html>");
+                            Support.displayError("<html><b>Cannot resolve host " + hostName + "</b><br><br>Make sure you have entered correct<br>host name or address.</html>");
                         }
                     });
                 }
@@ -122,7 +120,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             ExplorerSupport.sharedInstance().selectDataSource(knownHost);
-                            NetBeansProfiler.getDefaultNB().displayWarning("<html>Host " + hostName + " already monitored as " + DataSourceDescriptorFactory.getDescriptor(knownHost).getName() + "</html>");
+                            Support.displayWarning("<html>Host " + hostName + " already monitored as " + DataSourceDescriptorFactory.getDescriptor(knownHost).getName() + "</html>");
                         }
                     });
                 }
@@ -177,7 +175,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
         }
     }
     
-    HostImpl getHostByAddress(InetAddress inetAddress) {
+    public HostImpl getHostByAddress(InetAddress inetAddress) {
         waitForInitialization();
         
         Set<HostImpl> knownHosts = getDataSources(HostImpl.class);
@@ -204,7 +202,7 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
             registerDataSource(LOCALHOST);
         } catch (UnknownHostException e) {
             System.err.println("Critical failure: cannot resolve localhost");
-            NetBeansProfiler.getDefaultNB().displayError("Unable to resolve localhost!");
+            Support.displayError("Unable to resolve localhost!");
         }
     }
     
@@ -275,12 +273,12 @@ class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     }
     
     
-    void initialize() {
+    public void initialize() {
         initHosts();
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
     }
     
-    HostProvider() {
+    public HostProvider() {
         try {
             initializingHostsSemaphore.acquire();
         } catch (InterruptedException ex) {

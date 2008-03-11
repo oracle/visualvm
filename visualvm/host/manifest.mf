@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 OpenIDE-Module: com.sun.tools.visualvm.host
+OpenIDE-Module-Install: com/sun/tools/visualvm/host/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/host/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
 

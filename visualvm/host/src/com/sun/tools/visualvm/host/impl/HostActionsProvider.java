@@ -26,10 +26,12 @@
 package com.sun.tools.visualvm.host.impl;
 
 import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
-import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.host.HostsSupport;
+import com.sun.tools.visualvm.host.RemoteHostsContainer;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,12 +42,12 @@ import javax.swing.AbstractAction;
  *
  * @author Jiri Sedlacek
  */
-class HostActionsProvider {
+public class HostActionsProvider {
 
     private final RemoveHostAction removeHostAction = new RemoveHostAction();
 
 
-    void initialize() {
+    public void initialize() {
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HostActionProvider(), Host.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);

@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.host.overview;
 
-import com.sun.tools.visualvm.core.dataview.overview.*;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.host.model.HostOverview;
