@@ -29,11 +29,8 @@ package com.sun.tools.visualvm.core;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import org.openide.modules.ModuleInstall;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -46,13 +43,13 @@ public class Install extends ModuleInstall {
         // NOTE: this has to be called before any of DataSourceProviders initializes
         cleanupPreviousSession();
         
-        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-            public void run() {
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() { init(); }
-                });
-            }
-        });
+//        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+//            public void run() {
+//                RequestProcessor.getDefault().post(new Runnable() {
+//                    public void run() { init(); }
+//                });
+//            }
+//        });
     }
     
     private void init() {
@@ -65,12 +62,12 @@ public class Install extends ModuleInstall {
 //
 //        // Initialize core dumps
 //        CoreDumpSupport.register();
-        
-        // Initialize explorer
-        ExplorerSupport.sharedInstance();
-        
-        // Initialize snapshots
-        SnapshotsSupport.getInstance();
+//        
+//        // Initialize explorer
+//        ExplorerSupport.sharedInstance();
+//        
+//        // Initialize snapshots
+//        SnapshotsSupport.getInstance();
 //        
 //        // Initialize views
 //        OverviewViewSupport.getInstance();
