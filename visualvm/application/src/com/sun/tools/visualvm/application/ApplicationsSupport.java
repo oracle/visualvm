@@ -26,12 +26,16 @@
 package com.sun.tools.visualvm.application;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.host.Host;
+import java.lang.management.ManagementFactory;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class ApplicationsSupport {
+    
+    private final Application CURRENT_APPLICATION;
 
     private static ApplicationsSupport instance;
 
@@ -41,12 +45,22 @@ public final class ApplicationsSupport {
         }
         return instance;
     }
+    
+    Application getCurrentApplication() {
+        return CURRENT_APPLICATION;
+    }
 
-//    public static Application getCurrentApplication() {
-//        return JvmstatApplicationProvider.getCurrentApplication();
-//    }
+    private Application createCurrentApplication() {
+        String selfName = ManagementFactory.getRuntimeMXBean().getName();
+        int selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
+        Application currentApplication = new AbstractApplication(Host.LOCALHOST, selfPid) {};
+        Host.LOCALHOST.getRepository().addDataSource(currentApplication);
+        return currentApplication;
+    }
 
     public ApplicationsSupport() {
+        CURRENT_APPLICATION = createCurrentApplication();
+        
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
 
 //        new JvmstatApplicationProvider().initialize();

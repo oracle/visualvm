@@ -22,55 +22,19 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package com.sun.tools.visualvm.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.host.Host;
+import org.openide.modules.ModuleInstall;
 
 /**
- * DataSource representing an application.
- *
+ * Manages a module's lifecycle. Remember that an installer is optional and
+ * often not needed at all.
+ * 
  * @author Jiri Sedlacek
  */
-public interface Application extends DataSource {
+public class Installer extends ModuleInstall {
 
-    /**
-     * Instance representing actually running VisualVM application.
-     */
-    public static final Application CURRENT_APPLICATION = ApplicationsSupport.getInstance().getCurrentApplication();
-    
-    /**
-     * Process ID of the application is unknown.
-     */
-    public static final int UNKNOWN_PID = -1;
-
-    /**
-     * Returns unique Id of this application.
-     * 
-     * @return unique Id of this application.
-     */
-    public String getId();
-
-    /**
-     * Returns process Id of this application if known.
-     * 
-     * @return process Id of this application or UNKNOWN_PID.
-     */
-    public int getPid();
-
-    /**
-     * Returns a host instance for this application.
-     * 
-     * @return host instance for this application.
-     */
-    public Host getHost();
-
-    /**
-     * Returns true if this application is running on the localhost.
-     * 
-     * @return true if this application is running on the localhost.
-     */
-    public boolean isLocalApplication();
-
+    public void restored() {
+        ApplicationsSupport.getInstance();
+    }
 }

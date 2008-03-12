@@ -56,7 +56,7 @@ public class DefaultApplicationType extends ApplicationType  {
       if (mainClassName != null && mainClassName.length() > 0) {
         applicationName = mainClassName;
       } else {
-        applicationName = "<Unknown>";
+        applicationName = "<Unknown Application>";
       }
       name = applicationName;      
     }
@@ -64,7 +64,7 @@ public class DefaultApplicationType extends ApplicationType  {
   }
 
   public String getVersion() {
-    return "<Unknown>";
+    return "<Unknown Version>";
   }
 
   public String getDescription() {

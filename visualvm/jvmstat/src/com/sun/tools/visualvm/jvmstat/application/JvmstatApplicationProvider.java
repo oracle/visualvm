@@ -68,18 +68,6 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
         public void dataFinished(MonitoredHostDS host) { processFinishedHost(host); }
     };
     
-    // Not to be called from user code, use Application.CURRENT_APPLICATION instead
-    static synchronized Application getCurrentApplication() {    
-        String selfName = ManagementFactory.getRuntimeMXBean().getName();
-        Set<JvmstatApplication> localApplications = Host.LOCALHOST.getRepository().getDataSources(JvmstatApplication.class);
-        for (JvmstatApplication localApplication : localApplications)
-            if (localApplication.getState() == DataSource.STATE_AVAILABLE) {
-                String pid = Integer.toString(localApplication.getPid());
-                if (selfName.startsWith(pid.concat("@"))) return localApplication;
-            }
-        return null;
-    }
-    
     public void dataChanged(DataChangeEvent<MonitoredHostDS> event) {
         Set<MonitoredHostDS> newHosts = event.getAdded();
         for (MonitoredHostDS host : newHosts) processNewHost(host);
