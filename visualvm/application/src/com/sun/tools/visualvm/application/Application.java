@@ -25,11 +25,8 @@
 
 package com.sun.tools.visualvm.application;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.datasource.*;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.application.ApplicationsSupport;
-import java.util.Set;
 
 /**
  * DataSource representing an application.
@@ -41,7 +38,7 @@ public interface Application extends DataSource {
     /**
      * Instance representing actually running VisualVM application.
      */
-    public static final Application CURRENT_APPLICATION = ApplicationsSupport.getCurrentApplication();
+    public static final Application CURRENT_APPLICATION = null /*= ApplicationsSupport.getCurrentApplication()*/;
     
     /**
      * Process ID of the application is unknown.
@@ -75,14 +72,5 @@ public interface Application extends DataSource {
      * @return true if this application is running on the localhost.
      */
     public boolean isLocalApplication();
-
-    /**
-     * Returns set of snapshots created for this application.
-     * Use com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories
-     * to get a list of all registered snapshot types.
-     * 
-     * @return set of snapshots created for this application.
-     */
-    public Set<Snapshot> getSnapshots();
 
 }

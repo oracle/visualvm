@@ -25,10 +25,8 @@
 
 package com.sun.tools.visualvm.application;
 
-import com.sun.tools.visualvm.application.jmx.JmxApplication;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
@@ -76,8 +74,8 @@ class ApplicationDescriptorProvider extends
             return type.getName() + id;
         }
 
-        public boolean supportsRename() {
-            return getDataSource() instanceof JmxApplication;
-        }
+//        public boolean supportsRename() {
+//            return getDataSource() instanceof JmxApplication;
+//        }
     }
 }

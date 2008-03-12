@@ -93,7 +93,7 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
     }
     
     private void createSnapshotImpl(final Application application, final boolean interactive) {
-        Set<Snapshot> snapshots = application.getSnapshots();
+        Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
         if (snapshots.isEmpty()) return;
         
         File snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());

@@ -35,7 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import org.netbeans.modules.profiler.utils.IDEUtils;
+import javax.swing.SwingUtilities;
 
 public final class ApplicationSnapshotAction extends AbstractAction implements DataChangeListener {
     
@@ -51,17 +51,19 @@ public final class ApplicationSnapshotAction extends AbstractAction implements D
     
     public void actionPerformed(ActionEvent e) {
         Application selectedApplication = getSelectedApplication();
-        if (selectedApplication != null && !selectedApplication.getSnapshots().isEmpty())
+        if (selectedApplication != null && !selectedApplication.getRepository().getDataSources(Snapshot.class).isEmpty())
             ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(selectedApplication, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
     }
     
     void updateEnabled() {
         Application selectedApplication = getSelectedApplication();
-        final boolean isEnabled = selectedApplication != null && !selectedApplication.getSnapshots().isEmpty();
+        final boolean isEnabled = selectedApplication != null && !selectedApplication.getRepository().getDataSources(Snapshot.class).isEmpty();
         
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        Runnable enabler = new Runnable() {
             public void run() { setEnabled(isEnabled); }
-        });
+        };
+        if (SwingUtilities.isEventDispatchThread()) enabler.run();
+        else SwingUtilities.invokeLater(enabler);
     }
     
     private Application getSelectedApplication() {

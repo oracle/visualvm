@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jmx;
 
-import com.sun.tools.visualvm.application.jmx.JmxApplication;
+import com.sun.tools.visualvm.jmx.application.JmxApplication;
 import com.sun.tools.visualvm.application.jvmstat.JvmstatApplication;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;

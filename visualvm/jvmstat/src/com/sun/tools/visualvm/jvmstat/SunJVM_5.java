@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.application.jvmstat.JvmstatApplication;
+import com.sun.tools.visualvm.jvmstat.application.JvmstatApplication;
 import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredVm;

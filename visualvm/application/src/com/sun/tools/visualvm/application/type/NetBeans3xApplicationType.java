@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.jvm.JVM;
+import com.sun.tools.visualvm.application.JVM;
 
 /**
  *

@@ -27,8 +27,8 @@ package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.jvm.JVM;
-import com.sun.tools.visualvm.jvm.JVMFactory;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.JVMFactory;
 
 /**
  *

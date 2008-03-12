@@ -25,10 +25,9 @@
 
 package com.sun.tools.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.jmx.JmxApplication;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.jvm.JVM;
-import com.sun.tools.visualvm.jvm.JVMFactory;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.JVMFactory;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -56,8 +55,6 @@ public class DefaultApplicationType extends ApplicationType  {
       String applicationName;
       if (mainClassName != null && mainClassName.length() > 0) {
         applicationName = mainClassName;
-      } else if (application instanceof JmxApplication) {
-        applicationName = ((JmxApplication) application).getId();
       } else {
         applicationName = "<Unknown>";
       }

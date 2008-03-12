@@ -25,9 +25,6 @@
 
 package com.sun.tools.visualvm.application;
 
-import com.sun.tools.visualvm.core.application.*;
-import com.sun.tools.visualvm.application.jmx.JmxApplicationProvider;
-import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 
 /**
@@ -45,16 +42,16 @@ public final class ApplicationsSupport {
         return instance;
     }
 
-    public static Application getCurrentApplication() {
-        return JvmstatApplicationProvider.getCurrentApplication();
-    }
+//    public static Application getCurrentApplication() {
+//        return JvmstatApplicationProvider.getCurrentApplication();
+//    }
 
     public ApplicationsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
 
-        new JvmstatApplicationProvider().initialize();
-
-        JmxApplicationProvider.initialize();
+//        new JvmstatApplicationProvider().initialize();
+//
+//        JmxApplicationProvider.initialize();
 
         ApplicationActionsProvider.initialize();
     }

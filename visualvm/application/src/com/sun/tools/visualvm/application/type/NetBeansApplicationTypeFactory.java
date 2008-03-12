@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.application.type;
 
-import com.sun.tools.visualvm.jvm.JVM;
+import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.Application;
 import java.util.Collections;
 import java.util.HashSet;

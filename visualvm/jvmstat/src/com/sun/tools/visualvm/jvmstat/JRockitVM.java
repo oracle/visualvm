@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.application.jvmstat.JvmstatApplication;
+import com.sun.tools.visualvm.jvmstat.application.JvmstatApplication;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.core.tools.StackTrace;

@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.jvmstat;
 import com.sun.tools.visualvm.jvm.MonitoredData;
 import com.sun.tools.visualvm.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.jvm.DefaultJVM;
-import com.sun.tools.visualvm.application.jvmstat.JvmstatApplication;
+import com.sun.tools.visualvm.jvmstat.application.JvmstatApplication;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
