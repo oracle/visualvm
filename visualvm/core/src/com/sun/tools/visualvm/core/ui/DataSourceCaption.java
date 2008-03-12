@@ -57,6 +57,8 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     private DataSourceDescriptor<X> dataSourceDescriptor;
     
     private boolean isAvailable;
+    private String name;
+    private String description;
     
     
     public DataSourceCaption(X dataSource) {
@@ -68,9 +70,13 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         dataSourceDescriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
         dataSourceDescriptor.addPropertyChangeListener(this);
         
-        setCaption(dataSourceDescriptor.getName());
-        setDescription(dataSourceDescriptor.getDescription());
-        setAvailable(dataSource.getState() == DataSource.STATE_AVAILABLE);
+        isAvailable = dataSource.getState() == DataSource.STATE_AVAILABLE;
+        name = dataSourceDescriptor.getName();
+        description = dataSourceDescriptor.getDescription();
+        
+        updateCaption();
+        updateDescription();
+        updateAvailable();
     }
 
     
@@ -78,11 +84,15 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         String propertyName = evt.getPropertyName();
         
         if (DataSource.PROPERTY_STATE.equals(propertyName)) {
-            setAvailable((Integer)evt.getNewValue() == DataSource.STATE_AVAILABLE);
+            isAvailable = (Integer)evt.getNewValue() == DataSource.STATE_AVAILABLE;
+            updateAvailable();
+            updateCaption();
         } else if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
-            setCaption((String)evt.getNewValue());
+            name = (String)evt.getNewValue();
+            updateCaption();
         } else if (DataSourceDescriptor.PROPERTY_DESCRIPTION.equals(propertyName)) {
-            setDescription((String)evt.getNewValue());
+            description = (String)evt.getNewValue();
+            updateDescription();
         } else if (DataSourceDescriptor.PROPERTY_ICON.equals(propertyName)) {
             // Could display datasource icon instead of progress icon
             // setIcon(new ImageIcon((Image)evt.getNewValue()));
@@ -95,9 +105,7 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     }
     
     
-    private void setAvailable(boolean isAvailable) {
-        this.isAvailable = isAvailable;
-        
+    private void updateAvailable() {
         if (isAvailable) {
             if (ANIMATE) {
                 busyIconIndex = 0;
@@ -112,28 +120,28 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         }
     }
     
-    private void setCaption(String caption) {
+    private void updateCaption() {
         // TODO: mask all html-specific characters
-        caption = caption.replace(">", "&gt;");
-        caption = caption.replace("<", "&lt;");
+        name = name.replace(">", "&gt;");
+        name = name.replace("<", "&lt;");
         
         Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : UIManager.getColor("Label.disabledForeground");
         String textColorString = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
         
-        if (caption.contains(APPLICATION_PID_PREFIX) && caption.contains(APPLICATION_PID_SUFFIX)) {
+        if (name.contains(APPLICATION_PID_PREFIX) && name.contains(APPLICATION_PID_SUFFIX)) {
             // Hack to customize default Application displayname containing "(pid XXX)"
-            int startPid = caption.indexOf(APPLICATION_PID_PREFIX);
+            int startPid = name.indexOf(APPLICATION_PID_PREFIX);
             
-            String captionBase = caption.substring(0, startPid).trim();
-            String captionPid = caption.substring(startPid).trim();
+            String captionBase = name.substring(0, startPid).trim();
+            String captionPid = name.substring(startPid).trim();
             
             presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + captionBase + "</b> " + captionPid + "</nobr></body></html>");
         } else {
-            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + caption + "</b></nobr></body></html>");
+            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + name + "</b></nobr></body></html>");
         }
     }
     
-    private void setDescription(String description) {
+    private void updateDescription() {
         presenter.setToolTipText(description);
     }
     
