@@ -74,7 +74,7 @@ import org.openide.util.Utilities;
  */
 class ApplicationProfilerView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/profiler.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/profiler/resources/profiler.png";
 
     private DataViewComponent view;
     
@@ -368,7 +368,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // cpuButton
               cpuButton = new OneWayToggleButton("CPU");
-              cpuButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/cpu.png", true)));
+              cpuButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/cpu.png", true)));
               cpuButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleCPUProfiling(); }
               });
@@ -383,7 +383,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // memoryButton
               memoryButton = new OneWayToggleButton("Memory");
-              memoryButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/memory.png", true)));
+              memoryButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/memory.png", true)));
               memoryButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleMemoryProfiling(); }
               });
@@ -398,7 +398,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // stopButton
               stopButton = new JButton("Stop");
-              stopButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/stop.png", true)));
+              stopButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/stop.png", true)));
               stopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
               });
