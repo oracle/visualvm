@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.profiler;
 
-import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
 
 /**
  *
