@@ -126,9 +126,31 @@ class JmxApplicationConfigurator extends JPanel {
                 String displayname = getDisplayName();
                 displaynameField.setEnabled(displaynameCheckbox.isSelected());
 
-                okButton.setEnabled(url.length() > 0 && displayname.length() > 0);
+                okButton.setEnabled(enableOkButton(url, displayname));
             }
         });
+    }
+
+    private boolean enableOkButton(String url, String displayname) {
+        if (url.startsWith("service:jmx:")) { // NOI18N
+            return displayname.length() > 0;
+        } else {
+            int index = url.lastIndexOf(":");
+            if (index == -1) {
+                return false;
+            }
+            String host = url.substring(0, index);
+            String port = url.substring(index + 1);
+            if (host.length() > 0 && port.length() > 0) {
+                try {
+                    Integer.parseInt(port.trim());
+                    return displayname.length() > 0;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     private void initComponents() {
@@ -240,6 +262,7 @@ class JmxApplicationConfigurator extends JPanel {
 
         // okButton
         okButton = new JButton("OK");
+        okButton.setEnabled(false);
 
         // UI tweaks
         displaynameCheckbox.setBorder(connectionLabel.getBorder());
