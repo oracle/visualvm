@@ -36,10 +36,10 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class HeapDumpActionsProvider {
+public class HeapDumpActionsProvider {
     
 
-    void initialize() {
+    public void initialize() {
 //        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationActionProvider(), Application.class);
 //        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDump.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HeapDumpActionProvider(), DataSource.class);

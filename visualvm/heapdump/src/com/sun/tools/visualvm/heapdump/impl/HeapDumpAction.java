@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.core.heapdump.*;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
@@ -33,6 +32,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;

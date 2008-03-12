@@ -25,10 +25,9 @@
 
 package com.sun.tools.visualvm.heapdump;
 
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpImpl;
-import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import com.sun.tools.visualvm.heapdump.impl.HeapDumpImpl;
 import java.io.File;
 
 /**

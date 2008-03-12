@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
  *
  * @author Jiri Sedlacek
  */
-class HeapDumpPluggableView extends PluggableViewSupport<HeapDump> {
+public class HeapDumpPluggableView extends PluggableViewSupport<HeapDump> {
 
     public <X extends HeapDump> boolean allowsNewArea(X dataSource, int location) {
         return true;
@@ -44,7 +44,7 @@ class HeapDumpPluggableView extends PluggableViewSupport<HeapDump> {
         return true;
     }
 
-    <X extends HeapDump> void makeCustomizations(DataViewComponent view, X dataSource) {
+    public <X extends HeapDump> void makeCustomizations(DataViewComponent view, X dataSource) {
         super.customizeView(view, dataSource);
     }
 

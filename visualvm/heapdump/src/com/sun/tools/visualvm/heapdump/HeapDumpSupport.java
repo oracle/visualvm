@@ -90,12 +90,12 @@ public final class HeapDumpSupport {
         return heapDumpPluggableView;
     }
     
-    HeapDumpPluggableView getHeapDumpPluggableView() {
+    public HeapDumpPluggableView getHeapDumpPluggableView() {
         return heapDumpPluggableView;
     }
 
 
-    HeapDumpProvider getHeapDumpProvider() {
+    public HeapDumpProvider getHeapDumpProvider() {
         return heapDumpProvider;
     }
 

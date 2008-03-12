@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
+public class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
     
     private Map<HeapDump, DataSourceView> viewsCache = new HashMap();
     
@@ -61,7 +61,7 @@ class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
         return Collections.singleton(view);
     }
 
-    void initialize() {
+    public void initialize() {
         DataSourceViewsFactory.sharedInstance().addViewProvider(this, HeapDump.class);
     }
 

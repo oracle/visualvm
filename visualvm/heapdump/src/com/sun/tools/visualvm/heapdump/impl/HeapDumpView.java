@@ -25,11 +25,11 @@
 
 package com.sun.tools.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.core.heapdump.*;
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

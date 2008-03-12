@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.core.heapdump.*;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -36,10 +36,10 @@ import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
-import com.sun.tools.visualvm.application.ApplicationSnapshot;
-import com.sun.tools.visualvm.saagent.SAAgent;
-import com.sun.tools.visualvm.saagent.SAAgentFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
+import com.sun.tools.visualvm.tools.sa.SAAgent;
+import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -56,7 +56,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
+public class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
     
     private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
         public void dataFinished(Application application) { removeHeapDumps(application, false); }
@@ -93,7 +93,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
     }
     
     
-    void createHeapDump(final Application application, final boolean openView) {
+    public void createHeapDump(final Application application, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 JVM jvm = JVMFactory.getJVMFor(application);
@@ -190,7 +190,7 @@ class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataCha
         for (HeapDumpImpl heapDump : removed) heapDump.removed();
     }
     
-    void initialize() {
+    public void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
     }

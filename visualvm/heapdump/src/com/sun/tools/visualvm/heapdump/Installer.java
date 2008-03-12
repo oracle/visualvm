@@ -23,30 +23,18 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.heapdump.impl;
+package com.sun.tools.visualvm.heapdump;
 
-import com.sun.tools.visualvm.heapdump.AbstractHeapDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
-import java.io.File;
+import org.openide.modules.ModuleInstall;
 
 /**
- *
- * @author Jiri Sedlacek
+ * Manages a module's lifecycle. Remember that an installer is optional and
+ * often not needed at all.
  */
-final public class HeapDumpImpl extends AbstractHeapDump {
-
-    public HeapDumpImpl(File file, DataSource master) {
-        super(file, master);
+public class Installer extends ModuleInstall {
+    
+    public void restored() {
+        HeapDumpSupport.getInstance();
     }
     
-    public void delete() {
-        super.delete();
-        HeapDumpSupport.getInstance().getHeapDumpProvider().unregisterHeapDump(this);
-    }
-
-    void removed() {
-        setState(STATE_FINISHED);
-    }
-
 }
