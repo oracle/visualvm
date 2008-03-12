@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application>{
+public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application>{
     
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
@@ -61,7 +61,7 @@ class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Applica
         return Collections.singleton(view);
     }
 
-    void initialize() {
+    public void initialize() {
         DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
     }
 

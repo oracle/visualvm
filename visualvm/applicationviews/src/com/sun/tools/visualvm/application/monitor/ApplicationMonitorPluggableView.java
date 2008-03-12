@@ -29,11 +29,12 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
+
 /**
  *
  * @author Jiri Sedlacek
  */
-class ApplicationMonitorPluggableView extends PluggableViewSupport<Application> {
+public class ApplicationMonitorPluggableView extends PluggableViewSupport<Application> {
 
     public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
         return false;

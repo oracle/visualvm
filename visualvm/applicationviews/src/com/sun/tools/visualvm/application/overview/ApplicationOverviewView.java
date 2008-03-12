@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.application.overview;
 
-import com.sun.tools.visualvm.core.dataview.overview.*;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
@@ -66,7 +66,8 @@ class ApplicationOverviewView extends DataSourceView {
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent(application);
-            OverviewViewSupport.getInstance().getApplicationOverviewPluggableView().makeCustomizations(view, application);
+            ApplicationOverviewPluggableView pluggableView = (ApplicationOverviewPluggableView)ApplicationViewsSupport.sharedInstance().getOverviewView();
+            pluggableView.makeCustomizations(view, application);
             application = null;
         }
         return view;

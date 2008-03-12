@@ -29,16 +29,14 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.lang.management.ThreadMXBean;
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -81,7 +79,8 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent();
-            ThreadsViewSupport.getInstance().getApplicationThreadsPluggableView().makeCustomizations(view, application);
+            ApplicationThreadsPluggableView pluggableView = (ApplicationThreadsPluggableView)ApplicationViewsSupport.sharedInstance().getThreadsView();
+            pluggableView.makeCustomizations(view, application);
         }
         
         return view;
@@ -164,19 +163,19 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
             
             add(area, BorderLayout.CENTER);
             
-            threadDumpButton = new JButton(new AbstractAction("Thread Dump") {
-                public void actionPerformed(ActionEvent e) {
-                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-                }
-            });
-            threadDumpButton.setEnabled(jvm.isTakeThreadDumpSupported());
+//            threadDumpButton = new JButton(new AbstractAction("Thread Dump") {
+//                public void actionPerformed(ActionEvent e) {
+//                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+//                }
+//            });
+//            threadDumpButton.setEnabled(jvm.isTakeThreadDumpSupported());
             
             JPanel buttonsArea = new JPanel(new BorderLayout());
             buttonsArea.setBackground(area.getBackground());
             JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
             buttonsContainer.setBackground(area.getBackground());
             buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
+//            buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
             buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
             
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);

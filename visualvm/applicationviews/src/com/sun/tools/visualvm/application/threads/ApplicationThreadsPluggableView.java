@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationThreadsPluggableView extends PluggableViewSupport<Application> {
+public class ApplicationThreadsPluggableView extends PluggableViewSupport<Application> {
 
     public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
         switch (location) {

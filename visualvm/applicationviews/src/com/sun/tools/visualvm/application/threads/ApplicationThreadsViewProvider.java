@@ -26,11 +26,11 @@
 package com.sun.tools.visualvm.application.threads;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModel;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application>{
+public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application>{
     
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
@@ -64,7 +64,7 @@ class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Applicat
         return Collections.singleton(view);
     }
 
-    void initialize() {
+    public void initialize() {
         DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
     }
 

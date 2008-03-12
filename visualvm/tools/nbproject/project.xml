@@ -32,7 +32,10 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>com.sun.tools.visualvm.tools.jmx</package>
+                <package>com.sun.tools.visualvm.tools.sa</package>
+            </public-packages>
         </data>
     </configuration>
 </project>

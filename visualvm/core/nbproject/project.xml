@@ -155,9 +155,9 @@
                 <package>com.sun.tools.visualvm.core.datasupport</package>
                 <package>com.sun.tools.visualvm.core.explorer</package>
                 <package>com.sun.tools.visualvm.core.model</package>
+                <package>com.sun.tools.visualvm.core.options</package>
                 <package>com.sun.tools.visualvm.core.scheduler</package>
                 <package>com.sun.tools.visualvm.core.snapshot</package>
-                <package>com.sun.tools.visualvm.core.temporary</package>
                 <package>com.sun.tools.visualvm.core.ui</package>
                 <package>com.sun.tools.visualvm.core.ui.components</package>
             </public-packages>

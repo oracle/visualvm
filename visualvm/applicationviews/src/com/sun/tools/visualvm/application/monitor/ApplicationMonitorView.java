@@ -27,16 +27,16 @@ package com.sun.tools.visualvm.application.monitor;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModel;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModelFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.application.MonitoredData;
 import com.sun.tools.visualvm.application.MonitoredDataListener;
+import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,7 +45,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.InputEvent;
 import java.lang.management.MemoryMXBean;
 import java.text.NumberFormat;
 import javax.swing.AbstractAction;
@@ -89,7 +88,8 @@ class ApplicationMonitorView extends DataSourceView {
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent(application);
-            MonitorViewSupport.getInstance().getApplicationMonitorPluggableView().makeCustomizations(view, application);
+            ApplicationMonitorPluggableView pluggableView = (ApplicationMonitorPluggableView)ApplicationViewsSupport.sharedInstance().getMonitorView();
+            pluggableView.makeCustomizations(view, application);
         }
         
         return view;
@@ -200,12 +200,12 @@ class ApplicationMonitorView extends DataSourceView {
             });
             gcButton.setEnabled(memoryMXBean != null);
             
-            heapDumpButton = new JButton(new AbstractAction("Heap Dump") {
-                public void actionPerformed(ActionEvent e) {
-                    HeapDumpSupport.getInstance().takeHeapDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
-                }
-            });
-            heapDumpButton.setEnabled(jvm.isTakeHeapDumpSupported());
+//            heapDumpButton = new JButton(new AbstractAction("Heap Dump") {
+//                public void actionPerformed(ActionEvent e) {
+//                    HeapDumpSupport.getInstance().takeHeapDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+//                }
+//            });
+//            heapDumpButton.setEnabled(jvm.isTakeHeapDumpSupported());
             
             JPanel buttonsArea = new JPanel(new BorderLayout());
             buttonsArea.setBackground(area.getBackground());
@@ -213,7 +213,7 @@ class ApplicationMonitorView extends DataSourceView {
             buttonsContainer.setBackground(area.getBackground());
             buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             buttonsContainer.add(gcButton, BorderLayout.WEST);
-            buttonsContainer.add(heapDumpButton, BorderLayout.EAST);
+//            buttonsContainer.add(heapDumpButton, BorderLayout.EAST);
             buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
             
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);

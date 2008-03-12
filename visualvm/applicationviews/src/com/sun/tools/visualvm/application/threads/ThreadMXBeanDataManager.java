@@ -26,13 +26,13 @@
 package com.sun.tools.visualvm.application.threads;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.jmx.model.CachedMBeanServerConnection;
-import com.sun.tools.visualvm.jmx.model.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import javax.management.MBeanServerConnection;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
@@ -46,7 +46,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
   private static final long[] dummyLong = new long[0];
 
   private ThreadMXBean threadBean;
-  private CachedMBeanServerConnection serverConnection;
+  private MBeanServerConnection serverConnection;
   private Set<Long> threadIdSet = new HashSet();
   private boolean refreshRunning;
 
@@ -64,7 +64,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
         try {
           ThreadMonitoredDataResponce resp = new ThreadMonitoredDataResponce();
           if (serverConnection != null) { // flush data
-            serverConnection.flush();
+//            serverConnection.flush();
           }
           resp.fillInThreadData();
           processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));

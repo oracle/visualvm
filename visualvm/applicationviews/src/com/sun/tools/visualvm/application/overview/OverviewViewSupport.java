@@ -25,17 +25,12 @@
 
 package com.sun.tools.visualvm.application.overview;
 
-import com.sun.tools.visualvm.host.overview.HostOverviewViewProvider;
-import com.sun.tools.visualvm.host.overview.HostOverviewPluggableView;
-import com.sun.tools.visualvm.application.overview.ApplicationOverviewViewProvider;
-import com.sun.tools.visualvm.application.overview.ApplicationOverviewPluggableView;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
@@ -58,73 +53,6 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
  * @author Tomas Hurka
  */
 public final class OverviewViewSupport {
-
-    private static OverviewViewSupport instance;
-
-    private HostOverviewPluggableView hostPluggableView;
-    private ApplicationOverviewPluggableView applicationPluggableView;
-    private CoreDumpOverviewPluggableView coreDumpPluggableView;
-
-
-    /**
-     * Returns singleton instance of OverviewViewSupport.
-     * 
-     * @return singleton instance of OverviewViewSupport.
-     */
-    public static synchronized OverviewViewSupport getInstance() {
-        if (instance == null) instance = new OverviewViewSupport();
-        return instance;
-    }
-
-    
-    /**
-     * Returns PluggableView instance to be used to customize the Overview view of a host.
-     * 
-     * @return PluggableView instance to be used to customize the Overview view of a host.
-     */
-    public PluggableViewSupport getHostPluggableView() {
-        return getHostOverviewPluggableView();
-    }
-    
-    HostOverviewPluggableView getHostOverviewPluggableView() {
-        return hostPluggableView;
-    }
-    
-    /**
-     * Returns PluggableView instance to be used to customize the Overview view of an application.
-     * 
-     * @return PluggableView instance to be used to customize the Overview view of an application.
-     */
-    public PluggableViewSupport getApplicationPluggableView() {
-        return getApplicationOverviewPluggableView();
-    }
-
-    ApplicationOverviewPluggableView getApplicationOverviewPluggableView() {
-        return applicationPluggableView;
-    }
-    
-    /**
-     * Returns PluggableView instance to be used to customize the Overview view of a core dump.
-     * 
-     * @return PluggableView instance to be used to customize the Overview view of a core dump.
-     */
-    public PluggableViewSupport getCoreDumpPluggableView() {
-        return getCoreDumpOverviewPluggableView();
-    }
-    
-    CoreDumpOverviewPluggableView getCoreDumpOverviewPluggableView() {
-        return coreDumpPluggableView;
-    }
-    
-    private OverviewViewSupport() {
-        hostPluggableView = new HostOverviewPluggableView();
-        new HostOverviewViewProvider().initialize();
-        
-        applicationPluggableView = new ApplicationOverviewPluggableView();
-        coreDumpPluggableView = new CoreDumpOverviewPluggableView();
-        new ApplicationOverviewViewProvider().initialize();
-        CoreDumpOverviewViewProvider.register();
-    }
 
  // --- Snapshots -----------------------------------------------------------
     
