@@ -36,81 +36,19 @@ import org.openide.ErrorManager;
  *
  * @author Tomas Hurka
  */
-public class SAAgent extends Model {
-    private Agent agent;
-    private int pid;
-    String executable;
-    String core;
-    private Properties sysProp;
-    private String jvmFlags;
-    private String jvmArgs;
-    private String commandLine;
+public abstract class SAAgent extends Model {
+
+    public abstract Properties getSystemProperties();
     
-    SAAgent(File jdkHome,File sajar,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
-        agent = Agent.getAgent(jdkHome,sajar);
-        pid = id;
-        readData();
-    }
+    public abstract boolean takeHeapDump(String file);
     
-    SAAgent(File jdkHome,File sajar,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
-        agent = Agent.getAgent(jdkHome,sajar);
-        executable = execFile.getAbsolutePath();
-        core = coreFile.getAbsolutePath();
-        readData();
-    }
-    public Properties getSystemProperties() {
-        return sysProp;
-    }
+    public abstract String takeThreadDump();
     
-    public boolean takeHeapDump(String file){
-        try {
-            synchronized (agent) {
-                try {
-                    if (attach()) {
-                        SAObject hprofWrite = agent.getHeapHprofBinWriter();
-                        hprofWrite.invoke("write",file);
-                        return true;
-                    }
-                } finally {
-                    agent.detach();
-                }
-            }
-        } catch (Exception ex) {
-            Throwable e = ex.getCause();
-            ErrorManager.getDefault().notify(e == null ? ex : e);
-        }
-        return false;
-    }
+    public abstract String getJVMFlags();
     
-    public String takeThreadDump(){
-        try {
-            synchronized (agent) {
-                try {
-                    if (attach()) {
-                        return new StackTrace(agent.getVM()).getStackTrace();
-                    }
-                } finally {
-                    agent.detach();
-                }
-            }
-        } catch (Exception ex) {
-            Throwable e = ex.getCause();
-            ErrorManager.getDefault().notify(e == null ? ex : e);
-        }
-        return null;
-    }
+    public abstract String getJVMArgs();
     
-    public String getJVMFlags() {
-        return jvmFlags;
-    }
-    
-    public String getJVMArgs() {
-        return jvmArgs;
-    }
-    
-    public String getJavaCommand() {
-        return commandLine;
-    }
+    public abstract String getJavaCommand();
     
     public String getVmVersion() {
         return findByName("java.vm.version");
@@ -135,26 +73,4 @@ public class SAAgent extends Model {
         return p.getProperty(key);
     }
     
-    private boolean attach() throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        if (core == null) {
-            return agent.attach(pid);
-        }
-        return agent.attach(executable,core);
-    }
-    
-    private void readData() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        synchronized (agent) {
-            try {
-                if (attach()) {
-                    Arguments args = agent.getArguments();
-                    jvmFlags = args.getJVMFlags();
-                    jvmArgs = args.getJVMArgs();
-                    commandLine = args.getJavaCommand();
-                    sysProp = agent.getVM().getSystemProperties();
-                }
-            } finally {
-                agent.detach();
-            }
-        }
-    }
 }

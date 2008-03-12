@@ -23,31 +23,33 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.tools.sa;
+package com.sun.tools.visualvm.tools.jmx;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.ModelFactory;
+import javax.management.MBeanServerConnection;
 
 /**
+ * Cached MBeanServerConnection:
  *
- * @author Tomas Hurka
+ * This is an object that wraps an existing MBeanServerConnection and adds
+ * caching to it, as follows:
+ *
+ * - The first time an attribute is called in a given MBean, the result is
+ *   cached. Every subsequent time getAttribute is called for that attribute
+ *   the cached result is returned.
+ *
+ * - When the {@link CachedMBeanServerConnection.flush()} method is invoked the
+ *   attributes cache is flushed. Then any subsequent call to getAttribute will
+ *   retrieve all the values for the attributes that are known to the cache.
+ *
+ * - The attributes cache uses a learning approach and only the attributes
+ *   that are in the cache will be retrieved between two subsequent updates.
+ *
+ * @author Luis-Miguel Alventosa
  */
-public final class SAAgentFactory extends ModelFactory<SAAgent,DataSource> {
+public interface CachedMBeanServerConnection extends MBeanServerConnection {
 
-    private static SAAgentFactory saAgentFactory;
-
-    private SAAgentFactory() {
-    }
-
-    public static synchronized SAAgentFactory getDefault() {
-        if (saAgentFactory == null) {
-            saAgentFactory = new SAAgentFactory();
-        }
-        return saAgentFactory;
-    }
-    
-    public static SAAgent getSAAgentFor(DataSource app) {
-        return getDefault().getModel(app);
-    }
-    
+    /**
+     * Flush all cached values of attributes.
+     */
+    public void flush();
 }
