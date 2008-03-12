@@ -113,6 +113,10 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     }
     
     private void setCaption(String caption) {
+        // TODO: mask all html-specific characters
+        caption = caption.replace(">", "&gt;");
+        caption = caption.replace("<", "&lt;");
+        
         Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : UIManager.getColor("Label.disabledForeground");
         String textColorString = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
         
