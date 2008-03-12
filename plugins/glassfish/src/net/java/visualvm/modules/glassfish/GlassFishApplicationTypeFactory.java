@@ -31,7 +31,10 @@ import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
 import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.model.apptype.MainClassApplicationTypeFactory;
+import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.model.jvm.JVM;
+import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 
 
 /**
@@ -50,9 +53,19 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
     public static void shutdown() {
         ApplicationTypeFactory.getDefault().unregisterFactory(INSTANCE);
     }
-    
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
+    public ApplicationType createModelFor(Application app) {
+        JVM jvm = JVMFactory.getJVMFor(app);
+        if (jvm.getMainClass() != null) return super.createModelFor(app);
+        if (jvm.isGetSystemPropertiesSupported()) {
+            if (jvm.getSystemProperties().get("com.sun.aas.instanceName") != null) {
+                return new GlassFishInstanceType(app, jvm);
+            }
+        }
+        return null;
+    }
+    
     @Override
     public ApplicationType createApplicationTypeFor(Application app, JVM jvm, String mainClass) {
         if ("com.sun.enterprise.server.PELaunch".equals(mainClass)) {
@@ -62,5 +75,5 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
         }
 
         return super.createApplicationTypeFor(app, jvm, mainClass);
-    }    
+    }
 }

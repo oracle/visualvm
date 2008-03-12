@@ -48,8 +48,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 /**
  *
@@ -65,6 +68,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
         @Override
         public DataSourceDescriptor getDescriptor() {
             return new DataSourceDescriptor(this) {
+
                 @Override
                 public int getAutoExpansionPolicy() {
                     return EXPAND_NEVER;
@@ -80,6 +84,9 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
 
     private class DiscoveryTask implements SchedulerTask {
 
+        final private AtomicBoolean isProcessing = new AtomicBoolean(false);
+        final private AtomicBoolean beenNotified = new AtomicBoolean(false);
+        
         private GlassFishModel model;
 
         public DiscoveryTask(GlassFishModel model) {
@@ -87,59 +94,75 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
         }
 
         public void onSchedule(long timeStamp) {
-            JmxModel jmx = JmxModelFactory.getJmxModelFor(model.getApplication());
-            if (jmx == null || jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
+            if (!isProcessing.compareAndSet(false, true)) {
                 return;
             }
-
-            DomainRoot dr = AMXUtil.getDomainRoot(jmx);
-            if (dr == null || !dr.getAMXReady()) {
-                return;
-            }
-
-            String serverName = JMXUtil.getServerName(jmx);
-            if (serverName == null) {
-                return;
-            }
-
-            ServerRootMonitor srm = dr.getMonitoringRoot().getServerRootMonitorMap().get(serverName);
-
-            Map<String, WebModuleConfig> map = dr.getDomainConfig().getWebModuleConfigMap();
-            Map<String, String> contextRootMap = new HashMap<String, String>();
-
-            for (Map.Entry<String, WebModuleConfig> cfgEntry : map.entrySet()) {
-                String contextRoot = cfgEntry.getValue().getContextRoot();
-                if (!contextRoot.startsWith("/")) contextRoot = "/" + contextRoot;
-                contextRootMap.put(contextRoot, cfgEntry.getKey());
-            }
-            Set<GlassFishApplication> currentApps = new HashSet<GlassFishApplication>();
-            for (Map.Entry<String, WebModuleVirtualServerMonitor> virtMonitorEntry : srm.getWebModuleVirtualServerMonitorMap().entrySet()) {
-                String objectName = JMXUtil.getObjectName(J2EETypes.WEB_MODULE, virtMonitorEntry.getKey(), jmx);
-                String moduleName = JMXUtil.getWebModuleName(objectName, jmx, contextRootMap);
-                String appName = JMXUtil.getJ2EEAppName(objectName);
-
-                if (moduleName == null || moduleName.length() == 0) {
-                    continue;
+            try {
+                JmxModel jmx = JmxModelFactory.getJmxModelFor(model.getApplication());
+                if ((jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) && beenNotified.compareAndSet(false, true)){
+                    NotifyDescriptor nd = new NotifyDescriptor.Message("Can not establish JMX connection", NotifyDescriptor.ERROR_MESSAGE);
+                    DialogDisplayer.getDefault().notifyLater(nd);
+                    model.setVisible(false);
                 }
-                GlassFishWebModule webModule = new GlassFishWebModule(appName != null ? (moduleName + " (in " + appName + ")") : moduleName, objectName, virtMonitorEntry.getValue(), model);
+                if (jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
+                    return;
+                }
+                
+                DomainRoot dr = AMXUtil.getDomainRoot(jmx);
+                if (dr == null || !dr.getAMXReady()) {
+                    return;
+                }
 
-                currentApps.add(webModule);
+                String serverName = JMXUtil.getServerName(jmx);
+                if (serverName == null) {
+                    return;
+                }
+
+                ServerRootMonitor srm = dr.getMonitoringRoot().getServerRootMonitorMap().get(serverName);
+
+                Map<String, WebModuleConfig> map = dr.getDomainConfig().getWebModuleConfigMap();
+                Map<String, String> contextRootMap = new HashMap<String, String>();
+
+                for (Map.Entry<String, WebModuleConfig> cfgEntry : map.entrySet()) {
+                    String contextRoot = cfgEntry.getValue().getContextRoot();
+                    if (!contextRoot.startsWith("/")) {
+                        contextRoot = "/" + contextRoot;
+                    }
+                    contextRootMap.put(contextRoot, cfgEntry.getKey());
+                }
+                Set<GlassFishApplication> currentApps = new HashSet<GlassFishApplication>();
+                for (Map.Entry<String, WebModuleVirtualServerMonitor> virtMonitorEntry : srm.getWebModuleVirtualServerMonitorMap().entrySet()) {
+                    String objectName = JMXUtil.getObjectName(J2EETypes.WEB_MODULE, virtMonitorEntry.getKey(), jmx);
+                    String moduleName = JMXUtil.getWebModuleName(objectName, jmx, contextRootMap);
+                    String appName = JMXUtil.getJ2EEAppName(objectName);
+
+                    if (moduleName == null || moduleName.length() == 0) {
+                        continue;
+                    }
+                    GlassFishWebModule webModule = new GlassFishWebModule(appName != null ? (moduleName + " (in " + appName + ")") : moduleName, objectName, virtMonitorEntry.getValue(), model);
+
+                    currentApps.add(webModule);
+                }
+
+                Set<GlassFishApplication> toRemoveApps = new HashSet<GlassFishApplication>(model.getRepository().getDataSources());
+                Set<GlassFishApplication> toAdd = new HashSet<GlassFishApplication>(currentApps);
+                toRemoveApps.removeAll(currentApps);
+                toAdd.removeAll(model.getRepository().getDataSources());
+
+                Set<LazyLoadingSource> lazy = model.getRepository().getDataSources(LazyLoadingSource.class);
+                if (toAdd.size() == 0 && lazy.size() > 0) {
+                    return;
+                }
+                unregisterDataSources(lazy);
+                Set<GlassFishDataSource> toRemove = new HashSet<GlassFishDataSource>(toRemoveApps);
+                toRemove.addAll(lazy);
+
+                unregisterDataSources(toRemoveApps);
+                registerDataSources(toAdd);
+                model.getRepository().updateDataSources(toAdd, toRemove);
+            } finally {
+                isProcessing.set(false);
             }
-
-            Set<GlassFishApplication> toRemoveApps = new HashSet<GlassFishApplication>(model.getRepository().getDataSources());
-            Set<GlassFishApplication> toAdd = new HashSet<GlassFishApplication>(currentApps);
-            toRemoveApps.removeAll(currentApps);
-            toAdd.removeAll(model.getRepository().getDataSources());
-            
-            Set<LazyLoadingSource> lazy = model.getRepository().getDataSources(LazyLoadingSource.class);
-            if (toAdd.size() == 0 && lazy.size() > 0) return;
-            unregisterDataSources(lazy);
-            Set<GlassFishDataSource> toRemove = new  HashSet<GlassFishDataSource>(toRemoveApps);
-            toRemove.addAll(lazy);
-            
-            unregisterDataSources(toRemoveApps);
-            registerDataSources(toAdd);
-            model.getRepository().updateDataSources(toAdd, toRemove);
         }
     }
 
@@ -186,7 +209,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
     }
 
     public void dataSourceCollapsed(DataSource source) {
-    // do nothing
+        // do nothing
     }
 
     public void dataSourceExpanded(DataSource source) {
