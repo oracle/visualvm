@@ -55,7 +55,7 @@ public class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSource
     
     private static class CoreDumpDescriptor extends AbstractSnapshotDescriptor<CoreDump> {
         
-        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredump.png", true);
+        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredump.png", true);
         
         CoreDumpDescriptor(CoreDump coreDump) {
             super(coreDump, ICON);
@@ -64,7 +64,7 @@ public class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSource
     }
 
     private static class CoreDumpsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/coredumps.png", true);
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredumps.png", true);
         
         CoreDumpsContainerDescriptor() {
             super(CoreDumpsContainer.sharedInstance(), "VM Coredumps", null, NODE_ICON, 20, EXPAND_ON_EACH_NEW_CHILD);
