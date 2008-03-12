@@ -33,7 +33,6 @@ import java.util.List;
 /**
  *
  * @author Tomas Hurka
- * @author Luis-Miguel Alventosa
  */
 class StackTrace {
 

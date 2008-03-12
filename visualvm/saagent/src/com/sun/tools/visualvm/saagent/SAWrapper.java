@@ -44,18 +44,17 @@ class SAWrapper {
     
     URLClassLoader loader;
     File libraryPath;
-
+    
     SAWrapper(File jdkHome, File saJarFile) throws MalformedURLException {
-	// By default SA agent classes prefer dbx debugger to proc debugger
-	// and Windows process debugger to windbg debugger. SA expects 
-	// special properties to be set to choose other debuggers.
+        // By default SA agent classes prefer dbx debugger to proc debugger
+        // and Windows process debugger to windbg debugger. SA expects
+        // special properties to be set to choose other debuggers.
         // We will set those here before attaching to SA agent.
-	System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true");
-	System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");
+        System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true");
+        System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");
         URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
         String osArch = System.getProperty("os.arch");
         if ("x86".equals(osArch)) {
-            osArch = "i386";
         }
         libraryPath = new File(jdkHome, "jre/lib/" + osArch);
         LOGGER.fine("Path " + libraryPath.getAbsolutePath());
@@ -73,7 +72,7 @@ class SAWrapper {
                 }
                 return super.findLibrary(libname);
             }
-
+            
             /**
              * Copy the specified native library into the temporary directory
              * and return the absolute path. Returns null, if we fail to copy

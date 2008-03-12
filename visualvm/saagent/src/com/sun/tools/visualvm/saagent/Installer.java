@@ -25,31 +25,17 @@
 
 package com.sun.tools.visualvm.saagent;
 
-import java.lang.reflect.InvocationTargetException;
+import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
+import org.openide.modules.ModuleInstall;
 
 /**
- *
- * @author Tomas Hurka
+ * Manages a module's lifecycle. Remember that an installer is optional and
+ * often not needed at all.
  */
-class Arguments {
-
-    private final Class arguments;
-
-    Arguments(Class args) {
-        arguments = args;
+public class Installer extends ModuleInstall {
+    
+    public void restored() {
+        SAAgentFactory.getDefault().registerFactory(new SAProvider());
     }
-
-    String getJVMFlags() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return (String) arguments.getMethod("getJVMFlags").invoke(null);
-    }
-
-    String getJVMArgs()  throws NoSuchMethodException, IllegalAccessException, InvocationTargetException{
-        return (String) arguments.getMethod("getJVMArgs").invoke(null);
-    }
-
-    String getJavaCommand()  throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return (String) arguments.getMethod("getJavaCommand").invoke(null);
-    }
-
-
+    
 }

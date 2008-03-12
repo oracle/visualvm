@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.saagent;
 
-import com.sun.tools.visualvm.core.model.Model;
+import com.sun.tools.visualvm.tools.sa.SAAgent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -36,7 +36,7 @@ import org.openide.ErrorManager;
  *
  * @author Tomas Hurka
  */
-public class SAAgent extends Model {
+public class SA extends SAAgent {
     private Agent agent;
     private int pid;
     String executable;
@@ -46,18 +46,19 @@ public class SAAgent extends Model {
     private String jvmArgs;
     private String commandLine;
     
-    SAAgent(File jdkHome,File sajar,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
+    SA(File jdkHome,File sajar,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
         agent = Agent.getAgent(jdkHome,sajar);
         pid = id;
         readData();
     }
     
-    SAAgent(File jdkHome,File sajar,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
+    SA(File jdkHome,File sajar,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
         agent = Agent.getAgent(jdkHome,sajar);
         executable = execFile.getAbsolutePath();
         core = coreFile.getAbsolutePath();
         readData();
     }
+    
     public Properties getSystemProperties() {
         return sysProp;
     }
@@ -110,29 +111,6 @@ public class SAAgent extends Model {
     
     public String getJavaCommand() {
         return commandLine;
-    }
-    
-    public String getVmVersion() {
-        return findByName("java.vm.version");
-    }
-    
-    public String getJavaHome() {
-        return findByName("java.home");
-    }
-    
-    public String getVMInfo() {
-        return findByName("java.vm.info");
-    }
-    
-    public String getVMName() {
-        return findByName("java.vm.name");
-    }
-    
-    private String findByName(String key) {
-        Properties p = getSystemProperties();
-        if (p == null)
-            return null;
-        return p.getProperty(key);
     }
     
     private boolean attach() throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {

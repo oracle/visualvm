@@ -26,39 +26,24 @@
 package com.sun.tools.visualvm.saagent;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.coredump.CoreDump;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.model.ModelFactory;
-import com.sun.tools.visualvm.core.model.ModelProvider;
-import com.sun.tools.visualvm.jvm.JVM;
-import com.sun.tools.visualvm.jvm.JVMFactory;
+import com.sun.tools.visualvm.tools.sa.SAAgent;
 import java.io.File;
-
 import org.openide.ErrorManager;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class SAAgentFactory extends ModelFactory<SAAgent,DataSource> implements ModelProvider<SAAgent,DataSource> {
+public final class SAProvider extends AbstractModelProvider<SAAgent, DataSource>  {
     private static final String SA_JAR = "lib/sa-jdi.jar";
 
-    private static SAAgentFactory saAgentFactory;
-
-    private SAAgentFactory() {
-    }
-
-    public static synchronized SAAgentFactory getDefault() {
-        if (saAgentFactory == null) {
-            saAgentFactory = new SAAgentFactory();
-            saAgentFactory.registerFactory(saAgentFactory);
-        }
-        return saAgentFactory;
-    }
-    
-    public static SAAgent getSAAgentFor(DataSource app) {
-        return getDefault().getModel(app);
+    SAProvider() {
     }
     
     public SAAgent createModelFor(DataSource ds) {
@@ -73,7 +58,7 @@ public final class SAAgentFactory extends ModelFactory<SAAgent,DataSource> imple
                     return null;
                 }
                 try {
-                    return new SAAgent(jdkHome,saJar,app.getPid());
+                    return new SA(jdkHome,saJar,app.getPid());
                 } catch (Exception ex) {
                     ErrorManager.getDefault().notify(ex);
                 }
@@ -91,7 +76,7 @@ public final class SAAgentFactory extends ModelFactory<SAAgent,DataSource> imple
                     return null;
                 }
                 try {
-                    return new SAAgent(jdkHome,saJar,executable,coreFile);
+                    return new SA(jdkHome,saJar,executable,coreFile);
                 } catch (Exception ex) {
                     ErrorManager.getDefault().notify(ex);
                 }
