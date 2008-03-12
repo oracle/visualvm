@@ -25,15 +25,16 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.coredump.*;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
+import com.sun.tools.visualvm.coredump.CoreDumpSupport;
+import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
+public class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -191,13 +192,14 @@ class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
     CoreDumpProvider() {
     }
     
-    void register() {
+    public static void register() {
+        final CoreDumpProvider provider = new CoreDumpProvider();
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                initPersistedCoreDumps();
+                provider.initPersistedCoreDumps();
             }
         });
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+        DataSourceRepository.sharedInstance().addDataSourceProvider(provider);
     }
   
 }

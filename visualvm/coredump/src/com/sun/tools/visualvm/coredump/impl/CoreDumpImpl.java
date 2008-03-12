@@ -25,9 +25,9 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.coredump.*;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.coredump.AbstractCoreDump;
-import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.io.File;
 import java.io.IOException;
 

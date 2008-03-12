@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.coredump.*;
+import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;

@@ -25,24 +25,16 @@
 
 package com.sun.tools.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
+import org.openide.modules.ModuleInstall;
 
 /**
- * DataSource representing a core dump.
- *
- * @author Tomas Hurka
+ * Manages a module's lifecycle. Remember that an installer is optional and
+ * often not needed at all.
  */
-public interface CoreDump extends Snapshot {
+public class Installer extends ModuleInstall {
     
-    /**
-     * Returns java executable which will be used to retrieve data from this core dump.
-     * This executable must be compatible with the executable which was running the application
-     * when the core dump was created.
-     * 
-     * @return java executable which will be used to retrieve data from this core dump
-     */
-    public String getExecutable();
-    
-    public String getJDKHome();
+    public void restored() {
+        CoreDumpSupport.register();
+    }
     
 }

@@ -26,10 +26,10 @@
 package com.sun.tools.visualvm.coredump.overview;
 
 import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.saagent.SAAgent;
-import com.sun.tools.visualvm.saagent.SAAgentFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.tools.sa.SAAgent;
+import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
 import java.awt.BorderLayout;
 import java.util.Properties;
 import javax.swing.BorderFactory;

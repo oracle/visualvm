@@ -25,12 +25,12 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.coredump.*;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
+import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -38,9 +38,9 @@ import org.openide.util.Utilities;
  *
  * @author Tomas Hurka
  */
-class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+public class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    CoreDumpDescriptorProvider() {
+    public CoreDumpDescriptorProvider() {
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {

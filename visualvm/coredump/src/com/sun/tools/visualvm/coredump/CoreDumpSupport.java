@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.coredump;
 
-import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
-import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
-import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
-import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
+import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
+import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
 import java.io.File;
 
 /**
@@ -58,12 +58,12 @@ public final class CoreDumpSupport {
         return category;
     }
     
-    static CoreDumpProvider getProvider() {
+    public static CoreDumpProvider getProvider() {
         return provider;
     }
     
     // TODO: should be moved to some public Utils class
-    static String getCurrentJDKHome() {
+    public static String getCurrentJDKHome() {
         if (currentJDKHome == null) {
             currentJDKHome = System.getProperty("java.home");
             String jreSuffix = File.separator + "jre";
@@ -78,7 +78,7 @@ public final class CoreDumpSupport {
         return coredumpsStorageDirectoryString;
     }
     
-    static File getStorageDirectory() {
+    public static File getStorageDirectory() {
         if (coredumpsStorageDirectory == null) {
             String snapshotsStorageString = getStorageDirectoryString();
             coredumpsStorageDirectory = new File(snapshotsStorageString);
@@ -92,7 +92,7 @@ public final class CoreDumpSupport {
         return coredumpsStorageDirectory;
     }
     
-    static boolean storageDirectoryExists() {
+    public static boolean storageDirectoryExists() {
         return new File(getStorageDirectoryString()).isDirectory();
     }
 
@@ -101,8 +101,7 @@ public final class CoreDumpSupport {
         DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainerProvider.register();
         CoreDumpActionsProvider.register();
-        provider = new CoreDumpProvider();
-        provider.register();
+        CoreDumpProvider.register();
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
     }
 

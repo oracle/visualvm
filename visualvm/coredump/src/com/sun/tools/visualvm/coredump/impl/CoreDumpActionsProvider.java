@@ -25,12 +25,13 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.datasource.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.coredump.CoreDumpSupport;
+import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,12 +42,12 @@ import javax.swing.AbstractAction;
  *
  * @author Tomas Hurka
  */
-class CoreDumpActionsProvider {
+public class CoreDumpActionsProvider {
     
     private static final RemoveCoreDumpAction removeCoreDumpAction = new RemoveCoreDumpAction();
     
     
-    static void register() {
+    public static void register() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
         explorer.addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDumpImpl.class);
         explorer.addExplorerActionsProvider(new CoreDumpsContainerActionProvider(), CoreDumpsContainer.class);

@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.coredump.*;
 import com.sun.tools.visualvm.coredump.CoreDump;
+import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

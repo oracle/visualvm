@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.coredump;
 
-import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 
 /**
