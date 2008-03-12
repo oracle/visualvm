@@ -194,6 +194,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                             "<html>Invalid JMX connection: " + connectionName + "</html>");
                 }
             });
+            storage.deleteCustomPropertiesStorage();
             return;
         }
         
@@ -208,6 +209,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                             "<html>Cannot resolve host " + hostName + "</html>");
                 }
             });
+            storage.deleteCustomPropertiesStorage();
             return;            
         }
         
@@ -223,6 +225,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
                             "<html>Cannot connect using " + connectionName + "</html>");
                 }
             });
+            storage.deleteCustomPropertiesStorage();
             return;
         }
         
