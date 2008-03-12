@@ -113,11 +113,11 @@
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-datasource-descriptor-RenameDataSourceAction.instance"/>
                 <attr name="position" intvalue="700"/>
             </file>
-            <!--file name="applications-separator2.instance">
+            <file name="applications-separator2.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="800"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.shadow">
+            <!--file name="com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.instance"/>
                 <attr name="position" intvalue="900"/>
             </file>

@@ -23,8 +23,9 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.application.snapshot;
+package com.sun.tools.visualvm.application;
 
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotsSupport;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
@@ -95,10 +96,14 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         
     public void delete() {
         super.delete();
-        ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().unregisterSnapshot(this);
+//        ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().unregisterSnapshot(this);
+        // NOTE: instance should be also unregistered from the provider but this won't
+        // be neccessary once DataSourceRepository will track DataSources automatically
+        getOwner().getRepository().removeDataSource(this);
     }
 
-    void removed() {
+    // TODO: should not be public!
+    public void removed() {
         setState(STATE_FINISHED);
     }
     

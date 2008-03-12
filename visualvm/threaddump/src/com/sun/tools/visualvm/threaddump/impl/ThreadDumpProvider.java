@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.core.threaddump.*;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
@@ -36,10 +35,11 @@ import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
-import com.sun.tools.visualvm.saagent.SAAgent;
-import com.sun.tools.visualvm.saagent.SAAgentFactory;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
+import com.sun.tools.visualvm.tools.sa.SAAgent;
+import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -58,7 +58,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
+public class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
     
     private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
         public void dataFinished(Application application) { removeThreadDumps(application, false); }
@@ -95,7 +95,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
     }
     
     
-    void createThreadDump(final Application application, final boolean openView) {
+    public void createThreadDump(final Application application, final boolean openView) {
          RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 JVM jvm = JVMFactory.getJVMFor(application);
@@ -141,7 +141,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
         if (delete) for (ThreadDumpImpl threadDump : threadDumps) threadDump.delete();
     }
     
-    void createThreadDump(final CoreDump coreDump, final boolean openView) {
+    public void createThreadDump(final CoreDump coreDump, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
@@ -196,7 +196,7 @@ class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements Dat
         for (ThreadDumpImpl threadDump : removed) threadDump.removed();
     }
     
-    void initialize() {
+    public void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
     }

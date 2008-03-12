@@ -24,16 +24,15 @@
  */
 package com.sun.tools.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.core.threaddump.*;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.core.snapshot.*;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
@@ -60,10 +59,10 @@ public final class ThreadDumpAction extends AbstractAction {
                 if (isAvailable(dataSource)) {
                     if (dataSource instanceof Application) {
                         Application application = (Application)dataSource;
-                        ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                        ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                     } else if (dataSource instanceof CoreDump) {
                         CoreDump coreDump = (CoreDump)dataSource;
-                        ThreadDumpSupport.getInstance().getThreadDumpProvider().createThreadDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                        ThreadDumpSupport.getInstance().takeThreadDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                     }
                 } else {
                     NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for " + DataSourceDescriptorFactory.getDescriptor(dataSource).getName());

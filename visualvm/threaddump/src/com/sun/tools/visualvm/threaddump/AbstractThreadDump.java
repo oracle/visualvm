@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.threaddump;
 import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
 import com.sun.tools.visualvm.core.datasource.*;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
-import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.io.File;
 
 /**

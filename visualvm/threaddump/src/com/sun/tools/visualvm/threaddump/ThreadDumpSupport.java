@@ -25,14 +25,18 @@
 
 package com.sun.tools.visualvm.threaddump;
 
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpViewProvider;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpActionsProvider;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpProvider;
+import com.sun.tools.visualvm.threaddump.impl.ThreadDumpPluggableView;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.coredump.CoreDump;
+import com.sun.tools.visualvm.threaddump.impl.ThreadDumpActionsProvider;
+import com.sun.tools.visualvm.threaddump.impl.ThreadDumpCategory;
+import com.sun.tools.visualvm.threaddump.impl.ThreadDumpDescriptorProvider;
+import com.sun.tools.visualvm.threaddump.impl.ThreadDumpProvider;
+import com.sun.tools.visualvm.threaddump.impl.ThreadDumpViewProvider;
 
 /**
  * A public entrypoint to the thread dump support in VisualVM.
@@ -79,18 +83,16 @@ public final class ThreadDumpSupport {
         threadDumpProvider.createThreadDump(application, openView);
     }
     
-    // TODO: publish takeThreadDump for CoreDump??
+    public void takeThreadDump(CoreDump coreDump, boolean openView) {
+        threadDumpProvider.createThreadDump(coreDump, openView);
+    }
     
     /**
      * Returns PluggableView instance to be used to customize the thread dump view.
      * 
      * @return PluggableView instance to be used to customize the thread dump view.
      */
-    public PluggableViewSupport getPluggableView() {
-        return threadDumpPluggableView;
-    }
-    
-    ThreadDumpPluggableView getThreadDumpPluggableView() {
+    public PluggableViewSupport getThreadDumpView() {
         return threadDumpPluggableView;
     }
 

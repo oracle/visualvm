@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.application.snapshot;
 
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;

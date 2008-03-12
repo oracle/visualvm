@@ -36,9 +36,9 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-class ThreadDumpActionsProvider {
+public class ThreadDumpActionsProvider {
     
-    void initialize() {
+    public void initialize() {
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ThreadDumpActionProvider(), DataSource.class);
 //        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationNodeActionProvider(), Application.class);
 //        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpNodeActionProvider(), CoreDump.class);

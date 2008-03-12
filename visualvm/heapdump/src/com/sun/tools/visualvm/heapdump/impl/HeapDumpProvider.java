@@ -36,7 +36,7 @@ import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.saagent.SAAgent;
 import com.sun.tools.visualvm.saagent.SAAgentFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;

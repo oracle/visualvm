@@ -25,44 +25,27 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.threaddump.ThreadDump;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.sun.tools.visualvm.threaddump.*;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
-    
-    private final Map<ThreadDump, DataSourceView> viewsCache = new HashMap();
-    
+public class ThreadDumpPluggableView extends PluggableViewSupport<ThreadDump> {
 
-    public boolean supportsViewsFor(ThreadDump threadDump) {
+    public <X extends ThreadDump> boolean allowsNewArea(X dataSource, int location) {
+        return true;
+        // TODO: should return true only if the area hasn't been configured yet (false after first plugin configured it)
+    }
+
+    public <X extends ThreadDump> boolean allowsNewView(X dataSource, int location) {
         return true;
     }
-    
-    public synchronized Set<? extends DataSourceView> getViews(final ThreadDump threadDump) {
-        DataSourceView view = viewsCache.get(threadDump);
-        if (view == null) {
-            view = new ThreadDumpView(threadDump) {
-                protected void removed() {
-                    super.removed();
-                    viewsCache.remove(threadDump);
-                }
-            };
-            viewsCache.put(threadDump, view);
-        }
-        return Collections.singleton(view);
-    }
 
-    public void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, ThreadDump.class);
+    <X extends ThreadDump> void makeCustomizations(DataViewComponent view, X dataSource) {
+        super.customizeView(view, dataSource);
     }
 
 }

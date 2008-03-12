@@ -25,11 +25,11 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.core.threaddump.*;
 import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
@@ -61,7 +61,8 @@ class ThreadDumpView extends DataSourceView {
     public ThreadDumpView(ThreadDump threadDump) {
         super(threadDump.getFile().getName(), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
         view = createViewComponent(threadDump);
-        ThreadDumpSupport.getInstance().getThreadDumpPluggableView().makeCustomizations(view, threadDump);
+        ThreadDumpPluggableView pluggableView = (ThreadDumpPluggableView)ThreadDumpSupport.getInstance().getThreadDumpView();
+        pluggableView.makeCustomizations(view, threadDump);
     }
         
     public DataViewComponent getView() {

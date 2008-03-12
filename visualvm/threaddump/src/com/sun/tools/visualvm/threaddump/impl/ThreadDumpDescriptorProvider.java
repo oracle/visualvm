@@ -23,23 +23,21 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.threaddump;
+package com.sun.tools.visualvm.threaddump.impl;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
-import java.awt.Image;
-import org.openide.util.Utilities;
+import com.sun.tools.visualvm.threaddump.ThreadDumpDescriptor;
 
 /**
  *
  * @author Tomas Hurka
  */
-class ThreadDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+public class ThreadDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    ThreadDumpDescriptorProvider() {
+    public ThreadDumpDescriptorProvider() {
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
@@ -49,14 +47,6 @@ class ThreadDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescr
         return null;
     }
     
-    private static class ThreadDumpDescriptor extends AbstractSnapshotDescriptor<ThreadDump> {
-        
-        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/threaddump.png", true);
-        
-        public ThreadDumpDescriptor(ThreadDump threadDump) {
-            super(threadDump, ICON);
-        }
-        
-    }
+    
 
 }

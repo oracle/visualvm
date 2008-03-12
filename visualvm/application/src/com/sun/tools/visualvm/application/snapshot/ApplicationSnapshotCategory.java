@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.application.snapshot;
 
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
 
