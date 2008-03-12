@@ -26,30 +26,44 @@
 package com.sun.tools.visualvm.host.overview;
 
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.host.model.HostOverviewFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class HostOverviewPluggableView extends PluggableViewSupport<Host> {
+public class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
+    
+    private final Map<Host, DataSourceView> viewsCache = new HashMap();
+    
 
-    public <X extends Host> boolean allowsNewArea(X dataSource, int location) {
-        switch (location) {
-            case DataViewComponent.TOP_LEFT:
-            case DataViewComponent.TOP_RIGHT:
-                return false;
-            default: return true; // TODO: should return true only if the area hasn't been configured yet (false after first plugin configured it)
+    public boolean supportsViewsFor(Host host) {
+        return HostOverviewFactory.getSystemOverviewFor(host) != null;
+    }
+
+    public synchronized Set<? extends DataSourceView> getViews(final Host host) {
+        DataSourceView view = viewsCache.get(host);
+        if (view == null) {
+            view = new HostOverviewView(host) {
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(host);
+                }
+            };
+            viewsCache.put(host, view);
         }
+        return Collections.singleton(view);
     }
 
-    public <X extends Host> boolean allowsNewView(X dataSource, int location) {
-        return true;
-    }
-
-    <X extends Host> void makeCustomizations(DataViewComponent view, X dataSource) {
-        super.customizeView(view, dataSource);
+    public void initialize() {
+        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Host.class);
     }
 
 }

@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.host.model.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
+import com.sun.tools.visualvm.host.views.HostViewsSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -58,7 +59,7 @@ import org.openide.util.Utilities;
  */
 class HostOverviewView extends DataSourceView implements DataFinishedListener<Host> {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/overview.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";
 
     private DataViewComponent view;
     private Host host;
@@ -78,7 +79,8 @@ class HostOverviewView extends DataSourceView implements DataFinishedListener<Ho
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent();
-            OverviewViewSupport.getInstance().getHostOverviewPluggableView().makeCustomizations(view, host);
+            HostOverviewPluggableView pluggableView = (HostOverviewPluggableView)HostViewsSupport.sharedInstance().getOverviewView();
+            pluggableView.makeCustomizations(view, host);
         }
         
         return view;

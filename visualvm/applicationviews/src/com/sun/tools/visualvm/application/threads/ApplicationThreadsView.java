@@ -54,7 +54,7 @@ import org.openide.util.Utilities;
  */
 class ApplicationThreadsView extends DataSourceView implements DataFinishedListener<Application> {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/threads.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";
     private static final int DEFAULT_REFRESH = 1000;
 
     private DataViewComponent view;

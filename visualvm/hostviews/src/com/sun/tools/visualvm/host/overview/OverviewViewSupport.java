@@ -55,40 +55,6 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
  */
 public final class OverviewViewSupport {
 
-    private static OverviewViewSupport instance;
-
-    private HostOverviewPluggableView hostPluggableView;
-
-
-    /**
-     * Returns singleton instance of OverviewViewSupport.
-     * 
-     * @return singleton instance of OverviewViewSupport.
-     */
-    public static synchronized OverviewViewSupport getInstance() {
-        if (instance == null) instance = new OverviewViewSupport();
-        return instance;
-    }
-
-    
-    /**
-     * Returns PluggableView instance to be used to customize the Overview view of a host.
-     * 
-     * @return PluggableView instance to be used to customize the Overview view of a host.
-     */
-    public PluggableViewSupport getHostPluggableView() {
-        return getHostOverviewPluggableView();
-    }
-    
-    HostOverviewPluggableView getHostOverviewPluggableView() {
-        return hostPluggableView;
-    }
-    
-    private OverviewViewSupport() {
-        hostPluggableView = new HostOverviewPluggableView();
-        new HostOverviewViewProvider().initialize();
-    }
-
  // --- Snapshots -----------------------------------------------------------
     
     static class SnapshotsViewSupport extends JPanel  {

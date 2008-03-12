@@ -46,7 +46,7 @@ import org.openide.util.Utilities;
  */
 class ApplicationOverviewView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/overview.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/overview.png";
 
     private Application application;
     
