@@ -35,32 +35,24 @@
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
         </folder>
         <file name="Profile_hidden"/>
-        <file name="System_hidden"/>
-        <folder name="Window">
-            <file name="SelectDocumentNode_hidden"/>
-            <file name="org-netbeans-core-actions-GlobalPropertiesAction.instance_hidden"/>
-            <file name="org-netbeans-core-actions-NextViewCallbackAction.instance_hidden"/>
-            <file name="org-netbeans-core-actions-PreviousViewCallbackAction.instance_hidden"/>
-            <file name="org-netbeans-core-actions-ViewRuntimeTabAction.instance_hidden"/>
-            <file name="org-netbeans-core-output2-OutputWindowAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-CloneDocumentAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-CloseAllButThisAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-CloseAllDocumentsAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-CloseWindowAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-DocumentsAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-MaximizeWindowAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-NextTabAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-PreviousTabAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-RecentViewListAction.instance_hidden"/>
-            <file name="org-netbeans-core-windows-actions-SwitchToRecentDocumentAction.instance_hidden"/>
-            <file name="org-netbeans-modules-favorites-Add.instance_hidden"/>
-            <file name="org-netbeans-modules-favorites-Remove.instance_hidden"/>
-            <file name="org-netbeans-modules-favorites-View.instance_hidden"/>
-            <file name="org-netbeans-modules-options-keymap-ExportShortcutsToHTMLAction.instance_hidden"/>
-            <file name="org-netbeans-progress-module-ProgressListAction.instance_hidden"/>
+        <folder name="System">
+            <file name="org-netbeans-core-actions-JumpNextAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-JumpPrevAction.instance_hidden"/>
+            <file name="org-openide-actions-EditAction.instance_hidden"/>
+            <file name="org-openide-actions-InstantiateAction.instance_hidden"/>
+            <file name="org-openide-actions-MoveDownAction.instance_hidden"/>
+            <file name="org-openide-actions-MoveUpAction.instance_hidden"/>
+            <file name="org-openide-actions-NewAction.instance_hidden"/>
+            <file name="org-openide-actions-NewTemplateAction.instance_hidden"/>
+            <file name="org-openide-actions-OpenAction.instance_hidden"/>
+            <file name="org-openide-actions-PopupAction.instance_hidden"/>
+            <file name="org-openide-actions-RenameAction.instance_hidden"/>
+            <file name="org-openide-actions-ReorderAction.instance_hidden"/>
+            <file name="org-openide-actions-SaveAction.instance_hidden"/>
+            <file name="org-openide-actions-SaveAllAction.instance_hidden"/>
+            <file name="org-openide-actions-SaveAsAction.instance_hidden"/>
         </folder>
     </folder>
-    <file name="Favorites_hidden"/>
     <folder name="Menu">
         <file name="Edit_hidden"/>
         <folder name="File">
@@ -105,27 +97,28 @@
             <file name="CloseAllButThisAction.shadow_hidden"/>
             <file name="CloseAllDocumentsAction.shadow_hidden"/>
             <file name="DocumentsAction.shadow_hidden"/>
-            <file name="Output_hidden"/>
             <file name="Profile_hidden"/>
             <file name="ProgressListAction.shadow_hidden"/>
             <file name="Separator4.instance_hidden"/>
             <file name="SwitchToRecentDocumentAction.shadow_hidden"/>
-            <file name="ViewFavoritesTabAction.shadow_hidden"/>
-            <file name="ViewRuntimeTabAction.shadow_hidden"/>
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.shadow_hidden"/>
         </folder>
     </folder>
     <folder name="OptionsDialog">
         <folder name="Advanced.instance_hidden"/>
-        <file name="Advanced_hidden"/>
         <folder name="General.instance_hidden"/>
-        <file name="Keymaps.instance_hidden"/>
     </folder>
     <folder name="Services">
+        <folder name="JavaHelp">
+            <file name="org-netbeans-modules-profiler-helpset.xml_hidden"/>
+        </folder>
         <folder name="NoOps">
             <file name="NoIndentEngine.instance_hidden"/>
         </folder>
         <file name="org-openide-text-PrintSettings.settings_hidden"/>
+    </folder>
+    <folder name="Shortcuts">
+        <file name="S-F9.instance_hidden"/>
     </folder>
     <folder name="Toolbars">
         <file name="Edit_hidden"/>
@@ -134,17 +127,7 @@
         </folder>
         <file name="Profile_hidden"/>
     </folder>
-    <file name="UI_hidden"/>
     <folder name="Windows2">
-        <folder name="Components">
-            <file name="runtime.settings_hidden"/>
-        </folder>
-        <folder name="Modes">
-            <folder name="explorer">
-                <file name="favorites.wstcref_hidden"/>
-                <file name="runtime.wstcref_hidden"/>
-            </folder>
-        </folder>
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
     </folder>
     <!--folder name="Windows2Local">
