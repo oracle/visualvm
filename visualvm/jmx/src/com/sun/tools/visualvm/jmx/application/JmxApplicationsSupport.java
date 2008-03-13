@@ -36,7 +36,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-class JmxApplicationsSupport {
+public class JmxApplicationsSupport {
     
     private static final String STORAGE_DIRNAME = "jmxapplications";
     
@@ -68,4 +68,8 @@ class JmxApplicationsSupport {
         return new File(getStorageDirectoryString()).isDirectory();
     }
 
+    public static void register() {
+        JmxApplicationProvider.initialize();
+        JmxApplicationActionsProvider.initialize();
+    }
 }

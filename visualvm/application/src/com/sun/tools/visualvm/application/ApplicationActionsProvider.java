@@ -44,19 +44,11 @@ class ApplicationActionsProvider {
 
     private static final HeapDumpOnOOMEAction heapDumpOnOOMEAction =
             new HeapDumpOnOOMEAction();
-//    private static final RemoveJmxConnectionAction removeJmxConnectionAction =
-//            new RemoveJmxConnectionAction();
 
     static void initialize() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
         explorer.addExplorerActionsProvider(
                 new ApplicationActionProvider(), Application.class);
-//        explorer.addExplorerActionsProvider(
-//                new HostActionProvider(), Host.class);
-////        explorer.addExplorerActionsProvider(
-////                new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
-//        explorer.addExplorerActionsProvider(
-//                new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
 
     private static class HeapDumpOnOOMEAction extends AbstractAction {
@@ -80,18 +72,6 @@ class ApplicationActionsProvider {
         }
     }
 
-//    private static class RemoveJmxConnectionAction extends AbstractAction {
-//
-//        public RemoveJmxConnectionAction() {
-//            super("Remove");
-//        }
-//
-//        public void actionPerformed(ActionEvent e) {
-//            JmxApplication app = (JmxApplication) e.getSource();
-//            JmxApplicationProvider.sharedInstance().removeJmxApplication(app);
-//        }
-//    }
-//
     private static class ApplicationActionProvider
             implements ExplorerActionsProvider<Application> {
 
@@ -108,55 +88,7 @@ class ApplicationActionsProvider {
                 actions.add(new ExplorerActionDescriptor(
                         heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
             }
-//            if (app instanceof JmxApplication) {
-//                actions.add(new ExplorerActionDescriptor(removeJmxConnectionAction, 100));
-//            }
             return actions;
         }
     }
-//
-//    private static class HostActionProvider implements ExplorerActionsProvider<Host> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(Host host) {
-//            return null;
-//        }
-//
-//        public Set<ExplorerActionDescriptor> getActions(Host host) {
-//            Set<ExplorerActionDescriptor> actions =
-//                    new HashSet<ExplorerActionDescriptor>();
-//            if (host != Host.UNKNOWN_HOST)
-//                actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 110));
-//            return actions;
-//        }
-//    }
-
-//    private static class RemoteHostsContainerActionProvider
-//            implements ExplorerActionsProvider<RemoteHostsContainer> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
-//            return null;
-//        }
-//
-//        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
-//            Set<ExplorerActionDescriptor> actions =
-//                    new HashSet<ExplorerActionDescriptor>();
-//            actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 30));
-//            return actions;
-//        }
-//    }
-
-//    private static class DataSourceRootActionProvider
-//            implements ExplorerActionsProvider<DataSourceRoot> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) {
-//            return null;
-//        }
-//
-//        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
-//            Set<ExplorerActionDescriptor> actions =
-//                    new HashSet<ExplorerActionDescriptor>();
-//            actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 20));
-//            return actions;
-//        }
-//    }
 }

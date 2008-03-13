@@ -315,7 +315,7 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         }
     }
 
-    static void initialize() {
+    public static void initialize() {
         DataSourceRepository.sharedInstance().addDataSourceProvider(
                 JmxApplicationProvider.sharedInstance());
         RequestProcessor.getDefault().post(new Runnable() {
