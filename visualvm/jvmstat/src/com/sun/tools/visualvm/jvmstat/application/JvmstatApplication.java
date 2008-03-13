@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.host.MonitoredHostDS;
 import com.sun.tools.visualvm.application.AbstractApplication;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.host.Host;
@@ -34,21 +33,11 @@ import com.sun.tools.visualvm.host.Host;
  *
  * @author Jiri Sedlacek
  */
-public final class JvmstatApplication extends AbstractApplication {
-    
-    private final MonitoredHostDS monitoredHost;
-    
+final class JvmstatApplication extends AbstractApplication {    
 
-    JvmstatApplication(Host host, MonitoredHostDS monitoredHost, int pid) {
+    JvmstatApplication(Host host, int pid) {
         super(host, pid);
-        this.monitoredHost = monitoredHost;
     }
-    
-    
-    public MonitoredHostDS getMonitoredHost() {
-        return monitoredHost;
-    }
-
     
     void removed() {
         setState(DataSource.STATE_FINISHED);

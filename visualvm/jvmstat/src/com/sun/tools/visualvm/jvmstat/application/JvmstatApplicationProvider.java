@@ -25,22 +25,17 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.host.MonitoredHostDS;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
-import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import sun.jvmstat.monitor.MonitoredHost;
-import sun.jvmstat.monitor.event.HostEvent;
-import sun.jvmstat.monitor.event.HostListener;
-import sun.jvmstat.monitor.MonitorException;
-import sun.jvmstat.monitor.event.VmStatusChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
-import java.lang.management.ManagementFactory;
+import com.sun.tools.visualvm.host.Host;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,41 +43,44 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.global.Platform;
+import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.openide.DialogDisplayer;
+import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
+import org.openide.util.RequestProcessor;
+import sun.jvmstat.monitor.MonitorException;
+import sun.jvmstat.monitor.MonitoredHost;
+import sun.jvmstat.monitor.event.HostEvent;
+import sun.jvmstat.monitor.event.HostListener;
+import sun.jvmstat.monitor.event.VmStatusChangeEvent;
+
+
 
 /**
  * A provider for Applications discovered by jvmstat.
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplication> implements DataChangeListener<MonitoredHostDS> {
+public class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplication> implements DataChangeListener<Host> {
     
     private final Map<Integer, JvmstatApplication> applications = new HashMap();
     
-    private final Map<MonitoredHostDS, HostListener> mapping = Collections.synchronizedMap(new HashMap());
+    private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
     
-    private final DataFinishedListener<MonitoredHostDS> hostFinishedListener = new DataFinishedListener<MonitoredHostDS>() {
-        public void dataFinished(MonitoredHostDS host) { processFinishedHost(host); }
+    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
+        public void dataFinished(Host host) { processFinishedHost(host); }
     };
     
-    public void dataChanged(DataChangeEvent<MonitoredHostDS> event) {
-        Set<MonitoredHostDS> newHosts = event.getAdded();
-        for (MonitoredHostDS host : newHosts) processNewHost(host);
+    public void dataChanged(DataChangeEvent<Host> event) {
+        Set<Host> newHosts = event.getAdded();
+        for (Host host : newHosts) processNewHost(host);
     }
     
-//    TODO: check that applications are not removed twice from the host, unregister MonitoredHostListener!!!
+    //    TODO: check that applications are not removed twice from the host, unregister MonitoredHostListener!!!
     
-    private void processNewHost(final MonitoredHostDS hostDs) {
-        
-        // Get the MonitoredHost for Host
-        final MonitoredHost monitoredHost = hostDs.getMonitoredHost();
-        final Host host = hostDs.getHost();
-        
-        if (host == Host.LOCALHOST && Platform.isWindows()) checkForBrokenJps(monitoredHost);
-
+    private boolean processNewHost(final Host host) {
         // Flag for determining first MonitoredHost event
         final boolean firstEvent[] = new boolean[] { true };
         
@@ -90,55 +88,60 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
         // NOTE: the code relies on the fact that the provider is the first listener registered in MonitoredHost of the Host
         // in which case the first obtained event contains all applications already running on the Host
         HostListener hostListener = null;
+        
+        // Get the MonitoredHost for Host
+        final MonitoredHost monitoredHost = getMonitoredHost(host);
+        
+        if (monitoredHost == null) { // monitored host not available reshedule
+            rescheduleProcessNewHost(host);
+            return false;
+        }
+        monitoredHost.setInterval(GlobalPreferences.sharedInstance().getMonitoredHostPoll() * 1000);
+        if (host == Host.LOCALHOST) checkForBrokenJps(monitoredHost);
         try {
             // Fetch already running applications on the host
-            processNewApplicationsByIds(host, hostDs, monitoredHost.activeVms());
+            processNewApplicationsByIds(host, monitoredHost.activeVms());
             
             hostListener = new HostListener() {
-
+                
                 public void vmStatusChanged(final VmStatusChangeEvent e) {
-//                    RequestProcessor.getDefault().post(new Runnable() {
-//                        public void run() {
-                            if (firstEvent[0]) {
-                                // First event for this Host
-                                // NOTE: already existing applications are treated as new on this host
-                                firstEvent[0] = false;
-                                processNewApplicationsByIds(host, hostDs, e.getActive());
-                            } else {
-                                processNewApplicationsByIds(host, hostDs, e.getStarted());
-                                processTerminatedApplicationsByIds(host, e.getTerminated());
-                            }
-//                        }
-//                    });
+                    if (firstEvent[0]) {
+                        // First event for this Host
+                        // NOTE: already existing applications are treated as new on this host
+                        firstEvent[0] = false;
+                        processNewApplicationsByIds(host, e.getActive());
+                    } else {
+                        processNewApplicationsByIds(host, e.getStarted());
+                        processTerminatedApplicationsByIds(host, e.getTerminated());
+                    }
                 }
-
-                public void disconnected(HostEvent e) {}                
+                
+                public void disconnected(HostEvent e) {
+                    rescheduleProcessNewHost(host);
+                }
             };
             monitoredHost.addHostListener(hostListener);
+            mapping.put(host, hostListener);
         } catch (MonitorException e) {
-            System.err.println("[" + this.getClass().getName() + "] " + "Unable to monitor host " + hostDs.getHost().getHostName());
-            e.printStackTrace();
+            ErrorManager.getDefault().notify(ErrorManager.USER,e);
+            return false;
         }
-        
-        if (hostListener != null) {
-            mapping.put(hostDs, hostListener);
-            hostDs.notifyWhenFinished(hostFinishedListener);
-        }
+        return true;
     }
     
-    private void processFinishedHost(MonitoredHostDS host) {
+    private void processFinishedHost(Host host) {
         HostListener hostListener = mapping.get(host);
         mapping.remove(host);
-        try { host.getMonitoredHost().removeHostListener(hostListener); } catch (MonitorException ex) {}
-        processAllTerminatedApplications(host.getHost());
+        try { getMonitoredHost(host).removeHostListener(hostListener); } catch (MonitorException ex) {}
+        processAllTerminatedApplications(host);
     }
     
-    private void processNewApplicationsByIds(Host host, MonitoredHostDS monitoredHost, Set<Integer> applicationIds) {
+    private void processNewApplicationsByIds(Host host, Set<Integer> applicationIds) {
         Set<JvmstatApplication> newApplications = new HashSet();
         
         for (int applicationId : applicationIds)
             if (!applications.containsKey(applicationId)) {
-                JvmstatApplication application = new JvmstatApplication(host, monitoredHost, applicationId);
+                JvmstatApplication application = new JvmstatApplication(host, applicationId);
                 applications.put(applicationId, application);
                 newApplications.add(application);
             }
@@ -178,7 +181,7 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
     protected <Y extends JvmstatApplication> void unregisterDataSources(final Set<Y> removed) {
         super.unregisterDataSources(removed);
         for (JvmstatApplication application : removed) application.removed();
-    }    
+    }
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
     private void checkForBrokenJps(MonitoredHost monitoredHost) {
@@ -189,14 +192,16 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
         } catch (Exception e) {
             return;
         }
-
+        
         String message = DesktopUtils.isBrowseAvailable() ? "<html><b>Local Java applications cannot be detected.</b><br><br>" +
                 "Please see the Troubleshooting guide for VisualVM for more<br>" +
                 "information and steps to fix the problem.<br><br>" +
-                "<a href=\"https://visualvm.dev.java.net/troubleshooting.html#jpswin\">https://visualvm.dev.java.net/troubleshooting.html#jpswin</a></html>" : "<html><b>Local applications cannot be detected.</b><br><br>" +
-                "Please see the Troubleshooting guide for VisualVM for more<br>" +
-                "information and steps to fix the problem.<br><br>" +
-                "<nobr>https://visualvm.dev.java.net/troubleshooting.html#jpswin</nobr></html>";
+                "<a href=\"https://visualvm.dev.java.net/troubleshooting.html#jpswin\">https://visualvm.dev.java.net/troubleshooting.html#jpswin</a></html>"
+                :
+            "<html><b>Local applications cannot be detected.</b><br><br>" +
+            "Please see the Troubleshooting guide for VisualVM for more<br>" +
+            "information and steps to fix the problem.<br><br>" +
+            "<nobr>https://visualvm.dev.java.net/troubleshooting.html#jpswin</nobr></html>";
         final HTMLLabel label = new HTMLLabel(message) {
             protected void showURL(URL url) {
                 try {
@@ -205,7 +210,7 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
                 }
             }
         };
-
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(label, NotifyDescriptor.ERROR_MESSAGE);
@@ -213,9 +218,37 @@ class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplic
             }
         });
     }
-
-    void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, MonitoredHostDS.class);
+    
+    private MonitoredHost getMonitoredHost(Host host) {
+        try {
+            return MonitoredHost.getMonitoredHost(host.getHostName());
+        } catch (URISyntaxException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+        } catch (MonitorException ex) {
+            ErrorManager.getDefault().log(ErrorManager.WARNING,ex.getLocalizedMessage());
+        }
+        return null;
     }
+    
+    private void rescheduleProcessNewHost(final Host host) {
+        int interval = GlobalPreferences.sharedInstance().getMonitoredHostPoll();
+        Timer timer = new Timer(interval*1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        if (host.isVisible()) processNewHost(host);
+                    }
+                });
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+    
+    public static void register() {
+        JvmstatApplicationProvider provider = new JvmstatApplicationProvider();
+        DataSourceRepository.sharedInstance().addDataSourceProvider(provider);
+        DataSourceRepository.sharedInstance().addDataChangeListener(provider, Host.class);
+    }
+
 }
