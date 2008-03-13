@@ -30,6 +30,8 @@ import com.sun.tools.visualvm.jmx.application.JmxApplication;
 import com.sun.tools.visualvm.core.model.ModelProvider;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
 
 /**
  * The {@code JmxModelFactory} class is a factory class for getting
@@ -38,25 +40,29 @@ import com.sun.tools.visualvm.tools.jmx.JmxModel;
  * @author Luis-Miguel Alventosa
  */
 public class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
-
-
+    
+    
     /**
      * Default {@link ModelProvider} implementation for {@link JmxModel}.
-     * 
+     *
      * In order to extend the {@code JmxModelFactory} to register your
      * own {@link JmxModel}s for the different types of {@link Application}
      * call {@link JmxModelFactory.registerFactory()} supplying the new
      * instance of {@link ModelProvider}.
-     * 
+     *
      * @param app application.
-     * 
+     *
      * @return an instance of {@link JmxModel}.
      */
     public JmxModel createModelFor(Application app) {
-        if (app instanceof JvmstatApplication) {
-            return new JmxModelImpl((JvmstatApplication) app);
-        } else if (app instanceof JmxApplication) {
+        Jvmstat jvmstat;
+        
+        if (app instanceof JmxApplication) {
             return new JmxModelImpl((JmxApplication) app);
+        }
+        jvmstat = JvmstatFactory.getJvmstatFor(app);
+        if (jvmstat != null) {
+            return new JmxModelImpl(app,jvmstat);
         }
         return null;
     }

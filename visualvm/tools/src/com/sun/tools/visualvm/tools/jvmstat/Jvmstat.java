@@ -23,35 +23,57 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package com.sun.tools.visualvm.tools.jvmstat;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.attach.Attach;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
+import com.sun.tools.visualvm.core.model.Model;
+import java.util.List;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class AttachProvider extends AbstractModelProvider<Attach, Application>  {
+public abstract class Jvmstat extends Model {
+        
+    public abstract String getMainArgs();
     
+    public abstract String getMainClass();
     
-    AttachProvider() {
+    public abstract boolean isAttachable();
+        
+    public abstract String findByName(String name);
+    
+    public abstract List<String> findByPattern(String pattern);
+    
+    public abstract void addJvmstatListener(JvmstatListener l);
+    
+    public abstract void removeJvmstatListener(JvmstatListener l);
+    
+    public String getCommandLine() {
+        return findByName("sun.rt.javaCommand");
     }
     
-    public Attach createModelFor(Application app) {
-        if (Host.LOCALHOST.equals(app.getHost())) {
-            Jvmstat jvmstat = JvmstatFactory.getJvmstatFor(app);
-            
-            if (jvmstat != null && jvmstat.isAttachable()) {
-                return new AttachImpl(app);
-            }
-        }
-        return null;
+    public String getJvmArgs() {
+        return findByName("java.rt.vmArgs");
     }
     
+    public String getJvmFlags() {
+        return findByName("java.rt.vmFlags");
+    }
+    
+    public String getJavaHome() {
+        return findByName("java.property.java.home");
+    }
+    
+    public String getVMInfo() {
+        return findByName("java.property.java.vm.info");
+    }
+    
+    public String getVMName() {
+        return findByName("java.property.java.vm.name");
+    }
+    
+    public String getVmVersion() {
+        return findByName("java.property.java.vm.version");
+    }
     
 }

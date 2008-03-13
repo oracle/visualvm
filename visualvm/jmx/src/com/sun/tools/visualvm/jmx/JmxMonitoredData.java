@@ -41,34 +41,34 @@ import sun.jvmstat.monitor.LongMonitor;
 public class JmxMonitoredData extends MonitoredData {
 
 
-  JmxMonitoredData(JmxJVM jvm) {
-    JvmJmxModel jvmModel = jvm.getJmxModel();
-    ClassLoadingMXBean classBean = jvmModel.getClassLoadingMXBean();
-    ThreadMXBean threadBean = jvmModel.getThreadMXBean();
-    RuntimeMXBean runtimeBean = jvmModel.getRuntimeMXBean();
-    MemoryUsage mem = jvmModel.getMemoryMXBean().getHeapMemoryUsage();
-    MemoryUsage perm = jvm.getPermGenPool().getUsage();
-    loadedClasses = classBean.getLoadedClassCount();
-    sharedLoadedClasses = 0;
-    sharedUnloadedClasses = 0;
-    unloadedClasses = classBean.getUnloadedClassCount();
-    threadsDaemon = threadBean.getDaemonThreadCount();
-    threadsLive = threadBean.getThreadCount();
-    threadsLivePeak = threadBean.getPeakThreadCount();
-    threadsStarted = threadBean.getTotalStartedThreadCount();
-    applicationTime = 0;
-    upTime = runtimeBean.getUptime();
-    genCapacity = new long[2];
-    genUsed = new long[2];
-    genMaxCapacity = new long[2];
-    genCapacity[0] = mem.getCommitted();
-    genUsed[0] = mem.getUsed();
-    genMaxCapacity[0] = mem.getMax();
-    genCapacity[1] = perm.getCommitted();
-    genUsed[1] = perm.getUsed();
-    genMaxCapacity[1] = perm.getMax();
-    monitoredVm = jvm;
-  }
+//  JmxMonitoredData(JmxJVM jvm) {
+//    JvmJmxModel jvmModel = jvm.getJmxModel();
+//    ClassLoadingMXBean classBean = jvmModel.getClassLoadingMXBean();
+//    ThreadMXBean threadBean = jvmModel.getThreadMXBean();
+//    RuntimeMXBean runtimeBean = jvmModel.getRuntimeMXBean();
+//    MemoryUsage mem = jvmModel.getMemoryMXBean().getHeapMemoryUsage();
+//    MemoryUsage perm = jvm.getPermGenPool().getUsage();
+//    loadedClasses = classBean.getLoadedClassCount();
+//    sharedLoadedClasses = 0;
+//    sharedUnloadedClasses = 0;
+//    unloadedClasses = classBean.getUnloadedClassCount();
+//    threadsDaemon = threadBean.getDaemonThreadCount();
+//    threadsLive = threadBean.getThreadCount();
+//    threadsLivePeak = threadBean.getPeakThreadCount();
+//    threadsStarted = threadBean.getTotalStartedThreadCount();
+//    applicationTime = 0;
+//    upTime = runtimeBean.getUptime();
+//    genCapacity = new long[2];
+//    genUsed = new long[2];
+//    genMaxCapacity = new long[2];
+//    genCapacity[0] = mem.getCommitted();
+//    genUsed[0] = mem.getUsed();
+//    genMaxCapacity[0] = mem.getMax();
+//    genCapacity[1] = perm.getCommitted();
+//    genUsed[1] = perm.getUsed();
+//    genMaxCapacity[1] = perm.getMax();
+//    monitoredVm = jvm;
+//  }
   
   private long getLongValue(LongMonitor mon) {
     if (mon!=null) {

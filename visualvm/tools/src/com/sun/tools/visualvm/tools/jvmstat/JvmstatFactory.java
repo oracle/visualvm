@@ -23,35 +23,31 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package com.sun.tools.visualvm.tools.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.attach.Attach;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
+import com.sun.tools.visualvm.core.model.ModelFactory;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class AttachProvider extends AbstractModelProvider<Attach, Application>  {
-    
-    
-    AttachProvider() {
+public final class JvmstatFactory extends ModelFactory<Jvmstat, Application> {
+
+    private static JvmstatFactory jvmstatFactory;
+
+    private JvmstatFactory() {
     }
-    
-    public Attach createModelFor(Application app) {
-        if (Host.LOCALHOST.equals(app.getHost())) {
-            Jvmstat jvmstat = JvmstatFactory.getJvmstatFor(app);
-            
-            if (jvmstat != null && jvmstat.isAttachable()) {
-                return new AttachImpl(app);
-            }
+
+    public static synchronized JvmstatFactory getDefault() {
+        if (jvmstatFactory == null) {
+            jvmstatFactory = new JvmstatFactory();
         }
-        return null;
+        return jvmstatFactory;
     }
     
+    public static Jvmstat getJvmstatFor(Application app) {
+        return getDefault().getModel(app);
+    }
     
 }

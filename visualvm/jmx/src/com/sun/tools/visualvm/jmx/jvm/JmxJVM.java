@@ -51,7 +51,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Tomas Hurka
  */
-class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
+class JmxJVM {/* extends DefaultJVM implements DataFinishedListener<Application> {
     private static final int DEFAULT_REFRESH = 2000;
     private static final String PERM_GEN = "Perm Gen";
     private static final String PS_PERM_GEN = "PS Perm Gen";
@@ -233,6 +233,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
             }
         });
         timer.setCoalesce(true);
+        timer.setInitialDelay(0);
         timer.start();
     }
     
@@ -273,5 +274,6 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         }
         return permGenPool;
     }
+    */
     
 }
