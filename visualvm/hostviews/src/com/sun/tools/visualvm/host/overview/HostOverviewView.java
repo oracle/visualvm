@@ -123,6 +123,7 @@ class HostOverviewView extends DataSourceView implements DataFinishedListener<Ho
                 });
             }
         });
+        timer.setInitialDelay(0);
         timer.start();
         host.notifyWhenFinished(this);
         // TODO: create listener for host availability and start/stop the timer accordingly

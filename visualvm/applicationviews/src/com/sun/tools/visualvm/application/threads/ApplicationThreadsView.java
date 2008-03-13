@@ -99,7 +99,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         timer = new Timer(GlobalPreferences.sharedInstance().getThreadsPoll() * 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) { threadsManager.refreshThreads(); }
         });
-        timer.setCoalesce(true);
+        timer.setInitialDelay(0);
         timer.start();
         application.notifyWhenFinished(this);
                 
