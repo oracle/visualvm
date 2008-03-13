@@ -25,37 +25,17 @@
 
 package com.sun.tools.visualvm.attach;
 
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import java.util.Properties;
+import com.sun.tools.visualvm.tools.attach.AttachFactory;
+import org.openide.modules.ModuleInstall;
 
 /**
- *
- * @author Tomas Hurka
+ * Manages a module's lifecycle. Remember that an installer is optional and
+ * often not needed at all.
  */
-public class SystemProperties {
-
-  // Attach to pid and perform a getSystemProperties
-  public static Properties getSystemProperties(int pid) throws Exception {
-    VirtualMachine vm = null;
-    try {
-      vm = VirtualMachine.attach(Integer.toString(pid));
-    } catch (Exception x) {
-      String msg = x.getMessage();
-      if (msg != null) {
-        System.err.println(pid + ": " + msg);
-      } else {
-        x.printStackTrace();
-      }
-      if (x instanceof AttachNotSupportedException) {
-
-      }
-      return null;
+public class Installer extends ModuleInstall {
+    
+    public void restored() {
+        AttachFactory.getDefault().registerFactory(new AttachProvider());
     }
-
-    Properties p = vm.getSystemProperties();
-    vm.detach();
-    return p;
-  }
-
+    
 }

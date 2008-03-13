@@ -33,6 +33,7 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
+                <package>com.sun.tools.visualvm.tools.attach</package>
                 <package>com.sun.tools.visualvm.tools.jmx</package>
                 <package>com.sun.tools.visualvm.tools.sa</package>
             </public-packages>

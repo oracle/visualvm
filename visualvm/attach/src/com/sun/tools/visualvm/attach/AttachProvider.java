@@ -25,55 +25,27 @@
 
 package com.sun.tools.visualvm.attach;
 
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import java.io.InputStream;
-import sun.tools.attach.HotSpotVirtualMachine;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.tools.attach.Attach;
 
 /**
  *
  * @author Tomas Hurka
  */
-public class StackTrace {
+public final class AttachProvider extends AbstractModelProvider<Attach, Application>  {
 
-  // Attach to pid and perform a thread dump
-  public static String runThreadDump(int pid) throws Exception {
-    VirtualMachine vm = null;
-    try {
-      vm = VirtualMachine.attach(Integer.toString(pid));
-    } catch (Exception x) {
-      String msg = x.getMessage();
-      if (msg != null) {
-        System.err.println(pid + ": " + msg);
-      } else {
-        x.printStackTrace();
-      }
-      if (x instanceof AttachNotSupportedException) {
-//        return new SAStackTrace(pid).getStackTrace();
-      }
-      return null;
+
+    AttachProvider() {
     }
-
-    // Cast to HotSpotVirtualMachine as this is implementation specific
-    // method.
-    InputStream in = ((HotSpotVirtualMachine)vm).remoteDataDump("-l");
-    StringBuffer buffer = new StringBuffer(1024);
     
-    // read to EOF and just print output
-    byte b[] = new byte[256];
-    int n;
-    do {
-      n = in.read(b);
-      if (n > 0) {
-        String s = new String(b, 0, n, "UTF-8");
-        
-        buffer.append(s);
-      }
-    } while (n > 0);
-    in.close();
-    vm.detach();
-    return buffer.toString();
-  }
-  
-  
+    public Attach createModelFor(Application app) {
+        if (Host.LOCALHOST.equals(app.getHost())) {
+            return new AttachImpl(app);
+        }
+        return null;
+    }
+    
+    
 }
