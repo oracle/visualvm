@@ -25,10 +25,11 @@
 
 package com.sun.tools.visualvm.jmx.jvm;
 
-import com.sun.tools.visualvm.core.model.jvm.*;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.MonitoredData;
+import com.sun.tools.visualvm.application.MonitoredDataListener;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

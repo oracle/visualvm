@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import java.io.File;
 
 /**

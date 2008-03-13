@@ -25,11 +25,11 @@
 
 package com.sun.tools.visualvm.jmx;
 
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.jmx.application.JmxApplication;
-import com.sun.tools.visualvm.application.jvmstat.JvmstatApplication;
-import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 
 /**
  * The {@code JmxModelFactory} class is a factory class for getting
@@ -37,42 +37,8 @@ import com.sun.tools.visualvm.application.Application;
  *
  * @author Luis-Miguel Alventosa
  */
-public final class JmxModelFactory
-        extends ModelFactory<JmxModel, Application>
-        implements ModelProvider<JmxModel, Application> {
+public class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
 
-    private static JmxModelFactory factory;
-
-    private JmxModelFactory() {
-    }
-
-    /**
-     * Getter for the default version of the {@link JmxFactory}.
-     * 
-     * @return an instance of {@link JmxFactory}.
-     */
-    public static synchronized JmxModelFactory getDefault() {
-        if (factory == null) {
-            factory = new JmxModelFactory();
-            factory.registerFactory(factory);
-        }
-        return factory;
-    }
-
-    /**
-     * Factory method for obtaining the {@link JmxModel} for the given
-     * {@link Application}. Note that there is only one instance of
-     * {@link JmxModel} for application instance. This {@link JmxModel}
-     * instance is cached.
-     * 
-     * @param app application.
-     * 
-     * @return a {@link JmxModel} instance which encapsulates the
-     * application's JMX model.
-     */
-    public static JmxModel getJmxModelFor(Application app) {
-        return getDefault().getModel(app);
-    }
 
     /**
      * Default {@link ModelProvider} implementation for {@link JmxModel}.
@@ -88,9 +54,9 @@ public final class JmxModelFactory
      */
     public JmxModel createModelFor(Application app) {
         if (app instanceof JvmstatApplication) {
-            return new JmxModel((JvmstatApplication) app);
+            return new JmxModelImpl((JvmstatApplication) app);
         } else if (app instanceof JmxApplication) {
-            return new JmxModel((JmxApplication) app);
+            return new JmxModelImpl((JmxApplication) app);
         }
         return null;
     }

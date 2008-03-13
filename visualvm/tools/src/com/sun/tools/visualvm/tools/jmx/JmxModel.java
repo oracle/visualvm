@@ -66,7 +66,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  */
 public abstract class JmxModel extends Model {
 
-    private SwingPropertyChangeSupport propertyChangeSupport =
+    protected SwingPropertyChangeSupport propertyChangeSupport =
             new SwingPropertyChangeSupport(this, true);
     /**
      * The {@link ConnectionState ConnectionState} bound property name.

@@ -31,12 +31,11 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.visualvm.jmx.application.ApplicationSecurityConfigurator;
 import com.sun.tools.visualvm.jmx.application.JmxApplication;
-import com.sun.tools.visualvm.application.jvmstat.JvmstatApplication;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.model.Model;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -122,45 +121,19 @@ import sun.rmi.transport.LiveRef;
  *
  * @author Luis-Miguel Alventosa
  */
-public class JmxModel extends Model {
+public class JmxModelImpl extends JmxModel {
 
     private static final String PROPERTY_USERNAME = "prop_username";
     private static final String PROPERTY_PASSWORD = "prop_password";
-    private final static Logger LOGGER = Logger.getLogger(JmxModel.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());
     private ProxyClient client;
-    private SwingPropertyChangeSupport propertyChangeSupport =
-            new SwingPropertyChangeSupport(this, true);
-    /**
-     * The {@link ConnectionState ConnectionState} bound property name.
-     */
-    public static String CONNECTION_STATE_PROPERTY = "connectionState";
-
-    /**
-     * Values for the {@linkplain #CONNECTION_STATE_PROPERTY
-     * <i>ConnectionState</i>} bound property.
-     */
-    public enum ConnectionState {
-
-        /**
-         * The connection has been successfully established.
-         */
-        CONNECTED,
-        /**
-         * No connection present.
-         */
-        DISCONNECTED,
-        /**
-         * The connection is being attempted.
-         */
-        CONNECTING
-    }
 
     /**
      * Creates an instance of {@code JmxModel} for a {@link JvmstatApplication}.
      *
      * @param application the {@link JvmstatApplication}.
      */
-    public JmxModel(JvmstatApplication application) {
+    public JmxModelImpl(JvmstatApplication application) {
         try {
             JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
             Storage storage = application.getStorage();
@@ -241,7 +214,7 @@ public class JmxModel extends Model {
      *
      * @param application the {@link JmxApplication}.
      */
-    public JmxModel(JmxApplication application) {
+    public JmxModelImpl(JmxApplication application) {
         try {
             JMXServiceURL url = application.getJMXServiceURL();
             Storage storage = application.getStorage();
@@ -284,52 +257,6 @@ public class JmxModel extends Model {
             storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
         }
         return jsc;
-    }
-
-    /**
-     * Add a {@link java.beans.PropertyChangeListener PropertyChangeListener}
-     * to the listener list.
-     * The listener is registered for all properties.
-     * The same listener object may be added more than once, and will be called
-     * as many times as it is added.
-     * If {@code listener} is {@code null}, no exception is thrown and
-     * no action is taken.
-     *
-     * @param listener the {@code PropertyChangeListener} to be added.
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    private void addWeakPropertyChangeListener(PropertyChangeListener listener) {
-        if (!(listener instanceof WeakPCL)) {
-            listener = new WeakPCL(listener);
-        }
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    /**
-     * Removes a {@link java.beans.PropertyChangeListener PropertyChangeListener}
-     * from the listener list. This
-     * removes a {@code PropertyChangeListener} that was registered for all
-     * properties. If {@code listener} was added more than once to the same
-     * event source, it will be notified one less time after being removed. If
-     * {@code listener} is {@code null}, or was never added, no exception is
-     * thrown and no action is taken.
-     *
-     * @param listener the {@code PropertyChangeListener} to be removed.
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        if (!(listener instanceof WeakPCL)) {
-            // Search for the WeakPCL holding this listener (if any)
-            for (PropertyChangeListener pcl : propertyChangeSupport.getPropertyChangeListeners()) {
-                if (pcl instanceof WeakPCL && ((WeakPCL) pcl).get() == listener) {
-                    listener = pcl;
-                    break;
-                }
-            }
-        }
-        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     /**
@@ -401,9 +328,9 @@ public class JmxModel extends Model {
         private boolean sslStub = false;
         private final String connectionName;
         private final String displayName;
-        private final JmxModel model;
+        private final JmxModelImpl model;
 
-        public ProxyClient(JmxModel model, String hostName, int port,
+        public ProxyClient(JmxModelImpl model, String hostName, int port,
                 String userName, String password) throws IOException {
             this.model = model;
             this.connectionName = getConnectionName(hostName, port, userName);
@@ -426,7 +353,7 @@ public class JmxModel extends Model {
             }
         }
 
-        public ProxyClient(JmxModel model, String url,
+        public ProxyClient(JmxModelImpl model, String url,
                 String userName, String password) throws IOException {
             this.model = model;
             this.connectionName = getConnectionName(url, userName);
@@ -434,7 +361,7 @@ public class JmxModel extends Model {
             setParameters(new JMXServiceURL(url), userName, password);
         }
 
-        public ProxyClient(JmxModel model, LocalVirtualMachine lvm)
+        public ProxyClient(JmxModelImpl model, LocalVirtualMachine lvm)
                 throws IOException {
             this.model = model;
             this.lvm = lvm;
@@ -589,7 +516,7 @@ public class JmxModel extends Model {
             ConnectionState oldState = connectionState;
             connectionState = state;
             model.propertyChangeSupport.firePropertyChange(
-                    JmxModel.CONNECTION_STATE_PROPERTY, oldState, state);
+                    JmxModelImpl.CONNECTION_STATE_PROPERTY, oldState, state);
         }
 
         public ConnectionState getConnectionState() {
@@ -815,7 +742,7 @@ public class JmxModel extends Model {
         }
 
         private void dispose() {
-            JmxModel.this.removePropertyChangeListener(this);
+            JmxModelImpl.this.removePropertyChangeListener(this);
         }
     }
 

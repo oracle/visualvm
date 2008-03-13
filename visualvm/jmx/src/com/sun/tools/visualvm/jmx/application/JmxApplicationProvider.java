@@ -27,12 +27,12 @@ package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.datasupport.Storage;
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.jmx.model.JmxModel;
-import com.sun.tools.visualvm.jmx.model.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;

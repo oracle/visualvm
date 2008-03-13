@@ -27,10 +27,10 @@ package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.application.AbstractApplication;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.datasupport.Storage;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModel;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import java.lang.management.RuntimeMXBean;
 import javax.management.remote.JMXServiceURL;
 

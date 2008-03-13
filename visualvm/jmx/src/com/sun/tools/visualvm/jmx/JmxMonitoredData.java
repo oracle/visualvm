@@ -25,8 +25,9 @@
 
 package com.sun.tools.visualvm.jmx;
 
-import com.sun.tools.visualvm.jmx.jvm.JmxJVM;
-import com.sun.tools.visualvm.jmx.model.JvmJmxModel;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.MonitoredData;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
@@ -37,41 +38,10 @@ import sun.jvmstat.monitor.LongMonitor;
  *
  * @author Tomas Hurka
  */
-public class MonitoredData {
+public class JmxMonitoredData extends MonitoredData {
 
-  final private long loadedClasses;
-  final private long sharedLoadedClasses;
-  final private long sharedUnloadedClasses;
-  final private long unloadedClasses;
-  final private long threadsDaemon;
-  final private long threadsLive;
-  final private long threadsLivePeak;
-  final private long threadsStarted;
-  final private long applicationTime;
-  final private long upTime;
-  final private long[] genCapacity;
-  final private long[] genUsed;
-  final private long[] genMaxCapacity;
-  final private JVM monitoredVm;
 
-  MonitoredData(JvmstatJVM jvm) {
-    loadedClasses = getLongValue(jvm.getLoadedClasses());
-    sharedLoadedClasses = getLongValue(jvm.getSharedLoadedClasses());
-    sharedUnloadedClasses = getLongValue(jvm.getSharedUnloadedClasses());
-    unloadedClasses = getLongValue(jvm.getUnloadedClasses());
-    threadsDaemon = getLongValue(jvm.getThreadsDaemon());
-    threadsLive = getLongValue(jvm.getThreadsLive());
-    threadsLivePeak = getLongValue(jvm.getThreadsLivePeak());
-    threadsStarted = getLongValue(jvm.getThreadsStarted());
-    applicationTime = 1000*getLongValue(jvm.getApplicationTime())/jvm.getOsFrequency();
-    upTime = 1000*getLongValue(jvm.getUpTime())/jvm.getOsFrequency();
-    genCapacity = jvm.getGenerationSum(jvm.getGenCapacity());
-    genUsed = jvm.getGenerationSum(jvm.getGenUsed());
-    genMaxCapacity = jvm.getGenMaxCapacity();
-    monitoredVm = jvm;
-  }
-
-  MonitoredData(JmxJVM jvm) {
+  JmxMonitoredData(JmxJVM jvm) {
     JvmJmxModel jvmModel = jvm.getJmxModel();
     ClassLoadingMXBean classBean = jvmModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jvmModel.getThreadMXBean();

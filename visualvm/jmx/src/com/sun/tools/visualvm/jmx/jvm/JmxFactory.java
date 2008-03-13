@@ -25,12 +25,13 @@
 
 package com.sun.tools.visualvm.jmx.jvm;
 
-import com.sun.tools.visualvm.core.model.jvm.*;
-import com.sun.tools.visualvm.jmx.application.JmxApplication;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.jmx.JvmJmxModelFactory;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.jmx.application.JmxApplication;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
+
 
 /**
  *
