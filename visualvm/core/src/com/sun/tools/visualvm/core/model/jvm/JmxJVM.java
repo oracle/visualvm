@@ -25,7 +25,10 @@
 
 package com.sun.tools.visualvm.core.model.jvm;
 
+import com.sun.management.HotSpotDiagnosticMXBean;
+import com.sun.management.VMOption;
 import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
 import java.awt.event.ActionEvent;
@@ -42,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import javax.swing.Timer;
 import org.openide.util.RequestProcessor;
 
@@ -53,15 +58,21 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     private static final int DEFAULT_REFRESH = 2000;
     private static final String PERM_GEN = "Perm Gen";
     private static final String PS_PERM_GEN = "PS Perm Gen";
+    private static final String HOTSPOT_DIAGNOSTIC_MXBEAN_NAME =
+            "com.sun.management:type=HotSpotDiagnostic";
     
+    private Application app;
     private JvmJmxModel jmxModel;
     private Properties systemProperties;
     private String jvmArgs;
     private Set<MonitoredDataListener> listeners;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
+    private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
+    private Object hotspotDiagnosticMXBeanLock = new Object();
     
-    JmxJVM(JvmJmxModel model) {
+    JmxJVM(Application application, JvmJmxModel model) {
+        app = application;
         jmxModel = model;
         listeners = new HashSet();
     }
@@ -160,15 +171,41 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
             }
         }
     }
-    
+
+    HotSpotDiagnosticMXBean getHotSpotDiagnosticMXBean() {
+        synchronized (hotspotDiagnosticMXBeanLock) {
+            if (hotspotDiagnosticMXBean == null) {
+                try {
+                    hotspotDiagnosticMXBean = jmxModel.getMXBean(
+                            ObjectName.getInstance(HOTSPOT_DIAGNOSTIC_MXBEAN_NAME),
+                            HotSpotDiagnosticMXBean.class);
+                } catch (MalformedObjectNameException e) {
+                    LOGGER.warning("Couldn't find HotSpotDiagnosticMXBean: " +
+                            e.getLocalizedMessage());
+                }
+            }
+            return hotspotDiagnosticMXBean;
+        }
+    }
+
     public boolean isDumpOnOOMEnabled() {
-        return false;
+        HotSpotDiagnosticMXBean hsd = getHotSpotDiagnosticMXBean();
+        // Get HeapDumpOnOutOfMemoryError
+        VMOption vmOption = hsd.getVMOption("HeapDumpOnOutOfMemoryError");
+        return Boolean.valueOf(vmOption.getValue());
     }
-    
+
     public void setDumpOnOOMEnabled(boolean enabled) {
-        throw new UnsupportedOperationException();
+        HotSpotDiagnosticMXBean hsd = getHotSpotDiagnosticMXBean();
+        if (enabled) {
+            // Set HeapDumpPath
+            hsd.setVMOption("HeapDumpPath",
+                    app.getStorage().getDirectory().getAbsolutePath());
+        }
+        // Set HeapDumpOnOutOfMemoryError
+        hsd.setVMOption("HeapDumpOnOutOfMemoryError", enabled ? "true" : "false");
     }
-    
+
     public File takeHeapDump() throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -202,9 +239,18 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     }
     
     public boolean isDumpOnOOMEnabledSupported() {
-        return false;
+        if (is14() || is15()) {
+            return false;
+        }
+        if (!app.getHost().equals(Host.LOCALHOST)) {
+            return false;
+        }
+        if (getHotSpotDiagnosticMXBean() == null) {
+            return false;
+        }
+        return true;
     }
-    
+   
     public boolean isTakeHeapDumpSupported() {
         return false;
     }
@@ -259,7 +305,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
 
     MemoryPoolMXBean getPermGenPool() {
         if (permGenPool == null) {
-            Collection<MemoryPoolMXBean> pools = getJmxModel().getMemoryPoolMXBeans();
+            Collection<MemoryPoolMXBean> pools = jmxModel.getMemoryPoolMXBeans();
             for (MemoryPoolMXBean pool : pools) {
                 if (pool.getType().equals(MemoryType.NON_HEAP) &&
                         (PERM_GEN.equals(pool.getName()) ||

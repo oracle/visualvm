@@ -41,7 +41,7 @@ public class JmxFactory extends AbstractModelProvider<JVM,Application> {
         if (app instanceof JmxApplication) {
             JvmJmxModel jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(app);
             if (jmxModel != null) {
-                JmxJVM jvm = new JmxJVM(jmxModel);
+                JmxJVM jvm = new JmxJVM(app, jmxModel);
                 app.notifyWhenFinished(jvm);
                 return jvm;
             }
