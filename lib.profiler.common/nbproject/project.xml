@@ -69,6 +69,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.utilities</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <package>org.netbeans.lib.profiler.common</package>
                 <package>org.netbeans.lib.profiler.common.event</package>
                 <package>org.netbeans.lib.profiler.common.filters</package>
