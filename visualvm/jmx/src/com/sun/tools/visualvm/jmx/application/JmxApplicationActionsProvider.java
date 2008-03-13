@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
@@ -33,6 +32,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -50,6 +50,8 @@ class JmxApplicationActionsProvider {
 
     static void initialize() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
+        explorer.addExplorerActionsProvider(
+                new JmxActionProvider(), JmxApplication.class);
         explorer.addExplorerActionsProvider(
                 new HostActionProvider(), Host.class);
         explorer.addExplorerActionsProvider(
@@ -70,21 +72,17 @@ class JmxApplicationActionsProvider {
         }
     }
 
-    private static class ApplicationActionProvider
-            implements ExplorerActionsProvider<Application> {
+    private static class JmxActionProvider
+            implements ExplorerActionsProvider<JmxApplication> {
 
-        public ExplorerActionDescriptor getDefaultAction(Application app) {
+        public ExplorerActionDescriptor getDefaultAction(JmxApplication app) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(Application app) {
-            Set<ExplorerActionDescriptor> actions =
-                    new HashSet<ExplorerActionDescriptor>();
-
-            if (app instanceof JmxApplication) {
-                actions.add(new ExplorerActionDescriptor(removeJmxConnectionAction, 100));
-            }
-            return actions;
+        public Set<ExplorerActionDescriptor> getActions(JmxApplication app) {
+            ExplorerActionDescriptor remove;
+            remove = new ExplorerActionDescriptor(removeJmxConnectionAction, 100);
+            return Collections.singleton(remove);
         }
     }
 
@@ -97,7 +95,7 @@ class JmxApplicationActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(Host host) {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
-            if (host != Host.UNKNOWN_HOST)
+            if (!Host.UNKNOWN_HOST.equals(host))
                 actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 110));
             return actions;
         }
