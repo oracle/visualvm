@@ -25,17 +25,44 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import java.awt.Image;
+import java.io.File;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class SnapshotsContainerProvider {
+public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceDescriptor<X> {
     
-    void initialize() {
-        SnapshotsContainer container = SnapshotsContainer.sharedInstance();
-        DataSource.ROOT.getRepository().addDataSource(container);
+    
+    public SnapshotDescriptor(X snapshot, Image icon) {
+        super(snapshot, resolveName(snapshot),
+              snapshot.getFile().getAbsolutePath(),
+              icon, POSITION_AT_THE_END, EXPAND_NEVER);
+    }
+    
+    private static String resolveName(Snapshot snapshot) {
+        String persistedName = snapshot.getStorage().getCustomProperty(PROPERTY_NAME);
+        if (persistedName != null) return persistedName;
+        
+        File file = snapshot.getFile();
+        if (file == null) return snapshot.toString();
+        
+        String fileName = file.getName();
+        SnapshotCategory category = snapshot.getCategory();
+        String name = "[" + category.getPrefix() + "] " + fileName;
+        
+        if (category.isSnapshot(file)) {
+            String timeStamp = category.getTimeStamp(fileName);
+            if (timeStamp != null) name = "[" + category.getPrefix() + "] " + timeStamp;
+        }
+        
+        return name;
+    }
+    
+    public boolean supportsRename() {
+        return true;
     }
 
 }

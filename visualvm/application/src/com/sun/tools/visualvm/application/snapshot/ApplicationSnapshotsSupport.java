@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import java.io.File;
 
 /**
@@ -103,21 +104,12 @@ public final class ApplicationSnapshotsSupport {
     }
     
     
-//    private static File getUniqueFile(File directory, String prefix, String suffix) {
-//        File file = new File(directory, prefix + suffix);
-//        while (file.exists()) {
-//            prefix = prefix + "_";
-//            file = new File(directory, prefix + suffix);
-//        }
-//        return file;
-//    }
-    
     private ApplicationSnapshotsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationSnapshotDescriptorProvider());
         snapshotProvider = ApplicationSnapshotProvider.sharedInstance();
         
         RegisteredSnapshotCategories.sharedInstance().addCategory(snapshotCategory);
-        
+        SnapshotsContainer.sharedInstance(); // Notify SnapshotsContainer
         snapshotProvider.initialize();
         ApplicationSnapshotActionProvider.getInstance().initialize();
     }

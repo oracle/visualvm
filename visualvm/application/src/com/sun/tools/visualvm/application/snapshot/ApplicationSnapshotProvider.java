@@ -185,7 +185,8 @@ class ApplicationSnapshotProvider {
             }
         }
         
-        SnapshotsContainer.sharedInstance().getRepository().addDataSources(snapshots);
+        if (!snapshots.isEmpty()) 
+            SnapshotsContainer.sharedInstance().getRepository().addDataSources(snapshots);
     }
     
     

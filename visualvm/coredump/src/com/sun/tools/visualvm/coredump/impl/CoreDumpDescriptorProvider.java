@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
+import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.Image;
 import org.openide.util.Utilities;
@@ -53,7 +53,7 @@ public class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSource
         return null;
     }
     
-    private static class CoreDumpDescriptor extends AbstractSnapshotDescriptor<CoreDump> {
+    private static class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
         
         private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredump.png", true);
         

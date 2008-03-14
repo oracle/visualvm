@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
+import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -49,7 +49,7 @@ class HeapDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
         return null;
     }
     
-    private static class HeapDumpDescriptor extends AbstractSnapshotDescriptor<HeapDump> {
+    private static class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
         
         private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
         

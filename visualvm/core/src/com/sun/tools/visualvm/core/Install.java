@@ -30,6 +30,7 @@ package com.sun.tools.visualvm.core;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import org.openide.modules.ModuleInstall;
 
@@ -45,6 +46,9 @@ public class Install extends ModuleInstall {
         cleanupPreviousSession();
         
         DataSourceRepository.sharedInstance();
+        
+        // Initialize snapshots
+        SnapshotsSupport.getInstance();
         
 //        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
 //            public void run() {

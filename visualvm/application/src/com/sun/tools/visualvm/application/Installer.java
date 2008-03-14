@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.application;
 
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotsSupport;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -36,5 +37,6 @@ public class Installer extends ModuleInstall {
 
     public void restored() {
         ApplicationsSupport.getInstance();
+        ApplicationSnapshotsSupport.getInstance();
     }
 }

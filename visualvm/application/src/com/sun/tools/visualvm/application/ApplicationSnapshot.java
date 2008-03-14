@@ -93,15 +93,6 @@ public final class ApplicationSnapshot extends Snapshot {
         return storage;
     }
     
-        
-    public void delete() {
-        super.delete();
-//        ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().unregisterSnapshot(this);
-        // NOTE: instance should be also unregistered from the provider but this won't
-        // be neccessary once DataSourceRepository will track DataSources automatically
-        getOwner().getRepository().removeDataSource(this);
-    }
-    
     
     private void saveArchive(File archive) {
         Utils.createArchive(getFile(), archive);

@@ -26,6 +26,9 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 
 /**
  *
@@ -43,6 +46,13 @@ public final class SnapshotsContainer extends DataSource {
     
     
     private SnapshotsContainer() {
+//        getRepository().addDataChangeListener(new DataChangeListener() {
+//            public void dataChanged(DataChangeEvent event) {
+//                setVisible(!event.getCurrent().isEmpty());
+//            }
+//        }, DataSource.class);
+        DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
+        DataSource.ROOT.getRepository().addDataSource(this);
     }
 
 }

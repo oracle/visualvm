@@ -115,7 +115,7 @@ public abstract class Snapshot extends DataSource {
     }
     
     public void delete() {
-        getStorage().deleteCustomPropertiesStorage();
+        getOwner().getRepository().removeDataSource(this);
         File f = getFile();
         if (f != null) Utils.delete(f, true);
         setFile(null);

@@ -156,6 +156,7 @@ public abstract class DataSource {
     // Implementation of this DataSource removal
     // Persistent DataSources can remove appropriate entries from their storage
     protected void remove(DataSource removeRoot) {
+        getStorage().deleteCustomPropertiesStorage();
     }
     
     

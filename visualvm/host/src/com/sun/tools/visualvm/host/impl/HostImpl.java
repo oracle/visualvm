@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import java.net.UnknownHostException;
@@ -47,11 +46,6 @@ final class HostImpl extends Host {
     
     public boolean supportsUserRemove() {
         return true;
-    }
-    
-    
-    protected void remove(DataSource removeRoot) {
-        givenStorage.deleteCustomPropertiesStorage();
     }
     
     protected Storage createStorage() {

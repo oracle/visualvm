@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshotDescriptor;
+import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -50,7 +50,7 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
         return null;
     }
     
-    private static class ApplicationSnapshotDescriptor extends AbstractSnapshotDescriptor<ApplicationSnapshot> {
+    private static class ApplicationSnapshotDescriptor extends SnapshotDescriptor<ApplicationSnapshot> {
         
         private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);
         private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
