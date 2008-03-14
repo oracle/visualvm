@@ -58,6 +58,8 @@ made subject to such option by the copyright holder.
             </module-dependencies>
             <friend-packages>
                 <friend>org.netbeans.modules.profiler</friend>
+                <friend>org.netbeans.modules.profiler.attach</friend>
+                <friend>org.netbeans.modules.profiler.attach.impl</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
@@ -65,6 +67,9 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.projectsupport</friend>
+                <friend>org.netbeans.modules.profiler.utilities</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <package>org.netbeans.lib.profiler.common</package>
                 <package>org.netbeans.lib.profiler.common.event</package>
                 <package>org.netbeans.lib.profiler.common.filters</package>

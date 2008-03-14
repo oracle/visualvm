@@ -40,8 +40,6 @@
 
 package org.netbeans.modules.profiler.ui.stp;
 
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -53,13 +51,10 @@ import org.netbeans.lib.profiler.ui.components.JExtendedComboBox;
 import org.netbeans.modules.profiler.ui.FilterSetsPanel;
 import org.netbeans.modules.profiler.ui.GlobalFiltersPanel;
 import org.netbeans.modules.profiler.ui.HyperlinkLabel;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.QuickFilterPanel;
 import org.netbeans.modules.profiler.ui.panels.PreferredInstrFilterPanel;
-import org.netbeans.modules.profiler.ui.panels.ProgressDisplayer;
 import org.netbeans.modules.profiler.ui.panels.RootMethodsPanel;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -71,7 +66,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.ButtonGroup;
