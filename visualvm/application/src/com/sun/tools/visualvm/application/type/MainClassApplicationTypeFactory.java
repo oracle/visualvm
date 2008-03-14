@@ -43,39 +43,39 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
 
     private String[][] appmatrix = {
         // build tools
-        {"org.apache.tools.ant.launch.Launcher","Ant","com/sun/tools/visualvm/core/ui/resources/application.png"},
+        {"org.apache.tools.ant.launch.Launcher","Ant","com/sun/tools/visualvm/application/resources/application.png"},
 
         // Application servers
-        {"com.sun.enterprise.server.PELaunch","GlassFish","com/sun/tools/visualvm/core/ui/resources/apps/GlassFish.png"},
-        {"com.sun.enterprise.ee.nodeagent.NodeAgentMain", "GlassFish Node", "com/sun/tools/visualvm/core/ui/resources/apps/GlassFishNode.png"},
-        {"org.apache.catalina.startup.Bootstrap","Tomcat","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"org.jboss.Main","JBoss","com/sun/tools/visualvm/core/ui/resources/application.png"},
+        {"com.sun.enterprise.server.PELaunch","GlassFish","com/sun/tools/visualvm/application/type/resources/GlassFish.png"},
+        {"com.sun.enterprise.ee.nodeagent.NodeAgentMain", "GlassFish Node", "com/sun/tools/visualvm/application/type/resources/GlassFishNode.png"},
+        {"org.apache.catalina.startup.Bootstrap","Tomcat","com/sun/tools/visualvm/application/resources/application.png"},
+        {"org.jboss.Main","JBoss","com/sun/tools/visualvm/application/resources/application.png"},
         
         // JDK tools
-        {"sun.tools.jconsole.JConsole","JConsole","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.jps.Jps","Jps","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.jstat.Jstat","Jstat","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.jstatd.Jstatd","Jstatd","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.jvm.hotspot.tools.JStack","JStack","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.jstack.JStack","JStack","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.jvm.hotspot.tools.JMap","JMap","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.jmap.JMap","JMap","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"com.sun.tools.hat.Main","JHat","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.jinfo.JInfo","JInfo","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd","com/sun/tools/visualvm/core/ui/resources/application.png"},
+        {"sun.tools.jconsole.JConsole","JConsole","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.jps.Jps","Jps","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.jstat.Jstat","Jstat","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.jstatd.Jstatd","Jstatd","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.jvm.hotspot.tools.JStack","JStack","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.jstack.JStack","JStack","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.jvm.hotspot.tools.JMap","JMap","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.jmap.JMap","JMap","com/sun/tools/visualvm/application/resources/application.png"},
+        {"com.sun.tools.hat.Main","JHat","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.jinfo.JInfo","JInfo","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd","com/sun/tools/visualvm/application/resources/application.png"},
         
         // JDK utilitites
-        {"sun.tools.jar.Main","Jar","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"com.sun.java.util.jar.pack.Driver","pack200","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"com.sun.tools.javadoc.Main","JavaDoc","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"com.sun.tools.javac.Main","Javac","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"com.sun.tools.javah.Main","Javah","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.tools.javap.Main","Javap","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"sun.security.tools.JarSigner","JarSigner","com/sun/tools/visualvm/core/ui/resources/application.png"},
-        {"com.sun.tools.apt.Main","APT","com/sun/tools/visualvm/core/ui/resources/application.png"},
+        {"sun.tools.jar.Main","Jar","com/sun/tools/visualvm/application/resources/application.png"},
+        {"com.sun.java.util.jar.pack.Driver","pack200","com/sun/tools/visualvm/application/resources/application.png"},
+        {"com.sun.tools.javadoc.Main","JavaDoc","com/sun/tools/visualvm/application/resources/application.png"},
+        {"com.sun.tools.javac.Main","Javac","com/sun/tools/visualvm/application/resources/application.png"},
+        {"com.sun.tools.javah.Main","Javah","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.tools.javap.Main","Javap","com/sun/tools/visualvm/application/resources/application.png"},
+        {"sun.security.tools.JarSigner","JarSigner","com/sun/tools/visualvm/application/resources/application.png"},
+        {"com.sun.tools.apt.Main","APT","com/sun/tools/visualvm/application/resources/application.png"},
         
         // Java DB
-        {"org.apache.derby.drda.NetworkServerControl", "JavaDB", "com/sun/tools/visualvm/core/ui/resources/apps/JavaDB.png"},
+        {"org.apache.derby.drda.NetworkServerControl", "JavaDB", "com/sun/tools/visualvm/application/type/resources/JavaDB.png"},
     };
     
     Map<String,String[]> map;

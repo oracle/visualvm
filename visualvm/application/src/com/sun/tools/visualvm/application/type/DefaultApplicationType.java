@@ -38,41 +38,41 @@ import org.openide.util.Utilities;
  * @author Luis-Miguel Alventosa
  */
 public class DefaultApplicationType extends ApplicationType  {
-  String name;
-  Application application;
-
-  DefaultApplicationType(Application app) {
-    application = app;
-  }
-
-  public String getName() {
-    if (name == null) {
-      JVM jvm = JVMFactory.getJVMFor(application);
-      String mainClassName = null;
-      if (jvm.isBasicInfoSupported()) {
-        mainClassName = jvm.getMainClass();
-      }
-      String applicationName;
-      if (mainClassName != null && mainClassName.length() > 0) {
-        applicationName = mainClassName;
-      } else {
-        applicationName = "<Unknown Application>";
-      }
-      name = applicationName;      
+    String name;
+    Application application;
+    
+    DefaultApplicationType(Application app) {
+        application = app;
     }
-    return name;
-  }
-
-  public String getVersion() {
-    return "<Unknown Version>";
-  }
-
-  public String getDescription() {
-    return "";
-  }
-
-  public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/core/ui/resources/application.png";
-    return Utilities.loadImage(iconPath, true);
-  }
+    
+    public String getName() {
+        if (name == null) {
+            JVM jvm = JVMFactory.getJVMFor(application);
+            String mainClassName = null;
+            if (jvm.isBasicInfoSupported()) {
+                mainClassName = jvm.getMainClass();
+            }
+            String applicationName;
+            if (mainClassName != null && mainClassName.length() > 0) {
+                applicationName = mainClassName;
+            } else {
+                applicationName = "<Unknown Application>";
+            }
+            name = applicationName;
+        }
+        return name;
+    }
+    
+    public String getVersion() {
+        return "<Unknown Version>";
+    }
+    
+    public String getDescription() {
+        return "";
+    }
+    
+    public Image getIcon() {
+        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";
+        return Utilities.loadImage(iconPath, true);
+    }
 }

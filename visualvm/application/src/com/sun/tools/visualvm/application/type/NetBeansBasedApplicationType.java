@@ -65,7 +65,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
   }
 
   public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/core/ui/resources/application.png";
+    String iconPath = "com/sun/tools/visualvm/application/resources/application.png";
     return Utilities.loadImage(iconPath, true);
   }
 }
