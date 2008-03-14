@@ -56,18 +56,18 @@ public final class DataSourceRepository extends DataSourceProvider implements Da
 
     
     public void dataChanged(DataChangeEvent<DataSource> event) {
-        changeDataSources(event.getAdded(), event.getRemoved());
+        Set<DataSource> added = event.getAdded();
+        Set<DataSource> removed = event.getRemoved();
+        if (!added.isEmpty() || !removed.isEmpty()) changeDataSources(added, removed);
     }
     
     
     protected void registerDataSourcesImpl(Set<? extends DataSource> added) {
-        System.err.println(">>> Registered " + added);
         super.registerDataSourcesImpl(added);
         for (DataSource dataSource : added) dataSource.getRepository().addDataChangeListener(this, DataSource.class);
     }
     
     protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
-        System.err.println(">>> Unregistered " + removed);
         super.unregisterDataSourcesImpl(removed);
         for (DataSource dataSource : removed) dataSource.getRepository().removeDataChangeListener(this);
     }

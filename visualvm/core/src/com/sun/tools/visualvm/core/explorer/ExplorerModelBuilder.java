@@ -112,8 +112,10 @@ class ExplorerModelBuilder {
                         DataSourceContainer repository = dataSource.getRepository();
                         DataChangeListener repositoryListener = new DataChangeListener() {
                             public void dataChanged(DataChangeEvent event) {
-                                processRemovedDataSources(event.getRemoved());
-                                processAddedDataSources(event.getAdded());
+                                Set<DataSource> added = event.getAdded();
+                                Set<DataSource> removed = event.getRemoved();
+                                if (!removed.isEmpty()) processRemovedDataSources(removed);
+                                if (!added.isEmpty()) processAddedDataSources(added);
                             }
                         };
                         repository.addDataChangeListener(repositoryListener, DataSource.class);

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
@@ -140,12 +141,16 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     private void processNewApplicationsByIds(Host host, Set<Integer> applicationIds) {
         Set<JvmstatApplication> newApplications = new HashSet();
         
-        for (int applicationId : applicationIds)
+        for (int applicationId : applicationIds) {
+            // Do not provide instance for Application.CURRENT_APPLICATION
+            if (Application.CURRENT_APPLICATION.getPid() == applicationId) continue;
+            
             if (!applications.containsKey(applicationId)) {
                 JvmstatApplication application = new JvmstatApplication(host, applicationId);
                 applications.put(applicationId, application);
                 newApplications.add(application);
             }
+        }
         
         host.getRepository().addDataSources(newApplications);
     }
@@ -153,12 +158,16 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     private void processTerminatedApplicationsByIds(Host host, Set<Integer> applicationIds) {
         Set<JvmstatApplication> finishedApplications = new HashSet();
         
-        for (int applicationId : applicationIds)
+        for (int applicationId : applicationIds) {
+            // Do not remove instance for Application.CURRENT_APPLICATION
+            if (Application.CURRENT_APPLICATION.getPid() == applicationId) continue;
+            
             if (applications.containsKey(applicationId)) {
                 JvmstatApplication application = applications.get(applicationId);
                 applications.remove(applicationId);
                 finishedApplications.add(application);
             }
+        }
         
         host.getRepository().removeDataSources(finishedApplications);
 //        unregisterDataSources(finishedApplications);
