@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application;
 
 import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotsSupport;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
@@ -41,7 +41,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-public final class ApplicationSnapshot extends AbstractSnapshot {
+public final class ApplicationSnapshot extends Snapshot {
     
     private Storage storage;
     
@@ -100,11 +100,6 @@ public final class ApplicationSnapshot extends AbstractSnapshot {
         // NOTE: instance should be also unregistered from the provider but this won't
         // be neccessary once DataSourceRepository will track DataSources automatically
         getOwner().getRepository().removeDataSource(this);
-    }
-
-    // TODO: should not be public!
-    public void removed() {
-        setState(STATE_FINISHED);
     }
     
     

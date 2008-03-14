@@ -53,13 +53,15 @@ class CoreDumpImpl extends AbstractCoreDump {
     // removes link to coredump on the filesystem
     void remove() {
         getStorage().deleteCustomPropertiesStorage();
-        CoreDumpSupport.getProvider().unregisterCoreDump(this);
+        getOwner().getRepository().removeDataSource(this);
+        finished();
     }
     
     // deletes coredump stored in VisualVM persistent storage
     public void delete() {
         super.delete();
-        CoreDumpSupport.getProvider().unregisterCoreDump(this);
+        getOwner().getRepository().removeDataSource(this);
+        finished();
     }
     
     

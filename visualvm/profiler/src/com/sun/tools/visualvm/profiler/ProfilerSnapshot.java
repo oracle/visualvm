@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.profiler;
 
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshot extends AbstractSnapshot {
+class ProfilerSnapshot extends Snapshot {
     
     public ProfilerSnapshot() {
         super(null, ProfilerSupport.getInstance().getCategory());

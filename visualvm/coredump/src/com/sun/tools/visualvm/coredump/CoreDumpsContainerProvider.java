@@ -26,25 +26,16 @@
 package com.sun.tools.visualvm.coredump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class CoreDumpsContainerProvider extends DefaultDataSourceProvider<CoreDumpsContainer> {
-    
-    private void initContainer() {
-        CoreDumpsContainer container = CoreDumpsContainer.sharedInstance();
-        DataSource.ROOT.getRepository().addDataSource(container);
-        registerDataSource(container);
-    }
+class CoreDumpsContainerProvider {
     
     static void register() {
-        CoreDumpsContainerProvider support = new CoreDumpsContainerProvider();
-        support.initContainer();
-        DataSourceRepository.sharedInstance().addDataSourceProvider(support);
+        CoreDumpsContainer container = CoreDumpsContainer.sharedInstance();
+        DataSource.ROOT.getRepository().addDataSource(container);
     }
 
 }

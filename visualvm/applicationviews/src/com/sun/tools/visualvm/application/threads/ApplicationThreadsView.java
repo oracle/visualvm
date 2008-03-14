@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.threads;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
@@ -52,7 +52,7 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationThreadsView extends DataSourceView implements DataFinishedListener<Application> {
+class ApplicationThreadsView extends DataSourceView implements DataRemovedListener<Application> {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";
     private static final int DEFAULT_REFRESH = 1000;
@@ -90,7 +90,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         timer.stop();
     }
     
-    public void dataFinished(Application dataSource) {
+    public void dataRemoved(Application dataSource) {
         timer.stop();
     }
     
@@ -101,7 +101,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
         });
         timer.setInitialDelay(0);
         timer.start();
-        application.notifyWhenFinished(this);
+        application.notifyWhenRemoved(this);
                 
         final DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport(application, jvm, threadsManager, timer).getMasterView(),
@@ -127,7 +127,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements DataFinishedListener<Application> {
+    private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application> {
         
         private HTMLTextArea area;
         private JButton threadDumpButton;
@@ -142,7 +142,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
             return new DataViewComponent.MasterView("Threads", null, this);
         }
         
-        public void dataFinished(Application dataSource) {
+        public void dataRemoved(Application dataSource) {
             threadDumpButton.setEnabled(false);
         }
         
@@ -180,7 +180,7 @@ class ApplicationThreadsView extends DataSourceView implements DataFinishedListe
             
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
             
-            application.notifyWhenFinished(this);
+            application.notifyWhenRemoved(this);
         }
         
         private void updateThreadsCounts(final ThreadMXBeanDataManager threadsManager) {

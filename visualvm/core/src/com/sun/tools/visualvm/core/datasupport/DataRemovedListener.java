@@ -34,13 +34,13 @@ package com.sun.tools.visualvm.core.datasupport;
  *
  * @author Jiri Sedlacek
  */
-public interface DataFinishedListener<X> {
+public interface DataRemovedListener<X> {
 
     /**
      * Invoked only once when the monitored data became finished.
      * 
      * @param dataSource item removed from the repository.
      */
-    public void dataFinished(X dataSource);
+    public void dataRemoved(X dataSource);
 
 }

@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.host.HostsSupport;
@@ -55,7 +54,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
+class JmxApplicationProvider {
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -228,16 +227,13 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
         
         // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
-        registerDataSource(application);
     }
 
     public void removeJmxApplication(JmxApplication app) {
         app.getStorage().deleteCustomPropertiesStorage();
-        unregisterDataSource(app);
     }
     
     protected <Y extends JmxApplication> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
         for (JmxApplication app : removed) {
             if (app.getOwner() != null) app.getOwner().getRepository().removeDataSource(app);
             app.finished();
@@ -316,8 +312,6 @@ class JmxApplicationProvider extends DefaultDataSourceProvider<JmxApplication> {
     }
 
     public static void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(
-                JmxApplicationProvider.sharedInstance());
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 JmxApplicationProvider.sharedInstance().initPersistedApplications();

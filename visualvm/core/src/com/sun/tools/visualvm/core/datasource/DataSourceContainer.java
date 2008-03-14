@@ -28,46 +28,58 @@ package com.sun.tools.visualvm.core.datasource;
 import java.util.Set;
 
 /**
- * General definition of a container managing and providing DataSource instances.
+ * Default implementation of DataSourceContainer.
+ * This class implements all neccessary methods to act as a repository of a DataSource.
  *
  * @author Jiri Sedlacek
  */
-public interface DataSourceContainer<X extends DataSource> extends DataSourceProvider<X> {
-
-    /**
-     * Adds new DataSource instance to the container.
-     * 
-     * @param added DataSource to be added.
-     */
-    public <Y extends X> void addDataSource(Y added);
-
-    /**
-     * Adds new DataSource instances to the container.
-     * 
-     * @param added set of DataSource instances to be added.
-     */
-    public <Y extends X> void addDataSources(Set<Y> added);
-
-    /**
-     * Removes a DataSource from the container.
-     * 
-     * @param removed DataSource to be removed.
-     */
-    public <Y extends X> void removeDataSource(Y removed);
-
-    /**
-     * Removes the DataSource instances from the container.
-     * 
-     * @param removed set of DataSource instances to be removed.
-     */
-    public <Y extends X> void removeDataSources(Set<Y> removed);
+public final class DataSourceContainer extends DataSourceProvider {
+    
+    private final DataSource owner;
+    
     
     /**
-     * Adds and removes DataSource instances ro/from the container.
+     * Default implementation of DataSourceContainer.
+     * DataSoures can benefit from using this class which implements
+     * managing created DataSource instances and firing the events to listeners
+     * as their repositories.
      * 
-     * @param added set of DataSource instances to be added,
-     * @param removed set of DataSource instances to be removed.
+     * @param owner
      */
-    public <Y extends X> void updateDataSources(Set<Y> added, Set<Y> removed);
+    DataSourceContainer(DataSource owner) {
+        this.owner = owner;
+    }
+    
+
+    public void addDataSource(DataSource added) {
+        registerDataSource(added);
+    }
+
+    public void addDataSources(Set<? extends DataSource> added) {
+        super.registerDataSources(added);
+    }
+
+    public void removeDataSource(DataSource removed) {
+        unregisterDataSource(removed);
+    }
+
+    public void removeDataSources(Set<? extends DataSource> removed) {
+        super.unregisterDataSources(removed);
+    }
+    
+    public void updateDataSources(Set<? extends DataSource> added, Set<? extends DataSource> removed) {
+        super.changeDataSources(added, removed);
+    }
+    
+    
+    protected void registerDataSourcesImpl(Set<? extends DataSource> added) {
+        for (DataSource dataSource : added) dataSource.add(owner);
+        super.registerDataSourcesImpl(added);
+    }
+    
+    protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
+        for (DataSource dataSource : removed) dataSource.remove();
+        super.unregisterDataSourcesImpl(removed);
+    }
 
 }

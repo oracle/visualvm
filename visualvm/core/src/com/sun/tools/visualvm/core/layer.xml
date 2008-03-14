@@ -58,6 +58,9 @@
             <file name="com-sun-tools-visualvm-core-datasource-descriptor-RenameDataSourceAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.datasource.descriptor.RenameDataSourceAction.getInstance"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-ui-RemoveDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.RemoveDataSourceAction.getInstance"/>
+            </file>
             <!--file name="com-sun-tools-visualvm-core-profiler-ProfileApplicationAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.profiler.ProfileApplicationAction.getInstance"/>
             </file>
@@ -113,25 +116,29 @@
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-datasource-descriptor-RenameDataSourceAction.instance"/>
                 <attr name="position" intvalue="700"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-ui-RemoveDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-RemoveDataSourceAction.instance"/>
+                <attr name="position" intvalue="800"/>
+            </file>
             <file name="applications-separator2.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                <attr name="position" intvalue="800"/>
+                <attr name="position" intvalue="900"/>
             </file>
             <!--file name="com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-threaddump-ThreadDumpAction.instance"/>
-                <attr name="position" intvalue="900"/>
+                <attr name="position" intvalue="1000"/>
             </file>
             <file name="com-sun-tools-visualvm-core-heapdump-HeapDumpAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-heapdump-HeapDumpAction.instance"/>
-                <attr name="position" intvalue="1000"/>
+                <attr name="position" intvalue="1100"/>
             </file>
             <file name="com-sun-tools-visualvm-core-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="1100"/>
+                <attr name="position" intvalue="1200"/>
             </file>
             <file name="com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-snapshot-application-ApplicationSnapshotAction.instance"/>
-                <attr name="position" intvalue="1200"/>
+                <attr name="position" intvalue="1300"/>
             </file-->
         </folder>
         <folder name="Window">

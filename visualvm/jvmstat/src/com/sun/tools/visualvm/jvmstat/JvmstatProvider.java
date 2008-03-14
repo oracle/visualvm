@@ -44,7 +44,7 @@ import sun.jvmstat.monitor.VmIdentifier;
 public class JvmstatProvider extends AbstractModelProvider<Jvmstat,Application> {
     
     static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
-        if (app.isFinished() || app.getPid() != Application.UNKNOWN_PID) return null;
+        if (app.isRemoved() || app.getPid() != Application.UNKNOWN_PID) return null;
         
         String vmId = "//" + app.getPid() + "?mode=r";
         try {
@@ -64,7 +64,7 @@ public class JvmstatProvider extends AbstractModelProvider<Jvmstat,Application> 
             vm = getMonitoredVm(app);
             if (vm != null) {
                 JvmstatImpl jvmstat = new JvmstatImpl(app,vm);
-                app.notifyWhenFinished(jvmstat);
+                app.notifyWhenRemoved(jvmstat);
                 return jvmstat;
             }
         } catch (MonitorException ex) {

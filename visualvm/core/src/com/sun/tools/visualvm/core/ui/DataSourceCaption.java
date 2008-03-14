@@ -28,6 +28,8 @@ package com.sun.tools.visualvm.core.ui;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -45,7 +47,7 @@ import javax.swing.UIManager;
  *
  * @author Jiri Sedlacek
  */
-final class DataSourceCaption<X extends DataSource> extends JComponent implements PropertyChangeListener {
+final class DataSourceCaption<X extends DataSource> extends JComponent implements PropertyChangeListener, DataRemovedListener<DataSource> {
     
     private static final boolean ANIMATE = Boolean.getBoolean("com.sun.tools.visualvm.core.ui.DataSourceCaption.animate");
     private static final int ANIMATION_RATE = Integer.getInteger("com.sun.tools.visualvm.core.ui.DataSourceCaption.animationRate", 80);
@@ -59,6 +61,7 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     private boolean isAvailable;
     private String name;
     private String description;
+    private boolean finished = false;
     
     
     public DataSourceCaption(X dataSource) {
@@ -70,21 +73,22 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         dataSourceDescriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
         dataSourceDescriptor.addPropertyChangeListener(this);
         
-        isAvailable = dataSource.getState() == DataSource.STATE_AVAILABLE;
+        initAvailable();
         name = dataSourceDescriptor.getName();
         description = dataSourceDescriptor.getDescription();
         
         updateCaption();
         updateDescription();
         updateAvailable();
+        
+        dataSource.notifyWhenRemoved(this);
     }
 
     
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
-        
-        if (DataSource.PROPERTY_STATE.equals(propertyName)) {
-            isAvailable = (Integer)evt.getNewValue() == DataSource.STATE_AVAILABLE;
+        if (Stateful.PROPERTY_STATE.equals(propertyName)) {
+            isAvailable = (Integer)evt.getNewValue() == Stateful.STATE_AVAILABLE;
             updateAvailable();
             updateCaption();
         } else if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
@@ -99,7 +103,17 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         }
     }
     
-    public void finish() {
+    
+    public void dataRemoved(DataSource dataSource) {
+        finish();
+        isAvailable = false;
+        updateAvailable();
+        updateCaption();
+    }
+    
+    public synchronized void finish() {
+        if (finished) return;
+        finished = true;
         dataSource.removePropertyChangeListener(this);
         dataSourceDescriptor.removePropertyChangeListener(this);
     }
@@ -163,6 +177,15 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         });
     }
     
+    
+    private void initAvailable() {
+        if (dataSource instanceof Stateful) {
+            Stateful statefulDataSource = (Stateful)dataSource;
+            isAvailable = statefulDataSource.getState() == Stateful.STATE_AVAILABLE;
+        } else {
+            isAvailable = true;
+        }
+    }
     
     private void initComponents() {
         setLayout(new BorderLayout());

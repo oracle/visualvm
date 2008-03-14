@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
@@ -105,7 +105,7 @@ class ApplicationProfilerView extends DataSourceView {
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements ProfilingStateListener, DataFinishedListener<Application> {
+    private static class MasterViewSupport extends JPanel implements ProfilingStateListener, DataRemovedListener<Application> {
         
         private Application application;
         private ProfilingResultsViewSupport profilingResultsView;
@@ -139,7 +139,7 @@ class ApplicationProfilerView extends DataSourceView {
             return new DataViewComponent.MasterView("Profiler", null, this);
         }
         
-        public void dataFinished(Application application) {
+        public void dataRemoved(Application application) {
             disableControlButtons();
             statusValueLabel.setText("application terminated");
             NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);

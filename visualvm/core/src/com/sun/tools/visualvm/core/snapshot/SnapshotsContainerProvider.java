@@ -26,24 +26,16 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class SnapshotsContainerProvider extends DefaultDataSourceProvider<SnapshotsContainer> {
-    
-    private void initContainer() {
-        SnapshotsContainer container = SnapshotsContainer.sharedInstance();
-        DataSource.ROOT.getRepository().addDataSource(container);
-        registerDataSource(container);
-    }
+public class SnapshotsContainerProvider {
     
     void initialize() {
-        initContainer();
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+        SnapshotsContainer container = SnapshotsContainer.sharedInstance();
+        DataSource.ROOT.getRepository().addDataSource(container);
     }
 
 }

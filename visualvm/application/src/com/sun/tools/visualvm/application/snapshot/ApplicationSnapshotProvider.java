@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.application.snapshot;
 
 import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
@@ -35,7 +34,6 @@ import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
@@ -51,7 +49,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> {
+class ApplicationSnapshotProvider {
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -126,7 +124,6 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
-        registerDataSource(snapshot);
     }
     
     private static String getDisplayNameSuffix(Application application) {
@@ -155,7 +152,6 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                         Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
                         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
                         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
-                        registerDataSource(snapshot);
                         if (deleteArchive) if (!archive.delete()) archive.deleteOnExit();
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -172,19 +168,6 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
                 }
             }
         });
-    }
-
-    void unregisterSnapshot(ApplicationSnapshot snapshot) {
-        unregisterDataSource(snapshot);
-    }
-    
-    
-    protected <Y extends ApplicationSnapshot> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
-        for (ApplicationSnapshot snapshot : removed) {
-            if (snapshot.getOwner() != null) snapshot.getOwner().getRepository().removeDataSource(snapshot);
-            snapshot.removed();
-        }
     }
     
         
@@ -203,12 +186,10 @@ class ApplicationSnapshotProvider extends SnapshotProvider<ApplicationSnapshot> 
         }
         
         SnapshotsContainer.sharedInstance().getRepository().addDataSources(snapshots);
-        registerDataSources(snapshots);
     }
     
     
     void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(ApplicationSnapshotProvider.sharedInstance());
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { loadSnapshots(); }
         });

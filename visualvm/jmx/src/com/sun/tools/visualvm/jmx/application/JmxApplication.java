@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.application.AbstractApplication;
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
@@ -40,7 +40,7 @@ import javax.management.remote.JMXServiceURL;
  * 
  * @author Luis-Miguel Alventosa
  */
-public final class JmxApplication extends AbstractApplication {
+public final class JmxApplication extends Application {
     
     private int pid = -1;
     private final JMXServiceURL url;

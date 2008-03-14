@@ -25,7 +25,8 @@
 
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.host.AbstractHost;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import java.net.UnknownHostException;
 
@@ -33,29 +34,28 @@ import java.net.UnknownHostException;
  *
  * @author Jiri Sedlacek
  */
-final class HostImpl extends AbstractHost {
+final class HostImpl extends Host {
     
     private Storage givenStorage;
     
     
-    HostImpl() throws UnknownHostException {
-        super("localhost");
-    }
-
     HostImpl(String hostName, Storage givenStorage) throws UnknownHostException {
         super(hostName);
         this.givenStorage = givenStorage;
     }
     
     
-    protected Storage createStorage() {
-        if (givenStorage == null) return super.createStorage(); // LOCALHOST
-        return givenStorage;
+    public boolean supportsUserRemove() {
+        return true;
     }
     
-
-    void finished() {
-        setState(STATE_FINISHED);
+    
+    protected void remove(DataSource removeRoot) {
+        givenStorage.deleteCustomPropertiesStorage();
+    }
+    
+    protected Storage createStorage() {
+        return givenStorage;
     }
 
 }

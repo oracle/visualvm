@@ -27,10 +27,8 @@ package com.sun.tools.visualvm.host.impl;
 
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
-import com.sun.tools.visualvm.host.AbstractHost;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
@@ -58,7 +56,7 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
  * @author Jiri Sedlacek
  */
 // A provider for Hosts
-public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
+public class HostProvider {
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -67,21 +65,9 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
     private static final String PROPERTY_HOSTNAME = "prop_hostname";
-
-    private HostImpl LOCALHOST = null;
-    private Host UNKNOWN_HOST = null;
     
     private boolean initializingHosts = true;
     private Semaphore initializingHostsSemaphore = new Semaphore(1);
-
-
-    public Host getLocalhost() {
-        return LOCALHOST;
-    }
-    
-    public Host getUnknownHost() {
-        return UNKNOWN_HOST;
-    }
 
 
     public Host createHost(final HostProperties hostDescriptor, final boolean interactive) {
@@ -150,7 +136,6 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 
                 if (newHost != null) {
                     RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
-                    registerDataSource(newHost);
                 }
                 return newHost;
             }
@@ -162,69 +147,52 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
         waitForInitialization();
         
         // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
-        unregisterDataSource(host);
-        host.getStorage().deleteCustomPropertiesStorage();
-    }
-    
-    
-    protected <Y extends HostImpl> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
-        for (HostImpl host : removed) {
-            RemoteHostsContainer.sharedInstance().getRepository().removeDataSource(host);
-            host.finished();
-        }
+        DataSource owner = host.getOwner();
+        if (owner != null) owner.getRepository().removeDataSource(host);
     }
     
     public HostImpl getHostByAddress(InetAddress inetAddress) {
         waitForInitialization();
         
-        Set<HostImpl> knownHosts = getDataSources(HostImpl.class);
+        Set<HostImpl> knownHosts = DataSourceRepository.sharedInstance().getDataSources(HostImpl.class);
         for (HostImpl knownHost : knownHosts)
             if (knownHost.getInetAddress().equals(inetAddress)) return knownHost;
         return null;
     }
     
-    // Here the Host instances for localhost and persisted remote hosts should be created
-    private void initHosts() {
-        initLocalHost();
-        initUnknownHost();
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                initPersistedHosts();
-            }
-        });
-    }
-    
-    private void initLocalHost() {
+    public Host createLocalHost() {
         try {
-            LOCALHOST = new HostImpl();
-            DataSource.ROOT.getRepository().addDataSource(LOCALHOST);
-            registerDataSource(LOCALHOST);
+            return new Host("localhost") {};
         } catch (UnknownHostException e) {
             System.err.println("Critical failure: cannot resolve localhost");
             NetBeansProfiler.getDefaultNB().displayError("Unable to resolve localhost!");
+            return null;
         }
     }
     
-    private void initUnknownHost() {
+    public Host createUnknownHost() {
         try {
-            // Create a "placeholder" InetAddress instance
-            InetAddress address = InetAddress.getByAddress(new byte[] { 0, 0, 0, 0 }); 
-            
-            // Create host instance
-            UNKNOWN_HOST = new AbstractHost("unknown", address) {};
-            
-            // Only show the host when there's some DataSource in repository
-            UNKNOWN_HOST.getRepository().addDataChangeListener(new DataChangeListener() {
-                public void dataChanged(DataChangeEvent event) {
-                    UNKNOWN_HOST.setVisible(!event.getCurrent().isEmpty());
-                }
-            }, DataSource.class);
-            
-            // Host will appear under Remote container
-            RemoteHostsContainer.sharedInstance().getRepository().addDataSource(UNKNOWN_HOST);
+            return new Host("unknown", InetAddress.getByAddress(new byte[] { 0, 0, 0, 0 })) {};
         } catch (UnknownHostException e) {
             System.err.println("Failure: cannot resolve <unknown> host");
+            return null;
+        }
+    }
+    
+    private void initLocalHost() {
+        Host localhost = Host.LOCALHOST;
+        if (localhost != null) DataSource.ROOT.getRepository().addDataSource(localhost);
+    }
+    
+    private void initUnknownHost() {
+        final Host unknownhost = Host.UNKNOWN_HOST;
+        if (unknownhost != null) {
+            RemoteHostsContainer.sharedInstance().getRepository().addDataSource(unknownhost);
+            unknownhost.getRepository().addDataChangeListener(new DataChangeListener() {
+                public void dataChanged(DataChangeEvent event) {
+                    unknownhost.setVisible(!event.getCurrent().isEmpty());
+                }
+            }, DataSource.class);
         }
     }
     
@@ -251,8 +219,7 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
                 if (persistedHost != null) hosts.add(persistedHost);
             }
 
-            RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);
-            registerDataSources(hosts);        
+            RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);     
         }
         
         DataSource.EVENT_QUEUE.post(new Runnable() {
@@ -274,8 +241,13 @@ public class HostProvider extends DefaultDataSourceProvider<HostImpl> {
     
     
     public void initialize() {
-        initHosts();
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                initLocalHost();
+                initUnknownHost();
+                initPersistedHosts();
+            }
+        });
     }
     
     public HostProvider() {

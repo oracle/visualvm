@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.threaddump;
 
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasource.*;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
@@ -35,7 +35,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-public abstract class AbstractThreadDump extends AbstractSnapshot implements ThreadDump {
+public abstract class AbstractThreadDump extends Snapshot implements ThreadDump {
     
     /**
      * Creates new instance of AbstractThreadDump with the data stored in a file.

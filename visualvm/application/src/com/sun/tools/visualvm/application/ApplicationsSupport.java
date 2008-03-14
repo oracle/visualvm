@@ -28,14 +28,13 @@ package com.sun.tools.visualvm.application;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class ApplicationsSupport {
-    
-    private final Application CURRENT_APPLICATION;
 
     private static ApplicationsSupport instance;
 
@@ -46,27 +45,25 @@ public final class ApplicationsSupport {
         return instance;
     }
     
-    Application getCurrentApplication() {
-        return CURRENT_APPLICATION;
-    }
-
-    private Application createCurrentApplication() {
+    Application createCurrentApplication() {
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
         int selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
-        Application currentApplication = new AbstractApplication(Host.LOCALHOST, selfPid) {};
-        Host.LOCALHOST.getRepository().addDataSource(currentApplication);
+        Application currentApplication = new Application(Host.LOCALHOST, selfPid) {};
+        
         return currentApplication;
     }
+    
+    private void initCurrentApplication() {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                Host.LOCALHOST.getRepository().addDataSource(Application.CURRENT_APPLICATION);
+            }
+        });
+    }
 
-    public ApplicationsSupport() {
-        CURRENT_APPLICATION = createCurrentApplication();
-        
+    private ApplicationsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
-
-//        new JvmstatApplicationProvider().initialize();
-//
-//        JmxApplicationProvider.initialize();
-
         ApplicationActionsProvider.initialize();
+        initCurrentApplication();
     }
 }

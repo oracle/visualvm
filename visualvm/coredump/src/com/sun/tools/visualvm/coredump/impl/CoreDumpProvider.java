@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
 import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.io.File;
@@ -50,7 +49,7 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
+public class CoreDumpProvider {
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -131,29 +130,15 @@ public class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
 
         if (newCoreDump != null) {
             CoreDumpsContainer.sharedInstance().getRepository().addDataSource(newCoreDump);
-            registerDataSource(newCoreDump);
         }
     }
     
     private CoreDumpImpl getCoreDumpByFile(File file) {
         if (!file.isFile()) return null;
-        Set<CoreDumpImpl> knownCoredumps = getDataSources(CoreDumpImpl.class);
+        Set<CoreDumpImpl> knownCoredumps = DataSourceRepository.sharedInstance().getDataSources(CoreDumpImpl.class);
         for (CoreDumpImpl knownCoredump : knownCoredumps)
             if (knownCoredump.getFile().equals(file)) return knownCoredump;
         return null;
-    }
-
-    void unregisterCoreDump(CoreDumpImpl coreDump) {
-        unregisterDataSource(coreDump);
-    }
-    
-    
-    protected <Y extends CoreDumpImpl> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
-        for (CoreDumpImpl coreDump : removed) {
-            if (coreDump.getOwner() != null) coreDump.getOwner().getRepository().removeDataSource(coreDump);
-            coreDump.finished();
-        }
     }
     
     private void initPersistedCoreDumps() {
@@ -185,7 +170,6 @@ public class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
         }
         
         CoreDumpsContainer.sharedInstance().getRepository().addDataSources(coredumps);
-        registerDataSources(coredumps);
     }
     
     
@@ -199,7 +183,6 @@ public class CoreDumpProvider extends SnapshotProvider<CoreDumpImpl> {
                 provider.initPersistedCoreDumps();
             }
         });
-        DataSourceRepository.sharedInstance().addDataSourceProvider(provider);
     }
   
 }

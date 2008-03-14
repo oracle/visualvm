@@ -29,14 +29,10 @@ import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -44,46 +40,12 @@ import javax.swing.AbstractAction;
  */
 public class HostActionsProvider {
 
-    private final RemoveHostAction removeHostAction = new RemoveHostAction();
-
 
     public void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HostActionProvider(), Host.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
     
-    
-    private class RemoveHostAction extends AbstractAction {
-        
-        public RemoveHostAction() {
-            super("Remove");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            HostImpl host = (HostImpl)e.getSource();
-            HostsSupport.getInstance().getHostProvider().removeHost(host, true);
-        }
-        
-    }
-    
-    
-    private class HostActionProvider implements ExplorerActionsProvider<Host> {
-        
-        public ExplorerActionDescriptor getDefaultAction(Host host) {
-            return null;
-        }
-
-        public Set<ExplorerActionDescriptor> getActions(Host host) {
-            if (host == null || host == Host.LOCALHOST) return Collections.EMPTY_SET;
-            
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            if (host instanceof HostImpl) actions.add(new ExplorerActionDescriptor(removeHostAction, 100)); // TODO: should be implemented in HostImplActionsProvider and registered on HostImpl
-
-            return actions;
-        }
-    }
     
     private class RemoteHostsContainerActionProvider implements ExplorerActionsProvider<RemoteHostsContainer> {
 

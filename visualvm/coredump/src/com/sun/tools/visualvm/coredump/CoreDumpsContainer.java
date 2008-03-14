@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class CoreDumpsContainer extends AbstractDataSource {
+public class CoreDumpsContainer extends DataSource {
     
     private static CoreDumpsContainer sharedInstance;
     

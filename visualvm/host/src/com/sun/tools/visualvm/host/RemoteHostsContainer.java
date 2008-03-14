@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class RemoteHostsContainer extends AbstractDataSource {
+public class RemoteHostsContainer extends DataSource {
     
     private static RemoteHostsContainer sharedInstance;
     

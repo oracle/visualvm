@@ -25,197 +25,212 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import org.openide.util.RequestProcessor;
 
 /**
- * DataSource is a general object representing a data unit within the VisualVM.
  *
  * @author Jiri Sedlacek
  */
-public interface DataSource {
+public abstract class DataSource {
     
-    public static final RequestProcessor EVENT_QUEUE = new RequestProcessor("DataSource Event Queue");
-
-    /**
-     * Named property for DataSource owner.
-     */
-    public static final String PROPERTY_OWNER = "prop_owner";
-    /**
-     * Named property for DataSource state.
-     */
-    public static final String PROPERTY_STATE = "prop_state";
     /**
      * Named property for DataSource visibility.
      */
     public static final String PROPERTY_VISIBLE = "prop_visible";
-
-    /**
-     * State of this DataSource cannot be determined.
-     */
-    public static final int STATE_UNKNOWN = -1;
-    /**
-     * DataSource is unavailable.
-     * This can mean temporarily unavailable host or definitely terminated application.
-     */
-    public static final int STATE_UNAVAILABLE = 0;
-    /**
-     * DataSource is available.
-     * This means an online host or a running application.
-     */
-    public static final int STATE_AVAILABLE = 1;
-    /**
-     * DataSource is at the end of it's lifecycle.
-     * This means that state of the DataSource will always be STATE_FINISHED.
-     */
-    public static final int STATE_FINISHED = Integer.MIN_VALUE;
+    
+    public static final RequestProcessor EVENT_QUEUE = new RequestProcessor("DataSource Event Queue");
     
     /**
      * Virtual root of DataSource tree.
      * ROOT corresponds to invisible root of explorer tree.
      */
     public static final DataSource ROOT = new DataSourceRoot();
+    
+    
+    private DataSource owner;
+    private boolean isAdded = false;
+    private DataSource master;
+    private boolean visible = true;
+    private Storage storage;
+    private DataSourceContainer repository;
+    private PropertyChangeSupport changeSupport;
+    private Set<ComparableWeakReference<DataRemovedListener>> removedListeners;
+
 
     /**
-     * Sets owner of this DataSource.
-     * Do not use this method directly, owner is set automatically when adding a DataSource
-     * into owner's repository.
-     * 
-     * @param owner owner of this DataSource.
+     * Creates new instance of AbstractDataSource with no master.
      */
-    public void setOwner(DataSource owner);
-    /**
-     * Returns owner of this DataSource.
-     * Owner is the DataSource which repository contains this DataSource.
-     * 
-     * @return "parent" of this DataSource.
-     */
-    public DataSource getOwner();
+    public DataSource() {
+        this(null);
+    }
 
     /**
-     * Returns current state of this DataSource.
-     * State can be STATE_AVAILABLE, STATE_UNAVAILABLE, STATE_UNKNOWN or STATE_FINISHED, subclasses can
-     * define additional states. Can be monitored by a PropertyChangeListener as property PROPERTY_STATE.
+     * Creates new instance of AbstractDataSource with defined master.
      * 
-     * @return current state of this DataSource.
+     * @param master master of the DataSource.
      */
-    public int getState();
+    public DataSource(DataSource master) {
+        this.master = master;
+    }
+    
+    
+    public final DataSource getOwner() {
+        return owner;
+    }
+    
+    public final synchronized void setVisible(boolean newVisible) {
+        if (this == DataSource.ROOT && !newVisible) throw new IllegalArgumentException("DataSourceRoot cannot be hidden");
+        boolean oldVisible = visible;
+        visible = newVisible;
+        getChangeSupport().firePropertyChange(PROPERTY_VISIBLE, oldVisible, newVisible);
+    }
+
+    public final boolean isVisible() {
+        return visible;
+    }
+    
+    public DataSource getMaster() {
+        return master;
+    }
+    
+    public final Storage getStorage() {
+        if (storage == null) {
+            storage = createStorage();
+            if (storage == null) throw new NullPointerException("Storage cannot be null");
+        }
+        return storage;
+    }
+
+    public final DataSourceContainer getRepository() {
+        if (repository == null) repository = new DataSourceContainer(this);
+        return repository;
+    }
+
+    public final void addPropertyChangeListener(PropertyChangeListener listener) {
+        getChangeSupport().addPropertyChangeListener(listener);
+    }
+
+    public final void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        getChangeSupport().addPropertyChangeListener(propertyName, listener);
+    }
+
+    public final void removePropertyChangeListener(PropertyChangeListener listener) {
+        getChangeSupport().removePropertyChangeListener(listener);
+    }
+
+    public final void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        getChangeSupport().removePropertyChangeListener(propertyName, listener);
+    }
+    
+    // Returns true if this DataSource can be removed using Remove action
+    public boolean supportsUserRemove() {
+        return false;
+    }
+    
+    // Notifies the listener that the DataSource has been removed from the tree
+    public final void notifyWhenRemoved(DataRemovedListener listener) {
+        if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
+        if (isRemoved()) listener.dataRemoved(this);
+        else getRemovedListeners().add(new ComparableWeakReference(listener));
+    }
+    
+    // Checks if the DataSource has been removed from the tree
+    public final boolean isRemoved() {
+        return getOwner() == null;
+    }
+    
+    // Performs blocking check if the DataSource can be removed in context of removeRoot
+    // Here the DataSource can for example warn user about possible data loss.
+    protected boolean checkRemove(DataSource removeRoot) {
+        return true;
+    }
+    
+    // Implementation of this DataSource removal
+    // Persistent DataSources can remove appropriate entries from their storage
+    protected void remove(DataSource removeRoot) {
+    }
+    
+    
+    final void add(DataSource owner) {
+        if (isAdded) throw new UnsupportedOperationException("DataSource can be added only once");
+        this.owner = owner;
+        isAdded = true;
+    }
+    
+    final void remove() {
+        if (checkRemove(this, this)) remove(this, this);
+    }
+    
+    private static boolean checkRemove(DataSource dataSource, DataSource removeRoot) {
+        // Check if the DataSource can be removed
+        if (!dataSource.checkRemove(removeRoot)) return false;
+        
+        // Check if all repository DataSources can be removed
+        Set<? extends DataSource> repositoryDataSources = dataSource.getRepository().getDataSources();
+        for (DataSource repositoryDataSource : repositoryDataSources)
+            if (!repositoryDataSource.checkRemove(removeRoot)) return false;
+        return true;
+    }
+    
+    private static void remove(DataSource dataSource, DataSource removeRoot) {
+        // Remove repository DataSources
+        Set<? extends DataSource> repositoryDataSources = dataSource.getRepository().getDataSources();
+        for (DataSource repositoryDataSource : repositoryDataSources)
+            repositoryDataSource.remove(removeRoot);
+        
+        // Remove DataSource
+        dataSource.remove(removeRoot);
+        
+        // Clear owner of the DataSource
+        dataSource.owner = null;
+        
+        // Notify listeners
+        if (!dataSource.hasRemovedListeners()) return;
+        Set<ComparableWeakReference<DataRemovedListener>> listeners = dataSource.getRemovedListeners();
+        for (WeakReference<DataRemovedListener> listenerReference : listeners) {
+            DataRemovedListener listener = listenerReference.get();
+            if (listener != null) listener.dataRemoved(dataSource);
+        }
+        dataSource.getRemovedListeners().clear();
+    }
+    
     
     /**
-     * Sets visibility of this DataSource in explorer tree.
-     * 
-     * @param visible
-     */
-    public void setVisible(boolean visible);
-    /**
-     * Returns true if this DataSource is visible in explorer tree, false otherwise.
-     * 
-     * @return true if this DataSource is visible in explorer tree, false otherwise.
-     */
-    public boolean isVisible();
-    
-    /**
-     * Returns a master DataSource which will display this DataSource as a subtab.
-     * This is used for example for thread dumps and heap dumps which are opened as additional views
-     * of an application.
-     * 
-     * @return master DataSource or null when this DataSource should be displayed in its own window.
-     */
-    public DataSource getMaster();
-    
-    /**
-     * Returns Storage instance for this DataSource.
+     * Creates Storage instance for this DataSource.
+     * This method should never return null.
      * 
      * @return Storage instance for this DataSource.
      */
-    public Storage getStorage();
-
+    protected Storage createStorage() {
+        return new Storage(Storage.getTemporaryStorageDirectory());
+    }
+    
     /**
-     * Repository of this DataSource which can contain any other DataSources.
+     * Returns instance of PropertyChangeSupport used for processing property changes.
      * 
-     * @return repository of this DataSource.
+     * @return instance of PropertyChangeSupport used for processing property changes.
      */
-    public DataSourceContainer getRepository();
-
-    /**
-     * Add a PropertyChangeListener to the listener list.
-     * The listener is registered for all properties.
-     * The same listener object may be added more than once, and will be called
-     * as many times as it is added.
-     * If <code>listener</code> is null, no exception is thrown and no action
-     * is taken.
-     *
-     * @param listener  The PropertyChangeListener to be added
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+    protected final PropertyChangeSupport getChangeSupport() {
+        if (changeSupport == null) changeSupport = new PropertyChangeSupport(this);
+        return changeSupport;
+    }
     
-    /**
-     * Add a PropertyChangeListener for a specific property.  The listener
-     * will be invoked only when a call on firePropertyChange names that
-     * specific property.
-     * The same listener object may be added more than once.  For each
-     * property,  the listener will be invoked the number of times it was added
-     * for that property.
-     * If <code>propertyName</code> or <code>listener</code> is null, no
-     * exception is thrown and no action is taken.
-     *
-     * @param propertyName  The name of the property to listen on.
-     * @param listener  The PropertyChangeListener to be added
-     */
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
     
-    /**
-     * Remove a PropertyChangeListener from the listener list.
-     * This removes a PropertyChangeListener that was registered
-     * for all properties.
-     * If <code>listener</code> was added more than once to the same event
-     * source, it will be notified one less time after being removed.
-     * If <code>listener</code> is null, or was never added, no exception is
-     * thrown and no action is taken.
-     *
-     * @param listener  The PropertyChangeListener to be removed
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+    final boolean hasRemovedListeners() {
+        return removedListeners != null;
+    }
     
-    /**
-     * Remove a PropertyChangeListener for a specific property.
-     * If <code>listener</code> was added more than once to the same event
-     * source for the specified property, it will be notified one less time
-     * after being removed.
-     * If <code>propertyName</code> is null,  no exception is thrown and no
-     * action is taken.
-     * If <code>listener</code> is null, or was never added for the specified
-     * property, no exception is thrown and no action is taken.
-     *
-     * @param propertyName  The name of the property that was listened on.
-     * @param listener  The PropertyChangeListener to be removed
-     */
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
-    
-    /**
-     * Returns true if state of this DataSource is STATE_FINISHED.
-     * This means that the DataSource has been unregistered from all repositories
-     * and removed from explorer tree.
-     * Once the DataSource is in STATE_FINISHED, its state won't change any more.
-     * 
-     * @return true if state of this DataSource is STATE_FINISHED.
-     */
-    public boolean isFinished();
-    
-    /**
-     * Registers a DataFinishedListener for a single notification when this DataSource is removed.
-     * This event occurs only once during the DataSource lifecycle exactly when the isFinished() method
-     * starts to return true. At this time the DataSource should be unregistered from all repositories
-     * and removed from explorer tree.
-     * Note that this listener is referenced by WeakReference in monitored DataSource -
-     * be sure that the listener has at least one strong reference. You should always avoid writing
-     * code like this:<pre>
-     * DataSource.notifyWhenFinished(new DataFinishedListener() { ... });
-     * </pre>
-     * 
-     * @param listener a DataFinishedListener for a single notification when state of this DataSource becomes STATE_FINISHED.
-     */
-    public void notifyWhenFinished(DataFinishedListener listener);
+    final Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
+        if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet());
+        return removedListeners;
+    }
 
 }

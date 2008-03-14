@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.coredump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ import org.openide.util.Utilities;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public abstract class AbstractCoreDump extends AbstractSnapshot implements CoreDump {
+public abstract class AbstractCoreDump extends Snapshot implements CoreDump {
     
     private final File jdkHome;
     

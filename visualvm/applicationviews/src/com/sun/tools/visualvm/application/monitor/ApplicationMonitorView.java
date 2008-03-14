@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.monitor;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.application.MonitoredData;
@@ -144,7 +144,7 @@ class ApplicationMonitorView extends DataSourceView {
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements DataFinishedListener<Application> {
+    private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application> {
         
         private Application application;
         private JVM jvm;
@@ -172,7 +172,7 @@ class ApplicationMonitorView extends DataSourceView {
             area.select(selStart, selEnd);
         }
         
-        public void dataFinished(Application dataSource) {
+        public void dataRemoved(Application dataSource) {
             gcButton.setEnabled(false);
             heapDumpButton.setEnabled(false);
         }
@@ -218,7 +218,7 @@ class ApplicationMonitorView extends DataSourceView {
             
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
             
-            application.notifyWhenFinished(this);
+            application.notifyWhenRemoved(this);
         }
 
         private String getBasicTelemetry(MonitoredData data) {

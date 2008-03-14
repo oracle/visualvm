@@ -25,22 +25,21 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.application.AbstractApplication;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.host.Host;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JvmstatApplication extends AbstractApplication {    
+final class JvmstatApplication extends Application {    
 
     JvmstatApplication(Host host, int pid) {
         super(host, pid);
     }
     
-    void removed() {
-        setState(DataSource.STATE_FINISHED);
-    }
+//    void removed() {
+//        setState(DataSource.STATE_FINISHED);
+//    }
 
 }

@@ -26,35 +26,93 @@
 package com.sun.tools.visualvm.host;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 
 /**
- * DataSource representing a host.
+ * Abstract implementation of Host.
  *
  * @author Jiri Sedlacek
  */
-public interface Host extends DataSource {
-
+public abstract class Host extends DataSource implements Stateful {
+    
     /**
      * Instance representing the localhost.
      */
-    public static final Host LOCALHOST = HostsSupport.getInstance().getLocalHost();
+    public static final Host LOCALHOST = HostsSupport.getInstance().createLocalHost();
     
-    public static final Host UNKNOWN_HOST = HostsSupport.getInstance().getUnknownHost();
+    public static final Host UNKNOWN_HOST = HostsSupport.getInstance().createUnknownHost();
+
+    private final String hostName;
+    private InetAddress inetAddress;
+    private int state = STATE_AVAILABLE;
+
 
     /**
-     * Returns host name or IP of the host.
-     * This is the string used when adding new host to VisualVM.
+     * Creates new instance of Host defined by hostName.
      * 
-     * @return host name or IP of the host.
+     * @param hostName name or IP of the host.
+     * @throws java.net.UnknownHostException if host cannot be resolved using provided hostName/IP.
      */
-    public String getHostName();
+    public Host(String hostName) throws UnknownHostException {
+        this(hostName, InetAddress.getByName(hostName));
+    }
 
     /**
-     * Returns an InetAddress instance for this host.
+     * Creates new instance of Host defined by hostName, displayName and InetAddress instance for the host.
      * 
-     * @return InetAddress instance for this host.
+     * @param hostName name or IP of the host,
+     * @param inetAddress InetAddress instance for the host.
      */
-    public InetAddress getInetAddress();
+    public Host(String hostName, InetAddress inetAddress) {
+        if (hostName == null) throw new IllegalArgumentException("Host name cannot be null");
+        if (inetAddress == null) throw new IllegalArgumentException("InetAddress cannot be null");
+        
+        this.hostName = hostName;
+        this.inetAddress = inetAddress;
+    }
+    
+    
+    public String getHostName() {
+        return hostName;
+    }
+    
+    public final InetAddress getInetAddress() {
+        return inetAddress;
+    }
+    
+    public int getState() {
+        return state;
+    }
+    
+    protected final synchronized void setState(int newState) {
+        int oldState = state;
+        state = newState;
+        getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
+    }
+    
+    
+    public int hashCode() {
+        if (Host.UNKNOWN_HOST == this) return super.hashCode();
+        InetAddress address = getInetAddress();
+        if (this == LOCALHOST) return address.hashCode();
+        if (address.isAnyLocalAddress()) return LOCALHOST.hashCode();
+        else return getInetAddress().hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Host)) return false;
+        if (Host.UNKNOWN_HOST == this) return obj == this;
+        Host host = (Host)obj;
+        InetAddress thisAddress = getInetAddress();
+        InetAddress otherAddress = host.getInetAddress();
+        if (thisAddress.isAnyLocalAddress() && otherAddress.isAnyLocalAddress()) return true;
+        else return thisAddress.equals(otherAddress);
+    }
+
+    public String toString() {
+        return getHostName() + " [IP: " + getInetAddress().getHostAddress() + "]";
+    }
 
 }

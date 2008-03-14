@@ -26,51 +26,117 @@
 package com.sun.tools.visualvm.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.host.Host;
+import java.io.File;
 
 /**
- * DataSource representing an application.
+ * Abstract implementation of Application.
  *
  * @author Jiri Sedlacek
  */
-public interface Application extends DataSource {
-
+public abstract class Application extends DataSource implements Stateful {
+    
     /**
      * Instance representing actually running VisualVM application.
      */
-    public static final Application CURRENT_APPLICATION = ApplicationsSupport.getInstance().getCurrentApplication();
+    public static final Application CURRENT_APPLICATION = ApplicationsSupport.getInstance().createCurrentApplication();
     
     /**
      * Process ID of the application is unknown.
      */
     public static final int UNKNOWN_PID = -1;
 
-    /**
-     * Returns unique Id of this application.
-     * 
-     * @return unique Id of this application.
-     */
-    public String getId();
+    private String id;
+    private int pid;
+    private Host host;
+    private int state = STATE_AVAILABLE;
+
 
     /**
-     * Returns process Id of this application if known.
+     * Creates new instance of AbstractApplication identified by id running on a Host
      * 
-     * @return process Id of this application or UNKNOWN_PID.
+     * @param host host of the application,
+     * @param id unique identificator of the application.
      */
-    public int getPid();
+    public Application(Host host, String id) {
+        this(host, id, UNKNOWN_PID);
+    }
 
     /**
-     * Returns a host instance for this application.
+     * Creates new instance of AbstractApplication identified by its process id running on a Host.
      * 
-     * @return host instance for this application.
+     * @param host host of the application,
+     * @param pid process id of the application.
      */
-    public Host getHost();
+    public Application(Host host, int pid) {
+        this(host, host.getHostName() + "-" + pid, pid);
+    }
 
     /**
-     * Returns true if this application is running on the localhost.
+     * Creates new instance of Abstract application identified by its id and/or process id running on a Host.
      * 
-     * @return true if this application is running on the localhost.
+     * @param host host of the application,
+     * @param id unique identificator of the application,
+     * @param pid process ide of the application or UNKNOWN_PID if the process id is unknown.
      */
-    public boolean isLocalApplication();
+    public Application(Host host, String id, int pid) {
+        if (host == null) throw new IllegalArgumentException("Host cannot be null");
+        if (id == null && pid == UNKNOWN_PID) throw new IllegalArgumentException("Either id or pid must be provided for the application");
+        this.host = host;
+        this.id = id;
+        this.pid = pid;
+    }
+
+
+    public String getId() {
+        return id;
+    }
+
+    public int getPid() {
+        return pid;
+    }
+
+    public Host getHost() {
+        return host;
+    }
+
+    public boolean isLocalApplication() {
+        return Host.LOCALHOST.equals(getHost());
+    }
+    
+    
+    public int getState() {
+        return state;
+    }
+    
+    protected final synchronized void setState(int newState) {
+        int oldState = state;
+        state = newState;
+        getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
+    }
+    
+    
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Application)) return false;
+        Application app = (Application) obj;
+        return getId().equals(app.getId());
+    }
+    
+    public String toString() {
+        return "Application [id: " + getId() + ", pid: " + getPid() + ", host: " + getHost().getHostName() + "]";
+    }
+    
+    
+    // <system_temp>/visualvm.dat/<application_id>
+    protected Storage createStorage() {
+        File directory = new File(Storage.getTemporaryStorageDirectoryString() + File.separator + getId());
+        return new Storage(directory);
+    }
 
 }

@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.host.overview;
 
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.host.model.HostOverview;
 import com.sun.tools.visualvm.host.model.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -57,7 +57,7 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-class HostOverviewView extends DataSourceView implements DataFinishedListener<Host> {
+class HostOverviewView extends DataSourceView implements DataRemovedListener<Host> {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";
 
@@ -90,7 +90,7 @@ class HostOverviewView extends DataSourceView implements DataFinishedListener<Ho
         timer.stop();
     }
     
-    public void dataFinished(Host dataSource) {
+    public void dataRemoved(Host dataSource) {
         timer.stop();
     }
     
@@ -125,8 +125,7 @@ class HostOverviewView extends DataSourceView implements DataFinishedListener<Ho
         });
         timer.setInitialDelay(0);
         timer.start();
-        host.notifyWhenFinished(this);
-        // TODO: create listener for host availability and start/stop the timer accordingly
+        host.notifyWhenRemoved(this);
         
         return dvc;
     }

@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class SnapshotsContainer extends AbstractDataSource {
+public final class SnapshotsContainer extends DataSource {
     
     private static SnapshotsContainer sharedInstance;
     

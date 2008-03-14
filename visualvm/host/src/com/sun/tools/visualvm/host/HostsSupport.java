@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.host;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.host.impl.HostActionsProvider;
@@ -47,22 +48,14 @@ public final class HostsSupport {
     
     private static HostsSupport instance;
 
-    private final HostProvider hostProvider;
+    private final HostProvider hostProvider = new HostProvider();
 
 
     public static synchronized HostsSupport getInstance() {
         if (instance == null) instance = new HostsSupport();
         return instance;
     }
-
-
-    public Host getLocalHost() {
-        return getHostProvider().getLocalhost();
-    }
     
-    public Host getUnknownHost() {
-        return getHostProvider().getUnknownHost();
-    }
 
     public Host createHost(String hostname) {
         return getHostProvider().createHost(new HostProperties(hostname, hostname), true);
@@ -100,14 +93,23 @@ public final class HostsSupport {
     public static boolean storageDirectoryExists() {
         return new File(getStorageDirectoryString()).isDirectory();
     }
+    
+    
+    Host createLocalHost() {
+        return hostProvider.createLocalHost();
+    }
+    
+    Host createUnknownHost() {
+        return hostProvider.createUnknownHost();
+    }
 
 
     private HostsSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorProvider());
         
-        new RemoteHostsContainerProvider().initialize();
+        RemoteHostsContainer container = RemoteHostsContainer.sharedInstance();
+        DataSource.ROOT.getRepository().addDataSource(container);
         
-        hostProvider = new HostProvider();
         hostProvider.initialize();
 
         new HostActionsProvider().initialize();

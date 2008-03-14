@@ -26,10 +26,9 @@
 package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.host.Host;
@@ -63,14 +62,14 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class JvmstatApplicationProvider extends DefaultDataSourceProvider<JvmstatApplication> implements DataChangeListener<Host> {
+public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private final Map<Integer, JvmstatApplication> applications = new HashMap();
     
     private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
     
-    private final DataFinishedListener<Host> hostFinishedListener = new DataFinishedListener<Host>() {
-        public void dataFinished(Host host) { processFinishedHost(host); }
+    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
+        public void dataRemoved(Host host) { processFinishedHost(host); }
     };
     
     public void dataChanged(DataChangeEvent<Host> event) {
@@ -81,6 +80,8 @@ public class JvmstatApplicationProvider extends DefaultDataSourceProvider<Jvmsta
     //    TODO: check that applications are not removed twice from the host, unregister MonitoredHostListener!!!
     
     private boolean processNewHost(final Host host) {
+        if (host == Host.UNKNOWN_HOST) return true;
+            
         // Flag for determining first MonitoredHost event
         final boolean firstEvent[] = new boolean[] { true };
         
@@ -147,7 +148,6 @@ public class JvmstatApplicationProvider extends DefaultDataSourceProvider<Jvmsta
             }
         
         host.getRepository().addDataSources(newApplications);
-        registerDataSources(newApplications);
     }
     
     private void processTerminatedApplicationsByIds(Host host, Set<Integer> applicationIds) {
@@ -161,7 +161,7 @@ public class JvmstatApplicationProvider extends DefaultDataSourceProvider<Jvmsta
             }
         
         host.getRepository().removeDataSources(finishedApplications);
-        unregisterDataSources(finishedApplications);
+//        unregisterDataSources(finishedApplications);
     }
     
     private void processAllTerminatedApplications(Host host) {
@@ -175,13 +175,12 @@ public class JvmstatApplicationProvider extends DefaultDataSourceProvider<Jvmsta
             }
         
         host.getRepository().removeDataSources(finishedApplications);
-        unregisterDataSources(finishedApplications);
+//        unregisterDataSources(finishedApplications);
     }
     
-    protected <Y extends JvmstatApplication> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
-        for (JvmstatApplication application : removed) application.removed();
-    }
+//    protected <Y extends JvmstatApplication> void unregisterDataSources(final Set<Y> removed) {
+//        for (JvmstatApplication application : removed) application.removed();
+//    }
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
     private void checkForBrokenJps(MonitoredHost monitoredHost) {
@@ -247,7 +246,6 @@ public class JvmstatApplicationProvider extends DefaultDataSourceProvider<Jvmsta
     
     public static void register() {
         JvmstatApplicationProvider provider = new JvmstatApplicationProvider();
-        DataSourceRepository.sharedInstance().addDataSourceProvider(provider);
         DataSourceRepository.sharedInstance().addDataChangeListener(provider, Host.class);
     }
 

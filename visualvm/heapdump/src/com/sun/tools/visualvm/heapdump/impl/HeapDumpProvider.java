@@ -31,8 +31,7 @@ import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
@@ -56,18 +55,18 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
+public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot> {
     
-    private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
-        public void dataFinished(Application application) { removeHeapDumps(application, false); }
+    private final DataRemovedListener<Application> applicationFinishedListener = new DataRemovedListener<Application>() {
+        public void dataRemoved(Application application) { removeHeapDumps(application, false); }
     };
     
-    private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
-        public void dataFinished(CoreDump coredump) { removeHeapDumps(coredump); }
+    private final DataRemovedListener<CoreDump> coredumpFinishedListener = new DataRemovedListener<CoreDump>() {
+        public void dataRemoved(CoreDump coredump) { removeHeapDumps(coredump); }
     };
     
-    private final DataFinishedListener<ApplicationSnapshot> snapshotFinishedListener = new DataFinishedListener<ApplicationSnapshot>() {
-        public void dataFinished(ApplicationSnapshot snapshot) { processFinishedSnapshot(snapshot); }
+    private final DataRemovedListener<ApplicationSnapshot> snapshotFinishedListener = new DataRemovedListener<ApplicationSnapshot>() {
+        public void dataRemoved(ApplicationSnapshot snapshot) { processFinishedSnapshot(snapshot); }
     };
     
     
@@ -82,7 +81,6 @@ public class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements 
         File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
         for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
         snapshot.getRepository().addDataSources(heapDumps);
-        registerDataSources(heapDumps);
         snapshot.notifyWhenFinished(snapshotFinishedListener);
     }
     
@@ -114,7 +112,6 @@ public class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements 
                     try {
                         final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
                         application.getRepository().addDataSource(heapDump);
-                        registerDataSource(heapDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
                             public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                         });
@@ -155,7 +152,6 @@ public class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements 
                         if (saAget.takeHeapDump(dumpFile.getAbsolutePath())) {
                             final HeapDumpImpl heapDump = new HeapDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(heapDump);
-                            registerDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                             });
@@ -182,16 +178,13 @@ public class HeapDumpProvider extends SnapshotProvider<HeapDumpImpl> implements 
     
     void unregisterHeapDump(HeapDumpImpl heapDump) {
         if (heapDump.getOwner() != null) heapDump.getOwner().getRepository().removeDataSource(heapDump);
-        unregisterDataSource(heapDump);
     }
     
     protected <Y extends HeapDumpImpl> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
         for (HeapDumpImpl heapDump : removed) heapDump.removed();
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
     }
     

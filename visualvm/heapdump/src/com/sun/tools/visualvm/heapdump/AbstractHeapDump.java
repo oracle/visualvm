@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 
@@ -35,7 +35,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-public abstract class AbstractHeapDump extends AbstractSnapshot implements HeapDump {
+public abstract class AbstractHeapDump extends Snapshot implements HeapDump {
     
     /**
      * Creates new instance of AbstractHeapDump with the data stored in a file.

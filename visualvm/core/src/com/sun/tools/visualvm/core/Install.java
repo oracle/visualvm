@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core;
 
 //import com.sun.tools.visualvm.application.ApplicationsSupport;
 
+import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.io.File;
@@ -42,6 +43,8 @@ public class Install extends ModuleInstall {
     public void restored() {
         // NOTE: this has to be called before any of DataSourceProviders initializes
         cleanupPreviousSession();
+        
+        DataSourceRepository.sharedInstance();
         
 //        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
 //            public void run() {

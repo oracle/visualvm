@@ -30,8 +30,7 @@ import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.snapshot.SnapshotProvider;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
@@ -58,18 +57,18 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> implements DataChangeListener<ApplicationSnapshot> {
+public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapshot> {
     
-    private final DataFinishedListener<Application> applicationFinishedListener = new DataFinishedListener<Application>() {
-        public void dataFinished(Application application) { removeThreadDumps(application, false); }
+    private final DataRemovedListener<Application> applicationFinishedListener = new DataRemovedListener<Application>() {
+        public void dataRemoved(Application application) { removeThreadDumps(application, false); }
     };
     
-    private final DataFinishedListener<CoreDump> coredumpFinishedListener = new DataFinishedListener<CoreDump>() {
-        public void dataFinished(CoreDump coredump) { removeThreadDumps(coredump); }
+    private final DataRemovedListener<CoreDump> coredumpFinishedListener = new DataRemovedListener<CoreDump>() {
+        public void dataRemoved(CoreDump coredump) { removeThreadDumps(coredump); }
     };
     
-    private final DataFinishedListener<ApplicationSnapshot> snapshotFinishedListener = new DataFinishedListener<ApplicationSnapshot>() {
-        public void dataFinished(ApplicationSnapshot snapshot) { processFinishedSnapshot(snapshot); }
+    private final DataRemovedListener<ApplicationSnapshot> snapshotFinishedListener = new DataRemovedListener<ApplicationSnapshot>() {
+        public void dataRemoved(ApplicationSnapshot snapshot) { processFinishedSnapshot(snapshot); }
     };
     
     
@@ -84,7 +83,6 @@ public class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> impleme
         File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
         for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
         snapshot.getRepository().addDataSources(threadDumps);
-        registerDataSources(threadDumps);
         snapshot.notifyWhenFinished(snapshotFinishedListener);
     }
     
@@ -116,7 +114,6 @@ public class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> impleme
                     try {
                         final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
                         application.getRepository().addDataSource(threadDump);
-                        registerDataSource(threadDump);
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
                             public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                         });
@@ -161,7 +158,6 @@ public class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> impleme
                             os.close();
                             final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);
-                            registerDataSource(threadDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                             });
@@ -188,16 +184,13 @@ public class ThreadDumpProvider extends SnapshotProvider<ThreadDumpImpl> impleme
     
     void unregisterThreadDump(ThreadDumpImpl threadDump) {
         if (threadDump.getOwner() != null) threadDump.getOwner().getRepository().removeDataSource(threadDump);
-        unregisterDataSource(threadDump);
     }
     
     protected <Y extends ThreadDumpImpl> void unregisterDataSources(final Set<Y> removed) {
-        super.unregisterDataSources(removed);
         for (ThreadDumpImpl threadDump : removed) threadDump.removed();
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(this);
         DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
     }
     

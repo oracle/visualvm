@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import java.util.Set;
 
 /**
  * Central repository of all known DataSources.
@@ -38,7 +39,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
  *
  * @author Jiri Sedlacek
  */
-public final class DataSourceRepository extends DefaultDataSourceProvider<DataSource> implements DataChangeListener<DataSource> {
+public final class DataSourceRepository extends DataSourceProvider implements DataChangeListener<DataSource> {
 
     private static DataSourceRepository sharedInstance;
 
@@ -49,38 +50,31 @@ public final class DataSourceRepository extends DefaultDataSourceProvider<DataSo
      * @return singleton instance of DataSourceRepository.
      */
     public synchronized static DataSourceRepository sharedInstance() {
-        if (sharedInstance == null) sharedInstance = createSharedInstance();
+        if (sharedInstance == null) sharedInstance = new DataSourceRepository();
         return sharedInstance;
     }
 
-
-    /**
-     * Registers new DataSourceProvider to the repository.
-     * 
-     * @param provider DataSourceProvider to be added.
-     */
-    public void addDataSourceProvider(DataSourceProvider provider) {
-        provider.addDataChangeListener(this, DataSource.class);
-    }
     
-    /**
-     * Unregisters DataSourceProvider from the repository.
-     * 
-     * @param provider DataSourceProvider to be removed.
-     */
-    public void removeDataSourceProvider(DataSourceProvider provider) {
-        provider.removeDataChangeListener(this);
-    }
-
     public void dataChanged(DataChangeEvent<DataSource> event) {
-        updateDataSources(event.getAdded(), event.getRemoved());
+        changeDataSources(event.getAdded(), event.getRemoved());
     }
     
     
-    private DataSourceRepository() {}
+    protected void registerDataSourcesImpl(Set<? extends DataSource> added) {
+        System.err.println(">>> Registered " + added);
+        super.registerDataSourcesImpl(added);
+        for (DataSource dataSource : added) dataSource.getRepository().addDataChangeListener(this, DataSource.class);
+    }
     
-    private static DataSourceRepository createSharedInstance() {
-        return new DataSourceRepository();
+    protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
+        System.err.println(">>> Unregistered " + removed);
+        super.unregisterDataSourcesImpl(removed);
+        for (DataSource dataSource : removed) dataSource.getRepository().removeDataChangeListener(this);
+    }
+    
+    
+    private DataSourceRepository() {
+        registerDataSource(DataSource.ROOT);
     }
 
 }

@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
@@ -55,7 +55,7 @@ import sun.management.counter.Variability;
  *
  * @author Tomas Hurka
  */
-public class JvmstatImpl extends Jvmstat implements VmListener, DataFinishedListener<Application> {
+public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListener<Application> {
     Application application;
     Boolean isDumpOnOOMEnabled;
     MonitoredVm monitoredVm;
@@ -230,7 +230,7 @@ public class JvmstatImpl extends Jvmstat implements VmListener, DataFinishedList
         disableListeners();
     }
     
-    public void dataFinished(Application dataSource) {
+    public void dataRemoved(Application dataSource) {
         disableListeners();
     }
     
