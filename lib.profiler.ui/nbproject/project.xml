@@ -61,9 +61,11 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
                 <friend>org.netbeans.modules.profiler.utilities</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <package>org.netbeans.lib.profiler.ui</package>
                 <package>org.netbeans.lib.profiler.ui.charts</package>
                 <package>org.netbeans.lib.profiler.ui.components</package>
