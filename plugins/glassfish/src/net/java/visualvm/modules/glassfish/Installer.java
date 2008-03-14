@@ -32,6 +32,7 @@ import net.java.visualvm.modules.glassfish.datasource.GlassFishDataSourceDescrip
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServletProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishServletViewProvider;
 import net.java.visualvm.modules.glassfish.dataview.GlassFishWebModuleViewProvider;
+import net.java.visualvm.modules.glassfish.jmx.GFJmxModelFactory;
 import org.openide.modules.ModuleInstall;
 
 
@@ -57,6 +58,7 @@ public class Installer extends ModuleInstall {
         GlassFishOverview.initialize();
         GlassFishDataSourceDescriptorProvider.initialize();
         GlassFishApplicationProvider.initialize();
+        GFJmxModelFactory.initialize();
     }
 
     @Override
@@ -70,6 +72,7 @@ public class Installer extends ModuleInstall {
         GlassFishOverview.shutdown();
         GlassFishDataSourceDescriptorProvider.shutdown();
         GlassFishApplicationProvider.shutdown();
+        GFJmxModelFactory.shutdown();
         super.uninstalled();
     }
 }

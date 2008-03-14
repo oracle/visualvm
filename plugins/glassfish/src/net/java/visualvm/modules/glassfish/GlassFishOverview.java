@@ -30,6 +30,7 @@ import com.sun.appserv.management.config.HTTPListenerConfig;
 import com.sun.appserv.management.config.HTTPServiceConfig;
 import com.sun.appserv.management.config.IIOPListenerConfig;
 import com.sun.appserv.management.config.IIOPServiceConfig;
+import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.config.SystemPropertiesAccess;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
@@ -39,7 +40,7 @@ import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.ViewPlugin;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
-import net.java.visualvm.modules.glassfish.datasource.GlassFishModel;
+import javax.swing.event.HyperlinkEvent;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import java.awt.BorderLayout;
@@ -49,8 +50,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
+import javax.swing.event.HyperlinkListener;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 
 /**
@@ -90,10 +95,28 @@ public class GlassFishOverview implements ViewPlugin<Application> {
         public DetailsView getView() {
             JPanel panel = new JPanel(new BorderLayout());
             panel.setOpaque(false);
-
+            panel.setBorder(BorderFactory.createEmptyBorder());
+            
             final HTMLTextArea area = new HTMLTextArea();
             area.setOpaque(false);
-            panel.add(area, BorderLayout.CENTER);
+            area.setBorder(BorderFactory.createEmptyBorder());
+            area.addHyperlinkListener(new HyperlinkListener() {
+                public void hyperlinkUpdate(HyperlinkEvent e) {
+                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        StringTokenizer st = new StringTokenizer(e.getDescription(), "#");
+                        String service = st.nextToken();
+                        String level = st.nextToken();
+                        setMonitoringLevel(AMXUtil.getMonitoringConfig(jmxModel), service, cycleLevel(level));
+                        area.setText(buildInfo());                        
+                    }
+                }
+            });
+            JScrollPane scrollPane = new JScrollPane(area);
+            scrollPane.setOpaque(false);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+            scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+
+            panel.add(scrollPane, BorderLayout.CENTER);
 
             DataViewComponent.DetailsView details = new DataViewComponent.DetailsView("SJSAS/GlassFish",
                     "Application server details", panel, null);
@@ -156,7 +179,7 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             ConfigConfig cc = domainRoot.getDomainConfig().getConfigConfigMap().get(JMXUtil.getServerConfig(jmxModel));
 
             StringBuilder sb = new StringBuilder();
-
+            sb.append("<h2>General information</h2>");
             sb.append("<b>Server Name: </b>").append(serverName).append("<br/>");
             sb.append("<b>Domain: </b>").append(getDomain()).append("<br/>");
             sb.append("<b>Config Dir: </b>").append(JMXUtil.getServerConfigDir(jmxModel)).append("<br/>");
@@ -186,6 +209,29 @@ public class GlassFishOverview implements ViewPlugin<Application> {
 
             String version = domainRoot.getJ2EEDomain().getJ2EEServerMap().get(serverName).getserverVersion();
             sb.append("<b>Installed Version: </b>").append(version).append("<br/>");
+            ModuleMonitoringLevelsConfig monitoringConfig = AMXUtil.getMonitoringConfig(jmxModel);
+            if (monitoringConfig != null) {
+                sb.append("<hr/>");
+                sb.append("<h2>Monitoring Configuration</h2>");
+                sb.append("<table>");
+                for(Map.Entry<String, String> entry : monitoringConfig.getAllLevels().entrySet()) {
+                    String color;
+                    if (entry.getValue().toUpperCase().equals("OFF")) {
+                        color = "red";
+                    } else if (entry.getValue().toUpperCase().equals("LOW")) {
+                        color = "yellow";
+                    } else {
+                        color = "green";
+                    }
+                    sb.append("<tr>");
+                    sb.append("<td>").append(entry.getKey()).append("</td>");
+                    sb.append("<td style=\"color: ").append(color).append("\">");
+                    sb.append("<a href=\"").append(entry.getKey()).append("#").append(entry.getValue()).append("\" alt=\"Click to cycle\">");
+                    sb.append(entry.getValue()).append("</a></td>");
+                    sb.append("</tr>");
+                }
+                sb.append("</table>");
+            }
             return sb.toString();
         }
 
@@ -208,6 +254,42 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             ConfigConfig config = domainRoot.getDomainConfig().getConfigConfigMap().get(configName);
 
             return config.getSystemPropertyValue(pn);
+        }
+        
+        private static String cycleLevel(String level) {
+            if (level.toUpperCase().equals("OFF")) {
+                return "LOW";
+            } else if (level.toUpperCase().equals("LOW")) {
+                return "HIGH";
+            } else {
+                return "OFF";
+            }
+        }
+        
+        private static void setMonitoringLevel(ModuleMonitoringLevelsConfig config, String service, String level) {
+            if (service.toUpperCase().equals("HTTPSERVICE")) {
+                config.setHTTPService(level);
+            } else if (service.toUpperCase().equals("CONNECTORSERVICE")) {
+                config.setConnectorService(level);
+            } else if (service.toUpperCase().equals("JDBCCONNECTIONPOOL")) {
+                config.setJDBCConnectionPool(level);
+            } else if (service.toUpperCase().equals("THREADPOOL")) {
+                config.setThreadPool(level);
+            } else if (service.toUpperCase().equals("ORB")) {
+                config.setORB(level);
+            } else if (service.toUpperCase().equals("CONNECTORCONNECTIONPOOL")) {
+                config.setConnectorConnectionPool(level);
+            } else if (service.toUpperCase().equals("JVM")) {
+                config.setJVM(level);
+            } else if (service.toUpperCase().equals("TRANSACTIONSERVICE")) {
+                config.setTransactionService(level);
+            } else if (service.toUpperCase().equals("WEBCONTAINER")) {
+                config.setWebContainer(level);
+            } else if (service.toUpperCase().equals("JMSSERVICE")) {
+                config.setJMSService(level);
+            } else if (service.toUpperCase().equals("EJBCONTAINER")) {
+                config.setEJBContainer(level);
+            }
         }
     }
 

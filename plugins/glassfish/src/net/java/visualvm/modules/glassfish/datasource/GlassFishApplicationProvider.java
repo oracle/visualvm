@@ -25,6 +25,7 @@
 package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.DomainRoot;
+import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.config.WebModuleConfig;
 import com.sun.appserv.management.j2ee.J2EETypes;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
@@ -64,7 +65,13 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
     private final Map<GlassFishModel, ScheduledTask> taskMap = new HashMap<GlassFishModel, ScheduledTask>();
 
     private static class LazyLoadingSource extends GlassFishDataSource {
-
+        private String message;
+        private GlassFishModel parent;
+        public LazyLoadingSource(String message, GlassFishModel parent) {
+            this.message = message;
+            this.parent = parent;
+        }
+        
         @Override
         public DataSourceDescriptor getDescriptor() {
             return new DataSourceDescriptor(this) {
@@ -76,9 +83,35 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
 
                 @Override
                 public String getName() {
-                    return "Please Wait ...";
+                    return message;
                 }
             };
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final LazyLoadingSource other = (LazyLoadingSource) obj;
+            if (this.message != other.message && (this.message == null || !this.message.equals(other.message))) {
+                return false;
+            }
+            if (this.parent != other.parent && (this.parent == null || !this.parent.equals(other.parent))) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 19 * hash + (this.message != null ? this.message.hashCode() : 0);
+            hash = 19 * hash + (this.parent != null ? this.parent.hashCode() : 0);
+            return hash;
         }
     }
 
@@ -144,20 +177,23 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
                     currentApps.add(webModule);
                 }
 
-                Set<GlassFishApplication> toRemoveApps = new HashSet<GlassFishApplication>(model.getRepository().getDataSources());
-                Set<GlassFishApplication> toAdd = new HashSet<GlassFishApplication>(currentApps);
+                Set<GlassFishDataSource> toRemoveApps = new HashSet<GlassFishDataSource>(model.getRepository().getDataSources());
+                Set<GlassFishDataSource> toAdd = new HashSet<GlassFishDataSource>(currentApps);
                 toRemoveApps.removeAll(currentApps);
                 toAdd.removeAll(model.getRepository().getDataSources());
 
                 Set<LazyLoadingSource> lazy = model.getRepository().getDataSources(LazyLoadingSource.class);
-                if (toAdd.size() == 0 && lazy.size() > 0) {
-                    return;
-                }
-                unregisterDataSources(lazy);
                 Set<GlassFishDataSource> toRemove = new HashSet<GlassFishDataSource>(toRemoveApps);
                 toRemove.addAll(lazy);
 
-                unregisterDataSources(toRemoveApps);
+                if (currentApps.size() == 0) {
+                    LazyLoadingSource unavailable = new LazyLoadingSource("Unavailable", model);
+                    toAdd.add(unavailable);
+                    toRemove.remove(unavailable);
+                }
+                toAdd.removeAll(lazy);
+
+                unregisterDataSources(toRemove);
                 registerDataSources(toAdd);
                 model.getRepository().updateDataSources(toAdd, toRemove);
             } finally {
@@ -177,7 +213,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
 
     private void addModels(Set<GlassFishModel> models) {
         for (GlassFishModel model : models) {
-            GlassFishDataSource lazyDS = new LazyLoadingSource();
+            GlassFishDataSource lazyDS = new LazyLoadingSource("Please wait", model);
             model.getRepository().addDataSource(lazyDS);
             ScheduledTask task = Scheduler.sharedInstance().schedule(new DiscoveryTask(model), Quantum.SUSPENDED);
             taskMap.put(model, task);

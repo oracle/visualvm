@@ -28,8 +28,13 @@ package net.java.visualvm.modules.glassfish.jmx;
 import com.sun.appserv.management.DomainRoot;
 import com.sun.appserv.management.base.SystemInfo;
 import com.sun.appserv.management.client.ProxyFactory;
+import com.sun.appserv.management.config.ConfigConfig;
+import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.monitor.MonitoringRoot;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.management.MBeanServerConnection;
 
 /**
@@ -37,14 +42,12 @@ import javax.management.MBeanServerConnection;
  * @author Jaroslav Bachorik
  */
 public class AMXUtil {
-    private static ProxyFactory amxProxyFactory = null;
-    private static DomainRoot domainRoot = null;
-    private static MonitoringRoot monitoringRoot = null;
-
+    private static final Map<MBeanServerConnection, WeakReference<ProxyFactory>> proxyMap = new WeakHashMap<MBeanServerConnection, WeakReference<ProxyFactory>>();
+    
     public static MonitoringRoot getMonitoringRoot(MBeanServerConnection connection) throws Exception {
         DomainRoot dr = getDomainRoot(connection);
         if (dr == null) return null;
-        return monitoringRoot ==  null ? dr.getMonitoringRoot() : monitoringRoot;
+        return dr.getMonitoringRoot();
     }
 
     public static DomainRoot getDomainRoot(JmxModel model) {
@@ -57,15 +60,29 @@ public class AMXUtil {
     
     public static DomainRoot getDomainRoot(MBeanServerConnection connection) throws Exception {
         try {
-            return domainRoot == null ? getAMXProxyFactory(connection).getDomainRoot() : domainRoot;
+            DomainRoot domainRoot = getAMXProxyFactory(connection).getDomainRoot();
+            domainRoot.waitAMXReady();
+            return domainRoot;
         } catch (Exception e) {
             return null;
         }
     }
     
+    public static ModuleMonitoringLevelsConfig getMonitoringConfig(JmxModel jmxModel) {
+        ConfigConfig cc = getDomainRoot(jmxModel).getDomainConfig().getConfigConfigMap().get(JMXUtil.getServerConfig(jmxModel));
+        return cc.getMonitoringServiceConfig().getModuleMonitoringLevelsConfig();
+    }
+    
     public static ProxyFactory getAMXProxyFactory(MBeanServerConnection connection) throws Exception {
-        return amxProxyFactory == null ? 
-        ProxyFactory.getInstance(connection) : amxProxyFactory;
+        WeakReference<ProxyFactory> pfref = proxyMap.get(connection);
+        ProxyFactory pf = null;
+        if (pfref == null || pfref.get() == null) {
+            pf = ProxyFactory.getInstance(connection);
+            proxyMap.put(connection, new WeakReference<ProxyFactory>(pf));
+        } else {
+            pf = pfref.get();
+        }
+        return pf;
     }
        
     public static boolean isEE(DomainRoot dr) {
