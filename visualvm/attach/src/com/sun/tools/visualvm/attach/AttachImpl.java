@@ -51,7 +51,7 @@ public class AttachImpl extends Attach {
     
     public synchronized Properties getSystemProperties() {
         try {
-            return vm.getSystemProperties();
+            return getVirtualMachine().getSystemProperties();
         } catch (IOException ex) {
             ErrorManager.getDefault().notify(ErrorManager.USER,ex);
         }
@@ -60,7 +60,7 @@ public class AttachImpl extends Attach {
     
     public synchronized boolean takeHeapDump(String fileName) {
         try {
-            InputStream in = vm.dumpHeap(fileName,LIVE_OBJECTS_OPTION);
+            InputStream in = getVirtualMachine().dumpHeap(fileName,LIVE_OBJECTS_OPTION);
             String out = readToEOF(in);
             if (out.length()>0) {
                 ErrorManager.getDefault().log(ErrorManager.USER,out);
@@ -74,7 +74,7 @@ public class AttachImpl extends Attach {
     
     public synchronized String takeThreadDump() {
         try {
-            InputStream in = vm.remoteDataDump("-l");
+            InputStream in = getVirtualMachine().remoteDataDump("-l");
             return readToEOF(in);
         } catch (IOException ex) {
             ErrorManager.getDefault().notify(ErrorManager.USER,ex);
@@ -84,7 +84,7 @@ public class AttachImpl extends Attach {
     
     public synchronized String printFlag(String name) {
         try {
-            InputStream in = vm.printFlag(name);
+            InputStream in = getVirtualMachine().printFlag(name);
             return readToEOF(in);
         } catch (IOException ex) {
             ErrorManager.getDefault().notify(ErrorManager.USER,ex);
@@ -94,7 +94,7 @@ public class AttachImpl extends Attach {
     
     public synchronized void setFlag(String name, String value) {
         try {
-            InputStream in = vm.setFlag(name,value);
+            InputStream in = getVirtualMachine().setFlag(name,value);
             String out = readToEOF(in);
             if (out.length()>0) {
                 ErrorManager.getDefault().log(ErrorManager.USER,out);                
@@ -104,12 +104,12 @@ public class AttachImpl extends Attach {
         }
     }
     
-    private HotSpotVirtualMachine getVirtualMachine() {
+    private HotSpotVirtualMachine getVirtualMachine() throws IOException {
         if (vm == null) {
             try {
                 vm = (HotSpotVirtualMachine) VirtualMachine.attach(pid);
             } catch (Exception x) {
-                ErrorManager.getDefault().notify(ErrorManager.WARNING,x);
+                throw new IOException(x.getLocalizedMessage(),x);
             }
         }
         return vm;
