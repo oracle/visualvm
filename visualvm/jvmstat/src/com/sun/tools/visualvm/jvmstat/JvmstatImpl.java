@@ -25,13 +25,11 @@
 
 package com.sun.tools.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.jvm.MonitoredData;
-import com.sun.tools.visualvm.jvm.MonitoredDataListener;
-import com.sun.tools.visualvm.jvm.DefaultJVM;
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplication;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
+import org.openide.ErrorManager;
 import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
@@ -57,38 +55,24 @@ import sun.management.counter.Variability;
  *
  * @author Tomas Hurka
  */
-public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataFinishedListener<Application> {
-    JvmstatApplication application;
+public class JvmstatImpl extends Jvmstat implements VmListener, DataFinishedListener<Application> {
+    Application application;
     Boolean isDumpOnOOMEnabled;
     MonitoredVm monitoredVm;
-    Set<MonitoredDataListener> listeners;
-    LongMonitor loadedClasses;
-    LongMonitor sharedLoadedClasses;
-    LongMonitor sharedUnloadedClasses;
-    LongMonitor unloadedClasses;
-    LongMonitor threadsDaemon;
-    LongMonitor threadsLive;
-    LongMonitor threadsLivePeak;
-    LongMonitor threadsStarted;
-    LongMonitor applicationTime;
-    LongMonitor upTime;
+    Set<JvmstatListener> listeners;
     long osFrequency;
     List<LongMonitor> genCapacity;
     List<LongMonitor> genUsed;
     long[] genMaxCapacity;
     private Map<String,String> valueCache;
-    
-    JvmstatJVM(JvmstatApplication app,MonitoredVm vm) {
+
+    JvmstatImpl(Application app,MonitoredVm vm) {
         application = app;
         monitoredVm = vm;
         valueCache = new HashMap();
         listeners = new HashSet();
     }
-    
-    public boolean is14() {
-        return true;
-    }
-    
+        
     public boolean isAttachable() {
         try {
             return MonitoredVmUtil.isAttachable(monitoredVm);
@@ -98,27 +82,11 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         return false;
     }
     
-    public boolean isBasicInfoSupported() {
-        return true;
-    }
-    
-    public String getCommandLine() {
-        return findByName("sun.rt.javaCommand");
-    }
-    
-    public String getJvmArgs() {
-        return findByName("java.rt.vmArgs");
-    }
-    
-    public String getJvmFlags() {
-        return findByName("java.rt.vmFlags");
-    }
-    
     public String getMainArgs() {
         try {
             return MonitoredVmUtil.mainArgs(monitoredVm);
         } catch (MonitorException ex) {
-            ex.printStackTrace();
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
         }
         return null;
     }
@@ -128,7 +96,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         try {
             mainClassName = MonitoredVmUtil.mainClass(monitoredVm,true);
         } catch (MonitorException ex) {
-            ex.printStackTrace();
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
             return null;
         }
         if (application.getHost().equals(Host.LOCALHOST)) {
@@ -139,7 +107,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
                     mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                     assert mainClassName!=null;
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
                 }
             }
         }
@@ -153,42 +121,8 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
         return mainClassName;
     }
-    
-    public String getVmVersion() {
-        return findByName("java.property.java.vm.version");
-    }
-    
-    long getOsFrequency() {
-        return osFrequency;
-    }
-    
-    abstract String getPermGenPrefix();
-    
-    public String getJavaHome() {
-        return findByName("java.property.java.home");
-    }
-    
-    public String getVMInfo() {
-        return findByName("java.property.java.vm.info");
-    }
-    
-    public String getVMName() {
-        return findByName("java.property.java.vm.name");
-    }
-    
-    public boolean isDumpOnOOMEnabled() {
-        if (isDumpOnOOMEnabled == null) {
-            String args = getJvmFlags().concat(getJvmArgs());
-            if (args.contains("-XX:+HeapDumpOnOutOfMemoryError")) {
-                isDumpOnOOMEnabled = Boolean.TRUE;
-            } else {
-                isDumpOnOOMEnabled = Boolean.FALSE;
-            }
-        }
-        return isDumpOnOOMEnabled.booleanValue();
-    }
-    
-    public void addMonitoredDataListener(MonitoredDataListener l) {
+        
+    public void addJvmstatListener(JvmstatListener l) {
         synchronized (listeners) {
             if (listeners.isEmpty()) {
                 initListeners();
@@ -197,7 +131,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
         }
     }
     
-    public void removeMonitoredDataListener(MonitoredDataListener l) {
+    public void removeJvmstatListener(JvmstatListener l) {
         synchronized (listeners) {
             if (!listeners.isEmpty()) {
                 listeners.remove(l);
@@ -222,7 +156,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
             }
             return value;
         } catch (MonitorException ex) {
-            ex.printStackTrace();
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
         }
         return null;
     }
@@ -236,90 +170,27 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
             }
             return monitorStrList;
         } catch (MonitorException ex) {
-            ex.printStackTrace();
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
         }
         return null;
     }
     
-    abstract void initListeners();
+    void initListeners() {
+        try {
+            monitoredVm.addVmListener(this);
+        } catch (MonitorException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
+        }
+    }
     
     void disableListeners() {
         try {
             monitoredVm.removeVmListener(this);
         } catch (MonitorException ex) {
-            ex.printStackTrace();
+             ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
         }
     }
-    
-    long[] getGenerationSum(List<LongMonitor> counters) {
-        long[] results=new long[2];
-        String prefix = getPermGenPrefix();
         
-        for (LongMonitor counter : counters) {
-            if (counter != null) {
-                long val = counter.longValue();
-                if (counter.getName().startsWith(prefix)) {
-                    results[1]+= val;
-                } else {
-                    results[0]+= val;
-                }
-            }
-        }
-        return results;
-    }
-    
-    LongMonitor getLoadedClasses() {
-        return loadedClasses;
-    }
-    
-    LongMonitor getSharedLoadedClasses() {
-        return sharedLoadedClasses;
-    }
-    
-    LongMonitor getSharedUnloadedClasses() {
-        return sharedUnloadedClasses;
-    }
-    
-    LongMonitor getUnloadedClasses() {
-        return unloadedClasses;
-    }
-    
-    LongMonitor getThreadsDaemon() {
-        return threadsDaemon;
-    }
-    
-    LongMonitor getThreadsLive() {
-        return threadsLive;
-    }
-    
-    LongMonitor getThreadsLivePeak() {
-        return threadsLivePeak;
-    }
-    
-    LongMonitor getThreadsStarted() {
-        return threadsStarted;
-    }
-    
-    LongMonitor getApplicationTime() {
-        return applicationTime;
-    }
-    
-    LongMonitor getUpTime() {
-        return upTime;
-    }
-    
-    List<LongMonitor> getGenCapacity() {
-        return genCapacity;
-    }
-    
-    List<LongMonitor> getGenUsed() {
-        return genUsed;
-    }
-    
-    long[] getGenMaxCapacity() {
-        return genMaxCapacity;
-    }
-    
     /**
      * Invoked when instrumentation objects are inserted into or removed
      * from the MonitoredVm.
@@ -339,13 +210,12 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
      */
     public void monitorsUpdated(VmEvent event) {
         assert event.getMonitoredVm().equals(monitoredVm);
-        MonitoredData data = new MonitoredData(this);
-        List<MonitoredDataListener> listenersCopy;
+        List<JvmstatListener> listenersCopy;
         synchronized  (listeners) {
             listenersCopy = new ArrayList(listeners);
         }
-        for (MonitoredDataListener listener : listenersCopy) {
-            listener.monitoredDataEvent(data);
+        for (JvmstatListener listener : listenersCopy) {
+            listener.dataChanged(this);
         }
     }
     
@@ -356,9 +226,7 @@ public abstract class JvmstatJVM extends DefaultJVM implements VmListener, DataF
      * @param event the object describing the event.
      */
     public void disconnected(VmEvent event) {
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Disconnect "+event.getMonitoredVm().getVmIdentifier());
-        }
+        ErrorManager.getDefault().log("Disconnect "+event.getMonitoredVm().getVmIdentifier());
         disableListeners();
     }
     
