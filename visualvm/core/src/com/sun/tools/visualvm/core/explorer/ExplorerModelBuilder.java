@@ -262,17 +262,19 @@ class ExplorerModelBuilder {
         // Save selection
         DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
         
-        // Setup map of indexes
+        // Cache indexes and childs
         for (ExplorerNode node : removed) {
             ExplorerNode nodeParent = (ExplorerNode)node.getParent();
-            pairs.put(nodeParent, new ArrayList());
+            List<IndexNodePair> list = pairs.get(nodeParent);
+            if (list == null) {
+                list = new ArrayList();
+                pairs.put(nodeParent, list);
+            }
+            list.add(new IndexNodePair(nodeParent.getIndex(node), node));
         }
-
-        // Remove nodes and cache indexes and childs
+        
+        // Remove nodes
         for (ExplorerNode node : removed) {
-            ExplorerNode nodeParent = (ExplorerNode)node.getParent();
-            int index = nodeParent.getIndex(node);
-            pairs.get(nodeParent).add(new IndexNodePair(index, node));
             node.removeFromParent();
             nodes.remove(node.getUserObject());
         }
