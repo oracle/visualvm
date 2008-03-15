@@ -271,7 +271,7 @@ public class JVMImpl extends JVM {
         }
         Attach attach = getAttach();
         if (attach!=null) {
-            attach.setFlag(HEAP_DUMP_ON_OOME,enabled?"true":"false");
+            attach.setFlag(HEAP_DUMP_ON_OOME,enabled?"1":"0");
             if (enabled) {
                 attach.setFlag("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
             }
