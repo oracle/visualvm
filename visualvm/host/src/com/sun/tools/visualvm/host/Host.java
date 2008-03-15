@@ -98,7 +98,7 @@ public abstract class Host extends DataSource implements Stateful {
         InetAddress address = getInetAddress();
         if (this == LOCALHOST) return address.hashCode();
         if (address.isAnyLocalAddress()) return LOCALHOST.hashCode();
-        else return getInetAddress().hashCode();
+        else return address.hashCode();
     }
 
     public boolean equals(Object obj) {

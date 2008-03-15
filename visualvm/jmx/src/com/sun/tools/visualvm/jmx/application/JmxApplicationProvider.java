@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
@@ -235,8 +236,8 @@ class JmxApplicationProvider {
     
     protected <Y extends JmxApplication> void unregisterDataSources(final Set<Y> removed) {
         for (JmxApplication app : removed) {
-            if (app.getOwner() != null) app.getOwner().getRepository().removeDataSource(app);
-            app.finished();
+            DataSource owner = app.getOwner();
+            if (owner != null) owner.getRepository().removeDataSource(app);
         }
     }
     
