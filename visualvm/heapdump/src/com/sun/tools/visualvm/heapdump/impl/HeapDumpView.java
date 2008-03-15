@@ -53,7 +53,7 @@ import org.openide.util.Utilities;
  */
 class HeapDumpView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/heapdump.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/heapdump/resources/heapdump.png";
 
     private DataViewComponent view;
     

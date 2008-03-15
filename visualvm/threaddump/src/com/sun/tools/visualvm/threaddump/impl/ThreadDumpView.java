@@ -53,7 +53,7 @@ import org.openide.util.Utilities;
  */
 class ThreadDumpView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/threaddump.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/threaddump/resources/threaddump.png";
 
     private DataViewComponent view;
     
