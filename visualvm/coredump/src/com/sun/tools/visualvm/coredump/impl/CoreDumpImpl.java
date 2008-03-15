@@ -25,7 +25,9 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.io.File;
@@ -47,7 +49,7 @@ class CoreDumpImpl extends CoreDump {
     }
     
     public boolean supportsDelete() {
-        return CoreDumpSupport.getStorageDirectory().equals(getFile().getParentFile());
+        return false;
     }
     
     
@@ -56,7 +58,15 @@ class CoreDumpImpl extends CoreDump {
     }
 
     public boolean supportsUserRemove() {
-        return !supportsDelete();
+        return true;
+    }
+    
+    
+    protected void remove(DataSource removeRoot) {
+        File file = getFile();
+        if (CoreDumpSupport.getStorageDirectory().equals(file.getParentFile())) Utils.delete(file, true);
+        setFile(null);
+        getStorage().deleteCustomPropertiesStorage();
     }
     
 }

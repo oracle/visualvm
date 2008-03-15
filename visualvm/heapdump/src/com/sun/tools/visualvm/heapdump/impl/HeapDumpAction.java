@@ -60,10 +60,10 @@ public final class HeapDumpAction extends AbstractAction {
                 if (isAvailable(dataSource)) {
                     if (dataSource instanceof Application) {
                         Application application = (Application)dataSource;
-                        HeapDumpSupport.getInstance().getHeapDumpProvider().createHeapDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                        HeapDumpSupport.getInstance().takeHeapDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                     } else if (dataSource instanceof CoreDump) {
                         CoreDump coreDump = (CoreDump)dataSource;
-                        HeapDumpSupport.getInstance().getHeapDumpProvider().createHeapDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                        HeapDumpSupport.getInstance().takeHeapDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                     }
                 } else {
                     NetBeansProfiler.getDefaultNB().displayError("Cannot take heap dump for " + DataSourceDescriptorFactory.getDescriptor(dataSource).getName());

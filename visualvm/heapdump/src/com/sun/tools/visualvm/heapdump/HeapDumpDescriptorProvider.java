@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
@@ -51,7 +50,7 @@ class HeapDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescrip
     
     private static class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
         
-        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/heapdump.png", true);
+        private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/heapdump/resources/heapdump.png", true);
         
         public HeapDumpDescriptor(HeapDump heapDump) {
             super(heapDump, ICON);

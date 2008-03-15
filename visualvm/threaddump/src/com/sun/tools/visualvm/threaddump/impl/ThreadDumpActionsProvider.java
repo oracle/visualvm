@@ -40,8 +40,6 @@ public class ThreadDumpActionsProvider {
     
     public void initialize() {
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ThreadDumpActionProvider(), DataSource.class);
-//        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationNodeActionProvider(), Application.class);
-//        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpNodeActionProvider(), CoreDump.class);
     }
     
     
@@ -59,36 +57,5 @@ public class ThreadDumpActionsProvider {
         }
         
     }
-    
-    
-//    private class ApplicationNodeActionProvider implements ExplorerActionsProvider<Application> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
-//
-//        public Set<ExplorerActionDescriptor> getActions(Application application) {
-//            Set<ExplorerActionDescriptor> actions = new HashSet();
-//            
-//            if (ThreadDumpAction.getInstance().isEnabled())
-//                actions.add(new ExplorerActionDescriptor(ThreadDumpAction.getInstance(), 10));
-//            
-//            return actions;
-//        }
-//        
-//    }
-//    
-//    private class CoreDumpNodeActionProvider implements ExplorerActionsProvider<CoreDump> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(CoreDump coreDump) { return null; }
-//
-//        public Set<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
-//            Set<ExplorerActionDescriptor> actions = new HashSet();
-//            
-//            if (ThreadDumpAction.getInstance().isEnabled())
-//                actions.add(new ExplorerActionDescriptor(ThreadDumpAction.getInstance(), 10));
-//            
-//            return actions;
-//        }
-//        
-//    }
 
 }

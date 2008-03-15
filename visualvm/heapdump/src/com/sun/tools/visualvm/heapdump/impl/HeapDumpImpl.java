@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.heapdump.impl;
 
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.io.File;
 
 /**
@@ -38,11 +37,6 @@ final public class HeapDumpImpl extends HeapDump {
 
     public HeapDumpImpl(File file, DataSource master) {
         super(file, master);
-    }
-    
-    public void delete() {
-        super.delete();
-        HeapDumpSupport.getInstance().getHeapDumpProvider().unregisterHeapDump(this);
     }
 
 }

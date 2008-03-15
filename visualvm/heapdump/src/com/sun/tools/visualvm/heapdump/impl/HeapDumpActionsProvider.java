@@ -40,8 +40,6 @@ public class HeapDumpActionsProvider {
     
 
     public void initialize() {
-//        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ApplicationActionProvider(), Application.class);
-//        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDump.class);
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new HeapDumpActionProvider(), DataSource.class);
     }
     
@@ -60,36 +58,5 @@ public class HeapDumpActionsProvider {
         }
         
     }
-    
-    
-//    private class ApplicationActionProvider implements ExplorerActionsProvider<Application> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(Application application) { return null; }
-//
-//        public Set<ExplorerActionDescriptor> getActions(Application application) {
-//            Set<ExplorerActionDescriptor> actions = new HashSet();
-//            
-//            JVM jvm = JVMFactory.getJVMFor(application);
-//            if (jvm.isTakeHeapDumpSupported())
-//                actions.add(new ExplorerActionDescriptor(takeApplicationHeapDumpAction, 20));
-//            
-//            return actions;
-//        }
-//        
-//    }
-//    
-//    private class CoreDumpActionProvider implements ExplorerActionsProvider<CoreDump> {
-//
-//        public ExplorerActionDescriptor getDefaultAction(CoreDump coreDump) { return null; }
-//
-//        public Set<ExplorerActionDescriptor> getActions(CoreDump coreDump) {
-//            Set<ExplorerActionDescriptor> actions = new HashSet();
-//            
-//            actions.add(new ExplorerActionDescriptor(takeCoreDumpHeapDumpAction, 20));
-//            
-//            return actions;
-//        }
-//        
-//    }
 
 }

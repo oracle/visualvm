@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.heapdump.HeapDumpPluggableView;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -61,7 +62,8 @@ class HeapDumpView extends DataSourceView {
     public HeapDumpView(HeapDump heapDump) {
         super(heapDump.getFile().getName(), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
         view = createViewComponent(heapDump);
-        HeapDumpSupport.getInstance().getHeapDumpPluggableView().makeCustomizations(view, heapDump);
+        HeapDumpPluggableView pluggableView = (HeapDumpPluggableView)HeapDumpSupport.getInstance().getHeapDumpView();
+        pluggableView.makeCustomizations(view, heapDump);
     }
         
     public DataViewComponent getView() {

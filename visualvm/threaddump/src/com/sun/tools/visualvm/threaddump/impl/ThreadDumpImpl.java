@@ -38,13 +38,5 @@ final class ThreadDumpImpl extends ThreadDump {
     ThreadDumpImpl(File file, DataSource master) {
         super(file, master);
     }
-    
-    public void delete() {
-        super.delete();
-//        ThreadDumpSupport.getInstance().getThreadDumpProvider().unregisterThreadDump(this);
-        // NOTE: instance should be also unregistered from the provider but this won't
-        // be neccessary once DataSourceRepository will track DataSources automatically
-        getOwner().getRepository().removeDataSource(this);
-    }
 
 }

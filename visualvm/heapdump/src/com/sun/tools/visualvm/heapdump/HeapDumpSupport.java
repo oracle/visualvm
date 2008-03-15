@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.coredump.CoreDump;
 
 /**
  * A public entrypoint to the heap dump support in VisualVM.
@@ -79,24 +80,24 @@ public final class HeapDumpSupport {
         heapDumpProvider.createHeapDump(application, openView);
     }
     
-    // TODO: publish takeHeapDump for CoreDump??
+    /**
+     * Takes heap dump from CoreDump.
+     * 
+     * @param coreDump CoreDump to take the heap dump,
+     * @param openView true if taken heap dump should be opened, false otherwise.
+     */
+    public void takeHeapDump(CoreDump coreDump, boolean openView) {
+        heapDumpProvider.createHeapDump(coreDump, openView);
+    }
+    
     
     /**
      * Returns PluggableView instance to be used to customize the heap dump view.
      * 
      * @return PluggableView instance to be used to customize the heap dump view.
      */
-    public PluggableViewSupport getPluggableView() {
+    public PluggableViewSupport getHeapDumpView() {
         return heapDumpPluggableView;
-    }
-    
-    public HeapDumpPluggableView getHeapDumpPluggableView() {
-        return heapDumpPluggableView;
-    }
-
-
-    public HeapDumpProvider getHeapDumpProvider() {
-        return heapDumpProvider;
     }
 
 

@@ -116,11 +116,15 @@ public abstract class Snapshot extends DataSource {
     
     public void delete() {
         getOwner().getRepository().removeDataSource(this);
+    }
+    
+    
+    protected void remove(DataSource removeRoot) {
         File f = getFile();
         if (f != null) Utils.delete(f, true);
         setFile(null);
+        super.remove(removeRoot);
     }
-            
     
     protected Storage createStorage() {
         File f = getFile();

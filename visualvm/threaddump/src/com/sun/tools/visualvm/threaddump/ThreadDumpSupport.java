@@ -97,11 +97,6 @@ public final class ThreadDumpSupport {
     }
 
 
-    ThreadDumpProvider getThreadDumpProvider() {
-        return threadDumpProvider;
-    }
-
-
     private ThreadDumpSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorProvider());
         threadDumpProvider = new ThreadDumpProvider();
