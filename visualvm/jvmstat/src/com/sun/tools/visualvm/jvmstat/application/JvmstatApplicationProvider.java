@@ -75,13 +75,22 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     public void dataChanged(DataChangeEvent<Host> event) {
         Set<Host> newHosts = event.getAdded();
-        for (Host host : newHosts) processNewHost(host);
+        for (final Host host : newHosts) {
+            // run new host in request processor, since it will take
+            // a long time that there is no jstatd running on new host
+            // we do not want to block DataSource.EVENT_QUEUE for long time
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    processNewHost(host);
+                }
+            });
+        }
     }
     
     //    TODO: check that applications are not removed twice from the host, unregister MonitoredHostListener!!!
     
-    private boolean processNewHost(final Host host) {
-        if (host == Host.UNKNOWN_HOST) return true;
+    private void processNewHost(final Host host) {
+        if (host == Host.UNKNOWN_HOST) return;
             
         // Flag for determining first MonitoredHost event
         final boolean firstEvent[] = new boolean[] { true };
@@ -96,7 +105,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         
         if (monitoredHost == null) { // monitored host not available reshedule
             rescheduleProcessNewHost(host);
-            return false;
+            return;
         }
         monitoredHost.setInterval(GlobalPreferences.sharedInstance().getMonitoredHostPoll() * 1000);
         if (host == Host.LOCALHOST) checkForBrokenJps(monitoredHost);
@@ -126,9 +135,9 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             mapping.put(host, hostListener);
         } catch (MonitorException e) {
             ErrorManager.getDefault().notify(ErrorManager.USER,e);
-            return false;
+            rescheduleProcessNewHost(host);
+            return;
         }
-        return true;
     }
     
     private void processFinishedHost(Host host) {
@@ -158,10 +167,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     private void processTerminatedApplicationsByIds(Host host, Set<Integer> applicationIds) {
         Set<JvmstatApplication> finishedApplications = new HashSet();
         
-        for (int applicationId : applicationIds) {
-            // Do not remove instance for Application.CURRENT_APPLICATION
-            if (Application.CURRENT_APPLICATION.getPid() == applicationId) continue;
-            
+        for (int applicationId : applicationIds) {            
             if (applications.containsKey(applicationId)) {
                 JvmstatApplication application = applications.get(applicationId);
                 applications.remove(applicationId);
@@ -242,9 +248,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         int interval = GlobalPreferences.sharedInstance().getMonitoredHostPoll();
         Timer timer = new Timer(interval*1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // do not block EQ - use request processor, processNewHost() can take a long time
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
-                        if (host.isVisible()) processNewHost(host);
+                        if (!host.isRemoved()) processNewHost(host);
                     }
                 });
             }
