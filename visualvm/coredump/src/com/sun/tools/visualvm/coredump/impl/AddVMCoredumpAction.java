@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -41,7 +40,7 @@ public final class AddVMCoredumpAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         CoreDumpConfigurator newCoreDumpConfiguration = CoreDumpConfigurator.defineCoreDump();
         if (newCoreDumpConfiguration != null) {
-            CoreDumpSupport.getProvider().createCoreDump(newCoreDumpConfiguration.getCoreDumpFile(),
+            CoreDumpProvider.createCoreDump(newCoreDumpConfiguration.getCoreDumpFile(),
                     newCoreDumpConfiguration.getDisplayname(), newCoreDumpConfiguration.getJavaHome(),
                     newCoreDumpConfiguration.deleteSourceFile());
         }

@@ -30,7 +30,6 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
-import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -44,9 +43,6 @@ public class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSource
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (CoreDumpsContainer.sharedInstance().equals(ds)) {
-            return new CoreDumpsContainerDescriptor();
-        }
         if (ds instanceof CoreDump) {
             return new CoreDumpDescriptor((CoreDump) ds);
         }
@@ -59,15 +55,6 @@ public class CoreDumpDescriptorProvider extends AbstractModelProvider<DataSource
         
         CoreDumpDescriptor(CoreDump coreDump) {
             super(coreDump, ICON);
-        }
-        
-    }
-
-    private static class CoreDumpsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredumps.png", true);
-        
-        CoreDumpsContainerDescriptor() {
-            super(CoreDumpsContainer.sharedInstance(), "VM Coredumps", null, NODE_ICON, 20, EXPAND_ON_EACH_NEW_CHILD);
         }
         
     }

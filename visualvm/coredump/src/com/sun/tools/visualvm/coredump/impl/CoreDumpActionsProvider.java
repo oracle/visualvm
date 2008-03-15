@@ -30,13 +30,10 @@ import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -44,29 +41,13 @@ import javax.swing.AbstractAction;
  */
 public class CoreDumpActionsProvider {
     
-    private static final RemoveCoreDumpAction removeCoreDumpAction = new RemoveCoreDumpAction();
-    
     
     public static void register() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
-        explorer.addExplorerActionsProvider(new CoreDumpActionProvider(), CoreDumpImpl.class);
         explorer.addExplorerActionsProvider(new CoreDumpsContainerActionProvider(), CoreDumpsContainer.class);
         explorer.addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
     
-    
-    private static class RemoveCoreDumpAction extends AbstractAction {
-        
-        public RemoveCoreDumpAction() {
-            super("Remove");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            CoreDumpImpl coreDump = (CoreDumpImpl)e.getSource();
-            coreDump.remove();
-        }
-        
-    }
     
     private static abstract class AbstractCoreDumpActionProvider<T extends DataSource> implements ExplorerActionsProvider<T> {
         
@@ -78,19 +59,6 @@ public class CoreDumpActionsProvider {
             return Collections.EMPTY_SET;
         }
         
-    }
-    
-    private static class CoreDumpActionProvider extends AbstractCoreDumpActionProvider<CoreDumpImpl> {
-        
-        public Set<ExplorerActionDescriptor> getActions(CoreDumpImpl coreDump) {
-            Set<ExplorerActionDescriptor> actions = new HashSet();
-            
-            actions.add(new ExplorerActionDescriptor(null, 30));
-            if (!CoreDumpSupport.getStorageDirectory().equals(coreDump.getFile().getParentFile()))
-                actions.add(new ExplorerActionDescriptor(removeCoreDumpAction, 100)); // TODO: should be implemented in CoreDumpImplActionProvider registered for CoreDumpImpl.class
-            
-            return actions;
-        }
     }
     
     private static class CoreDumpsContainerActionProvider extends AbstractCoreDumpActionProvider<CoreDumpsContainer> {

@@ -46,20 +46,11 @@ public final class CoreDumpSupport {
     private static String coredumpsStorageDirectoryString;
     
     private static CoreDumpCategory category = new CoreDumpCategory();
-    private static CoreDumpProvider provider;
     private static String currentJDKHome;
     
     
     public static SnapshotCategory getCategory() {
         return category;
-    }
-    
-    static CoreDumpCategory getCoreDumpCategory() {
-        return category;
-    }
-    
-    public static CoreDumpProvider getProvider() {
-        return provider;
     }
     
     // TODO: should be moved to some public Utils class
@@ -99,7 +90,7 @@ public final class CoreDumpSupport {
     
     public static void register() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
-        CoreDumpsContainerProvider.register();
+        CoreDumpsContainer.sharedInstance();
         CoreDumpActionsProvider.register();
         CoreDumpProvider.register();
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);

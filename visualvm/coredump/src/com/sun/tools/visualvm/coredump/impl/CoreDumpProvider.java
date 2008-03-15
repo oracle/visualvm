@@ -60,7 +60,7 @@ public class CoreDumpProvider {
     private static final String PROPERTY_JAVA_HOME = "prop_java_home";
     
     
-    void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome, final boolean deleteCoreDump) {
+    static void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome, final boolean deleteCoreDump) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 createCoreDumpImpl(coreDumpFile, displayName, jdkHome, deleteCoreDump);
@@ -68,7 +68,7 @@ public class CoreDumpProvider {
         });
     }
     
-    private void createCoreDumpImpl(String coreDumpFile, final String displayName, String jdkHome, boolean deleteCoreDump) {
+    private static void createCoreDumpImpl(String coreDumpFile, final String displayName, String jdkHome, boolean deleteCoreDump) {
         
         // TODO: check if the same coredump isn't already imported (can happen for moved coredumps)
         
@@ -133,7 +133,7 @@ public class CoreDumpProvider {
         }
     }
     
-    private CoreDumpImpl getCoreDumpByFile(File file) {
+    private static CoreDumpImpl getCoreDumpByFile(File file) {
         if (!file.isFile()) return null;
         Set<CoreDumpImpl> knownCoredumps = DataSourceRepository.sharedInstance().getDataSources(CoreDumpImpl.class);
         for (CoreDumpImpl knownCoredump : knownCoredumps)
@@ -169,7 +169,8 @@ public class CoreDumpProvider {
             if (persistedCoredump != null) coredumps.add(persistedCoredump);
         }
         
-        CoreDumpsContainer.sharedInstance().getRepository().addDataSources(coredumps);
+        if (!coredumps.isEmpty())
+            CoreDumpsContainer.sharedInstance().getRepository().addDataSources(coredumps);
     }
     
     

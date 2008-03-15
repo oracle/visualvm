@@ -23,40 +23,36 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package com.sun.tools.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.coredump.CoreDumpSupport;
-import java.io.File;
-import java.io.IOException;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Tomas Hurka
- * @author Jiri Sedlacek
  */
-class CoreDumpImpl extends CoreDump {
+class CoreDumpContainerDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    private Storage storage;
-    
-    
-    public CoreDumpImpl(File file, File javaHomeName, Storage storage) throws IOException {
-        super(file, javaHomeName);
-        this.storage = storage;
+    public CoreDumpContainerDescriptorProvider() {
     }
     
-    public boolean supportsDelete() {
-        return CoreDumpSupport.getStorageDirectory().equals(getFile().getParentFile());
-    }
-    
-    
-    protected Storage createStorage() {
-        return storage;
+    public DataSourceDescriptor createModelFor(DataSource ds) {
+        if (CoreDumpsContainer.sharedInstance().equals(ds)) {
+            return new CoreDumpsContainerDescriptor();
+        }
+        return null;
     }
 
-    public boolean supportsUserRemove() {
-        return !supportsDelete();
+    private static class CoreDumpsContainerDescriptor extends DataSourceDescriptor {
+        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredumps.png", true);
+        
+        CoreDumpsContainerDescriptor() {
+            super(CoreDumpsContainer.sharedInstance(), "VM Coredumps", null, NODE_ICON, 20, EXPAND_ON_EACH_NEW_CHILD);
+        }
+        
     }
-    
 }

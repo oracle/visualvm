@@ -26,12 +26,13 @@
 package com.sun.tools.visualvm.coredump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class CoreDumpsContainer extends DataSource {
+public final class CoreDumpsContainer extends DataSource {
     
     private static CoreDumpsContainer sharedInstance;
     
@@ -43,6 +44,8 @@ public class CoreDumpsContainer extends DataSource {
     
     
     private CoreDumpsContainer() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpContainerDescriptorProvider());
+        DataSource.ROOT.getRepository().addDataSource(this);
     }
 
 }
