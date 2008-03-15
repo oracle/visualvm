@@ -81,7 +81,7 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
         File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
         for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
         snapshot.getRepository().addDataSources(heapDumps);
-        snapshot.notifyWhenFinished(snapshotFinishedListener);
+        snapshot.notifyWhenRemoved(snapshotFinishedListener);
     }
     
     private void processFinishedSnapshot(ApplicationSnapshot snapshot) {
@@ -115,7 +115,7 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
                             public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                         });
-                        application.notifyWhenFinished(applicationFinishedListener);
+                        application.notifyWhenRemoved(applicationFinishedListener);
                     } catch (IOException ex) {
                         ErrorManager.getDefault().notify(ex);
                     }
@@ -155,7 +155,7 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                             });
-                            coreDump.notifyWhenFinished(coredumpFinishedListener);
+                            coreDump.notifyWhenRemoved(coredumpFinishedListener);
                         }
                     } catch (Exception ex) {
                         ErrorManager.getDefault().notify(ex);
@@ -181,7 +181,10 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
     }
     
     protected <Y extends HeapDumpImpl> void unregisterDataSources(final Set<Y> removed) {
-        for (HeapDumpImpl heapDump : removed) heapDump.removed();
+        for (HeapDumpImpl heapDump : removed)
+// temporary removed
+//            heapDump.removed();
+            ;
     }
     
     public void initialize() {

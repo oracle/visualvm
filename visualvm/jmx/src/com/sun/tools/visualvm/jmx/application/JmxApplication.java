@@ -73,14 +73,13 @@ public final class JmxApplication extends Application {
         }
         return pid;
     }
-    
+
+    public boolean supportsUserRemove() {
+        return true;
+    }
     
     protected Storage createStorage() {
         return storage;
     }
-    
-    
-    void finished() {
-        setState(DataSource.STATE_FINISHED);
-    }
+
 }

@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.threaddump.impl;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
@@ -84,8 +85,12 @@ public final class ThreadDumpAction extends AbstractAction {
     // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
     private static boolean isEnabled(DataSource dataSource) {
         if (dataSource == null) return false;
-        if (dataSource.getState() != DataSource.STATE_AVAILABLE) return false;
-        if (dataSource instanceof CoreDump || dataSource instanceof Application) return true;
+        if (dataSource instanceof Application) {
+            Application app = (Application)dataSource;
+            if (app.getState() != Stateful.STATE_AVAILABLE) return false;
+            return true;
+        }
+        if (dataSource instanceof CoreDump) return true;
         return false;
     }
     

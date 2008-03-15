@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.coredump.impl;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.coredump.AbstractCoreDump;
+import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.io.IOException;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-class CoreDumpImpl extends AbstractCoreDump {
+class CoreDumpImpl extends CoreDump {
     
     private Storage storage;
     
@@ -54,23 +54,20 @@ class CoreDumpImpl extends AbstractCoreDump {
     void remove() {
         getStorage().deleteCustomPropertiesStorage();
         getOwner().getRepository().removeDataSource(this);
-        finished();
     }
     
     // deletes coredump stored in VisualVM persistent storage
     public void delete() {
         super.delete();
         getOwner().getRepository().removeDataSource(this);
-        finished();
     }
-    
     
     protected Storage createStorage() {
         return storage;
     }
-    
-    void finished() {
-        setState(STATE_FINISHED); 
+
+    public boolean supportsUserRemove() {
+        return true;
     }
     
 }

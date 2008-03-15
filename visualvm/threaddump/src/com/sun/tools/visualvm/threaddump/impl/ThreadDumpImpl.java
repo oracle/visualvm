@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.threaddump.AbstractThreadDump;
+import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.io.File;
 
@@ -33,7 +33,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-final class ThreadDumpImpl extends AbstractThreadDump {
+final class ThreadDumpImpl extends ThreadDump {
 
     ThreadDumpImpl(File file, DataSource master) {
         super(file, master);
@@ -45,10 +45,6 @@ final class ThreadDumpImpl extends AbstractThreadDump {
         // NOTE: instance should be also unregistered from the provider but this won't
         // be neccessary once DataSourceRepository will track DataSources automatically
         getOwner().getRepository().removeDataSource(this);
-    }
-
-    void removed() {
-        setState(STATE_FINISHED);
     }
 
 }

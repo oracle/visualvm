@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.heapdump.AbstractHeapDump;
+import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.io.File;
@@ -34,7 +34,7 @@ import java.io.File;
  *
  * @author Jiri Sedlacek
  */
-final public class HeapDumpImpl extends AbstractHeapDump {
+final public class HeapDumpImpl extends HeapDump {
 
     public HeapDumpImpl(File file, DataSource master) {
         super(file, master);
@@ -43,10 +43,6 @@ final public class HeapDumpImpl extends AbstractHeapDump {
     public void delete() {
         super.delete();
         HeapDumpSupport.getInstance().getHeapDumpProvider().unregisterHeapDump(this);
-    }
-
-    void removed() {
-        setState(STATE_FINISHED);
     }
 
 }

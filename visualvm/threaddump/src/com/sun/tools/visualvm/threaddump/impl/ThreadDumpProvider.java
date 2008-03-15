@@ -83,7 +83,7 @@ public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapsho
         File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
         for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
         snapshot.getRepository().addDataSources(threadDumps);
-        snapshot.notifyWhenFinished(snapshotFinishedListener);
+        snapshot.notifyWhenRemoved(snapshotFinishedListener);
     }
     
     private void processFinishedSnapshot(ApplicationSnapshot snapshot) {
@@ -117,7 +117,7 @@ public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapsho
                         if (openView) SwingUtilities.invokeLater(new Runnable() {
                             public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                         });
-                        application.notifyWhenFinished(applicationFinishedListener);
+                        application.notifyWhenRemoved(applicationFinishedListener);
                     } catch (IOException ex) {
                         ErrorManager.getDefault().notify(ex);
                     }
@@ -161,7 +161,7 @@ public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapsho
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                             });
-                            coreDump.notifyWhenFinished(coredumpFinishedListener);
+                            coreDump.notifyWhenRemoved(coredumpFinishedListener);
                         } catch (Exception ex) {
                             ErrorManager.getDefault().notify(ex);
                         }
@@ -187,7 +187,10 @@ public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapsho
     }
     
     protected <Y extends ThreadDumpImpl> void unregisterDataSources(final Set<Y> removed) {
-        for (ThreadDumpImpl threadDump : removed) threadDump.removed();
+        for (ThreadDumpImpl threadDump : removed) 
+// temporary removed
+//            threadDump.removed();
+            ;
     }
     
     public void initialize() {
