@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.host.Host;
@@ -78,7 +79,7 @@ public final class ProfileApplicationAction extends AbstractAction {
         if (application == null) return false;
         if (application.getHost() != Host.LOCALHOST) return false;
         if (Application.CURRENT_APPLICATION.equals(application)) return false;
-        if (application.getState() != DataSource.STATE_AVAILABLE) return false;
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         
         return true;
     }

@@ -27,9 +27,9 @@ package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.JVMFactory;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
@@ -131,7 +131,7 @@ class ApplicationProfilerView extends DataSourceView {
             NetBeansProfiler.getDefaultNB().addProfilingStateListener(this);
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
-            application.notifyWhenFinished(this);
+            application.notifyWhenRemoved(this);
         }
         
         
@@ -283,7 +283,7 @@ class ApplicationProfilerView extends DataSourceView {
         }
 
         private void enableControlButtons() {
-          boolean enabled = application.getState() == DataSource.STATE_AVAILABLE;
+          boolean enabled = application.getState() == Stateful.STATE_AVAILABLE;
           cpuButton.setEnabled(enabled);
           memoryButton.setEnabled(enabled);
           stopButton.setEnabled(NetBeansProfiler.getDefaultNB().getTargetAppRunner().targetAppIsRunning());
