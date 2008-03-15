@@ -143,7 +143,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
         
         public void dataRemoved(Application dataSource) {
-            threadDumpButton.setEnabled(false);
+//            threadDumpButton.setEnabled(false);
         }
         
         
