@@ -31,15 +31,24 @@ import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.management.LockInfo;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
+import java.lang.management.MonitorInfo;
 import java.lang.management.RuntimeMXBean;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,12 +64,12 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
+
     private static final int DEFAULT_REFRESH = 2000;
     private static final String PERM_GEN = "Perm Gen";
     private static final String PS_PERM_GEN = "PS Perm Gen";
     private static final String HOTSPOT_DIAGNOSTIC_MXBEAN_NAME =
             "com.sun.management:type=HotSpotDiagnostic";
-    
     private Application app;
     private JvmJmxModel jmxModel;
     private Properties systemProperties;
@@ -70,37 +79,37 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     private MemoryPoolMXBean permGenPool;
     private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
     private Object hotspotDiagnosticMXBeanLock = new Object();
-    
+
     JmxJVM(Application application, JvmJmxModel model) {
         app = application;
         jmxModel = model;
         listeners = new HashSet();
     }
-    
+
     public boolean is14() {
         return getVmVersion().startsWith("1.4.");
     }
-    
+
     public boolean is15() {
         return getVmVersion().startsWith("1.5.");
     }
-    
+
     public boolean is16() {
         return getVmVersion().startsWith("1.6.");
     }
-    
+
     public boolean is17() {
         return getVmVersion().startsWith("1.7.");
     }
-    
+
     public boolean isAttachable() {
         return false;
     }
-    
+
     public String getCommandLine() {
         return "Unknown";
     }
-    
+
     public synchronized String getJvmArgs() {
         if (jvmArgs == null) {
             StringBuilder buf = new StringBuilder();
@@ -116,35 +125,35 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         }
         return jvmArgs;
     }
-    
+
     public String getJvmFlags() {
         return null;
     }
-    
+
     public String getMainArgs() {
         return null;
     }
-    
+
     public String getMainClass() {
         return null;
     }
-    
+
     public String getVmVersion() {
         return findByName("java.vm.version");
     }
-    
+
     public String getJavaHome() {
         return findByName("java.home");
     }
-    
+
     public String getVMInfo() {
         return findByName("java.vm.info");
     }
-    
+
     public String getVMName() {
         return findByName("java.vm.name");
     }
-    
+
     public synchronized Properties getSystemProperties() {
         if (systemProperties == null) {
             Map propMap = jmxModel.getRuntimeMXBean().getSystemProperties();
@@ -153,16 +162,16 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         }
         return systemProperties;
     }
-    
+
     public void addMonitoredDataListener(MonitoredDataListener l) {
-        synchronized(listeners) {
+        synchronized (listeners) {
             if (listeners.isEmpty()) {
                 initTimer();
             }
             listeners.add(l);
         }
     }
-    
+
     public void removeMonitoredDataListener(MonitoredDataListener l) {
         synchronized (listeners) {
             listeners.remove(l);
@@ -172,7 +181,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         }
     }
 
-    HotSpotDiagnosticMXBean getHotSpotDiagnosticMXBean() {
+    private HotSpotDiagnosticMXBean getHotSpotDiagnosticMXBean() {
         synchronized (hotspotDiagnosticMXBeanLock) {
             if (hotspotDiagnosticMXBean == null) {
                 try {
@@ -209,39 +218,104 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     public File takeHeapDump() throws IOException {
         throw new UnsupportedOperationException();
     }
-    
-    public File takeThreadDump() throws IOException {
-        throw new UnsupportedOperationException();
+
+    private String runThreadDump() throws Exception {
+        ThreadMXBean threadMXBean = jmxModel.getThreadMXBean();
+        RuntimeMXBean runtimeMXBean = jmxModel.getRuntimeMXBean();
+        StringBuffer sb = new StringBuffer(1024);
+        DateFormat df = DateFormat.getDateTimeInstance();
+        sb.append(df.format(new Date()) + "\n");
+        sb.append("Full thread dump " + runtimeMXBean.getVmName() +
+                " (" + runtimeMXBean.getVmVersion() + " " +
+                getSystemProperties().getProperty("java.vm.info") + "):\n");
+        if (is15()) {
+            // dumpAllThreads new in Java SE 6
+            return "JDK 5.0 not implemented yet";
+        } else {
+            ThreadInfo[] threads = threadMXBean.dumpAllThreads(true, true);
+            for (ThreadInfo thread : threads) {
+                MonitorInfo[] monitors = thread.getLockedMonitors();
+                sb.append("\n\"" + thread.getThreadName() +
+                        "\" : t@" + thread.getThreadId() + "\n");
+                sb.append("   java.lang.Thread.State: " + thread.getThreadState());
+                if (thread.getLockName() != null) {
+                    sb.append(" on " + thread.getLockName());
+                    if (thread.getLockOwnerName() != null) {
+                        sb.append(" owned by: " + thread.getLockOwnerName());
+                    }
+                }
+                sb.append("\n");
+                int index = 0;
+                for (StackTraceElement st : thread.getStackTrace()) {
+                    sb.append("        at " + st.toString() + "\n");
+                    if (monitors != null) {
+                        for (MonitorInfo mi : monitors) {
+                            if (mi.getLockedStackDepth() == index) {
+                                sb.append("        - locked " + mi.toString() + "\n");
+                            }
+                        }
+                    }
+                    index++;
+                }
+                sb.append("\n   Locked ownable synchronizers:");
+                LockInfo[] synchronizers = thread.getLockedSynchronizers();
+                if (synchronizers != null || synchronizers.length == 0) {
+                    sb.append("\n        - None\n");
+                } else {
+                    for (LockInfo li : synchronizers) {
+                        sb.append("\n        - locked " + li.toString() + "\n");
+                    }
+                }
+            }
+            return sb.toString();
+        }
     }
-    
+
+    private String getStackTrace() {
+        try {
+            return runThreadDump();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Cannot get thread dump " + e.getLocalizedMessage(); // NOI18N
+        }
+    }
+
+    public File takeThreadDump() throws IOException {
+        String dump = getStackTrace();
+        File snapshotDir = app.getStorage().getDirectory();
+        String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
+        File dumpFile = new File(snapshotDir, name);
+        OutputStream os = new FileOutputStream(dumpFile);
+        os.write(dump.getBytes("UTF-8"));
+        os.close();
+        return dumpFile;
+    }
+
     public boolean isBasicInfoSupported() {
         return true;
     }
-    
+
     public boolean isMonitoringSupported() {
         return isClassMonitoringSupported() || isThreadMonitoringSupported() || isMemoryMonitoringSupported();
     }
-    
+
     public boolean isClassMonitoringSupported() {
         return true;
     }
-    
+
     public boolean isThreadMonitoringSupported() {
         return true;
     }
-    
+
     public boolean isMemoryMonitoringSupported() {
         return true;
     }
-    
+
     public boolean isGetSystemPropertiesSupported() {
         return true;
     }
-    
+
     public boolean isDumpOnOOMEnabledSupported() {
-        if (is14() || is15()) {
-            return false;
-        }
         if (!app.getHost().equals(Host.LOCALHOST)) {
             return false;
         }
@@ -250,22 +324,23 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         }
         return true;
     }
-   
+
     public boolean isTakeHeapDumpSupported() {
         return false;
     }
-    
+
     public boolean isTakeThreadDumpSupported() {
-        return false;
+        return jmxModel.getThreadMXBean() != null;
     }
-    
+
     private String findByName(String key) {
         Properties p = getSystemProperties();
-        if (p == null)
+        if (p == null) {
             return null;
+        }
         return p.getProperty(key);
     }
-    
+
     private void initTimer() {
         timer = new Timer(DEFAULT_REFRESH, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -279,22 +354,24 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         timer.setCoalesce(true);
         timer.start();
     }
-    
+
     private void disableTimer() {
-        if (timer != null) timer.stop();
+        if (timer != null) {
+            timer.stop();
+        }
     }
-    
+
     private void computeMonitoredData() {
         MonitoredData data = new MonitoredData(this);
         List<MonitoredDataListener> listenersCopy;
-        synchronized  (listeners) {
+        synchronized (listeners) {
             listenersCopy = new ArrayList(listeners);
         }
         for (MonitoredDataListener listener : listenersCopy) {
             listener.monitoredDataEvent(data);
         }
     }
-    
+
     JvmJmxModel getJmxModel() {
         return jmxModel;
     }
@@ -317,5 +394,4 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         }
         return permGenPool;
     }
-    
 }
