@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.ClassNameComparator;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataChangeSupport;
+import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -45,27 +46,47 @@ import java.util.TreeSet;
  */
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
     
-    private SortedSet<ModelProvider<M, D>> factories = new TreeSet(new ModelProviderComparator());
-    private Map<DataSourceKey<D>,Reference<M>> modelMap = new HashMap();
-    private DataChangeSupport<ModelProvider<M, D>> factoryChange = new DataChangeSupport();
+    // special marker for null model
+    private final Reference<M> NULL_MODEL;
+    // set of registered factories
+    private SortedSet<ModelProvider<M, D>> factories;
+    // cache
+    private Map<DataSourceKey<D>,Reference<M>> modelCache;
+    // asynchronous change support
+    private DataChangeSupport<ModelProvider<M, D>> factoryChange;
     
-    public final synchronized M getModel(D dataSource) {
+    protected ModelFactory() {
+        NULL_MODEL = new SoftReference(null);
+        factories = new TreeSet(new ModelProviderComparator());
+        modelCache = new HashMap();
+        factoryChange = new DataChangeSupport();
+        
+    }
+    
+    public synchronized final M getModel(D dataSource) {
         DataSourceKey<D> key = new DataSourceKey(dataSource);
-        Reference<M> modelRef = modelMap.get(key);
+        Reference<M> modelRef = modelCache.get(key);
         M model = null;
         
         if (modelRef != null) {
-            model = modelRef.get();
-            if (model != null) {
+            if (modelRef == NULL_MODEL) {  // cached null model, return null
+                return null;
+            }
+            model = modelRef.get(); // if model is in cache return it,
+            if (model != null) {    // otherwise get it from factories
                 return model;
             }
         }
+        // try to get model from registered factories
         for (ModelProvider<M, D> factory : factories) {
             model = factory.createModelFor(dataSource);
-            if (model != null) {
-                modelMap.put(key,new SoftReference(model));
+            if (model != null) {  // we have model, put it into cache
+                modelCache.put(key,new SoftReference(model));
                 break;
             }
+        }
+        if (model == null) {  // model was not found - cache null model
+            modelCache.put(key,NULL_MODEL);
         }
         return model;
     }
@@ -119,7 +140,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     }
     
     private void clearCache() {
-        if (!modelMap.isEmpty()) modelMap = new HashMap();
+        modelCache.clear();
     }
     
     private class ModelProviderComparator implements Comparator<ModelProvider<M,D>> {
@@ -165,7 +186,8 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         }
         
         public String toString() {
-            return "DataSourceKey for "+weakReference.toString();
+            DataSource ds = weakReference.get();
+            return "DataSourceKey for "+System.identityHashCode(this)+" for "+ds==null?"NULL":ds.toString();
         }
     }
 }
