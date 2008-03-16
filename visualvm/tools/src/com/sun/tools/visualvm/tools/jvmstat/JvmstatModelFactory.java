@@ -25,23 +25,29 @@
 
 package com.sun.tools.visualvm.tools.jvmstat;
 
-import com.sun.tools.visualvm.core.model.Model;
-import java.util.List;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.model.ModelFactory;
 
 /**
  *
  * @author Tomas Hurka
  */
-public abstract class Jvmstat extends Model {
-        
-    public abstract String findByName(String name);
-    public abstract MonitoredValue findMonitoredValueByName(String name);
+public final class JvmstatModelFactory extends ModelFactory<JvmstatModel, Application> {
+
+    private static JvmstatModelFactory jvmstatModelFactory;
+
+    private JvmstatModelFactory() {
+    }
+
+    public static synchronized JvmstatModelFactory getDefault() {
+        if (jvmstatModelFactory == null) {
+            jvmstatModelFactory = new JvmstatModelFactory();
+        }
+        return jvmstatModelFactory;
+    }
     
-    public abstract List<String> findByPattern(String pattern);
-    public abstract List<MonitoredValue> findMonitoredValueByPattern(String pattern);
-    
-    public abstract void addJvmstatListener(JvmstatListener l);
-    
-    public abstract void removeJvmstatListener(JvmstatListener l);
+    public static JvmstatModel getJvmstatModelFor(Application app) {
+        return getDefault().getModel(app);
+    }
     
 }

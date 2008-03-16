@@ -2,6 +2,7 @@ package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -12,6 +13,7 @@ public class Installer extends ModuleInstall {
     
     public void restored() {
         JvmstatFactory.getDefault().registerFactory(new JvmstatProvider());
+        JvmstatModelFactory.getDefault().registerFactory(new JvmstatModelProvider());
         JvmstatApplicationProvider.register();
     }
     

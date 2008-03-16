@@ -37,6 +37,8 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -139,6 +141,7 @@ public class JmxModelImpl extends JmxModel {
             Storage storage = application.getStorage();
             String username = storage.getCustomProperty(PROPERTY_USERNAME);
             String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+            JvmstatModel jvmstatModel = JvmstatModelFactory.getJvmstatModelFor(application);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
             ProxyClient proxyClient = null;
             if (Application.CURRENT_APPLICATION.equals(application)) {
@@ -147,7 +150,7 @@ public class JmxModelImpl extends JmxModel {
             } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvmstat.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
-                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvmstat.isAttachable(), connectorAddress);
+                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvmstatModel.isAttachable(), connectorAddress);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
                         proxyClient = new ProxyClient(this, lvm);
@@ -177,7 +180,7 @@ public class JmxModelImpl extends JmxModel {
                     // JMX management agent using the port specified in
                     // the -Dcom.sun.management.jmxremote.port=<port>
                     // system property
-                    String jvmArgs = jvmstat.getJvmArgs();
+                    String jvmArgs = jvmstatModel.getJvmArgs();
                     StringTokenizer st = new StringTokenizer(jvmArgs);
                     int port = -1;
                     boolean authenticate = false;

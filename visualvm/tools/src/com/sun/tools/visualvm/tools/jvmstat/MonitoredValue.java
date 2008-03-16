@@ -25,23 +25,11 @@
 
 package com.sun.tools.visualvm.tools.jvmstat;
 
-import com.sun.tools.visualvm.core.model.Model;
-import java.util.List;
-
 /**
  *
  * @author Tomas Hurka
  */
-public abstract class Jvmstat extends Model {
-        
-    public abstract String findByName(String name);
-    public abstract MonitoredValue findMonitoredValueByName(String name);
-    
-    public abstract List<String> findByPattern(String pattern);
-    public abstract List<MonitoredValue> findMonitoredValueByPattern(String pattern);
-    
-    public abstract void addJvmstatListener(JvmstatListener l);
-    
-    public abstract void removeJvmstatListener(JvmstatListener l);
-    
+public abstract class MonitoredValue  {
+    public abstract String getName();
+    public abstract Object getValue();
 }

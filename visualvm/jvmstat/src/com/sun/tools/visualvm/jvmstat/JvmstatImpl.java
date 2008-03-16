@@ -27,25 +27,19 @@ package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
-import java.io.File;
-import java.io.IOException;
+import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 import org.openide.ErrorManager;
-import sun.jvmstat.monitor.LongMonitor;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredVm;
-import sun.jvmstat.monitor.MonitoredVmUtil;
 import sun.jvmstat.monitor.event.MonitorStatusChangeEvent;
 import sun.jvmstat.monitor.event.VmEvent;
 import sun.jvmstat.monitor.event.VmListener;
@@ -57,13 +51,8 @@ import sun.management.counter.Variability;
  */
 public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListener<Application> {
     Application application;
-    Boolean isDumpOnOOMEnabled;
     MonitoredVm monitoredVm;
     Set<JvmstatListener> listeners;
-    long osFrequency;
-    List<LongMonitor> genCapacity;
-    List<LongMonitor> genUsed;
-    long[] genMaxCapacity;
     private Map<String,String> valueCache;
 
     JvmstatImpl(Application app,MonitoredVm vm) {
@@ -72,56 +61,7 @@ public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListe
         valueCache = new HashMap();
         listeners = new HashSet();
     }
-        
-    public boolean isAttachable() {
-        try {
-            return MonitoredVmUtil.isAttachable(monitoredVm);
-        } catch (MonitorException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-    
-    public String getMainArgs() {
-        try {
-            return MonitoredVmUtil.mainArgs(monitoredVm);
-        } catch (MonitorException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
-        }
-        return null;
-    }
-    
-    public String getMainClass() {
-        String mainClassName;
-        try {
-            mainClassName = MonitoredVmUtil.mainClass(monitoredVm,true);
-        } catch (MonitorException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
-            return null;
-        }
-        if (application.getHost().equals(Host.LOCALHOST)) {
-            File jarFile = new File(mainClassName);
-            if (jarFile.exists()) {
-                try {
-                    JarFile jf = new JarFile(jarFile);
-                    mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
-                    assert mainClassName!=null;
-                } catch (IOException ex) {
-                    ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
-                }
-            }
-        }
-        if (mainClassName.endsWith(".jar")) {
-            mainClassName = mainClassName.replace('\\', '/');
-            int index = mainClassName.lastIndexOf("/");
-            if (index != -1) {
-                mainClassName = mainClassName.substring(index + 1);
-            }
-        }
-        mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
-        return mainClassName;
-    }
-        
+               
     public void addJvmstatListener(JvmstatListener l) {
         synchronized (listeners) {
             if (listeners.isEmpty()) {
@@ -161,6 +101,19 @@ public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListe
         return null;
     }
     
+    public MonitoredValue findMonitoredValueByName(String name) {
+        try {
+            Monitor mon = monitoredVm.findByName(name);
+            if (mon != null) {
+                return new MonitoredValueImpl(mon);
+            }
+        } catch (MonitorException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
+        }
+        return null;
+    }
+
+    
     public List<String> findByPattern(String pattern) {
         try {
             List<Monitor> monitorList = monitoredVm.findByPattern(pattern);
@@ -173,6 +126,20 @@ public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListe
             ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
         }
         return null;
+    }
+    
+    public List<MonitoredValue> findMonitoredValueByPattern(String pattern) {
+        try {
+            List<Monitor> monitorList = monitoredVm.findByPattern(pattern);
+            List<MonitoredValue> monitoredValueList = new ArrayList(monitorList.size());
+            for (Monitor monitor : monitorList) {
+                monitoredValueList.add(new MonitoredValueImpl(monitor));
+            }
+            return monitoredValueList;
+        } catch (MonitorException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
+        }
+        return null;  
     }
     
     void initListeners() {
@@ -228,10 +195,12 @@ public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListe
     public void disconnected(VmEvent event) {
         ErrorManager.getDefault().log("Disconnect "+event.getMonitoredVm().getVmIdentifier());
         disableListeners();
+        monitoredVm.detach();
     }
     
     public void dataRemoved(Application dataSource) {
         disableListeners();
+        monitoredVm.detach();
     }
     
 }

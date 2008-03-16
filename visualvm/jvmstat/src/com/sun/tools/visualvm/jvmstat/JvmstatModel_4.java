@@ -23,35 +23,39 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.attach.Attach;
+import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class AttachProvider extends AbstractModelProvider<Attach, Application>  {
-    
-    
-    AttachProvider() {
+class JvmstatModel_4 extends JvmstatModel {
+    private static final String PERM_GEN_PREFIX = "hotspot.gc.generation.2.";
+
+    JvmstatModel_4(Application app,Jvmstat stat) {
+        super(app,stat);
+        initMonitoredVales();
     }
-    
-    public Attach createModelFor(Application app) {
-        if (Host.LOCALHOST.equals(app.getHost())) {
-            JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatModelFor(app);
-            
-            if (jvmstat != null && jvmstat.isAttachable()) {
-                return new AttachImpl(app);
-            }
-        }
-        return null;
+
+    private void initMonitoredVales() {
+      loadedClasses = jvmstat.findMonitoredValueByName("hotspot.rt.cl.classes.loaded");
+      unloadedClasses = jvmstat.findMonitoredValueByName("hotspot.rt.cl.classes.unloaded");
+      applicationTime = jvmstat.findMonitoredValueByName("sun.rt.applicationTime");
+      upTime = jvmstat.findMonitoredValueByName("hotspot.rt.hrt.ticks");
+      MonitoredValue osFrequencyMon = jvmstat.findMonitoredValueByName("hotspot.rt.hrt.frequency");
+      osFrequency = getLongValue(osFrequencyMon);
+      genCapacity = jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.capacity.current");
+      genUsed = jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.space.[0-9]+.used");
+      genMaxCapacity = getGenerationSum(jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.capacity.max"));
     }
-    
+
+    protected String getPermGenPrefix() {
+        return PERM_GEN_PREFIX;
+    }
     
 }

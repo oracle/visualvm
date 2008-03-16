@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.jvm;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.MonitoredData;
 import com.sun.tools.visualvm.application.MonitoredDataListener;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
@@ -37,6 +38,9 @@ import com.sun.tools.visualvm.tools.attach.AttachFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import com.sun.tools.visualvm.tools.sa.SAAgent;
 import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
 import java.io.File;
@@ -44,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.management.RuntimeMXBean;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +63,14 @@ import javax.management.ObjectName;
  *
  * @author Tomas Hurka
  */
-public class JVMImpl extends JVM {
+public class JVMImpl extends JVM implements JvmstatListener {
     private static final String HOTSPOT_DIAGNOSTIC_MXBEAN_NAME =
             "com.sun.management:type=HotSpotDiagnostic";
     private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";
     Application application;
     Boolean isDumpOnOOMEnabled;
     Jvmstat monitoredVm;
+    JvmstatModel jvmstatModel;
     Set<MonitoredDataListener> listeners;
     
     // static JVM data 
@@ -88,6 +94,7 @@ public class JVMImpl extends JVM {
     JVMImpl(Application app,Jvmstat jvms) {
         application = app;
         monitoredVm = jvms;
+        jvmstatModel = JvmstatModelFactory.getJvmstatModelFor(app);
         listeners = new HashSet();
     }
     
@@ -97,8 +104,8 @@ public class JVMImpl extends JVM {
     }
     
     public boolean isAttachable() {
-        if (monitoredVm != null) {
-            return monitoredVm.isAttachable();
+        if (jvmstatModel != null) {
+            return jvmstatModel.isAttachable();
         }
         return false;
     }
@@ -210,26 +217,41 @@ public class JVMImpl extends JVM {
     }
     
     public void addMonitoredDataListener(MonitoredDataListener l) {
-        
+        synchronized (listeners) {
+            if (listeners.add(l)) {
+                if (monitoredVm != null) {
+                    monitoredVm.addJvmstatListener(this);
+                }
+            }
+        }
     }
     
     public void removeMonitoredDataListener(MonitoredDataListener l) {
+        synchronized (listeners) {
+            if (listeners.remove(l)) {
+                if (listeners.isEmpty()) {
+                    if (monitoredVm != null) {
+                        monitoredVm.removeJvmstatListener(this);
+                    }
+                }
+            }
+        }
     }
     
     public boolean isMonitoringSupported() {
-        return false;
+        return true;
     }
     
     public boolean isClassMonitoringSupported() {
-        return false;
+        return true;
     }
     
     public boolean isThreadMonitoringSupported() {
-        return false;
+        return !is14();
     }
     
     public boolean isMemoryMonitoringSupported() {
-        return false;
+        return true;
     }
     
     public boolean isGetSystemPropertiesSupported() {
@@ -279,7 +301,7 @@ public class JVMImpl extends JVM {
             HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
             hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,enabled?"true":"false");
             if (enabled) {
-                attach.setFlag("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
+                hsDiagnostic.setVMOption("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
             }
         }
         isDumpOnOOMEnabled = Boolean.valueOf(enabled);
@@ -366,16 +388,16 @@ public class JVMImpl extends JVM {
             if (staticDataInitialized) {
                 return;
             }
-            if (monitoredVm != null) {
-                commandLine = monitoredVm.getCommandLine();
+            if (jvmstatModel != null) {
+                commandLine = jvmstatModel.getCommandLine();
                 jvmArgs = getJvmArgsJvmstat();
-                jvmFlags = monitoredVm.getJvmFlags();
-                mainArgs = monitoredVm.getMainArgs();
-                mainClass = getMainClassJvmstat();
-                vmVersion = monitoredVm.getVmVersion();
-                javaHome = monitoredVm.getJavaHome();
-                vmInfo = monitoredVm.getVMInfo();
-                vmName = monitoredVm.getVMName();
+                jvmFlags = jvmstatModel.getJvmFlags();
+                mainArgs = jvmstatModel.getMainArgs();
+                mainClass = jvmstatModel.getMainClass();
+                vmVersion = jvmstatModel.getVmVersion();
+                javaHome = jvmstatModel.getJavaHome();
+                vmInfo = jvmstatModel.getVMInfo();
+                vmName = jvmstatModel.getVMName();
             } else {
                 RuntimeMXBean runtime = getRuntime();
                 if (runtime != null) {
@@ -392,7 +414,7 @@ public class JVMImpl extends JVM {
     }
     
     private String getJvmArgsJvmstat() {
-        String args = monitoredVm.getJvmArgs();
+        String args = jvmstatModel.getJvmArgs();
         if (args.length() == 1024) {
             args = getJvmArgsJmx();
             if (args == null) {
@@ -402,38 +424,10 @@ public class JVMImpl extends JVM {
                 }
             }
             if (args == null || args.length() == 0) {
-                args = monitoredVm.getJvmArgs();
+                args = jvmstatModel.getJvmArgs();
             }
         }
         return args;
-    }
-    
-    private String getMainClassJvmstat() {
-        String mainClassName = monitoredVm.getMainClass();
-        if (mainClassName == null) {
-            return null;
-        }
-        if (application.getHost().equals(Host.LOCALHOST)) {
-            File jarFile = new File(mainClassName);
-            if (jarFile.exists()) {
-                try {
-                    JarFile jf = new JarFile(jarFile);
-                    mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
-                    assert mainClassName!=null;
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        if (mainClassName.endsWith(".jar")) {
-            mainClassName = mainClassName.replace('\\', '/');
-            int index = mainClassName.lastIndexOf("/");
-            if (index != -1) {
-                mainClassName = mainClassName.substring(index + 1);
-            }
-        }
-        mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
-        return mainClassName;
     }
     
     private String getJvmArgsJmx() {
@@ -468,6 +462,22 @@ public class JVMImpl extends JVM {
             hotspotDiagnosticInitialized = true;
             return hotspotDiagnosticMXBean;
         }
+    }
+
+    public void dataChanged(Jvmstat stat) {
+        assert stat == monitoredVm;
+        MonitoredData data = new MonitoredDataImpl(this,jvmstatModel);
+        notifyListeners(data);        
+    }
+
+    private void notifyListeners(final MonitoredData data) {
+        List<MonitoredDataListener> listenersCopy;
+        synchronized (listeners) {
+            listenersCopy = new ArrayList(listeners);
+        }
+        for (MonitoredDataListener listener : listenersCopy) {
+            listener.monitoredDataEvent(data);
+        }        
     }
 
 }
