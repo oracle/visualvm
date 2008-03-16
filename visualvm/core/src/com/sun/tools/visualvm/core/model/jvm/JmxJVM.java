@@ -30,13 +30,16 @@ import com.sun.management.VMOption;
 import com.sun.tools.visualvm.core.datasource.Application;
 import com.sun.tools.visualvm.core.datasource.Host;
 import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.core.model.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.LockInfo;
 import java.lang.management.MemoryPoolMXBean;
@@ -54,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import javax.management.ObjectName;
 import javax.swing.Timer;
 import org.openide.util.RequestProcessor;
@@ -214,8 +218,39 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         hsd.setVMOption("HeapDumpOnOutOfMemoryError", enabled ? "true" : "false");
     }
 
+    private String takeHeapDump(File dumpFile) {
+        try {
+            HotSpotDiagnosticMXBean hsd = getHotSpotDiagnosticMXBean();
+            hsd.dumpHeap(dumpFile.getAbsolutePath(), true);
+            InputStream in = new FileInputStream(dumpFile);
+            StringBuffer buffer = new StringBuffer(1024);
+            // read to EOF and just print output
+            byte b[] = new byte[256];
+            int n;
+            do {
+                n = in.read(b);
+                if (n > 0) {
+                    String s = new String(b, 0, n, "UTF-8");
+                    buffer.append(s);
+                }
+            } while (n > 0);
+            in.close();
+            return buffer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Cannot get heap dump " + e.getLocalizedMessage(); // NOI18N
+        }
+    }
+
     public File takeHeapDump() throws IOException {
-        throw new UnsupportedOperationException();
+        File snapshotDir = app.getStorage().getDirectory();
+        String name = HeapDumpSupport.getInstance().getCategory().createFileName();
+        File dumpFile = new File(snapshotDir,name);
+        String dump = takeHeapDump(dumpFile);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Dump " + dump);
+        }
+        return dumpFile;
     }
 
     private String runThreadDump() throws Exception {
@@ -335,7 +370,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         return !is14();
     }
 
-    public boolean isDumpOnOOMEnabledSupported() {
+    private boolean isHeapDumpSupported() {
         if (is14() || is15()) {
             return false;
         }
@@ -348,8 +383,12 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         return true;
     }
 
+    public boolean isDumpOnOOMEnabledSupported() {
+        return isHeapDumpSupported();
+    }
+
     public boolean isTakeHeapDumpSupported() {
-        return false;
+        return isHeapDumpSupported();
     }
 
     public boolean isTakeThreadDumpSupported() {
