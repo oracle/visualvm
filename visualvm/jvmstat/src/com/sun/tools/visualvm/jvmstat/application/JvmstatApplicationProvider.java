@@ -103,7 +103,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         // Get the MonitoredHost for Host
         final MonitoredHost monitoredHost = getMonitoredHost(host);
         
-        if (monitoredHost == null) { // monitored host not available reshedule
+        if (monitoredHost == null) { // monitored host not available reschedule
             rescheduleProcessNewHost(host);
             return;
         }
@@ -176,7 +176,6 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
         
         host.getRepository().removeDataSources(finishedApplications);
-//        unregisterDataSources(finishedApplications);
     }
     
     private void processAllTerminatedApplications(Host host) {
@@ -190,12 +189,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             }
         
         host.getRepository().removeDataSources(finishedApplications);
-//        unregisterDataSources(finishedApplications);
     }
-    
-//    protected <Y extends JvmstatApplication> void unregisterDataSources(final Set<Y> removed) {
-//        for (JvmstatApplication application : removed) application.removed();
-//    }
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
     private void checkForBrokenJps(MonitoredHost monitoredHost) {
@@ -237,9 +231,11 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         try {
             return MonitoredHost.getMonitoredHost(host.getHostName());
         } catch (URISyntaxException ex) {
+            // TODO: Host should't be scheduled for later MonitoredHost resolving if URISyntaxException
             ErrorManager.getDefault().notify(ErrorManager.USER,ex);
         } catch (MonitorException ex) {
-            ErrorManager.getDefault().log(ErrorManager.WARNING,ex.getLocalizedMessage());
+            // NOTE: valid state, jstatd not running, Host will be scheduled for later MonitoredHost resolving
+//            ErrorManager.getDefault().log(ErrorManager.WARNING,ex.getLocalizedMessage());
         }
         return null;
     }
