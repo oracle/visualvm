@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.ListModel;
 import net.java.visualvm.btrace.config.ProbeConfig;
 
-public final class ProbesVisualPanel1 extends JPanel {
+public final class ScriptsVisualPanel1 extends JPanel {
 
     private Map<String, List<ProbeConfig>> categoryMap = new HashMap<String, List<ProbeConfig>>();
     private ListModel categoriesModel = new AbstractListModel() {
@@ -59,10 +59,10 @@ public final class ProbesVisualPanel1 extends JPanel {
         }
     };
     private DefaultListModel probesModel = new DefaultListModel();
-    private ProbesWizardPanel1 controller;
+    private ScriptsWizardPanel1 controller;
 
     /** Creates new form probesVisualPanel1 */
-    public ProbesVisualPanel1(ProbesWizardPanel1 controller, Collection<ProbeConfig> probes) {
+    public ScriptsVisualPanel1(ScriptsWizardPanel1 controller, Collection<ProbeConfig> probes) {
         for (ProbeConfig probe : probes) {
             if (categoryMap.containsKey(probe.getCategory())) {
                 categoryMap.get(probe.getCategory()).add(probe);

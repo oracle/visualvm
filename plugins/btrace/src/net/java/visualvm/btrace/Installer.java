@@ -26,8 +26,8 @@ package net.java.visualvm.btrace;
 
 import net.java.visualvm.btrace.actions.ApplicationActionsProvider;
 import net.java.visualvm.btrace.actions.ProbeActionsProvider;
-import net.java.visualvm.btrace.datasource.ProbeDataSourceProvider;
-import net.java.visualvm.btrace.views.ProbeViewProvider;
+import net.java.visualvm.btrace.datasource.ScriptDataSourceProvider;
+import net.java.visualvm.btrace.views.ScriptViewProvider;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -39,16 +39,16 @@ public class Installer extends ModuleInstall {
     public void restored() {
         ApplicationActionsProvider.initialize();
         ProbeActionsProvider.initialize();
-        ProbeViewProvider.initialize();
-        ProbeDataSourceProvider.initialize();
+        ScriptViewProvider.initialize();
+        ScriptDataSourceProvider.initialize();
     }
 
     @Override
     public void uninstalled() {
         ApplicationActionsProvider.shutdown();
         ProbeActionsProvider.shutdown();
-        ProbeViewProvider.shutdown();
-        ProbeDataSourceProvider.shutdown();
+        ScriptViewProvider.shutdown();
+        ScriptDataSourceProvider.shutdown();
         super.uninstalled();
     }
 }

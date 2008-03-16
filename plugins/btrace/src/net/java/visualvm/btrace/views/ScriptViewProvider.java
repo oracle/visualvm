@@ -32,38 +32,38 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import net.java.visualvm.btrace.datasource.ProbeDataSource;
+import net.java.visualvm.btrace.datasource.ScriptDataSource;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeViewProvider implements DataSourceViewsProvider<ProbeDataSource> {
-    private final static ProbeViewProvider INSTANCE = new ProbeViewProvider();
+public class ScriptViewProvider implements DataSourceViewsProvider<ScriptDataSource> {
+    private final static ScriptViewProvider INSTANCE = new ScriptViewProvider();
     
-    private final Map<ProbeDataSource, ProbeView> viewMap = new  HashMap<ProbeDataSource, ProbeView>();
+    private final Map<ScriptDataSource, ScriptView> viewMap = new  HashMap<ScriptDataSource, ScriptView>();
     
-    public Set<? extends DataSourceView> getViews(ProbeDataSource dataSource) {
+    public Set<? extends DataSourceView> getViews(ScriptDataSource dataSource) {
         return Collections.singleton(getView(dataSource));
     }
     
-    private DataSourceView getView(ProbeDataSource dataSource) {
+    private DataSourceView getView(ScriptDataSource dataSource) {
         synchronized(viewMap) {
             if (viewMap.containsKey(dataSource)) {
                 return viewMap.get(dataSource);
             }
-            ProbeView view = new ProbeView(dataSource);
+            ScriptView view = new ScriptView(dataSource);
             viewMap.put(dataSource, view);
             return view;
         }
     }
 
-    public boolean supportsViewsFor(ProbeDataSource dataSource) {
+    public boolean supportsViewsFor(ScriptDataSource dataSource) {
         return true;
     }
     
     public static void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, ProbeDataSource.class);
+        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, ScriptDataSource.class);
     }
     
     public static void shutdown() {

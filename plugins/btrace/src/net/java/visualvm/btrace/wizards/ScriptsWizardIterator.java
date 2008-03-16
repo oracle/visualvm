@@ -32,7 +32,7 @@ import javax.swing.event.ChangeListener;
 import net.java.visualvm.btrace.config.ProbeConfig;
 import org.openide.WizardDescriptor;
 
-public final class ProbesWizardIterator implements WizardDescriptor.Iterator {
+public final class ScriptsWizardIterator implements WizardDescriptor.Iterator {
 
     // To invoke this wizard, copy-paste and run the following code, e.g. from
     // SomeAction.performAction():
@@ -56,7 +56,7 @@ public final class ProbesWizardIterator implements WizardDescriptor.Iterator {
 
     private Collection<ProbeConfig> probeConfigs;
     
-    public ProbesWizardIterator(Collection<ProbeConfig> forProbes) {
+    public ScriptsWizardIterator(Collection<ProbeConfig> forProbes) {
         probeConfigs = forProbes;
     }
     
@@ -67,7 +67,7 @@ public final class ProbesWizardIterator implements WizardDescriptor.Iterator {
     private WizardDescriptor.Panel[] getPanels() {
         if (panels == null) {
             panels = new WizardDescriptor.Panel[]{
-                new ProbesWizardPanel1(probeConfigs)
+                new ScriptsWizardPanel1(probeConfigs)
             };
             String[] steps = new String[panels.length];
             for (int i = 0; i < panels.length; i++) {

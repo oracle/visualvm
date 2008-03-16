@@ -35,7 +35,7 @@ import net.java.visualvm.btrace.config.ProbeConfig;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
-public class ProbesWizardPanel1 implements WizardDescriptor.Panel {
+public class ScriptsWizardPanel1 implements WizardDescriptor.Panel {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -44,7 +44,7 @@ public class ProbesWizardPanel1 implements WizardDescriptor.Panel {
     private Component component;
     private Collection<ProbeConfig> probes;
     
-    public ProbesWizardPanel1(Collection<ProbeConfig> probes) {
+    public ScriptsWizardPanel1(Collection<ProbeConfig> probes) {
         this.probes = probes;
     }
 
@@ -54,7 +54,7 @@ public class ProbesWizardPanel1 implements WizardDescriptor.Panel {
     // create only those which really need to be visible.
     public Component getComponent() {
         if (component == null) {
-            component = new ProbesVisualPanel1(this, probes);
+            component = new ScriptsVisualPanel1(this, probes);
         }
         return component;
     }

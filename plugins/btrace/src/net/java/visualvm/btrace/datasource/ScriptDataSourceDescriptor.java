@@ -34,11 +34,11 @@ import org.openide.util.Utilities;
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeDataSourceDescriptor extends DataSourceDescriptor {
+public class ScriptDataSourceDescriptor extends DataSourceDescriptor {
     private static final String ICON_PATH = "net/java/visualvm/btrace/resources/JDBC.png";
     
     private ProbeConfig config;
-    public ProbeDataSourceDescriptor(ProbeDataSource datasource) {
+    public ScriptDataSourceDescriptor(ScriptDataSource datasource) {
         config = datasource.getConfig();
     }
     
@@ -54,6 +54,6 @@ public class ProbeDataSourceDescriptor extends DataSourceDescriptor {
 
     @Override
     public String getName() {
-        return "[probe] ".concat(config.getName());
+        return "[BTrace] ".concat(config.getName());
     }
 }

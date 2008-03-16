@@ -18,12 +18,12 @@ import net.java.visualvm.btrace.config.ProbeConfig.ProbeConnection;
  *
  * @author  Jaroslav Bachorik
  */
-public class ProbeStatsPanel extends javax.swing.JPanel {
+public class StatsPanel extends javax.swing.JPanel {
 
     final private List<ProbeConnection> statsProviders = new ArrayList<ProbeConnection>();
 
     /** Creates new form ProbeStatsPanel */
-    public ProbeStatsPanel(Collection<ProbeConnection> probeConnections) {
+    public StatsPanel(Collection<ProbeConnection> probeConnections) {
         initComponents();
         statsProviders.clear();
         statsProviders.addAll(probeConnections);

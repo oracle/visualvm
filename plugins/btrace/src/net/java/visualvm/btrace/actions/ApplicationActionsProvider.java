@@ -45,8 +45,8 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import net.java.visualvm.btrace.config.ConfigParser;
 import net.java.visualvm.btrace.config.ProbeConfig;
-import net.java.visualvm.btrace.datasource.ProbeDataSourceProvider;
-import net.java.visualvm.btrace.wizards.ProbesWizardIterator;
+import net.java.visualvm.btrace.datasource.ScriptDataSourceProvider;
+import net.java.visualvm.btrace.wizards.ScriptsWizardIterator;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
@@ -74,7 +74,7 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
         }
 
         public void actionPerformed(ActionEvent e) {
-            WizardDescriptor.Iterator iterator = new ProbesWizardIterator(loadProbes());
+            WizardDescriptor.Iterator iterator = new ScriptsWizardIterator(loadProbes());
             WizardDescriptor wizardDescriptor = new WizardDescriptor(iterator);
             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
             // {1} will be replaced by WizardDescriptor.Iterator.name()
@@ -86,11 +86,16 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
             boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
             if (!cancelled) {
                 try {
-                    ProbeDataSourceProvider.sharedInstance().startProbe((ProbeConfig) wizardDescriptor.getProperty("probe"), app);
+                    ScriptDataSourceProvider.sharedInstance().startProbe((ProbeConfig) wizardDescriptor.getProperty("probe"), app);
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
             }
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return ScriptDataSourceProvider.sharedInstance().isReady();
         }
     }
 

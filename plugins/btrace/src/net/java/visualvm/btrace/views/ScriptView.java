@@ -36,10 +36,14 @@ import java.awt.Color;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import net.java.visualvm.btrace.config.ProbeConfig.ProbeConnection;
-import net.java.visualvm.btrace.datasource.ProbeDataSource;
+import net.java.visualvm.btrace.datasource.ScriptDataSource;
 import net.java.visualvm.btrace.ui.components.graph.DynamicGraph;
 import net.java.visualvm.btrace.ui.components.graph.DynamicLineGraph;
 import net.java.visualvm.btrace.ui.components.graph.ValueProvider;
@@ -55,12 +59,13 @@ import sun.jvmstat.monitor.VmIdentifier;
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeView extends DataSourceView {
+public class ScriptView extends DataSourceView {
+
     private DataViewComponent dataView = null;
-    private ProbeDataSource probe;
-    volatile private ProbeStatsPanel statsPanel = null;
+    private ScriptDataSource probe;
+    volatile private StatsPanel statsPanel = null;
     volatile private DynamicGraph graph = null;
-    
+    final private static ExecutorService probeOutputConsumer = Executors.newCachedThreadPool();
     private MonitoredDataListener mdl = new MonitoredDataListener() {
 
         public void monitoredDataEvent(MonitoredData data) {
@@ -72,8 +77,8 @@ public class ProbeView extends DataSourceView {
             }
         }
     };
-    
-    public ProbeView(ProbeDataSource probe) {
+
+    public ScriptView(ScriptDataSource probe) {
         super(DataSourceDescriptorFactory.getDescriptor(probe).getName(), DataSourceDescriptorFactory.getDescriptor(probe).getIcon(), POSITION_AT_THE_END);
         this.probe = probe;
         JVMFactory.getJVMFor(probe.getApplication()).addMonitoredDataListener(mdl);
@@ -94,14 +99,16 @@ public class ProbeView extends DataSourceView {
             try {
                 MonitoredVm mvm = MonitoredHost.getMonitoredHost(app.getHost().getHostName()).getMonitoredVm(new VmIdentifier(vmId));
                 List<ValueProvider> providers = new ArrayList<ValueProvider>();
-                for(ProbeConnection connection : probe.getConfig().getConnections()) {
+                for (ProbeConnection connection : probe.getConfig().getConnections()) {
                     final Monitor mntr = mvm.findByName(connection.jvmStatVar);
                     providers.add(new ValueProvider(connection.jvmStatVar, connection.name) {
 
                         @Override
                         public long getValue() {
                             Object value = mntr.getValue();
-                            if (value == null) return 0L;
+                            if (value == null) {
+                                return 0L;
+                            }
                             return Long.parseLong(value.toString());
                         }
                     });
@@ -115,7 +122,7 @@ public class ProbeView extends DataSourceView {
         }
         return new ArrayList<ValueProvider>();
     }
-    
+
     private void initialize() {
         HTMLTextArea generalDataArea = new HTMLTextArea();
         generalDataArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
@@ -124,42 +131,76 @@ public class ProbeView extends DataSourceView {
         DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("", null, generalDataArea);
         DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
 
-        dataView = new DataViewComponent(masterView, masterConfiguration);      
-        
-        ProbeOutputPanel pvp = new ProbeOutputPanel();
-        statsPanel = new ProbeStatsPanel(probe.getConfig().getConnections());
+        dataView = new DataViewComponent(masterView, masterConfiguration);
 
+        statsPanel = new StatsPanel(probe.getConfig().getConnections());
+
+//        ScriptEngineManager factory = new ScriptEngineManager();
+//        ScriptEngine engine = factory.getEngineByExtension("fx");
+//        String script = "import javafx.ui.*;" +
+//                            "Frame { " +
+//                                "title: \"Hello World JavaFX\" " +
+//                                "width: 200 " +
+//                                "height: 50 " + 
+//                                "content: Label { " +
+//                                    "text: \"Hello World\" " +
+//                                "} " +
+//                                "visible: true " +
+//                        "}";
+//        try {
+//            engine.eval(script);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        
+        
         graph = new DynamicLineGraph(getValueProviders(), 10);
         graph.setBackground(Color.WHITE);
         graph.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        
-        dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Console Output", true), DataViewComponent.BOTTOM_LEFT);
-        dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, pvp, null), DataViewComponent.BOTTOM_LEFT);
-        
-        dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Monitored Data", true), DataViewComponent.TOP_RIGHT);
-        dataView.addDetailsView(new DataViewComponent.DetailsView("Monitored Data", null, graph, null), DataViewComponent.TOP_RIGHT);
 
-        pvp.setReader(probe.getReader());
+        if (!probe.getConfig().getConnections().isEmpty()) {
+            dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Monitored Data", true), DataViewComponent.TOP_RIGHT);
+            dataView.addDetailsView(new DataViewComponent.DetailsView("Monitored Data", null, graph, null), DataViewComponent.TOP_RIGHT);
+        }
+        dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Console Output", true), DataViewComponent.BOTTOM_RIGHT);
+        dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, new OutputPane(probe.getReader()), null), DataViewComponent.BOTTOM_RIGHT);
+
+//        final InputOutput io = IOProvider.getDefault().getIO(probe.toString(), false);
+//        
+//        probeOutputConsumer.submit(new Runnable() {
+//            private BufferedReader probeLineReader = new BufferedReader(probe.getReader());
+//            public void run() {
+//                try {
+//                    while(true) {
+//                        io.getOut().println(probeLineReader.readLine());
+//                    }
+//                } catch (IOException e) {
+//                    Exceptions.attachMessage(e, "Error while processing BTrace Script output");
+//                }
+//            }
+//        });
+    //pvp.setReader(probe.getReader());
     }
 
     @Override
     public boolean isClosable() {
         return true;
     }
-    
+
     private String getProbeInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
-        sb.append("<h1>").append(probe.getConfig().getName()).append(" (").append(probe.getConfig().getCategory()).append(")").append("</h1>");;
+        sb.append("<h1>").append(probe.getConfig().getName()).append(" (").append(probe.getConfig().getCategory()).append(")").append("</h1>");
+        ;
         sb.append("<b>").append("Description:").append("</b><br/>");
         sb.append(cleanseHtml(probe.getConfig().getDescription()));
         sb.append("</html>");
-        
+
         return sb.toString();
     }
-    
+
     private static String cleanseHtml(String html) {
-        String cleansed = html.replace("<html>","").replace("</html>", "").replace("<br>", "").replace("<br/>", "").replace("\n", " ").replace("\r", " ").replace("  ", " ").trim();
+        String cleansed = html.replace("<html>", "").replace("</html>", "").replace("<br>", "").replace("<br/>", "").replace("\n", " ").replace("\r", " ").replace("  ", " ").trim();
         return cleansed;
     }
 }

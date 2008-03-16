@@ -26,7 +26,6 @@ package net.java.visualvm.btrace.datasource;
 
 import com.sun.btrace.client.Client;
 import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -50,9 +49,9 @@ import net.java.visualvm.btrace.config.ProbeConfig;
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeDataSource> implements DataChangeListener<Application> {
+public class ScriptDataSourceProvider extends DefaultDataSourceProvider<ScriptDataSource> implements DataChangeListener<Application> {
 
-    private static final ProbeDataSourceProvider INSTANCE = new ProbeDataSourceProvider();
+    private static final ScriptDataSourceProvider INSTANCE = new ScriptDataSourceProvider();
     private static final ProbeDataSourceDescriptorProvider DESC_FACTORY = new ProbeDataSourceDescriptorProvider();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss:SSS");
     
@@ -61,9 +60,10 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
         DATE_FORMAT.setTimeZone(TimeZone.getDefault());
     }
     private final ExecutorService deployer = Executors.newCachedThreadPool();
-    private final Map<Application, Client> clientMap = new HashMap<Application, Client>();
 
-    private ProbeDataSourceProvider() {
+    volatile private boolean providerReady = true;
+    
+    private ScriptDataSourceProvider() {
     }
 
     public static void initialize() {
@@ -77,7 +77,7 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
         DataSourceDescriptorFactory.getDefault().unregisterFactory(DESC_FACTORY);
     }
 
-    public static ProbeDataSourceProvider sharedInstance() {
+    public static ScriptDataSourceProvider sharedInstance() {
         return INSTANCE;
     }
 
@@ -85,7 +85,7 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
         Set<Application> removed = event.getRemoved();
         if (removed != null && !removed.isEmpty()) {
             for (Application app : removed) {
-                for (ProbeDataSource pds : (Set<ProbeDataSource>) app.getRepository().getDataSources(ProbeDataSource.class)) {
+                for (ScriptDataSource pds : (Set<ScriptDataSource>) app.getRepository().getDataSources(ScriptDataSource.class)) {
                     // undeploy probe
                 }
             }
@@ -97,8 +97,9 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
         if (code != null) {
             deployer.submit(new DeployTask(BTraceClientCache.sharedInstance().getClient(app), code) {
 
-                protected ProbeDataSource prepareProbe(DeployTask deployer) {
-                    ProbeDataSource pds = new ProbeDataSource(ProbeDataSourceProvider.this, config, app, deployer);
+                protected ScriptDataSource prepareProbe(DeployTask deployer) {
+                    providerReady = false;
+                    ScriptDataSource pds = new ScriptDataSource(ScriptDataSourceProvider.this, config, app, deployer);
                     registerDataSource(pds);
                     app.getRepository().addDataSource(pds);
                     openProbeWindow(pds);
@@ -106,16 +107,21 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
                 }
 
                 @Override
-                protected void removeProbe(ProbeDataSource pds) {
+                protected void removeProbe(ScriptDataSource pds) {
                     pds.getApplication().getRepository().removeDataSource(pds);
                     unregisterDataSource(pds);
+                    providerReady = true;
                 }
             });
         }
     }
 
-    public void stopProbe(ProbeDataSource pds) {
+    public void stopProbe(ScriptDataSource pds) {
         pds.stop();
+    }
+    
+    public boolean isReady() {
+        return providerReady;
     }
 
     private byte[] loadProbeCode(ProbeConfig config) {
@@ -141,7 +147,7 @@ public class ProbeDataSourceProvider extends DefaultDataSourceProvider<ProbeData
         return null;
     }
 
-    private static void openProbeWindow(ProbeDataSource pds) {
+    private static void openProbeWindow(ScriptDataSource pds) {
         DataSourceWindowManager.sharedInstance().openDataSource(pds);
     }
 }

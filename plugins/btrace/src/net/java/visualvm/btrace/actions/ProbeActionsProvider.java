@@ -31,37 +31,37 @@ import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
-import net.java.visualvm.btrace.datasource.ProbeDataSource;
-import net.java.visualvm.btrace.datasource.ProbeDataSourceProvider;
+import net.java.visualvm.btrace.datasource.ScriptDataSource;
+import net.java.visualvm.btrace.datasource.ScriptDataSourceProvider;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeActionsProvider implements ExplorerActionsProvider<ProbeDataSource> {
+public class ProbeActionsProvider implements ExplorerActionsProvider<ScriptDataSource> {
 
     private final static ProbeActionsProvider INSTANCE = new ProbeActionsProvider();
 
-    public Set<ExplorerActionDescriptor> getActions(final ProbeDataSource probe) {
+    public Set<ExplorerActionDescriptor> getActions(final ScriptDataSource probe) {
         return new HashSet<ExplorerActionDescriptor>() {
 
             {
                 add(new ExplorerActionDescriptor(new AbstractAction("Undeploy") {
 
                     public void actionPerformed(ActionEvent e) {
-                        ProbeDataSourceProvider.sharedInstance().stopProbe(probe);
+                        ScriptDataSourceProvider.sharedInstance().stopProbe(probe);
                     }
                 }, 10));
             }
         };
     }
 
-    public ExplorerActionDescriptor getDefaultAction(ProbeDataSource probe) {
+    public ExplorerActionDescriptor getDefaultAction(ScriptDataSource probe) {
         return null;
     }
 
     public static void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(INSTANCE, ProbeDataSource.class);
+        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(INSTANCE, ScriptDataSource.class);
     }
 
     public static void shutdown() {

@@ -34,9 +34,9 @@ import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
  * @author Jaroslav Bachorik
  */
 public class ProbeDataSourceDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
-    public ProbeDataSourceDescriptor createModelFor(DataSource datasource) {
-        if (datasource instanceof ProbeDataSource) {
-            return new ProbeDataSourceDescriptor((ProbeDataSource)datasource);
+    public ScriptDataSourceDescriptor createModelFor(DataSource datasource) {
+        if (datasource instanceof ScriptDataSource) {
+            return new ScriptDataSourceDescriptor((ScriptDataSource)datasource);
         }
         return null;
     }

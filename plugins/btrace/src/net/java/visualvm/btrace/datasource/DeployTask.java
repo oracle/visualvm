@@ -80,7 +80,7 @@ public abstract class DeployTask implements Runnable {
         try {
             client.submit(probeCode, new String[0], new CommandListener() {
 
-                volatile private ProbeDataSource pds = null;
+                volatile private ScriptDataSource pds = null;
 
                 public void onCommand(Command cmd) throws IOException {
                     switch (cmd.getType()) {
@@ -88,7 +88,11 @@ public abstract class DeployTask implements Runnable {
                             if (pds == null) {
                                 break;
                             }
-                            probeWriter.println(DATE_FORMAT.format(new Date(((MessageCommand) cmd).getTime())) + " : " + ((MessageCommand) cmd).getMessage());
+                            MessageCommand msg = (MessageCommand)cmd;
+                            if (msg.getTime() > 0L) {
+                                probeWriter.print(DATE_FORMAT.format(new Date(msg.getTime())));
+                            }
+                            probeWriter.println(msg.getMessage());
                             probeWriter.flush();
                             break;
                         }
@@ -120,6 +124,6 @@ public abstract class DeployTask implements Runnable {
 
     }
 
-    abstract protected ProbeDataSource prepareProbe(DeployTask deployer);
-    abstract protected void removeProbe(ProbeDataSource pds);
+    abstract protected ScriptDataSource prepareProbe(DeployTask deployer);
+    abstract protected void removeProbe(ScriptDataSource pds);
 }

@@ -24,11 +24,8 @@
  */
 package net.java.visualvm.btrace.datasource;
 
-import com.sun.btrace.client.Client;
 import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
 import com.sun.tools.visualvm.core.datasource.Application;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import net.java.visualvm.btrace.config.ProbeConfig;
 
@@ -36,13 +33,13 @@ import net.java.visualvm.btrace.config.ProbeConfig;
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeDataSource extends AbstractDataSource {
+public class ScriptDataSource extends AbstractDataSource {
     private ProbeConfig config;
     private Application application;
-    private ProbeDataSourceProvider provider;
+    private ScriptDataSourceProvider provider;
     private DeployTask task;
     
-    public ProbeDataSource(ProbeDataSourceProvider provider, ProbeConfig config, Application master, DeployTask deployTask) {
+    public ScriptDataSource(ScriptDataSourceProvider provider, ProbeConfig config, Application master, DeployTask deployTask) {
         super(master);
         this.config = config;
         this.application = master;
