@@ -45,7 +45,7 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.swing.Timer;
 import org.openide.util.RequestProcessor;
@@ -188,7 +187,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
                     hotspotDiagnosticMXBean = jmxModel.getMXBean(
                             ObjectName.getInstance(HOTSPOT_DIAGNOSTIC_MXBEAN_NAME),
                             HotSpotDiagnosticMXBean.class);
-                } catch (MalformedObjectNameException e) {
+                } catch (Exception e) {
                     LOGGER.warning("Couldn't find HotSpotDiagnosticMXBean: " +
                             e.getLocalizedMessage());
                 }
@@ -223,20 +222,39 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
         ThreadMXBean threadMXBean = jmxModel.getThreadMXBean();
         RuntimeMXBean runtimeMXBean = jmxModel.getRuntimeMXBean();
         StringBuffer sb = new StringBuffer(1024);
-        DateFormat df = DateFormat.getDateTimeInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sb.append(df.format(new Date()) + "\n");
         sb.append("Full thread dump " + runtimeMXBean.getVmName() +
                 " (" + runtimeMXBean.getVmVersion() + " " +
                 getSystemProperties().getProperty("java.vm.info") + "):\n");
         if (is15()) {
-            // dumpAllThreads new in Java SE 6
-            return "JDK 5.0 not implemented yet";
+            long[] threadIds = threadMXBean.getAllThreadIds();
+            for (long threadId : threadIds) {
+                ThreadInfo thread = threadMXBean.getThreadInfo(threadId, Integer.MAX_VALUE);
+                sb.append("\n\"" + thread.getThreadName() +
+                        "\" - Thread t@" + thread.getThreadId() + "\n");
+                sb.append("   java.lang.Thread.State: " + thread.getThreadState());
+                if (thread.getLockName() != null) {
+                    sb.append(" on " + thread.getLockName());
+                    if (thread.getLockOwnerName() != null) {
+                        sb.append(" owned by: " + thread.getLockOwnerName());
+                    }
+                }
+                sb.append("\n");
+                for (StackTraceElement st : thread.getStackTrace()) {
+                    sb.append("        at " + st.toString() + "\n");
+                }
+            }
+            return sb.toString();
         } else {
             ThreadInfo[] threads = threadMXBean.dumpAllThreads(true, true);
             for (ThreadInfo thread : threads) {
-                MonitorInfo[] monitors = thread.getLockedMonitors();
+                MonitorInfo[] monitors = null;
+                if (threadMXBean.isObjectMonitorUsageSupported()) {
+                    monitors = thread.getLockedMonitors();
+                }
                 sb.append("\n\"" + thread.getThreadName() +
-                        "\" : t@" + thread.getThreadId() + "\n");
+                        "\" - Thread t@" + thread.getThreadId() + "\n");
                 sb.append("   java.lang.Thread.State: " + thread.getThreadState());
                 if (thread.getLockName() != null) {
                     sb.append(" on " + thread.getLockName());
@@ -257,13 +275,15 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
                     }
                     index++;
                 }
-                sb.append("\n   Locked ownable synchronizers:");
-                LockInfo[] synchronizers = thread.getLockedSynchronizers();
-                if (synchronizers != null || synchronizers.length == 0) {
-                    sb.append("\n        - None\n");
-                } else {
-                    for (LockInfo li : synchronizers) {
-                        sb.append("\n        - locked " + li.toString() + "\n");
+                if (threadMXBean.isSynchronizerUsageSupported()) {
+                    sb.append("\n   Locked ownable synchronizers:");
+                    LockInfo[] synchronizers = thread.getLockedSynchronizers();
+                    if (synchronizers != null || synchronizers.length == 0) {
+                        sb.append("\n        - None\n");
+                    } else {
+                        for (LockInfo li : synchronizers) {
+                            sb.append("\n        - locked " + li.toString() + "\n");
+                        }
                     }
                 }
             }
@@ -312,10 +332,13 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     }
 
     public boolean isGetSystemPropertiesSupported() {
-        return true;
+        return !is14();
     }
 
     public boolean isDumpOnOOMEnabledSupported() {
+        if (is14() || is15()) {
+            return false;
+        }
         if (!app.getHost().equals(Host.LOCALHOST)) {
             return false;
         }
@@ -330,7 +353,7 @@ class JmxJVM extends DefaultJVM implements DataFinishedListener<Application> {
     }
 
     public boolean isTakeThreadDumpSupported() {
-        return jmxModel.getThreadMXBean() != null;
+        return is14() ? false : (jmxModel.getThreadMXBean() != null);
     }
 
     private String findByName(String key) {

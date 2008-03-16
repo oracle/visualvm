@@ -146,8 +146,11 @@ class ApplicationOverviewView extends DataSourceView {
             data.append("<br>");
             data.append("<b>JVM:</b> " + jvm.getVMName() + " (" + jvm.getVmVersion() + ", " + jvm.getVMInfo() + ")<br>");
             data.append("<b>Java Home:</b> " + jvm.getJavaHome() + "<br>");
-            data.append("<b>JVM Flags:</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? "none" : jvmFlags) + "<br><br>");
-            data.append("<b>Heap dump on OOME:</b> " + (jvm.isDumpOnOOMEnabled()?"enabled":"disabled") + "<br>");
+            data.append("<b>JVM Flags:</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? "none" : jvmFlags) + "<br>");
+            if (jvm.isDumpOnOOMEnabledSupported()) {
+              data.append("<br>");
+              data.append("<b>Heap dump on OOME:</b> " + (jvm.isDumpOnOOMEnabled()?"enabled":"disabled") + "<br>");
+            }
           }
 
           return data.toString();
