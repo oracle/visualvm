@@ -69,9 +69,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
     
-    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
-        public void dataRemoved(Host host) { processFinishedHost(host); }
-    };
+    // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
+//    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
+//        public void dataRemoved(Host host) { processFinishedHost(host); }
+//    };
     
     public void dataChanged(DataChangeEvent<Host> event) {
         Set<Host> newHosts = event.getAdded();
@@ -140,12 +141,13 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
     }
     
-    private void processFinishedHost(Host host) {
-        HostListener hostListener = mapping.get(host);
-        mapping.remove(host);
-        try { getMonitoredHost(host).removeHostListener(hostListener); } catch (MonitorException ex) {}
-        processAllTerminatedApplications(host);
-    }
+    // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
+//    private void processFinishedHost(Host host) {
+//        HostListener hostListener = mapping.get(host);
+//        mapping.remove(host);
+//        try { getMonitoredHost(host).removeHostListener(hostListener); } catch (MonitorException ex) {}
+//        processAllTerminatedApplications(host);
+//    }
     
     private void processNewApplicationsByIds(Host host, Set<Integer> applicationIds) {
         Set<JvmstatApplication> newApplications = new HashSet();
@@ -178,18 +180,19 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         host.getRepository().removeDataSources(finishedApplications);
     }
     
-    private void processAllTerminatedApplications(Host host) {
-        Set<JvmstatApplication> applicationsSet = host.getRepository().getDataSources(JvmstatApplication.class);
-        Set<JvmstatApplication> finishedApplications = new HashSet();
-        
-        for (JvmstatApplication application : applicationsSet)
-            if (applications.containsKey(application.getPid())) {
-                applications.remove(application.getPid());
-                finishedApplications.add(application);
-            }
-        
-        host.getRepository().removeDataSources(finishedApplications);
-    }
+    // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
+//    private void processAllTerminatedApplications(Host host) {
+//        Set<JvmstatApplication> applicationsSet = host.getRepository().getDataSources(JvmstatApplication.class);
+//        Set<JvmstatApplication> finishedApplications = new HashSet();
+//        
+//        for (JvmstatApplication application : applicationsSet)
+//            if (applications.containsKey(application.getPid())) {
+//                applications.remove(application.getPid());
+//                finishedApplications.add(application);
+//            }
+//        
+//        host.getRepository().removeDataSources(finishedApplications);
+//    }
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
     private void checkForBrokenJps(MonitoredHost monitoredHost) {
