@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -95,7 +96,7 @@ public final class RenameDataSourceAction extends AbstractAction {
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(DataSource selected) {
+            public void selectionChanged(Set<DataSource> selected) {
                 updateEnabled();
             }
         });

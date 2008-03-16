@@ -45,12 +45,12 @@ public class ThreadDumpActionsProvider {
     
     private class ThreadDumpActionProvider implements ExplorerActionsProvider<DataSource> {
 
-        public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSource> dataSources) { return null; }
 
-        public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSource> dataSources) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (ThreadDumpAction.isAvailable(dataSource))
+            if (ThreadDumpAction.getInstance().isAvailable())
                 actions.add(new ExplorerActionDescriptor(ThreadDumpAction.getInstance(), 10));
             
             return actions;

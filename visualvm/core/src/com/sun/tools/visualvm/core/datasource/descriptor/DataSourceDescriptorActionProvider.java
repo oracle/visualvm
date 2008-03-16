@@ -57,12 +57,12 @@ final class DataSourceDescriptorActionProvider {
     
     private class DataSourceActionsProvider implements ExplorerActionsProvider<DataSource> {
         
-        public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) {
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSource> dataSources) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
-            if (RenameDataSourceAction.isAvailable(dataSource))
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSource> dataSources) {
+            if (dataSources.size() == 1 && RenameDataSourceAction.isAvailable(dataSources.iterator().next()))
                 return Collections.singleton(new ExplorerActionDescriptor(RenameDataSourceAction.getInstance(), 90));
             else return Collections.EMPTY_SET;
         }

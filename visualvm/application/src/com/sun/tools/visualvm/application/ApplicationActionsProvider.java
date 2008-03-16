@@ -75,19 +75,22 @@ class ApplicationActionsProvider {
     private static class ApplicationActionProvider
             implements ExplorerActionsProvider<Application> {
 
-        public ExplorerActionDescriptor getDefaultAction(Application app) {
+        public ExplorerActionDescriptor getDefaultAction(Set<Application> apps) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(Application app) {
+        public Set<ExplorerActionDescriptor> getActions(Set<Application> apps) {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
-            JVM jvm = JVMFactory.getJVMFor(app);
-            if (jvm.isDumpOnOOMEnabledSupported()) {
-                actions.add(new ExplorerActionDescriptor(null, 40));
-                actions.add(new ExplorerActionDescriptor(
-                        heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
+            if (apps.size() == 1) {
+                JVM jvm = JVMFactory.getJVMFor(apps.iterator().next());
+                if (jvm.isDumpOnOOMEnabledSupported()) {
+                    actions.add(new ExplorerActionDescriptor(null, 40));
+                    actions.add(new ExplorerActionDescriptor(
+                            heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
+                }
             }
+            
             return actions;
         }
     }

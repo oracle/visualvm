@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -68,8 +69,8 @@ public final class Storage {
     }
     
     
-    public File getDirectory() {
-        if (!directory.exists() && !directory.mkdirs()) throw new IllegalStateException("Cannot create storage directory " + directory);
+    public synchronized File getDirectory() {
+        if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);
         return directory;
     }
     
@@ -134,7 +135,7 @@ public final class Storage {
                 throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");
             if (temporaryStorageDirectory.exists() && (!temporaryStorageDirectory.canRead() || !temporaryStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");
-            if (!temporaryStorageDirectory.exists() && !temporaryStorageDirectory.mkdirs())
+            if (!Utils.prepareDirectory(temporaryStorageDirectory))
                 throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString);
         }
         return temporaryStorageDirectory;
@@ -164,7 +165,7 @@ public final class Storage {
                 throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way");
             if (persistentStorageDirectory.exists() && (!persistentStorageDirectory.canRead() || !persistentStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");
-            if (!persistentStorageDirectory.exists() && !persistentStorageDirectory.mkdirs())
+            if (!Utils.prepareDirectory(persistentStorageDirectory))
                 throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
         }
         return persistentStorageDirectory;

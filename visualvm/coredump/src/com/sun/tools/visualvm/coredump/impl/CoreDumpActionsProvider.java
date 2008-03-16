@@ -49,29 +49,25 @@ public class CoreDumpActionsProvider {
     }
     
     
-    private static abstract class AbstractCoreDumpActionProvider<T extends DataSource> implements ExplorerActionsProvider<T> {
+    private static class CoreDumpsContainerActionProvider implements ExplorerActionsProvider<CoreDumpsContainer> {
         
-        public ExplorerActionDescriptor getDefaultAction(T dataSource) {
-            return null;
+        public ExplorerActionDescriptor getDefaultAction(Set<CoreDumpsContainer> container) {
+            return new ExplorerActionDescriptor(AddVMCoredumpAction.getInstance(), 0);
         }
         
-        public Set<ExplorerActionDescriptor> getActions(T coreDump) {
+        public Set<ExplorerActionDescriptor> getActions(Set<CoreDumpsContainer> container) {
             return Collections.EMPTY_SET;
         }
         
     }
     
-    private static class CoreDumpsContainerActionProvider extends AbstractCoreDumpActionProvider<CoreDumpsContainer> {
+    private static class DataSourceRootActionProvider implements ExplorerActionsProvider<DataSource> {
         
-        public ExplorerActionDescriptor getDefaultAction(CoreDumpsContainer dataSource) {
-            return new ExplorerActionDescriptor(AddVMCoredumpAction.getInstance(), 0);
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSource> dataSource) {
+            return null;
         }
         
-    }
-    
-    private static class DataSourceRootActionProvider extends AbstractCoreDumpActionProvider<DataSource> {
-        
-        public Set<ExplorerActionDescriptor> getActions(DataSource root) {
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSource> root) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(AddVMCoredumpAction.getInstance(), 30));

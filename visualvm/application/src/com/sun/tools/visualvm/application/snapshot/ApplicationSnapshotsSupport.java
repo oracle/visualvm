@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.application.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
@@ -79,13 +80,13 @@ public final class ApplicationSnapshotsSupport {
         return snapshotProvider;
     }
     
-    static String getStorageDirectoryString() {
+    static synchronized String getStorageDirectoryString() {
         if (snapshotsStorageDirectoryString == null)
             snapshotsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + SNAPSHOTS_STORAGE_DIRNAME;
         return snapshotsStorageDirectoryString;
     }
     
-    static File getStorageDirectory() {
+    static synchronized File getStorageDirectory() {
         if (snapshotsStorageDirectory == null) {
             String snapshotsStorageString = getStorageDirectoryString();
             snapshotsStorageDirectory = new File(snapshotsStorageString);
@@ -93,7 +94,7 @@ public final class ApplicationSnapshotsSupport {
                 throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString + ", file in the way");
             if (snapshotsStorageDirectory.exists() && (!snapshotsStorageDirectory.canRead() || !snapshotsStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access snapshots storage directory " + snapshotsStorageString + ", read&write permission required");
-            if (!snapshotsStorageDirectory.exists() && !snapshotsStorageDirectory.mkdirs())
+            if (!Utils.prepareDirectory(snapshotsStorageDirectory))
                 throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString);
         }
         return snapshotsStorageDirectory;

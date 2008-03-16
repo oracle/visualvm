@@ -33,15 +33,18 @@ import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 public final class ApplicationSnapshotAction extends AbstractAction implements DataChangeListener {
     
     private static ApplicationSnapshotAction instance;
     
-    private DataSource lastSelectedApplication;
+    private Set<Application> lastSelectedApplications;
     
     
     public static synchronized ApplicationSnapshotAction getInstance() {
@@ -50,26 +53,38 @@ public final class ApplicationSnapshotAction extends AbstractAction implements D
     }
     
     public void actionPerformed(ActionEvent e) {
-        Application selectedApplication = getSelectedApplication();
-        if (selectedApplication != null && !selectedApplication.getRepository().getDataSources(Snapshot.class).isEmpty())
-            ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(selectedApplication, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+        Set<Application> saveableApplications = getSaveableApplications();
+        for (Application application : saveableApplications)
+            ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
     }
     
     void updateEnabled() {
-        Application selectedApplication = getSelectedApplication();
-        final boolean isEnabled = selectedApplication != null && !selectedApplication.getRepository().getDataSources(Snapshot.class).isEmpty();
+        Set<Application> saveableApplications = getSaveableApplications();
+        final boolean isEnabled = !saveableApplications.isEmpty();
         
-        Runnable enabler = new Runnable() {
+        IDEUtils.runInEventDispatchThread(new Runnable() {
             public void run() { setEnabled(isEnabled); }
-        };
-        if (SwingUtilities.isEventDispatchThread()) enabler.run();
-        else SwingUtilities.invokeLater(enabler);
+        });
     }
     
-    private Application getSelectedApplication() {
-        DataSource selectedApplication = ExplorerSupport.sharedInstance().getSelectedDataSource();
-        if (selectedApplication == null) return null;
-        return selectedApplication instanceof Application ? (Application)selectedApplication : null;
+    private Set<Application> getSaveableApplications() {
+        Set<Application> selectedApplications = getSelectedApplications();
+        Set<Application> saveableApplications = new HashSet();
+        for (Application application : selectedApplications)
+            if (!application.getRepository().getDataSources(Snapshot.class).isEmpty())
+                saveableApplications.add(application);
+            else return Collections.EMPTY_SET;
+        return saveableApplications;
+    }
+    
+    private Set<Application> getSelectedApplications() {
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
+        Set<Application> selectedApplications = new HashSet();
+        for (DataSource dataSource : selectedDataSources)
+            if (dataSource instanceof Application)
+                selectedApplications.add((Application)dataSource);
+            else return Collections.EMPTY_SET;
+        return selectedApplications;
     }
     
     
@@ -79,15 +94,17 @@ public final class ApplicationSnapshotAction extends AbstractAction implements D
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(DataSource selected) {
-                updateEnabled();
-                if (lastSelectedApplication != null) {
-                    lastSelectedApplication.getRepository().removeDataChangeListener(ApplicationSnapshotAction.this);
-                    lastSelectedApplication = null;
+            public void selectionChanged(Set<DataSource> selected) {
+                Set<Application> selectedApplications = getSelectedApplications();
+                if (lastSelectedApplications != null) {
+                    for (Application application : lastSelectedApplications)
+                        application.getRepository().removeDataChangeListener(ApplicationSnapshotAction.this);
+                    lastSelectedApplications = null;
                 }
-                if (selected instanceof Application) {
-                    lastSelectedApplication = selected;
-                    lastSelectedApplication.getRepository().addDataChangeListener(ApplicationSnapshotAction.this, Snapshot.class);
+                if (!selectedApplications.isEmpty()) {
+                    lastSelectedApplications = selectedApplications;
+                    for (Application application : lastSelectedApplications)
+                        application.getRepository().addDataChangeListener(ApplicationSnapshotAction.this, Snapshot.class);
                 }
             }
         });

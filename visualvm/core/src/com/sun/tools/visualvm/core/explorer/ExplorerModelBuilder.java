@@ -226,7 +226,7 @@ class ExplorerModelBuilder {
         Map<ExplorerNode, List<Integer>> indexes = new HashMap();
         
         // Save selection
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         
         // Add nodes and create parent entries
         for (ExplorerNode node : added) {
@@ -253,14 +253,14 @@ class ExplorerModelBuilder {
         }
         
         // Try to restore selection
-        ExplorerSupport.sharedInstance().selectDataSource(selectedDataSource);
+        ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
     
     private void removeNodes(Set<ExplorerNode> removed) {
         Map<ExplorerNode, List<IndexNodePair>> pairs = new HashMap();
         
         // Save selection
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         
         // Cache indexes and childs
         for (ExplorerNode node : removed) {
@@ -294,7 +294,7 @@ class ExplorerModelBuilder {
         }
         
         // Try to restore selection
-        ExplorerSupport.sharedInstance().selectDataSource(selectedDataSource);
+        ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
     
     

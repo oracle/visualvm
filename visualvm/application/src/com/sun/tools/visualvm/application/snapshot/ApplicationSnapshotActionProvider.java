@@ -62,11 +62,11 @@ final class ApplicationSnapshotActionProvider {
     
     private class AddApplicationSnapshotActionProvider implements ExplorerActionsProvider<SnapshotsContainer> {
         
-        public ExplorerActionDescriptor getDefaultAction(SnapshotsContainer container) {
+        public ExplorerActionDescriptor getDefaultAction(Set<SnapshotsContainer> container) {
             return new ExplorerActionDescriptor(AddApplicationSnapshotAction.getInstance(), 0);
         }
 
-        public Set<ExplorerActionDescriptor> getActions(SnapshotsContainer container) {
+        public Set<ExplorerActionDescriptor> getActions(Set<SnapshotsContainer> container) {
             return Collections.EMPTY_SET;
         }
         
@@ -74,11 +74,11 @@ final class ApplicationSnapshotActionProvider {
     
     private class AddApplicationSnapshotRootActionProvider implements ExplorerActionsProvider<DataSourceRoot> {
         
-        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) {
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSourceRoot> root) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSourceRoot> root) {
             return Collections.singleton(new ExplorerActionDescriptor(AddApplicationSnapshotAction.getInstance(), 40));
         }
         
@@ -86,11 +86,11 @@ final class ApplicationSnapshotActionProvider {
     
     private class SaveApplicationActionProvider implements ExplorerActionsProvider<Application> {
         
-        public ExplorerActionDescriptor getDefaultAction(Application application) {
+        public ExplorerActionDescriptor getDefaultAction(Set<Application> applications) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(Application application) {
+        public Set<ExplorerActionDescriptor> getActions(Set<Application> applications) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
             if (ApplicationSnapshotAction.getInstance().isEnabled())

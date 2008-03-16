@@ -49,11 +49,11 @@ public class HostActionsProvider {
     
     private class RemoteHostsContainerActionProvider implements ExplorerActionsProvider<RemoteHostsContainer> {
 
-        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
+        public ExplorerActionDescriptor getDefaultAction(Set<RemoteHostsContainer> container) {
             return new ExplorerActionDescriptor(AddRemoteHostAction.getInstance(), 0);
         }
 
-        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
+        public Set<ExplorerActionDescriptor> getActions(Set<RemoteHostsContainer> container) {
             return Collections.EMPTY_SET;
         }
         
@@ -61,9 +61,9 @@ public class HostActionsProvider {
     
     private class DataSourceRootActionProvider implements ExplorerActionsProvider<DataSourceRoot> {
 
-        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSourceRoot> root) { return null; }
 
-        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSourceRoot> root) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
             actions.add(new ExplorerActionDescriptor(AddRemoteHostAction.getInstance(), 10));

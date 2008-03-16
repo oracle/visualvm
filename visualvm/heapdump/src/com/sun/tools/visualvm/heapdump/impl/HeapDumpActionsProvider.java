@@ -46,12 +46,12 @@ public class HeapDumpActionsProvider {
     
     private class HeapDumpActionProvider implements ExplorerActionsProvider<DataSource> {
 
-        public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) { return null; }
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSource> dataSources) { return null; }
 
-        public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSource> dataSources) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (HeapDumpAction.isAvailable(dataSource))
+            if (HeapDumpAction.getInstance().isAvailable())
                 actions.add(new ExplorerActionDescriptor(HeapDumpAction.getInstance(), 20));
             
             return actions;

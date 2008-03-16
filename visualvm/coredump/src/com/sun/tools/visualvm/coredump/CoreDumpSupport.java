@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.coredump;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
@@ -77,7 +78,7 @@ public final class CoreDumpSupport {
                 throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString + ", file in the way");
             if (coredumpsStorageDirectory.exists() && (!coredumpsStorageDirectory.canRead() || !coredumpsStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access coredumps storage directory " + snapshotsStorageString + ", read&write permission required");
-            if (!coredumpsStorageDirectory.exists() && !coredumpsStorageDirectory.mkdirs())
+            if (!Utils.prepareDirectory(coredumpsStorageDirectory))
                 throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString);
         }
         return coredumpsStorageDirectory;

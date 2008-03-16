@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.io.File;
 
 /**
@@ -58,7 +59,7 @@ public class JmxApplicationsSupport {
                 throw new IllegalStateException("Cannot create hosts storage directory " + storageString + ", file in the way");
             if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access hosts storage directory " + storageString + ", read&write permission required");
-            if (!storageDirectory.exists() && !storageDirectory.mkdirs())
+            if (!Utils.prepareDirectory(storageDirectory))
                 throw new IllegalStateException("Cannot create hosts storage directory " + storageString);
         }
         return storageDirectory;

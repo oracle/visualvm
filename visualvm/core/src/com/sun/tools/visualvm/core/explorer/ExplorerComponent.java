@@ -37,6 +37,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -61,6 +63,7 @@ class ExplorerComponent extends JPanel {
     
     private static ExplorerComponent instance;
     
+    private JTree explorerTree;
     private boolean vetoTreeExpansion = false;
     
     
@@ -78,22 +81,6 @@ class ExplorerComponent extends JPanel {
     }
     
     
-    private void performDefaultAction(TreePath path) {
-        if (path == null) return;
-    
-        ExplorerNode node = (ExplorerNode)path.getLastPathComponent();
-        DataSource dataSource = node.getUserObject();
-        Action defaultAction = getDefaultAction(dataSource);
-        if (defaultAction == null) return;
-    
-        defaultAction.actionPerformed(new ActionEvent(dataSource, 0, "Default Action"));
-    }
-    
-    private static Action getDefaultAction(DataSource dataSource) {
-        return ExplorerContextMenuFactory.sharedInstance().getDefaultActionFor(dataSource);
-    }
-            
-    
     private void initComponents() {
         setLayout(new BorderLayout());
         
@@ -102,9 +89,8 @@ class ExplorerComponent extends JPanel {
             protected void processMouseEvent(MouseEvent e) {
                 vetoTreeExpansion = false;
                 if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() >= getToggleClickCount()) {
-                    TreePath path = getPathForLocation(e.getX(), e.getY());
-                    ExplorerNode node = path != null ? (ExplorerNode)path.getLastPathComponent() : null;
-                    if (node != null && getDefaultAction(node.getUserObject()) != null && getPathBounds(path).contains(e.getX(), e.getY())) vetoTreeExpansion = true;
+                    Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
+                    if (getDefaultAction(selectedDataSources) != null) vetoTreeExpansion = true;
                 }
                 super.processMouseEvent(e);
             }
@@ -113,7 +99,7 @@ class ExplorerComponent extends JPanel {
         explorerTree.setShowsRootHandles(true);
         explorerTree.setRowHeight(getTreeRowHeight());
         explorerTree.setCellRenderer(new ExplorerNodeRenderer());
-        explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         explorerTree.addKeyListener(new ExplorerTreeKeyAdapter());
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
         
@@ -126,7 +112,7 @@ class ExplorerComponent extends JPanel {
         String DEFAULT_ACTION_KEY = "DEFAULT_ACTION"; // NOI18N
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), DEFAULT_ACTION_KEY); // NOI18N
         getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), DEFAULT_ACTION_KEY); // NOI18N
-        getActionMap().put(DEFAULT_ACTION_KEY, new AbstractAction() { public void actionPerformed(ActionEvent e) { performDefaultAction(explorerTree.getSelectionPath()); }}); // NOI18N
+        getActionMap().put(DEFAULT_ACTION_KEY, new AbstractAction() { public void actionPerformed(ActionEvent e) { performDefaultAction(); }}); // NOI18N
         
         // Control tree expansion
         explorerTree.addTreeWillExpandListener(new TreeWillExpandListener() {
@@ -153,8 +139,25 @@ class ExplorerComponent extends JPanel {
     }
     
     
-    private JTree explorerTree;
+    private static Action getDefaultAction(Set<DataSource> dataSources) {
+        return ExplorerContextMenuFactory.sharedInstance().getDefaultActionFor(dataSources);
+    }
     
+    private void performDefaultAction() {
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
+        Action defaultAction = getDefaultAction(selectedDataSources);
+        if (defaultAction != null) defaultAction.actionPerformed(new ActionEvent(selectedDataSources, 0, "Default Action"));
+    }
+    
+    private void displayContextMenu(int x, int y) {
+        // Determine the node for which to display context menu
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
+        if (selectedDataSources.isEmpty()) selectedDataSources = Collections.singleton(DataSource.ROOT);
+
+        // Create popup menu and display it
+        JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(selectedDataSources);
+        if (popupMenu != null) popupMenu.show(explorerTree, x, y);
+    }
     
     private class ExplorerTreeKeyAdapter extends KeyAdapter {
         public void keyPressed(KeyEvent e) {
@@ -163,17 +166,21 @@ class ExplorerComponent extends JPanel {
                 
                 e.consume();
                 
+                int x;
+                int y;
                 TreePath path = explorerTree.getSelectionPath();
+                
                 if (path != null) {
                     Rectangle pathRect = explorerTree.getPathBounds(path);
-                    JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(ExplorerSupport.sharedInstance().getDataSource(path));
-                    if (popupMenu != null) popupMenu.show(explorerTree, pathRect.x, pathRect.y);
+                    x = pathRect.x;
+                    y = pathRect.y;
                 } else {
                     Point pathPoint = new Point(explorerTree.getWidth() / 3, explorerTree.getHeight() / 3);
-                    JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(DataSource.ROOT);
-                    if (popupMenu != null) popupMenu.show(explorerTree, pathPoint.x, pathPoint.y);
+                    x = pathPoint.x;
+                    y = pathPoint.y;
                 }
                 
+                displayContextMenu(x, y);
             }
         }
     }
@@ -183,24 +190,20 @@ class ExplorerComponent extends JPanel {
             if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
                 // Select path on location or clear selection
                 TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
-                if (path != null) explorerTree.setSelectionPath(path);
-                else explorerTree.clearSelection();
+                if (path != null) {
+                    if (!explorerTree.isPathSelected(path))
+                        explorerTree.setSelectionPath(path);
+                } else {
+                    explorerTree.clearSelection();
+                }
             }
         }
     
         public void mouseClicked(MouseEvent e) {
             if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                
-                // Determine the node for which to display context menu
-                TreePath selectedPath = explorerTree.getSelectionPath();
-                ExplorerNode selectedNode = selectedPath != null ? (ExplorerNode)selectedPath.getLastPathComponent() : null;
-        
-                // Create popup menu and display it
-                JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(selectedNode == null ? DataSource.ROOT : selectedNode.getUserObject());
-                if (popupMenu != null) popupMenu.show(explorerTree, e.getX(), e.getY());
-                
+                displayContextMenu(e.getX(), e.getY());                
             } else if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() == explorerTree.getToggleClickCount()) {
-                performDefaultAction(explorerTree.getPathForLocation(e.getX(), e.getY()));
+                performDefaultAction();
             }
         }
     }

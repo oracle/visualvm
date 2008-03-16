@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.host;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.host.impl.HostActionsProvider;
 import com.sun.tools.visualvm.host.impl.HostDescriptorProvider;
 import com.sun.tools.visualvm.host.impl.HostProperties;
@@ -84,7 +85,7 @@ public final class HostsSupport {
                 throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");
             if (hostsStorageDirectory.exists() && (!hostsStorageDirectory.canRead() || !hostsStorageDirectory.canWrite()))
                 throw new IllegalStateException("Cannot access hosts storage directory " + snapshotsStorageString + ", read&write permission required");
-            if (!hostsStorageDirectory.exists() && !hostsStorageDirectory.mkdirs())
+            if (!Utils.prepareDirectory(hostsStorageDirectory))
                 throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString);
         }
         return hostsStorageDirectory;

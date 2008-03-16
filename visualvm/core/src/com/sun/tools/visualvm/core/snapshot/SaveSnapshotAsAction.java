@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -64,8 +65,7 @@ public final class SaveSnapshotAsAction extends AbstractAction {
     
     private Snapshot getSelectedSnapshot() {
         DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
-        if (selectedDataSource == null) return null;
-        return selectedDataSource instanceof Snapshot ? (Snapshot)selectedDataSource : null;
+        return (selectedDataSource != null && selectedDataSource instanceof Snapshot) ? (Snapshot)selectedDataSource : null;
     }
     
     
@@ -77,7 +77,7 @@ public final class SaveSnapshotAsAction extends AbstractAction {
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(DataSource selected) {
+            public void selectionChanged(Set<DataSource> selected) {
                 updateEnabled();
             }
         });

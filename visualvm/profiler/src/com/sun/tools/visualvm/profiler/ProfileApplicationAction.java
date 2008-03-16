@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -94,8 +95,7 @@ public final class ProfileApplicationAction extends AbstractAction {
     
     private Application getSelectedApplication() {
         DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
-        if (selectedDataSource == null) return null;
-        return selectedDataSource instanceof Application ? (Application)selectedDataSource : null;
+        return (selectedDataSource != null && selectedDataSource instanceof Application) ? (Application)selectedDataSource : null;
     }
     
     
@@ -105,7 +105,7 @@ public final class ProfileApplicationAction extends AbstractAction {
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(DataSource selected) {
+            public void selectionChanged(Set<DataSource> selected) {
                 updateEnabled();
             }
         });

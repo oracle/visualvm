@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -48,32 +49,30 @@ public final class RemoveDataSourceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        final DataSource selectedDataSource = getSelectedDataSource();
-        selectedDataSource.getOwner().getRepository().removeDataSource(selectedDataSource);
+        Set<DataSource> removableDataSources = getRemovableDataSources();
+        for (DataSource dataSource : removableDataSources)
+            dataSource.getOwner().getRepository().removeDataSource(dataSource);
     }
     
     private void updateEnabled() {
-        final DataSource selectedDataSource = getSelectedDataSource();
+        final boolean isEnabled = !getRemovableDataSources().isEmpty();
         
         IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() {
-                setEnabled(isEnabled(selectedDataSource));
-            }
+            public void run() { setEnabled(isEnabled); }
         });
     }
     
-    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
-    private static boolean isEnabled(DataSource dataSource) {
-        return dataSource != null && dataSource.supportsUserRemove();
+    private Set<DataSource> getRemovableDataSources() {
+        Set<DataSource> selectedDataSources = getSelectedDataSources();
+        Set<DataSource> removableDataSources = new HashSet();
+        for (DataSource dataSource : selectedDataSources)
+            if (!dataSource.supportsUserRemove()) return Collections.EMPTY_SET;
+            else removableDataSources.add(dataSource);
+        return removableDataSources;
     }
     
-    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
-    static boolean isAvailable(DataSource dataSource) {
-        return isEnabled(dataSource);
-    }
-    
-    private DataSource getSelectedDataSource() {
-        return ExplorerSupport.sharedInstance().getSelectedDataSource();
+    private Set<DataSource> getSelectedDataSources() {
+        return ExplorerSupport.sharedInstance().getSelectedDataSources();
     }
     
     
@@ -83,13 +82,13 @@ public final class RemoveDataSourceAction extends AbstractAction {
         
         ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(new ExplorerActionsProvider<DataSource>() {
 
-            public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) { return null; }
+            public ExplorerActionDescriptor getDefaultAction(Set<DataSource> dataSources) { return null; }
 
-            public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
+            public Set<ExplorerActionDescriptor> getActions(Set<DataSource> dataSources) {
                 Set<ExplorerActionDescriptor> actions = new HashSet();
 
                 if (RemoveDataSourceAction.this.isEnabled())
-                actions.add(new ExplorerActionDescriptor(RemoveDataSourceAction.this, 100));
+                    actions.add(new ExplorerActionDescriptor(RemoveDataSourceAction.this, 100));
 
                 return actions;
             }
@@ -98,7 +97,7 @@ public final class RemoveDataSourceAction extends AbstractAction {
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(DataSource selected) {
+            public void selectionChanged(Set<DataSource> selected) {
                 updateEnabled();
             }
         });

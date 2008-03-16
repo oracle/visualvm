@@ -25,10 +25,10 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -46,44 +46,41 @@ public final class OpenDataSourceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        final DataSource selectedDataSource = getSelectedDataSource();
+        final Set<DataSource> selectedDataSources = getSelectedDataSources();
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                if (isAvailable(selectedDataSource)) {
-                    DataSourceWindowManager.sharedInstance().openDataSource(selectedDataSource);
+                if (isAvailable(selectedDataSources)) {
+                    for (DataSource dataSource : selectedDataSources)
+                        DataSourceWindowManager.sharedInstance().openDataSource(dataSource);
                 } else {
-                    NetBeansProfiler.getDefaultNB().displayError("Cannot open " + DataSourceDescriptorFactory.getDescriptor(selectedDataSource).getName());
+                    NetBeansProfiler.getDefaultNB().displayError("Cannot open selected item(s)");
                 }
             }
         });
     }
     
     private void updateEnabled() {
-        final DataSource selectedDataSource = getSelectedDataSource();
+        final boolean isEnabled = !getSelectedDataSources().isEmpty();
         
         IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
-                setEnabled(isEnabled(selectedDataSource));
+                setEnabled(isEnabled);
             }
         });
     }
     
-    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
-    private static boolean isEnabled(DataSource dataSource) {
-        if (dataSource == null) return false;
+    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
+    boolean isAvailable(Set<DataSource> selectedDataSources) {
+        if (!isEnabled()) return false;
+        
+        for (DataSource dataSource : selectedDataSources)
+            if (!DataSourceViewsFactory.sharedInstance().canCreateWindowFor(dataSource)) return false;
         return true;
     }
     
-    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
-    static boolean isAvailable(DataSource dataSource) {
-        if (!isEnabled(dataSource)) return false;
-        
-        return DataSourceViewsFactory.sharedInstance().canCreateWindowFor(dataSource);
-    }
-    
-    private DataSource getSelectedDataSource() {
-        return ExplorerSupport.sharedInstance().getSelectedDataSource();
+    private Set<DataSource> getSelectedDataSources() {
+        return ExplorerSupport.sharedInstance().getSelectedDataSources();
     }
     
     
@@ -93,7 +90,7 @@ public final class OpenDataSourceAction extends AbstractAction {
         
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(DataSource selected) {
+            public void selectionChanged(Set<DataSource> selected) {
                 updateEnabled();
             }
         });

@@ -96,7 +96,7 @@ class ApplicationSnapshotProvider {
         if (snapshots.isEmpty()) return;
         
         File snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
-        if (!snapshotDirectory.exists() && !snapshotDirectory.mkdirs())
+        if (!Utils.prepareDirectory(snapshotDirectory))
             throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
         
         for (Snapshot snapshot : snapshots) {

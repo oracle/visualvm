@@ -30,12 +30,8 @@ import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.RemoteHostsContainer;
-import java.awt.event.ActionEvent;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.AbstractAction;
 
 /**
  *
@@ -45,73 +41,27 @@ import javax.swing.AbstractAction;
  */
 class JmxApplicationActionsProvider {
 
-    private static final RemoveJmxConnectionAction removeJmxConnectionAction =
-            new RemoveJmxConnectionAction();
-
     static void initialize() {
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
         explorer.addExplorerActionsProvider(
-                new JmxActionProvider(), JmxApplication.class);
-        explorer.addExplorerActionsProvider(
                 new HostActionProvider(), Host.class);
-        explorer.addExplorerActionsProvider(
-                new RemoteHostsContainerActionProvider(), RemoteHostsContainer.class);
         explorer.addExplorerActionsProvider(
                 new DataSourceRootActionProvider(), DataSourceRoot.class);
     }
 
-    private static class RemoveJmxConnectionAction extends AbstractAction {
-
-        public RemoveJmxConnectionAction() {
-            super("Remove");
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            JmxApplication app = (JmxApplication) e.getSource();
-            JmxApplicationProvider.sharedInstance().removeJmxApplication(app);
-        }
-    }
-
-    private static class JmxActionProvider
-            implements ExplorerActionsProvider<JmxApplication> {
-
-        public ExplorerActionDescriptor getDefaultAction(JmxApplication app) {
-            return null;
-        }
-
-        public Set<ExplorerActionDescriptor> getActions(JmxApplication app) {
-            ExplorerActionDescriptor remove;
-            remove = new ExplorerActionDescriptor(removeJmxConnectionAction, 100);
-            return Collections.singleton(remove);
-        }
-    }
-
     private static class HostActionProvider implements ExplorerActionsProvider<Host> {
 
-        public ExplorerActionDescriptor getDefaultAction(Host host) {
+        public ExplorerActionDescriptor getDefaultAction(Set<Host> hosts) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(Host host) {
+        public Set<ExplorerActionDescriptor> getActions(Set<Host> hosts) {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
-            if (!Host.UNKNOWN_HOST.equals(host))
+            
+            if (hosts.size() == 1 && !Host.UNKNOWN_HOST.equals(hosts.iterator().next()))
                 actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 110));
-            return actions;
-        }
-    }
-
-    private static class RemoteHostsContainerActionProvider
-            implements ExplorerActionsProvider<RemoteHostsContainer> {
-
-        public ExplorerActionDescriptor getDefaultAction(RemoteHostsContainer container) {
-            return null;
-        }
-
-        public Set<ExplorerActionDescriptor> getActions(RemoteHostsContainer container) {
-            Set<ExplorerActionDescriptor> actions =
-                    new HashSet<ExplorerActionDescriptor>();
-            actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 30));
+            
             return actions;
         }
     }
@@ -119,11 +69,11 @@ class JmxApplicationActionsProvider {
     private static class DataSourceRootActionProvider
             implements ExplorerActionsProvider<DataSourceRoot> {
 
-        public ExplorerActionDescriptor getDefaultAction(DataSourceRoot root) {
+        public ExplorerActionDescriptor getDefaultAction(Set<DataSourceRoot> root) {
             return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(DataSourceRoot root) {
+        public Set<ExplorerActionDescriptor> getActions(Set<DataSourceRoot> root) {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
             actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 20));

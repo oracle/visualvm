@@ -26,8 +26,10 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -84,10 +86,19 @@ public class ExplorerSupport {
      */
     public void selectDataSource(final DataSource dataSource) {
         if (dataSource == null) return;
+        selectDataSources(Collections.singleton(dataSource));
+    }
+    
+    public void selectDataSources(final Set<DataSource> dataSources) {
+        if (dataSources.isEmpty()) return;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                ExplorerNode node = getNode(dataSource);
-                if (node != null) mainTree.setSelectionPath(getPath(node));
+                List<TreePath> selectedPaths = new ArrayList();
+                for (DataSource dataSource : dataSources) {
+                    ExplorerNode node = getNode(dataSource);
+                    if (node != null) selectedPaths.add(getPath(node));
+                }
+                mainTree.setSelectionPaths(selectedPaths.isEmpty() ? null : selectedPaths.toArray(new TreePath[selectedPaths.size()]));
             } 
         });
     }
@@ -107,7 +118,20 @@ public class ExplorerSupport {
      * @return DataSource selected in explorer tree or null if no DataSource is selected.
      */
     public DataSource getSelectedDataSource() {
-        return getDataSource(mainTree.getSelectionPath());
+        Set<DataSource> selectedDataSources = getSelectedDataSources();
+        return selectedDataSources.size() == 1 ? selectedDataSources.iterator().next() : null;
+    }
+    
+    public Set<DataSource> getSelectedDataSources() {
+        TreePath[] selectedPaths = mainTree.getSelectionPaths();
+        if (selectedPaths == null) return Collections.EMPTY_SET;
+        
+        Set<DataSource> selectedDataSources = new HashSet();
+        for (TreePath treePath : selectedPaths) {
+            DataSource dataSource = getDataSource(treePath);
+            if (dataSource != null) selectedDataSources.add(dataSource);
+        }
+        return selectedDataSources;
     }
     
     /**
@@ -194,9 +218,9 @@ public class ExplorerSupport {
     private class ExplorerTreeSelectionListener implements TreeSelectionListener {
 
         public void valueChanged(TreeSelectionEvent e) {
-            DataSource selectedDataSource = getSelectedDataSource();
+            Set<DataSource> selectedDataSources = getSelectedDataSources();
             Set<ExplorerSelectionListener> listeners = new HashSet(selectionListeners);
-            for (ExplorerSelectionListener listener : listeners) listener.selectionChanged(selectedDataSource);
+            for (ExplorerSelectionListener listener : listeners) listener.selectionChanged(selectedDataSources);
         }
         
     }
