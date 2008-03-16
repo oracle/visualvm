@@ -184,7 +184,7 @@ public class ExplorerSupport {
             
     
     private ExplorerSupport() {
-        mainTree = ExplorerUI.instance().getTree();
+        mainTree = ExplorerComponent.instance().getTree();
         mainTree.addTreeSelectionListener(new ExplorerTreeSelectionListener());
         mainTree.addTreeExpansionListener(new ExplorerTreeExpansionListener());
         OpenDataSourceSupport.getInstance().initialize();

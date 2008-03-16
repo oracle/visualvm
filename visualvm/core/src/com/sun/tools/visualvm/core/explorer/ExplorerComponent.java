@@ -57,19 +57,19 @@ import javax.swing.tree.TreeSelectionModel;
  *
  * @author Jiri Sedlacek
  */
-class ExplorerUI extends JPanel {
+class ExplorerComponent extends JPanel {
     
-    private static ExplorerUI instance;
+    private static ExplorerComponent instance;
     
     private boolean vetoTreeExpansion = false;
     
     
-    public static ExplorerUI instance() {
-        if (instance == null) instance = new ExplorerUI();
+    public static ExplorerComponent instance() {
+        if (instance == null) instance = new ExplorerComponent();
         return instance;
     }
     
-    private ExplorerUI() {
+    private ExplorerComponent() {
         initComponents();
     }
     

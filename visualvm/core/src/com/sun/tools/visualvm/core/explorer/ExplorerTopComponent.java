@@ -56,7 +56,7 @@ final class ExplorerTopComponent extends TopComponent {
   
     private void initComponents() {
         setLayout(new BorderLayout());
-        add(ExplorerUI.instance(), BorderLayout.CENTER);
+        add(ExplorerComponent.instance(), BorderLayout.CENTER);
     }
     
     
