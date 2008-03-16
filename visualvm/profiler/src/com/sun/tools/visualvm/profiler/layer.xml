@@ -37,7 +37,7 @@
         <folder name="Applications">
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="1100"/>
+                <attr name="position" intvalue="1200"/>
             </file>
         </folder>
     </folder>

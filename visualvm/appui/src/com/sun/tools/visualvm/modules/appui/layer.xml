@@ -97,6 +97,11 @@
         </folder>
         <file name="org-openide-text-PrintSettings.settings_hidden"/>
     </folder>
+    <folder name="Shortcuts">
+        <file name="AS-F2.instance_hidden"/>
+        <file name="CS-F2.instance_hidden"/>
+        <file name="S-F9.instance_hidden"/>
+    </folder>
     <folder name="Toolbars">
         <file name="Edit_hidden"/>
         <folder name="File">

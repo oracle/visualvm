@@ -37,7 +37,7 @@
         <folder name="Applications">
             <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance"/>
-                <attr name="position" intvalue="900"/>
+                <attr name="position" intvalue="1000"/>
             </file>
         </folder>
     </folder>

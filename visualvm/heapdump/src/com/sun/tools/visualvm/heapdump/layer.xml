@@ -39,7 +39,7 @@
             <attr name="position" intvalue="200"/>
             <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance"/>
-                <attr name="position" intvalue="1000"/>
+                <attr name="position" intvalue="1100"/>
             </file>
         </folder>
     </folder>
