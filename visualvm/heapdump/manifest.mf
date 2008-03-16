@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: false
 OpenIDE-Module: com.sun.tools.visualvm.heapdump
 OpenIDE-Module-Install: com/sun/tools/visualvm/heapdump/Installer.class
 OpenIDE-Module-Layer: com/sun/tools/visualvm/heapdump/layer.xml
