@@ -51,11 +51,11 @@ import org.openide.ErrorManager;
 /**
  * This model relies on the {@link JmxModel} for the given application
  * and returns MXBean proxies for the Java platform MXBeans.
- * 
+ *
  * @author Luis-Miguel Alventosa
  */
 public class JvmJmxModel extends Model {
-
+    
     private Application app;
     protected MBeanServerConnection mbsc;
     private ClassLoadingMXBean classLoadingMXBean = null;
@@ -68,7 +68,7 @@ public class JvmJmxModel extends Model {
     private List<GarbageCollectorMXBean> garbageCollectorMXBeans = null;
     private List<MemoryManagerMXBean> memoryManagerMXBeans = null;
     private List<MemoryPoolMXBean> memoryPoolMXBeans = null;
-
+    
     /**
      * Creates an instance of {@code JvmJmxModel} for a given {@link Application}.
      *
@@ -81,7 +81,7 @@ public class JvmJmxModel extends Model {
             mbsc = jmxModel.getCachedMBeanServerConnection();
         }
     }
-
+    
     /**
      * Returns an MXBean proxy for the class loading system of the JVM.
      */
@@ -91,7 +91,7 @@ public class JvmJmxModel extends Model {
         }
         return classLoadingMXBean;
     }
-
+    
     /**
      * Returns an MXBean proxy for the compilation system of the JVM.
      */
@@ -101,7 +101,7 @@ public class JvmJmxModel extends Model {
         }
         return compilationMXBean;
     }
-
+    
     /**
      * Returns an MXBean proxy for the logging system of the JVM.
      */
@@ -111,7 +111,7 @@ public class JvmJmxModel extends Model {
         }
         return loggingMXBean;
     }
-
+    
     /**
      * Returns a collection of MXBean proxies for the garbage collectors of the JVM.
      */
@@ -148,7 +148,7 @@ public class JvmJmxModel extends Model {
         }
         return garbageCollectorMXBeans;
     }
-
+    
     /**
      * Returns a collection of MXBean proxies for the memory managers of the JVM.
      */
@@ -185,7 +185,7 @@ public class JvmJmxModel extends Model {
         }
         return memoryManagerMXBeans;
     }
-
+    
     /**
      * Returns an MXBean proxy for the memory system of the JVM.
      */
@@ -195,7 +195,7 @@ public class JvmJmxModel extends Model {
         }
         return memoryMXBean;
     }
-
+    
     /**
      * Returns a collection of MXBean proxies for the memory pools of the JVM.
      */
@@ -232,7 +232,7 @@ public class JvmJmxModel extends Model {
         }
         return memoryPoolMXBeans;
     }
-
+    
     /**
      * Returns an MXBean proxy for the operating system of the JVM.
      */
@@ -242,7 +242,7 @@ public class JvmJmxModel extends Model {
         }
         return operatingSystemMXBean;
     }
-
+    
     /**
      * Returns an MXBean proxy for the runtime system of the JVM.
      */
@@ -252,7 +252,7 @@ public class JvmJmxModel extends Model {
         }
         return runtimeMXBean;
     }
-
+    
     /**
      * Returns an MXBean proxy for the thread system of the JVM.
      */
@@ -262,7 +262,7 @@ public class JvmJmxModel extends Model {
         }
         return threadMXBean;
     }
-
+    
     /**
      * Generic method that returns an MXBean proxy for the given platform
      * MXBean identified by its ObjectName and which implements the supplied
@@ -273,11 +273,13 @@ public class JvmJmxModel extends Model {
     }
     
     <T> T getMXBean(String objectNameStr, Class<T> interfaceClass) {
-        try {
-            return newPlatformMXBeanProxy(mbsc, objectNameStr, interfaceClass);
-        } catch (Exception e) {
-            ErrorManager.getDefault().notify(ErrorManager.USER, e);
-            return null;
+        if (mbsc != null) {
+            try {
+                return newPlatformMXBeanProxy(mbsc, objectNameStr, interfaceClass);
+            } catch (Exception e) {
+                ErrorManager.getDefault().notify(ErrorManager.USER, e);
+            }
         }
+        return null;
     }
 }
