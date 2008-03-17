@@ -32,21 +32,21 @@ import com.sun.tools.visualvm.core.model.ModelFactory;
  *
  * @author Tomas Hurka
  */
-public final class SAAgentFactory extends ModelFactory<SAAgent,DataSource> {
+public final class SaModelFactory extends ModelFactory<SaModel, DataSource> {
 
-    private static SAAgentFactory saAgentFactory;
+    private static SaModelFactory saAgentFactory;
 
-    private SAAgentFactory() {
+    private SaModelFactory() {
     }
 
-    public static synchronized SAAgentFactory getDefault() {
+    public static synchronized SaModelFactory getDefault() {
         if (saAgentFactory == null) {
-            saAgentFactory = new SAAgentFactory();
+            saAgentFactory = new SaModelFactory();
         }
         return saAgentFactory;
     }
     
-    public static SAAgent getSAAgentFor(DataSource app) {
+    public static SaModel getSAAgentFor(DataSource app) {
         return getDefault().getModel(app);
     }
     

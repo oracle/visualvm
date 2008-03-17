@@ -36,8 +36,8 @@ import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
-import com.sun.tools.visualvm.tools.sa.SAAgent;
-import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
+import com.sun.tools.visualvm.tools.sa.SaModel;
+import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -119,7 +119,7 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
                     File snapshotDir = coreDump.getStorage().getDirectory();
                     String name = HeapDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
-                    SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
+                    SaModel saAget = SaModelFactory.getSAAgentFor(coreDump);
                     try {
                         if (saAget.takeHeapDump(dumpFile.getAbsolutePath())) {
                             final HeapDumpImpl heapDump = new HeapDumpImpl(dumpFile, coreDump);

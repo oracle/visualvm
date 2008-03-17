@@ -28,8 +28,8 @@ package com.sun.tools.visualvm.coredump.overview;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.tools.sa.SAAgent;
-import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
+import com.sun.tools.visualvm.tools.sa.SaModel;
+import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import java.awt.BorderLayout;
 import java.util.Properties;
 import javax.swing.BorderFactory;
@@ -65,7 +65,7 @@ class CoreDumpOverviewView extends DataSourceView {
                 new MasterViewSupport(coreDump).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        SAAgent saAgent = SAAgentFactory.getSAAgentFor(coreDump);
+        SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
         Properties jvmProperties = saAgent.getSystemProperties();
         String jvmargs = saAgent.getJVMArgs();
         
@@ -109,7 +109,7 @@ class CoreDumpOverviewView extends DataSourceView {
         }
         
         private String getGeneralProperties(CoreDump coreDump) {
-            SAAgent saAgent = SAAgentFactory.getSAAgentFor(coreDump);
+            SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
             StringBuilder data = new StringBuilder();
             
             // CoreDump information

@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.saagent;
 
-import com.sun.tools.visualvm.tools.sa.SAAgent;
+import com.sun.tools.visualvm.tools.sa.SaModel;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -36,7 +36,7 @@ import org.openide.ErrorManager;
  *
  * @author Tomas Hurka
  */
-public class SA extends SAAgent {
+public class SaModelImpl extends SaModel {
     private Agent agent;
     private int pid;
     String executable;
@@ -46,13 +46,13 @@ public class SA extends SAAgent {
     private String jvmArgs;
     private String commandLine;
     
-    SA(File jdkHome,File sajar,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
+    SaModelImpl(File jdkHome,File sajar,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
         agent = Agent.getAgent(jdkHome,sajar);
         pid = id;
         readData();
     }
     
-    SA(File jdkHome,File sajar,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
+    SaModelImpl(File jdkHome,File sajar,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
         agent = Agent.getAgent(jdkHome,sajar);
         executable = execFile.getAbsolutePath();
         core = coreFile.getAbsolutePath();

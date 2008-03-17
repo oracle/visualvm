@@ -32,7 +32,7 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.sa.SAAgent;
+import com.sun.tools.visualvm.tools.sa.SaModel;
 import java.io.File;
 import org.openide.ErrorManager;
 
@@ -40,13 +40,13 @@ import org.openide.ErrorManager;
  *
  * @author Tomas Hurka
  */
-public final class SAProvider extends AbstractModelProvider<SAAgent, DataSource>  {
+public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource>  {
     private static final String SA_JAR = "lib/sa-jdi.jar";
 
-    SAProvider() {
+    SaModelProvider() {
     }
     
-    public SAAgent createModelFor(DataSource ds) {
+    public SaModel createModelFor(DataSource ds) {
         if (ds instanceof Application) {
             Application app = (Application) ds;
             if (Host.LOCALHOST.equals(app)) {
@@ -58,7 +58,7 @@ public final class SAProvider extends AbstractModelProvider<SAAgent, DataSource>
                     return null;
                 }
                 try {
-                    return new SA(jdkHome,saJar,app.getPid());
+                    return new SaModelImpl(jdkHome,saJar,app.getPid());
                 } catch (Exception ex) {
                     ErrorManager.getDefault().notify(ex);
                 }
@@ -76,7 +76,7 @@ public final class SAProvider extends AbstractModelProvider<SAAgent, DataSource>
                     return null;
                 }
                 try {
-                    return new SA(jdkHome,saJar,executable,coreFile);
+                    return new SaModelImpl(jdkHome,saJar,executable,coreFile);
                 } catch (Exception ex) {
                     ErrorManager.getDefault().notify(ex);
                 }

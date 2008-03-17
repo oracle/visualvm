@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.saagent;
 
-import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
+import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -35,7 +35,7 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        SAAgentFactory.getDefault().registerFactory(new SAProvider());
+        SaModelFactory.getDefault().registerFactory(new SaModelProvider());
     }
     
 }

@@ -36,7 +36,7 @@ import org.openide.ErrorManager;
  *
  * @author Tomas Hurka
  */
-public abstract class SAAgent extends Model {
+public abstract class SaModel extends Model {
 
     public abstract Properties getSystemProperties();
     

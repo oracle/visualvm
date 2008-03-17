@@ -36,8 +36,8 @@ import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.sa.SAAgent;
-import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
+import com.sun.tools.visualvm.tools.sa.SaModel;
+import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -121,7 +121,7 @@ public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapsho
                     File snapshotDir = coreDump.getStorage().getDirectory();
                     String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
-                    SAAgent saAget = SAAgentFactory.getSAAgentFor(coreDump);
+                    SaModel saAget = SaModelFactory.getSAAgentFor(coreDump);
                     String dump = saAget.takeThreadDump();
                     if (dump != null) {
                         try {

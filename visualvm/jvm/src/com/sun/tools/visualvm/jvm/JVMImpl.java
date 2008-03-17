@@ -41,8 +41,8 @@ import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.sa.SAAgent;
-import com.sun.tools.visualvm.tools.sa.SAAgentFactory;
+import com.sun.tools.visualvm.tools.sa.SaModel;
+import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -272,7 +272,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
         if (prop != null) {
             return prop;
         }
-        SAAgent saAgent = getSAAgent();
+        SaModel saAgent = getSAAgent();
         if (saAgent != null) {
             return saAgent.getSystemProperties();
         }
@@ -347,7 +347,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
             threadDump = jmxSupport.takeThreadDump();
         }
         if (threadDump == null) {
-            SAAgent sa = getSAAgent();
+            SaModel sa = getSAAgent();
             if (sa != null) {
                 threadDump = sa.takeThreadDump();
             }
@@ -375,8 +375,8 @@ public class JVMImpl extends JVM implements JvmstatListener {
         return AttachFactory.getAttachFor(application);
     }
     
-    protected SAAgent getSAAgent() {
-        return SAAgentFactory.getSAAgentFor(application);
+    protected SaModel getSAAgent() {
+        return SaModelFactory.getSAAgentFor(application);
     }
     
     protected void initStaticData() {
@@ -413,7 +413,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
         if (args.length() == 1024) {
             args = jmxSupport.getJvmArgs();
             if (args == null) {
-                SAAgent sa = getSAAgent();
+                SaModel sa = getSAAgent();
                 if (sa != null) {
                     args = sa.getJVMArgs();
                 }
