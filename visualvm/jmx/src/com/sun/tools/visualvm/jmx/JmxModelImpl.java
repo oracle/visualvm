@@ -36,9 +36,9 @@ import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -136,12 +136,12 @@ public class JmxModelImpl extends JmxModel {
      *
      * @param application the {@link JvmstatApplication}.
      */
-    public JmxModelImpl(Application application,Jvmstat jvmstat) {
+    public JmxModelImpl(Application application,JvmstatModel jvmstat) {
         try {
             Storage storage = application.getStorage();
             String username = storage.getCustomProperty(PROPERTY_USERNAME);
             String password = storage.getCustomProperty(PROPERTY_PASSWORD);
-            JvmstatModel jvmstatModel = JvmstatModelFactory.getJvmstatModelFor(application);
+            JvmJvmstatModel jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(application);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
             ProxyClient proxyClient = null;
             if (Application.CURRENT_APPLICATION.equals(application)) {

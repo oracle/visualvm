@@ -26,24 +26,18 @@
 package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 
 /**
  *
  * @author Tomas Hurka
  */
-class JvmstatModel_5 extends JvmstatModel {
+class JvmJvmstatModel_5 extends JvmJvmstatModel {
     private static final String PERM_GEN_PREFIX = "sun.gc.generation.2.";
 
-    JvmstatModel_5(Application app,Jvmstat stat) {
+    JvmJvmstatModel_5(Application app,JvmstatModel stat) {
         super(app,stat);
         initMonitoredVales();
     }

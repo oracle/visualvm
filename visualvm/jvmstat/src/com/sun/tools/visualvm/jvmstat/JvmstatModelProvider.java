@@ -27,40 +27,50 @@ package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import java.net.URISyntaxException;
+import org.openide.ErrorManager;
+import sun.jvmstat.monitor.MonitorException;
+import sun.jvmstat.monitor.MonitoredHost;
+import sun.jvmstat.monitor.MonitoredVm;
+import sun.jvmstat.monitor.VmIdentifier;
 
 /**
  *
  * @author Tomas Hurka
  */
-public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel,Application> {
+public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Application> {
+    
+    static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
+        if (app.isRemoved() || app.getPid() == Application.UNKNOWN_PID) return null;
+        
+        String vmId = "//" + app.getPid() + "?mode=r";
+        try {
+            MonitoredHost monitoredHost = MonitoredHost.getMonitoredHost(app.getHost().getHostName());
+            MonitoredVm mvm = monitoredHost.getMonitoredVm(new VmIdentifier(vmId));
+            mvm.setInterval(GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000);
+            return mvm;
+        } catch (URISyntaxException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.EXCEPTION,ex);
+            return null;
+        }
+    }
     
     public JvmstatModel createModelFor(Application app) {
-        Jvmstat jvmstat = JvmstatFactory.getJvmstatFor(app);
-        if (jvmstat != null) {
-            String vmVersion = jvmstat.findByName("java.property.java.vm.version");
-
-            JvmstatModel model = null;
-            // Check for Sun VM (and maybe other?)
-            // JVM 1.4
-            if (vmVersion.startsWith("1.4.")) model = new JvmstatModel_4(app,jvmstat); // NOI18N
-            
-            // JVM 1.5
-            else if (vmVersion.startsWith("1.5.")) model = new JvmstatModel_5(app,jvmstat); // NOI18N
-            
-            // JVM 1.6
-            else if (vmVersion.startsWith("1.6.")) model = new JvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("10.0")) model = new JvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
-            
-            // JVM 1.7
-            else if (vmVersion.startsWith("1.7.")) model = new JvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("11.0")) model = new JvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("12.0")) model = new JvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
-            if (model != null) {
-                return model;
+        MonitoredVm vm = null;
+        try {
+            vm = getMonitoredVm(app);
+            if (vm != null) {
+                JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
+                app.notifyWhenRemoved(jvmstat);
+                return jvmstat;
             }
+        } catch (MonitorException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+        }
+        if (vm != null) {
+            vm.detach();
         }
         return null;
     }

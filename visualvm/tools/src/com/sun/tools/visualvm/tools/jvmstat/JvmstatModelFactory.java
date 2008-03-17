@@ -34,19 +34,19 @@ import com.sun.tools.visualvm.core.model.ModelFactory;
  */
 public final class JvmstatModelFactory extends ModelFactory<JvmstatModel, Application> {
 
-    private static JvmstatModelFactory jvmstatModelFactory;
+    private static JvmstatModelFactory jvmstatFactory;
 
     private JvmstatModelFactory() {
     }
 
     public static synchronized JvmstatModelFactory getDefault() {
-        if (jvmstatModelFactory == null) {
-            jvmstatModelFactory = new JvmstatModelFactory();
+        if (jvmstatFactory == null) {
+            jvmstatFactory = new JvmstatModelFactory();
         }
-        return jvmstatModelFactory;
+        return jvmstatFactory;
     }
     
-    public static JvmstatModel getJvmstatModelFor(Application app) {
+    public static JvmstatModel getJvmstatFor(Application app) {
         return getDefault().getModel(app);
     }
     

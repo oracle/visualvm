@@ -31,5 +31,5 @@ package com.sun.tools.visualvm.tools.jvmstat;
  */
 public interface JvmstatListener {
    
-    public void dataChanged(Jvmstat jvmstat);
+    public void dataChanged(JvmstatModel jvmstat);
 }

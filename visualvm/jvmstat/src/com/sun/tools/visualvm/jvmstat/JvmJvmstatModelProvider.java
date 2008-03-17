@@ -23,47 +23,46 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.jmx.application.JmxApplication;
-import com.sun.tools.visualvm.core.model.ModelProvider;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
- * The {@code JmxModelFactory} class is a factory class for getting
- * the {@link JmxModel} representation for the {@link Application}.
  *
- * @author Luis-Miguel Alventosa
+ * @author Tomas Hurka
  */
-public class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
+public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatModel, Application> {
     
-    
-    /**
-     * Default {@link ModelProvider} implementation for {@link JmxModel}.
-     *
-     * In order to extend the {@code JmxModelFactory} to register your
-     * own {@link JmxModel}s for the different types of {@link Application}
-     * call {@link JmxModelFactory.registerFactory()} supplying the new
-     * instance of {@link ModelProvider}.
-     *
-     * @param app application.
-     *
-     * @return an instance of {@link JmxModel}.
-     */
-    public JmxModel createModelFor(Application app) {
-        JvmstatModel jvmstat;
-        
-        if (app instanceof JmxApplication) {
-            return new JmxModelImpl((JmxApplication) app);
-        }
-        jvmstat = JvmstatModelFactory.getJvmstatFor(app);
+    public JvmJvmstatModel createModelFor(Application app) {
+        JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         if (jvmstat != null) {
-            return new JmxModelImpl(app,jvmstat);
+            String vmVersion = jvmstat.findByName("java.property.java.vm.version");
+
+            JvmJvmstatModel model = null;
+            // Check for Sun VM (and maybe other?)
+            // JVM 1.4
+            if (vmVersion.startsWith("1.4.")) model = new JvmJvmstatModel_4(app,jvmstat); // NOI18N
+            
+            // JVM 1.5
+            else if (vmVersion.startsWith("1.5.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            
+            // JVM 1.6
+            else if (vmVersion.startsWith("1.6.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("10.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
+            
+            // JVM 1.7
+            else if (vmVersion.startsWith("1.7.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("11.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("12.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
+            if (model != null) {
+                return model;
+            }
         }
         return null;
     }
+    
 }

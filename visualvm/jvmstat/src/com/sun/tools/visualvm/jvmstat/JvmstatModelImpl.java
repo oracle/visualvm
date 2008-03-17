@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 import java.util.ArrayList;
@@ -49,13 +49,13 @@ import sun.management.counter.Variability;
  *
  * @author Tomas Hurka
  */
-public class JvmstatImpl extends Jvmstat implements VmListener, DataRemovedListener<Application> {
+public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRemovedListener<Application> {
     Application application;
     MonitoredVm monitoredVm;
     Set<JvmstatListener> listeners;
     private Map<String,String> valueCache;
 
-    JvmstatImpl(Application app,MonitoredVm vm) {
+    JvmstatModelImpl(Application app,MonitoredVm vm) {
         application = app;
         monitoredVm = vm;
         valueCache = new HashMap();

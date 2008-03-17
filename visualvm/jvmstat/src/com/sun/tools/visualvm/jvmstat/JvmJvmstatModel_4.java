@@ -26,18 +26,18 @@
 package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 
 /**
  *
  * @author Tomas Hurka
  */
-class JvmstatModel_4 extends JvmstatModel {
+class JvmJvmstatModel_4 extends JvmJvmstatModel {
     private static final String PERM_GEN_PREFIX = "hotspot.gc.generation.2.";
 
-    JvmstatModel_4(Application app,Jvmstat stat) {
+    JvmJvmstatModel_4(Application app,JvmstatModel stat) {
         super(app,stat);
         initMonitoredVales();
     }
