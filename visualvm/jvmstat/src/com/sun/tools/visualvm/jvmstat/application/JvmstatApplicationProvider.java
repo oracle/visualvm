@@ -29,12 +29,12 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -65,7 +65,7 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  */
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
-    private final Map<Integer, JvmstatApplication> applications = new HashMap();
+    private final Map<Integer, WeakReference<JvmstatApplication>> applications = new HashMap();
     
     private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
     
@@ -129,6 +129,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                 }
                 
                 public void disconnected(HostEvent e) {
+                    processDisconnectedHost(host);
                     rescheduleProcessNewHost(host);
                 }
             };
@@ -141,13 +142,13 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
     }
     
-    // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
-//    private void processFinishedHost(Host host) {
-//        HostListener hostListener = mapping.get(host);
-//        mapping.remove(host);
-//        try { getMonitoredHost(host).removeHostListener(hostListener); } catch (MonitorException ex) {}
-//        processAllTerminatedApplications(host);
-//    }
+    
+    private void processDisconnectedHost(Host host) {
+        HostListener hostListener = mapping.get(host);
+        mapping.remove(host);
+        try { getMonitoredHost(host).removeHostListener(hostListener); } catch (MonitorException ex) {}
+        host.getRepository().removeDataSources(host.getRepository().getDataSources(JvmstatApplication.class));
+    }
     
     private void processNewApplicationsByIds(Host host, Set<Integer> applicationIds) {
         Set<JvmstatApplication> newApplications = new HashSet();
@@ -158,7 +159,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             
             if (!applications.containsKey(applicationId)) {
                 JvmstatApplication application = new JvmstatApplication(host, applicationId);
-                applications.put(applicationId, application);
+                applications.put(applicationId, new WeakReference(application));
                 newApplications.add(application);
             }
         }
@@ -171,9 +172,9 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         
         for (int applicationId : applicationIds) {            
             if (applications.containsKey(applicationId)) {
-                JvmstatApplication application = applications.get(applicationId);
+                JvmstatApplication application = applications.get(applicationId).get();
+                if (application != null) finishedApplications.add(application);
                 applications.remove(applicationId);
-                finishedApplications.add(application);
             }
         }
         
