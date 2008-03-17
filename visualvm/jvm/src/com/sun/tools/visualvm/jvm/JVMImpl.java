@@ -64,14 +64,13 @@ import javax.management.ObjectName;
  * @author Tomas Hurka
  */
 public class JVMImpl extends JVM implements JvmstatListener {
-    private static final String HOTSPOT_DIAGNOSTIC_MXBEAN_NAME =
-            "com.sun.management:type=HotSpotDiagnostic";
     private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";
     Application application;
     Boolean isDumpOnOOMEnabled;
     Jvmstat monitoredVm;
     JvmstatModel jvmstatModel;
     Set<MonitoredDataListener> listeners;
+    JmxSupport jmxSupport;
     
     // static JVM data 
     private boolean staticDataInitialized; 
@@ -86,20 +85,18 @@ public class JVMImpl extends JVM implements JvmstatListener {
     private String vmInfo;
     private String vmName;
 
-    // HotspotDiagnostic 
-    private boolean hotspotDiagnosticInitialized;
-    private Object hotspotDiagnosticLock = new Object();
-    private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
  
     JVMImpl(Application app,Jvmstat jvms) {
         application = app;
         monitoredVm = jvms;
         jvmstatModel = JvmstatModelFactory.getJvmstatModelFor(app);
+        jmxSupport = new JmxSupport(app,this);
         listeners = new HashSet();
     }
     
     JVMImpl(Application app,JvmJmxModel jmx) {
         application = app;
+        jmxSupport = new JmxSupport(app,this);
         listeners = new HashSet();
     }
     
@@ -198,7 +195,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
             if (attach != null) {
                 args = attach.printFlag(HEAP_DUMP_ON_OOME);
             }
-            HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
+            HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
             if (args == null && hsDiagnostic != null) {
                 String value = hsDiagnostic.getVMOption(HEAP_DUMP_ON_OOME).getValue();
                 isDumpOnOOMEnabled = Boolean.valueOf(value);
@@ -221,6 +218,8 @@ public class JVMImpl extends JVM implements JvmstatListener {
             if (listeners.add(l)) {
                 if (monitoredVm != null) {
                     monitoredVm.addJvmstatListener(this);
+                } else {
+                    jmxSupport.disableTimer();
                 }
             }
         }
@@ -232,6 +231,8 @@ public class JVMImpl extends JVM implements JvmstatListener {
                 if (listeners.isEmpty()) {
                     if (monitoredVm != null) {
                         monitoredVm.removeJvmstatListener(this);
+                    } else {
+                        jmxSupport.initTimer();
                     }
                 }
             }
@@ -239,19 +240,19 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public boolean isMonitoringSupported() {
-        return true;
+        return isClassMonitoringSupported() || isThreadMonitoringSupported() || isMemoryMonitoringSupported();
     }
     
     public boolean isClassMonitoringSupported() {
-        return true;
+        return monitoredVm != null || jmxSupport.getRuntime() != null;
     }
     
     public boolean isThreadMonitoringSupported() {
-        return !is14();
+        return (!is14() && monitoredVm != null) || jmxSupport.getRuntime() != null;
     }
     
     public boolean isMemoryMonitoringSupported() {
-        return true;
+        return monitoredVm != null || jmxSupport.getRuntime() != null;
     }
     
     public boolean isGetSystemPropertiesSupported() {
@@ -267,10 +268,8 @@ public class JVMImpl extends JVM implements JvmstatListener {
         }
         if (prop != null)
             return prop;
-        RuntimeMXBean runtime = getRuntime();
-        if (runtime != null) {
-            prop = new Properties();
-            prop.putAll(runtime.getSystemProperties());
+        prop = jmxSupport.getSystemProperties();
+        if (prop != null) {
             return prop;
         }
         SAAgent saAgent = getSAAgent();
@@ -284,7 +283,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public boolean isDumpOnOOMEnabledSupported() {
-        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && getHotSpotDiagnostic() != null); 
+        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
     }
     
     public void setDumpOnOOMEnabled(boolean enabled) {
@@ -298,7 +297,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
                 attach.setFlag("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
             }
         } else {
-            HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
+            HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
             hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,enabled?"true":"false");
             if (enabled) {
                 hsDiagnostic.setVMOption("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
@@ -308,7 +307,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public boolean isTakeHeapDumpSupported() {
-        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && getHotSpotDiagnostic() != null); 
+        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
     }
     
     public File takeHeapDump() throws IOException {
@@ -325,7 +324,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
             }
             return null;
         }
-        HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
+        HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
         if (hsDiagnostic != null) {
 //            hsDiagnostic.dumpHeap(dumpFile.getAbsolutePath(),true);
             return dumpFile;
@@ -334,7 +333,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public boolean isTakeThreadDumpSupported() {
-        return getAttach() != null || getSAAgent() != null;
+        return getAttach() != null || jmxSupport.getRuntime() != null || getSAAgent() != null;
     }
     
     public File takeThreadDump() throws IOException {
@@ -343,6 +342,9 @@ public class JVMImpl extends JVM implements JvmstatListener {
         
         if (attach != null) {
             threadDump = attach.takeThreadDump();
+        }
+        if (threadDump == null) {
+            threadDump = jmxSupport.takeThreadDump();
         }
         if (threadDump == null) {
             SAAgent sa = getSAAgent();
@@ -377,12 +379,6 @@ public class JVMImpl extends JVM implements JvmstatListener {
         return SAAgentFactory.getSAAgentFor(application);
     }
     
-    protected RuntimeMXBean getRuntime() {
-        JvmJmxModel jmx = getJXM();
-        if (jmx != null) return jmx.getRuntimeMXBean();
-        return null;
-    }
-    
     protected void initStaticData() {
         synchronized (staticDataLock) {
             if (staticDataInitialized) {
@@ -399,14 +395,13 @@ public class JVMImpl extends JVM implements JvmstatListener {
                 vmInfo = jvmstatModel.getVMInfo();
                 vmName = jvmstatModel.getVMName();
             } else {
-                RuntimeMXBean runtime = getRuntime();
-                if (runtime != null) {
-                    Map<String,String> propMap = runtime.getSystemProperties();
-                    jvmArgs = getJvmArgsJmx();
-                    vmVersion = propMap.get("java.vm.version");
-                    javaHome = propMap.get("java.home");
-                    vmInfo = propMap.get("java.vm.info");
-                    vmName = propMap.get("java.vm.name");
+                jvmArgs = jmxSupport.getJvmArgs();
+                Properties prop = jmxSupport.getSystemProperties();
+                if (prop != null) {
+                    vmVersion = prop.getProperty("java.vm.version");
+                    javaHome = prop.getProperty("java.home");
+                    vmInfo = prop.getProperty("java.vm.info");
+                    vmName = prop.getProperty("java.vm.name");
                 }
             }
             staticDataInitialized = true;
@@ -416,7 +411,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     private String getJvmArgsJvmstat() {
         String args = jvmstatModel.getJvmArgs();
         if (args.length() == 1024) {
-            args = getJvmArgsJmx();
+            args = jmxSupport.getJvmArgs();
             if (args == null) {
                 SAAgent sa = getSAAgent();
                 if (sa != null) {
@@ -429,40 +424,6 @@ public class JVMImpl extends JVM implements JvmstatListener {
         }
         return args;
     }
-    
-    private String getJvmArgsJmx() {
-        RuntimeMXBean runtime = getRuntime();
-        if (runtime != null) {
-            StringBuilder buf = new StringBuilder();
-            List<String> args = runtime.getInputArguments();
-            for (String arg : args) {
-                buf.append(arg).append(' ');
-            }
-            return buf.toString();
-        }
-        return null;
-    }
-
-    HotSpotDiagnosticMXBean getHotSpotDiagnostic() {
-        synchronized (hotspotDiagnosticLock) {
-            if (hotspotDiagnosticInitialized) {
-                return hotspotDiagnosticMXBean;
-            }
-            JvmJmxModel jmxModel = getJXM();
-            if (jmxModel != null) {
-                try {
-                    hotspotDiagnosticMXBean = jmxModel.getMXBean(
-                            ObjectName.getInstance(HOTSPOT_DIAGNOSTIC_MXBEAN_NAME),
-                            HotSpotDiagnosticMXBean.class);
-                } catch (MalformedObjectNameException e) {
-                    LOGGER.warning("Couldn't find HotSpotDiagnosticMXBean: " +
-                            e.getLocalizedMessage());
-                }
-            }
-            hotspotDiagnosticInitialized = true;
-            return hotspotDiagnosticMXBean;
-        }
-    }
 
     public void dataChanged(Jvmstat stat) {
         assert stat == monitoredVm;
@@ -470,7 +431,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
         notifyListeners(data);        
     }
 
-    private void notifyListeners(final MonitoredData data) {
+    void notifyListeners(final MonitoredData data) {
         List<MonitoredDataListener> listenersCopy;
         synchronized (listeners) {
             listenersCopy = new ArrayList(listeners);

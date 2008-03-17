@@ -74,12 +74,12 @@ public class MonitoredDataImpl extends MonitoredData {
     jvm = vm;
   }
 
-  MonitoredDataImpl(JVM vm,JvmJmxModel jvmModel) {
-    ClassLoadingMXBean classBean = jvmModel.getClassLoadingMXBean();
-    ThreadMXBean threadBean = jvmModel.getThreadMXBean();
-    RuntimeMXBean runtimeBean = jvmModel.getRuntimeMXBean();
-    MemoryUsage mem = jvmModel.getMemoryMXBean().getHeapMemoryUsage();
-    MemoryUsage perm = null;//jvm.getPermGenPool().getUsage();
+  MonitoredDataImpl(JVM vm,JmxSupport jmxSupport,JvmJmxModel jmxModel) {
+    ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
+    ThreadMXBean threadBean = jmxModel.getThreadMXBean();
+    RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
+    MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
+    MemoryUsage perm = jmxSupport.getPermGenPool().getUsage();
     loadedClasses = classBean.getLoadedClassCount();
     sharedLoadedClasses = 0;
     sharedUnloadedClasses = 0;
