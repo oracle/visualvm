@@ -29,7 +29,7 @@ package com.sun.tools.visualvm.jvm;
 import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.MonitoredData;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
@@ -57,7 +57,7 @@ public class MonitoredDataImpl extends MonitoredData {
   final private long[] genMaxCapacity;
   final private JVM jvm;
 
-  MonitoredDataImpl(JVM vm,JvmstatModel jvmstatModel) {
+  MonitoredDataImpl(JVM vm,JvmJvmstatModel jvmstatModel) {
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();

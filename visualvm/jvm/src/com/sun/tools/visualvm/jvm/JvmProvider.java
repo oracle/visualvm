@@ -31,8 +31,8 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 
 
 /**
@@ -42,7 +42,7 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatFactory;
 public class JvmProvider extends AbstractModelProvider<JVM,Application> {
     
     public JVM createModelFor(Application app) {
-        Jvmstat jvmstat = JvmstatFactory.getJvmstatFor(app);
+        JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         JVMImpl jvm = null;
         
         if (jvmstat != null) {

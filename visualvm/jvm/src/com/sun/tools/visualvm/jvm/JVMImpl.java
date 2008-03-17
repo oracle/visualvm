@@ -37,10 +37,10 @@ import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import com.sun.tools.visualvm.tools.sa.SaModel;
 import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
@@ -67,8 +67,8 @@ public class JVMImpl extends JVM implements JvmstatListener {
     private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";
     Application application;
     Boolean isDumpOnOOMEnabled;
-    Jvmstat monitoredVm;
-    JvmstatModel jvmstatModel;
+    JvmstatModel monitoredVm;
+    JvmJvmstatModel jvmstatModel;
     Set<MonitoredDataListener> listeners;
     JmxSupport jmxSupport;
     
@@ -86,10 +86,10 @@ public class JVMImpl extends JVM implements JvmstatListener {
     private String vmName;
 
  
-    JVMImpl(Application app,Jvmstat jvms) {
+    JVMImpl(Application app,JvmstatModel jvms) {
         application = app;
         monitoredVm = jvms;
-        jvmstatModel = JvmstatModelFactory.getJvmstatModelFor(app);
+        jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(app);
         jmxSupport = new JmxSupport(app,this);
         listeners = new HashSet();
     }
@@ -425,7 +425,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
         return args;
     }
 
-    public void dataChanged(Jvmstat stat) {
+    public void dataChanged(JvmstatModel stat) {
         assert stat == monitoredVm;
         MonitoredData data = new MonitoredDataImpl(this,jvmstatModel);
         notifyListeners(data);        
