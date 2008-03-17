@@ -98,7 +98,7 @@ public class GlassFishOverview implements ViewPlugin<Application> {
             panel.setBorder(BorderFactory.createEmptyBorder());
             
             final HTMLTextArea area = new HTMLTextArea();
-            area.setOpaque(false);
+            area.setOpaque(true);
             area.setBorder(BorderFactory.createEmptyBorder());
             area.addHyperlinkListener(new HyperlinkListener() {
                 public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -180,10 +180,10 @@ public class GlassFishOverview implements ViewPlugin<Application> {
 
             StringBuilder sb = new StringBuilder();
             sb.append("<h2>General information</h2>");
-            sb.append("<b>Server Name: </b>").append(serverName).append("<br/>");
-            sb.append("<b>Domain: </b>").append(getDomain()).append("<br/>");
-            sb.append("<b>Config Dir: </b>").append(JMXUtil.getServerConfigDir(jmxModel)).append("<br/>");
-            sb.append("<br/><");
+            sb.append("<b>Server Name: </b>").append(serverName).append("<br>");
+            sb.append("<b>Domain: </b>").append(getDomain()).append("<br>");
+            sb.append("<b>Config Dir: </b>").append(JMXUtil.getServerConfigDir(jmxModel)).append("<br>");
+            sb.append("<br>");
             sb.append("<b>HTTP Port(s): </b>");
 
             Collection<String> hports = getHTTPPorts(cc.getHTTPServiceConfig());
@@ -193,9 +193,9 @@ public class GlassFishOverview implements ViewPlugin<Application> {
                     sb.append(",");
                 }
             }
-            sb.append("<br/>");
+            sb.append("<br>");
 
-            sb.append("<b>IOOP Port(s): </b> ");
+            sb.append("<b>IIOP Port(s): </b> ");
 
             Collection<String> iports = getIIOPPorts(cc.getIIOPServiceConfig());
             for (Iterator<String> iter = iports.iterator(); iter.hasNext();) {
@@ -204,14 +204,13 @@ public class GlassFishOverview implements ViewPlugin<Application> {
                     sb.append(",");
                 }
             }
-            sb.append("<br/>");
-            sb.append("<br/>");
+            sb.append("<br><br>");
 
             String version = domainRoot.getJ2EEDomain().getJ2EEServerMap().get(serverName).getserverVersion();
-            sb.append("<b>Installed Version: </b>").append(version).append("<br/>");
+            sb.append("<b>Installed Version: </b>").append(version).append("<br><br>");
             ModuleMonitoringLevelsConfig monitoringConfig = AMXUtil.getMonitoringConfig(jmxModel);
             if (monitoringConfig != null) {
-                sb.append("<hr/>");
+                sb.append("<hr>");
                 sb.append("<h2>Monitoring Configuration</h2>");
                 sb.append("<table>");
                 for(Map.Entry<String, String> entry : monitoringConfig.getAllLevels().entrySet()) {

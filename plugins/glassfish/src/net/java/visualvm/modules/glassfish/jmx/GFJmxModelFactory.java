@@ -60,31 +60,33 @@ public class GFJmxModelFactory extends ModelFactory<JmxModel, Application> imple
     private JMXDetailsPanel credentialsPanel = null;
     
     public JmxModel createModelFor(Application app) {
-        if (app.isLocalApplication()) return null; // local applications will use the deafault JmxModelFactory
-        try {
-            String userName = STORAGE.getCustomProperty(PROPERTY_USERNAME);
-            String password = STORAGE.getCustomProperty(PROPERTY_PASSWORD);
-            int serverPort = 8686;
-            
-            getCredentialsPanel().setPassword(password);
-            getCredentialsPanel().setUserName(userName);
-            if (DialogDisplayer.getDefault().notify(getDialogDescriptor()) == DialogDescriptor.OK_OPTION) {
-                STORAGE.setCustomProperty(PROPERTY_USERNAME, getCredentialsPanel().getUserName());
-                STORAGE.setCustomProperty(PROPERTY_PASSWORD, getCredentialsPanel().getPassword());
-                serverPort = getCredentialsPanel().getServerPort();
-            }
-            
-            ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(app);
-            if (at instanceof GlassFishApplicationType) {
-                return new JmxModel(new JmxApplication(
-                        app.getHost(), 
-                        new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + app.getHost().getHostName() + ":" + serverPort + "/jmxrmi"), STORAGE));
-            }
-
-        } catch (MalformedURLException malformedURLException) {
+        // Local applications will use the default JmxModelFactory
+        if (app.isLocalApplication()) {
+            return null;
         }
-
-        return null;
+        // Non-GlassFish remote applications will use the default JmxModelFactory too
+        ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(app);
+        if (!(at instanceof GlassFishApplicationType)) {
+            return null;
+        }
+        String userName = STORAGE.getCustomProperty(PROPERTY_USERNAME);
+        String password = STORAGE.getCustomProperty(PROPERTY_PASSWORD);
+        int serverPort = 8686;
+        getCredentialsPanel().setPassword(password);
+        getCredentialsPanel().setUserName(userName);
+        if (DialogDisplayer.getDefault().notify(getDialogDescriptor()) == DialogDescriptor.OK_OPTION) {
+            STORAGE.setCustomProperty(PROPERTY_USERNAME, getCredentialsPanel().getUserName());
+            STORAGE.setCustomProperty(PROPERTY_PASSWORD, getCredentialsPanel().getPassword());
+            serverPort = getCredentialsPanel().getServerPort();
+        }
+        JMXServiceURL serverURL;
+        try {
+            serverURL = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" +
+                    app.getHost().getHostName() + ":" + serverPort + "/jmxrmi");
+        } catch (MalformedURLException e) {
+            return null;
+        }
+        return new JmxModel(new JmxApplication(app.getHost(), serverURL, STORAGE));
     }
 
     @Override

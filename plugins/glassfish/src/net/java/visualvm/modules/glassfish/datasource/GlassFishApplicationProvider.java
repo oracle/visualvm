@@ -133,7 +133,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
             try {
                 JmxModel jmx = JmxModelFactory.getJmxModelFor(model.getApplication());
                 if ((jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) && beenNotified.compareAndSet(false, true)){
-                    NotifyDescriptor nd = new NotifyDescriptor.Message("Can not establish JMX connection", NotifyDescriptor.ERROR_MESSAGE);
+                    NotifyDescriptor nd = new NotifyDescriptor.Message("Cannot establish JMX connection", NotifyDescriptor.ERROR_MESSAGE);
                     DialogDisplayer.getDefault().notifyLater(nd);
                     model.setVisible(false);
                 }
