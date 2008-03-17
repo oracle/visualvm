@@ -78,6 +78,9 @@ public class GFJmxModelFactory extends ModelFactory<JmxModel, Application> imple
             STORAGE.setCustomProperty(PROPERTY_USERNAME, getCredentialsPanel().getUserName());
             STORAGE.setCustomProperty(PROPERTY_PASSWORD, getCredentialsPanel().getPassword());
             serverPort = getCredentialsPanel().getServerPort();
+        } else {
+            // Revert to default JmxModelFactory on Cancel button
+            return null;
         }
         JMXServiceURL serverURL;
         try {
