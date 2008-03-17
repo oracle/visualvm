@@ -59,8 +59,10 @@ class JmxApplicationActionsProvider {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
             
-            if (hosts.size() == 1 && !Host.UNKNOWN_HOST.equals(hosts.iterator().next()))
-                actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 110));
+            if (hosts.size() == 1 && !Host.UNKNOWN_HOST.equals(hosts.iterator().next())) {
+                actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 50));
+                actions.add(new ExplorerActionDescriptor(null, 55));
+            }
             
             return actions;
         }
