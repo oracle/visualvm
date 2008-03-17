@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.io.File;
 
@@ -70,6 +71,7 @@ public class JmxApplicationsSupport {
     }
 
     public static void register() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new JmxApplicationDescriptorProvider());
         JmxApplicationProvider.initialize();
         JmxApplicationActionsProvider.initialize();
     }

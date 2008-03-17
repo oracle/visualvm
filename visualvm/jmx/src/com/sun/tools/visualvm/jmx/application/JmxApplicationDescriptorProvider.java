@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
@@ -35,16 +35,20 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-class ApplicationDescriptorProvider extends
+class JmxApplicationDescriptorProvider extends
         AbstractModelProvider<DataSourceDescriptor, DataSource> {
 
-    ApplicationDescriptorProvider() {
+    JmxApplicationDescriptorProvider() {
     }
 
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (ds instanceof Application) {
-            return new ApplicationDescriptor((Application) ds);
+        if (ds instanceof JmxApplication) {
+            return new JmxApplicationDescriptor((JmxApplication) ds);
         }
         return null;
+    }
+    
+    public int depth() {
+        return 10;
     }
 }
