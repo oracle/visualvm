@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.saagent;
+package com.sun.tools.visualvm.sa;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

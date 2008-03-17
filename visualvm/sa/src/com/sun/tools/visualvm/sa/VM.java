@@ -23,19 +23,38 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.saagent;
+package com.sun.tools.visualvm.sa;
 
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
-import org.openide.modules.ModuleInstall;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Properties;
+
 
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
+ *
+ * @author Tomas Hurka
  */
-public class Installer extends ModuleInstall {
-    
-    public void restored() {
-        SaModelFactory.getDefault().registerFactory(new SaModelProvider());
+class VM {
+
+    private final SAObject vm;
+
+    VM(Object saVM) {
+        vm = new SAObject(saVM);
+    }
+
+    Properties getSystemProperties() throws IllegalAccessException, InvocationTargetException {
+        return (Properties) vm.invoke("getSystemProperties");
+    }
+
+    SAObject getThreads() throws IllegalAccessException, InvocationTargetException {
+        return vm.invokeSA("getThreads");
+    }
+
+    SAObject getObjectHeap() throws IllegalAccessException, InvocationTargetException {
+        return vm.invokeSA("getObjectHeap");
+    }
+
+    SAObject getSystemDictionary() throws IllegalAccessException, InvocationTargetException {
+        return vm.invokeSA("getSystemDictionary");
     }
     
 }
