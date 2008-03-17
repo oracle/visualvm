@@ -33,8 +33,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.attach.Attach;
-import com.sun.tools.visualvm.tools.attach.AttachFactory;
+import com.sun.tools.visualvm.tools.attach.AttachModel;
+import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.Jvmstat;
@@ -190,7 +190,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     
     public boolean isDumpOnOOMEnabled() {
         if (isDumpOnOOMEnabled == null) {
-            Attach attach = getAttach();
+            AttachModel attach = getAttach();
             String args = null;
             if (attach != null) {
                 args = attach.printFlag(HEAP_DUMP_ON_OOME);
@@ -260,7 +260,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public Properties getSystemProperties() {
-        Attach attach = getAttach();
+        AttachModel attach = getAttach();
         Properties prop = null;
         
         if (attach != null) {
@@ -290,7 +290,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
         if (!isDumpOnOOMEnabledSupported()) {
             throw new UnsupportedOperationException();
         }
-        Attach attach = getAttach();
+        AttachModel attach = getAttach();
         if (attach!=null) {
             attach.setFlag(HEAP_DUMP_ON_OOME,enabled?"1":"0");
             if (enabled) {
@@ -317,7 +317,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
         File snapshotDir = application.getStorage().getDirectory();
         String name = HeapDumpSupport.getInstance().getCategory().createFileName();
         File dumpFile = new File(snapshotDir,name);
-        Attach attach = getAttach();
+        AttachModel attach = getAttach();
         if (attach != null) {
             if (attach.takeHeapDump(dumpFile.getAbsolutePath())) {
                 return dumpFile;
@@ -337,7 +337,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public File takeThreadDump() throws IOException {
-        Attach attach = getAttach();
+        AttachModel attach = getAttach();
         String threadDump = null;
         
         if (attach != null) {
@@ -371,8 +371,8 @@ public class JVMImpl extends JVM implements JvmstatListener {
         return JvmJmxModelFactory.getJvmJmxModelFor(application);
     }
     
-    protected Attach getAttach() {
-        return AttachFactory.getAttachFor(application);
+    protected AttachModel getAttach() {
+        return AttachModelFactory.getAttachFor(application);
     }
     
     protected SaModel getSAAgent() {

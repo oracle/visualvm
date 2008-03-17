@@ -25,29 +25,23 @@
 
 package com.sun.tools.visualvm.tools.attach;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.ModelFactory;
+import com.sun.tools.visualvm.core.model.Model;
+import java.util.Properties;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class AttachFactory extends ModelFactory<Attach, Application> {
+public abstract class AttachModel extends Model {
 
-    private static AttachFactory attachFactory;
-
-    private AttachFactory() {
-    }
-
-    public static synchronized AttachFactory getDefault() {
-        if (attachFactory == null) {
-            attachFactory = new AttachFactory();
-        }
-        return attachFactory;
-    }
+    public abstract Properties getSystemProperties();
     
-    public static Attach getAttachFor(Application app) {
-        return getDefault().getModel(app);
-    }
+    public abstract boolean takeHeapDump(String fileName);
+    
+    public abstract String takeThreadDump();
+    
+    public abstract String printFlag(String name);
+    
+    public abstract void setFlag(String name,String value);
     
 }

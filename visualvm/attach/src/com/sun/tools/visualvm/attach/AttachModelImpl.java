@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.attach;
 
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.attach.Attach;
+import com.sun.tools.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -38,14 +38,14 @@ import sun.tools.attach.HotSpotVirtualMachine;
  *
  * @author Tomas Hurka
  */
-public class AttachImpl extends Attach {
+public class AttachModelImpl extends AttachModel {
     String pid;
     HotSpotVirtualMachine vm;
     private static final String LIVE_OBJECTS_OPTION = "-live";
     private static final String ALL_OBJECTS_OPTION = "-all";
     
     
-    AttachImpl(Application app) {
+    AttachModelImpl(Application app) {
         pid = Integer.toString(app.getPid());
     }
     

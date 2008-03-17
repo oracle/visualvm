@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.attach;
 
-import com.sun.tools.visualvm.tools.attach.AttachFactory;
+import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -35,7 +35,7 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        AttachFactory.getDefault().registerFactory(new AttachProvider());
+        AttachModelFactory.getDefault().registerFactory(new AttachModelProvider());
     }
     
 }

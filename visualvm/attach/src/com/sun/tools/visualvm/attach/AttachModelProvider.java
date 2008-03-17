@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.attach;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.attach.Attach;
+import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 
@@ -36,18 +36,18 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
  *
  * @author Tomas Hurka
  */
-public final class AttachProvider extends AbstractModelProvider<Attach, Application>  {
+public final class AttachModelProvider extends AbstractModelProvider<AttachModel, Application>  {
     
     
-    AttachProvider() {
+    AttachModelProvider() {
     }
     
-    public Attach createModelFor(Application app) {
+    public AttachModel createModelFor(Application app) {
         if (Host.LOCALHOST.equals(app.getHost())) {
             JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatModelFor(app);
             
             if (jvmstat != null && jvmstat.isAttachable()) {
-                return new AttachImpl(app);
+                return new AttachModelImpl(app);
             }
         }
         return null;
