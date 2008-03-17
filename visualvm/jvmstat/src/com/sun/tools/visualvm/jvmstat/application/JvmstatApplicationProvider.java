@@ -37,7 +37,6 @@ import java.awt.event.ActionListener;
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -66,8 +65,6 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private final Map<Integer, WeakReference<JvmstatApplication>> applications = new HashMap();
-    
-    private final Map<Host, HostListener> mapping = Collections.synchronizedMap(new HashMap());
     
     // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
 //    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
@@ -129,12 +126,11 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                 }
                 
                 public void disconnected(HostEvent e) {
-                    processDisconnectedHost(host);
+                    processDisconnectedHost(host, monitoredHost, this);
                     rescheduleProcessNewHost(host);
                 }
             };
             monitoredHost.addHostListener(hostListener);
-            mapping.put(host, hostListener);
         } catch (MonitorException e) {
             ErrorManager.getDefault().notify(ErrorManager.USER,e);
             rescheduleProcessNewHost(host);
@@ -143,10 +139,8 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     }
     
     
-    private void processDisconnectedHost(Host host) {
-        HostListener hostListener = mapping.get(host);
-        mapping.remove(host);
-        try { getMonitoredHost(host).removeHostListener(hostListener); } catch (MonitorException ex) {}
+    private void processDisconnectedHost(Host host, MonitoredHost monitoredHost, HostListener listener) {
+        try { monitoredHost.removeHostListener(listener); } catch (MonitorException ex) {}
         host.getRepository().removeDataSources(host.getRepository().getDataSources(JvmstatApplication.class));
     }
     
