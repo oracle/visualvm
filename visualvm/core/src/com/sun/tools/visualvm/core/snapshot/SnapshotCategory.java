@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.Snapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.io.File;
 import java.io.FilenameFilter;

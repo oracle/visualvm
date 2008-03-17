@@ -1,0 +1,222 @@
+/*
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * CA 95054 USA or visit www.sun.com if you need additional information or
+ * have any questions.
+ */
+
+package com.sun.tools.visualvm.tools.jvmstat;
+
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.model.Model;
+import com.sun.tools.visualvm.host.Host;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+
+/**
+ *
+ * @author Tomas Hurka
+ */
+public abstract class JvmJvmstatModel extends Model {
+    protected Application application;
+    protected JvmstatModel jvmstat;
+    protected MonitoredValue loadedClasses;
+    protected MonitoredValue sharedLoadedClasses;
+    protected MonitoredValue sharedUnloadedClasses;
+    protected MonitoredValue unloadedClasses;
+    protected MonitoredValue threadsDaemon;
+    protected MonitoredValue threadsLive;
+    protected MonitoredValue threadsLivePeak;
+    protected MonitoredValue threadsStarted;
+    protected MonitoredValue applicationTime;
+    protected MonitoredValue upTime;
+    protected long osFrequency;
+    protected List<MonitoredValue> genCapacity;
+    protected List<MonitoredValue> genUsed;
+    protected long[] genMaxCapacity;
+    
+    protected JvmJvmstatModel(Application app,JvmstatModel stat) {
+        application = app;
+        jvmstat = stat;
+    }
+    
+    public String getCommandLine() {
+        return jvmstat.findByName("sun.rt.javaCommand");
+    }
+    
+    public String getJvmArgs() {
+        return jvmstat.findByName("java.rt.vmArgs");
+    }
+    
+    public String getJvmFlags() {
+        return jvmstat.findByName("java.rt.vmFlags");
+    }
+    
+    public String getJavaHome() {
+        return jvmstat.findByName("java.property.java.home");
+    }
+    
+    public String getVMInfo() {
+        return jvmstat.findByName("java.property.java.vm.info");
+    }
+    
+    public String getVMName() {
+        return jvmstat.findByName("java.property.java.vm.name");
+    }
+    
+    public String getVmVersion() {
+        return jvmstat.findByName("java.property.java.vm.version");
+    }
+    
+    public boolean isAttachable() {
+        String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");
+        if (jvmCapabilities == null) {
+             return false;
+        }
+        return jvmCapabilities.charAt(0) == '1';
+    }
+    
+    public String getMainArgs() {
+        String commandLine = getCommandLine();
+
+        int firstSpace = commandLine.indexOf(' ');
+        if (firstSpace > 0) {
+            return commandLine.substring(firstSpace + 1);
+        }
+        return null;
+    }
+    
+    public String getMainClass() {
+        String commandLine = getCommandLine();
+        String mainClassName = commandLine;
+
+        int firstSpace = commandLine.indexOf(' ');
+        if (firstSpace > 0) {
+            mainClassName = commandLine.substring(0, firstSpace);
+        }
+        if (application.getHost().equals(Host.LOCALHOST)) {
+            File jarFile = new File(mainClassName);
+            if (jarFile.exists()) {
+                try {
+                    JarFile jf = new JarFile(jarFile);
+                    mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+                    assert mainClassName!=null;
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        if (mainClassName.endsWith(".jar")) {
+            mainClassName = mainClassName.replace('\\', '/');
+            int index = mainClassName.lastIndexOf("/");
+            if (index != -1) {
+                mainClassName = mainClassName.substring(index + 1);
+            }
+        }
+        mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
+        return mainClassName;
+    }
+
+    public long getLoadedClasses() {
+        return getLongValue(loadedClasses);
+    }
+    
+    public long getSharedLoadedClasses() {
+        return getLongValue(sharedLoadedClasses);
+    }
+    
+    public long getSharedUnloadedClasses() {
+        return getLongValue(sharedUnloadedClasses);
+   }
+    
+    public long getUnloadedClasses() {
+        return getLongValue(unloadedClasses);
+    }
+    
+    public long getThreadsDaemon() {
+        return getLongValue(threadsDaemon);
+    }
+    
+    public long getThreadsLive() {
+        return getLongValue(threadsLive);
+    }
+    
+    public long getThreadsLivePeak() {
+        return getLongValue(threadsStarted);
+    }
+    
+    public long getThreadsStarted() {
+        return getLongValue(threadsStarted);
+    }
+    
+    public long getApplicationTime() {
+        return getLongValue(applicationTime);
+    }
+    
+    public long getUpTime() {
+        return getLongValue(upTime);
+    }
+    
+    public long[] getGenCapacity() {
+        return getGenerationSum(genCapacity);
+    }
+    
+    public long[] getGenUsed() {
+        return getGenerationSum(genUsed);
+    }
+    
+    public long[] getGenMaxCapacity() {
+        return genMaxCapacity;
+    }
+    
+    public long getOsFrequency() {
+        return osFrequency;
+    }
+    
+    protected abstract String getPermGenPrefix();
+
+    protected long getLongValue(MonitoredValue val) {
+        if (val != null) {
+            return ((Long)val.getValue()).longValue();
+        }
+        return 0;
+    }
+    
+    protected long[] getGenerationSum(List<MonitoredValue> values) {
+        long[] results=new long[2];
+        String prefix = getPermGenPrefix();
+        
+        for (MonitoredValue value : values) {
+            if (value != null) {
+                long val = ((Long)value.getValue()).longValue();
+                if (value.getName().startsWith(prefix)) {
+                    results[1]+= val;
+                } else {
+                    results[0]+= val;
+                }
+            }
+        }
+        return results;
+    }
+}

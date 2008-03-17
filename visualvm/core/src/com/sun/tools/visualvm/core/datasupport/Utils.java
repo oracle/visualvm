@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasupport;
 
+import com.sun.tools.visualvm.core.datasupport.Base64;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -85,13 +86,19 @@ public final class Utils {
         return getUniqueFile(directory, getFileBase(file), getFileExt(file));
     }
     
-    public static File getUniqueFile(File directory, String fileName, String fileExt) {
+    public synchronized static File getUniqueFile(File directory, String fileName, String fileExt) {
         File newFile = new File(directory, fileName + fileExt);
         while (newFile.exists()) {
             fileName = fileName + "_";
             newFile = new File(directory, fileName + fileExt);
         }
         return newFile;
+    }
+    
+    public static synchronized boolean prepareDirectory(File directory) {
+        if (directory.exists()) return true;
+        directory.mkdirs();
+        return directory.exists();
     }
     
     public static boolean copyFile(File file, File copy) {
@@ -190,7 +197,7 @@ public final class Utils {
         ZipFile zipFile = null;
         
         try {
-            directory.mkdirs();
+            prepareDirectory(directory);
             
             zipFile = new ZipFile(archive);
             Enumeration<? extends ZipEntry> entries = zipFile.entries();

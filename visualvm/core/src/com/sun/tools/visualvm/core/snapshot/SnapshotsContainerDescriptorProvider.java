@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 

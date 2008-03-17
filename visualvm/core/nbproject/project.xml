@@ -150,23 +150,14 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>com.sun.tools.visualvm.core.application</package>
                 <package>com.sun.tools.visualvm.core.datasource</package>
+                <package>com.sun.tools.visualvm.core.datasource.descriptor</package>
                 <package>com.sun.tools.visualvm.core.datasupport</package>
-                <package>com.sun.tools.visualvm.core.dataview.monitor</package>
-                <package>com.sun.tools.visualvm.core.dataview.overview</package>
-                <package>com.sun.tools.visualvm.core.dataview.threads</package>
                 <package>com.sun.tools.visualvm.core.explorer</package>
-                <package>com.sun.tools.visualvm.core.heapdump</package>
                 <package>com.sun.tools.visualvm.core.model</package>
-                <package>com.sun.tools.visualvm.core.model.apptype</package>
-                <package>com.sun.tools.visualvm.core.model.dsdescr</package>
-                <package>com.sun.tools.visualvm.core.model.host</package>
-                <package>com.sun.tools.visualvm.core.model.jmx</package>
-                <package>com.sun.tools.visualvm.core.model.jvm</package>
+                <package>com.sun.tools.visualvm.core.options</package>
                 <package>com.sun.tools.visualvm.core.scheduler</package>
                 <package>com.sun.tools.visualvm.core.snapshot</package>
-                <package>com.sun.tools.visualvm.core.threaddump</package>
                 <package>com.sun.tools.visualvm.core.ui</package>
                 <package>com.sun.tools.visualvm.core.ui.components</package>
             </public-packages>

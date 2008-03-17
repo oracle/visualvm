@@ -45,7 +45,7 @@ public interface ExplorerActionsProvider <T extends DataSource> {
      * @param dataSource DataSource for which to display the action,
      * @return ExplorerActionDescriptor describing the default action for given DataSource.
      */
-    public ExplorerActionDescriptor getDefaultAction(T dataSource);
+    public ExplorerActionDescriptor getDefaultAction(Set<T> dataSource);
 
     /**
      * Returns set of ExplorerActionDesctiptors describing actions for given DataSource.
@@ -55,6 +55,6 @@ public interface ExplorerActionsProvider <T extends DataSource> {
      * @param dataSource DataSource for which to display the actions,
      * @return set of ExplorerActionDesctiptors describing actions for given DataSource.
      */
-    public Set<ExplorerActionDescriptor> getActions(T dataSource);
+    public Set<ExplorerActionDescriptor> getActions(Set<T> dataSource);
 
 }

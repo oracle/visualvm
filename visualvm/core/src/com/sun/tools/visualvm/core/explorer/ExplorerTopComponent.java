@@ -39,7 +39,7 @@ import org.openide.windows.WindowManager;
 final class ExplorerTopComponent extends TopComponent {
 
     private static final String PREFERRED_ID = "ExplorerTopComponent";
-    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/localHost.png";
+    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/explorer.png";
 
     private static ExplorerTopComponent instance;
 
@@ -56,7 +56,7 @@ final class ExplorerTopComponent extends TopComponent {
   
     private void initComponents() {
         setLayout(new BorderLayout());
-        add(ExplorerUI.instance(), BorderLayout.CENTER);
+        add(ExplorerComponent.instance(), BorderLayout.CENTER);
     }
     
     

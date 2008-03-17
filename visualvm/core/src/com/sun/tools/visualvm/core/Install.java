@@ -25,22 +25,14 @@
 
 package com.sun.tools.visualvm.core;
 
-import com.sun.tools.visualvm.core.application.ApplicationsSupport;
-import com.sun.tools.visualvm.core.coredump.CoreDumpSupport;
-import com.sun.tools.visualvm.core.datasupport.Storage;
+//import com.sun.tools.visualvm.application.ApplicationsSupport;
+
+import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.dataview.monitor.MonitorViewSupport;
-import com.sun.tools.visualvm.core.heapdump.HeapDumpSupport;
-import com.sun.tools.visualvm.core.host.HostsSupport;
-import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
-import com.sun.tools.visualvm.core.dataview.threads.ThreadsViewSupport;
-import com.sun.tools.visualvm.core.profiler.ProfilerSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
-import com.sun.tools.visualvm.core.snapshot.application.ApplicationSnapshotsSupport;
-import com.sun.tools.visualvm.core.threaddump.ThreadDumpSupport;
 import java.io.File;
 import org.openide.modules.ModuleInstall;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -53,45 +45,53 @@ public class Install extends ModuleInstall {
         // NOTE: this has to be called before any of DataSourceProviders initializes
         cleanupPreviousSession();
         
-        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-            public void run() {
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() { init(); }
-                });
-            }
-        });
-    }
-    
-    private void init() {
-        
-        // Initialize hosts
-        HostsSupport.getInstance();
-        
-        // Initialize applications
-        ApplicationsSupport.getInstance();
-
-        // Initialize core dumps
-        CoreDumpSupport.register();
+        DataSourceRepository.sharedInstance();
         
         // Initialize snapshots
         SnapshotsSupport.getInstance();
         
-        // Initialize views
-        OverviewViewSupport.getInstance();
-        MonitorViewSupport.getInstance();
-        ThreadsViewSupport.getInstance();
+//        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+//            public void run() {
+//                RequestProcessor.getDefault().post(new Runnable() {
+//                    public void run() { init(); }
+//                });
+//            }
+//        });
+    }
+    
+    private void init() {
         
-        // Initialize profiler
-        ProfilerSupport.getInstance();
-        
-        // Initialize thread dumps
-        ThreadDumpSupport.getInstance();
- 
-        // Initialize heap dumps
-        HeapDumpSupport.getInstance();
-        
-        // Initialize Application snapshots support
-        ApplicationSnapshotsSupport.getInstance();
+//        // Initialize hosts
+//        HostsSupport.getInstance();
+//        
+//        // Initialize applications
+//        ApplicationsSupport.getInstance();
+//
+//        // Initialize core dumps
+//        CoreDumpSupport.register();
+//        
+//        // Initialize explorer
+//        ExplorerSupport.sharedInstance();
+//        
+//        // Initialize snapshots
+//        SnapshotsSupport.getInstance();
+//        
+//        // Initialize views
+//        OverviewViewSupport.getInstance();
+//        MonitorViewSupport.getInstance();
+//        ThreadsViewSupport.getInstance();
+//        
+//        // Initialize profiler
+//        ProfilerSupport.getInstance();
+//        
+//        // Initialize thread dumps
+//        ThreadDumpSupport.getInstance();
+// 
+//        // Initialize heap dumps
+//        HeapDumpSupport.getInstance();
+//        
+//        // Initialize Application snapshots support
+//        ApplicationSnapshotsSupport.getInstance();
 
     }
     

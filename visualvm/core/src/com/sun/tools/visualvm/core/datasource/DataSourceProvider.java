@@ -25,44 +25,170 @@
 
 package com.sun.tools.visualvm.core.datasource;
 
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.datasupport.Utils;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * General definition of a provider providing DataSource instances.
+ * Default implementation of DataSourceProvider.
+ * DataSourceProviders can benefit from extending this class which implements
+ * managing created DataSource instances and firing the events to listeners.
  *
  * @author Jiri Sedlacek
  */
-public interface DataSourceProvider <X extends DataSource> {
+public class DataSourceProvider {
 
+    private final Set<DataSource> dataSources = Collections.synchronizedSet(new HashSet());
+    private final Map<DataChangeListener<? extends DataSource>, Class<? extends DataSource>> listeners = new HashMap();
+    
+    
     /**
-     * Adds a listener for DataSoures managed by this provider.
-     * 
-     * @param listener DataChangeListener to be added,
-     * @param scope scope of DataSources for which the listeners registers.
+     * Creates new instance of DefaultDataSourceProvider.
      */
-    public <Y extends X> void addDataChangeListener(DataChangeListener<Y> listener, Class<Y> scope);
+    DataSourceProvider() {
+    }
+    
 
-    /**
-     * Removes a listener.
-     * 
-     * @param listener DataChangeListener to be removed.
-     */
-    public <Y extends X> void removeDataChangeListener(DataChangeListener<Y> listener);
+    public final <Y extends DataSource> void addDataChangeListener(final DataChangeListener<Y> listener, final Class<Y> scope) {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() {
+                if (listeners.containsKey(listener)) throw new IllegalArgumentException("Listener " + listener + " already registered"); // NOI18N
+                listeners.put(listener, scope);
+                fireCurrentState(listener);
+            }
+        });
+    }
 
-    /**
-     * Returns all DataSource instances managed by this provider.
-     * 
-     * @return all DataSource instances managed by this provider.
-     */
-    public Set<X> getDataSources();
+    public final <Y extends DataSource> void removeDataChangeListener(final DataChangeListener<Y> listener) {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() {
+                if (!listeners.containsKey(listener)) throw new IllegalArgumentException("Listener " + listener + " not registered"); // NOI18N
+                listeners.remove(listener);
+            }
+        });
+    }
 
+    public final Set<DataSource> getDataSources() {
+        return new HashSet(dataSources);
+    }
+
+    public final <Y extends DataSource> Set<Y> getDataSources(Class<Y> scope) {
+        return Utils.getFilteredSet(dataSources, scope);
+    }
+    
+    
     /**
-     * Returns all DataSource instances of given scope managed by this provider.
+     * Registers added DataSource into this provider.
      * 
-     * @param scope scope of DataSource types to return.
-     * @return all DataSource instances of given scope managed by this provider.
+     * @param added added DataSource to register.
      */
-    public <Y extends X> Set<Y> getDataSources(Class<Y> scope);
+    protected final void registerDataSource(DataSource added) {
+        registerDataSources(Collections.singleton(added));
+    }
+    
+    /**
+     * Registers added DataSources into this provider.
+     * 
+     * @param added added DataSources to register.
+     */
+    protected final void registerDataSources(final Set<? extends DataSource> added) {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() {
+                if (!added.isEmpty()) registerDataSourcesImpl(added);
+            }
+        });
+    }
+    
+    /**
+     * Unregisters removed DataSource from this provider.
+     * 
+     * @param removed removed DataSource to unregister.
+     */
+    protected final void unregisterDataSource(DataSource removed) {
+        unregisterDataSources(Collections.singleton(removed));
+    }
+    
+    /**
+     * Unregisters removed DataSources from this provider.
+     * 
+     * @param removed removed DataSources to unregister.
+     */
+    protected final void unregisterDataSources(final Set<? extends DataSource> removed) {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() {
+                if (!removed.isEmpty()) unregisterDataSourcesImpl(removed);
+            }
+        });
+    }
+    
+    /**
+     * Registers added DataSources into this provider and unregisters removed DataSources from this provider.
+     * 
+     * @param added added DataSources to register.
+     * @param removed removed DataSources to unregister.
+     */
+    protected final void changeDataSources(final Set<? extends DataSource> added, final Set<? extends DataSource> removed) {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() {
+                if (!removed.isEmpty()) unregisterDataSourcesImpl(removed);
+                if (!added.isEmpty()) registerDataSourcesImpl(added);
+            }
+        });
+    }
+    
+    protected void registerDataSourcesImpl(Set<? extends DataSource> added) {
+        for (DataSource dataSource : added) if (dataSources.contains(dataSource))
+            throw new UnsupportedOperationException("DataSource already in repository: " + dataSource);
+            
+        dataSources.addAll(added);
+        fireDataAdded(added);
+    }
+    
+    protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
+        for (DataSource dataSource : removed) if (!dataSources.contains(dataSource))
+            throw new UnsupportedOperationException("DataSource not in repository: " + dataSource);
+        
+        dataSources.removeAll(removed);
+        fireDataRemoved(removed);
+    }
+    
+    
+    private void fireCurrentState(DataChangeListener<? extends DataSource> listener) {
+        fireDataChanged(listener, null, null);
+    }
+    
+    private void fireDataAdded(Set<? extends DataSource> added) {
+        fireDataChanged(added, Collections.EMPTY_SET);
+    }
+    
+    private void fireDataRemoved(Set<? extends DataSource> removed) {
+        fireDataChanged(Collections.EMPTY_SET, removed);
+    }
+    
+    private void fireDataChanged(Set<? extends DataSource> added, Set<? extends DataSource> removed) {
+        Set<DataChangeListener<? extends DataSource>> listenersSet = listeners.keySet();
+        for (DataChangeListener listener : listenersSet) fireDataChanged(listener, added, removed);
+    }
+    
+    private void fireDataChanged(DataChangeListener<? extends DataSource> listener, Set<? extends DataSource> added, Set<? extends DataSource> removed) {
+        Class<? extends DataSource> filter = listeners.get(listener);
+        Set<? extends DataSource> filteredCurrent = Utils.getFilteredSet(dataSources, filter);
+        if (added == null && removed == null) {
+            DataChangeEvent event = new DataChangeEvent(filteredCurrent, filteredCurrent, null);
+            listener.dataChanged(event);
+        } else {
+            Set<? extends DataSource> filteredAdded = Utils.getFilteredSet(added, filter);
+            Set<? extends DataSource> filteredRemoved = Utils.getFilteredSet(removed, filter);
+            if (!filteredAdded.isEmpty() || !filteredRemoved.isEmpty()) {
+                DataChangeEvent event = new DataChangeEvent(filteredCurrent, filteredAdded, filteredRemoved);
+                listener.dataChanged(event);
+            }
+        }
+    }
 
 }

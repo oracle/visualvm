@@ -56,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Exceptions;
 
 /**
@@ -97,7 +98,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private boolean draggedOut = false;
   
   public void addViewTab(DataSource dataSource, DataSourceView view) {
-    DataSourceViewContainer container = new DataSourceViewContainer(DataSourceCaptionFactory.getInstance().getDataSourcePresenter(dataSource), view.getView());
+    DataSourceViewContainer container = new DataSourceViewContainer(new DataSourceCaption(dataSource), view.getView());
     mapping.put(container, view);
     super.add(container);
     setTitleAt(getComponentCount() - 1, view.getName() + (view.isClosable() ? "  " : ""));
@@ -107,6 +108,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   public void removeTabAt(int index) {
       DataSourceViewContainer container = (DataSourceViewContainer)getComponentAt(index);
       super.removeTabAt(index);
+      container.getCaption().finish();
       mapping.remove(container);
   }
   
@@ -114,10 +116,16 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       return mapping.get(container);
   }
   
-  public int indexOfView(DataSourceView view) {
-      for (int i = 0; i < getTabCount(); i++)
-          if (((DataSourceViewContainer)getComponentAt(i)).getView() == view.getView()) return i;
-      return -1;
+  public int indexOfView(final DataSourceView view) {
+      final int[] index = new int[1];
+      index[0] = -1;
+      IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+          public void run() {
+              for (int i = 0; i < getTabCount(); i++)
+                  if (((DataSourceViewContainer)getComponentAt(i)).getView() == view.getView()) index[0] = i;
+          }
+      });
+      return index[0];
   }
   
   public Set<DataSourceView> getViews() {
@@ -508,9 +516,11 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   
   static class DataSourceViewContainer extends JPanel {
       
+      private DataSourceCaption caption;
       private DataViewComponent view;
       
-      public DataSourceViewContainer(JComponent caption, DataViewComponent view) {
+      public DataSourceViewContainer(DataSourceCaption caption, DataViewComponent view) {
+          this.caption = caption;
           this.view = view;
           setLayout(new BorderLayout());
           setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
@@ -523,6 +533,8 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
               add(caption, BorderLayout.NORTH);
           }
       }
+      
+      public DataSourceCaption getCaption() { return caption; }
       
       public DataViewComponent getView() { return view; }
   }

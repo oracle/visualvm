@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

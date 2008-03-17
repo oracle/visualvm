@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,12 +77,16 @@ public final class DataSourceWindowManager {
                 DataSource viewMaster = getViewMaster(dataSource);
 
                 // Resolve cached window
-                DataSourceWindow window = openedWindows.get(viewMaster);
+                final DataSourceWindow window = openedWindows.get(viewMaster);
                 if (window == null) return; // Window not opened
                 
                 // Remove all views of the dataSource
-                List<? extends DataSourceView> views = DataSourceViewsFactory.sharedInstance().getViews(dataSource);
-                for (DataSourceView view : views) window.removeView(view);
+                final List<? extends DataSourceView> views = DataSourceViewsFactory.sharedInstance().getViews(dataSource);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (DataSourceView view : views) window.removeView(view);
+                    }
+                });
             }
         });
     }

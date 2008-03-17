@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.Snapshot;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
@@ -57,16 +56,16 @@ final class SnapshotActionProvider {
     
     private class SnapshotActionsProvider implements ExplorerActionsProvider<Snapshot> {
         
-        public ExplorerActionDescriptor getDefaultAction(Snapshot snapshot) {
-            if (snapshot.supportsSaveAs())
+        public ExplorerActionDescriptor getDefaultAction(Set<Snapshot> snapshots) {
+            if (snapshots.size() == 1 && snapshots.iterator().next().supportsSaveAs())
                 return new ExplorerActionDescriptor(SaveSnapshotAsAction.getInstance(), 20);
             else return null;
         }
 
-        public Set<ExplorerActionDescriptor> getActions(Snapshot snapshot) {
+        public Set<ExplorerActionDescriptor> getActions(Set<Snapshot> snapshots) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (snapshot.supportsDelete())
+            if (DeleteSnapshotAction.getInstance().isEnabled())
                 actions.add(new ExplorerActionDescriptor(DeleteSnapshotAction.getInstance(), 100));
             
             return actions;

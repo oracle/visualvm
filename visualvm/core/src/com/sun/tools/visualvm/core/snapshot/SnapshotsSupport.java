@@ -25,9 +25,9 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.AbstractSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.io.File;
 import java.util.Date;
 import javax.swing.JFileChooser;
@@ -57,7 +57,7 @@ public final class SnapshotsSupport {
     }
     
     
-    public void saveAs(final AbstractSnapshot snapshot, String dialogTitle) {
+    public void saveAs(final Snapshot snapshot, String dialogTitle) {
         final File file = snapshot.getFile();
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(dialogTitle);
@@ -92,8 +92,8 @@ public final class SnapshotsSupport {
     
     
     private SnapshotsSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
-        new SnapshotsContainerProvider().initialize();
+//        DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
+//        new SnapshotsContainerProvider().initialize();
         SnapshotActionProvider.getInstance().initialize();
     }
 

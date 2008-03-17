@@ -33,6 +33,23 @@
             <file name="master-help.xml_hidden"/>
             <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
+            <file name="Show Welcome.instance">
+	        <attr name="instanceClass" stringvalue="com.sun.tools.visualvm.modules.appui.welcome.ShowWelcomeAction"/>
+            </file>
+        </folder>
+        <folder name="Profile">
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance_hidden"/>
         </folder>
         <file name="Profile_hidden"/>
         <folder name="System">
@@ -71,6 +88,9 @@
             <file name="Separator1.instance_hidden"/>
             <file name="master-help.xml_hidden"/>
             <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
+            <file name="com-sun-tools-visualvm-modules-appui-welcome-ShowWelcomeAction.instance">
+                <attr name="position" intvalue="1100"/>
+            </file>
             <file name="com-sun-tools-visualvm-modules-appui-AboutAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Help/com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
                 <attr name="position" intvalue="1200"/>
@@ -119,6 +139,9 @@
     </folder>
     <folder name="Shortcuts">
         <file name="S-F9.instance_hidden"/>
+        <file name="AS-F2.instance_hidden"/>
+        <file name="CS-F2.instance_hidden"/>
+        <file name="S-F9.instance_hidden"/>
     </folder>
     <folder name="Toolbars">
         <file name="Edit_hidden"/>
@@ -129,6 +152,14 @@
     </folder>
     <folder name="Windows2">
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
+        <folder name="Modes">
+            <folder name="editor">
+                <file name="VisualVMWelcome.wstcref" url="welcome/resources/VisualVMWelcome.wstcref"/>
+            </folder>
+        </folder>
+        <folder name="Components">
+            <file name="VisualVMWelcome.settings" url="welcome/resources/VisualVMWelcome.settings"/>
+        </folder>
     </folder>
     <!--folder name="Windows2Local">
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>

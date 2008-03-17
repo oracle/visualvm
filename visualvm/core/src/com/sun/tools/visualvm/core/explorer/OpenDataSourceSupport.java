@@ -52,13 +52,13 @@ final class OpenDataSourceSupport implements ExplorerActionsProvider<DataSource>
     }
     
 
-    public ExplorerActionDescriptor getDefaultAction(DataSource dataSource) {
-        if (OpenDataSourceAction.isAvailable(dataSource))
+    public ExplorerActionDescriptor getDefaultAction(Set<DataSource> dataSources) {
+        if (OpenDataSourceAction.getInstance().isAvailable(dataSources))
             return new ExplorerActionDescriptor(OpenDataSourceAction.getInstance(), 0);
         else return null;
     }
 
-    public Set<ExplorerActionDescriptor> getActions(DataSource dataSource) {
+    public Set<ExplorerActionDescriptor> getActions(Set<DataSource> dataSources) {
         return Collections.EMPTY_SET;
     }
 

@@ -25,13 +25,16 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class SnapshotsContainer extends AbstractDataSource {
+public final class SnapshotsContainer extends DataSource {
     
     private static SnapshotsContainer sharedInstance;
     
@@ -43,6 +46,13 @@ public final class SnapshotsContainer extends AbstractDataSource {
     
     
     private SnapshotsContainer() {
+//        getRepository().addDataChangeListener(new DataChangeListener() {
+//            public void dataChanged(DataChangeEvent event) {
+//                setVisible(!event.getCurrent().isEmpty());
+//            }
+//        }, DataSource.class);
+        DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
+        DataSource.ROOT.getRepository().addDataSource(this);
     }
 
 }

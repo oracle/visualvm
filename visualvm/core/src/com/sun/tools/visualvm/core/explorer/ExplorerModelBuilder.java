@@ -29,8 +29,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceContainer;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -112,8 +112,10 @@ class ExplorerModelBuilder {
                         DataSourceContainer repository = dataSource.getRepository();
                         DataChangeListener repositoryListener = new DataChangeListener() {
                             public void dataChanged(DataChangeEvent event) {
-                                processRemovedDataSources(event.getRemoved());
-                                processAddedDataSources(event.getAdded());
+                                Set<DataSource> added = event.getAdded();
+                                Set<DataSource> removed = event.getRemoved();
+                                if (!removed.isEmpty()) processRemovedDataSources(removed);
+                                if (!added.isEmpty()) processAddedDataSources(added);
                             }
                         };
                         repository.addDataChangeListener(repositoryListener, DataSource.class);
@@ -224,7 +226,7 @@ class ExplorerModelBuilder {
         Map<ExplorerNode, List<Integer>> indexes = new HashMap();
         
         // Save selection
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         
         // Add nodes and create parent entries
         for (ExplorerNode node : added) {
@@ -251,26 +253,28 @@ class ExplorerModelBuilder {
         }
         
         // Try to restore selection
-        ExplorerSupport.sharedInstance().selectDataSource(selectedDataSource);
+        ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
     
     private void removeNodes(Set<ExplorerNode> removed) {
         Map<ExplorerNode, List<IndexNodePair>> pairs = new HashMap();
         
         // Save selection
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         
-        // Setup map of indexes
+        // Cache indexes and childs
         for (ExplorerNode node : removed) {
             ExplorerNode nodeParent = (ExplorerNode)node.getParent();
-            pairs.put(nodeParent, new ArrayList());
+            List<IndexNodePair> list = pairs.get(nodeParent);
+            if (list == null) {
+                list = new ArrayList();
+                pairs.put(nodeParent, list);
+            }
+            list.add(new IndexNodePair(nodeParent.getIndex(node), node));
         }
-
-        // Remove nodes and cache indexes and childs
+        
+        // Remove nodes
         for (ExplorerNode node : removed) {
-            ExplorerNode nodeParent = (ExplorerNode)node.getParent();
-            int index = nodeParent.getIndex(node);
-            pairs.get(nodeParent).add(new IndexNodePair(index, node));
             node.removeFromParent();
             nodes.remove(node.getUserObject());
         }
@@ -290,7 +294,7 @@ class ExplorerModelBuilder {
         }
         
         // Try to restore selection
-        ExplorerSupport.sharedInstance().selectDataSource(selectedDataSource);
+        ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
     
     
