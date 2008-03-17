@@ -302,7 +302,7 @@ class ApplicationProfilerView extends DataSourceView {
           cpuSettings = ProfilingSettingsPresets.createCPUPreset();
           cpuSettings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
           
-          memorySettings = ProfilingSettingsPresets.createMemoryPreset();
+          memorySettings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
 
           // Attach settings default
           attachSettings = new AttachSettings();
