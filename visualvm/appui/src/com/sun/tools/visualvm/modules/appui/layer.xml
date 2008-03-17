@@ -34,6 +34,20 @@
             <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
         </folder>
+        <folder name="Profile">
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance_hidden"/>
+        </folder>
     </folder>
     <folder name="Menu">
         <file name="Edit_hidden"/>

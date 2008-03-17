@@ -44,7 +44,7 @@ import org.openide.util.RequestProcessor;
 class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
     
     private static final String NAME = "Profiler Snapshots";
-    private static final String PREFIX = "profiler";
+    private static final String PREFIX = "snapshot";
     private static final String SUFFIX = ".nps";
     
     public ProfilerSnapshotCategory() {

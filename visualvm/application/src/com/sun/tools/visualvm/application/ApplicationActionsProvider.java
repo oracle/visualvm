@@ -85,9 +85,9 @@ class ApplicationActionsProvider {
             if (apps.size() == 1) {
                 JVM jvm = JVMFactory.getJVMFor(apps.iterator().next());
                 if (jvm.isDumpOnOOMEnabledSupported()) {
-                    actions.add(new ExplorerActionDescriptor(null, 40));
+                    actions.add(new ExplorerActionDescriptor(null, 60));
                     actions.add(new ExplorerActionDescriptor(
-                            heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 41));
+                            heapDumpOnOOMEAction.refresh(!jvm.isDumpOnOOMEnabled()), 61));
                 }
             }
             

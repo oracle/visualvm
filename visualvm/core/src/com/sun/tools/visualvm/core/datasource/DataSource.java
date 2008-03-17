@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.datasource;
 
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.ref.WeakReference;
@@ -156,6 +157,7 @@ public abstract class DataSource {
     // Implementation of this DataSource removal
     // Persistent DataSources can remove appropriate entries from their storage
     protected void remove(DataSource removeRoot) {
+        DataSourceWindowManager.sharedInstance().closeDataSource(this);
         getStorage().deleteCustomPropertiesStorage();
     }
     

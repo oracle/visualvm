@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -33,8 +34,10 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.Set;
 import org.netbeans.lib.profiler.global.Platform;
+import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.ResultsManager;
 
 /**
  *
@@ -47,6 +50,7 @@ public final class ProfilerSupport {
     private Application profiledApplication;
     private ProfilerSnapshotCategory category;
     private ApplicationProfilerViewProvider profilerViewProvider;
+    private ProfilerSnapshotsProvider profilerSnapshotsProvider;
 
 
     public static synchronized ProfilerSupport getInstance() {
@@ -59,6 +63,10 @@ public final class ProfilerSupport {
         return category;
     }
     
+    
+    ProfilerSnapshotsProvider getSnapshotsProvider() {
+        return profilerSnapshotsProvider;
+    }
     
     void setProfiledApplication(Application profiledApplication) {
         this.profiledApplication = profiledApplication;
@@ -77,6 +85,12 @@ public final class ProfilerSupport {
         Set<? extends DataSourceView> activeViewSet = profilerViewProvider.getViews(application);
         if (activeViewSet.isEmpty()) return;
         DataSourceWindowManager.sharedInstance().selectView(application, activeViewSet.iterator().next());
+    }
+    
+    void takeSnapshot(boolean openView) {
+        LoadedSnapshot snapshot = ResultsManager.getDefault().takeSnapshot();
+        File file = new File(profiledApplication.getStorage().getDirectory() + File.separator + category.createFileName());
+        System.err.println(">>> About to save file to " + file);
     }
     
     
@@ -146,15 +160,24 @@ public final class ProfilerSupport {
     
     
     private ProfilerSupport() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new ProfilerSnapshotDescriptorProvider());
         profilerViewProvider = new ApplicationProfilerViewProvider();
         profilerViewProvider.initialize();
+        
+        new ProfilerSnapshotViewProvider().initialize();
         
         category = new ProfilerSnapshotCategory();
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
         
+        profilerSnapshotsProvider = new ProfilerSnapshotsProvider();
+        profilerSnapshotsProvider.initialize();
+        
         ProfilerActionsProvider.getInstance().initialize();
         
         checkCalibration();
+        
+        ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
+        ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
     }
 
 }

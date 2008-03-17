@@ -56,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Exceptions;
 
 /**
@@ -115,10 +116,16 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       return mapping.get(container);
   }
   
-  public int indexOfView(DataSourceView view) {
-      for (int i = 0; i < getTabCount(); i++)
-          if (((DataSourceViewContainer)getComponentAt(i)).getView() == view.getView()) return i;
-      return -1;
+  public int indexOfView(final DataSourceView view) {
+      final int[] index = new int[1];
+      index[0] = -1;
+      IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+          public void run() {
+              for (int i = 0; i < getTabCount(); i++)
+                  if (((DataSourceViewContainer)getComponentAt(i)).getView() == view.getView()) index[0] = i;
+          }
+      });
+      return index[0];
   }
   
   public Set<DataSourceView> getViews() {

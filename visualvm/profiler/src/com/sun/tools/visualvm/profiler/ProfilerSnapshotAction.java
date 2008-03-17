@@ -25,45 +25,48 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.SnapshotsListener;
+import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.util.RequestProcessor;
+import org.openide.util.actions.SystemAction;
 
-public final class ProfileApplicationAction extends AbstractAction {
+public final class ProfilerSnapshotAction extends AbstractAction {
     
-    private static ProfileApplicationAction instance;
+    private static ProfilerSnapshotAction instance;
+    
+    private final TakeSnapshotAction originalAction = SystemAction.get(TakeSnapshotAction.class);
+    private boolean openNextSnapshot = true;
     
     
-    public static synchronized ProfileApplicationAction getInstance() {
-        if (instance == null) instance = new ProfileApplicationAction();
+    public static synchronized ProfilerSnapshotAction getInstance() {
+        if (instance == null) instance = new ProfilerSnapshotAction();
         return instance;
     }
     
-    public void actionPerformed(ActionEvent e) {
+    public synchronized void actionPerformed(final ActionEvent e) {
         final Application selectedApplication = getSelectedApplication();
         
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                if (isAvailable(selectedApplication)) {
-                    ProfilerSupport.getInstance().selectProfilerView(selectedApplication);
-                } else {
-                    NetBeansProfiler.getDefaultNB().displayError("Cannot profile " + DataSourceDescriptorFactory.getDescriptor(selectedApplication).getName());
-                }
-            }
-        });
+        if (isAvailable(selectedApplication)) {
+            originalAction.performAction();
+            openNextSnapshot = (e.getModifiers() & InputEvent.CTRL_MASK) == 0;
+        } else {
+            NetBeansProfiler.getDefaultNB().displayError("Cannot take profiler snapshot");
+        }
     }
+    
     
     private void updateEnabled() {
         final Application selectedApplication = getSelectedApplication();
@@ -75,22 +78,14 @@ public final class ProfileApplicationAction extends AbstractAction {
         });
     }
     
-    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
-    boolean isEnabled(Application application) {
-        if (application == null) return false;
-        if (application.getHost() != Host.LOCALHOST) return false;
-        if (Application.CURRENT_APPLICATION.equals(application)) return false;
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-        
-        return true;
+    private boolean isEnabled(Application application) {
+        return ProfilerSupport.getInstance().getProfiledApplication() == application &&
+                originalAction.isEnabled();
     }
     
     // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
     boolean isAvailable(Application application) {
-        if (!isEnabled(application)) return false;
-        
-        JVM jvm = JVMFactory.getJVMFor(application);
-        return jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
+        return isEnabled(application);
     }
     
     private Application getSelectedApplication() {
@@ -99,14 +94,30 @@ public final class ProfileApplicationAction extends AbstractAction {
     }
     
     
-    private ProfileApplicationAction() {
-        putValue(Action.NAME, "Profile");
-        putValue(Action.SHORT_DESCRIPTION, "Profile");
+    private ProfilerSnapshotAction() {
+        putValue(Action.NAME, "Profiler Snapshot");
+        putValue(Action.SHORT_DESCRIPTION, "Profiler Snapshot");
         
         updateEnabled();
+        originalAction.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (SystemAction.PROP_ENABLED.equals(evt.getPropertyName()))
+                    updateEnabled();
+            }
+        });
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
             public void selectionChanged(Set<DataSource> selected) {
                 updateEnabled();
+            }
+        });
+        ResultsManager.getDefault().addSnapshotsListener(new SnapshotsListener() {
+            public void snapshotLoaded(LoadedSnapshot arg0) {}
+            public void snapshotRemoved(LoadedSnapshot arg0) {}
+            public void snapshotTaken(LoadedSnapshot arg0) {}
+            
+            public void snapshotSaved(LoadedSnapshot arg0) {
+                ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(arg0, openNextSnapshot);
+                openNextSnapshot = true;
             }
         });
     }

@@ -68,7 +68,7 @@ class ApplicationSnapshotDescriptorProvider extends AbstractModelProvider<DataSo
                 if (persistedIcon != null) icon = persistedIcon;
             }
             
-            return Utilities.mergeImages(icon, NODE_BADGE, 0, 0);
+            return icon != null ? Utilities.mergeImages(icon, NODE_BADGE, 0, 0) : null;
         }
         
     }

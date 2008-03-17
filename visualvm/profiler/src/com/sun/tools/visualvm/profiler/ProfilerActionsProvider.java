@@ -64,8 +64,14 @@ final class ProfilerActionsProvider {
         public Set<ExplorerActionDescriptor> getActions(Set<Application> applications) {
             Set<ExplorerActionDescriptor> actions = new HashSet();
             
-            if (applications.size() == 1 && ProfileApplicationAction.isAvailable(applications.iterator().next()))
-                actions.add(new ExplorerActionDescriptor(ProfileApplicationAction.getInstance(), 30));
+            if (applications.size() == 1) {
+                Application application = applications.iterator().next();
+                
+                if (ProfileApplicationAction.getInstance().isAvailable(application))
+                    actions.add(new ExplorerActionDescriptor(ProfileApplicationAction.getInstance(), 30));
+                if (ProfilerSnapshotAction.getInstance().isAvailable(application))
+                    actions.add(new ExplorerActionDescriptor(ProfilerSnapshotAction.getInstance(), 40));
+            }
             
             return actions;
         }

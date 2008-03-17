@@ -95,6 +95,7 @@ public final class ApplicationSnapshotAction extends AbstractAction implements D
         updateEnabled();
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
             public void selectionChanged(Set<DataSource> selected) {
+                updateEnabled();
                 Set<Application> selectedApplications = getSelectedApplications();
                 if (lastSelectedApplications != null) {
                     for (Application application : lastSelectedApplications)

@@ -25,7 +25,11 @@
 
 package com.sun.tools.visualvm.profiler;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
 
 /**
  *
@@ -33,8 +37,34 @@ import com.sun.tools.visualvm.core.snapshot.Snapshot;
  */
 class ProfilerSnapshot extends Snapshot {
     
+    private LoadedSnapshot loadedSnapshot;
+    
     public ProfilerSnapshot() {
         super(null, ProfilerSupport.getInstance().getCategory());
+    }
+    
+    
+    public ProfilerSnapshot(LoadedSnapshot loadedSnapshot, DataSource master) {
+        super(loadedSnapshot.getFile(), ProfilerSupport.getInstance().getCategory(), master);
+        this.loadedSnapshot = loadedSnapshot;
+    }
+    
+    
+    public LoadedSnapshot getLoadedSnapshot() {
+        return loadedSnapshot;
+    }
+    
+    public boolean supportsSaveAs() {
+        return true;
+    }
+    
+    public void remove(DataSource removeRoot) {
+        super.remove(removeRoot);
+        ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
+    }
+    
+    public void saveAs() {
+        SnapshotsSupport.getInstance().saveAs(this, "Save Profiler Snapshot As");
     }
 
 }

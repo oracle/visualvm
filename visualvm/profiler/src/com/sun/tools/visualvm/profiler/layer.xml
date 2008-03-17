@@ -31,6 +31,9 @@
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.getInstance"/>
             </file>
+            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.getInstance"/>
+            </file>
         </folder>
     </folder>
     <folder name="Menu">
@@ -38,6 +41,10 @@
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
                 <attr name="position" intvalue="1200"/>
+            </file>
+            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+                <attr name="position" intvalue="1300"/>
             </file>
         </folder>
     </folder>

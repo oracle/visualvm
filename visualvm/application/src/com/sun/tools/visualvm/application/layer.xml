@@ -44,7 +44,7 @@
             </file>
             <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
-                <attr name="position" intvalue="1300"/>
+                <attr name="position" intvalue="1400"/>
             </file>
         </folder>
     </folder>
