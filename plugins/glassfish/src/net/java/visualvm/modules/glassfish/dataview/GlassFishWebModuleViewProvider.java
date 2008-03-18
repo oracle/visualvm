@@ -24,6 +24,7 @@
  */
 package net.java.visualvm.modules.glassfish.dataview;
 
+import com.sun.appserv.management.monitor.ServletMonitor;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.management.AttributeNotFoundException;
@@ -31,9 +32,7 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ReflectionException;
-import net.java.visualvm.modules.glassfish.ui.StatsTable;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
-import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats;
 import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.jmx.JmxModel;
 import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
@@ -46,10 +45,8 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
-import net.java.visualvm.modules.glassfish.ui.Chart;
 import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -64,12 +61,17 @@ import java.util.Set;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.RowSorter;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.DialShape;
+import org.jfree.chart.plot.MeterInterval;
+import org.jfree.chart.plot.MeterPlot;
+import org.jfree.data.Range;
+import org.jfree.data.general.DefaultValueDataset;
 
 
 /**
@@ -88,12 +90,8 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private Chart activeSessionsChart;
-        private Chart jspChart;
-        private Chart totalSessionsChart;
+        private MeterPlot trafficPlot;
         private DataViewComponent dvc;
-        private TableModel servletsModel;
-        private TableModel wsModel;
         private GlassFishWebModule module;
         private ScheduledTask refreshTask;
 
@@ -128,87 +126,15 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             masterPanel.add(generalDataScroll, BorderLayout.CENTER);
             masterPanel.add(appLink, BorderLayout.NORTH);
             
-            JPanel chartActiveSessionsPanel = new JPanel(new BorderLayout());
-            chartActiveSessionsPanel.setOpaque(false);
-            activeSessionsChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Current", "Maximum" }, new Color[] { Color.BLUE, Color.RED });
-                    }
-                };
-            chartActiveSessionsPanel.add(activeSessionsChart, BorderLayout.CENTER);
-            chartActiveSessionsPanel.add(activeSessionsChart.getBigLegendPanel(), BorderLayout.SOUTH);
-
-            JPanel chartTotalSessionsPanel = new JPanel(new BorderLayout());
-            chartTotalSessionsPanel.setOpaque(false);
-            totalSessionsChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Created", "Expired", "Rejected" },
-                                                new Color[] { Color.BLUE, Color.GREEN, Color.RED });
-                    }
-                };
-            chartTotalSessionsPanel.add(totalSessionsChart, BorderLayout.CENTER);
-            chartTotalSessionsPanel.add(totalSessionsChart.getBigLegendPanel(), BorderLayout.SOUTH);
-
-            JPanel chartJspPanel = new JPanel(new BorderLayout());
-            chartJspPanel.setOpaque(false);
-            jspChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Count", "Reloads", "Errors" },
-                                                new Color[] { Color.BLUE, Color.GREEN, Color.RED });
-                    }
-                };
-            chartJspPanel.add(jspChart, BorderLayout.CENTER);
-            chartJspPanel.add(jspChart.getBigLegendPanel(), BorderLayout.SOUTH);
-
-            JPanel servletsPanel = new JPanel(new BorderLayout());
-            servletsPanel.setOpaque(false);
-            servletsModel = new ServletTableModel(webModule.getMonitor(), Quantum.seconds(5));
-
-            RowSorter<TableModel> servletsRowSorter = new TableRowSorter<TableModel>(servletsModel);
-
-            StatsTable servletsTable = new StatsTable(servletsModel);
-            servletsTable.setRowSorter(servletsRowSorter);
-            servletsTable.setOpaque(false);
-
-            JScrollPane servletsScroller = new JScrollPane(servletsTable);
-            servletsScroller.setOpaque(false);
-            servletsPanel.add(servletsScroller, BorderLayout.CENTER);
-
-            JPanel wsPanel = new JPanel(new BorderLayout());
-            wsPanel.setOpaque(false);
-            wsModel = new WSTableModel(webModule.getMonitor(), Quantum.seconds(5));
-
-            RowSorter<TableModel> wsRowSorter = new TableRowSorter<TableModel>(wsModel);
-
-            StatsTable wsTable = new StatsTable(wsModel);
-            wsTable.setRowSorter(wsRowSorter);
-            wsTable.setOpaque(false);
-
-            JScrollPane wsScroller = new JScrollPane(wsTable);
-            wsScroller.setOpaque(false);
-            wsPanel.add(wsScroller, BorderLayout.CENTER);
-
+            trafficPlot = new MeterPlot();
+            
+            
             DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Overview", null, masterPanel);
             DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
             dvc = new DataViewComponent(masterView, masterConfiguration);
-            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Sessions", true), DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Active", null, chartActiveSessionsPanel, null),
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Statistics", true), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Statistics", null, getTrafficChart(), null),
                                DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Total", null, chartTotalSessionsPanel, null),
-                               DataViewComponent.TOP_LEFT);
-
-            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("JSPs", true), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("JSPs", null, chartJspPanel, null), DataViewComponent.TOP_RIGHT);
-
-            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Runtime", true),
-                                     DataViewComponent.BOTTOM_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Servlets", null, servletsPanel, null),
-                               DataViewComponent.BOTTOM_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("WebServices", null, wsPanel, null),
-                               DataViewComponent.BOTTOM_LEFT);
             
             refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
                 public void onSchedule(long timeStamp) {
@@ -258,26 +184,44 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
 
         private void refreshData(long sampleTime) {
             WebModuleVirtualServerMonitor monitor = module.getMonitor();
-            WebModuleVirtualServerStats stats = monitor.getWebModuleVirtualServerStats();
-            activeSessionsChart.getModel()
-                               .addItemValues(sampleTime,
-                                              new long[] {
-                                                  stats.getActiveSessionsCurrent().getCount(),
-                                                  stats.getActiveSessionsHigh().getCount()
-                                              });
-            totalSessionsChart.getModel()
-                              .addItemValues(sampleTime,
-                                             new long[] {
-                                                 stats.getSessionsTotal().getCount(), stats.getExpiredSessionsTotal().getCount(),
-                                                 stats.getRejectedSessionsTotal().getCount()
-                                             });
-            jspChart.getModel()
-                    .addItemValues(sampleTime,
-                                   new long[] {
-                                       stats.getJSPCount().getCount(), stats.getJSPReloadCount().getCount(),
-                                       stats.getJSPErrorCount().getCount()
-                                   });
+            long serviceTime = 0L;
+            long requestCount = 0L;
+            for(Map.Entry<String, ServletMonitor> entry : monitor.getServletMonitorMap().entrySet()) {
+                serviceTime += entry.getValue().getAltServletStats().getProcessingTime().getCount();
+                requestCount += entry.getValue().getAltServletStats().getRequestCount().getCount();
+            }
+            long throughput = (serviceTime == 0L || requestCount == 0L) ? 0L : Math.round(1000d / (serviceTime / requestCount));
+            
+            trafficPlot.setDataset(new DefaultValueDataset(throughput));
+        }
+        
+        private JComponent getTrafficChart() {
+            trafficPlot.setRange(new Range(0d, 300d));
+            trafficPlot.addInterval(new MeterInterval("Low", new Range(0d, 20d), Color.BLACK, null, Color.RED));
+            trafficPlot.addInterval(new MeterInterval("Medium", new Range(20d, 200d), Color.BLACK, null, Color.YELLOW));
+            trafficPlot.addInterval(new MeterInterval("High", new Range(200d, 300d), Color.BLACK, null, Color.GREEN));
+            
+            trafficPlot.setDialShape(DialShape.CHORD);
+            trafficPlot.setUnits("requests/sec");
+            trafficPlot.setDialBackgroundPaint(Color.LIGHT_GRAY);
+            trafficPlot.setDrawBorder(false);
+            trafficPlot.setNeedlePaint(Color.BLACK);
+            
+            trafficPlot.setValuePaint(Color.BLUE);
+            
+            trafficPlot.setBackgroundPaint(Color.WHITE);
 
+            JFreeChart chart = new JFreeChart(trafficPlot);
+            chart.setAntiAlias(true);
+            chart.setBackgroundPaint(Color.WHITE);
+            chart.setBorderVisible(false);
+            
+            ChartPanel meterPanel = new ChartPanel(chart);
+            meterPanel.setOpaque(false);
+            meterPanel.setBackground(Color.WHITE);
+            meterPanel.setBorder(BorderFactory.createTitledBorder("Traffic"));
+            
+            return meterPanel;
         }
     }
 
