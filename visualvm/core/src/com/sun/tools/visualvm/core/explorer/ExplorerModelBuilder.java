@@ -165,7 +165,9 @@ class ExplorerModelBuilder {
 
                         // Process DataSource
                         ExplorerNode node = getNodeFor(dataSource);
-                        removedNodes.add(node);
+                        if (node != null) {
+                            removedNodes.add(node);
+                        }
 
                         DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
                         descriptor.removePropertyChangeListener(descriptorListeners.get(descriptor));
