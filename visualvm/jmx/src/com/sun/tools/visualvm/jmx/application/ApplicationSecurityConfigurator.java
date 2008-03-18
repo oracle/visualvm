@@ -60,7 +60,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
                 asc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
         d.pack();
-        d.setSize(titleLabel.getPreferredSize().width + 120,
+        d.setSize(titleLabel.getPreferredSize().width + 200,
                 d.getPreferredSize().height);
         d.setVisible(true);
 
