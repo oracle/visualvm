@@ -25,7 +25,7 @@
 
 package net.java.visualvm.btrace.datasource;
 
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import net.java.visualvm.btrace.config.ProbeConfig;
 import org.openide.util.Utilities;

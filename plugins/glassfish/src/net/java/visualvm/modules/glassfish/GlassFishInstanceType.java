@@ -25,8 +25,8 @@
  */
 package net.java.visualvm.modules.glassfish;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.jvm.JVM;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVM;
 import java.awt.Image;
 import java.text.MessageFormat;
 import org.openide.util.Exceptions;

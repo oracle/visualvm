@@ -25,7 +25,7 @@
 
 package net.java.visualvm.modules.glassfish.jmx;
 
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import java.io.IOException;
 import java.util.Map;
 import javax.management.AttributeNotFoundException;

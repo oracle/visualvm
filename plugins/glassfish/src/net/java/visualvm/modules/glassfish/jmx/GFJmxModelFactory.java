@@ -25,15 +25,14 @@
 
 package net.java.visualvm.modules.glassfish.jmx;
 
-import com.sun.tools.visualvm.core.application.JmxApplication;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasupport.Storage;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.type.ApplicationType;
+import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -48,9 +47,9 @@ import org.openide.DialogDisplayer;
  * @author Jaroslav Bachorik
  */
 public class GFJmxModelFactory extends ModelFactory<JmxModel, Application> implements ModelProvider<JmxModel, Application>{
-    private static final String STORAGE_DIRNAME = "jmxapplicationsGF"; // copy form JmxApplicationsSupport ....
-    private static final String PROPERTY_USERNAME = "prop_username"; // copy form JmxApplicationsSupport ....
-    private static final String PROPERTY_PASSWORD = "prop_password"; // copy form JmxApplicationsSupport ....
+    private static final String STORAGE_DIRNAME = "jmxapplicationsGF"; // copy from JmxApplicationsSupport ....
+    private static final String PROPERTY_USERNAME = "prop_username"; // copy from JmxApplicationsSupport ....
+    private static final String PROPERTY_PASSWORD = "prop_password"; // copy from JmxApplicationsSupport ....
     
     private static final Storage STORAGE = new Storage(new File(Storage.getPersistentStorageDirectoryString() + File.separator + STORAGE_DIRNAME));
 
@@ -89,7 +88,8 @@ public class GFJmxModelFactory extends ModelFactory<JmxModel, Application> imple
         } catch (MalformedURLException e) {
             return null;
         }
-        return new JmxModel(new JmxApplication(app.getHost(), serverURL, STORAGE));
+        return null;
+//        return new JmxModel(new JmxApplication(app.getHost(), serverURL, STORAGE));
     }
 
     @Override

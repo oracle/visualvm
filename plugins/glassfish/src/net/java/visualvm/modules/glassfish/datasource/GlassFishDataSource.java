@@ -25,15 +25,14 @@
 
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.tools.visualvm.core.datasource.AbstractDataSource;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class GlassFishDataSource extends AbstractDataSource {
+public abstract class GlassFishDataSource extends DataSource {
     public GlassFishDataSource() {
         this(null);
     }

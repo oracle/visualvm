@@ -25,11 +25,11 @@
 package net.java.visualvm.btrace.datasource;
 
 import com.sun.btrace.client.Client;
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;

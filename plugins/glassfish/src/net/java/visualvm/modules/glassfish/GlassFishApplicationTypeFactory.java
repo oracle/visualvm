@@ -27,14 +27,13 @@
 
 package net.java.visualvm.modules.glassfish;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.apptype.MainClassApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVM;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.type.ApplicationType;
+import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
+import com.sun.tools.visualvm.application.type.MainClassApplicationTypeFactory;
+
 
 
 /**
@@ -57,6 +56,7 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
     @Override
     public ApplicationType createModelFor(Application app) {
         JVM jvm = JVMFactory.getJVMFor(app);
+        if (!jvm.isBasicInfoSupported()) return null;
         if (jvm.getMainClass() != null) return super.createModelFor(app);
         if (jvm.isGetSystemPropertiesSupported()) {
             if (jvm.getSystemProperties().get("com.sun.aas.instanceName") != null) {

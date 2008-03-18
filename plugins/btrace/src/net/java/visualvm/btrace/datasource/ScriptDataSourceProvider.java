@@ -24,21 +24,17 @@
  */
 package net.java.visualvm.btrace.datasource;
 
-import com.sun.btrace.client.Client;
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
@@ -49,10 +45,10 @@ import net.java.visualvm.btrace.config.ProbeConfig;
  *
  * @author Jaroslav Bachorik
  */
-public class ScriptDataSourceProvider extends DefaultDataSourceProvider<ScriptDataSource> implements DataChangeListener<Application> {
+public class ScriptDataSourceProvider {
 
     private static final ScriptDataSourceProvider INSTANCE = new ScriptDataSourceProvider();
-    private static final ProbeDataSourceDescriptorProvider DESC_FACTORY = new ProbeDataSourceDescriptorProvider();
+    private static final ScriptDataSourceDescriptorProvider DESC_FACTORY = new ScriptDataSourceDescriptorProvider();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss:SSS");
     
 
@@ -67,13 +63,10 @@ public class ScriptDataSourceProvider extends DefaultDataSourceProvider<ScriptDa
     }
 
     public static void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(INSTANCE);
-
         DataSourceDescriptorFactory.getDefault().registerFactory(DESC_FACTORY);
     }
 
     public static void shutdown() {
-        DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceDescriptorFactory.getDefault().unregisterFactory(DESC_FACTORY);
     }
 
@@ -100,7 +93,6 @@ public class ScriptDataSourceProvider extends DefaultDataSourceProvider<ScriptDa
                 protected ScriptDataSource prepareProbe(DeployTask deployer) {
                     providerReady = false;
                     ScriptDataSource pds = new ScriptDataSource(ScriptDataSourceProvider.this, config, app, deployer);
-                    registerDataSource(pds);
                     app.getRepository().addDataSource(pds);
                     openProbeWindow(pds);
                     return pds;
@@ -109,7 +101,6 @@ public class ScriptDataSourceProvider extends DefaultDataSourceProvider<ScriptDa
                 @Override
                 protected void removeProbe(ScriptDataSource pds) {
                     pds.getApplication().getRepository().removeDataSource(pds);
-                    unregisterDataSource(pds);
                     providerReady = true;
                 }
             });

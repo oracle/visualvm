@@ -5,7 +5,7 @@
  */
 package net.java.visualvm.btrace.views;
 
-import com.sun.tools.visualvm.core.model.jvm.MonitoredData;
+import com.sun.tools.visualvm.application.MonitoredData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,8 +65,8 @@ public class StatsPanel extends javax.swing.JPanel {
     private net.java.visualvm.btrace.utils.HTMLTextArea statsOutputPanel;
     // End of variables declaration//GEN-END:variables
     
-    public void refresh(MonitoredData data) {
-        final String infoHtml = buildInfo(data);
+    public void refresh() {
+        final String infoHtml = buildInfo();
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -75,7 +75,7 @@ public class StatsPanel extends javax.swing.JPanel {
         });
     }
 
-    private String buildInfo(MonitoredData data) {
+    private String buildInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
         sb.append("<table>");

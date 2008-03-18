@@ -24,21 +24,21 @@
  */
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import java.util.Set;
+import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
+
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishModel> implements DataChangeListener<Application>, DataFinishedListener<Application> {
+public class GlassFishModelProvider implements DataChangeListener<Application>, DataRemovedListener<Application> {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final GlassFishModelProvider INSTANCE = new GlassFishModelProvider();
     
@@ -66,16 +66,14 @@ public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishM
     }
 
     public static void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().addDataChangeListener(INSTANCE, Application.class);
     }
 
     public static void shutdown() {
-        DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
     }
     
-    public void dataFinished(Application application) {
+    public void dataRemoved(Application application) {
         processFinishedApplication(application);
     }
 
@@ -83,18 +81,16 @@ public class GlassFishModelProvider extends DefaultDataSourceProvider<GlassFishM
         // TODO: remove listener!!!
         Set<GlassFishModel> roots = app.getRepository().getDataSources(GlassFishModel.class);
         app.getRepository().removeDataSources(roots);
-        unregisterDataSources(roots);
     }
 
     private void processNewApplication(final Application app) {
         if (ApplicationTypeFactory.getApplicationTypeFor(app) instanceof GlassFishApplicationType) {
             GlassFishModel gfm = new GlassFishModel(app);
-            registerDataSource(gfm);
             app.getRepository().addDataSource(gfm);
 
-            app.notifyWhenFinished(new DataFinishedListener() {
+            app.notifyWhenRemoved(new DataRemovedListener() {
 
-                public void dataFinished(Object dataSource) {
+                public void dataRemoved(Object dataSource) {
                     processFinishedApplication(app);
                 }
             });

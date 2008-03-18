@@ -32,14 +32,14 @@ import com.sun.appserv.management.config.IIOPListenerConfig;
 import com.sun.appserv.management.config.IIOPServiceConfig;
 import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.config.SystemPropertiesAccess;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.dataview.overview.OverviewViewSupport;
-import com.sun.tools.visualvm.core.model.apptype.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
+import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.ViewPlugin;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import javax.swing.event.HyperlinkEvent;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -314,10 +314,10 @@ public class GlassFishOverview implements ViewPlugin<Application> {
     }
 
     public static void initialize() {
-        OverviewViewSupport.getInstance().getApplicationPluggableView().addPlugin(INSTANCE, Application.class);
+        ApplicationViewsSupport.sharedInstance().getOverviewView().addPlugin(INSTANCE, Application.class);
     }
 
     public static void shutdown() {
-        OverviewViewSupport.getInstance().getApplicationPluggableView().removePlugin(INSTANCE);
+        ApplicationViewsSupport.sharedInstance().getOverviewView().removePlugin(INSTANCE);
     }
 }

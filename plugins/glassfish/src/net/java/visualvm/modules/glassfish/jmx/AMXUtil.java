@@ -31,7 +31,7 @@ import com.sun.appserv.management.client.ProxyFactory;
 import com.sun.appserv.management.config.ConfigConfig;
 import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.monitor.MonitoringRoot;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;

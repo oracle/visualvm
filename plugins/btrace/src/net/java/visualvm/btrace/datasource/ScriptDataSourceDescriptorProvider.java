@@ -26,14 +26,14 @@
 package net.java.visualvm.btrace.datasource;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ProbeDataSourceDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
+public class ScriptDataSourceDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
     public ScriptDataSourceDescriptor createModelFor(DataSource datasource) {
         if (datasource instanceof ScriptDataSource) {
             return new ScriptDataSourceDescriptor((ScriptDataSource)datasource);

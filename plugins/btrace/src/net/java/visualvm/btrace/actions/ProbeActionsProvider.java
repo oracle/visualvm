@@ -24,6 +24,7 @@
  */
 package net.java.visualvm.btrace.actions;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
@@ -66,5 +67,17 @@ public class ProbeActionsProvider implements ExplorerActionsProvider<ScriptDataS
 
     public static void shutdown() {
         ExplorerContextMenuFactory.sharedInstance().removeExplorerActionsProvider(INSTANCE);
+    }
+
+    public ExplorerActionDescriptor getDefaultAction(Set<ScriptDataSource> scripts) {
+        return null;
+    }
+
+    public Set<ExplorerActionDescriptor> getActions(Set<ScriptDataSource> scripts) {
+        Set<ExplorerActionDescriptor> actions = new HashSet<ExplorerActionDescriptor>();
+        for(ScriptDataSource script : scripts) {
+            actions.addAll(getActions(script));
+        }
+        return actions;
     }
 }

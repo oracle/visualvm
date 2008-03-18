@@ -58,7 +58,6 @@ public class Installer extends ModuleInstall {
         GlassFishOverview.initialize();
         GlassFishDataSourceDescriptorProvider.initialize();
         GlassFishApplicationProvider.initialize();
-        GFJmxModelFactory.initialize();
     }
 
     @Override
@@ -72,7 +71,6 @@ public class Installer extends ModuleInstall {
         GlassFishOverview.shutdown();
         GlassFishDataSourceDescriptorProvider.shutdown();
         GlassFishApplicationProvider.shutdown();
-        GFJmxModelFactory.shutdown();
         super.uninstalled();
     }
 }

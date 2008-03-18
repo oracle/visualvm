@@ -24,22 +24,23 @@
  */
 package net.java.visualvm.btrace.views;
 
-import com.sun.tools.visualvm.core.application.JvmstatApplication;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.model.jvm.MonitoredData;
-import com.sun.tools.visualvm.core.model.jvm.MonitoredDataListener;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.MonitoredData;
+import com.sun.tools.visualvm.application.MonitoredDataListener;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 import java.awt.Color;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import net.java.visualvm.btrace.config.ProbeConfig.ProbeConnection;
@@ -65,12 +66,11 @@ public class ScriptView extends DataSourceView {
     private ScriptDataSource probe;
     volatile private StatsPanel statsPanel = null;
     volatile private DynamicGraph graph = null;
-    final private static ExecutorService probeOutputConsumer = Executors.newCachedThreadPool();
-    private MonitoredDataListener mdl = new MonitoredDataListener() {
 
-        public void monitoredDataEvent(MonitoredData data) {
+    private JvmstatListener mdl = new JvmstatListener() {
+        public void dataChanged(JvmstatModel arg0) {
             if (statsPanel != null) {
-                statsPanel.refresh(data);
+                statsPanel.refresh();
             }
             if (graph != null) {
                 graph.update();
@@ -81,7 +81,7 @@ public class ScriptView extends DataSourceView {
     public ScriptView(ScriptDataSource probe) {
         super(DataSourceDescriptorFactory.getDescriptor(probe).getName(), DataSourceDescriptorFactory.getDescriptor(probe).getIcon(), POSITION_AT_THE_END);
         this.probe = probe;
-        JVMFactory.getJVMFor(probe.getApplication()).addMonitoredDataListener(mdl);
+        JvmstatModelFactory.getJvmstatFor(probe.getApplication()).addJvmstatListener(mdl);
     }
 
     @Override
@@ -94,31 +94,24 @@ public class ScriptView extends DataSourceView {
 
     private List<ValueProvider> getValueProviders() {
         Application app = probe.getApplication();
-        String vmId = "//" + app.getPid() + "?mode=r";
-        if (app instanceof JvmstatApplication) {
-            try {
-                MonitoredVm mvm = MonitoredHost.getMonitoredHost(app.getHost().getHostName()).getMonitoredVm(new VmIdentifier(vmId));
-                List<ValueProvider> providers = new ArrayList<ValueProvider>();
-                for (ProbeConnection connection : probe.getConfig().getConnections()) {
-                    final Monitor mntr = mvm.findByName(connection.jvmStatVar);
-                    providers.add(new ValueProvider(connection.jvmStatVar, connection.name) {
+        JvmstatModel model = JvmstatModelFactory.getJvmstatFor(app);
+        if (model != null) {
+            List<ValueProvider> providers = new ArrayList<ValueProvider>();
+            for (ProbeConnection connection : probe.getConfig().getConnections()) {
+                final MonitoredValue mntr = model.findMonitoredValueByName(connection.jvmStatVar);
+                providers.add(new ValueProvider(connection.jvmStatVar, connection.name) {
 
-                        @Override
-                        public long getValue() {
-                            Object value = mntr.getValue();
-                            if (value == null) {
-                                return 0L;
-                            }
-                            return Long.parseLong(value.toString());
+                    @Override
+                    public long getValue() {
+                        Object value = mntr.getValue();
+                        if (value == null) {
+                            return 0L;
                         }
-                    });
-                }
-                return providers;
-            } catch (MonitorException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (URISyntaxException ex) {
-                Exceptions.printStackTrace(ex);
+                        return Long.parseLong(value.toString());
+                    }
+                });
             }
+            return providers;
         }
         return new ArrayList<ValueProvider>();
     }
@@ -134,25 +127,6 @@ public class ScriptView extends DataSourceView {
         dataView = new DataViewComponent(masterView, masterConfiguration);
 
         statsPanel = new StatsPanel(probe.getConfig().getConnections());
-
-//        ScriptEngineManager factory = new ScriptEngineManager();
-//        ScriptEngine engine = factory.getEngineByExtension("fx");
-//        String script = "import javafx.ui.*;" +
-//                            "Frame { " +
-//                                "title: \"Hello World JavaFX\" " +
-//                                "width: 200 " +
-//                                "height: 50 " + 
-//                                "content: Label { " +
-//                                    "text: \"Hello World\" " +
-//                                "} " +
-//                                "visible: true " +
-//                        "}";
-//        try {
-//            engine.eval(script);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        
         
         graph = new DynamicLineGraph(getValueProviders(), 10);
         graph.setBackground(Color.WHITE);
@@ -164,22 +138,6 @@ public class ScriptView extends DataSourceView {
         }
         dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Console Output", true), DataViewComponent.BOTTOM_RIGHT);
         dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, new OutputPane(probe.getReader()), null), DataViewComponent.BOTTOM_RIGHT);
-
-//        final InputOutput io = IOProvider.getDefault().getIO(probe.toString(), false);
-//        
-//        probeOutputConsumer.submit(new Runnable() {
-//            private BufferedReader probeLineReader = new BufferedReader(probe.getReader());
-//            public void run() {
-//                try {
-//                    while(true) {
-//                        io.getOut().println(probeLineReader.readLine());
-//                    }
-//                } catch (IOException e) {
-//                    Exceptions.attachMessage(e, "Error while processing BTrace Script output");
-//                }
-//            }
-//        });
-    //pvp.setReader(probe.getReader());
     }
 
     @Override

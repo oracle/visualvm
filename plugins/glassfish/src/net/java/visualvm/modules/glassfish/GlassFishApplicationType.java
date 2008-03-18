@@ -25,7 +25,7 @@
  */
 package net.java.visualvm.modules.glassfish;
 
-import com.sun.tools.visualvm.core.model.apptype.ApplicationType;
+import com.sun.tools.visualvm.application.type.ApplicationType;
 import org.openide.util.Utilities;
 import java.awt.Image;
 

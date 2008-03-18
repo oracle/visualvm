@@ -26,10 +26,9 @@ package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.monitor.ServletMonitor;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ import java.util.Set;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFishServlet> implements DataChangeListener<GlassFishWebModule>, DataFinishedListener<GlassFishWebModule> {
+public class GlassFishServletProvider implements DataChangeListener<GlassFishWebModule>, DataRemovedListener<GlassFishWebModule> {
     private final static GlassFishServletProvider INSTANCE = new GlassFishServletProvider();
     
     private GlassFishServletProvider() {}
@@ -65,16 +64,14 @@ public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFis
     }
 
     public static void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().addDataChangeListener(INSTANCE, GlassFishWebModule.class);
     }
     
     public static void shutdown() {
-        DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
     }
     
-    public void dataFinished(GlassFishWebModule module) {
+    public void dataRemoved(GlassFishWebModule module) {
         processFinishedModule(module);
     }
 
@@ -82,16 +79,14 @@ public class GlassFishServletProvider extends DefaultDataSourceProvider<GlassFis
         // TODO: remove listener!!!
         Set<GlassFishServlet> monitoredServlets = module.getRepository().getDataSources(GlassFishServlet.class);
         module.getRepository().removeDataSources(monitoredServlets);
-        unregisterDataSources(monitoredServlets);
     }
 
     private void processNewWebModule(final GlassFishWebModule module) {
         for (Map.Entry<String, ServletMonitor> monitorEntry : module.getMonitor().getServletMonitorMap().entrySet()) {
             GlassFishServlet servlet = new GlassFishServlet(monitorEntry.getKey(), module, monitorEntry.getValue());
-            registerDataSource(servlet);
             module.getRepository().addDataSource(servlet);
         }
 
-        module.notifyWhenFinished(this);
+        module.notifyWhenRemoved(this);
     }
 }

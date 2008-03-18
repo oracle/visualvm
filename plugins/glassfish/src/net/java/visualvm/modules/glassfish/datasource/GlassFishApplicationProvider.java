@@ -25,26 +25,24 @@
 package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.DomainRoot;
-import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.config.WebModuleConfig;
 import com.sun.appserv.management.j2ee.J2EETypes;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.DefaultDataSourceProvider;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataFinishedListener;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerExpansionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.model.dsdescr.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,7 +57,7 @@ import org.openide.NotifyDescriptor;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishApplicationProvider extends DefaultDataSourceProvider<GlassFishDataSource> implements DataChangeListener<GlassFishModel>, DataFinishedListener<GlassFishModel>, ExplorerExpansionListener {
+public class GlassFishApplicationProvider implements DataChangeListener<GlassFishModel>, DataRemovedListener<GlassFishModel>, ExplorerExpansionListener {
 
     private static final GlassFishApplicationProvider INSTANCE = new GlassFishApplicationProvider();
     private final Map<GlassFishModel, ScheduledTask> taskMap = new HashMap<GlassFishModel, ScheduledTask>();
@@ -177,7 +175,7 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
                     currentApps.add(webModule);
                 }
 
-                Set<GlassFishDataSource> toRemoveApps = new HashSet<GlassFishDataSource>(model.getRepository().getDataSources());
+                Set<GlassFishDataSource> toRemoveApps = new HashSet<GlassFishDataSource>(model.getRepository().getDataSources(GlassFishDataSource.class));
                 Set<GlassFishDataSource> toAdd = new HashSet<GlassFishDataSource>(currentApps);
                 toRemoveApps.removeAll(currentApps);
                 toAdd.removeAll(model.getRepository().getDataSources());
@@ -193,9 +191,9 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
                 }
                 toAdd.removeAll(lazy);
 
-                unregisterDataSources(toRemove);
-                registerDataSources(toAdd);
-                model.getRepository().updateDataSources(toAdd, toRemove);
+                if (toAdd.size() > 0 || toRemove.size() > 0) {
+                    model.getRepository().updateDataSources(toAdd, toRemove);
+                }
             } finally {
                 isProcessing.set(false);
             }
@@ -227,19 +225,17 @@ public class GlassFishApplicationProvider extends DefaultDataSourceProvider<Glas
         }
     }
 
-    public void dataFinished(GlassFishModel model) {
+    public void dataRemoved(GlassFishModel model) {
         // removing the reference to the ScheduledTask practically unschedules the task
         Scheduler.sharedInstance().unschedule(taskMap.remove(model));
     }
 
     public static void initialize() {
-        DataSourceRepository.sharedInstance().addDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().addDataChangeListener(INSTANCE, GlassFishModel.class);
         ExplorerSupport.sharedInstance().addExpansionListener(INSTANCE);
     }
 
     public static void shutdown() {
-        DataSourceRepository.sharedInstance().removeDataSourceProvider(INSTANCE);
         DataSourceRepository.sharedInstance().removeDataChangeListener(INSTANCE);
         ExplorerSupport.sharedInstance().removeExpansionListener(INSTANCE);
     }

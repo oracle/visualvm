@@ -24,12 +24,12 @@
  */
 package net.java.visualvm.btrace.actions;
 
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVM;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -169,5 +169,22 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
             baseURL = new String(probeManifestPath.substring(0, Math.min(len, index)));
         }
         return new URL(baseURL);
+    }
+
+    public ExplorerActionDescriptor getDefaultAction(Set<Application> apps) {
+        return null;
+    }
+
+    public Set<ExplorerActionDescriptor> getActions(Set<Application> apps) {
+        Set<ExplorerActionDescriptor> actionDescriptors = null;
+        for(Application app : apps) {
+            Set<ExplorerActionDescriptor> currentActions = getActions(app);
+            if (actionDescriptors == null) {
+                actionDescriptors = new HashSet<ExplorerActionDescriptor>(currentActions);
+            } else {
+                actionDescriptors.retainAll(currentActions);
+            }
+        }
+        return actionDescriptors;
     }
 }

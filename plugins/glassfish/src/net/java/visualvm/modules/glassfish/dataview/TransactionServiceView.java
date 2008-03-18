@@ -2,7 +2,7 @@ package net.java.visualvm.modules.glassfish.dataview;
 
 import com.sun.appserv.management.monitor.TransactionServiceMonitor;
 import com.sun.appserv.management.monitor.statistics.TransactionServiceStats;
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
