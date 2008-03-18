@@ -28,16 +28,13 @@ package com.sun.tools.visualvm.jvm;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.application.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.core.ui.RemoveDataSourceAction;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.lang.management.LockInfo;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
@@ -65,8 +62,9 @@ public class JmxSupport implements DataRemovedListener {
             "com.sun.management:type=HotSpotDiagnostic";
     private static final String PERM_GEN = "Perm Gen";
     private static final String PS_PERM_GEN = "PS Perm Gen";
-    JvmJmxModel jmxModel;
-    JVMImpl jvm;
+    private Application application;
+    private JvmJmxModel jmxModel;
+    private JVMImpl jvm;
     // HotspotDiagnostic
     private boolean hotspotDiagnosticInitialized;
     private Object hotspotDiagnosticLock = new Object();
@@ -76,15 +74,23 @@ public class JmxSupport implements DataRemovedListener {
    
     JmxSupport(Application app,JVMImpl vm) {
         jvm = vm;
-        jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(app);
+        application = app;
         app.notifyWhenRemoved(this);
     }
     
     RuntimeMXBean getRuntime() {
-        if (jmxModel != null) return jmxModel.getRuntimeMXBean();
+        JvmJmxModel jmx = getJmxModel();
+        if (jmx != null) return jmx.getRuntimeMXBean();
         return null;
     }
-    
+
+    synchronized JvmJmxModel getJmxModel() {
+        if (jmxModel == null) {
+            jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
+        }
+        return jmxModel;
+    }
+
     Properties getSystemProperties() {
         RuntimeMXBean runtime = getRuntime();
         if (runtime != null) {
@@ -113,9 +119,10 @@ public class JmxSupport implements DataRemovedListener {
             if (hotspotDiagnosticInitialized) {
                 return hotspotDiagnosticMXBean;
             }
-            if (jmxModel != null) {
+            JvmJmxModel jmx = getJmxModel();
+            if (jmx != null) {
                 try {
-                    hotspotDiagnosticMXBean = jmxModel.getMXBean(
+                    hotspotDiagnosticMXBean = jmx.getMXBean(
                             ObjectName.getInstance(HOTSPOT_DIAGNOSTIC_MXBEAN_NAME),
                             HotSpotDiagnosticMXBean.class);
                 } catch (MalformedObjectNameException e) {
@@ -130,9 +137,15 @@ public class JmxSupport implements DataRemovedListener {
     }
     
     String takeThreadDump() {
-        RuntimeMXBean runtimeMXBean = getRuntime();
-        ThreadMXBean threadMXBean = jmxModel.getThreadMXBean();
+        JvmJmxModel jmx = getJmxModel();
+        RuntimeMXBean runtimeMXBean;
+        ThreadMXBean threadMXBean;
         
+        if (jmx == null) {
+            return null;
+        }
+        runtimeMXBean = getRuntime();
+        threadMXBean = jmx.getThreadMXBean();
         if (runtimeMXBean == null || threadMXBean == null) {
             return null;
         }
@@ -207,7 +220,7 @@ public class JmxSupport implements DataRemovedListener {
 
     MemoryPoolMXBean getPermGenPool() {
         if (permGenPool == null) {
-            Collection<MemoryPoolMXBean> pools = jmxModel.getMemoryPoolMXBeans();
+            Collection<MemoryPoolMXBean> pools = getJmxModel().getMemoryPoolMXBeans();
             for (MemoryPoolMXBean pool : pools) {
                 if (pool.getType().equals(MemoryType.NON_HEAP) &&
                         (PERM_GEN.equals(pool.getName()) ||
@@ -222,11 +235,12 @@ public class JmxSupport implements DataRemovedListener {
 
     void initTimer() {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
+        final JvmJmxModel jmx = getJmxModel();
         timer = new Timer(interval, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
-                        MonitoredData data = new MonitoredDataImpl(jvm,JmxSupport.this,jmxModel);
+                        MonitoredData data = new MonitoredDataImpl(jvm,JmxSupport.this,jmx);
                         jvm.notifyListeners(data);
                     }
                 });
