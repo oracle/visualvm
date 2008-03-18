@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
