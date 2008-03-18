@@ -77,6 +77,7 @@
             </module-dependencies>
             <public-packages>
                 <package>com.sun.tools.visualvm.application</package>
+                <package>com.sun.tools.visualvm.application.type</package>
             </public-packages>
         </data>
     </configuration>
