@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.jconsole;
 
-import com.sun.tools.visualvm.core.datasource.Application;
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;

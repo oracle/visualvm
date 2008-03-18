@@ -28,17 +28,17 @@ package com.sun.tools.visualvm.modules.jconsole;
 import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
-import com.sun.tools.visualvm.core.application.JmxApplication;
-import com.sun.tools.visualvm.core.application.JvmstatApplication;
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.datasupport.Storage;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.core.model.jvm.JVMFactory;
-import com.sun.tools.visualvm.core.model.jvm.JvmstatJVM;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Constructor;
@@ -124,8 +124,9 @@ class JConsoleView extends DataSourceView {
 
                 if (availablePlugins) {
                     ProxyClient proxyClient = null;
-                    if (application instanceof JvmstatApplication) {
-                        JvmstatJVM jvm = (JvmstatJVM) JVMFactory.getJVMFor(application);
+                    JVM jvm = JVMFactory.getJVMFor(application);
+                    JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(application);
+                    if (jvmstat != null) { // Use Jvmstat model
                         Storage storage = application.getStorage();
                         String username = storage.getCustomProperty(PROPERTY_USERNAME);
                         String password = storage.getCustomProperty(PROPERTY_PASSWORD);
@@ -135,7 +136,7 @@ class JConsoleView extends DataSourceView {
                             proxyClient = ProxyClient.getProxyClient("localhost", 0, null, null); // NOI18N
                         } else if (application.isLocalApplication()) {
                             // Create a ProxyClient from local pid
-                            String connectorAddress = jvm.findByName(
+                            String connectorAddress = jvmstat.findByName(
                                     "sun.management.JMXConnectorServer.address"); // NOI18N
                             LocalVirtualMachine lvm = new LocalVirtualMachine(
                                     application.getPid(), "Dummy command line",
@@ -145,9 +146,9 @@ class JConsoleView extends DataSourceView {
                             // Create a ProxyClient for the remote out-of-the-box
                             // JMX management agent using the port and security
                             // related information retrieved through jvmstat.
-                            List<String> urls = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
+                            List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
                             if (urls.size() != 0) {
-                                List<String> auths = jvm.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
+                                List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
                                 proxyClient = ProxyClient.getProxyClient(urls.get(0), username, password);
 //                                if (username != null && "true".equals(auths.get(0))) {
 //                                    supplyCredentials(application, proxyClient);
@@ -178,8 +179,8 @@ class JConsoleView extends DataSourceView {
                                 }
                             }
                         }
-                    } else if (application instanceof JmxApplication) {
-                        JMXServiceURL url = ((JmxApplication) application).getJMXServiceURL();
+                    } else { // Use JMX model
+                        JMXServiceURL url = jmx.getJMXServiceURL();
                         Storage storage = application.getStorage();
                         String username = storage.getCustomProperty(PROPERTY_USERNAME);
                         String password = storage.getCustomProperty(PROPERTY_PASSWORD);
