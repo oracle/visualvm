@@ -61,7 +61,7 @@ class JmxApplicationActionsProvider {
             
             if (hosts.size() == 1 && !Host.UNKNOWN_HOST.equals(hosts.iterator().next())) {
                 actions.add(new ExplorerActionDescriptor(AddJMXConnectionAction.getInstance(), 50));
-                actions.add(new ExplorerActionDescriptor(null, 55));
+                if (!Host.LOCALHOST.equals(hosts.iterator().next())) actions.add(new ExplorerActionDescriptor(null, 55));
             }
             
             return actions;
