@@ -3,5 +3,6 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: com.sun.tools.visualvm.jvmstat
 OpenIDE-Module-Install: com/sun/tools/visualvm/jvmstat/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/jvmstat/Bundle.properties
+OpenIDE-Module-Provides: com.sun.tools.visualvm.jvmstat
 OpenIDE-Module-Specification-Version: 1.0
 

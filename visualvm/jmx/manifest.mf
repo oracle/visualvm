@@ -4,5 +4,6 @@ OpenIDE-Module: com.sun.tools.visualvm.jmx
 OpenIDE-Module-Layer: com/sun/tools/visualvm/jmx/layer.xml
 OpenIDE-Module-Install: com/sun/tools/visualvm/jmx/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/jmx/Bundle.properties
+OpenIDE-Module-Provides: com.sun.tools.visualvm.jmx
 OpenIDE-Module-Specification-Version: 1.0
 
