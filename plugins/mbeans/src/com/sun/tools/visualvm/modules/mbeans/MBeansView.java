@@ -25,9 +25,9 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.core.datasource.Application;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DisplayArea;

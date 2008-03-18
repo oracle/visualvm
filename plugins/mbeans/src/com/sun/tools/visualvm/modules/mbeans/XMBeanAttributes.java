@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.core.model.jmx.CachedMBeanServerConnection;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 
 import javax.swing.*;
 import javax.swing.event.*;

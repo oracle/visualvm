@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.core.model.jmx.JmxModel;
-import com.sun.tools.visualvm.core.model.jmx.JmxModel.ConnectionState;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 
 import java.awt.*;
 import java.awt.event.*;
