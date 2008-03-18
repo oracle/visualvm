@@ -308,6 +308,18 @@ public class JmxModelImpl extends JmxModel {
         return null;
     }
 
+    /**
+     * Returns the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     *
+     * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     */
+    public JMXServiceURL getJMXServiceURL() {
+        if (client != null) {
+            return client.getUrl();
+        }
+        return null;        
+    }
+
     static class ProxyClient implements NotificationListener {
 
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;

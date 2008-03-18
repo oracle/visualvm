@@ -30,6 +30,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXServiceURL;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 
@@ -169,6 +170,13 @@ public abstract class JmxModel extends Model {
      * if the JMX connection couldn't be established.
      */
     public abstract CachedMBeanServerConnection getCachedMBeanServerConnection();
+
+    /**
+     * Returns the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     *
+     * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     */
+    public abstract JMXServiceURL getJMXServiceURL();
 
     /**
      * The PropertyChangeListener is handled via a WeakReference
