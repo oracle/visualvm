@@ -930,7 +930,9 @@ public class JmxModelImpl extends JmxModel {
 
         private int vmid;
         private boolean isAttachSupported;
-        private String address;
+        
+        // @GuardedBy this
+        volatile private String address;
 
         public LocalVirtualMachine(int vmid, boolean canAttach, String connectorAddress) {
             this.vmid = vmid;
@@ -942,7 +944,7 @@ public class JmxModelImpl extends JmxModel {
             return vmid;
         }
 
-        public boolean isManageable() {
+        public synchronized boolean isManageable() {
             return (address != null);
         }
 
@@ -950,7 +952,7 @@ public class JmxModelImpl extends JmxModel {
             return isAttachSupported;
         }
 
-        public void startManagementAgent() throws IOException {
+        public synchronized void startManagementAgent() throws IOException {
             if (address != null) {
                 // already started
                 return;
@@ -969,7 +971,7 @@ public class JmxModelImpl extends JmxModel {
             }
         }
 
-        public String connectorAddress() {
+        public synchronized String connectorAddress() {
             // return null if not available or no JMX agent
             return address;
         }
@@ -977,7 +979,7 @@ public class JmxModelImpl extends JmxModel {
                 "com.sun.management.jmxremote.localConnectorAddress";
 
         // load the management agent into the target VM
-        private void loadManagementAgent() throws IOException {
+        private synchronized void loadManagementAgent() throws IOException {
             VirtualMachine vm = null;
             String name = String.valueOf(vmid);
             try {
