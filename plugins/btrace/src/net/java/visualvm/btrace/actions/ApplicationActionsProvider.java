@@ -101,7 +101,7 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
 
     public Set<ExplorerActionDescriptor> getActions(Application app) {
         JVM jvm = JVMFactory.getJVMFor(app);
-        if (jvm.isMonitoringSupported() && probesRegistered()) {
+        if (app.isLocalApplication() && jvm.isMonitoringSupported() && probesRegistered()) {
             Set<ExplorerActionDescriptor> actions = new HashSet<ExplorerActionDescriptor>();
             actions.add(new ExplorerActionDescriptor(null, 50));
             actions.add(new ExplorerActionDescriptor(new DeployAction(app), 51));
