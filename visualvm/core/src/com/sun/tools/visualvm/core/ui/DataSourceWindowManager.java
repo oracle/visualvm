@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -187,6 +188,7 @@ public final class DataSourceWindowManager {
             });
         } catch (Exception e) {
             System.err.println("Failed to initialize views for " + window.getDataSource());
+            e.printStackTrace();
         }
 
         // Blocking notification that the view has been added
