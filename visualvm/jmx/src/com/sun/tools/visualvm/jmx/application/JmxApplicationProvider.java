@@ -25,12 +25,13 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.io.File;
@@ -40,6 +41,8 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.SwingUtilities;
@@ -72,6 +75,11 @@ class JmxApplicationProvider {
     private static final String PROPERTY_PASSWORD = "prop_password";
 
     private static JmxApplicationProvider sharedInstance;
+    
+    
+    private boolean trackingNewHosts;
+    private Map<String, Storage> persistedApplications = new HashMap();
+    
     
     public synchronized static JmxApplicationProvider sharedInstance() {
         if (sharedInstance == null) sharedInstance = new JmxApplicationProvider();
@@ -188,6 +196,7 @@ class JmxApplicationProvider {
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) serviceURL = getServiceURL(connectionName);
         if (serviceURL == null) {
+            storage.deleteCustomPropertiesStorage();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
@@ -202,6 +211,7 @@ class JmxApplicationProvider {
         try {
             host = getHost(hostName, serviceURL);
         } catch (Exception e) {
+            storage.deleteCustomPropertiesStorage();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
@@ -217,6 +227,7 @@ class JmxApplicationProvider {
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+            storage.deleteCustomPropertiesStorage();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
@@ -228,17 +239,6 @@ class JmxApplicationProvider {
         
         // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
-    }
-
-    public void removeJmxApplication(JmxApplication app) {
-        app.getStorage().deleteCustomPropertiesStorage();
-    }
-    
-    protected <Y extends JmxApplication> void unregisterDataSources(final Set<Y> removed) {
-        for (JmxApplication app : removed) {
-            DataSource owner = app.getOwner();
-            if (owner != null) owner.getRepository().removeDataSource(app);
-        }
     }
     
     private String normalizeConnectionName(String connectionName) {
@@ -298,17 +298,47 @@ class JmxApplicationProvider {
         
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
+            persistedApplications.put(storage.getCustomProperty(PROPERTY_HOSTNAME), storage);
+        }
+        
+        DataChangeListener<Host> dataChangeListener = new DataChangeListener<Host>() {
+
+            public synchronized void dataChanged(DataChangeEvent<Host> event) {
+                Set<Host> hosts = event.getAdded();
+                for (Host host : hosts) {
+                    String hostName = host.getHostName();
+                    final Storage storage = persistedApplications.get(hostName);
+                    if (storage != null) {
+                        persistedApplications.remove(hostName);
+                        
+                        String[] keys = new String[] {
+                            PROPERTY_CONNECTION_STRING,
+                            PROPERTY_HOSTNAME,
+                            PROPERTY_USERNAME,
+                            PROPERTY_PASSWORD
+                        };
+
+                        final String[] values = storage.getCustomProperties(keys);
+                        RequestProcessor.getDefault().post(new Runnable() {
+                            public void run() {
+                                addJmxApplication(null, values[0],
+                                    values[1].length() == 0 ? null : values[1], storage);
+                            }
+                        });
+                    }
+                }
+                
+                if (trackingNewHosts && persistedApplications.isEmpty()) {
+                    trackingNewHosts = false;
+                    DataSourceRepository.sharedInstance().removeDataChangeListener(this);
+                }
+            }
             
-            String[] keys = new String[] {
-                PROPERTY_CONNECTION_STRING,
-                PROPERTY_HOSTNAME,
-                PROPERTY_USERNAME,
-                PROPERTY_PASSWORD
-            };
-            
-            String[] values = storage.getCustomProperties(keys);
-            addJmxApplication(null, values[0],
-                    values[1].length() == 0 ? null : values[1], storage);
+        };
+        
+        if (!persistedApplications.isEmpty()) {
+            trackingNewHosts = true;
+            DataSourceRepository.sharedInstance().addDataChangeListener(dataChangeListener, Host.class);
         }
     }
 
