@@ -30,9 +30,11 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
+import com.sun.tools.visualvm.coredump.overview.OverviewViewSupport;
 import java.io.File;
 import org.openide.util.Utilities;
 
@@ -98,6 +100,7 @@ public final class CoreDumpSupport {
         CoreDumpActionsProvider.register();
         CoreDumpProvider.register();
         RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        OverviewViewSupport.getInstance();
     }
 
 }

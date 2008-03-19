@@ -44,7 +44,7 @@ import org.openide.util.Utilities;
  */
 class CoreDumpOverviewView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/core/ui/resources/overview.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/overview.png";
     
     private DataViewComponent view;
     

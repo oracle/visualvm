@@ -34,6 +34,8 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
+import com.sun.tools.visualvm.tools.sa.SaModel;
+import com.sun.tools.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
@@ -41,7 +43,10 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.ui.SwingWorker;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
@@ -61,6 +66,47 @@ public class CoreDumpProvider {
     
     private static final String PROPERTY_JAVA_HOME = "prop_java_home";
     
+    private static class CoreDumpAdder extends SwingWorker {
+        volatile private ProgressHandle ph = null;
+        volatile private boolean success = false;
+        private CoreDumpImpl newCoreDump;
+        private Storage storage;
+        private String[] propNames, propValues;
+        
+        public CoreDumpAdder(CoreDumpImpl newCoreDump, Storage storage, String[] propNames, String[] propValues) {
+            this.newCoreDump = newCoreDump;
+            this.storage = storage;
+            this.propValues = propValues;
+            this.propNames = propNames;
+        }
+        
+        @Override
+        protected void doInBackground() {
+            SaModel model = SaModelFactory.getSAAgentFor(newCoreDump);
+            if (model != null) {
+                CoreDumpsContainer.sharedInstance().getRepository().addDataSource(newCoreDump);
+                storage.setCustomProperties(propNames, propValues);
+
+                success = true;
+            }
+        }
+
+        @Override
+        protected void nonResponding() {
+            ph = ProgressHandleFactory.createHandle("Inspecting core dump");
+            ph.start();
+        }
+
+        @Override
+        protected void done() {
+            if (ph != null) {
+                ph.finish();
+            }
+            if (!success) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(newCoreDump.getFile().getAbsolutePath() + " is not a valid core dump!"));
+            }
+        }
+    }
     
     static void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome, final boolean deleteCoreDump) {
         RequestProcessor.getDefault().post(new Runnable() {
@@ -106,12 +152,12 @@ public class CoreDumpProvider {
             }
         }
         
-        String[] propNames = new String[] {
+        final String[] propNames = new String[] {
             SNAPSHOT_VERSION,
             Snapshot.PROPERTY_FILE,
             DataSourceDescriptor.PROPERTY_NAME,
             PROPERTY_JAVA_HOME };
-        String[] propValues = new String[] {
+        final String[] propValues = new String[] {
             CURRENT_SNAPSHOT_VERSION,
             coreDumpFile,
             displayName,
@@ -120,18 +166,15 @@ public class CoreDumpProvider {
 
         File customPropertiesStorage = Utils.getUniqueFile(CoreDumpSupport.getStorageDirectory(), new File(coreDumpFile).getName(), Storage.DEFAULT_PROPERTIES_EXT);
         Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
-        storage.setCustomProperties(propNames, propValues);
-
-        CoreDumpImpl newCoreDump = null;
+        
         try {
-            newCoreDump = new CoreDumpImpl(new File(coreDumpFile), new File(jdkHome), storage);
+            CoreDumpImpl newCoreDump = new CoreDumpImpl(new File(coreDumpFile), new File(jdkHome), storage);
+            if (newCoreDump != null) {
+                new CoreDumpAdder(newCoreDump, storage, propNames, propValues).execute();
+            }
         } catch (Exception e) {
             System.err.println("Error creating coredump: " + e.getMessage());
             return;
-        }
-
-        if (newCoreDump != null) {
-            CoreDumpsContainer.sharedInstance().getRepository().addDataSource(newCoreDump);
         }
     }
     

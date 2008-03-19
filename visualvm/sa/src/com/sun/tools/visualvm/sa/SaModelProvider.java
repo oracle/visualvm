@@ -34,13 +34,16 @@ import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.sa.SaModel;
 import java.io.File;
-import org.openide.ErrorManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Tomas Hurka
  */
 public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource>  {
+    private static final Logger LOGGER = Logger.getLogger(SaModelProvider.class.getName());
+    
     private static final String SA_JAR = "lib/sa-jdi.jar";
 
     SaModelProvider() {
@@ -60,7 +63,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                 try {
                     return new SaModelImpl(jdkHome,saJar,app.getPid());
                 } catch (Exception ex) {
-                    ErrorManager.getDefault().notify(ex);
+                    LOGGER.log(Level.SEVERE, "Error getting SA agent", ex);
                 }
                 return null;
             }
@@ -78,7 +81,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                 try {
                     return new SaModelImpl(jdkHome,saJar,executable,coreFile);
                 } catch (Exception ex) {
-                    ErrorManager.getDefault().notify(ex);
+                    LOGGER.log(Level.FINE, "Unable to retrieve SA agent", ex);
                 }
                 return null;
             }
