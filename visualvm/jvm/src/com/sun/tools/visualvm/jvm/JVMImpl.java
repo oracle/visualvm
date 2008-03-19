@@ -251,7 +251,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
     }
     
     public boolean isGetSystemPropertiesSupported() {
-        return getAttach() != null || getJXM() != null || getSAAgent() != null;
+        return getAttach() != null || jmxSupport.getRuntime() != null || getSAAgent() != null;
     }
     
     public Properties getSystemProperties() {
@@ -360,10 +360,6 @@ public class JVMImpl extends JVM implements JvmstatListener {
         os.write(threadDump.getBytes("UTF-8"));
         os.close();
         return dumpFile;
-    }
-    
-    protected JvmJmxModel getJXM() {
-        return JvmJmxModelFactory.getJvmJmxModelFor(application);
     }
     
     protected AttachModel getAttach() {
