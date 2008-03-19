@@ -84,7 +84,8 @@ public final class DataSourceWindowManager {
                 final List<? extends DataSourceView> views = DataSourceViewsFactory.sharedInstance().getViews(dataSource);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        for (DataSourceView view : views) window.removeView(view);
+                        for (DataSourceView view : views)
+                            if (window.containsView(view)) window.removeView(view);
                     }
                 });
             }
