@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.tools.jmx;
 
 import com.sun.tools.visualvm.core.model.Model;
 import com.sun.tools.visualvm.application.Application;
+import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
 import java.lang.management.GarbageCollectorMXBean;
@@ -276,7 +277,7 @@ public class JvmJmxModel extends Model {
         if (mbsc != null) {
             try {
                 return newPlatformMXBeanProxy(mbsc, objectNameStr, interfaceClass);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 ErrorManager.getDefault().notify(ErrorManager.USER, e);
             }
         }
