@@ -165,6 +165,7 @@ class ExplorerModelBuilder {
 
                         // Process DataSource
                         ExplorerNode node = getNodeFor(dataSource);
+                        assert(node != null);
                         if (node != null) {
                             removedNodes.add(node);
                         }
