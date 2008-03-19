@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.coredump.impl;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.openide.util.Utilities;
 
 public final class AddVMCoredumpAction extends AbstractAction {
     
@@ -48,7 +49,9 @@ public final class AddVMCoredumpAction extends AbstractAction {
     
     
     private AddVMCoredumpAction() {
+        setEnabled(!Utilities.isWindows());
         putValue(Action.NAME, "Add VM Coredump...");
         putValue(Action.SHORT_DESCRIPTION, "Add VM Coredump");
     }
+    
 }

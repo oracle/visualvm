@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
 import java.io.File;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -90,6 +91,8 @@ public final class CoreDumpSupport {
 
     
     public static void register() {
+        if (Utilities.isWindows()) return;
+        
         DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainer.sharedInstance();
         CoreDumpActionsProvider.register();

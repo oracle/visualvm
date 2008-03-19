@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -43,6 +44,8 @@ public class CoreDumpActionsProvider {
     
     
     public static void register() {
+        if (Utilities.isWindows()) return;
+        
         ExplorerContextMenuFactory explorer = ExplorerContextMenuFactory.sharedInstance();
         explorer.addExplorerActionsProvider(new CoreDumpsContainerActionProvider(), CoreDumpsContainer.class);
         explorer.addExplorerActionsProvider(new DataSourceRootActionProvider(), DataSourceRoot.class);
