@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.swing.Timer;
@@ -71,7 +72,7 @@ public class JmxSupport implements DataRemovedListener {
     private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
-   
+    
     JmxSupport(Application app,JVMImpl vm) {
         jvm = vm;
         application = app;
@@ -83,14 +84,14 @@ public class JmxSupport implements DataRemovedListener {
         if (jmx != null) return jmx.getRuntimeMXBean();
         return null;
     }
-
+    
     synchronized JvmJmxModel getJmxModel() {
         if (jmxModel == null) {
             jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
         }
         return jmxModel;
     }
-
+    
     Properties getSystemProperties() {
         RuntimeMXBean runtime = getRuntime();
         if (runtime != null) {
@@ -129,7 +130,9 @@ public class JmxSupport implements DataRemovedListener {
                     ErrorManager.getDefault().log(ErrorManager.WARNING,
                             "Couldn't find HotSpotDiagnosticMXBean: " +
                             e.getLocalizedMessage());
-                }
+                } catch (IllegalArgumentException ex) {
+                    ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL,ex);
+                } 
             }
             hotspotDiagnosticInitialized = true;
             return hotspotDiagnosticMXBean;
@@ -159,18 +162,20 @@ public class JmxSupport implements DataRemovedListener {
             long[] threadIds = threadMXBean.getAllThreadIds();
             for (long threadId : threadIds) {
                 ThreadInfo thread = threadMXBean.getThreadInfo(threadId, Integer.MAX_VALUE);
-                sb.append("\n\"" + thread.getThreadName() +
-                        "\" - Thread t@" + thread.getThreadId() + "\n");
-                sb.append("   java.lang.Thread.State: " + thread.getThreadState());
-                if (thread.getLockName() != null) {
-                    sb.append(" on " + thread.getLockName());
-                    if (thread.getLockOwnerName() != null) {
-                        sb.append(" owned by: " + thread.getLockOwnerName());
+                if (thread != null) {
+                    sb.append("\n\"" + thread.getThreadName() +
+                            "\" - Thread t@" + thread.getThreadId() + "\n");
+                    sb.append("   java.lang.Thread.State: " + thread.getThreadState());
+                    if (thread.getLockName() != null) {
+                        sb.append(" on " + thread.getLockName());
+                        if (thread.getLockOwnerName() != null) {
+                            sb.append(" owned by: " + thread.getLockOwnerName());
+                        }
                     }
-                }
-                sb.append("\n");
-                for (StackTraceElement st : thread.getStackTrace()) {
-                    sb.append("        at " + st.toString() + "\n");
+                    sb.append("\n");
+                    for (StackTraceElement st : thread.getStackTrace()) {
+                        sb.append("        at " + st.toString() + "\n");
+                    }
                 }
             }
         } else {
@@ -217,7 +222,7 @@ public class JmxSupport implements DataRemovedListener {
         }
         return sb.toString();
     }
-
+    
     MemoryPoolMXBean getPermGenPool() {
         if (permGenPool == null) {
             Collection<MemoryPoolMXBean> pools = getJmxModel().getMemoryPoolMXBeans();
@@ -232,7 +237,7 @@ public class JmxSupport implements DataRemovedListener {
         }
         return permGenPool;
     }
-
+    
     void initTimer() {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
         final JvmJmxModel jmx = getJmxModel();
@@ -249,15 +254,15 @@ public class JmxSupport implements DataRemovedListener {
         timer.setCoalesce(true);
         timer.start();
     }
-
+    
     void disableTimer() {
         if (timer != null) {
             timer.stop();
         }
     }
-
+    
     public void dataRemoved(Object dataSource) {
         disableTimer();
     }
-
+    
 }
