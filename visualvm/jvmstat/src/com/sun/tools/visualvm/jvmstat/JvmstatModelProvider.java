@@ -30,6 +30,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.ErrorManager;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
@@ -41,6 +43,7 @@ import sun.jvmstat.monitor.VmIdentifier;
  * @author Tomas Hurka
  */
 public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Application> {
+    private final static Logger LOGGER = Logger.getLogger(JvmstatModelProvider.class.getName());
     
     static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
         if (app.isRemoved() || app.getPid() == Application.UNKNOWN_PID) return null;
@@ -67,7 +70,7 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
                 return jvmstat;
             }
         } catch (MonitorException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            LOGGER.log(Level.FINE, "Could not get MonitoredVM", ex); // NOI18N
         }
         if (vm != null) {
             vm.detach();
