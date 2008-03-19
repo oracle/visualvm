@@ -50,7 +50,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.windows.WindowManager;
 
 /**
  *
@@ -242,7 +241,7 @@ public class HostProvider {
     
     
     public void initialize() {
-        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+        RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 initLocalHost();
                 initUnknownHost();

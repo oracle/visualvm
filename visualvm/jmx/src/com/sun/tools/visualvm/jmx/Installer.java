@@ -35,8 +35,8 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        JmxApplicationsSupport.register();
         JmxModelFactory.getDefault().registerFactory(new JmxModelProvider());
+        JmxApplicationsSupport.register();
     }
     
 }

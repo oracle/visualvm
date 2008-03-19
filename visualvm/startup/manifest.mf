@@ -3,5 +3,11 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: com.sun.tools.visualvm.modules.startup
 OpenIDE-Module-Install: com/sun/tools/visualvm/modules/startup/VisualVMStartup.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/startup/Bundle.properties
+OpenIDE-Module-Requires: 
+  com.sun.tools.visualvm.attach,
+  com.sun.tools.visualvm.jmx,
+  com.sun.tools.visualvm.jvm,
+  com.sun.tools.visualvm.jvmstat,
+  com.sun.tools.visualvm.sa
 OpenIDE-Module-Specification-Version: 1.0
 
