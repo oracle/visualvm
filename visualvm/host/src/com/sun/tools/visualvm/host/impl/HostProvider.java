@@ -188,13 +188,12 @@ public class HostProvider {
     private void initUnknownHost() {
         final Host unknownhost = Host.UNKNOWN_HOST;
         if (unknownhost != null) {
-            RemoteHostsContainer.sharedInstance().getRepository().addDataSource(unknownhost);
             unknownhost.getRepository().addDataChangeListener(new DataChangeListener() {
                 public void dataChanged(DataChangeEvent event) {
-                    System.out.println("Unknown Host Event: " + event.getCurrent().isEmpty());
                     unknownhost.setVisible(!event.getCurrent().isEmpty());
                 }
             }, DataSource.class);
+            RemoteHostsContainer.sharedInstance().getRepository().addDataSource(unknownhost);
         }
     }
     

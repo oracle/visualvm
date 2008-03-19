@@ -122,21 +122,23 @@ class ExplorerModelBuilder {
                         repositoryListeners.put(repository, repositoryListener);
                     }
 
-                    // Track visibility of the DataSource
-                    PropertyChangeListener visibilityListener = new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            processRemovedDataSources(Collections.singleton((DataSource)evt.getSource()));
-                            processAddedDataSources(Collections.singleton((DataSource)evt.getSource()));
-                        }
-                    };
-                    dataSource.addPropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
-                    visibilityListeners.put(dataSource, visibilityListener);
-
                 }
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         addNodes(addedNodes);
+                        
+                        for (DataSource dataSource : added) {
+                            // Track visibility of the DataSource
+                            PropertyChangeListener visibilityListener = new PropertyChangeListener() {
+                                public void propertyChange(PropertyChangeEvent evt) {
+                                    processRemovedDataSources(Collections.singleton((DataSource)evt.getSource()));
+                                    processAddedDataSources(Collections.singleton((DataSource)evt.getSource()));
+                                }
+                            };
+                            dataSource.addPropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
+                            visibilityListeners.put(dataSource, visibilityListener);
+                        }
                     }
                 });
             }
@@ -165,6 +167,8 @@ class ExplorerModelBuilder {
 
                         // Process DataSource
                         ExplorerNode node = getNodeFor(dataSource);
+                        // NOTE: parent node should be available here,
+                        // null means there's something wrong outside of ExplorerModelBuilder code
                         assert(node != null);
                         if (node != null) {
                             removedNodes.add(node);
