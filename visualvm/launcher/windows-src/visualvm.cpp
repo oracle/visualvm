@@ -96,6 +96,7 @@ int WINAPI
     if (pc != NULL && ((0 == stricmp("\\bin", pc)) || (0 == stricmp("\\launchers", pc))))
         *pc = '\0';
     if (!checkConfigFile(buf, appname)) {
+        sprintf(jdkswitch, "--jdkhome \"%s\"", buf);
         strcat(buf,"\\lib\\visualvm");
         if (!checkConfigFile(buf, appname)) {
             ErrorExit("Cannot read config file!", "checkConfigFile");

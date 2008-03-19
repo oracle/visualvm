@@ -21,6 +21,7 @@ APPNAME=`basename "$0"`
 
 if [ -f "$progdir/../lib/visualvm/etc/$APPNAME".conf ] ; then
     BASEDIR="$progdir/../lib/visualvm/"
+    jdkhome="$progdir/.."
 elif [ -f "$progdir/../etc/$APPNAME".conf ] ; then
      BASEDIR="$progdir/../"
 fi
