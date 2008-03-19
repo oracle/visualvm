@@ -150,7 +150,8 @@ public class JmxModelImpl extends JmxModel {
             } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvmstat.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
-                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvmstatModel.isAttachable(), connectorAddress);
+                String javaHome = jvmstat.findByName("java.property.java.home");
+                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvmstatModel.isAttachable(), connectorAddress, javaHome);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
                         proxyClient = new ProxyClient(this, lvm);
@@ -550,11 +551,9 @@ public class JmxModelImpl extends JmxModel {
                 tryConnect();
                 setConnectionState(ConnectionState.CONNECTED);
             } catch (SecurityException e) {
-                e.printStackTrace();
                 setConnectionState(ConnectionState.DISCONNECTED);
                 throw e;
             } catch (Exception e) {
-                e.printStackTrace();
                 setConnectionState(ConnectionState.DISCONNECTED);
                 // Workaround for GlassFish's LoginException class not found
                 if (e.toString().contains("com.sun.enterprise.security.LoginException")) {
@@ -930,14 +929,16 @@ public class JmxModelImpl extends JmxModel {
 
         private int vmid;
         private boolean isAttachSupported;
+        private String javaHome;
         
         // @GuardedBy this
         volatile private String address;
 
-        public LocalVirtualMachine(int vmid, boolean canAttach, String connectorAddress) {
+        public LocalVirtualMachine(int vmid, boolean canAttach, String connectorAddress, String home) {
             this.vmid = vmid;
             this.address = connectorAddress;
             this.isAttachSupported = canAttach;
+            this.javaHome = home;
         }
 
         public int vmid() {
@@ -989,17 +990,14 @@ public class JmxModelImpl extends JmxModel {
                 ioe.initCause(x);
                 throw ioe;
             }
-
-            String home = vm.getSystemProperties().getProperty("java.home");
-
             // Normally in ${java.home}/jre/lib/management-agent.jar but might
             // be in ${java.home}/lib in build environments.
 
-            String agent = home + File.separator + "jre" + File.separator +
+            String agent = javaHome + File.separator + "jre" + File.separator +
                     "lib" + File.separator + "management-agent.jar";
             File f = new File(agent);
             if (!f.exists()) {
-                agent = home + File.separator + "lib" + File.separator +
+                agent = javaHome + File.separator + "lib" + File.separator +
                         "management-agent.jar";
                 f = new File(agent);
                 if (!f.exists()) {
