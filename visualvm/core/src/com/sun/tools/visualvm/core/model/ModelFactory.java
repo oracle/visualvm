@@ -39,12 +39,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Tomas Hurka
  */
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
+    final protected static Logger LOGGER = Logger.getLogger(ModelFactory.class.getName());
     
     // special marker for null model
     private final Reference<M> NULL_MODEL;
@@ -110,6 +113,9 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         //                System.out.println("Type "+types[i]);
         //            }
         //        }
+        if (LOGGER.isLoggable(Level.FINER)) {
+            LOGGER.finer("Registering " + newFactory.getClass().getName());
+        }
         boolean added = factories.add(newFactory);
         if (added) {
             clearCache();
@@ -119,6 +125,9 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     }
     
     public final synchronized boolean unregisterFactory(ModelProvider<M, D> oldFactory) {
+        if (LOGGER.isLoggable(Level.FINER)) {
+            LOGGER.finer("Unregistering " + oldFactory.getClass().getName());
+        }
         boolean removed = factories.remove(oldFactory);
         if (removed) {
             clearCache();
