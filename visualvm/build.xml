@@ -105,13 +105,5 @@
                 -->
             </zipfileset>
         </zip>
-
-<!--
-        <zip destfile="dist/${app.name}.zip" update="yes">
-            <zipfileset dir="${cluster}/config/Modules" prefix="${app.name}/platform7/config/Modules">
-                <include name="**/org-netbeans*"/>
-            </zipfileset>
-        </zip>
--->
     </target>
 </project>
