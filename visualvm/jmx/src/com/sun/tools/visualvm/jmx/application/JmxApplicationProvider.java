@@ -51,6 +51,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
+import org.openide.windows.WindowManager;
 
 /**
  * A provider for Applications added as JMX connections.
@@ -343,7 +344,7 @@ class JmxApplicationProvider {
     }
 
     public static void initialize() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 JmxApplicationProvider.sharedInstance().initPersistedApplications();
             }

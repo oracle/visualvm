@@ -44,6 +44,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -181,7 +182,7 @@ public class CoreDumpProvider {
     public static void register() {
         if (Utilities.isWindows()) return;
         final CoreDumpProvider provider = new CoreDumpProvider();
-        RequestProcessor.getDefault().post(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 provider.initPersistedCoreDumps();
             }

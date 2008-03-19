@@ -50,6 +50,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -190,6 +191,7 @@ public class HostProvider {
             RemoteHostsContainer.sharedInstance().getRepository().addDataSource(unknownhost);
             unknownhost.getRepository().addDataChangeListener(new DataChangeListener() {
                 public void dataChanged(DataChangeEvent event) {
+                    System.out.println("Unknown Host Event: " + event.getCurrent().isEmpty());
                     unknownhost.setVisible(!event.getCurrent().isEmpty());
                 }
             }, DataSource.class);
@@ -241,7 +243,7 @@ public class HostProvider {
     
     
     public void initialize() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 initLocalHost();
                 initUnknownHost();
