@@ -36,6 +36,7 @@ public class Installer extends ModuleInstall {
     
     public void restored() {
         JVMFactory.getDefault().registerFactory(new JvmProvider());
+        JVMFactory.getDefault().registerFactory(new JRockitJvmProvider());
     }
     
 }

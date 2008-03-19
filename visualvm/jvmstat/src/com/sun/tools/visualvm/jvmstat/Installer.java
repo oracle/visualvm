@@ -14,6 +14,7 @@ public class Installer extends ModuleInstall {
     public void restored() {
         JvmstatModelFactory.getDefault().registerFactory(new JvmstatModelProvider());
         JvmJvmstatModelFactory.getDefault().registerFactory(new JvmJvmstatModelProvider());
+        JvmJvmstatModelFactory.getDefault().registerFactory(new JRockitJvmJvmstatModelProvider());
         JvmstatApplicationProvider.register();
     }
     
