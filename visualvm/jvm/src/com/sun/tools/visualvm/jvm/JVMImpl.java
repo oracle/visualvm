@@ -211,9 +211,10 @@ public class JVMImpl extends JVM implements JvmstatListener {
         synchronized (listeners) {
             if (listeners.add(l)) {
                 if (monitoredVm != null) {
+                    if (jmxSupport != null) jmxSupport.disableTimer();
                     monitoredVm.addJvmstatListener(this);
                 } else {
-                    jmxSupport.disableTimer();
+                    if (jmxSupport != null) jmxSupport.initTimer();
                 }
             }
         }
@@ -226,7 +227,7 @@ public class JVMImpl extends JVM implements JvmstatListener {
                     if (monitoredVm != null) {
                         monitoredVm.removeJvmstatListener(this);
                     } else {
-                        jmxSupport.initTimer();
+                        if (jmxSupport != null) jmxSupport.disableTimer();
                     }
                 }
             }
