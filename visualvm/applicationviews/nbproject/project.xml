@@ -24,7 +24,31 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>com.sun.tools.visualvm.coredump</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.heapdump</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>com.sun.tools.visualvm.host</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.threaddump</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
