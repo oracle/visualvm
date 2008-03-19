@@ -25,11 +25,11 @@
 
 package com.sun.tools.visualvm.application.monitor;
 
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.charts.ChartModelListener;
 import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
-import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.BorderFactory;
@@ -51,10 +51,9 @@ class ChartsSupport {
   public static abstract class Chart extends GraphPanel implements ChartModelListener {
 
     private SynchronousXYChart xyChart;
-    private DynamicSynchronousXYChartModel xyChartModel;
+    private BoundedDynamicXYChartModel xyChartModel;
     private JPanel bigLegendPanel;
     private JPanel smallLegendPanel;
-    private int chartTimeLength = 180000; // 3 minutes to switch from fitToWindow to trackingEnd
     
     public Chart() {
       long time = System.currentTimeMillis();
@@ -63,7 +62,8 @@ class ChartsSupport {
       setOpaque(true);
       setBackground(Color.WHITE);
       
-      xyChartModel = new DynamicSynchronousXYChartModel() {
+      GlobalPreferences preferences = GlobalPreferences.sharedInstance();
+      xyChartModel = new BoundedDynamicXYChartModel(preferences.getMonitoredDataCache() * 60 / preferences.getMonitoredDataPoll()) {
         public  long    getMaxDisplayYValue(int seriesIndex)      { return getMaxYValue(0); }
       };
       setupModel(xyChartModel);
@@ -84,7 +84,7 @@ class ChartsSupport {
     }
     
     protected abstract SynchronousXYChart createChart();
-    protected abstract void setupModel(DynamicSynchronousXYChartModel xyChartModel);
+    protected abstract void setupModel(BoundedDynamicXYChartModel xyChartModel);
     protected abstract JPanel createBigLegend();
     protected abstract JPanel createSmallLegend();
     
@@ -92,7 +92,7 @@ class ChartsSupport {
       return xyChart;
     };
     
-    public DynamicSynchronousXYChartModel getModel() {
+    public BoundedDynamicXYChartModel getModel() {
       return xyChartModel;
     }
     
@@ -119,7 +119,7 @@ class ChartsSupport {
   
   public static class ClassesMetricsChart extends Chart {
     
-    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
+    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
       xyChartModel.setupModel(new String[] {"Total loaded classes", "Shared loaded classes"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
     }
 
@@ -155,7 +155,7 @@ class ChartsSupport {
   
   public static class ThreadsMetricsChart extends Chart {
     
-    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
+    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
       xyChartModel.setupModel(new String[] {"Live threads", "Daemon threads"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
     }
 
@@ -192,7 +192,7 @@ class ChartsSupport {
   
   public static class HeapMetricsChart extends Chart {
     
-    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
+    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
       xyChartModel.setupModel(new String[] {"Heap size", "Used heap"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
     }
 
@@ -230,7 +230,7 @@ class ChartsSupport {
   
   public static class PermGenMetricsChart extends Chart {
     
-    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
+    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
       xyChartModel.setupModel(new String[] {"PermGen size", "Used PermGen"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
     }
 

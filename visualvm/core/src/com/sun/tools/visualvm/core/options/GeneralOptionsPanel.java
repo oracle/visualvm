@@ -68,6 +68,14 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        jLabel10 = new javax.swing.JLabel();
+        mhRefresh1 = new javax.swing.JSpinner();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        dataRefresh1 = new javax.swing.JSpinner();
+        jLabel13 = new javax.swing.JLabel();
 
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
@@ -94,6 +102,20 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel8, "sec.");
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, "Charts Cache");
+
+        jLabel10.setDisplayedMnemonic('h');
+        jLabel10.setLabelFor(mhRefresh);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "Monitored Host:");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, "min.");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, "min.");
+
+        jLabel13.setDisplayedMnemonic('m');
+        jLabel13.setLabelFor(dataRefresh);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "Monitored Data:");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -102,40 +124,59 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(instrFilter)
-                        .addContainerGap())
-                    .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(layout.createSequentialGroup()
-                                        .add(jLabel4)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
-                                    .add(layout.createSequentialGroup()
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                            .add(jLabel1)
-                                            .add(jLabel2)
-                                            .add(jLabel3))
-                                        .add(35, 35, 35)
-                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                            .add(dataRefresh)
-                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, thrdRefresh)
-                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, mhRefresh, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE))
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                            .add(jLabel6)
-                                            .add(jLabel8)
-                                            .add(jLabel7))))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                                .add(12, 12, 12)
+                                .add(instrFilter))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                                 .add(jLabel5)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel4)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                            .add(layout.createSequentialGroup()
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel1)
+                                    .add(jLabel2)
+                                    .add(jLabel3))
+                                .add(35, 35, 35)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                    .add(dataRefresh)
+                                    .add(org.jdesktop.layout.GroupLayout.TRAILING, thrdRefresh)
+                                    .add(org.jdesktop.layout.GroupLayout.TRAILING, mhRefresh, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel6)
+                                    .add(jLabel8)
+                                    .add(jLabel7))))
+                        .add(10, 10, 10))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel9)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jSeparator3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel10)
+                                .add(36, 36, 36)
+                                .add(mhRefresh1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel11))
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel13)
+                                .add(35, 35, 35)
+                                .add(dataRefresh1)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel12)))
+                        .add(91, 91, 91))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -161,9 +202,23 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(dataRefresh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel9)
+                    .add(jSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel10)
+                    .add(jLabel11)
+                    .add(mhRefresh1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel13)
+                    .add(jLabel12)
+                    .add(dataRefresh1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(18, 18, 18)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jLabel5)
                     .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(instrFilter)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -180,6 +235,8 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         mhRefresh.setValue(GlobalPreferences.sharedInstance().getMonitoredHostPoll());
         dataRefresh.setValue(GlobalPreferences.sharedInstance().getMonitoredDataPoll());
         thrdRefresh.setValue(GlobalPreferences.sharedInstance().getThreadsPoll());
+        mhRefresh1.setValue(GlobalPreferences.sharedInstance().getMonitoredHostCache());
+        dataRefresh1.setValue(GlobalPreferences.sharedInstance().getMonitoredDataCache());
         instrFilter.setSelected(GlobalPreferences.sharedInstance().isProfilerInstrFilter());
     }
 
@@ -187,6 +244,8 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         GlobalPreferences.sharedInstance().setMonitoredHostPoll((Integer) mhRefresh.getValue());
         GlobalPreferences.sharedInstance().setMonitoredDataPoll((Integer) dataRefresh.getValue());
         GlobalPreferences.sharedInstance().setThreadsPoll((Integer) thrdRefresh.getValue());
+        GlobalPreferences.sharedInstance().setMonitoredHostCache((Integer) mhRefresh1.getValue());
+        GlobalPreferences.sharedInstance().setMonitoredDataCache((Integer) dataRefresh1.getValue());
         GlobalPreferences.sharedInstance().setProfilerInstrFilter(instrFilter.isSelected());
         // TODO store modified settings
         // Example:
@@ -203,7 +262,9 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
             int mh = (Integer) mhRefresh.getValue();
             int md = (Integer) dataRefresh.getValue();
             int th = (Integer) thrdRefresh.getValue();
-            return mh > 0 && md > 0 && th > 0;
+            int mhc = (Integer) mhRefresh1.getValue();
+            int mdc = (Integer) dataRefresh1.getValue();
+            return mh > 0 && md > 0 && th > 0 && mhc > 0 && mdc > 0;
         } catch (Exception e) {
         }
         return false;
@@ -211,8 +272,13 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner dataRefresh;
+    private javax.swing.JSpinner dataRefresh1;
     private javax.swing.JCheckBox instrFilter;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -220,9 +286,12 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSpinner mhRefresh;
+    private javax.swing.JSpinner mhRefresh1;
     private javax.swing.JSpinner thrdRefresh;
     // End of variables declaration//GEN-END:variables
 
@@ -230,5 +299,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         mhRefresh.getModel().addChangeListener(changeListener);
         thrdRefresh.getModel().addChangeListener(changeListener);
         dataRefresh.getModel().addChangeListener(changeListener);
+        mhRefresh1.getModel().addChangeListener(changeListener);
+        dataRefresh1.getModel().addChangeListener(changeListener);
     }
 }

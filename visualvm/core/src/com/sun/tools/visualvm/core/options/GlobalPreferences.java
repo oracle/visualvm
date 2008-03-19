@@ -52,11 +52,15 @@ public class GlobalPreferences implements PreferenceChangeListener {
     private static final String INT_KEY_MONHOST_POLL = "MonitoredHostPoll";
     private static final String INT_KEY_THREADS_POLL = "ThreadsPoll";
     private static final String INT_KEY_MONDATA_POLL = "MonitoredDataPoll";
+    private static final String INT_KEY_MONHOST_CACHE = "MonitoredHostCache";
+    private static final String INT_KEY_MONDATA_CACHE = "MonitoredDataCache";
     private static final String BOOL_KEY_PROFILER_FILTER = "ProfilerInstrFilter";
     
     private final static int MONHOST_POLL_DEFAULT = 3;
     private final static int THREADS_POLL_DEFAULT = 1;
-    private final static int MONDATA_POLL_DEFAULT = 2;
+    private final static int MONDATA_POLL_DEFAULT = 1;
+    private final static int MONHOST_CACHE_DEFAULT = 60;
+    private final static int MONDATA_CACHE_DEFAULT = 60;
     
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
     private final Preferences prefs;
@@ -132,6 +136,30 @@ public class GlobalPreferences implements PreferenceChangeListener {
     
     public void watchMonitoredDataPoll(PreferenceChangeListener pcl) {
         addListener(INT_KEY_MONDATA_POLL, pcl);
+    }
+    
+    public int getMonitoredHostCache() {
+        return getPollingInterval(INT_KEY_MONHOST_CACHE, MONHOST_CACHE_DEFAULT);
+    }
+    
+    public void setMonitoredHostCache(int value) {
+        setPollingInterval(INT_KEY_MONHOST_CACHE, value);
+    }
+    
+    public void watchMonitoredHostCache(PreferenceChangeListener pcl) {
+        addListener(INT_KEY_MONHOST_CACHE, pcl);
+    }
+    
+    public int getMonitoredDataCache() {
+        return getPollingInterval(INT_KEY_MONDATA_CACHE, MONDATA_CACHE_DEFAULT);
+    }
+    
+    public void setMonitoredDataCache(int value) {
+        setPollingInterval(INT_KEY_MONDATA_CACHE, value);
+    }
+    
+    public void watchMonitoredDataCache(PreferenceChangeListener pcl) {
+        addListener(INT_KEY_MONDATA_CACHE, pcl);
     }
     
     public boolean isProfilerInstrFilter() {
