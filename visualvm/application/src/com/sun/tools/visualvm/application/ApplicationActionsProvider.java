@@ -65,7 +65,9 @@ class ApplicationActionsProvider {
         public void actionPerformed(final ActionEvent e) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    JVM jvm = JVMFactory.getJVMFor((Application) e.getSource());
+                    Set<Application> apps = (Set<Application>)e.getSource();
+                    if (apps.size() != 1) return;
+                    JVM jvm = JVMFactory.getJVMFor(apps.iterator().next());
                     jvm.setDumpOnOOMEnabled(oomeEnabled);
                 }
             });
