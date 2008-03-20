@@ -39,6 +39,8 @@ import java.util.jar.JarFile;
  * @author Tomas Hurka
  */
 public abstract class JvmJvmstatModel extends Model {
+    private static final String JAR_SUFFIX = ".jar";  // NOI18N
+    
     protected Application application;
     protected JvmstatModel jvmstat;
     protected MonitoredValue loadedClasses;
@@ -89,6 +91,10 @@ public abstract class JvmJvmstatModel extends Model {
         return jvmstat.findByName("java.property.java.vm.version");
     }
     
+    public String getClassPath() {
+        return jvmstat.findByName("java.property.java.class.path");        
+    }
+    
     public boolean isAttachable() {
         String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");
         if (jvmCapabilities == null) {
@@ -99,22 +105,18 @@ public abstract class JvmJvmstatModel extends Model {
     
     public String getMainArgs() {
         String commandLine = getCommandLine();
+        String arg0 = getFirstArgument();
 
-        int firstSpace = commandLine.indexOf(' ');
-        if (firstSpace > 0) {
-            return commandLine.substring(firstSpace + 1);
+        int firstSpace = arg0.length();
+        if (firstSpace < commandLine.length()) {
+            return commandLine.substring(firstSpace);
         }
         return null;
     }
     
     public String getMainClass() {
-        String commandLine = getCommandLine();
-        String mainClassName = commandLine;
-
-        int firstSpace = commandLine.indexOf(' ');
-        if (firstSpace > 0) {
-            mainClassName = commandLine.substring(0, firstSpace);
-        }
+        String mainClassName = getFirstArgument();
+        // if we are on localhost try read main class from jar file
         if (application.getHost().equals(Host.LOCALHOST)) {
             File jarFile = new File(mainClassName);
             if (jarFile.exists()) {
@@ -127,7 +129,8 @@ public abstract class JvmJvmstatModel extends Model {
                 }
             }
         }
-        if (mainClassName.endsWith(".jar")) {
+        
+        if (mainClassName.endsWith(JAR_SUFFIX)) {
             mainClassName = mainClassName.replace('\\', '/');
             int index = mainClassName.lastIndexOf("/");
             if (index != -1) {
@@ -135,6 +138,35 @@ public abstract class JvmJvmstatModel extends Model {
             }
         }
         mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
+        return mainClassName;
+    }
+
+    private String getFirstArgument() {
+        String commandLine = getCommandLine();
+        String mainClassName = null;
+        
+        // search for jar file
+        int jarIndex = commandLine.indexOf(JAR_SUFFIX); 
+        if (jarIndex != -1) {
+            String jarFile = commandLine.substring(0,jarIndex+JAR_SUFFIX.length());
+            // if this is not end of commandLine check that jar file is separated by space from other arguments
+            if (jarFile.length() == commandLine.length() || commandLine.charAt(jarFile.length()) == ' ') {
+                // jarFile must be on classpath
+                String classPath = getClassPath();
+                if (classPath != null && classPath.indexOf(jarFile) != -1) {
+                    mainClassName = jarFile;
+                }
+            }
+        }
+        // it looks like ordinary commandline with main class
+        if (mainClassName == null) {
+            int firstSpace = commandLine.indexOf(' ');
+            if (firstSpace > 0) {
+                mainClassName = commandLine.substring(0, firstSpace);
+            } else {
+                mainClassName = commandLine;
+            }
+        }
         return mainClassName;
     }
 
