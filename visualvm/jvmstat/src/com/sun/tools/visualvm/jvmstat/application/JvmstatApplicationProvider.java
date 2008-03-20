@@ -64,12 +64,21 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  */
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
+    private static JvmstatApplicationProvider instance;
+    
     private final Map<String, WeakReference<JvmstatApplication>> applications = new HashMap();
     
     // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
 //    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
 //        public void dataRemoved(Host host) { processFinishedHost(host); }
 //    };
+    
+    static synchronized JvmstatApplicationProvider sharedInstance() {
+        if (instance == null) {
+            instance = new JvmstatApplicationProvider(); 
+        }
+        return instance;
+    }
     
     public void dataChanged(DataChangeEvent<Host> event) {
         Set<Host> newHosts = event.getAdded();
@@ -177,6 +186,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         host.getRepository().removeDataSources(finishedApplications);
     }
     
+    void removeFromMap(JvmstatApplication jvmstatApplication) {
+        applications.remove(jvmstatApplication.getId());
+    }
+    
     // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
 //    private void processAllTerminatedApplications(Host host) {
 //        Set<JvmstatApplication> applicationsSet = host.getRepository().getDataSources(JvmstatApplication.class);
@@ -255,10 +268,8 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         timer.setRepeats(false);
         timer.start();
     }
-    
-    public static void register() {
-        JvmstatApplicationProvider provider = new JvmstatApplicationProvider();
-        DataSourceRepository.sharedInstance().addDataChangeListener(provider, Host.class);
-    }
 
+    public static void register() {
+        DataSourceRepository.sharedInstance().addDataChangeListener(sharedInstance(), Host.class);
+    }
 }

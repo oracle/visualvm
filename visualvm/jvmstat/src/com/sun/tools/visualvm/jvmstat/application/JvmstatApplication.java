@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.host.Host;
 
 /**
@@ -37,9 +38,11 @@ final class JvmstatApplication extends Application {
     JvmstatApplication(Host host, int pid) {
         super(host, pid);
     }
-    
-//    void removed() {
-//        setState(DataSource.STATE_FINISHED);
-//    }
+
+    protected void remove(DataSource removeRoot) {
+        super.remove(removeRoot);
+//        System.out.println("Remove "+this);
+        JvmstatApplicationProvider.sharedInstance().removeFromMap(this);
+    }
 
 }
