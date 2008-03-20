@@ -44,9 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,9 +74,6 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   static final String PROP_CLOSE = "close";  // NOI18N
   
   
-  private Map<DataSourceViewContainer, DataSourceView> mapping = new HashMap();
-  
-  
   DataSourceWindowTabbedPane() {
     addChangeListener( new ChangeListener() {
       public void stateChanged(ChangeEvent e) {
@@ -98,22 +93,20 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private boolean draggedOut = false;
   
   public void addViewTab(DataSource dataSource, DataSourceView view) {
-    DataSourceViewContainer container = new DataSourceViewContainer(new DataSourceCaption(dataSource), view.getView());
-    mapping.put(container, view);
+    ViewContainer container = new ViewContainer(new DataSourceCaption(dataSource), view);
     super.add(container);
     setTitleAt(getComponentCount() - 1, view.getName() + (view.isClosable() ? "  " : ""));
     super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()));
   }
   
   public void removeTabAt(int index) {
-      DataSourceViewContainer container = (DataSourceViewContainer)getComponentAt(index);
+      ViewContainer container = (ViewContainer)getComponentAt(index);
       super.removeTabAt(index);
       container.getCaption().finish();
-      mapping.remove(container);
   }
   
-  public DataSourceView getDataSourceView(DataSourceViewContainer container) {
-      return mapping.get(container);
+  public DataSourceView getDataSourceView(ViewContainer container) {
+      return container.getView();
   }
   
   public int indexOfView(final DataSourceView view) {
@@ -122,7 +115,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
           public void run() {
               for (int i = 0; i < getTabCount(); i++)
-                  if (((DataSourceViewContainer)getComponentAt(i)).getView() == view.getView()) index[0] = i;
+                  if (((ViewContainer)getComponentAt(i)).getViewComponent() == view.getView()) index[0] = i;
           }
       });
       return index[0];
@@ -132,9 +125,8 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       Set<DataSourceView> views = new HashSet();
       
       for (Component component : getComponents()) {
-          DataSourceViewContainer container = (DataSourceViewContainer)component;
-          DataSourceView view = mapping.get(container);
-          views.add(view);
+          ViewContainer container = (ViewContainer)component;
+          views.add(container.getView());
       }
       
       return views;
@@ -142,7 +134,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   
   // NOTE: has to be allowed, is called from super.add() needed in addViewTab()
   public void addTab(String title, Component component) {
-    if (component instanceof DataSourceViewContainer) super.addTab(title, component);
+    if (component instanceof ViewContainer) super.addTab(title, component);
     else throw new RuntimeException("Not supported for this component");
   }
   
@@ -156,8 +148,8 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   
   
   public void setTitleAt(int idx, String title) {
-    DataSourceViewContainer view = (DataSourceViewContainer)getComponentAt(idx);
-    if (mapping.get(view).isClosable()) {
+    ViewContainer container = (ViewContainer)getComponentAt(idx);
+    if (container.getView().isClosable()) {
       String nue = title.indexOf("</html>") != -1 ? //NOI18N
         Utilities.replaceString(title, "</html>", "&nbsp;&nbsp;</html>") //NOI18N
         : title + "  "; //NOI18N
@@ -180,8 +172,8 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     if (b == null)
       return null;
     else {
-      DataSourceViewContainer view = (DataSourceViewContainer)getComponentAt(i);
-      if (!mapping.get(view).isClosable()) return null;
+      ViewContainer container = (ViewContainer)getComponentAt(i);
+      if (!container.getView().isClosable()) return null;
       
       b = new Rectangle(b);
       fixGetBoundsAt(b);
@@ -514,19 +506,21 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     }
   }
   
-  static class DataSourceViewContainer extends JPanel {
+  static class ViewContainer extends JPanel {
       
       private DataSourceCaption caption;
-      private DataViewComponent view;
+      private DataSourceView view;
+      private DataViewComponent viewComponent;
       
-      public DataSourceViewContainer(DataSourceCaption caption, DataViewComponent view) {
+      public ViewContainer(DataSourceCaption caption, DataSourceView view) {
           this.caption = caption;
           this.view = view;
+          this.viewComponent = view.getView();
           setLayout(new BorderLayout());
           setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
           setBackground(Color.WHITE);
           
-          add(view, BorderLayout.CENTER);
+          add(viewComponent, BorderLayout.CENTER);
           if (caption != null) {
               caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
               caption.setBackground(Color.WHITE);
@@ -536,7 +530,9 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       
       public DataSourceCaption getCaption() { return caption; }
       
-      public DataViewComponent getView() { return view; }
+      public DataSourceView getView() { return view; }
+      
+      public DataViewComponent getViewComponent() { return viewComponent; }
   }
   
 }

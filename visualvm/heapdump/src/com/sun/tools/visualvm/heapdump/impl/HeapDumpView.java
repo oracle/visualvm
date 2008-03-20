@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.heapdump.impl;
 
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -37,7 +39,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,7 +46,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -53,18 +53,21 @@ import org.openide.util.Utilities;
  * @author Tomas Hurka
  */
 class HeapDumpView extends DataSourceView {
-    
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/heapdump/resources/heapdump.png";
 
     private DataViewComponent view;
     
 
     public HeapDumpView(HeapDump heapDump) {
-        super(heapDump.getFile().getName(), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
+        this(heapDump, DataSourceDescriptorFactory.getDescriptor(heapDump));
+    }
+    
+    private HeapDumpView(HeapDump heapDump, DataSourceDescriptor descriptor) {
+        super(descriptor.getName(), descriptor.getIcon(), 0);
         view = createViewComponent(heapDump);
         HeapDumpPluggableView pluggableView = (HeapDumpPluggableView)HeapDumpSupport.getInstance().getHeapDumpView();
         pluggableView.makeCustomizations(view, heapDump);
     }
+    
         
     public DataViewComponent getView() {
         return view;

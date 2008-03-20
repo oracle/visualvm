@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -38,13 +40,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -53,13 +53,16 @@ import org.openide.util.Utilities;
  */
 class ThreadDumpView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/threaddump/resources/threaddump.png";
-
     private DataViewComponent view;
     
 
     public ThreadDumpView(ThreadDump threadDump) {
-        super(threadDump.getFile().getName(), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
+        this(threadDump, DataSourceDescriptorFactory.getDescriptor(threadDump));
+        
+    }
+    
+    private ThreadDumpView(ThreadDump threadDump, DataSourceDescriptor descriptor) {
+        super(descriptor.getName(), descriptor.getIcon(), 0);
         view = createViewComponent(threadDump);
         ThreadDumpPluggableView pluggableView = (ThreadDumpPluggableView)ThreadDumpSupport.getInstance().getThreadDumpView();
         pluggableView.makeCustomizations(view, threadDump);

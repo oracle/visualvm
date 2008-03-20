@@ -32,6 +32,7 @@ import java.awt.BorderLayout;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
@@ -47,6 +48,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
 
     private DataSource dataSource;
     private DataSourceDescriptor dataSourceDescriptor;
+    private DataSourceWindowTabbedPane.ViewContainer singleViewContainer;
 
 
     // Doesn't need to be called from EDT
@@ -71,25 +73,54 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     }
 
     public void addView(DataSourceView view) {
-        tabbedContainer.addViewTab(dataSource, view);
+        if (viewsCount == 0) {
+            singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), view);
+            add(singleViewContainer, BorderLayout.CENTER);
+            doLayout();
+        } else if (viewsCount == 1) {
+            remove(singleViewContainer);
+            add(tabbedContainer, BorderLayout.CENTER);
+            tabbedContainer.addViewTab(dataSource, singleViewContainer.getView());
+            tabbedContainer.addViewTab(dataSource, view);
+            doLayout();
+            singleViewContainer = null;
+        } else {
+            tabbedContainer.addViewTab(dataSource, view);
+        }
         viewsCount++;
     }
     
     public void selectView(DataSourceView view) {
-        int viewIndex = indexOf(view);
-        if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
-        else tabbedContainer.setSelectedIndex(viewIndex);
+        if (viewsCount > 1) {
+            int viewIndex = indexOf(view);
+            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
+            else tabbedContainer.setSelectedIndex(viewIndex);
+        }
     }
     
     public void removeView(final DataSourceView view) {
-        int viewIndex = indexOf(view);
-        if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
-        else tabbedContainer.removeTabAt(viewIndex);
+        if (viewsCount == 1) {
+            if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
+            remove(singleViewContainer);
+            singleViewContainer = null;
+        } else {
+            int viewIndex = indexOf(view);
+            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
+            else tabbedContainer.removeTabAt(viewIndex);
+            
+            if (viewsCount == 2) {
+                singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), tabbedContainer.getViews().iterator().next());
+                remove(tabbedContainer);
+                tabbedContainer.removeTabAt(0);
+                add(singleViewContainer, BorderLayout.CENTER);
+                doLayout();
+            }
+        }
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { view.removed(); }
         });
-            
+        
         viewsCount--;
         if (viewsCount == 0 && isOpened()) close();
     }
@@ -100,7 +131,11 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     }
     
     public Set<DataSourceView> getViews() {
-        return tabbedContainer.getViews();
+        if (viewsCount == 1) {
+            return Collections.singleton(singleViewContainer.getView());
+        } else {
+            return tabbedContainer.getViews();
+        }
     }
     
     public boolean containsView(DataSourceView view) {
@@ -109,7 +144,11 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     
     
     private int indexOf(DataSourceView view) {
-        return tabbedContainer.indexOfView(view);
+        if (viewsCount == 1) {
+            return view == singleViewContainer.getView() ? 0 : -1;
+        } else {
+            return tabbedContainer.indexOfView(view);
+        }
     }
     
     
@@ -131,7 +170,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
                 public void run() { setIcon((Image)evt.getNewValue()); }
             });
         } else if ("close".equals(propertyName)) {
-            removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.DataSourceViewContainer)evt.getNewValue()));
+            removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.ViewContainer)evt.getNewValue()));
         }
     }
     
