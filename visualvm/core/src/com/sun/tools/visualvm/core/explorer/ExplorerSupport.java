@@ -163,7 +163,13 @@ public class ExplorerSupport {
     void expandNode(final ExplorerNode node) {
         if (node == null) return;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() { mainTree.expandPath(getPath(node)); } 
+            public void run() { 
+                TreePath path = getPath(node);
+                // For some reason expanding the path doesn't always work for a single invocation,
+                // invoking twice to be sure
+                mainTree.expandPath(path);
+                mainTree.expandPath(path);
+            } 
         });
     }
     
