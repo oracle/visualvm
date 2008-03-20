@@ -34,7 +34,6 @@ import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -66,7 +65,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private static JvmstatApplicationProvider instance;
     
-    private final Map<String, WeakReference<JvmstatApplication>> applications = new HashMap();
+    private final Map<String, JvmstatApplication> applications = new HashMap();
     
     // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
 //    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
@@ -163,7 +162,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             JvmstatApplication application = new JvmstatApplication(host, applicationPid);
             String appId = application.getId();
             if (!applications.containsKey(appId)) {
-                applications.put(appId, new WeakReference(application));
+                applications.put(appId, application);
                 newApplications.add(application);
             }
         }
@@ -177,7 +176,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         for (int applicationPid : applicationPids) {
              String appId = new JvmstatApplication(host, applicationPid).getId();
              if (applications.containsKey(appId)) {
-                JvmstatApplication application = applications.get(appId).get();
+                JvmstatApplication application = applications.get(appId);
                 if (application != null) finishedApplications.add(application);
                 applications.remove(appId);
             }

@@ -44,6 +44,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
@@ -146,7 +147,11 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
         
         public void dataRemoved(Application dataSource) {
-            threadDumpButton.setEnabled(false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    threadDumpButton.setEnabled(false);
+                }
+            });
         }
         
         

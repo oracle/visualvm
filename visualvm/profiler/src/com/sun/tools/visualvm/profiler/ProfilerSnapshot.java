@@ -58,8 +58,8 @@ class ProfilerSnapshot extends Snapshot {
         return true;
     }
     
-    public void remove(DataSource removeRoot) {
-        super.remove(removeRoot);
+    public void remove() {
+        super.remove();
         ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
     }
     

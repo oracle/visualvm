@@ -156,53 +156,30 @@ public abstract class DataSource {
     
     // Implementation of this DataSource removal
     // Persistent DataSources can remove appropriate entries from their storage
-    protected void remove(DataSource removeRoot) {
+    protected void remove() {
         DataSourceWindowManager.sharedInstance().closeDataSource(this);
         getStorage().deleteCustomPropertiesStorage();
     }
     
     
-    final void add(DataSource owner) {
+    final void addImpl(DataSource owner) {
         if (isAdded) throw new UnsupportedOperationException("DataSource can be added only once");
         this.owner = owner;
         isAdded = true;
     }
     
-    final void remove() {
-        if (checkRemove(this, this)) remove(this, this);
-    }
-    
-    private static boolean checkRemove(DataSource dataSource, DataSource removeRoot) {
-        // Check if the DataSource can be removed
-        if (!dataSource.checkRemove(removeRoot)) return false;
+    final void removeImpl() {
+        remove();
         
-        // Check if all repository DataSources can be removed
-        Set<? extends DataSource> repositoryDataSources = dataSource.getRepository().getDataSources();
-        for (DataSource repositoryDataSource : repositoryDataSources)
-            if (!repositoryDataSource.checkRemove(removeRoot)) return false;
-        return true;
-    }
-    
-    private static void remove(DataSource dataSource, DataSource removeRoot) {
-        // Remove repository DataSources
-        Set<? extends DataSource> repositoryDataSources = dataSource.getRepository().getDataSources();
-        for (DataSource repositoryDataSource : repositoryDataSources)
-            repositoryDataSource.remove(removeRoot);
+        this.owner = null;
         
-        // Remove DataSource
-        dataSource.remove(removeRoot);
-        
-        // Clear owner of the DataSource
-        dataSource.owner = null;
-        
-        // Notify listeners
-        if (!dataSource.hasRemovedListeners()) return;
-        Set<ComparableWeakReference<DataRemovedListener>> listeners = dataSource.getRemovedListeners();
+        if (!hasRemovedListeners()) return;
+        Set<ComparableWeakReference<DataRemovedListener>> listeners = getRemovedListeners();
         for (WeakReference<DataRemovedListener> listenerReference : listeners) {
             DataRemovedListener listener = listenerReference.get();
-            if (listener != null) listener.dataRemoved(dataSource);
+            if (listener != null) listener.dataRemoved(this);
         }
-        dataSource.getRemovedListeners().clear();
+        listeners.clear();
     }
     
     

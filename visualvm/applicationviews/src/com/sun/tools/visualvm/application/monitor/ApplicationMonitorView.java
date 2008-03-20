@@ -175,8 +175,12 @@ class ApplicationMonitorView extends DataSourceView {
         }
         
         public void dataRemoved(Application dataSource) {
-            gcButton.setEnabled(false);
-            heapDumpButton.setEnabled(false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    gcButton.setEnabled(false);
+                    heapDumpButton.setEnabled(false);
+                }
+            });
         }
         
         

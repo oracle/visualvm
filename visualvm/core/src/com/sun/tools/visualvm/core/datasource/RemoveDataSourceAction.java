@@ -22,9 +22,8 @@
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
-package com.sun.tools.visualvm.core.ui;
+package com.sun.tools.visualvm.core.datasource;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
@@ -51,7 +50,8 @@ public final class RemoveDataSourceAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         Set<DataSource> removableDataSources = getRemovableDataSources();
         for (DataSource dataSource : removableDataSources)
-            dataSource.getOwner().getRepository().removeDataSource(dataSource);
+            if (checkRemove(dataSource))
+                dataSource.getOwner().getRepository().removeDataSource(dataSource);
     }
     
     private void updateEnabled() {
@@ -73,6 +73,18 @@ public final class RemoveDataSourceAction extends AbstractAction {
     
     private Set<DataSource> getSelectedDataSources() {
         return ExplorerSupport.sharedInstance().getSelectedDataSources();
+    }
+    
+    
+    private static boolean checkRemove(DataSource dataSource) {
+        // Check if the DataSource can be removed
+        if (!dataSource.checkRemove(dataSource)) return false;
+        
+        // Check if all repository DataSources can be removed
+        Set<? extends DataSource> repositoryDataSources = dataSource.getRepository().getDataSources();
+        for (DataSource repositoryDataSource : repositoryDataSources)
+            if (!repositoryDataSource.checkRemove(dataSource)) return false;
+        return true;
     }
     
     

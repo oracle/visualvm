@@ -140,9 +140,13 @@ class ApplicationProfilerView extends DataSourceView {
         }
         
         public void dataRemoved(Application application) {
-            disableControlButtons();
-            statusValueLabel.setText("application terminated");
-            NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    disableControlButtons();
+                    statusValueLabel.setText("application terminated");
+                    NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
+                }
+            });
         }
         
         

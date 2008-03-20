@@ -40,6 +40,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
@@ -105,10 +106,14 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     
     
     public void dataRemoved(DataSource dataSource) {
-        finish();
-        isAvailable = false;
-        updateAvailable();
-        updateCaption();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                finish();
+                isAvailable = false;
+                updateAvailable();
+                updateCaption();
+            }
+        });
     }
     
     public synchronized void finish() {
