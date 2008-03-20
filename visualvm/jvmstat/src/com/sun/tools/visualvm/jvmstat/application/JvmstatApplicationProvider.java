@@ -64,7 +64,7 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  */
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
-    private final Map<Integer, WeakReference<JvmstatApplication>> applications = new HashMap();
+    private final Map<String, WeakReference<JvmstatApplication>> applications = new HashMap();
     
     // TODO: reimplement to listen for Host.getState() == STATE_UNAVAILABLE
 //    private final DataRemovedListener<Host> hostFinishedListener = new DataRemovedListener<Host>() {
@@ -109,7 +109,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         if (host == Host.LOCALHOST) checkForBrokenJps(monitoredHost);
         try {
             // Fetch already running applications on the host
-            processNewApplicationsByIds(host, monitoredHost.activeVms());
+            processNewApplicationsByPids(host, monitoredHost.activeVms());
             
             hostListener = new HostListener() {
                 
@@ -118,10 +118,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                         // First event for this Host
                         // NOTE: already existing applications are treated as new on this host
                         firstEvent[0] = false;
-                        processNewApplicationsByIds(host, e.getActive());
+                        processNewApplicationsByPids(host, e.getActive());
                     } else {
-                        processNewApplicationsByIds(host, e.getStarted());
-                        processTerminatedApplicationsByIds(host, e.getTerminated());
+                        processNewApplicationsByPids(host, e.getStarted());
+                        processTerminatedApplicationsByPids(host, e.getTerminated());
                     }
                 }
                 
@@ -144,16 +144,17 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         host.getRepository().removeDataSources(host.getRepository().getDataSources(JvmstatApplication.class));
     }
     
-    private void processNewApplicationsByIds(Host host, Set<Integer> applicationIds) {
+    private void processNewApplicationsByPids(Host host, Set<Integer> applicationPids) {
         Set<JvmstatApplication> newApplications = new HashSet();
         
-        for (int applicationId : applicationIds) {
+        for (int applicationPid : applicationPids) {
             // Do not provide instance for Application.CURRENT_APPLICATION
-            if (Application.CURRENT_APPLICATION.getPid() == applicationId) continue;
+            if (Application.CURRENT_APPLICATION.getPid() == applicationPid) continue;
             
-            if (!applications.containsKey(applicationId)) {
-                JvmstatApplication application = new JvmstatApplication(host, applicationId);
-                applications.put(applicationId, new WeakReference(application));
+            JvmstatApplication application = new JvmstatApplication(host, applicationPid);
+            String appId = application.getId();
+            if (!applications.containsKey(appId)) {
+                applications.put(appId, new WeakReference(application));
                 newApplications.add(application);
             }
         }
@@ -161,14 +162,15 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         host.getRepository().addDataSources(newApplications);
     }
     
-    private void processTerminatedApplicationsByIds(Host host, Set<Integer> applicationIds) {
+    private void processTerminatedApplicationsByPids(Host host, Set<Integer> applicationPids) {
         Set<JvmstatApplication> finishedApplications = new HashSet();
         
-        for (int applicationId : applicationIds) {            
-            if (applications.containsKey(applicationId)) {
-                JvmstatApplication application = applications.get(applicationId).get();
+        for (int applicationPid : applicationPids) {
+             String appId = new JvmstatApplication(host, applicationPid).getId();
+             if (applications.containsKey(appId)) {
+                JvmstatApplication application = applications.get(appId).get();
                 if (application != null) finishedApplications.add(application);
-                applications.remove(applicationId);
+                applications.remove(appId);
             }
         }
         
