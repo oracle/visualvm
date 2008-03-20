@@ -78,16 +78,12 @@ public final class DataSourceContainer extends DataSourceProvider {
     }
     
     protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
-        
-        
-        // Perform removal implementation
         for (DataSource dataSource : removed) {
             DataSourceContainer dataSourceRepository = dataSource.getRepository();
             dataSourceRepository.unregisterDataSourcesImpl(dataSourceRepository.getDataSources());
             dataSource.removeImpl();
         }
         
-        // Notify listeners (DataSource disappears from explorer immediately)
         super.unregisterDataSourcesImpl(removed);
     }
 
