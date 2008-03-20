@@ -27,7 +27,7 @@ package net.java.visualvm.btrace.datasource;
 import com.sun.btrace.CommandListener;
 import com.sun.btrace.client.Client;
 import com.sun.btrace.comm.Command;
-import com.sun.btrace.comm.MessageCommand;
+import com.sun.btrace.comm.DataCommand;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,8 +35,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  *
@@ -44,7 +42,6 @@ import java.util.Date;
  */
 public abstract class DeployTask implements Runnable {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss:SSS");
     private Client client;
     private byte[] probeCode;
     final PipedOutputStream pos;
@@ -84,18 +81,6 @@ public abstract class DeployTask implements Runnable {
 
                 public void onCommand(Command cmd) throws IOException {
                     switch (cmd.getType()) {
-                        case Command.MESSAGE: {
-                            if (pds == null) {
-                                break;
-                            }
-                            MessageCommand msg = (MessageCommand)cmd;
-                            if (msg.getTime() > 0L) {
-                                probeWriter.print(DATE_FORMAT.format(new Date(msg.getTime())));
-                            }
-                            probeWriter.println(msg.getMessage());
-                            probeWriter.flush();
-                            break;
-                        }
                         case Command.EXIT: {
                             probeWriter.println("Probe finished ...");
                             probeWriter.flush();
@@ -113,6 +98,18 @@ public abstract class DeployTask implements Runnable {
                             probeWriter.flush();
 
                             pds = prepareProbe(DeployTask.this);
+                            break;
+                        }
+                        default: {
+                            if (cmd instanceof DataCommand) {
+                                if (pds == null) {
+                                    break;
+                                }
+                                DataCommand dcmd = (DataCommand) cmd;
+                                dcmd.print(probeWriter);
+                                probeWriter.flush();
+                            }
+                            break;
                         }
                     }
                 }
@@ -125,5 +122,6 @@ public abstract class DeployTask implements Runnable {
     }
 
     abstract protected ScriptDataSource prepareProbe(DeployTask deployer);
+
     abstract protected void removeProbe(ScriptDataSource pds);
 }
