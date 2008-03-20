@@ -43,8 +43,8 @@
             <file name="com-sun-tools-visualvm-core-datasource-descriptor-RenameDataSourceAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.datasource.descriptor.RenameDataSourceAction.getInstance"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-datasource-RemoveDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.datasource.RemoveDataSourceAction.getInstance"/>
+            <file name="com-sun-tools-visualvm-core-ui-RemoveDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.RemoveDataSourceAction.getInstance"/>
             </file>
         </folder>
         <folder name="Window">
@@ -83,8 +83,8 @@
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-datasource-descriptor-RenameDataSourceAction.instance"/>
                 <attr name="position" intvalue="700"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-datasource-RemoveDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-datasource-RemoveDataSourceAction.instance"/>
+            <file name="com-sun-tools-visualvm-core-ui-RemoveDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-RemoveDataSourceAction.instance"/>
                 <attr name="position" intvalue="800"/>
             </file>
             <file name="applications-separator2.instance">

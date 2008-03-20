@@ -150,7 +150,7 @@ public abstract class DataSource {
     
     // Performs blocking check if the DataSource can be removed in context of removeRoot
     // Here the DataSource can for example warn user about possible data loss.
-    protected boolean checkRemove(DataSource removeRoot) {
+    public boolean checkRemove(DataSource removeRoot) {
         return true;
     }
     

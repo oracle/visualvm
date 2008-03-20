@@ -83,7 +83,6 @@ public final class DataSourceContainer extends DataSourceProvider {
             dataSourceRepository.unregisterDataSourcesImpl(dataSourceRepository.getDataSources());
             dataSource.removeImpl();
         }
-        
         super.unregisterDataSourcesImpl(removed);
     }
 

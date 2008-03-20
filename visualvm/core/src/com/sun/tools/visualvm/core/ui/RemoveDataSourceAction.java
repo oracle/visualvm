@@ -22,8 +22,9 @@
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
-package com.sun.tools.visualvm.core.datasource;
+package com.sun.tools.visualvm.core.ui;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
