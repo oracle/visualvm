@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import java.util.Set;
 import org.openide.ErrorManager;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
+import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
 import sun.jvmstat.monitor.event.MonitorStatusChangeEvent;
 import sun.jvmstat.monitor.event.VmEvent;
@@ -54,9 +56,12 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     MonitoredVm monitoredVm;
     Set<JvmstatListener> listeners;
     private Map<String,String> valueCache;
+    private Integer pid;
+    private MonitoredHost monitoredHost;
 
     JvmstatModelImpl(Application app,MonitoredVm vm) {
         application = app;
+        pid = Integer.valueOf(vm.getVmIdentifier().getLocalVmId());
         monitoredVm = vm;
         valueCache = new HashMap();
         listeners = new HashSet();
@@ -144,9 +149,12 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     
     void initListeners() {
         try {
+            monitoredHost = MonitoredHost.getMonitoredHost(application.getHost().getHostName());
             monitoredVm.addVmListener(this);
         } catch (MonitorException ex) {
             ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
+        } catch (URISyntaxException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);            
         }
     }
     
@@ -177,12 +185,24 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
      */
     public void monitorsUpdated(VmEvent event) {
         assert event.getMonitoredVm().equals(monitoredVm);
-        List<JvmstatListener> listenersCopy;
-        synchronized  (listeners) {
-            listenersCopy = new ArrayList(listeners);
-        }
-        for (JvmstatListener listener : listenersCopy) {
-            listener.dataChanged(this);
+        try {
+            // check that the application is still alive
+            if (monitoredHost.activeVms().contains(pid)) {
+                List<JvmstatListener> listenersCopy;
+                synchronized  (listeners) {
+                    listenersCopy = new ArrayList(listeners);
+                }
+                for (JvmstatListener listener : listenersCopy) {
+                    listener.dataChanged(this);
+                }
+            } else { // application is not alive
+                disableListeners();
+                monitoredVm.detach();
+            }
+        } catch (MonitorException ex) {
+             ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);
+             disableListeners();
+             monitoredVm.detach();
         }
     }
     
