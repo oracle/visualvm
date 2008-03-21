@@ -41,14 +41,19 @@
 
 package com.sun.tools.visualvm.modules.appui.welcome;
 
+import com.sun.tools.visualvm.core.ui.DesktopUtils;
+import com.sun.tools.visualvm.modules.appui.AboutAction;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.openide.ErrorManager;
 import org.openide.util.NbBundle;
@@ -58,6 +63,8 @@ import org.openide.util.NbBundle;
  * @author S. Aubrecht
  */
 public class Utils {
+    
+    private final static Logger LOGGER = Logger.getLogger(AboutAction.class.getName());
     
     /** Creates a new instance of Utils */
     private Utils() {
@@ -75,12 +82,22 @@ public class Utils {
     }
 
     public static void showURL(String href) {
-        try {
-//            HtmlBrowser.URLDisplayer displayer = HtmlBrowser.URLDisplayer.getDefault();
-//            if (displayer != null) {
-//                displayer.showURL(new URL(href));
-//            }
-        } catch (Exception e) {}
+        boolean opened = false;
+        
+        if (DesktopUtils.isBrowseAvailable()) {
+            try {
+                URL url = new URL(href);
+                DesktopUtils.browse(url.toURI());
+                opened = true;
+            } catch (Exception e) {
+                LOGGER.throwing(Utils.class.getName(), "showURL", e);
+            }
+        }
+        
+        if (!opened)
+            JOptionPane.showMessageDialog(null, "<html><b>Unable to launch web browser.</b><br><br>" + 
+                    "Please open the following link manually:<br><code>" + href +
+                    "</code></html>", "Unable To Launch Web Browser", JOptionPane.ERROR_MESSAGE);
     }
 
     static int getDefaultFontSize() {
