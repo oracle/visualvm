@@ -51,9 +51,8 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         String vmId = "//" + app.getPid() + "?mode=r";
         try {
             MonitoredHost monitoredHost = MonitoredHost.getMonitoredHost(app.getHost().getHostName());
-            MonitoredVm mvm = monitoredHost.getMonitoredVm(new VmIdentifier(vmId));
-            mvm.setInterval(GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000);
-            return mvm;
+            int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
+            return monitoredHost.getMonitoredVm(new VmIdentifier(vmId),refreshInterval);
         } catch (URISyntaxException ex) {
             ErrorManager.getDefault().notify(ErrorManager.EXCEPTION,ex);
             return null;
