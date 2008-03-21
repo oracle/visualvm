@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
@@ -44,6 +45,9 @@ public final class JmxApplication extends Application {
     private int pid;
     private final JMXServiceURL url;
     private final Storage storage;
+    // since getting JVM for the first time can take a long time
+    // hard reference jvm from application so we are sure that it is not garbage collected
+    JVM jvm;
 
     public JmxApplication(Host host, JMXServiceURL url, Storage storage) {
         super(host, url.toString());

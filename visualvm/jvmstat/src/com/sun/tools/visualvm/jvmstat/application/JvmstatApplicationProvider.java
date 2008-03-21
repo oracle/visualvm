@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
@@ -165,9 +166,11 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             // Do not provide instance for Application.CURRENT_APPLICATION
             if (Application.CURRENT_APPLICATION.getPid() == applicationPid) continue;
             
-            JvmstatApplication application = new JvmstatApplication(host, createId(host, applicationPid), applicationPid);
-            String appId = application.getId();
+            String appId = createId(host, applicationPid);
+            JvmstatApplication application = new JvmstatApplication(host, appId, applicationPid);
             if (!applications.containsKey(appId)) {
+                // precompute JVM 
+                application.jvm = JVMFactory.getJVMFor(application);
                 applications.put(appId, application);
                 newApplications.add(application);
             }

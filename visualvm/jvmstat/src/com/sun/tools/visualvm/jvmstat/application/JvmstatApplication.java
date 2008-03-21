@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.JVM;
 import com.sun.tools.visualvm.host.Host;
 
 /**
@@ -35,7 +36,9 @@ import com.sun.tools.visualvm.host.Host;
 final class JvmstatApplication extends Application {   
     
     private int pid;
-    
+    // since getting JVM for the first time can take a long time
+    // hard reference jvm from application so we are sure that it is not garbage collected
+    JVM jvm;
 
     JvmstatApplication(Host host, String id, int pid) {
         super(host, id);

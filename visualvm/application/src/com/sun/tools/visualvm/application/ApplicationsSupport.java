@@ -48,10 +48,9 @@ public final class ApplicationsSupport {
     Application createCurrentApplication() {
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
         final int selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
-        Application currentApplication = new Application(Host.LOCALHOST, Host.LOCALHOST.getHostName() + "-" + selfPid) {
-            public int getPid() { return selfPid; }
-        };
-        
+        CurrentApplication currentApplication = new CurrentApplication(selfPid, Host.LOCALHOST, Host.LOCALHOST.getHostName() + "-" + selfPid);
+        // precompute JVM
+        currentApplication.jvm = JVMFactory.getJVMFor(currentApplication);
         return currentApplication;
     }
     
@@ -67,5 +66,22 @@ public final class ApplicationsSupport {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
         ApplicationActionsProvider.initialize();
         initCurrentApplication();
+    }
+
+    private class CurrentApplication extends Application {
+
+        private int selfPid;
+        // since getting JVM for the first time can take a long time
+        // hard reference jvm from application so we are sure that it is not garbage collected
+        JVM jvm;
+        
+        private CurrentApplication(int selfPid, Host host, String id) {
+            super(host, id);
+            this.selfPid = selfPid;
+        }
+
+        public int getPid() {
+            return selfPid;
+        }
     }
 }
