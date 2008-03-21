@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 
 /**
  *
@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.application.JVM;
 public class NetBeans3xApplicationType extends MainClassApplicationType {
 
 
-  NetBeans3xApplicationType(Application app,JVM jvm) {
+  NetBeans3xApplicationType(Application app,Jvm jvm) {
     super(app,"NetBeans 3.x","com/sun/tools/visualvm/application/resources/application.png");
   }
 

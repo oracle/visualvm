@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.heapdump;
 
+import com.sun.tools.visualvm.heapdump.impl.HeapDumpPluggableView;
+import com.sun.tools.visualvm.heapdump.impl.HeapDumpCategory;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpViewProvider;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpProvider;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpActionsProvider;

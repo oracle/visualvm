@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.jvm;
 
 
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.MonitoredData;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
@@ -55,9 +55,9 @@ public class MonitoredDataImpl extends MonitoredData {
   final private long[] genCapacity;
   final private long[] genUsed;
   final private long[] genMaxCapacity;
-  final private JVM jvm;
+  final private Jvm jvm;
 
-  MonitoredDataImpl(JVM vm,JvmJvmstatModel jvmstatModel) {
+  MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel) {
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();
@@ -74,7 +74,7 @@ public class MonitoredDataImpl extends MonitoredData {
     jvm = vm;
   }
 
-  MonitoredDataImpl(JVM vm,JmxSupport jmxSupport,JvmJmxModel jmxModel) {
+  MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport,JvmJmxModel jmxModel) {
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
@@ -145,7 +145,7 @@ public class MonitoredDataImpl extends MonitoredData {
     return applicationTime;
   }
 
-  public JVM getJVM() {
+  public Jvm getJVM() {
     return jvm;
   }
 

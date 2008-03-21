@@ -39,10 +39,11 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public final class DataSourceRepository extends DataSourceProvider implements DataChangeListener<DataSource> {
+public final class DataSourceRepository extends DataSourceProvider {
 
     private static DataSourceRepository sharedInstance;
 
+    private final Listener dataChangeListener = new Listener();
 
     /**
      * Returns singleton instance of DataSourceRepository.
@@ -55,26 +56,30 @@ public final class DataSourceRepository extends DataSourceProvider implements Da
     }
 
     
-    public void dataChanged(DataChangeEvent<DataSource> event) {
-        Set<DataSource> added = event.getAdded();
-        Set<DataSource> removed = event.getRemoved();
-        if (!added.isEmpty() || !removed.isEmpty()) changeDataSources(added, removed);
-    }
-    
-    
-    protected void registerDataSourcesImpl(Set<? extends DataSource> added) {
+    void registerDataSourcesImpl(Set<? extends DataSource> added) {
         super.registerDataSourcesImpl(added);
-        for (DataSource dataSource : added) dataSource.getRepository().addDataChangeListener(this, DataSource.class);
+        for (DataSource dataSource : added) dataSource.getRepository().addDataChangeListener(dataChangeListener, DataSource.class);
     }
     
-    protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
+    void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
         super.unregisterDataSourcesImpl(removed);
-        for (DataSource dataSource : removed) dataSource.getRepository().removeDataChangeListener(this);
+        for (DataSource dataSource : removed) dataSource.getRepository().removeDataChangeListener(dataChangeListener);
     }
     
     
     private DataSourceRepository() {
         registerDataSource(DataSource.ROOT);
+    }
+    
+    
+    private class Listener implements DataChangeListener<DataSource> {
+        
+        public void dataChanged(DataChangeEvent<DataSource> event) {
+            Set<DataSource> added = event.getAdded();
+            Set<DataSource> removed = event.getRemoved();
+            if (!added.isEmpty() || !removed.isEmpty()) changeDataSources(added, removed);
+        }
+        
     }
 
 }

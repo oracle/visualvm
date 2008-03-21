@@ -37,7 +37,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Utilities;
 
-public final class LoadSnapshotAction extends AbstractAction {
+class LoadSnapshotAction extends AbstractAction {
     
     private static LoadSnapshotAction instance;
     

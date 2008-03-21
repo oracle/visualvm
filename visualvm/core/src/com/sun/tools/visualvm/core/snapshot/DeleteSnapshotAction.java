@@ -35,7 +35,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 
-public final class DeleteSnapshotAction extends AbstractAction {
+class DeleteSnapshotAction extends AbstractAction {
     
     private static DeleteSnapshotAction instance;
     

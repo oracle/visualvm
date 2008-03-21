@@ -48,7 +48,7 @@ class JmxApplicationDescriptorProvider extends
         return null;
     }
     
-    public int depth() {
+    public int priority() {
         return 10;
     }
 }

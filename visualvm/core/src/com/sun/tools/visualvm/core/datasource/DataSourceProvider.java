@@ -141,7 +141,7 @@ public class DataSourceProvider {
         });
     }
     
-    protected void registerDataSourcesImpl(Set<? extends DataSource> added) {
+    void registerDataSourcesImpl(Set<? extends DataSource> added) {
         for (DataSource dataSource : added) if (dataSources.contains(dataSource))
             throw new UnsupportedOperationException("DataSource already in repository: " + dataSource);
             
@@ -149,7 +149,7 @@ public class DataSourceProvider {
         fireDataAdded(added);
     }
     
-    protected void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
+    void unregisterDataSourcesImpl(Set<? extends DataSource> removed) {
         for (DataSource dataSource : removed) if (!dataSources.contains(dataSource))
             throw new UnsupportedOperationException("DataSource not in repository: " + dataSource);
         

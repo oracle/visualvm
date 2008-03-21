@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.application.jvm;
 
 /**
  * A "monitoredDataEvent" event is periodically fired by {@link JVM}.

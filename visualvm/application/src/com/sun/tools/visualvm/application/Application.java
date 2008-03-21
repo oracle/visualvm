@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.application;
 
+import com.sun.tools.visualvm.application.ApplicationSupport;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -41,7 +42,7 @@ public abstract class Application extends DataSource implements Stateful {
     /**
      * Instance representing actually running VisualVM application.
      */
-    public static final Application CURRENT_APPLICATION = ApplicationsSupport.getInstance().createCurrentApplication();
+    public static final Application CURRENT_APPLICATION = ApplicationSupport.getInstance().createCurrentApplication();
     
     /**
      * Process ID of the application is unknown.
@@ -69,7 +70,7 @@ public abstract class Application extends DataSource implements Stateful {
     }
 
 
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
@@ -77,16 +78,16 @@ public abstract class Application extends DataSource implements Stateful {
         return UNKNOWN_PID;
     }
 
-    public Host getHost() {
+    public final Host getHost() {
         return host;
     }
 
-    public boolean isLocalApplication() {
+    public final boolean isLocalApplication() {
         return Host.LOCALHOST.equals(getHost());
     }
     
     
-    public synchronized int getState() {
+    public final int getState() {
         return state;
     }
     
@@ -97,11 +98,11 @@ public abstract class Application extends DataSource implements Stateful {
     }
     
     
-    public int hashCode() {
+    public final int hashCode() {
         return getId().hashCode();
     }
 
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (!(obj instanceof Application)) return false;
         Application app = (Application) obj;
         return getId().equals(app.getId());

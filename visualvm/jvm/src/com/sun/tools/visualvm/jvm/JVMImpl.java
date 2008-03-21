@@ -26,9 +26,9 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.MonitoredData;
-import com.sun.tools.visualvm.application.MonitoredDataListener;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.host.Host;
@@ -57,7 +57,7 @@ import java.util.Set;
  *
  * @author Tomas Hurka
  */
-public class JVMImpl extends JVM implements JvmstatListener {
+public class JVMImpl extends Jvm implements JvmstatListener {
     private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";
     Application application;
     Boolean isDumpOnOOMEnabled;

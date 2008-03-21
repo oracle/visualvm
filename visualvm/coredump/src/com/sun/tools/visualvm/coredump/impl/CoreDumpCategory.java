@@ -23,15 +23,16 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package com.sun.tools.visualvm.coredump.impl;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.coredump.CoreDump;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class CoreDumpCategory extends SnapshotCategory<CoreDump> {
+public class CoreDumpCategory extends SnapshotCategory<CoreDump> {
     
     private static final String NAME = "Core Dumps";
     private static final String PREFIX = null;

@@ -23,12 +23,12 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.threads;
+package com.sun.tools.visualvm.application.views.threads;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -63,7 +63,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private DataViewComponent view;
     private Application application;
-    private JVM jvm;
+    private Jvm jvm;
     private ThreadMXBean threadBean;
     private ThreadMXBeanDataManager threadsManager;
     private Timer timer;
@@ -76,7 +76,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     }
     
     protected void willBeAdded() {
-        jvm = JVMFactory.getJVMFor(application);
+        jvm = JvmFactory.getJVMFor(application);
         threadsManager = new ThreadMXBeanDataManager(application, threadBean);
     }
         
@@ -137,7 +137,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         private JButton threadDumpButton;
         
         
-        public MasterViewSupport(Application application, JVM jvm, ThreadMXBeanDataManager threadsManager, Timer timer) {
+        public MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager, Timer timer) {
             initComponents(application, jvm, threadsManager, timer);
         }
         
@@ -155,7 +155,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
         
         
-        private void initComponents(final Application application, JVM jvm, final ThreadMXBeanDataManager threadsManager, Timer timer) {
+        private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager, Timer timer) {
             setLayout(new BorderLayout());
             
             area = new HTMLTextArea();

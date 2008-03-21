@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.threads;
+package com.sun.tools.visualvm.application.views.threads;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;

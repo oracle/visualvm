@@ -35,24 +35,4 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-class SnapshotsContainerDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
-    
-    SnapshotsContainerDescriptorProvider() {
-    }
-    
-    public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (SnapshotsContainer.sharedInstance().equals(ds)) {
-            return new SnapshotsContainerDescriptor();
-        }
-        return null;
-    }
-    
-    private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
-        
-        SnapshotsContainerDescriptor() {
-            super(SnapshotsContainer.sharedInstance(), "Snapshots", null, NODE_ICON, 30, EXPAND_ON_FIRST_CHILD);
-        }
-        
-    }
-}
+

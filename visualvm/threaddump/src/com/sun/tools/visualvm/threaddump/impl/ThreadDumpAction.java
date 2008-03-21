@@ -31,8 +31,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -94,7 +94,7 @@ public final class ThreadDumpAction extends AbstractAction {
         for (DataSource dataSource : threadDumpAbleDataSources)
             if (dataSource instanceof Application) {
                 Application application = (Application) dataSource;
-                JVM jvm = JVMFactory.getJVMFor(application);
+                Jvm jvm = JvmFactory.getJVMFor(application);
                 if (jvm == null || !jvm.isTakeThreadDumpSupported()) return false;
             }
         return true;

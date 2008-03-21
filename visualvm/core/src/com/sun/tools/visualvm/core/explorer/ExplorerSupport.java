@@ -44,7 +44,7 @@ import javax.swing.tree.TreePath;
  *
  * @author Jiri Sedlacek
  */
-public class ExplorerSupport {
+public final class ExplorerSupport {
 
     private static ExplorerSupport sharedInstance;
 

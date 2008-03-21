@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
 import java.util.Iterator;
@@ -43,7 +43,7 @@ public class NetBeansApplicationType extends ApplicationType {
   Set<String> clusters;
   private static final String NB_CLUSTER = "nb";    // NOI18N
 
-  NetBeansApplicationType(Application app,JVM jvm,Set<String> cls) {
+  NetBeansApplicationType(Application app,Jvm jvm,Set<String> cls) {
     application = app;
     clusters = cls;
   }

@@ -26,9 +26,11 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -46,13 +48,31 @@ public final class SnapshotsContainer extends DataSource {
     
     
     private SnapshotsContainer() {
-//        getRepository().addDataChangeListener(new DataChangeListener() {
-//            public void dataChanged(DataChangeEvent event) {
-//                setVisible(!event.getCurrent().isEmpty());
-//            }
-//        }, DataSource.class);
         DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
         DataSource.ROOT.getRepository().addDataSource(this);
+    }
+    
+    
+    private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
+            private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
+
+            SnapshotsContainerDescriptor() {
+                super(SnapshotsContainer.sharedInstance(), "Snapshots", null, NODE_ICON, 30, EXPAND_ON_FIRST_CHILD);
+            }
+
+        }
+    
+    private class SnapshotsContainerDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
+    
+        SnapshotsContainerDescriptorProvider() {
+        }
+
+        public DataSourceDescriptor createModelFor(DataSource ds) {
+            if (SnapshotsContainer.sharedInstance().equals(ds)) {
+                return new SnapshotsContainerDescriptor();
+            }
+            return null;
+        }
     }
 
 }

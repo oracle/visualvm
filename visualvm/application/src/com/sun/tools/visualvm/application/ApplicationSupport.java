@@ -25,22 +25,24 @@
 
 package com.sun.tools.visualvm.application;
 
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
-import org.openide.util.RequestProcessor;
+import org.openide.windows.WindowManager;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class ApplicationsSupport {
+final class ApplicationSupport {
 
-    private static ApplicationsSupport instance;
+    private static ApplicationSupport instance;
 
-    public static synchronized ApplicationsSupport getInstance() {
+    public static synchronized ApplicationSupport getInstance() {
         if (instance == null) {
-            instance = new ApplicationsSupport();
+            instance = new ApplicationSupport();
         }
         return instance;
     }
@@ -50,19 +52,19 @@ public final class ApplicationsSupport {
         final int selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
         CurrentApplication currentApplication = new CurrentApplication(selfPid, Host.LOCALHOST, Host.LOCALHOST.getHostName() + "-" + selfPid);
         // precompute JVM
-        currentApplication.jvm = JVMFactory.getJVMFor(currentApplication);
+        currentApplication.jvm = JvmFactory.getJVMFor(currentApplication);
         return currentApplication;
     }
     
     private void initCurrentApplication() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 Host.LOCALHOST.getRepository().addDataSource(Application.CURRENT_APPLICATION);
             }
         });
     }
 
-    private ApplicationsSupport() {
+    private ApplicationSupport() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
         ApplicationActionsProvider.initialize();
         initCurrentApplication();
@@ -73,7 +75,7 @@ public final class ApplicationsSupport {
         private int selfPid;
         // since getting JVM for the first time can take a long time
         // hard reference jvm from application so we are sure that it is not garbage collected
-        JVM jvm;
+        Jvm jvm;
         
         private CurrentApplication(int selfPid, Host host, String id) {
             super(host, id);

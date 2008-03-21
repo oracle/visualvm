@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -327,7 +327,7 @@ class ApplicationProfilerView extends DataSourceView {
               GridBagConstraints constraints;
 
               // classShareWarningLabel
-              boolean classSharingOn = JVMFactory.getJVMFor(application).getVMInfo().contains("sharing");
+              boolean classSharingOn = JvmFactory.getJVMFor(application).getVMInfo().contains("sharing");
               classShareWarningArea = new HTMLTextArea() {
                   protected void showURL(URL url) { 
                       try { DesktopUtils.browse(url.toURI()); } catch (Exception e) {}

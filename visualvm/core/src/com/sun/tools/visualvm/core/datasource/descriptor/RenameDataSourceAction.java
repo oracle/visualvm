@@ -35,12 +35,12 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.RequestProcessor;
 
-public final class RenameDataSourceAction extends AbstractAction {
+class RenameDataSourceAction extends AbstractAction {
     
     private static RenameDataSourceAction instance;
     
     
-    public static synchronized RenameDataSourceAction getInstance() {
+    static synchronized RenameDataSourceAction getInstance() {
         if (instance == null) instance = new RenameDataSourceAction();
         return instance;
     }

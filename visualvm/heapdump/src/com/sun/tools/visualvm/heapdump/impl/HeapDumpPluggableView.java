@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.heapdump;
+package com.sun.tools.visualvm.heapdump.impl;
 
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
  *
  * @author Jiri Sedlacek
  */
-public class HeapDumpPluggableView extends PluggableViewSupport<HeapDump> {
+public final class HeapDumpPluggableView extends PluggableViewSupport<HeapDump> {
 
     public <X extends HeapDump> boolean allowsNewArea(X dataSource, int location) {
         return true;

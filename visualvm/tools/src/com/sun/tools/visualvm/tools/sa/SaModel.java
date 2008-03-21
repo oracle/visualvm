@@ -26,11 +26,7 @@
 package com.sun.tools.visualvm.tools.sa;
 
 import com.sun.tools.visualvm.core.model.Model;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.util.Properties;
-import org.openide.ErrorManager;
 
 /**
  *

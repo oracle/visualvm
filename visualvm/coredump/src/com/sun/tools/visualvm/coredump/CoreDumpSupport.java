@@ -25,12 +25,12 @@
 
 package com.sun.tools.visualvm.coredump;
 
+import com.sun.tools.visualvm.coredump.impl.CoreDumpCategory;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;

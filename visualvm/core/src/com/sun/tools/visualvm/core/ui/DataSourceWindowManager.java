@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
 /**

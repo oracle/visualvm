@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
@@ -48,7 +48,7 @@ class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Applica
 
     public boolean supportsViewsFor(Application application) {
         if (Application.CURRENT_APPLICATION.equals(application) || application.getHost() != Host.LOCALHOST) return false;
-        JVM jvm = JVMFactory.getJVMFor(application);
+        Jvm jvm = JvmFactory.getJVMFor(application);
         return jvm.isAttachable() && !jvm.is14() && !jvm.is15();
     }
 

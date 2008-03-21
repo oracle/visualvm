@@ -25,8 +25,8 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -89,7 +89,7 @@ public final class ProfileApplicationAction extends AbstractAction {
     boolean isAvailable(Application application) {
         if (!isEnabled(application)) return false;
         
-        JVM jvm = JVMFactory.getJVMFor(application);
+        Jvm jvm = JvmFactory.getJVMFor(application);
         return jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
     }
     

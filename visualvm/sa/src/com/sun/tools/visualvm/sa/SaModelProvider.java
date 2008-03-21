@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.sa;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.coredump.CoreDump;
@@ -53,7 +53,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
         if (ds instanceof Application) {
             Application app = (Application) ds;
             if (Host.LOCALHOST.equals(app.getHost())) {
-                JVM jvm = JVMFactory.getJVMFor(app);
+                Jvm jvm = JvmFactory.getJVMFor(app);
                 File jdkHome = new File(jvm.getJavaHome());
                 File saJar = getSaJar(jdkHome);
 

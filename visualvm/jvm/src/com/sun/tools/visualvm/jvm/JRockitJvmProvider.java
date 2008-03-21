@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -44,7 +44,7 @@ import java.lang.management.RuntimeMXBean;
  */
 public class JRockitJvmProvider extends JvmProvider {
     
-    public JVM createModelFor(Application app) {
+    public Jvm createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         JRockitJVMImpl jvm = null;
         

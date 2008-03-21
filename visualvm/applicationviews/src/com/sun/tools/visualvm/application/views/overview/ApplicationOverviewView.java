@@ -23,11 +23,11 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.overview;
+package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -60,7 +60,7 @@ class ApplicationOverviewView extends DataSourceView {
     
     
     protected void willBeAdded() {
-        JVMFactory.getJVMFor(application); 
+        JvmFactory.getJVMFor(application); 
     }
     
     public DataViewComponent getView() {
@@ -80,7 +80,7 @@ class ApplicationOverviewView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(false));
         Properties jvmProperties = null;
         String jvmargs = null;
-        JVM jvm = JVMFactory.getJVMFor(application);
+        Jvm jvm = JvmFactory.getJVMFor(application);
         if (jvm.isBasicInfoSupported()) {
             jvmargs = jvm.getJvmArgs();
         }
@@ -127,7 +127,7 @@ class ApplicationOverviewView extends DataSourceView {
         }
         
         private String getGeneralProperties(Application application) {
-          JVM jvm = JVMFactory.getJVMFor(application);
+          Jvm jvm = JvmFactory.getJVMFor(application);
           StringBuilder data = new StringBuilder();
 
           // Application information

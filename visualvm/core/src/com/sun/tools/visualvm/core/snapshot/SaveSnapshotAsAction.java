@@ -36,7 +36,7 @@ import javax.swing.ImageIcon;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Utilities;
 
-public final class SaveSnapshotAsAction extends AbstractAction {
+class SaveSnapshotAsAction extends AbstractAction {
     
     private static SaveSnapshotAsAction instance;
     

@@ -61,7 +61,7 @@ public abstract class CoreDump extends Snapshot {
         }
     }
     
-    public String getExecutable() {
+    public final String getExecutable() {
         String home = getJDKHome();
         
         String exec = home+File.separatorChar+"bin"+File.separatorChar+"java";
@@ -71,7 +71,7 @@ public abstract class CoreDump extends Snapshot {
         return exec;
     }
     
-    public String getJDKHome() {
+    public final String getJDKHome() {
         return jdkHome.getAbsolutePath();
     }
     

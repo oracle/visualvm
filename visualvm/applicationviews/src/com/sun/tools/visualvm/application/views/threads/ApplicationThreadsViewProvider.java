@@ -23,12 +23,14 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.overview;
+package com.sun.tools.visualvm.application.views.threads;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,19 +40,20 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application>{
+public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application>{
     
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
     
 
     public boolean supportsViewsFor(Application application) {
-        return true;
+        JvmJmxModel jmx = JvmJmxModelFactory.getJvmJmxModelFor(application);
+        return jmx != null && jmx.getThreadMXBean() != null;
     }
 
     public synchronized Set<? extends DataSourceView> getViews(final Application application) {
         DataSourceView view = viewsCache.get(application);
         if (view == null) {
-            view = new ApplicationOverviewView(application) {
+            view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean()) {
                 public void removed() {
                     super.removed();
                     viewsCache.remove(application);

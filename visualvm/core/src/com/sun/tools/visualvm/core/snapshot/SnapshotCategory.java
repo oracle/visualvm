@@ -75,7 +75,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * 
      * @return name of the category.
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -84,7 +84,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * 
      * @return type of snapshots described by this category.
      */
-    public Class<X> getType() {
+    public final Class<X> getType() {
         return type;
     }
     
@@ -93,7 +93,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * 
      * @return preferred position of this category within other categories when presented in UI.
      */
-    public int getPreferredPosition() {
+    public final int getPreferredPosition() {
         return preferredPosition;
     }
     
@@ -112,7 +112,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * 
      * @return prefix of files containing the snapshots.
      */
-    protected String getPrefix() {
+    protected final String getPrefix() {
         return prefix;
     }
     
@@ -121,7 +121,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * 
      * @return suffix of files containing the snapshots.
      */
-    protected String getSuffix() {
+    protected final String getSuffix() {
         return suffix;
     }
     

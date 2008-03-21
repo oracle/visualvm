@@ -37,7 +37,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
  *
  * @author Jiri Sedlacek
  */
-public class JExtendedSplitPane extends JSplitPane {
+class JExtendedSplitPane extends JSplitPane {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class SplitPaneComponentListener extends ComponentAdapter {

@@ -51,7 +51,7 @@ import javax.swing.SwingUtilities;
  *
  * @author Jiri Sedlacek
  */
-public class DisplayArea extends JComponent {
+class DisplayArea extends JComponent {
 
     private boolean ignoresContentsHeight = true;
 

@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.overview;
+package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;

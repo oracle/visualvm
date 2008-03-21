@@ -39,7 +39,7 @@ import org.openide.util.Utilities;
  * @author Jiri Sedlacek
  */
 // TODO: should be moved to private package
-public final class ExplorerTopComponentAction extends AbstractAction {
+class ExplorerTopComponentAction extends AbstractAction {
     
     private static Action instance;
     

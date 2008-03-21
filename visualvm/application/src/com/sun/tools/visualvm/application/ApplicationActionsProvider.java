@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.application;
 
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
@@ -67,7 +69,7 @@ class ApplicationActionsProvider {
                 public void run() {
                     Set<Application> apps = (Set<Application>)e.getSource();
                     if (apps.size() != 1) return;
-                    JVM jvm = JVMFactory.getJVMFor(apps.iterator().next());
+                    Jvm jvm = JvmFactory.getJVMFor(apps.iterator().next());
                     jvm.setDumpOnOOMEnabled(oomeEnabled);
                 }
             });
@@ -85,7 +87,7 @@ class ApplicationActionsProvider {
             Set<ExplorerActionDescriptor> actions =
                     new HashSet<ExplorerActionDescriptor>();
             if (apps.size() == 1) {
-                JVM jvm = JVMFactory.getJVMFor(apps.iterator().next());
+                Jvm jvm = JvmFactory.getJVMFor(apps.iterator().next());
                 if (jvm.isDumpOnOOMEnabledSupported()) {
                     actions.add(new ExplorerActionDescriptor(null, 60));
                     actions.add(new ExplorerActionDescriptor(

@@ -27,8 +27,8 @@ package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 
 /**
  *
@@ -41,7 +41,7 @@ public class JavaWebStartApplicationTypeFactory
 
     @Override
     public ApplicationType createModelFor(Application application) {
-        JVM jvm = JVMFactory.getJVMFor(application);
+        Jvm jvm = JvmFactory.getJVMFor(application);
         if (jvm.isBasicInfoSupported()) {
             String args = jvm.getJvmArgs();
             int jws_index = args.indexOf(JWS);

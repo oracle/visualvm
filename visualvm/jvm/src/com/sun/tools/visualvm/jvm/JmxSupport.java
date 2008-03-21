@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.jvm;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.MonitoredData;
+import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;

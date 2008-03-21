@@ -26,9 +26,9 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.MonitoredData;
-import com.sun.tools.visualvm.application.MonitoredDataListener;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.host.Host;

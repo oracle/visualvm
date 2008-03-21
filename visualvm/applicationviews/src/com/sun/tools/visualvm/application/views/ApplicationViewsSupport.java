@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.application.views;
 
-import com.sun.tools.visualvm.application.threads.ApplicationThreadsPluggableView;
-import com.sun.tools.visualvm.application.overview.ApplicationOverviewPluggableView;
-import com.sun.tools.visualvm.application.monitor.ApplicationMonitorPluggableView;
+import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsPluggableView;
+import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewPluggableView;
+import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorPluggableView;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.monitor.ApplicationMonitorViewProvider;
-import com.sun.tools.visualvm.application.overview.ApplicationOverviewViewProvider;
-import com.sun.tools.visualvm.application.threads.ApplicationThreadsViewProvider;
+import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorViewProvider;
+import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider;
+import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsViewProvider;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 
 /**

@@ -120,24 +120,24 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         return autoExpansionPolicy;
     }
     
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public final void addPropertyChangeListener(PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(listener);
     }
 
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public final void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(propertyName, listener);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    public final void removePropertyChangeListener(PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public final void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(propertyName, listener);
     }
     
     
-    protected X getDataSource() {
+    protected final X getDataSource() {
         return dataSource;
     }
     
@@ -167,7 +167,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, newPolicy);
     }
     
-    protected PropertyChangeSupport getChangeSupport() {
+    protected final PropertyChangeSupport getChangeSupport() {
         return changeSupport;
     }
 

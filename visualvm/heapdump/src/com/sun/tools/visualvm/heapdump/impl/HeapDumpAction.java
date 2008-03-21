@@ -30,8 +30,8 @@ import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -93,7 +93,7 @@ public final class HeapDumpAction extends AbstractAction {
         for (DataSource dataSource : heapDumpAbleDataSources)
             if (dataSource instanceof Application) {
                 Application application = (Application) dataSource;
-                JVM jvm = JVMFactory.getJVMFor(application);
+                Jvm jvm = JvmFactory.getJVMFor(application);
                 if (jvm == null || !jvm.isTakeHeapDumpSupported()) return false;
             }
         return true;

@@ -23,18 +23,18 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.heapdump;
+package com.sun.tools.visualvm.heapdump.impl;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpImpl;
+import com.sun.tools.visualvm.heapdump.HeapDump;
 import java.io.File;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class HeapDumpCategory extends SnapshotCategory<HeapDump> {
+public class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     
     private static final String NAME = "Heap Dumps";
     private static final String PREFIX = "heapdump";

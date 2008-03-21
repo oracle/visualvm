@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -47,7 +47,7 @@ public class DefaultApplicationType extends ApplicationType  {
     
     public String getName() {
         if (name == null) {
-            JVM jvm = JVMFactory.getJVMFor(application);
+            Jvm jvm = JvmFactory.getJVMFor(application);
             String mainClassName = null;
             if (jvm.isBasicInfoSupported()) {
                 mainClassName = jvm.getMainClass();

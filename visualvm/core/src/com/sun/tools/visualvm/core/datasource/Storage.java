@@ -81,7 +81,7 @@ public final class Storage {
     }
     
     
-    public synchronized File getDirectory() {
+    public File getDirectory() {
         if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);
         return directory;
     }

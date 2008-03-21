@@ -32,7 +32,7 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
-public final class GeneralOptionsCategory extends OptionsCategory {
+class GeneralOptionsCategory extends OptionsCategory {
 
     public Icon getIcon() {
         return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/options.png"));

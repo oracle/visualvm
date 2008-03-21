@@ -26,8 +26,8 @@
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.Application;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +90,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
     }
     
     public ApplicationType createModelFor(Application appl) {
-        JVM jvm = JVMFactory.getJVMFor(appl);
+        Jvm jvm = JvmFactory.getJVMFor(appl);
             
         if (jvm.isBasicInfoSupported()) {
             String mainClass = jvm.getMainClass();
@@ -101,7 +101,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         return null;
     }
     
-    public ApplicationType createApplicationTypeFor(Application app, JVM jvm, String mainClass) {
+    public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
         String[] appDesc = map.get(mainClass);
         if (appDesc != null) {
             return new MainClassApplicationType(app,appDesc[NAME],appDesc[ICON_PATH]);

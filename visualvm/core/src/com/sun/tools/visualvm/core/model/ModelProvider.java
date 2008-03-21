@@ -34,5 +34,5 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 public interface ModelProvider<M extends Model,B extends DataSource> {
 
   M createModelFor(B app);
-  int depth();
+  int priority();
 }

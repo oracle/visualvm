@@ -71,11 +71,11 @@ public abstract class Snapshot extends DataSource {
     
 
     // NOTE: file can be null (snapshot not saved or doesn't support saving to file)
-    public File getFile() {
+    public final File getFile() {
         return file;
     }
     
-    public SnapshotCategory getCategory() {
+    public final SnapshotCategory getCategory() {
         return category;
     }
     
@@ -84,7 +84,7 @@ public abstract class Snapshot extends DataSource {
      * 
      * @param newFile file where data of this snapshot are stored.
      */
-    protected void setFile(File newFile) {
+    protected final void setFile(File newFile) {
         if (file == null && newFile == null) return;
         File oldFile = file;
         file = newFile;

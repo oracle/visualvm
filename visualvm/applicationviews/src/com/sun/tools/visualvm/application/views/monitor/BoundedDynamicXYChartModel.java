@@ -38,7 +38,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package com.sun.tools.visualvm.application.monitor;
+package com.sun.tools.visualvm.application.views.monitor;
 
 import java.awt.Color;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;

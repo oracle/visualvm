@@ -38,7 +38,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 
-public final class RemoveDataSourceAction extends AbstractAction {
+class RemoveDataSourceAction extends AbstractAction {
     
     private static RemoveDataSourceAction instance;
     

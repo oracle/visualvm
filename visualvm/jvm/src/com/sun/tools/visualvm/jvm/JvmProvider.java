@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -39,9 +39,9 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
  *
  * @author Tomas Hurka
  */
-public class JvmProvider extends AbstractModelProvider<JVM,Application> {
+public class JvmProvider extends AbstractModelProvider<Jvm,Application> {
     
-    public JVM createModelFor(Application app) {
+    public Jvm createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         JVMImpl jvm = null;
         

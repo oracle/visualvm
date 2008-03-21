@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.application.jvm;
 
 import com.sun.tools.visualvm.core.model.Model;
 import java.io.File;
@@ -36,8 +36,8 @@ import java.util.logging.Logger;
  * {@link JVMFactory.getJVMFor()} to get instance of JVM class.
  * @author Tomas Hurka
  */
-public abstract class JVM extends Model {
-    protected static final Logger LOGGER = Logger.getLogger(JVM.class.getName());
+public abstract class Jvm extends Model {
+    protected static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
     
     /**
      * Tests if target JVM is JRE 1.4.

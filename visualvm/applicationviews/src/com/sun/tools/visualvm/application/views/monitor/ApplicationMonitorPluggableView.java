@@ -23,36 +23,29 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package com.sun.tools.visualvm.application.views.monitor;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import java.awt.Image;
-import org.openide.util.Utilities;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+
 
 /**
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-class CoreDumpContainerDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
-    
-    public CoreDumpContainerDescriptorProvider() {
-    }
-    
-    public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (CoreDumpsContainer.sharedInstance().equals(ds)) {
-            return new CoreDumpsContainerDescriptor();
-        }
-        return null;
+public class ApplicationMonitorPluggableView extends PluggableViewSupport<Application> {
+
+    public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
+        return false;
     }
 
-    private static class CoreDumpsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredumps.png", true);
-        
-        CoreDumpsContainerDescriptor() {
-            super(CoreDumpsContainer.sharedInstance(), "VM Coredumps", null, NODE_ICON, 20, EXPAND_ON_EACH_NEW_CHILD);
-        }
-        
+    public <X extends Application> boolean allowsNewView(X dataSource, int location) {
+        return true;
     }
+
+    <X extends Application> void makeCustomizations(DataViewComponent view, X dataSource) {
+        super.customizeView(view, dataSource);
+    }
+
 }

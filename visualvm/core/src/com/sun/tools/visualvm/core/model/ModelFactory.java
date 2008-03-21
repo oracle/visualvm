@@ -29,7 +29,6 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.ClassNameComparator;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataChangeSupport;
-import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -118,15 +117,15 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         return removed;
     }
     
-    public void addFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
+    public final void addFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
         factoryChange.addChangeListener(listener);
     }
     
-    public void removeFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
+    public final void removeFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
         factoryChange.removeChangeListener(listener);
     }
     
-    public int depth() {
+    public int priority() {
         return -1;
     }
     
@@ -137,8 +136,8 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     private class ModelProviderComparator implements Comparator<ModelProvider<M,D>> {
         
         public int compare(ModelProvider<M, D> factory1, ModelProvider<M, D> factory2) {
-            int thisVal = factory1.depth();
-            int anotherVal = factory2.depth();
+            int thisVal = factory1.priority();
+            int anotherVal = factory2.priority();
             
             if (thisVal<anotherVal) {
                 return 1;

@@ -23,29 +23,46 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.monitor;
+package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-
+import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationMonitorPluggableView extends PluggableViewSupport<Application> {
+public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application>{
+    
+    private final Map<Application, DataSourceView> viewsCache = new HashMap();
+    
 
-    public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
-        return false;
-    }
-
-    public <X extends Application> boolean allowsNewView(X dataSource, int location) {
+    public boolean supportsViewsFor(Application application) {
         return true;
     }
 
-    <X extends Application> void makeCustomizations(DataViewComponent view, X dataSource) {
-        super.customizeView(view, dataSource);
+    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
+        DataSourceView view = viewsCache.get(application);
+        if (view == null) {
+            view = new ApplicationOverviewView(application) {
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(application);
+                }
+            };
+            viewsCache.put(application, view);
+        }
+        return Collections.singleton(view);
+    }
+
+    public void initialize() {
+        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }

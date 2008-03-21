@@ -23,9 +23,8 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.application.jvm;
 
-import com.sun.tools.visualvm.application.Application;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -34,10 +33,10 @@ import java.util.Properties;
  *
  * @author Tomas Hurka
  */
-class DefaultJVM extends JVM {
+class DefaultJvm extends Jvm {
 
 
-  DefaultJVM() {
+  DefaultJvm() {
 
   }
 

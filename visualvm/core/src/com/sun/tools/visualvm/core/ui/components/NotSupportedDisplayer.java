@@ -35,7 +35,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
  *
  * @author Jiri Sedlacek
  */
-public class NotSupportedDisplayer extends JPanel {
+public final class NotSupportedDisplayer extends JPanel {
 
     public static final String APPLICATION = "application";
     public static final String JVM = "JVM";

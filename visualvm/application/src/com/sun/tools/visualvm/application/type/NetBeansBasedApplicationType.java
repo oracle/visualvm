@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
 import java.util.Set;
@@ -42,7 +42,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
   String branding;
   Set<String> clusters;
 
-  NetBeansBasedApplicationType(Application app,JVM jvm,Set<String> cls, String br) {
+  NetBeansBasedApplicationType(Application app,Jvm jvm,Set<String> cls, String br) {
     application = app;
     clusters = cls;
     branding = br;

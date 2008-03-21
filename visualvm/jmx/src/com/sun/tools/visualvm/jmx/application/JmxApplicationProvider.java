@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -240,7 +240,7 @@ class JmxApplicationProvider {
             return;
         }
         // precompute JVM
-        application.jvm = JVMFactory.getJVMFor(application);
+        application.jvm = JvmFactory.getJVMFor(application);
         // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
     }

@@ -35,7 +35,7 @@ public abstract class AbstractModelProvider<M extends Model,B extends DataSource
 
   public abstract M createModelFor(B app);
 
-  public int depth() {
+  public int priority() {
     int depth = 1;
     Class cls = getClass();
 

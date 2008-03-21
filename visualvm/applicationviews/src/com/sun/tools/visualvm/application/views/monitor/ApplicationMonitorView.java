@@ -23,14 +23,14 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.monitor;
+package com.sun.tools.visualvm.application.views.monitor;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
-import com.sun.tools.visualvm.application.MonitoredData;
-import com.sun.tools.visualvm.application.MonitoredDataListener;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -73,7 +73,7 @@ class ApplicationMonitorView extends DataSourceView {
 
     private DataViewComponent view;
     private Application application;
-    private JVM jvm;
+    private Jvm jvm;
     private MemoryMXBean memoryMXBean;
     private MonitoredDataListener monitoredDataListener;
     
@@ -84,7 +84,7 @@ class ApplicationMonitorView extends DataSourceView {
     }
     
     protected void willBeAdded() {
-        jvm = JVMFactory.getJVMFor(application);
+        jvm = JvmFactory.getJVMFor(application);
         JvmJmxModel jvmJmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
         memoryMXBean = jvmJmxModel == null ? null : jvmJmxModel.getMemoryMXBean();
     }
@@ -151,13 +151,13 @@ class ApplicationMonitorView extends DataSourceView {
     private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application> {
         
         private Application application;
-        private JVM jvm;
+        private Jvm jvm;
         private MemoryMXBean memoryMXBean;
         private HTMLTextArea area;
         private JButton gcButton;
         private JButton heapDumpButton;
         
-        public MasterViewSupport(Application application, JVM jvm, MemoryMXBean memoryMXBean) {
+        public MasterViewSupport(Application application, Jvm jvm, MemoryMXBean memoryMXBean) {
             this.application = application;
             this.jvm = jvm;
             this.memoryMXBean = memoryMXBean;
@@ -269,7 +269,7 @@ class ApplicationMonitorView extends DataSourceView {
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public HeapViewSupport(JVM jvm) {
+        public HeapViewSupport(Jvm jvm) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
             initComponents();
         }        
@@ -381,7 +381,7 @@ class ApplicationMonitorView extends DataSourceView {
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public PermGenViewSupport(JVM jvm) {
+        public PermGenViewSupport(Jvm jvm) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
             initComponents();
         }        
@@ -493,7 +493,7 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel unloadedSharedClassesLabel;
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public ClassesViewSupport(JVM jvm) {
+        public ClassesViewSupport(Jvm jvm) {
             classMonitoringSupported = jvm.isClassMonitoringSupported();
             initComponents();
         }        
@@ -616,7 +616,7 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel startedThreadsLabel;
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
         
-        public ThreadsViewSupport(JVM jvm) {
+        public ThreadsViewSupport(Jvm jvm) {
             threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
             initComponents();
         }        

@@ -46,7 +46,7 @@ import org.openide.util.NbPreferences;
  *
  * @author Jaroslav Bachorik
  */
-public class GlobalPreferences implements PreferenceChangeListener {
+public final class GlobalPreferences implements PreferenceChangeListener {
     private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");
 
     private static final String INT_KEY_MONHOST_POLL = "MonitoredHostPoll";

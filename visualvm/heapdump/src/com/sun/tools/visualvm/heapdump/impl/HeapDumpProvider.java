@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.tools.sa.SaModel;
@@ -74,7 +74,7 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
     public void createHeapDump(final Application application, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                JVM jvm = JVMFactory.getJVMFor(application);
+                Jvm jvm = JvmFactory.getJVMFor(application);
                 if (!jvm.isTakeHeapDumpSupported()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.application.jvm;
 
 /**
  *
@@ -44,7 +44,7 @@ public abstract class MonitoredData {
   protected long[] genCapacity;
   protected long[] genUsed;
   protected long[] genMaxCapacity;
-  protected JVM monitoredVm;
+  protected Jvm monitoredVm;
   
   
   public long getLoadedClasses() {
@@ -83,7 +83,7 @@ public abstract class MonitoredData {
     return applicationTime;
   }
 
-  public JVM getMonitoredVm() {
+  public Jvm getMonitoredVm() {
     return monitoredVm;
   }
 

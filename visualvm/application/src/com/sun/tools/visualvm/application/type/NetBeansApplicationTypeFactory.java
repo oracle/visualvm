@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,7 +46,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
   private static final String MAIN_CLASS = "org.netbeans.Main";
   private static final Pattern nbcluster_pattern = Pattern.compile("nb[0-9]+\\.[0-9]+");
 
-  protected Set<String> computeClusters(JVM jvm) {
+  protected Set<String> computeClusters(Jvm jvm) {
     String args = jvm.getJvmArgs();
     int clusterIndex = args.indexOf(NETBEANS_DIRS);
     String pathSeparator = jvm.getJavaHome().contains("\\")?";":":";
@@ -72,7 +72,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
     return Collections.unmodifiableSet(clusters);
   }
   
-  protected String getBranding(JVM jvm) {
+  protected String getBranding(Jvm jvm) {
     String args = jvm.getMainArgs();
     if (args != null) {
       int brandingOffset = args.indexOf(BRANDING_ID);
@@ -88,7 +88,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
     return null;
   }
 
-  public ApplicationType createApplicationTypeFor(Application app, JVM jvm, String mainClass) {
+  public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
     if (MAIN_CLASS.equals(mainClass)) {
       String branding = getBranding(jvm);
       if (VISUALVM_ID.equals(branding)) {

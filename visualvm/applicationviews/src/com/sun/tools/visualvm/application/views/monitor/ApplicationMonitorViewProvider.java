@@ -23,11 +23,11 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.monitor;
+package com.sun.tools.visualvm.application.views.monitor;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
@@ -46,7 +46,7 @@ public class ApplicationMonitorViewProvider implements DataSourceViewsProvider<A
     
 
     public boolean supportsViewsFor(Application application) {
-        JVM jvm = JVMFactory.getJVMFor(application);
+        Jvm jvm = JvmFactory.getJVMFor(application);
         return jvm.isMonitoringSupported();
     }
 

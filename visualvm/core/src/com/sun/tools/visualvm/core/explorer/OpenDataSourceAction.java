@@ -35,7 +35,7 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.RequestProcessor;
 
-public final class OpenDataSourceAction extends AbstractAction {
+class OpenDataSourceAction extends AbstractAction {
     
     private static OpenDataSourceAction instance;
     

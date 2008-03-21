@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jvm;
 
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -35,8 +35,8 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        JVMFactory.getDefault().registerFactory(new JvmProvider());
-        JVMFactory.getDefault().registerFactory(new JRockitJvmProvider());
+        JvmFactory.getDefault().registerFactory(new JvmProvider());
+        JvmFactory.getDefault().registerFactory(new JRockitJvmProvider());
     }
     
 }

@@ -56,9 +56,7 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages>
-                <package>com.sun.tools.visualvm.attach</package>
-            </public-packages>
+            <public-packages/>
         </data>
     </configuration>
 </project>

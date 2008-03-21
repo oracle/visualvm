@@ -23,8 +23,9 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.application.jvm;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
 
@@ -34,20 +35,20 @@ import com.sun.tools.visualvm.core.model.ModelProvider;
  * 
  * @author Tomas Hurka
  */
-public final class JVMFactory extends ModelFactory<JVM,Application> implements ModelProvider<JVM,Application> {
+public final class JvmFactory extends ModelFactory<Jvm,Application> implements ModelProvider<Jvm,Application> {
 
-    private static JVMFactory jvmFactory;
+    private static JvmFactory jvmFactory;
 
-    private JVMFactory() {
+    private JvmFactory() {
     }
     
     /**
      * Getter for the default version of the JVMFactory.
      * @return instance of {@link JVMFactory}.
      */
-    public static synchronized JVMFactory getDefault() {
+    public static synchronized JvmFactory getDefault() {
         if (jvmFactory == null) {
-            jvmFactory = new JVMFactory();
+            jvmFactory = new JvmFactory();
             jvmFactory.registerFactory(jvmFactory);
         }
         return jvmFactory;
@@ -60,7 +61,7 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
      * @param app application 
      * @return {@link JVM} instance which encapsulates application's JVM.
      */
-    public static JVM getJVMFor(Application app) {
+    public static Jvm getJVMFor(Application app) {
         return getDefault().getModel(app);
     }
     
@@ -72,7 +73,7 @@ public final class JVMFactory extends ModelFactory<JVM,Application> implements M
      * @param app application
      * @return dummy instance of {@link JVM}
      */
-    public JVM createModelFor(Application app) {
-        return new DefaultJVM();
+    public Jvm createModelFor(Application app) {
+        return new DefaultJvm();
     }
 }

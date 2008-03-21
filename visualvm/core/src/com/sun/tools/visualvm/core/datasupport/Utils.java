@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.datasupport;
 
-import com.sun.tools.visualvm.core.datasupport.Base64;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;

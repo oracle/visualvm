@@ -98,7 +98,7 @@ public abstract class DataSource {
         return visible;
     }
     
-    public DataSource getMaster() {
+    public final DataSource getMaster() {
         return master;
     }
     
