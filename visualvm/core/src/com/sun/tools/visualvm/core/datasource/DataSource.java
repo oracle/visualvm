@@ -57,7 +57,7 @@ public abstract class DataSource {
     
     
     private DataSource owner;
-    private boolean isAdded = false;
+    private boolean isRemoved = false;
     private DataSource master;
     private boolean visible = true;
     private Storage storage;
@@ -145,7 +145,7 @@ public abstract class DataSource {
     
     // Checks if the DataSource has been removed from the tree
     public final boolean isRemoved() {
-        return getOwner() == null;
+        return isRemoved;
     }
     
     // Performs blocking check if the DataSource can be removed in context of removeRoot
@@ -163,15 +163,15 @@ public abstract class DataSource {
     
     
     final void addImpl(DataSource owner) {
-        if (isAdded) throw new UnsupportedOperationException("DataSource can be added only once");
+        if (isRemoved) throw new UnsupportedOperationException("DataSource can be added only once");
         this.owner = owner;
-        isAdded = true;
     }
     
     final void removeImpl() {
         remove();
         
         this.owner = null;
+        isRemoved = true;
         
         if (!hasRemovedListeners()) return;
         Set<ComparableWeakReference<DataRemovedListener>> listeners = getRemovedListeners();
