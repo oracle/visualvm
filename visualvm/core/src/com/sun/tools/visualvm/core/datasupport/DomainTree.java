@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasupport;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -235,10 +236,10 @@ public final class DomainTree<T, D> {
         
     }
     
-    private static final class ItemsComparator<T> implements Comparator<T> {
+    private static final class ItemsComparator<T> implements Comparator<T>, Serializable {
 
         public int compare(T o1, T o2) {
-            return new Integer(o1.hashCode()).compareTo(o2.hashCode());
+            return Integer.valueOf(o1.hashCode()).compareTo(o2.hashCode());
         }
         
     }

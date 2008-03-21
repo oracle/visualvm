@@ -167,6 +167,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         }
         
         public boolean equals(Object obj) {
+            if (obj == null) return false;
             if (obj instanceof DataSourceKey) {
                 D ds = weakReference.get();
                 D otherDs = ((DataSourceKey<D>)obj).weakReference.get();

@@ -140,8 +140,9 @@ class ThreadDumpView extends DataSourceView {
         private void loadThreadDump(final File file) {
             RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
+              InputStream is = null;
               try {
-                InputStream is = new FileInputStream(file);
+                is = new FileInputStream(file);
                 byte[] data = new byte[(int)file.length()];
                 try {
                   is.read(data);
@@ -164,6 +165,14 @@ class ThreadDumpView extends DataSourceView {
                 }
               } catch (FileNotFoundException ex) {
                 LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
+              } finally {
+                  if (is != null) {
+                      try {
+                          is.close();
+                      } catch (IOException e) {
+                          // ignore
+                      }
+                  }
               }
            }
           });

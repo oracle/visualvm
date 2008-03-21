@@ -251,12 +251,12 @@ class ExplorerModelBuilder {
         }
         
         // Notify tree model
-        for (ExplorerNode parent : indexes.keySet()) {
-            List<Integer> indexesList = indexes.get(parent);
+        for (Map.Entry<ExplorerNode, List<Integer>> entry : indexes.entrySet()) {
+            List<Integer> indexesList = entry.getValue();
             Collections.sort(indexesList);
             int[] indexesArr = new int[indexesList.size()];
             for (int i = 0; i < indexesArr.length; i++) indexesArr[i] = indexesList.get(i);
-            explorerModel.nodesWereInserted(parent, indexesArr);
+            explorerModel.nodesWereInserted(entry.getKey(), indexesArr);
         }
         
         // Try to restore selection
@@ -287,8 +287,8 @@ class ExplorerModelBuilder {
         }
         
         // Notify tree model
-        for (ExplorerNode parent : pairs.keySet()) {
-            List<IndexNodePair> indexesList = pairs.get(parent);
+        for (Map.Entry<ExplorerNode, List<IndexNodePair>> entry : pairs.entrySet()) {
+            List<IndexNodePair> indexesList = entry.getValue();
             Collections.sort(indexesList);
             int[] indexesArr = new int[indexesList.size()];
             Object[] childsArr = new Object[indexesList.size()];
@@ -297,7 +297,7 @@ class ExplorerModelBuilder {
                 indexesArr[i] = pair.index;
                 childsArr[i] = pair.node;
             }
-            explorerModel.nodesWereRemoved(parent, indexesArr, childsArr);
+            explorerModel.nodesWereRemoved(entry.getKey(), indexesArr, childsArr);
         }
         
         // Try to restore selection
@@ -332,6 +332,28 @@ class ExplorerModelBuilder {
             if (index == pair.index) return 0;
             if (index > pair.index) return 1;
             else return -1;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final IndexNodePair other = (IndexNodePair) obj;
+            if (this.index != other.index) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 37 * hash + this.index;
+            return hash;
         }
         
     }

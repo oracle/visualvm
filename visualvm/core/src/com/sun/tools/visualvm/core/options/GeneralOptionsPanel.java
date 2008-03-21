@@ -34,7 +34,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");
     private final GeneralOptionsPanelController controller;
 
-    private final ChangeListener changeListener = new ChangeListener() {
+    transient private final ChangeListener changeListener = new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
             controller.changed();
         }

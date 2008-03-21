@@ -210,7 +210,7 @@ public class JmxSupport implements DataRemovedListener {
                 if (threadMXBean.isSynchronizerUsageSupported()) {
                     sb.append("\n   Locked ownable synchronizers:");
                     LockInfo[] synchronizers = thread.getLockedSynchronizers();
-                    if (synchronizers != null || synchronizers.length == 0) {
+                    if (synchronizers == null || synchronizers.length == 0) {
                         sb.append("\n\t- None\n");
                     } else {
                         for (LockInfo li : synchronizers) {

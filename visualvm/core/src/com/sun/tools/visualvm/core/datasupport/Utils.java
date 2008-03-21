@@ -99,8 +99,7 @@ public final class Utils {
     
     public static synchronized boolean prepareDirectory(File directory) {
         if (directory.exists()) return true;
-        directory.mkdirs();
-        return directory.exists();
+        return directory.mkdirs();
     }
     
     public static boolean copyFile(File file, File copy) {

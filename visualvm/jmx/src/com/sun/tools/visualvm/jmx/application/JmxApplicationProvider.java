@@ -260,7 +260,7 @@ class JmxApplicationProvider {
                     serviceURL.getURLPath().startsWith("/jndi/rmi://")) {
                 String urlPath =
                         serviceURL.getURLPath().substring("/jndi/rmi://".length());
-                if ("/".equals(urlPath.charAt(0))) {
+                if ('/' == urlPath.charAt(0)) {
                     hostname = "localhost";
                 } else {
                     int colonIndex = urlPath.indexOf(":");

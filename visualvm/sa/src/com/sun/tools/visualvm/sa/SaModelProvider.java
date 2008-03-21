@@ -52,7 +52,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
     public SaModel createModelFor(DataSource ds) {
         if (ds instanceof Application) {
             Application app = (Application) ds;
-            if (Host.LOCALHOST.equals(app)) {
+            if (Host.LOCALHOST.equals(app.getHost())) {
                 JVM jvm = JVMFactory.getJVMFor(app);
                 File jdkHome = new File(jvm.getJavaHome());
                 File saJar = getSaJar(jdkHome);

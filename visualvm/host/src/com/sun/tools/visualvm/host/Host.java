@@ -82,7 +82,7 @@ public abstract class Host extends DataSource implements Stateful {
         return inetAddress;
     }
     
-    public int getState() {
+    public synchronized int getState() {
         return state;
     }
     

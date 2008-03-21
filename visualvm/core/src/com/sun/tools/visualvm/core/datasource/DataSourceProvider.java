@@ -182,8 +182,8 @@ public class DataSourceProvider {
             DataChangeEvent event = new DataChangeEvent(filteredCurrent, filteredCurrent, null);
             listener.dataChanged(event);
         } else {
-            Set<? extends DataSource> filteredAdded = Utils.getFilteredSet(added, filter);
-            Set<? extends DataSource> filteredRemoved = Utils.getFilteredSet(removed, filter);
+            Set<? extends DataSource> filteredAdded = added != null ? Utils.getFilteredSet(added, filter) : Collections.EMPTY_SET;
+            Set<? extends DataSource> filteredRemoved = removed != null ? Utils.getFilteredSet(removed, filter) : Collections.EMPTY_SET;
             if (!filteredAdded.isEmpty() || !filteredRemoved.isEmpty()) {
                 DataChangeEvent event = new DataChangeEvent(filteredCurrent, filteredAdded, filteredRemoved);
                 listener.dataChanged(event);

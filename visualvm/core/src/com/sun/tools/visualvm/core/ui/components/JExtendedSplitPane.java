@@ -60,7 +60,7 @@ public class JExtendedSplitPane extends JSplitPane {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ComponentListener splitPaneComponentListener = new SplitPaneComponentListener();
+    transient private ComponentListener splitPaneComponentListener = new SplitPaneComponentListener();
     
     private double dividerLocation;
     private int customDividerSize;

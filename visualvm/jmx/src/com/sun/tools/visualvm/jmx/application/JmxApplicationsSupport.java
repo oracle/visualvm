@@ -42,28 +42,36 @@ public class JmxApplicationsSupport {
     
     private static final String STORAGE_DIRNAME = "jmxapplications";
     
+    private static final Object storageDirectoryLock = new Object();
+    // @GuardedBy storageDirectoryLock
     private static File storageDirectory;
+    private static final Object storageDirectoryStringLock = new Object();
+    // @GuardedBy storageDirectoryStringLock
     private static String storageDirectoryString;
     
     
     static String getStorageDirectoryString() {
-        if (storageDirectoryString == null)
-            storageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + STORAGE_DIRNAME;
-        return storageDirectoryString;
+        synchronized(storageDirectoryStringLock) {
+            if (storageDirectoryString == null)
+                storageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + STORAGE_DIRNAME;
+            return storageDirectoryString;
+        }
     }
     
     static File getStorageDirectory() {
-        if (storageDirectory == null) {
-            String storageString = getStorageDirectoryString();
-            storageDirectory = new File(storageString);
-            if (storageDirectory.exists() && storageDirectory.isFile())
-                throw new IllegalStateException("Cannot create hosts storage directory " + storageString + ", file in the way");
-            if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access hosts storage directory " + storageString + ", read&write permission required");
-            if (!Utils.prepareDirectory(storageDirectory))
-                throw new IllegalStateException("Cannot create hosts storage directory " + storageString);
+        synchronized(storageDirectoryLock) {
+            if (storageDirectory == null) {
+                String storageString = getStorageDirectoryString();
+                storageDirectory = new File(storageString);
+                if (storageDirectory.exists() && storageDirectory.isFile())
+                    throw new IllegalStateException("Cannot create hosts storage directory " + storageString + ", file in the way");
+                if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite()))
+                    throw new IllegalStateException("Cannot access hosts storage directory " + storageString + ", read&write permission required");
+                if (!Utils.prepareDirectory(storageDirectory))
+                    throw new IllegalStateException("Cannot create hosts storage directory " + storageString);
+            }
+            return storageDirectory;
         }
-        return storageDirectory;
     }
     
     static boolean storageDirectoryExists() {

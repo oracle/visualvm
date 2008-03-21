@@ -86,7 +86,7 @@ public abstract class Application extends DataSource implements Stateful {
     }
     
     
-    public int getState() {
+    public synchronized int getState() {
         return state;
     }
     

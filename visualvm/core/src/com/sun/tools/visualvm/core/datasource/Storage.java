@@ -50,9 +50,17 @@ public final class Storage {
     
     public static final String DEFAULT_PROPERTIES_EXT = ".properties";
     
+    private static final Object temporaryStorageDirectoryLock = new Object();
+    // @GuardedBy temporaryStorageDirectory
     private static File temporaryStorageDirectory;
+    private static final Object temporaryStorageDirectoryStringLock = new Object();
+    // @GuardedBy temporaryStorageDirectoryString
     private static String temporaryStorageDirectoryString;
+    private static final Object persistentStorageDirectoryLock = new Object();
+    // @GuardedBy persistentStorageDirectory
     private static File persistentStorageDirectory;
+    private static final Object persistentStorageDirectoryStringLock = new Object();
+    // @GuardedBy persistentStorageDirectoryString
     private static String persistentStorageDirectoryString;
     
     private final File directory;
@@ -119,9 +127,11 @@ public final class Storage {
      * @return default storage directory for temporary (runtime) DataSource data
      */
     public static String getTemporaryStorageDirectoryString() {
-        if (temporaryStorageDirectoryString == null)
-            temporaryStorageDirectoryString = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + File.separator + TEMPORARY_STORAGE_DIRNAME;
-        return temporaryStorageDirectoryString;
+        synchronized(temporaryStorageDirectoryStringLock) {
+            if (temporaryStorageDirectoryString == null)
+                temporaryStorageDirectoryString = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + File.separator + TEMPORARY_STORAGE_DIRNAME;
+            return temporaryStorageDirectoryString;
+        }
     }
     
     /**
@@ -132,17 +142,19 @@ public final class Storage {
      * @return default storage directory for temporary (runtime) DataSource data
      */
     public static File getTemporaryStorageDirectory() {
-        if (temporaryStorageDirectory == null) {
-            String temporaryStorageString = getTemporaryStorageDirectoryString();
-            temporaryStorageDirectory = new File(temporaryStorageString);
-            if (temporaryStorageDirectory.exists() && temporaryStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");
-            if (temporaryStorageDirectory.exists() && (!temporaryStorageDirectory.canRead() || !temporaryStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");
-            if (!Utils.prepareDirectory(temporaryStorageDirectory))
-                throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString);
+        synchronized(temporaryStorageDirectoryLock) {
+            if (temporaryStorageDirectory == null) {
+                String temporaryStorageString = getTemporaryStorageDirectoryString();
+                temporaryStorageDirectory = new File(temporaryStorageString);
+                if (temporaryStorageDirectory.exists() && temporaryStorageDirectory.isFile())
+                    throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");
+                if (temporaryStorageDirectory.exists() && (!temporaryStorageDirectory.canRead() || !temporaryStorageDirectory.canWrite()))
+                    throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");
+                if (!Utils.prepareDirectory(temporaryStorageDirectory))
+                    throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString);
+            }
+            return temporaryStorageDirectory;
         }
-        return temporaryStorageDirectory;
     }
     
     /**
@@ -151,9 +163,11 @@ public final class Storage {
      * @return default storage directory for persistent DataSource data
      */
     public static String getPersistentStorageDirectoryString() {
-        if (persistentStorageDirectoryString == null)
-            persistentStorageDirectoryString = new File(System.getProperty("netbeans.user")).getAbsolutePath() + File.separator + PERSISTENT_STORAGE_DIRNAME;
-        return persistentStorageDirectoryString;
+        synchronized(persistentStorageDirectoryStringLock) {
+            if (persistentStorageDirectoryString == null)
+                persistentStorageDirectoryString = new File(System.getProperty("netbeans.user")).getAbsolutePath() + File.separator + PERSISTENT_STORAGE_DIRNAME;
+            return persistentStorageDirectoryString;
+        }
     }
     
     /**
@@ -162,17 +176,19 @@ public final class Storage {
      * @return default storage directory for persistent DataSource data
      */
     public static File getPersistentStorageDirectory() {
-        if (persistentStorageDirectory == null) {
-            String persistentStorageString = getPersistentStorageDirectoryString();
-            persistentStorageDirectory = new File(persistentStorageString);
-            if (persistentStorageDirectory.exists() && persistentStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way");
-            if (persistentStorageDirectory.exists() && (!persistentStorageDirectory.canRead() || !persistentStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");
-            if (!Utils.prepareDirectory(persistentStorageDirectory))
-                throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
+        synchronized(persistentStorageDirectoryLock) {
+            if (persistentStorageDirectory == null) {
+                String persistentStorageString = getPersistentStorageDirectoryString();
+                persistentStorageDirectory = new File(persistentStorageString);
+                if (persistentStorageDirectory.exists() && persistentStorageDirectory.isFile())
+                    throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way");
+                if (persistentStorageDirectory.exists() && (!persistentStorageDirectory.canRead() || !persistentStorageDirectory.canWrite()))
+                    throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");
+                if (!Utils.prepareDirectory(persistentStorageDirectory))
+                    throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
+            }
+            return persistentStorageDirectory;
         }
-        return persistentStorageDirectory;
     }
     
     public static boolean persistentStorageDirectoryExists() {

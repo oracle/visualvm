@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasupport;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -59,7 +60,7 @@ public interface Positionable {
     /**
      * Implementation of Comparator based on getPreferredPosition() value.
      */
-    static final class PositionableComparator implements Comparator {
+    static final class PositionableComparator implements Comparator, Serializable {
         
         public int compare(Object o1, Object o2) {
             Positionable p1 = (Positionable)o1;

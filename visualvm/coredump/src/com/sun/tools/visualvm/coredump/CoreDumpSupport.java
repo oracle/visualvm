@@ -46,10 +46,16 @@ public final class CoreDumpSupport {
     
     private static final String COREDUMPS_STORAGE_DIRNAME = "coredumps";
     
+    private static final Object coredumpsStorageDirectoryLock = new Object();
+    // @GuardedBy coredumpsStorageDirectoryLock
     private static File coredumpsStorageDirectory;
+    private static final Object coredumpsStorageDirectoryStringLock = new Object();
+    // @GuardedBy coredumpsStorageDirectoryStringLock
     private static String coredumpsStorageDirectoryString;
     
     private static CoreDumpCategory category = new CoreDumpCategory();
+    private static final Object currentJDKHomeLock = new Object();
+    // @GuardedBy currentJDKHomeLock
     private static String currentJDKHome;
     
     
@@ -59,32 +65,38 @@ public final class CoreDumpSupport {
     
     // TODO: should be moved to some public Utils class
     public static String getCurrentJDKHome() {
-        if (currentJDKHome == null) {
-            currentJDKHome = System.getProperty("java.home");
-            String jreSuffix = File.separator + "jre";
-            if (currentJDKHome.endsWith(jreSuffix)) currentJDKHome = currentJDKHome.substring(0, currentJDKHome.length() - jreSuffix.length());
+        synchronized(currentJDKHomeLock) {
+            if (currentJDKHome == null) {
+                currentJDKHome = System.getProperty("java.home");
+                String jreSuffix = File.separator + "jre";
+                if (currentJDKHome.endsWith(jreSuffix)) currentJDKHome = currentJDKHome.substring(0, currentJDKHome.length() - jreSuffix.length());
+            }
+            return currentJDKHome;
         }
-        return currentJDKHome;
     }
     
     static String getStorageDirectoryString() {
-        if (coredumpsStorageDirectoryString == null)
-            coredumpsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + COREDUMPS_STORAGE_DIRNAME;
-        return coredumpsStorageDirectoryString;
+        synchronized(coredumpsStorageDirectoryStringLock) {
+            if (coredumpsStorageDirectoryString == null)
+                coredumpsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + COREDUMPS_STORAGE_DIRNAME;
+            return coredumpsStorageDirectoryString;
+        }
     }
     
     public static File getStorageDirectory() {
-        if (coredumpsStorageDirectory == null) {
-            String snapshotsStorageString = getStorageDirectoryString();
-            coredumpsStorageDirectory = new File(snapshotsStorageString);
-            if (coredumpsStorageDirectory.exists() && coredumpsStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString + ", file in the way");
-            if (coredumpsStorageDirectory.exists() && (!coredumpsStorageDirectory.canRead() || !coredumpsStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access coredumps storage directory " + snapshotsStorageString + ", read&write permission required");
-            if (!Utils.prepareDirectory(coredumpsStorageDirectory))
-                throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString);
+        synchronized(coredumpsStorageDirectoryLock) {
+            if (coredumpsStorageDirectory == null) {
+                String snapshotsStorageString = getStorageDirectoryString();
+                coredumpsStorageDirectory = new File(snapshotsStorageString);
+                if (coredumpsStorageDirectory.exists() && coredumpsStorageDirectory.isFile())
+                    throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString + ", file in the way");
+                if (coredumpsStorageDirectory.exists() && (!coredumpsStorageDirectory.canRead() || !coredumpsStorageDirectory.canWrite()))
+                    throw new IllegalStateException("Cannot access coredumps storage directory " + snapshotsStorageString + ", read&write permission required");
+                if (!Utils.prepareDirectory(coredumpsStorageDirectory))
+                    throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString);
+            }
+            return coredumpsStorageDirectory;
         }
-        return coredumpsStorageDirectory;
     }
     
     public static boolean storageDirectoryExists() {

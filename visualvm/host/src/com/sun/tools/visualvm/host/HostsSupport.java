@@ -44,7 +44,11 @@ public final class HostsSupport {
 
     private static final String HOSTS_STORAGE_DIRNAME = "hosts";
     
+    private static final Object hostsStorageDirectoryLock = new Object();
+    // @GuardedBy hostsStorageDirectoryLock
     private static File hostsStorageDirectory;
+    private static final Object hostsStorageDirectoryStringLock = new Object();
+    // @GuardedBy hostsStorageDirectoryStringLock
     private static String hostsStorageDirectoryString;
     
     private static HostsSupport instance;
@@ -72,23 +76,27 @@ public final class HostsSupport {
     
     
     public static String getStorageDirectoryString() {
-        if (hostsStorageDirectoryString == null)
-            hostsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + HOSTS_STORAGE_DIRNAME;
-        return hostsStorageDirectoryString;
+        synchronized(hostsStorageDirectoryStringLock) {
+            if (hostsStorageDirectoryString == null)
+                hostsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + HOSTS_STORAGE_DIRNAME;
+            return hostsStorageDirectoryString;
+        }
     }
     
     public static File getStorageDirectory() {
-        if (hostsStorageDirectory == null) {
-            String snapshotsStorageString = getStorageDirectoryString();
-            hostsStorageDirectory = new File(snapshotsStorageString);
-            if (hostsStorageDirectory.exists() && hostsStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");
-            if (hostsStorageDirectory.exists() && (!hostsStorageDirectory.canRead() || !hostsStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access hosts storage directory " + snapshotsStorageString + ", read&write permission required");
-            if (!Utils.prepareDirectory(hostsStorageDirectory))
-                throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString);
+        synchronized(hostsStorageDirectoryLock) {
+            if (hostsStorageDirectory == null) {
+                String snapshotsStorageString = getStorageDirectoryString();
+                hostsStorageDirectory = new File(snapshotsStorageString);
+                if (hostsStorageDirectory.exists() && hostsStorageDirectory.isFile())
+                    throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");
+                if (hostsStorageDirectory.exists() && (!hostsStorageDirectory.canRead() || !hostsStorageDirectory.canWrite()))
+                    throw new IllegalStateException("Cannot access hosts storage directory " + snapshotsStorageString + ", read&write permission required");
+                if (!Utils.prepareDirectory(hostsStorageDirectory))
+                    throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString);
+            }
+            return hostsStorageDirectory;
         }
-        return hostsStorageDirectory;
     }
     
     public static boolean storageDirectoryExists() {
