@@ -32,11 +32,21 @@ import com.sun.tools.visualvm.host.Host;
  *
  * @author Jiri Sedlacek
  */
-final class JvmstatApplication extends Application {    
+final class JvmstatApplication extends Application {   
+    
+    private int pid;
+    
 
-    JvmstatApplication(Host host, int pid) {
-        super(host, pid);
+    JvmstatApplication(Host host, String id, int pid) {
+        super(host, id);
+        this.pid = pid;
     }
+    
+    
+    public int getPid() {
+        return pid;
+    }
+    
 
     protected void remove() {
         super.remove();

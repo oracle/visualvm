@@ -41,12 +41,13 @@ import javax.management.remote.JMXServiceURL;
  */
 public final class JmxApplication extends Application {
     
-    private int pid = -1;
+    private int pid;
     private final JMXServiceURL url;
     private final Storage storage;
 
     public JmxApplication(Host host, JMXServiceURL url, Storage storage) {
         super(host, url.toString());
+        pid = UNKNOWN_PID;
         this.url = url;
         this.storage = storage;
     }
@@ -57,7 +58,7 @@ public final class JmxApplication extends Application {
 
     @Override
     public int getPid() {
-        if (pid == -1) {
+        if (pid == UNKNOWN_PID) {
             JvmJmxModel jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(this);
             if (jmxModel != null) {
                 RuntimeMXBean rt = jmxModel.getRuntimeMXBean();

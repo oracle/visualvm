@@ -52,27 +52,7 @@ public abstract class Application extends DataSource implements Stateful {
     private int pid;
     private Host host;
     private int state = STATE_AVAILABLE;
-
-
-    /**
-     * Creates new instance of AbstractApplication identified by id running on a Host
-     * 
-     * @param host host of the application,
-     * @param id unique identificator of the application.
-     */
-    public Application(Host host, String id) {
-        this(host, id, UNKNOWN_PID);
-    }
-
-    /**
-     * Creates new instance of AbstractApplication identified by its process id running on a Host.
-     * 
-     * @param host host of the application,
-     * @param pid process id of the application.
-     */
-    public Application(Host host, int pid) {
-        this(host, host.getHostName() + "-" + pid, pid);
-    }
+    
 
     /**
      * Creates new instance of Abstract application identified by its id and/or process id running on a Host.
@@ -81,12 +61,11 @@ public abstract class Application extends DataSource implements Stateful {
      * @param id unique identificator of the application,
      * @param pid process ide of the application or UNKNOWN_PID if the process id is unknown.
      */
-    public Application(Host host, String id, int pid) {
+    public Application(Host host, String id) {
         if (host == null) throw new IllegalArgumentException("Host cannot be null");
         if (id == null && pid == UNKNOWN_PID) throw new IllegalArgumentException("Either id or pid must be provided for the application");
         this.host = host;
         this.id = id;
-        this.pid = pid;
     }
 
 
@@ -95,7 +74,7 @@ public abstract class Application extends DataSource implements Stateful {
     }
 
     public int getPid() {
-        return pid;
+        return UNKNOWN_PID;
     }
 
     public Host getHost() {

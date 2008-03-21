@@ -165,7 +165,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             // Do not provide instance for Application.CURRENT_APPLICATION
             if (Application.CURRENT_APPLICATION.getPid() == applicationPid) continue;
             
-            JvmstatApplication application = new JvmstatApplication(host, applicationPid);
+            JvmstatApplication application = new JvmstatApplication(host, createId(host, applicationPid), applicationPid);
             String appId = application.getId();
             if (!applications.containsKey(appId)) {
                 applications.put(appId, application);
@@ -180,7 +180,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         Set<JvmstatApplication> finishedApplications = new HashSet();
         
         for (int applicationPid : applicationPids) {
-             String appId = new JvmstatApplication(host, applicationPid).getId();
+             String appId = createId(host, applicationPid);
              if (applications.containsKey(appId)) {
                 JvmstatApplication application = applications.get(appId);
                 if (application != null) finishedApplications.add(application);
@@ -189,6 +189,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
         
         host.getRepository().removeDataSources(finishedApplications);
+    }
+    
+    private String createId(Host host, int pid) {
+        return host.getHostName() + "-" + pid;
     }
     
     void removeFromMap(JvmstatApplication jvmstatApplication) {
