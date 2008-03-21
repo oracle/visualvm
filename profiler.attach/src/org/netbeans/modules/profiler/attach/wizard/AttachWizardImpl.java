@@ -153,6 +153,12 @@ public class AttachWizardImpl extends AbstractWizard {
         proxy.setWizardStep(((AttachWizardContext) getContext()).getIntegrationProvider().getAttachedWizard());
     }
 
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        wizardModel = null;
+    }
+
     private boolean isAutomationAllowed(AttachWizardContext ctx) {
         if (!ctx.getIntegrationProvider().supportsAutomation()) {
             return false;
