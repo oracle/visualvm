@@ -40,6 +40,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -57,6 +59,7 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  */
 public class CoreDumpProvider {
+    private static final Logger LOGGER = Logger.getLogger(CoreDumpProvider.class.getName());
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -173,7 +176,7 @@ public class CoreDumpProvider {
                 new CoreDumpAdder(newCoreDump, storage, propNames, propValues).execute();
             }
         } catch (Exception e) {
-            System.err.println("Error creating coredump: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error creating coredump", e);
             return;
         }
     }
@@ -208,7 +211,7 @@ public class CoreDumpProvider {
             try {
                 persistedCoredump = new CoreDumpImpl(new File(propValues[0]), new File(propValues[1]), storage);
             } catch (Exception e) {
-                System.err.println("Error loading persisted host: " + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Error loading persisted host", e);
             }
             
             if (persistedCoredump != null) coredumps.add(persistedCoredump);

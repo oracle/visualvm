@@ -28,8 +28,6 @@ package com.sun.tools.visualvm.modules.mbeans;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import javax.swing.tree.*;
-import javax.swing.border.*;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Component;
@@ -38,13 +36,15 @@ import java.awt.Font;
 import java.awt.event.*;
 import java.awt.Dimension;
 import java.util.*;
-import java.io.*;
 import java.lang.reflect.Array;
 
-import javax.management.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.openmbean.*;
 
 class XOpenTypeViewer extends JPanel implements ActionListener {
+    private final static Logger LOGGER = Logger.getLogger(XOpenTypeViewer.class.getName());
+    
     JButton prev, incr, decr, tabularPrev, tabularNext;
     JLabel compositeLabel, tabularLabel;
     JScrollPane container;
@@ -653,8 +653,7 @@ class XOpenTypeViewer extends JPanel implements ActionListener {
             comp.viewed(this);
         } catch (Exception e) {
             // Nothing to change, the element can't be displayed
-            System.out.println("Exception viewing openType : " + e);
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Exception viewing openType", e);
         }
     }
 

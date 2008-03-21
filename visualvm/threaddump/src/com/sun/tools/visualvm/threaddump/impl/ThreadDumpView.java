@@ -39,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,9 +53,9 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 class ThreadDumpView extends DataSourceView {
+    private static final Logger LOGGER = Logger.getLogger(ThreadDumpView.class.getName());
     
     private DataViewComponent view;
-    
 
     public ThreadDumpView(ThreadDump threadDump) {
         this(threadDump, DataSourceDescriptorFactory.getDescriptor(threadDump));
@@ -145,7 +146,7 @@ class ThreadDumpView extends DataSourceView {
                 try {
                   is.read(data);
                 } catch (IOException ex) {
-                  ex.printStackTrace();
+                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
                 }
                 try {
                   HTMLTextArea area = new HTMLTextArea("<nobr><pre>" +
@@ -159,10 +160,10 @@ class ThreadDumpView extends DataSourceView {
                   contentsPanel.repaint();
 //                  contentsPanel.doLayout();
                 } catch (Exception ex) {
-                  ex.printStackTrace();
+                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
                 }
               } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
+                LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
               }
            }
           });

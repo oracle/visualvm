@@ -33,12 +33,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Tomas Hurka
  */
 public abstract class JvmJvmstatModel extends Model {
+    private static final Logger LOGGER = Logger.getLogger(JvmJvmstatModel.class.getName());
+    
     private static final String JAR_SUFFIX = ".jar";  // NOI18N
     
     protected Application application;
@@ -125,7 +128,7 @@ public abstract class JvmJvmstatModel extends Model {
                     mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                     assert mainClassName!=null;
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    LOGGER.throwing(JvmJvmstatModel.class.getName(), "getMainClass", ex);
                 }
             }
         }

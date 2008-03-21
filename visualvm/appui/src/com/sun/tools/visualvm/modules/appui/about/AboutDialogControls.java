@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,7 +47,7 @@ import javax.swing.SwingUtilities;
  * @author Jiri Sedlacek
  */
 public class AboutDialogControls extends JPanel {
-
+    private final static Logger LOGGER = Logger.getLogger(AboutDialogControls.class.getName());
 
     // --- Internal API --------------------------------------------------------
 
@@ -154,13 +155,13 @@ public class AboutDialogControls extends JPanel {
                             DesktopUtils.open(logfile);
                         } catch (Exception ex) {
                             showLogfileInBrowser(logfile);
-                            ex.printStackTrace(System.err); // IGNORE, most likely no viewer associated
+                            LOGGER.throwing(AboutDialogControls.class.getName(), "showLogFile", ex);
                         }
                     } else {
                         showLogfileInBrowser(logfile);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace(System.err);
+                    LOGGER.throwing(AboutDialogControls.class.getName(), "showLogFile", e);
                     JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(), "Cannot open the logfile " + logfile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
                 } finally {
                     logfileButton.setEnabled(true);

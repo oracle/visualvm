@@ -33,6 +33,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -51,6 +53,7 @@ import org.openide.util.Utilities;
  */
 
 public final class AcceptLicense {
+    private static final Logger LOGGER = Logger.getLogger(AcceptLicense.class.getName());
     
     private static JDialog d;
     private static String command;
@@ -228,9 +231,7 @@ public final class AcceptLicense {
         try {
             UIManager.setLookAndFeel(uiClassName);
         } catch (Exception ex) {
-            System.err.println("Cannot set L&F " + uiClassName); //NOI18N
-            System.err.println("Exception:" + ex.getMessage()); //NOI18N
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Cannot set L&F " + uiClassName, ex); //NOI18N
         }
     }
     

@@ -41,13 +41,15 @@ import java.util.jar.Manifest;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import com.sun.tools.visualvm.modules.appui.about.AboutDialog;
+import java.util.logging.Logger;
 import org.openide.util.Enumerations;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 
 public final class AboutAction extends AbstractAction {
-
+    private final static Logger LOGGER = Logger.getLogger(AboutAction.class.getName());
+    
     private String versionString = "Dev"; // Use "Dev" for development builds
 
 
@@ -75,7 +77,7 @@ public final class AboutAction extends AbstractAction {
                 aboutDialog.setDetails(getDetails());
                 aboutDialog.setLogfile(getLogfile());
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                LOGGER.throwing(AboutAction.class.getName(), "getAboutDialog", e);
             }
         }
         

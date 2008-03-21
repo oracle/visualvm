@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.jconsole;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.logging.Logger;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -37,6 +38,8 @@ import org.openide.modules.ModuleInstall;
  * @author Luis-Miguel Alventosa
  */
 public class Install extends ModuleInstall {
+    private final static Logger LOGGER = Logger.getLogger(Install.class.getName());
+    
     @Override
     public void restored() {
         try {
@@ -50,7 +53,7 @@ public class Install extends ModuleInstall {
             method.setAccessible(true);
             method.invoke(null);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.throwing(Install.class.getName(), "restored", e);
         }
     }
 }

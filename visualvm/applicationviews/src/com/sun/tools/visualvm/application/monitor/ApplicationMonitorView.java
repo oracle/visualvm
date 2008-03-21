@@ -49,6 +49,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.lang.management.MemoryMXBean;
 import java.text.NumberFormat;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -66,6 +67,7 @@ import org.openide.util.Utilities;
  * @author Jiri Sedlacek
  */
 class ApplicationMonitorView extends DataSourceView {
+    private static final Logger LOGGER = Logger.getLogger(ApplicationMonitorView.class.getName());
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/monitor.png";
 
@@ -199,7 +201,9 @@ class ApplicationMonitorView extends DataSourceView {
                 public void actionPerformed(ActionEvent e) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            try { memoryMXBean.gc(); } catch (Exception e) { e.printStackTrace(); }
+                            try { memoryMXBean.gc(); } catch (Exception e) { 
+                                LOGGER.throwing(ApplicationMonitorView.class.getName(), "initComponents", e);
+                            }
                         };
                     });
                 }

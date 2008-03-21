@@ -29,7 +29,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.JVM;
 import java.awt.Image;
 import java.text.MessageFormat;
-import org.openide.util.Exceptions;
+import java.util.Properties;
+import java.util.logging.Logger;
 import org.openide.util.Utilities;
 
 
@@ -40,7 +41,8 @@ import org.openide.util.Utilities;
  */
 public class GlassFishInstanceType extends GlassFishApplicationType {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    private final static Logger LOGGER = Logger.getLogger(GlassFishInstanceType.class.getName());
+    
     private final String description = "(domain = {0})";
     private String domainName = "UNKNOWN";
     private final String typeName = "GlassFish/SJSAS";
@@ -82,10 +84,13 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
     private void init(Application app, JVM jvm) {
         try {
             if (jvm.isGetSystemPropertiesSupported()) {
-              domainName = jvm.getSystemProperties().getProperty("com.sun.aas.domainName", domainName);
+                Properties props = jvm.getSystemProperties();
+                if (props != null) {
+                    domainName = props.getProperty("com.sun.aas.domainName", domainName);
+                }
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(GlassFishInstanceType.class.getName(), "init", ex);
         }
     }
 }

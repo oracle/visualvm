@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -72,6 +73,8 @@ class JConsoleView extends DataSourceView {
     private static final String PROPERTY_USERNAME = "prop_username";
     private static final String PROPERTY_PASSWORD = "prop_password";
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole.png"; // NOI18N
+    private static final Logger LOGGER = Logger.getLogger(JConsoleView.class.getName());
+    
     private Application application;
     private DataViewComponent view;
 
@@ -229,7 +232,7 @@ class JConsoleView extends DataSourceView {
                     jconsoleView = textArea;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.throwing(JConsoleView.class.getName(), "createViewComponent", e);
                 jconsoleView = new JLabel("\n\nUnexpected error: " + e.getMessage());
             }
         }

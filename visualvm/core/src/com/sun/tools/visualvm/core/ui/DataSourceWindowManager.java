@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -46,7 +48,8 @@ import org.openide.util.RequestProcessor;
 public final class DataSourceWindowManager {
     
     private static final RequestProcessor processor = new RequestProcessor("DataSourceWindowManager Processor");
-
+    private static final Logger LOGGER = Logger.getLogger(DataSourceWindowManager.class.getName());
+    
     private static DataSourceWindowManager sharedInstance;
 
     private final Map<DataSource, DataSourceWindow> openedWindows = Collections.synchronizedMap(new HashMap());
@@ -143,7 +146,11 @@ public final class DataSourceWindowManager {
                 public void run() {
                     if (viewToSelectF != null) {
                         if (windowF.containsView(viewToSelectF)) windowF.selectView(viewToSelectF);
-                        else System.err.println("Tried to select not opened view " + viewToSelectF);
+                        else {
+                            if (LOGGER.isLoggable(Level.WARNING)) {
+                                LOGGER.warning("Tried to select not opened view " + viewToSelectF);
+                            }
+                        }
                     }
                     if (!wasOpened) windowF.open();
                     if (selectWindow) windowF.requestActive();
@@ -187,8 +194,7 @@ public final class DataSourceWindowManager {
                 }
             });
         } catch (Exception e) {
-            System.err.println("Failed to initialize views for " + window.getDataSource());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to initialize views for " + window.getDataSource(), e);
         }
 
         // Blocking notification that the view has been added

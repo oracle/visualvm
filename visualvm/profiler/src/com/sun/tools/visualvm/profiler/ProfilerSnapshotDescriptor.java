@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.openide.util.Utilities;
 
@@ -35,7 +37,8 @@ import org.openide.util.Utilities;
  * @author Jiri Sedlacek
  */
 public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
-        
+    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
+    
     private static final Image CPU_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);
     private static final Image MEMORY_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png", true);
     private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
@@ -55,7 +58,7 @@ public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnaps
                 return Utilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
             else return null;
         } catch (Exception e) {
-            System.err.println("Failed to determine profiler snapshot type: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to determine profiler snapshot type", e);
             return null;
         }
     }

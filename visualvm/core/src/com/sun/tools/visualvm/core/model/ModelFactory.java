@@ -95,24 +95,6 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     }
     
     public final synchronized boolean registerFactory(ModelProvider<M, D> newFactory) {
-        //        System.out.println("Registering Class "+newFactory.getClass().getName());
-        //        Class superClass = newFactory.getClass();
-        //        ParameterizedType type = null;
-        //        while(!superClass.equals(Object.class)) {
-        //            Type genType =  superClass.getGenericSuperclass();
-        //            if (genType instanceof ParameterizedType) {
-        //                type = (ParameterizedType) genType;
-        //                break;
-        //            } else if (genType instanceof Class) {
-        //                superClass = (Class) genType;
-        //            }
-        //        }
-        //        if (type != null) {
-        //            Type[] types = type.getActualTypeArguments();
-        //            for (int i = 0; i < types.length; i++) {
-        //                System.out.println("Type "+types[i]);
-        //            }
-        //        }
         if (LOGGER.isLoggable(Level.FINER)) {
             LOGGER.finer("Registering " + newFactory.getClass().getName());
         }

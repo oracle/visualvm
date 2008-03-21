@@ -26,17 +26,13 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 // java import
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 //
 
 // java import
-import java.io.*;
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.net.*;
-//
 
 
 /**
@@ -47,7 +43,10 @@ import java.net.*;
 class XObject extends JLabel {
     private Object object;
     private static boolean useHashCodeRepresentation = true;
+    private final static Logger LOGGER = Logger.getLogger(XObject.class.getName());
+    
     public final static XObject NULL_OBJECT = new XObject("null");
+    
     public XObject (Object object, Icon icon) {
         this(object);
         setIcon(icon);
@@ -66,8 +65,7 @@ class XObject extends JLabel {
             }
         }
         catch (Throwable t) {
-            System.out.println("Error comparing XObjects"+
-                               t.getMessage());
+            LOGGER.log(Level.SEVERE, "Error comparing XObjects", t);
         }
         return false;
     }
@@ -118,8 +116,7 @@ class XObject extends JLabel {
             }
         }
         catch (Exception e) {
-             System.out.println("Error setting XObject object :"+
-                                e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error setting XObject object", e);
         }
     }
 }

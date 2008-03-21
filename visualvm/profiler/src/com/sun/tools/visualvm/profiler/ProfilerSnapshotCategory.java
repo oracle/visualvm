@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -42,6 +44,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
+    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotCategory.class.getName());
     
     private static final String NAME = "Profiler Snapshots";
     private static final String PREFIX = "snapshot";
@@ -71,7 +74,7 @@ class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
                             public void run() { ResultsManager.getDefault().openSnapshot(loadedSnapshot); }
                         });
                     } catch (Exception e) {
-                        System.err.println("Error loading profiler snapshot: " + e.getMessage());
+                        LOGGER.log(Level.SEVERE, "Error loading profiler snapshot", e);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() { NetBeansProfiler.getDefaultNB().displayError("Opening snapshot failed."); }
                         });

@@ -44,11 +44,12 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
-import org.openide.util.RequestProcessor;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.windows.WindowManager;
 
@@ -58,6 +59,7 @@ import org.openide.windows.WindowManager;
  */
 // A provider for Hosts
 public class HostProvider {
+    private static final Logger LOGGER = Logger.getLogger(HostProvider.class.getName());
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -132,7 +134,7 @@ public class HostProvider {
                 try {
                     newHost = new HostImpl(hostName, storage);
                 } catch (Exception e) {
-                    System.err.println("Error creating host: " + e.getMessage()); // Should never happen
+                    LOGGER.log(Level.SEVERE, "Error creating host", e); // Should never happen
                 }
                 
                 if (newHost != null) {
@@ -165,8 +167,7 @@ public class HostProvider {
         try {
             return new Host("localhost") {};
         } catch (UnknownHostException e) {
-            System.err.println("Critical failure: cannot resolve localhost");
-            NetBeansProfiler.getDefaultNB().displayError("Unable to resolve localhost!");
+            LOGGER.severe("Critical failure: cannot resolve localhost");
             return null;
         }
     }
@@ -175,7 +176,7 @@ public class HostProvider {
         try {
             return new Host("unknown", InetAddress.getByAddress(new byte[] { 0, 0, 0, 0 })) {};
         } catch (UnknownHostException e) {
-            System.err.println("Failure: cannot resolve <unknown> host");
+            LOGGER.severe("Failure: cannot resolve <unknown> host");
             return null;
         }
     }
@@ -214,7 +215,7 @@ public class HostProvider {
                 try {
                     persistedHost = new HostImpl(hostName, storage);
                 } catch (Exception e) {
-                    System.err.println("Error loading persisted host: " + e.getMessage());
+                    LOGGER.log(Level.SEVERE, "Error loading persisted host", e);
                 }
 
                 if (persistedHost != null) hosts.add(persistedHost);
@@ -236,7 +237,7 @@ public class HostProvider {
         if (initializingHosts) try {
             initializingHostsSemaphore.acquire();
         } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(HostProvider.class.getName(), "waitForInitialization", ex);
         }
     }
     
@@ -255,7 +256,7 @@ public class HostProvider {
         try {
             initializingHostsSemaphore.acquire();
         } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(HostProvider.class.getName(), "<init>", ex);
         }
     }
 

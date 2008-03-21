@@ -37,6 +37,8 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -50,7 +52,7 @@ import org.openide.util.Utilities;
 public final class Utils {
     
     private static final int COPY_PACKET_SIZE = 16384;
-    
+    private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
 
     public static <X, Y> boolean containsSubclass(Set<? extends Class<? extends Y>> classes, X superclassInstance) {
         for (Class<? extends Y> classs : classes) if (classs.isInstance(superclassInstance)) return true;
@@ -117,11 +119,11 @@ public final class Utils {
             while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
             return true;
         } catch (Exception e) {
-            System.err.println("Error copying file: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error copying file", e);
             return false;
         } finally {
-            try { if (fos != null) fos.close(); } catch (Exception e) { System.err.println("Problem closing target stream: " + e.getMessage()); }
-            try { if (fis != null) fis.close(); } catch (Exception e) { System.err.println("Problem closing source stream: " + e.getMessage()); }
+            try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing target stream", e); }
+            try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing source stream", e); }
         }
     }
     
@@ -177,16 +179,16 @@ public final class Utils {
                         while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) zos.write(packet, 0, bytes);
                     } finally {
                         if (zos != null) zos.closeEntry();
-                        try { if (fis != null) fis.close(); } catch (Exception e) { System.err.println("Problem closing archive entry stream: " + e.getMessage()); }
+                        try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive entry stream", e); }
                     }
                 } else {
                     // TODO: process directory
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error creating archive: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error creating archive", e);
         } finally {
-            try { if (zos != null) zos.close(); } catch (Exception e) { System.err.println("Problem closing archive stream: " + e.getMessage()); }
+            try { if (zos != null) zos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive stream", e); }
         }
     }
     
@@ -212,15 +214,15 @@ public final class Utils {
                     byte[] packet = new byte[COPY_PACKET_SIZE];
                     while ((bytes = is.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
                 } finally {
-                    try { if (fos != null) fos.close(); } catch (Exception e) { System.err.println("Problem closing extracted file stream: " + e.getMessage()); }
-                    try { if (is != null) is.close(); } catch (Exception e) { System.err.println("Problem closing zipentry stream: " + e.getMessage()); }
+                    try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing extracted file stream", e); }
+                    try { if (is != null) is.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing zipentry stream", e); }
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error extracting archive: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error extracting archive", e);
             return null;
         } finally {
-            try { if (zipFile != null) zipFile.close(); } catch (Exception e) { System.err.println("Problem closing archive: " + e.getMessage()); }
+            try { if (zipFile != null) zipFile.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive", e); }
         }
         
         return directory;
@@ -251,7 +253,7 @@ public final class Utils {
         try {
             ImageIO.write(bufferedImage, format, outputStream);
         } catch (Exception e) {
-            System.err.println(e);
+            LOGGER.throwing(Utils.class.getName(), "imageToBytes", e); // NOI18N
             return null;
         }
         

@@ -26,20 +26,19 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.event.*;
 import java.util.*;
-import java.io.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.*;
 
 class XMBeanOperations extends JPanel implements ActionListener {
+    private final static Logger LOGGER = Logger.getLogger(XMBeanOperations.class.getName());
     
     public final static String OPERATION_INVOCATION_EVENT =
             "jam.xoperations.invoke.result";
@@ -96,12 +95,14 @@ class XMBeanOperations extends JPanel implements ActionListener {
             String returnType = operations[i].getReturnType();
             if (returnType == null) {
                 methodLabel = new JLabel("null", JLabel.RIGHT);
-                System.err.println(
-                        "WARNING: The operation's return type " +
-                        "shouldn't be \"null\". Check how the " +
-                        "MBeanOperationInfo for the \"" +
-                        operations[i].getName() + "\" operation has " +
-                        "been defined in the MBean's implementation code.");
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    LOGGER.warning(
+                            "The operation's return type " +
+                            "shouldn't be \"null\". Check how the " +
+                            "MBeanOperationInfo for the \"" +
+                            operations[i].getName() + "\" operation has " +
+                            "been defined in the MBean's implementation code.");
+                }
             } else {
                 methodLabel = new JLabel(
                         Utils.getReadableClassName(returnType), JLabel.RIGHT);
@@ -181,7 +182,8 @@ class XMBeanOperations extends JPanel implements ActionListener {
                                 JOptionPane.INFORMATION_MESSAGE).run();
                 } catch (Throwable t) {
                     t = Utils.getActualException(t);
-                    t.printStackTrace();
+                    LOGGER.throwing(XMBeanOperations.class.getName(), "performInvokeRequest", t);
+                    
                     new ThreadDialog(
                             button,
                             Resources.getText("Problem invoking") + " " +

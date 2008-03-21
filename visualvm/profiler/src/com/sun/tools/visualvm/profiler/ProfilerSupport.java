@@ -33,6 +33,8 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -44,7 +46,8 @@ import org.netbeans.modules.profiler.ResultsManager;
  * @author Jiri Sedlacek
  */
 public final class ProfilerSupport {
-
+    private static final Logger LOGGER = Logger.getLogger(ProfilerSupport.class.getName());
+    
     private static ProfilerSupport instance;
     
     private Application profiledApplication;
@@ -90,7 +93,9 @@ public final class ProfilerSupport {
     void takeSnapshot(boolean openView) {
         LoadedSnapshot snapshot = ResultsManager.getDefault().takeSnapshot();
         File file = new File(profiledApplication.getStorage().getDirectory() + File.separator + category.createFileName());
-        System.err.println(">>> About to save file to " + file);
+        if (LOGGER.isLoggable(Level.FINER)) {
+            LOGGER.finer("About to save file to " + file);
+        }
     }
     
     

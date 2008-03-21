@@ -34,6 +34,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,6 +45,8 @@ public final class Storage {
     
     private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";
     private static final String PERSISTENT_STORAGE_DIRNAME = "repository";
+    
+    private static final Logger LOGGER = Logger.getLogger(Storage.class.getName());
     
     public static final String DEFAULT_PROPERTIES_EXT = ".properties";
     
@@ -199,14 +203,14 @@ public final class Storage {
             properties.loadFromXML(bis);
             return properties;
         } catch (Exception e) {
-            System.err.println("Error loading properties: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error loading properties", e);
             return null;
         } finally {
             try {
                 if (bis != null) bis.close();
                 if (is != null) is.close();
             } catch (Exception e) {
-                System.err.println("Problem closing input stream: " + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Problem closing input stream", e);
             }
         }
     }
@@ -219,13 +223,13 @@ public final class Storage {
             bos = new BufferedOutputStream(os);
             properties.storeToXML(os, null);
         } catch (Exception e) {
-            System.err.println("Error storing properties: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error storing properties", e);
         } finally {
             try {
                 if (bos != null) bos.close();
                 if (os != null) os.close();
             } catch (Exception e) {
-                System.err.println("Problem closing output stream: " + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Problem closing output stream", e);
             }
         }
     }

@@ -40,6 +40,7 @@ import java.io.*;
 
 import java.lang.reflect.Array;
 
+import java.util.logging.Logger;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
@@ -51,6 +52,8 @@ import javax.management.openmbean.TabularData;
   emptyTable. Since there are synchronization in the JMX world it's
   COMPULSORY to not call the JMX world in synchronized blocks */
 class XMBeanAttributes extends XTable {
+    private static final Logger LOGGER = Logger.getLogger(XMBeanAttributes.class.getName());
+    
     private final static String[] columnNames =
     {Resources.getText("Name"),
      Resources.getText("Value")};
@@ -867,9 +870,9 @@ class XMBeanAttributes extends XTable {
                                     new Attribute(attributeName,tableValue);
                                 mbean.setAttribute(attribute);
                             } catch (Throwable ex) {
-                                ex.printStackTrace();
                                 ex = Utils.getActualException(ex);
-
+                                LOGGER.throwing(XMBeanAttributes.class.getName(), "tableChanged", ex);
+                                
                                 String message = (ex.getMessage() != null) ? ex.getMessage() : ex.toString();
                                 EventQueue.invokeLater(new ThreadDialog(component,
                                                                         message+"\n",

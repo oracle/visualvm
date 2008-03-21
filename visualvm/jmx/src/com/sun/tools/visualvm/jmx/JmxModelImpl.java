@@ -32,7 +32,6 @@ import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.visualvm.jmx.application.ApplicationSecurityConfigurator;
 import com.sun.tools.visualvm.jmx.application.JmxApplication;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVMFactory;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -89,7 +88,6 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnector;
 import javax.management.remote.rmi.RMIServer;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
-import javax.swing.event.SwingPropertyChangeSupport;
 import sun.rmi.server.UnicastRef2;
 import sun.rmi.transport.LiveRef;
 
@@ -125,7 +123,6 @@ import sun.rmi.transport.LiveRef;
  * @author Luis-Miguel Alventosa
  */
 public class JmxModelImpl extends JmxModel {
-
     private static final String PROPERTY_USERNAME = "prop_username";
     private static final String PROPERTY_PASSWORD = "prop_password";
     private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());
@@ -208,8 +205,8 @@ public class JmxModelImpl extends JmxModel {
                 connect(application, proxyClient);
             }
         } catch (Exception e) {
+            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e);
             client = null;
-            e.printStackTrace();
         }
     }
 
@@ -229,8 +226,8 @@ public class JmxModelImpl extends JmxModel {
             client = proxyClient;
             connect(application, proxyClient);
         } catch (Exception e) {
+            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e);
             client = null;
-            e.printStackTrace();
         }
     }
 

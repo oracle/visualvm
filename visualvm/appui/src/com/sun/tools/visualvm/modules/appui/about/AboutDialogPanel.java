@@ -33,6 +33,7 @@ import java.awt.Point;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.net.URL;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -47,7 +48,7 @@ import org.netbeans.lib.profiler.ui.components.ImagePanel;
  * @author Jiri Sedlacek
  */
 public class AboutDialogPanel extends JPanel {
-
+    private final static Logger LOGGER = Logger.getLogger(AboutDialogPanel.class.getName());
 
     // --- Internal API --------------------------------------------------------
 
@@ -101,7 +102,7 @@ public class AboutDialogPanel extends JPanel {
                     try {
                         DesktopUtils.browse(url.toURI());
                     } catch (Exception e) {
-                        e.printStackTrace(System.err);
+                        LOGGER.throwing(AboutDialogPanel.class.getName(), "initComponents", e);
                     }
                 }
             }

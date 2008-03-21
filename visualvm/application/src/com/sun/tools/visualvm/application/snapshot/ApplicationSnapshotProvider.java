@@ -39,6 +39,8 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -58,6 +60,8 @@ class ApplicationSnapshotProvider {
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
     private static final String PROPERTIES_FILENAME = "application_snapshot" + Storage.DEFAULT_PROPERTIES_EXT;
+    
+    private static final Logger LOGGER = Logger.getLogger(ApplicationSnapshotProvider.class.getName());
     
     private static ApplicationSnapshotProvider sharedInstance;
     
@@ -103,7 +107,7 @@ class ApplicationSnapshotProvider {
             try {
                 snapshot.save(snapshotDirectory);
             } catch (Exception e) {
-                System.err.println("Error saving snapshot to application snapshot: " + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Error saving snapshot to application snapshot", e);
             }
         }
         

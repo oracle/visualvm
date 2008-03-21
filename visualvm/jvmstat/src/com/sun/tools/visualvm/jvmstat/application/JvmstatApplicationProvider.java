@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
@@ -62,6 +64,7 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  * @author Tomas Hurka
  */
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
+    private static final Logger LOGGER = Logger.getLogger(JvmstatApplicationProvider.class.getName());
     
     private static JvmstatApplicationProvider instance;
     
@@ -125,6 +128,9 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                     if (firstEvent[0]) {
                         // First event for this Host
                         // NOTE: already existing applications are treated as new on this host
+                        if (LOGGER.isLoggable(Level.FINER)) {
+                            LOGGER.finer("Monitored Host (" + host.getHostName() + ") status changed - adding all active applications");
+                        }
                         firstEvent[0] = false;
                         processNewApplicationsByPids(host, e.getActive());
                     } else {

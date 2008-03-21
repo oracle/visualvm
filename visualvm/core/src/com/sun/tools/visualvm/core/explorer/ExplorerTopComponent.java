@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import java.awt.BorderLayout;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.util.Utilities;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -39,6 +41,8 @@ import org.openide.windows.WindowManager;
 final class ExplorerTopComponent extends TopComponent {
 
     private static final String PREFERRED_ID = "ExplorerTopComponent";
+    private static final Logger LOGGER = Logger.getLogger(ExplorerTopComponent.class.getName());
+    
     static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/explorer.png";
 
     private static ExplorerTopComponent instance;
@@ -78,7 +82,9 @@ final class ExplorerTopComponent extends TopComponent {
         if (explorerTopComponent == null) return getInstance();
         if (explorerTopComponent instanceof ExplorerTopComponent) return (ExplorerTopComponent)explorerTopComponent;
     
-        System.err.println("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior.");
+        if (LOGGER.isLoggable(Level.WARNING)) {
+            LOGGER.warning("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior.");
+        }
         return getInstance();
     }
     

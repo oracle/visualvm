@@ -28,6 +28,7 @@ package net.java.visualvm.modules.glassfish.jmx;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -41,24 +42,26 @@ import org.openide.util.Exceptions;
  * @author Jaroslav Bachorik
  */
 public class JMXUtil {
+    private static final Logger LOGGER = Logger.getLogger(JMXUtil.class.getName());
+    
     public static final String getServerName(JmxModel jmx) {
         try {
             Object serverNameObj = jmx.getMBeanServerConnection().getAttribute(new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime"), "J2EEServer");
             return serverNameObj != null ? serverNameObj.toString() : null;
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         } catch (AttributeNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerName", ex);
         }
         return null;
     }
@@ -68,19 +71,19 @@ public class JMXUtil {
             Object serverConfObj = jmx.getMBeanServerConnection().getAttribute(new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime"), "config-ref");
             return serverConfObj != null ? serverConfObj.toString() : null;
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         } catch (AttributeNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfig", ex);
         }
         return null;
     }
@@ -90,17 +93,17 @@ public class JMXUtil {
             Object serverConfDirObj = jmx.getMBeanServerConnection().invoke(new ObjectName("com.sun.appserv:type=domain,category=config"), "getConfigDir", null, null);
             return serverConfDirObj != null ? serverConfDirObj.toString() : null;
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfigDir", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfigDir", ex);
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfigDir", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfigDir", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfigDir", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerConfigDir", ex);
         }
         return null;
     }
@@ -110,17 +113,17 @@ public class JMXUtil {
             Object serverDomainObj = jmx.getMBeanServerConnection().invoke(new ObjectName("com.sun.appserv:type=domain,category=config"), "getName", null, null);
             return serverDomainObj != null ? serverDomainObj.toString() : null;
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerDomain", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerDomain", ex);
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerDomain", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerDomain", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerDomain", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getServerDomain", ex);
         }
         return null;
     }
@@ -133,7 +136,7 @@ public class JMXUtil {
                 }
             }
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getObjectName", ex);
         }
         return moduleUniqueName;
     }
@@ -157,19 +160,19 @@ public class JMXUtil {
         try {
             return (String) jmx.getMBeanServerConnection().getAttribute(new ObjectName(objectName), "name");
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (AttributeNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         }
         return null;
     }
@@ -180,19 +183,19 @@ public class JMXUtil {
             if (!ctxMapping.startsWith("/")) ctxMapping = "/" + ctxMapping;
             return context2name.get(ctxMapping);
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (AttributeNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getWebModuleName", ex);
         }
         return null;
     }
@@ -202,19 +205,19 @@ public class JMXUtil {
             ObjectName on = new ObjectName("com.sun.appserv:j2eeType=J2EEServer,name=server,category=runtime");
             return (String[]) jmx.getMBeanServerConnection().getAttribute(on, "deployedObjects");
         } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         } catch (AttributeNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         } catch (MalformedObjectNameException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         } catch (NullPointerException ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.throwing(JMXUtil.class.getName(), "getDeployedObjects", ex);
         }
         return new String[0];
     }

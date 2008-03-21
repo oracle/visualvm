@@ -39,6 +39,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,7 +54,8 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 class HeapDumpView extends DataSourceView {
-
+    private final static Logger LOGGER = Logger.getLogger(HeapDumpView.class.getName());
+    
     private DataViewComponent view;
     
 
@@ -132,9 +134,9 @@ class HeapDumpView extends DataSourceView {
 //                    contentsPanel.doLayout();
                 } });
               } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
+                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);
               } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);
               }
             }
           });

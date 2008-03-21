@@ -32,6 +32,7 @@ import java.lang.management.ThreadMXBean;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
@@ -44,7 +45,8 @@ import org.netbeans.modules.profiler.ui.NBSwingWorker;
  */
 class ThreadMXBeanDataManager extends ThreadsDataManager {
   private static final long[] dummyLong = new long[0];
-
+  private static final Logger LOGGER = Logger.getLogger(ThreadMXBeanDataManager.class.getName());
+  
   private ThreadMXBean threadBean;
   private MBeanServerConnection serverConnection;
   private Set<Long> threadIdSet = new HashSet();
@@ -69,7 +71,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
           resp.fillInThreadData();
           processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));
         } catch (Exception ex) {
-          // ex.printStackTrace();
+            LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex);
         } finally {
           refreshRunning = false;
         }

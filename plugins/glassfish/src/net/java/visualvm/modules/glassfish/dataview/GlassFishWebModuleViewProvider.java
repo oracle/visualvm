@@ -61,6 +61,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.swing.BorderFactory;
@@ -78,6 +79,8 @@ import javax.swing.table.TableRowSorter;
  */
 public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<GlassFishWebModule> {
     private final static GlassFishWebModuleViewProvider INSTANCE = new GlassFishWebModuleViewProvider();
+    private final static Logger LOGGER = Logger.getLogger(GlassFishWebModuleViewProvider.class.getName());
+    
     private final Map<GlassFishWebModule, GlassfishWebModuleView> viewMap = new  HashMap<GlassFishWebModule, GlassFishWebModuleViewProvider.GlassfishWebModuleView>();
     
     private static class GlassfishWebModuleView extends DataSourceView {
@@ -234,19 +237,19 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
                 sb.append("<b>Caching: </b>").append(cacheAllowed ? "Allowed" : "Disallowed").append("<br/>");
                 sb.append("<br/>");
             } catch (MBeanException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             } catch (AttributeNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             } catch (InstanceNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             } catch (ReflectionException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             } catch (MalformedObjectNameException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             } catch (NullPointerException ex) {
-                Exceptions.printStackTrace(ex);
+                LOGGER.throwing(GlassFishWebModuleViewProvider.class.getName(), "buildInfo", ex);
             }
             return sb.toString();
         }

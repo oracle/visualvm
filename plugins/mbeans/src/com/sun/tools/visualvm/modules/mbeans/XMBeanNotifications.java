@@ -41,6 +41,8 @@ import java.util.*;
 import java.io.*;
 import java.lang.reflect.Array;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
@@ -55,6 +57,8 @@ class XMBeanNotifications extends JTable implements NotificationListener {
         Resources.getText("Message"),
         Resources.getText("Event"),
         Resources.getText("Source")};
+    
+    private final static Logger LOGGER = Logger.getLogger(XMBeanNotifications.class.getName());
     
     private HashMap<ObjectName, XMBeanNotificationsListener> listeners =
             new HashMap<ObjectName, XMBeanNotificationsListener>();
@@ -233,8 +237,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                         MBeanServerDelegate.DELEGATE_NAME, this, null, null);
                 subscribed = true;
             } catch (Exception e) {
-                System.err.println("Error adding listener for delegate:");
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error adding listener for delegate", e);
             }
         }
         XMBeanNotificationsListener listener =
@@ -264,8 +267,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                 }
             }
         } catch(Exception e) {
-            System.err.println("Error unregistering notification:");
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error unregistering notification", e);
         }
     }
     
@@ -595,8 +597,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                 mbean.getCachedMBeanServerConnection().removeNotificationListener(
                         mbean.getObjectName(), this, null, null);
             } catch (Exception e) {
-                System.err.println("Error removing listener:");
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error removing listener", e);
             }
             unregistered = true;
         }
@@ -613,8 +614,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                         mbean.getObjectName(), this, null, null);
                 unregistered = false;
             } catch (Exception e) {
-                System.err.println("Error adding listener:");
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error adding listener", e);
             }
         }
         
@@ -652,8 +652,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                                     XMBeanNotificationsListener.this,
                                     mbean, node, rowData, received);
                         } catch (Exception e) {
-                            System.err.println("Error handling notification:");
-                            e.printStackTrace();
+                            LOGGER.log(Level.SEVERE, "Error handling notification", e);
                         }
                     }
                 }

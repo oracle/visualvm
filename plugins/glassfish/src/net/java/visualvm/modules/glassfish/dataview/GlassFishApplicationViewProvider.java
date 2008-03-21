@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
 
@@ -50,8 +51,10 @@ import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
  * @author Jaroslav Bachorik
  */
 public class GlassFishApplicationViewProvider implements DataSourceViewsProvider<Application> {
-
+    
     private final static GlassFishApplicationViewProvider INSTANCE = new GlassFishApplicationViewProvider();
+    private final static Logger LOGGER = Logger.getLogger(GlassFishApplicationViewProvider.class.getName());
+    
     private final Map<Application, HTTPServiceView> httpServiceViewMap = new  HashMap<Application, HTTPServiceView>();
     private final Map<Application, TransactionServiceView> transServiceViewMap = new  HashMap<Application, TransactionServiceView>();
     
@@ -100,7 +103,7 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
                 }
                 };
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.throwing(GlassFishApplicationViewProvider.class.getName(), "getViews", e);
         }
 
         return Collections.EMPTY_SET;

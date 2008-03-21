@@ -30,16 +30,17 @@ import java.awt.event.*;
 import java.io.*;
 import javax.management.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.tree.*;
 import com.sun.tools.visualvm.modules.mbeans.XNodeInfo.Type;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
-import static com.sun.tools.visualvm.modules.mbeans.Utilities.*;
 
 @SuppressWarnings("serial")
 class XSheet extends JPanel
         implements ActionListener, NotificationListener {
+    private final static Logger LOGGER = Logger.getLogger(XSheet.class.getName());
     
     private JPanel topPanelAttributes;
     private JPanel topPanelOperations;
@@ -233,9 +234,9 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Couldn't get MBeanInfo for MBean [" +
-                            mbean.getObjectName() + "]");
-                    t.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Couldn't get MBeanInfo for MBean [" +
+                            mbean.getObjectName() + "]", t);
+
                     showErrorDialog(t.toString(),
                             Resources.getText("Problem displaying MBean"));
                 }
@@ -283,10 +284,10 @@ class XSheet extends JPanel
                     repaint();
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Problem displaying MBean " +
+                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " +
                             "attributes for MBean [" +
-                            mbean.getObjectName() + "]");
-                    t.printStackTrace();
+                            mbean.getObjectName() + "]", t);
+
                     showErrorDialog(t.toString(),
                             Resources.getText("Problem displaying MBean"));
                 }
@@ -332,10 +333,9 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Problem displaying MBean " +
+                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " +
                             "operations for MBean [" +
-                            mbean.getObjectName() + "]");
-                    t.printStackTrace();
+                            mbean.getObjectName() + "]", t);
                     showErrorDialog(t.toString(),
                             Resources.getText("Problem displaying MBean"));
                 }
@@ -389,10 +389,9 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Problem displaying MBean " +
+                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " +
                             "notifications for MBean [" +
-                            mbean.getObjectName() + "]");
-                    t.printStackTrace();
+                            mbean.getObjectName() + "]", t);
                     showErrorDialog(t.toString(),
                             Resources.getText("Problem displaying MBean"));
                 }
@@ -443,8 +442,8 @@ class XSheet extends JPanel
                     validate();
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Problem adding listener");
-                    t.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Problem adding listener", t);
+
                     showErrorDialog(t.getMessage(),
                             Resources.getText("Problem adding listener"));
                 }
@@ -470,8 +469,7 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Problem removing listener");
-                    t.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Problem removing listener", t);
                     showErrorDialog(t.getMessage(),
                             Resources.getText("Problem removing listener"));
                 }

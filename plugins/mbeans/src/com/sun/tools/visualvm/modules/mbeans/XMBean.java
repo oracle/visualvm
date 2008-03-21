@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.*;
 import javax.swing.Icon;
 
@@ -39,6 +41,7 @@ class XMBean {
     private final Object broadcasterLock = new Object();
     private MBeanInfo mbeanInfo;
     private final Object mbeanInfoLock = new Object();
+    private final static Logger LOGGER = Logger.getLogger(XMBean.class.getName());
     
     public XMBean(ObjectName objectName, MBeansTab mbeansTab) {
         this.mbeansTab = mbeansTab;
@@ -69,9 +72,8 @@ class XMBean {
                             getObjectName(),
                             "javax.management.NotificationBroadcaster");
                 } catch (Exception e) {
-                    System.err.println("Couldn't check if MBean [" +
-                            objectName + "] is a notification broadcaster");
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Couldn't check if MBean [" +
+                            objectName + "] is a notification broadcaster", e);
                     return false;
                 }
             }

@@ -34,6 +34,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
@@ -43,7 +44,8 @@ import org.openide.windows.TopComponent;
  * @author Jiri Sedlacek
  */
 class DataSourceWindow extends TopComponent implements PropertyChangeListener {
-
+    private final static Logger LOGGER = Logger.getLogger(DataSourceWindow.class.getName());
+    
     private int viewsCount = 0;
 
     private DataSource dataSource;
@@ -63,7 +65,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
                 }
             });
         } catch (Exception e) {
-            System.err.println("Failed to create window for " + dataSource);
+            LOGGER.severe("Failed to create window for " + dataSource);
         }
     }
     

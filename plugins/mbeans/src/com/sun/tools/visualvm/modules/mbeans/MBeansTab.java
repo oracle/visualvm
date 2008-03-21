@@ -37,6 +37,8 @@ import java.awt.EventQueue;
 import java.beans.*;
 import java.io.*;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -45,6 +47,7 @@ import javax.swing.tree.*;
 class MBeansTab extends JPanel implements
         NotificationListener, PropertyChangeListener,
         TreeSelectionListener, TreeWillExpandListener {
+    private final static Logger LOGGER = Logger.getLogger(MBeansTab.class.getName());
     
     private Application application;
     private DisplayArea displayArea;
@@ -134,9 +137,9 @@ class MBeansTab extends JPanel implements
                     // Should never happen because the MBeanServerDelegate
                     // is always present in any standard MBeanServer
                     //
-                    e.printStackTrace();
+                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
                     return null;
                 }
                 // Retrieve MBeans from MBeanServer
@@ -145,7 +148,7 @@ class MBeansTab extends JPanel implements
                 try {
                     mbeans = getCachedMBeanServerConnection().queryNames(null,null);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
                     return null;
                 }
                 return mbeans;
@@ -169,8 +172,7 @@ class MBeansTab extends JPanel implements
                     tree.setVisible(true);
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    System.err.println("Problem at MBean tree construction");
-                    t.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Problem at MBean tree construction", t);
                 }
             }
         }.execute();

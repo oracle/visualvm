@@ -136,6 +136,7 @@ public class GlassFishApplicationProvider implements DataChangeListener<GlassFis
                     model.setVisible(false);
                 }
                 if (jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
+                    model.setVisible(true);
                     return;
                 }
                 
@@ -192,7 +193,9 @@ public class GlassFishApplicationProvider implements DataChangeListener<GlassFis
                 toAdd.removeAll(lazy);
 
                 if (toAdd.size() > 0 || toRemove.size() > 0) {
-                    model.getRepository().updateDataSources(toAdd, toRemove);
+                    model.getRepository().addDataSources(toAdd);
+                    model.getRepository().removeDataSources(toRemove);
+//                    model.getRepository().updateDataSources(toAdd, toRemove);
                 }
             } finally {
                 isProcessing.set(false);

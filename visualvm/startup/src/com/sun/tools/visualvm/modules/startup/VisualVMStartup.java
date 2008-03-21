@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.modules.startup;
 
 import java.util.Properties;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.openide.LifecycleManager;
@@ -35,7 +36,8 @@ import org.openide.modules.ModuleInstall;
  * often not needed at all.
  */
 public class VisualVMStartup extends ModuleInstall {
-
+    private static final Logger LOGGER = Logger.getLogger(VisualVMStartup.class.getName());
+    
     public void validate() {
         if (!isCurrentJavaSupported()) {
             try {
@@ -63,7 +65,9 @@ public class VisualVMStartup extends ModuleInstall {
         try { vmClass = Class.forName("com.sun.tools.attach.VirtualMachine"); } catch (ClassNotFoundException ex) {}
 
         boolean isCurrentJavaSupported = (javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7")) && desktopClass != null && vmClass != null;
-        if (!isCurrentJavaSupported) System.err.println("Error starting VisualVM, unsupported Java version: " + getJavaInfo());
+        if (!isCurrentJavaSupported) {
+            LOGGER.warning("Error starting VisualVM, unsupported Java version: " + getJavaInfo());
+        }
         return isCurrentJavaSupported;
     }
     

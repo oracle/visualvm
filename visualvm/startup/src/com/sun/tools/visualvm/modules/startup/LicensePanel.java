@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 
 /**
@@ -37,7 +38,8 @@ import org.openide.util.NbBundle;
  * @author  Marek Slama
  */
 final class LicensePanel extends javax.swing.JPanel {
-
+    private final static Logger LOGGER = Logger.getLogger(LicensePanel.class.getName());
+    
     /** Creates new form LicensePanel */
     public LicensePanel(URL url) {
         this.url = url;
@@ -47,8 +49,7 @@ final class LicensePanel extends javax.swing.JPanel {
             jEditorPane1.setPage(url);
         } catch (IOException exc) {
             //Problem with locating file
-            System.err.println("Exception: " + exc.getMessage()); //NOI18N
-            exc.printStackTrace();
+            LOGGER.throwing(LicensePanel.class.getName(), "<init>", exc); //NOI18N
         }
     }
     

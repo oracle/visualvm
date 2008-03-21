@@ -26,17 +26,15 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
 
 @SuppressWarnings("serial")
 class OperationEntry extends JPanel {
+    private final static Logger LOGGER = Logger.getLogger(OperationEntry.class.getName());
+    
     private MBeanOperationInfo operation;
     private JComboBox sigs;
     private Dimension preferredSize;
@@ -112,7 +110,7 @@ class OperationEntry extends JPanel {
             validate();
             doLayout();
         } catch (Exception e) {
-            System.out.println("Error setting Operation panel: " + e.toString());
+            LOGGER.log(Level.SEVERE, "Error setting Operation panel: ", e);
         }
     }
 

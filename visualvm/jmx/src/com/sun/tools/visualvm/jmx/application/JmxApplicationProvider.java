@@ -44,12 +44,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
@@ -60,6 +60,7 @@ import org.openide.windows.WindowManager;
  * @author Luis-Miguel Alventosa
  */
 class JmxApplicationProvider {
+    private static final Logger LOGGER = Logger.getLogger(JmxApplicationProvider.class.getName());
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
@@ -282,7 +283,7 @@ class JmxApplicationProvider {
         try {
             return new JMXServiceURL(connectionString);
         } catch (MalformedURLException e) {
-            Exceptions.printStackTrace(e);
+            LOGGER.throwing(JMXServiceURL.class.getName(), "getServiceURL", e);
             return null;
         }
     }
