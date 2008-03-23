@@ -30,22 +30,8 @@ import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.DisplayArea;
-import com.sun.tools.visualvm.core.ui.components.JExtendedSplitPane;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.openide.util.Utilities;
 
 /**
@@ -71,15 +57,17 @@ class MBeansView extends DataSourceView {
     }
 
     private DataViewComponent createViewComponent() {
-        JComponent mbeansView = null;
+        DataViewComponent dvc = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         if (jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
             JTextArea textArea = new JTextArea("\n\nData not available in " +
                     "this tab because JMX connection to the JMX agent couldn't " +
                     "be established.");
             textArea.setEditable(false);
-            mbeansView = textArea;
-        } else {
+            dvc = new DataViewComponent(
+                new DataViewComponent.MasterView("MBeans", null, textArea),
+                new DataViewComponent.MasterViewConfiguration(true));
+        } else {           
             // MBeansTab
             MBeansTab mbeansTab = new MBeansTab(application);
             jmx.addPropertyChangeListener(mbeansTab);
@@ -99,64 +87,20 @@ class MBeansView extends DataSourceView {
             // MBeansMetadataView
             MBeansMetadataView mbeansMetadataView = new MBeansMetadataView(mbeansTab);
 
-            DisplayArea mbeansDisplayArea = new DisplayArea();
-            mbeansDisplayArea.setClosable(false);
-            mbeansDisplayArea.addTab(new DisplayArea.Tab("Attributes", mbeansAttributesView));
-            mbeansDisplayArea.addTab(new DisplayArea.Tab("Operations", mbeansOperationsView));
-            mbeansDisplayArea.addTab(new DisplayArea.Tab("Notifications", mbeansNotificationsView));
-            mbeansDisplayArea.addTab(new DisplayArea.Tab("Metadata", mbeansMetadataView));
-            mbeansTab.setDisplayArea(mbeansDisplayArea);
-
-            JExtendedSplitPane contentsSplitPane = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, mbeansTreeView, mbeansDisplayArea);
-            tweakSplitPaneUI(contentsSplitPane);
-            contentsSplitPane.setDividerLocation(0.3);
-            contentsSplitPane.setResizeWeight(0);
-
-            JPanel contentsPanel = new JPanel(new BorderLayout());
-            contentsPanel.setOpaque(false);
-            contentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-            contentsPanel.add(contentsSplitPane, BorderLayout.CENTER);
+            DataViewComponent.MasterView monitoringMasterView = new DataViewComponent.MasterView("", null, null);
+            DataViewComponent.MasterViewConfiguration monitoringMasterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
+            dvc = new DataViewComponent(monitoringMasterView, monitoringMasterConfiguration);
+        
+            dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.33, 0, -1, -1, -1, -1));
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("MBeans", false), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("MBeans", null, mbeansTreeView, null), DataViewComponent.TOP_LEFT);
             
-            mbeansView = contentsPanel;
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", false), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Attributes", null, mbeansAttributesView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Operations", null, mbeansOperationsView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Notifications", null, mbeansNotificationsView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Metadata", null, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT);
         }
-        return new DataViewComponent(
-                new DataViewComponent.MasterView("MBeans", null, mbeansView),
-                new DataViewComponent.MasterViewConfiguration(true));
-    }
-
-    private static void tweakSplitPaneUI(final JSplitPane splitPane) {
-        splitPane.setUI(new BasicSplitPaneUI() {
-            @Override
-            public BasicSplitPaneDivider createDefaultDivider() {
-                return new BasicSplitPaneDivider(this) {
-                    @Override
-                    public void paint(Graphics g) {
-                        Dimension size = getSize();
-                        g.setColor(getBackground());
-                        g.fillRect(0, 0, size.width, size.height);
-                    }
-                };
-            }
-        });
-        splitPane.setBorder(null);
-        splitPane.setOpaque(false);
-        splitPane.setDividerSize(6);
-
-        final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) splitPane.getUI()).getDivider();
-        divider.setBackground(Color.WHITE);
-        divider.setBorder(null);
-
-        divider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                divider.setBackground(new Color(235, 235, 235));
-                divider.repaint();
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                divider.setBackground(Color.WHITE);
-                divider.repaint();
-            }
-        });
+        return dvc;
     }
 }

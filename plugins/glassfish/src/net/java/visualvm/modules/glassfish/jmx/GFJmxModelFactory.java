@@ -93,7 +93,7 @@ public class GFJmxModelFactory extends ModelFactory<JmxModel, Application> imple
     }
 
     @Override
-    public int depth() {
+    public int priority() {
         return 10;
     }
     

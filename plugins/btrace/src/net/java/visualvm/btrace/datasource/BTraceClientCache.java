@@ -26,7 +26,7 @@ package net.java.visualvm.btrace.datasource;
 
 import com.sun.btrace.client.Client;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
@@ -88,7 +88,7 @@ public class BTraceClientCache implements DataChangeListener<Application> {
     
     private String findToolsJarPath(Application app) {
         String toolsJarPath = null;
-        Properties props = JVMFactory.getJVMFor(app).getSystemProperties();
+        Properties props = JvmFactory.getJVMFor(app).getSystemProperties();
         if (props != null && props.containsKey("java.home")) {
             String java_home = props.getProperty("java.home");
             java_home = java_home.replace(File.separator + "jre", "");

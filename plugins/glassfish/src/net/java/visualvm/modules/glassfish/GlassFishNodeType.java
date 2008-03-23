@@ -25,7 +25,7 @@
  */
 package net.java.visualvm.modules.glassfish;
 
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import org.openide.util.Utilities;
 import java.awt.Image;
 import java.text.MessageFormat;
@@ -46,7 +46,7 @@ public class GlassFishNodeType extends GlassFishApplicationType {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public GlassFishNodeType(JVM jvm, int pid) {
+    public GlassFishNodeType(Jvm jvm, int pid) {
         super(pid);
         init(jvm);
     }
@@ -76,7 +76,7 @@ public class GlassFishNodeType extends GlassFishApplicationType {
         return "0";
     }
 
-    private void init(JVM jvm) {
+    private void init(Jvm jvm) {
         Pattern pattern = Pattern.compile("-Dcom\\.sun\\.aas\\.instanceName=(.*?)\\s");
         Matcher mtchr = pattern.matcher(jvm.getJvmArgs());
 

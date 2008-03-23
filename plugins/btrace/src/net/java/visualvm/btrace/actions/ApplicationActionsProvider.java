@@ -25,8 +25,8 @@
 package net.java.visualvm.btrace.actions;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
 import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
 import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
@@ -100,7 +100,7 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
     }
 
     public Set<ExplorerActionDescriptor> getActions(Application app) {
-        JVM jvm = JVMFactory.getJVMFor(app);
+        Jvm jvm = JvmFactory.getJVMFor(app);
         if (app.isLocalApplication() && jvm.isMonitoringSupported() && probesRegistered()) {
             Set<ExplorerActionDescriptor> actions = new HashSet<ExplorerActionDescriptor>();
             actions.add(new ExplorerActionDescriptor(null, 50));

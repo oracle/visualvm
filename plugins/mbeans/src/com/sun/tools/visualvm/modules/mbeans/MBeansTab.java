@@ -30,7 +30,6 @@ import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.core.ui.components.DisplayArea;
 import com.sun.tools.visualvm.modules.mbeans.options.GlobalPreferences;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -50,7 +49,6 @@ class MBeansTab extends JPanel implements
     private final static Logger LOGGER = Logger.getLogger(MBeansTab.class.getName());
     
     private Application application;
-    private DisplayArea displayArea;
     private XTree tree;
     private XSheet sheet;
     private XDataViewer viewer;
@@ -100,14 +98,6 @@ class MBeansTab extends JPanel implements
     
     public JPanel getMetadataPanel() {
         return sheet.getMetadata();
-    }
-    
-    public DisplayArea getDisplayArea() {
-        return displayArea;
-    }
-    
-    public void setDisplayArea(DisplayArea displayArea) {
-        this.displayArea = displayArea;
     }
     
     public void dispose() {

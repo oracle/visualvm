@@ -5,7 +5,6 @@
  */
 package net.java.visualvm.btrace.views;
 
-import com.sun.tools.visualvm.application.MonitoredData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

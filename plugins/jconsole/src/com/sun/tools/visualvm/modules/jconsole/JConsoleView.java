@@ -29,8 +29,8 @@ import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -127,7 +127,7 @@ class JConsoleView extends DataSourceView {
 
                 if (availablePlugins) {
                     ProxyClient proxyClient = null;
-                    JVM jvm = JVMFactory.getJVMFor(application);
+                    Jvm jvm = JvmFactory.getJVMFor(application);
                     JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(application);
                     if (jvmstat != null) { // Use Jvmstat model
                         Storage storage = application.getStorage();

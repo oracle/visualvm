@@ -25,9 +25,6 @@
 package net.java.visualvm.btrace.views;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVMFactory;
-import com.sun.tools.visualvm.application.MonitoredData;
-import com.sun.tools.visualvm.application.MonitoredDataListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -36,11 +33,8 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 import java.awt.Color;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import net.java.visualvm.btrace.config.ProbeConfig.ProbeConnection;
@@ -49,12 +43,6 @@ import net.java.visualvm.btrace.ui.components.graph.DynamicGraph;
 import net.java.visualvm.btrace.ui.components.graph.DynamicLineGraph;
 import net.java.visualvm.btrace.ui.components.graph.ValueProvider;
 import net.java.visualvm.btrace.utils.HTMLTextArea;
-import org.openide.util.Exceptions;
-import sun.jvmstat.monitor.Monitor;
-import sun.jvmstat.monitor.MonitorException;
-import sun.jvmstat.monitor.MonitoredHost;
-import sun.jvmstat.monitor.MonitoredVm;
-import sun.jvmstat.monitor.VmIdentifier;
 
 /**
  *

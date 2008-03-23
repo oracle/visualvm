@@ -26,7 +26,7 @@
 package net.java.visualvm.modules.glassfish;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import java.awt.Image;
 import java.text.MessageFormat;
 import java.util.Properties;
@@ -46,11 +46,11 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
     private final String description = "(domain = {0})";
     private String domainName = "UNKNOWN";
     private final String typeName = "GlassFish/SJSAS";
-    private JVM gfJvm;
+    private Jvm gfJvm;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public GlassFishInstanceType(Application app, JVM jvm) {
+    public GlassFishInstanceType(Application app, Jvm jvm) {
         super(app.getPid());
         init(app, jvm);
     }
@@ -81,7 +81,7 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
         return "0";
     }
 
-    private void init(Application app, JVM jvm) {
+    private void init(Application app, Jvm jvm) {
         try {
             if (jvm.isGetSystemPropertiesSupported()) {
                 Properties props = jvm.getSystemProperties();

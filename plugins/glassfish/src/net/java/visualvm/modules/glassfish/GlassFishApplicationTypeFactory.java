@@ -28,8 +28,8 @@
 package net.java.visualvm.modules.glassfish;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.JVM;
-import com.sun.tools.visualvm.application.JVMFactory;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.application.type.MainClassApplicationTypeFactory;
@@ -55,7 +55,7 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
 
     @Override
     public ApplicationType createModelFor(Application app) {
-        JVM jvm = JVMFactory.getJVMFor(app);
+        Jvm jvm = JvmFactory.getJVMFor(app);
         if (!jvm.isBasicInfoSupported()) return null;
         if (jvm.getMainClass() != null) return super.createModelFor(app);
         if (jvm.isGetSystemPropertiesSupported()) {
@@ -67,7 +67,7 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
     }
     
     @Override
-    public ApplicationType createApplicationTypeFor(Application app, JVM jvm, String mainClass) {
+    public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
         if ("com.sun.enterprise.server.PELaunch".equals(mainClass)) {
             return new GlassFishInstanceType(app, jvm);
         } else if ("com.sun.enterprise.ee.nodeagent.NodeAgentMain".equals(mainClass)) {
