@@ -43,6 +43,7 @@ import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -81,7 +82,8 @@ class JmxApplicationProvider {
     
     
     private boolean trackingNewHosts;
-    private Map<String, Storage> persistedApplications = new HashMap();
+    private Map<String, Set<Storage>> persistedApplications =
+            new HashMap<String, Set<Storage>>();
     
     
     public synchronized static JmxApplicationProvider sharedInstance() {
@@ -302,7 +304,12 @@ class JmxApplicationProvider {
         
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
-            persistedApplications.put(storage.getCustomProperty(PROPERTY_HOSTNAME), storage);
+            Set<Storage> storageSet = persistedApplications.get(storage.getCustomProperty(PROPERTY_HOSTNAME));
+            if (storageSet == null) {
+                storageSet = new HashSet<Storage>();
+                persistedApplications.put(storage.getCustomProperty(PROPERTY_HOSTNAME), storageSet);
+            }
+            storageSet.add(storage);
         }
         
         DataChangeListener<Host> dataChangeListener = new DataChangeListener<Host>() {
@@ -311,8 +318,8 @@ class JmxApplicationProvider {
                 Set<Host> hosts = event.getAdded();
                 for (Host host : hosts) {
                     String hostName = host.getHostName();
-                    final Storage storage = persistedApplications.get(hostName);
-                    if (storage != null) {
+                    Set<Storage> storageSet = persistedApplications.get(hostName);
+                    if (storageSet != null) {
                         persistedApplications.remove(hostName);
                         
                         String[] keys = new String[] {
@@ -322,13 +329,15 @@ class JmxApplicationProvider {
                             PROPERTY_PASSWORD
                         };
 
-                        final String[] values = storage.getCustomProperties(keys);
-                        RequestProcessor.getDefault().post(new Runnable() {
-                            public void run() {
-                                addJmxApplication(null, values[0],
-                                    values[1].length() == 0 ? null : values[1], storage);
-                            }
-                        });
+                        for (final Storage storage : storageSet) {
+                            final String[] values = storage.getCustomProperties(keys);
+                            RequestProcessor.getDefault().post(new Runnable() {
+                                public void run() {
+                                    addJmxApplication(null, values[0],
+                                            values[1].length() == 0 ? null : values[1], storage);
+                                }
+                            });
+                        }
                     }
                 }
                 
