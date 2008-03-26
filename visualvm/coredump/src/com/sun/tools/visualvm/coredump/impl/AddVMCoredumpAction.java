@@ -74,9 +74,9 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     }
     
     protected void initialize() {
+        setEnabled(!notSupported);
         super.initialize();
         notSupported = Utilities.isWindows();
-        setEnabled(!notSupported);
     }
     
     
