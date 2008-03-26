@@ -62,25 +62,23 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";
 
     private DataViewComponent view;
-    private Host host;
     private Timer timer;
     private HostOverview hostOverview;
     
 
     public HostOverviewView(Host host) {
-        super("Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
-        this.host = host;
+        super(host, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);
     }
     
     protected void willBeAdded() {
-        hostOverview = HostOverviewFactory.getSystemOverviewFor(host);
+        hostOverview = HostOverviewFactory.getSystemOverviewFor((Host)getDataSource());
     }
         
     public DataViewComponent getView() {
         if (view == null) {
             view = createViewComponent();
             HostOverviewPluggableView pluggableView = (HostOverviewPluggableView)HostViewsSupport.sharedInstance().getOverviewView();
-            pluggableView.makeCustomizations(view, host);
+            pluggableView.makeCustomizations(view, (Host)getDataSource());
         }
         
         return view;
@@ -97,7 +95,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
     private DataViewComponent createViewComponent() {
         DataViewComponent dvc = new DataViewComponent(
-                new MasterViewSupport(host).getMasterView(),
+                new MasterViewSupport((Host)getDataSource()).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
         final CpuLoadViewSupport cpuLoadViewSupport = new CpuLoadViewSupport(hostOverview);
@@ -125,7 +123,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         });
         timer.setInitialDelay(0);
         timer.start();
-        host.notifyWhenRemoved(this);
+        ((Host)getDataSource()).notifyWhenRemoved(this);
         
         return dvc;
     }

@@ -52,7 +52,7 @@ class ProfilerSnapshotView extends DataSourceView {
     }
     
     private ProfilerSnapshotView(ProfilerSnapshot snapshot, DataSourceDescriptor descriptor) {
-        super(descriptor.getName(), descriptor.getIcon(), Positionable.POSITION_AT_THE_END);
+        super(snapshot, descriptor.getName(), descriptor.getIcon(), Positionable.POSITION_AT_THE_END, true);
         loadedSnapshot = snapshot.getLoadedSnapshot();
     }
     
@@ -64,10 +64,6 @@ class ProfilerSnapshotView extends DataSourceView {
     
     protected void removed() {
         loadedSnapshot = null;
-    }
-    
-    public boolean isClosable() {
-        return true;
     }
     
     

@@ -52,7 +52,7 @@ public class ApplicationSnapshotOverviewViewProvider implements DataSourceViewsP
         synchronized(viewsCache) {
             ApplicationOverviewView view = viewsCache.get(snapshot);
             if (view == null) {
-                view = new ApplicationOverviewView(ApplicationOverviewModel.create(snapshot)) {
+                view = new ApplicationOverviewView(snapshot, ApplicationOverviewModel.create(snapshot)) {
                     public void removed() {
                         super.removed();
                         viewsCache.remove(snapshot);

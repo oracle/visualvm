@@ -63,7 +63,7 @@ class ThreadDumpView extends DataSourceView {
     }
     
     private ThreadDumpView(ThreadDump threadDump, DataSourceDescriptor descriptor) {
-        super(descriptor.getName(), descriptor.getIcon(), 0);
+        super(threadDump, descriptor.getName(), descriptor.getIcon(), 0, true);
         view = createViewComponent(threadDump);
         ThreadDumpPluggableView pluggableView = (ThreadDumpPluggableView)ThreadDumpSupport.getInstance().getThreadDumpView();
         pluggableView.makeCustomizations(view, threadDump);
@@ -71,10 +71,6 @@ class ThreadDumpView extends DataSourceView {
         
     public DataViewComponent getView() {
         return view;
-    }
-    
-    public boolean isClosable() {
-        return true;
     }
     
     

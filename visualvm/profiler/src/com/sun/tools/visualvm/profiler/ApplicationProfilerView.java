@@ -80,7 +80,7 @@ class ApplicationProfilerView extends DataSourceView {
     
 
     public ApplicationProfilerView(Application application) {
-        super("Profiler", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 40);
+        super(application, "Profiler", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);
         view = createViewComponent(application);
     }
         

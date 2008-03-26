@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.io.File;
+import org.openide.util.RequestProcessor;
 
 /**
  * Abstract implementation of Snapshot.
@@ -120,8 +121,10 @@ public abstract class Snapshot extends DataSource {
     
     
     protected void remove() {
-        File f = getFile();
-        if (f != null) Utils.delete(f, true);
+        final File f = getFile();
+        if (f != null) Utils.FILE_QUEUE.post(new Runnable() {
+            public void run() { Utils.delete(f, true); }
+        });
         setFile(null);
         super.remove();
     }

@@ -64,7 +64,7 @@ class HeapDumpView extends DataSourceView {
     }
     
     private HeapDumpView(HeapDump heapDump, DataSourceDescriptor descriptor) {
-        super(descriptor.getName(), descriptor.getIcon(), 0);
+        super(heapDump, descriptor.getName(), descriptor.getIcon(), 0, true);
         view = createViewComponent(heapDump);
         HeapDumpPluggableView pluggableView = (HeapDumpPluggableView)HeapDumpSupport.getInstance().getHeapDumpView();
         pluggableView.makeCustomizations(view, heapDump);
@@ -73,10 +73,6 @@ class HeapDumpView extends DataSourceView {
         
     public DataViewComponent getView() {
         return view;
-    }
-    
-    public boolean isClosable() {
-        return true;
     }
     
     

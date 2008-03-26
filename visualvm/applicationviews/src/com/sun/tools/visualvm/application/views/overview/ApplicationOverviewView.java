@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.application.views.overview;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
@@ -44,8 +45,8 @@ class ApplicationOverviewView extends DataSourceView {
     private DataViewComponent view;
     
 
-    public ApplicationOverviewView(ApplicationOverviewModel model) {
-        super("Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10);
+    public ApplicationOverviewView(DataSource dataSource, ApplicationOverviewModel model) {
+        super(dataSource, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10, false);
         this.model = model;
     }
     

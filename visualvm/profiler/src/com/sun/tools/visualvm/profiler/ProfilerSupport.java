@@ -99,7 +99,7 @@ public final class ProfilerSupport {
         if (application == null) return;
         Set<? extends DataSourceView> activeViewSet = profilerViewProvider.getViews(application);
         if (activeViewSet.isEmpty()) return;
-        DataSourceWindowManager.sharedInstance().selectView(application, activeViewSet.iterator().next());
+        DataSourceWindowManager.sharedInstance().selectView(activeViewSet.iterator().next());
     }
     
     void takeSnapshot(boolean openView) {

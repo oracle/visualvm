@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.ui;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Image;
@@ -36,9 +37,11 @@ import java.awt.Image;
  */
 public abstract class DataSourceView implements Positionable {
 
+    private DataSource dataSource;
     private String name;
     private Image icon;
     private int preferredPosition;
+    private boolean isClosable;
 
 
     /**
@@ -47,26 +50,40 @@ public abstract class DataSourceView implements Positionable {
      * Order of the notifications/queries is as follows:
      * willBeAdded() -> getView() -> added() -> removed()
      * 
+     * @param dataSource dataSource of the view
      * @param name name of the view as it appears in the subtab,
      * @param icon icon of the view as it appears in the subtab,
-     * @param preferredPosition preferred position of the view among all other views for the DataSource.
+     * @param preferredPosition preferred position of the view among all other views for the DataSource,
+     * @param isClosable true if the user is allowed to close the view, false otherwise.
      */
-    public DataSourceView(String name, Image icon, int preferredPosition) {
+    public DataSourceView(DataSource dataSource, String name, Image icon, int preferredPosition, boolean isClosable) {
+        if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null");
         if (name == null) throw new IllegalArgumentException("Name cannot be null");
         if (icon == null) throw new IllegalArgumentException("Icon cannot be null");
 
+        this.dataSource = dataSource;
         this.name = name;
         this.icon = icon;
         this.preferredPosition = preferredPosition;
+        this.isClosable = isClosable;
     }
 
+
+    /**
+     * Returns dataSource of the view.
+     * 
+     * @return dataSource of the view.
+     */
+    public final DataSource getDataSource() {
+        return dataSource;
+    }
 
     /**
      * Returns name of the view as it appears in the subtab.
      * 
      * @return name of the view as it appears in the subtab.
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -75,7 +92,7 @@ public abstract class DataSourceView implements Positionable {
      * 
      * @return of the view as it appears in the subtab.
      */
-    public Image getImage() {
+    public final Image getImage() {
         return icon;
     }
     
@@ -92,7 +109,7 @@ public abstract class DataSourceView implements Positionable {
      * 
      * @return preferred position of the view among all other views for the DataSource.
      */
-    public int getPreferredPosition() {
+    public final int getPreferredPosition() {
         return preferredPosition;
     }
   
@@ -101,8 +118,8 @@ public abstract class DataSourceView implements Positionable {
      * 
      * @return true if the user is allowed to close the view, false otherwise.
      */
-    public boolean isClosable() {
-        return false;
+    public final boolean isClosable() {
+        return isClosable;
     }
     
     

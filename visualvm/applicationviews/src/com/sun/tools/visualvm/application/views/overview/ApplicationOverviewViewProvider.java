@@ -54,7 +54,7 @@ public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<
         synchronized(viewsCache) {
             ApplicationOverviewView view = viewsCache.get(application);
         if (view == null) {
-                view = new ApplicationOverviewView(ApplicationOverviewModel.create(application)) {
+                view = new ApplicationOverviewView(application, ApplicationOverviewModel.create(application)) {
                     DataViewComponent createViewComponent() {
                         DataViewComponent viewComponent = super.createViewComponent();
                         ApplicationOverviewPluggableView pluggableView = (ApplicationOverviewPluggableView)ApplicationViewsSupport.sharedInstance().getOverviewView();

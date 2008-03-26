@@ -42,6 +42,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
+import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
 /**
@@ -49,6 +50,8 @@ import org.openide.util.Utilities;
  * @author Jiri Sedlacek
  */
 public final class Utils {
+    
+    public static final RequestProcessor FILE_QUEUE = new RequestProcessor("File Queue");
     
     private static final int COPY_PACKET_SIZE = 16384;
     private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());

@@ -72,18 +72,17 @@ class ApplicationMonitorView extends DataSourceView {
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/monitor.png";
 
     private DataViewComponent view;
-    private Application application;
     private Jvm jvm;
     private MemoryMXBean memoryMXBean;
     private MonitoredDataListener monitoredDataListener;
     
 
     public ApplicationMonitorView(Application application) {
-        super("Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20);
-        this.application = application;
+        super(application, "Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);
     }
     
     protected void willBeAdded() {
+        Application application = (Application)getDataSource();
         jvm = JvmFactory.getJVMFor(application);
         JvmJmxModel jvmJmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
         memoryMXBean = jvmJmxModel == null ? null : jvmJmxModel.getMemoryMXBean();
@@ -91,6 +90,7 @@ class ApplicationMonitorView extends DataSourceView {
         
     public DataViewComponent getView() {
         if (view == null) {
+            Application application = (Application)getDataSource();
             view = createViewComponent(application);
             ApplicationMonitorPluggableView pluggableView = (ApplicationMonitorPluggableView)ApplicationViewsSupport.sharedInstance().getMonitorView();
             pluggableView.makeCustomizations(view, application);

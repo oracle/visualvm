@@ -62,7 +62,6 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     private static final int DEFAULT_REFRESH = 1000;
 
     private DataViewComponent view;
-    private Application application;
     private Jvm jvm;
     private ThreadMXBean threadBean;
     private ThreadMXBeanDataManager threadsManager;
@@ -70,19 +69,20 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     
 
     public ApplicationThreadsView(Application application, ThreadMXBean threadBean) {
-        super("Threads", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30);
-        this.application = application;
+        super(application, "Threads", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);
         this.threadBean = threadBean;
     }
     
     protected void willBeAdded() {
+        Application application = (Application)getDataSource();
         jvm = JvmFactory.getJVMFor(application);
         threadsManager = new ThreadMXBeanDataManager(threadBean);
     }
         
     public DataViewComponent getView() {
         if (view == null) {
-            view = createViewComponent();
+            Application application = (Application)getDataSource();
+            view = createViewComponent(application);
             ApplicationThreadsPluggableView pluggableView = (ApplicationThreadsPluggableView)ApplicationViewsSupport.sharedInstance().getThreadsView();
             pluggableView.makeCustomizations(view, application);
         }
@@ -99,7 +99,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     }
     
     
-    private DataViewComponent createViewComponent() {
+    private DataViewComponent createViewComponent(Application application) {
         timer = new Timer(GlobalPreferences.sharedInstance().getThreadsPoll() * 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) { threadsManager.refreshThreads(); }
         });

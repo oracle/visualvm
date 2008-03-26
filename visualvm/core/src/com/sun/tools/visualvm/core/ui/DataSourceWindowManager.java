@@ -30,8 +30,10 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -52,6 +54,7 @@ public final class DataSourceWindowManager {
     private static DataSourceWindowManager sharedInstance;
 
     private final Map<DataSource, DataSourceWindow> openedWindows = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSource, Set<DataSourceView>> openedViews = Collections.synchronizedMap(new HashMap());
 
 
     /**
@@ -94,8 +97,8 @@ public final class DataSourceWindowManager {
                 if (window == null) return; // Window not opened
                 
                 // Remove all views of the dataSource
-                final List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(dataSource);
-                SwingUtilities.invokeLater(new Runnable() {
+                final Set<DataSourceView> views = openedViews.get(dataSource);
+                if (views != null) SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (DataSourceView view : views)
                             if (window.containsView(view)) window.removeView(view);
@@ -105,10 +108,10 @@ public final class DataSourceWindowManager {
         });
     }
     
-    public void selectView(final DataSource dataSource, final DataSourceView view) {
+    public void selectView(final DataSourceView view) {
         processor.post(new Runnable() {
             public void run() {
-                openWindowAndSelectView(dataSource, view, true, true);
+                openWindowAndSelectView(view.getDataSource(), view, true, true);
             }
         });
     }
@@ -193,7 +196,17 @@ public final class DataSourceWindowManager {
                 newViews.add(view);
         
         // Blocking notification that the view will be added
-        for (DataSourceView view : newViews) view.willBeAdded();
+        for (DataSourceView view : newViews) {
+            DataSource dataSource = view.getDataSource();
+            Set<DataSourceView> cachedViews = openedViews.get(dataSource);
+            if (cachedViews == null) {
+                cachedViews = new HashSet();
+                openedViews.put(dataSource, cachedViews);
+            }
+            cachedViews.add(view);
+
+            view.willBeAdded();
+        }
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -210,8 +223,19 @@ public final class DataSourceWindowManager {
         for (DataSourceView view : newViews) view.added();
     }
     
-    void unregisterClosedWindow(final DataSourceWindow window) {
+    void unregisterClosedWindow(DataSourceWindow window) {
         openedWindows.remove(window.getDataSource());
+    }
+    
+    void unregisterClosedView(DataSourceView view) {
+        DataSource dataSource = view.getDataSource();
+        Set<DataSourceView> views = openedViews.get(dataSource);
+        if (views != null) {
+            views.remove(view);
+            if (views.isEmpty()) openedViews.remove(dataSource);
+        } else if (LOGGER.isLoggable(Level.WARNING)) {
+            LOGGER.warning("Tried to unregister not opened view " + view);
+        }
     }
     
     

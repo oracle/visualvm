@@ -50,7 +50,7 @@ class CoreDumpOverviewView extends DataSourceView {
     
     
     public CoreDumpOverviewView(CoreDump coreDump) {
-        super("Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0);
+        super(coreDump, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);
         view = createViewComponent(coreDump);
         OverviewViewSupport.getInstance().getCoreDumpOverviewPluggableView().makeCustomizations(view, coreDump);
     }
