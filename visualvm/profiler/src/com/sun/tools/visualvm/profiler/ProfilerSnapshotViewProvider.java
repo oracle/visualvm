@@ -25,9 +25,10 @@
 
 package com.sun.tools.visualvm.profiler;
 
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerSnapshotViewProvider implements DataSourceViewsProvider<ProfilerSnapshot>{
+class ProfilerSnapshotViewProvider implements DataSourceViewsProvider<ProfilerSnapshot>{
     
     private final Map<ProfilerSnapshot, DataSourceView> viewsCache = new HashMap();
     
@@ -60,8 +61,17 @@ public class ProfilerSnapshotViewProvider implements DataSourceViewsProvider<Pro
         return Collections.singleton(view);
     }
 
-    public void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, ProfilerSnapshot.class);
+    public boolean supportsSaveViewsFor(ProfilerSnapshot dataSource) {
+        return false;
+    }
+
+    public void saveViews(ProfilerSnapshot dataSource, Snapshot snapshot) {
+        
+}
+    
+
+    void initialize() {
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, ProfilerSnapshot.class);
     }
 
 }

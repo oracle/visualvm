@@ -26,9 +26,10 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,8 +62,17 @@ class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Applica
         return Collections.singleton(view);
     }
 
+    public boolean supportsSaveViewsFor(Application dataSource) {
+        return false;
+    }
+    
+    public void saveViews(Application dataSource, Snapshot snapshot) {
+        
+    }
+    
+
     void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }

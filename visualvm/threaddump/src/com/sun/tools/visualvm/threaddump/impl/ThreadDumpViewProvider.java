@@ -25,10 +25,11 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,8 +62,17 @@ public class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDum
         return Collections.singleton(view);
     }
 
+    public boolean supportsSaveViewsFor(ThreadDump dataSource) {
+        return false;
+    }
+    
+    public void saveViews(ThreadDump dataSource, Snapshot snapshot) {
+        
+    }
+    
+
     public void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, ThreadDump.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, ThreadDump.class);
     }
 
 }

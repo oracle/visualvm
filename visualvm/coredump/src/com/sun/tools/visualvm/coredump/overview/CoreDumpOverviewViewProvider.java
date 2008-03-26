@@ -25,10 +25,11 @@
 
 package com.sun.tools.visualvm.coredump.overview;
 
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,8 +64,17 @@ class CoreDumpOverviewViewProvider implements DataSourceViewsProvider<CoreDump>{
         return Collections.singleton(view);
     }
 
+    public boolean supportsSaveViewsFor(CoreDump dataSource) {
+        return false;
+    }
+    
+    public void saveViews(CoreDump dataSource, Snapshot snapshot) {
+        
+    }
+    
+
     static void register() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(new CoreDumpOverviewViewProvider(), CoreDump.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(new CoreDumpOverviewViewProvider(), CoreDump.class);
     }
 
 }

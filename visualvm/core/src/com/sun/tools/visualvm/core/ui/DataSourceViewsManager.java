@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,9 +41,9 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public final class DataSourceViewsFactory {
+public final class DataSourceViewsManager {
 
-    private static DataSourceViewsFactory sharedInstance;
+    private static DataSourceViewsManager sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
     private final Map<DataSourceViewsProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
@@ -53,8 +54,8 @@ public final class DataSourceViewsFactory {
      * 
      * @return singleton instance of DataSourceViewsFactory.
      */
-    public static synchronized DataSourceViewsFactory sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new DataSourceViewsFactory();
+    public static synchronized DataSourceViewsManager sharedInstance() {
+        if (sharedInstance == null) sharedInstance = new DataSourceViewsManager();
         return sharedInstance;
     }
     
@@ -78,13 +79,23 @@ public final class DataSourceViewsFactory {
         providers.remove(provider);
     }
     
-    /**
-     * Returns true if there is at least one provider providing at least one view for given DataSource, false otherwise.
-     * 
-     * @param dataSource DataSource to create Window for.
-     * @return true if there is at least one provider providing at least one view for given DataSource, false otherwise.
-     */
-    public boolean canCreateWindowFor(DataSource dataSource) {
+    public boolean canSaveViewsFor(DataSource dataSource) {
+        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        if (compatibleProviders.isEmpty()) return false;
+        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
+            if (compatibleProvider.supportsViewsFor(dataSource) && compatibleProvider.supportsSaveViewsFor(dataSource))
+                return true;
+        return false;
+    }
+    
+    public void saveViewsFor(DataSource dataSource, Snapshot snapshot) {
+        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
+            if (compatibleProvider.supportsViewsFor(dataSource) && compatibleProvider.supportsSaveViewsFor(dataSource))
+                compatibleProvider.saveViews(dataSource, snapshot);
+    }
+    
+    boolean hasViewsFor(DataSource dataSource) {
         Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
         for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
@@ -112,7 +123,7 @@ public final class DataSourceViewsFactory {
     }
     
     
-    private DataSourceViewsFactory() {
+    private DataSourceViewsManager() {
     }
 
 }

@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import java.awt.event.ActionEvent;
@@ -64,9 +65,12 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     }
     
     protected boolean isEnabled(Set<Application> applications) {
-        for (Application application : applications)
+        for (Application application : applications) {
+            if (DataSourceViewsManager.sharedInstance().canSaveViewsFor(application))
+                return true;
             if (application.getRepository().getDataSources(Snapshot.class).isEmpty())
                 return false;
+        }
         return true;
     }
     

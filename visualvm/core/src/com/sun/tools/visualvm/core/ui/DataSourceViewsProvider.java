@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import java.util.Set;
 
 /**
@@ -50,4 +51,8 @@ public interface DataSourceViewsProvider<X extends DataSource> {
      * @return set of DataSourceView instances provided by this provider for given DataSource instance.
      */
     public Set<? extends DataSourceView> getViews(X dataSource);
+    
+    public boolean supportsSaveViewsFor(X dataSource);
+    
+    public void saveViews(X dataSource, Snapshot snapshot);
 }

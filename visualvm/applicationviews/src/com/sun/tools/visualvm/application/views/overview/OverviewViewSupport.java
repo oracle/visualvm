@@ -35,12 +35,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -52,7 +47,57 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public final class OverviewViewSupport {
+class OverviewViewSupport {
+
+ // --- General data --------------------------------------------------------
+
+    static class MasterViewSupport extends JPanel  {
+
+    public MasterViewSupport(ApplicationOverviewModel model) {
+        initComponents(model);
+    }
+
+
+    public DataViewComponent.MasterView getMasterView() {
+        return new DataViewComponent.MasterView("Overview", null, this);
+    }
+
+
+    private void initComponents(ApplicationOverviewModel model) {
+        setLayout(new BorderLayout());
+
+        HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>");
+        area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+        setBackground(area.getBackground());
+
+        // TODO: implement listener for Application.oomeHeapDumpEnabled
+
+        add(area, BorderLayout.CENTER);
+    }
+
+    private String getGeneralProperties(ApplicationOverviewModel model) {
+      StringBuilder data = new StringBuilder();
+
+      // Application information
+      data.append("<b>PID:</b> " + model.getPid() + "<br>");
+      data.append("<b>Host:</b> " + model.getHostName() + "<br>");
+
+      if (model.basicInfoSupported()) {
+        data.append("<b>Main class:</b> " + model.getMainClass() + "<br>");
+        data.append("<b>Arguments:</b> " + model.getMainArgs() + "<br>");
+
+        data.append("<br>");
+        data.append("<b>JVM:</b> " + model.getVmId() + "<br>");
+        data.append("<b>Java Home:</b> " + model.getJavaHome() + "<br>");
+        data.append("<b>JVM Flags:</b> " + model.getJvmFlags() + "<br><br>");
+        data.append("<b>Heap dump on OOME:</b> " + model.oomeEnabled() + "<br>");
+      }
+
+      return data.toString();
+      
+    }
+
+}
 
  // --- Snapshots -----------------------------------------------------------
     
@@ -113,7 +158,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (jvmargs != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + jvmargs + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 setBackground(area.getBackground());
@@ -125,38 +170,14 @@ public final class OverviewViewSupport {
             add(new ScrollableContainer(contents), BorderLayout.CENTER);
         }
         
-        private String formatJVMArgs(String jvmargs) {
-            String mangledString = " ".concat(jvmargs).replace(" -","\n");
-            StringTokenizer tok = new StringTokenizer(mangledString,"\n");
-            StringBuffer text = new StringBuffer(100);
-
-            while(tok.hasMoreTokens()) {
-                String arg = tok.nextToken().replace(" ","&nbsp;");
-                int equalsSign = arg.indexOf('=');
-
-                text.append("<b>");
-                text.append("-");
-                if (equalsSign != -1) {
-                text.append(arg.substring(0,equalsSign));
-                text.append("</b>");
-                text.append(arg.substring(equalsSign));
-                } else {
-                text.append(arg);
-                text.append("</b>");
                 }
-                text.append("<br>");
-            }
-            return text.toString();
-        }
         
-    }
-    
     
     // --- System properties ---------------------------------------------------
     
     static class SystemPropertiesViewSupport extends JPanel  {
         
-        public SystemPropertiesViewSupport(Properties properties) {
+        public SystemPropertiesViewSupport(String properties) {
             initComponents(properties);
         }        
         
@@ -164,13 +185,13 @@ public final class OverviewViewSupport {
             return new DataViewComponent.DetailsView("System properties", null, this, null);
         }
         
-        private void initComponents(Properties properties) {
+        private void initComponents(String properties) {
             setLayout(new BorderLayout());
             
             JComponent contents;
             
             if (properties != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + properties + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 setBackground(area.getBackground());
@@ -182,25 +203,5 @@ public final class OverviewViewSupport {
             add(new ScrollableContainer(contents), BorderLayout.CENTER);
         }
         
-        private String formatSystemProperties(Properties properties) {
-            StringBuffer text = new StringBuffer(200);
-            List keys = new ArrayList(properties.keySet());
-            Iterator keyIt;
-
-            Collections.sort(keys);
-            keyIt = keys.iterator();
-            while(keyIt.hasNext()) {
-                String key = (String) keyIt.next();
-                String val = properties.getProperty(key);
-
-                text.append("<b>");
-                text.append(key);
-                text.append("</b>=");
-                text.append(val);
-                text.append("<br>");
             }
-            return text.toString();
         }
-        
-    }
-}

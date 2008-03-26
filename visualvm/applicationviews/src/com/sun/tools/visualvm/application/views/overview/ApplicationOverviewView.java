@@ -25,18 +25,9 @@
 
 package com.sun.tools.visualvm.application.views.overview;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import java.awt.BorderLayout;
-import java.util.Properties;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.Utilities;
 
 /**
@@ -48,113 +39,47 @@ class ApplicationOverviewView extends DataSourceView {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/overview.png";
 
-    private Application application;
+    private ApplicationOverviewModel model;
     
     private DataViewComponent view;
     
 
-    public ApplicationOverviewView(Application application) {
+    public ApplicationOverviewView(ApplicationOverviewModel model) {
         super("Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10);
-        this.application = application;
+        this.model = model;
     }
     
     
     protected void willBeAdded() {
-        JvmFactory.getJVMFor(application); 
+        model.initialize();
     }
     
     public DataViewComponent getView() {
-        if (view == null) {
-            view = createViewComponent(application);
-            ApplicationOverviewPluggableView pluggableView = (ApplicationOverviewPluggableView)ApplicationViewsSupport.sharedInstance().getOverviewView();
-            pluggableView.makeCustomizations(view, application);
-            application = null;
-        }
+        if (view == null) view = createViewComponent();
         return view;
     }
     
     
-    private DataViewComponent createViewComponent(Application application) {
+    ApplicationOverviewModel getModel() {
+        return model;
+    }
+    
+    
+    DataViewComponent createViewComponent() {
         DataViewComponent dvc = new DataViewComponent(
-                new MasterViewSupport(application).getMasterView(),
+                new OverviewViewSupport.MasterViewSupport(model).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
-        Properties jvmProperties = null;
-        String jvmargs = null;
-        Jvm jvm = JvmFactory.getJVMFor(application);
-        if (jvm.isBasicInfoSupported()) {
-            jvmargs = jvm.getJvmArgs();
-        }
-        if (jvm.isGetSystemPropertiesSupported()) {
-            jvmProperties = jvm.getSystemProperties();
-        }
+        
         dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Saved data", true), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(new OverviewViewSupport.SnapshotsViewSupport(application).getDetailsView(), DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(new OverviewViewSupport.SnapshotsViewSupport(model.getSource()).getDetailsView(), DataViewComponent.TOP_LEFT);
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(jvmargs).getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(jvmProperties).getDetailsView(), DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(model.getJvmArgs()).getDetailsView(), DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(model.getSystemProperties()).getDetailsView(), DataViewComponent.TOP_RIGHT);
         
         return dvc;
     }
     
-    
-    // --- General data --------------------------------------------------------
-    
-    private static class MasterViewSupport extends JPanel  {
-        
-        public MasterViewSupport(Application application) {
-            initComponents(application);
         }
-        
-        
-        public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Overview", null, this);
-        }
-        
-        
-        private void initComponents(Application application) {
-            setLayout(new BorderLayout());
-            
-            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(application) + "</nobr>");
-            area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            setBackground(area.getBackground());
-            
-            // TODO: implement listener for Application.oomeHeapDumpEnabled
-            
-            add(area, BorderLayout.CENTER);
-        }
-        
-        private String getGeneralProperties(Application application) {
-          Jvm jvm = JvmFactory.getJVMFor(application);
-          StringBuilder data = new StringBuilder();
-
-          // Application information
-          data.append("<b>PID:</b> " + application.getPid() + "<br>");
-          data.append("<b>Host:</b> " + application.getHost().getHostName() + "<br>");
-          if (jvm.isBasicInfoSupported()) {
-            String mainArgs = jvm.getMainArgs();
-            String mainClass = jvm.getMainClass();
-            
-            data.append("<b>Main class:</b> " + (mainClass == null ? "<Unknown>": mainClass) + "<br>");
-            data.append("<b>Arguments:</b> " + (mainArgs == null ? "none" : mainArgs) + "<br>");
-          }
-
-          // JVM information
-          if (jvm.isBasicInfoSupported()) {
-            String jvmFlags = jvm.getJvmFlags();
-
-            data.append("<br>");
-            data.append("<b>JVM:</b> " + jvm.getVMName() + " (" + jvm.getVmVersion() + ", " + jvm.getVMInfo() + ")<br>");
-            data.append("<b>Java Home:</b> " + jvm.getJavaHome() + "<br>");
-            data.append("<b>JVM Flags:</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? "none" : jvmFlags) + "<br><br>");
-            data.append("<b>Heap dump on OOME:</b> " + (jvm.isDumpOnOOMEnabled()?"enabled":"disabled") + "<br>");
-          }
-
-          return data.toString();
-        }
-        
-    }
-    
-}

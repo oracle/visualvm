@@ -25,11 +25,12 @@
 
 package com.sun.tools.visualvm.host.overview;
 
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.host.model.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,8 +63,17 @@ public class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
         return Collections.singleton(view);
     }
 
+    public boolean supportsSaveViewsFor(Host dataSource) {
+        return false;
+    }
+    
+    public void saveViews(Host dataSource, Snapshot snapshot) {
+        
+    }
+    
+
     public void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Host.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Host.class);
     }
 
 }

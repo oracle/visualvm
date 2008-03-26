@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorPlugga
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider;
+import com.sun.tools.visualvm.application.views.overview.ApplicationSnapshotOverviewViewProvider;
 import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsViewProvider;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 
@@ -68,6 +69,7 @@ public final class ApplicationViewsSupport {
     
     private ApplicationViewsSupport() {
         new ApplicationOverviewViewProvider().initialize();
+        new ApplicationSnapshotOverviewViewProvider().initialize();
         new ApplicationMonitorViewProvider().initialize();
         new ApplicationThreadsViewProvider().initialize();
     }

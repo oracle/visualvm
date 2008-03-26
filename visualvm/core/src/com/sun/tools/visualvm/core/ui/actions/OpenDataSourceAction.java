@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.core.ui.actions;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -51,7 +50,7 @@ class OpenDataSourceAction extends MultiDataSourceAction<DataSource> {
 
     protected boolean isEnabled(Set<DataSource> dataSources) {
         for (DataSource dataSource : dataSources)
-            if (!DataSourceViewsFactory.sharedInstance().canCreateWindowFor(dataSource)) return false;
+            if (!DataSourceWindowManager.sharedInstance().canOpenDataSource(dataSource)) return false;
         return true;
     }
     

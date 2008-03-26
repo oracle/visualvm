@@ -23,15 +23,13 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package com.sun.tools.visualvm.application.views.overview;
 
-import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,41 +39,42 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application>{
+public class ApplicationSnapshotOverviewViewProvider implements DataSourceViewsProvider<ApplicationSnapshot> {
     
-    private final Map<Application, DataSourceView> viewsCache = new HashMap();
+    private final Map<ApplicationSnapshot, ApplicationOverviewView> viewsCache = new HashMap();
     
 
-    public boolean supportsViewsFor(Application application) {
-        JvmJmxModel jmx = JvmJmxModelFactory.getJvmJmxModelFor(application);
-        return jmx != null && jmx.getThreadMXBean() != null;
+    public boolean supportsViewsFor(ApplicationSnapshot snapshot) {
+        return snapshot.getStorage().getCustomProperty(ApplicationOverviewModel.SNAPSHOT_VERSION) != null;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
-        DataSourceView view = viewsCache.get(application);
-        if (view == null) {
-            view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean()) {
-                public void removed() {
-                    super.removed();
-                    viewsCache.remove(application);
-                }
-            };
-            viewsCache.put(application, view);
+    public Set<? extends DataSourceView> getViews(final ApplicationSnapshot snapshot) {
+        synchronized(viewsCache) {
+            ApplicationOverviewView view = viewsCache.get(snapshot);
+            if (view == null) {
+                view = new ApplicationOverviewView(ApplicationOverviewModel.create(snapshot)) {
+                    public void removed() {
+                        super.removed();
+                        viewsCache.remove(snapshot);
+                    }
+                };
+                viewsCache.put(snapshot, view);
+            }
+            return Collections.singleton(view);
         }
-        return Collections.singleton(view);
     }
-
-    public boolean supportsSaveViewsFor(Application dataSource) {
+    
+    public boolean supportsSaveViewsFor(ApplicationSnapshot snapshot) {
         return false;
     }
     
-    public void saveViews(Application dataSource, Snapshot snapshot) {
-        
+    public void saveViews(ApplicationSnapshot appSnapshot, Snapshot snapshot) {
+        throw new UnsupportedOperationException("Cannot save snapshot views");
     }
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, ApplicationSnapshot.class);
     }
 
 }

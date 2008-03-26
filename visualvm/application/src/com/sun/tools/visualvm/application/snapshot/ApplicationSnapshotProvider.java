@@ -36,6 +36,8 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -97,7 +99,7 @@ class ApplicationSnapshotProvider {
     
     private void createSnapshotImpl(final Application application, final boolean interactive) {
         Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
-        if (snapshots.isEmpty()) return;
+        if (snapshots.isEmpty() && !DataSourceViewsManager.sharedInstance().canSaveViewsFor(application)) return;
         
         File snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
         if (!Utils.prepareDirectory(snapshotDirectory))
@@ -127,7 +129,10 @@ class ApplicationSnapshotProvider {
         storage.setCustomProperties(propNames, propValues);
         
         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
+        DataSourceViewsManager.sharedInstance().saveViewsFor(application, snapshot);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
+        
+        if (interactive) DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
     }
     
     private static String getDisplayNameSuffix(Application application) {

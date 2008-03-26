@@ -65,6 +65,16 @@ public final class DataSourceWindowManager {
     }
     
     
+    /**
+     * Returns true if there is at least one provider providing at least one view for given DataSource, false otherwise.
+     * 
+     * @param dataSource DataSource to open.
+     * @return true if there is at least one provider providing at least one view for given DataSource, false otherwise.
+     */
+    public boolean canOpenDataSource(DataSource dataSource) {
+        return DataSourceViewsManager.sharedInstance().hasViewsFor(dataSource);
+    }
+    
     public void openDataSource(final DataSource dataSource) {
         processor.post(new Runnable() {
             public void run() {
@@ -84,7 +94,7 @@ public final class DataSourceWindowManager {
                 if (window == null) return; // Window not opened
                 
                 // Remove all views of the dataSource
-                final List<? extends DataSourceView> views = DataSourceViewsFactory.sharedInstance().getViews(dataSource);
+                final List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(dataSource);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (DataSourceView view : views)
@@ -127,13 +137,13 @@ public final class DataSourceWindowManager {
                 window = new DataSourceWindow(viewMaster);
                 openedWindows.put(viewMaster, window);
 
-                List<? extends DataSourceView> views = DataSourceViewsFactory.sharedInstance().getViews(viewMaster);
+                List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(viewMaster);
                 addViews(window, views);
             }
 
             // Viewmaster opened, add views for the dataSource
             if (dataSource != viewMaster) {
-                List<? extends DataSourceView> views = DataSourceViewsFactory.sharedInstance().getViews(dataSource);
+                List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(dataSource);
                 addViews(window, views);
                 if (viewToSelect == null && !views.isEmpty()) viewToSelect = views.get(0);
             }

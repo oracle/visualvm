@@ -26,9 +26,12 @@
 package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,19 +41,26 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application>{
+public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application> {
     
-    private final Map<Application, DataSourceView> viewsCache = new HashMap();
+    private final Map<Application, ApplicationOverviewView> viewsCache = new HashMap();
     
 
     public boolean supportsViewsFor(Application application) {
         return true;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
-        DataSourceView view = viewsCache.get(application);
+    public Set<? extends DataSourceView> getViews(final Application application) {
+        synchronized(viewsCache) {
+            ApplicationOverviewView view = viewsCache.get(application);
         if (view == null) {
-            view = new ApplicationOverviewView(application) {
+                view = new ApplicationOverviewView(ApplicationOverviewModel.create(application)) {
+                    DataViewComponent createViewComponent() {
+                        DataViewComponent viewComponent = super.createViewComponent();
+                        ApplicationOverviewPluggableView pluggableView = (ApplicationOverviewPluggableView)ApplicationViewsSupport.sharedInstance().getOverviewView();
+                        pluggableView.makeCustomizations(viewComponent, application);
+                        return viewComponent;
+                    }
                 public void removed() {
                     super.removed();
                     viewsCache.remove(application);
@@ -60,9 +70,23 @@ public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<
         }
         return Collections.singleton(view);
     }
+    }
+
+    public boolean supportsSaveViewsFor(Application dataSource) {
+        return true;
+    }
+    
+    public void saveViews(Application dataSource, Snapshot snapshot) {
+        synchronized(viewsCache) {
+            ApplicationOverviewView view = viewsCache.get(dataSource);
+            if (view != null) view.getModel().save(snapshot);
+            else ApplicationOverviewModel.create(dataSource).save(snapshot);
+        }
+    }
+    
 
     public void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }

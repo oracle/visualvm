@@ -28,9 +28,10 @@ package com.sun.tools.visualvm.application.views.monitor;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,8 +65,17 @@ public class ApplicationMonitorViewProvider implements DataSourceViewsProvider<A
         return Collections.singleton(view);
     }
 
+    public boolean supportsSaveViewsFor(Application dataSource) {
+        return false;
+    }
+    
+    public void saveViews(Application dataSource, Snapshot snapshot) {
+        
+    }
+    
+
     public void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }
