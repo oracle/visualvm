@@ -25,8 +25,9 @@
 
 package net.java.visualvm.btrace.views;
 
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,11 +64,20 @@ public class ScriptViewProvider implements DataSourceViewsProvider<ScriptDataSou
     }
     
     public static void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, ScriptDataSource.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, ScriptDataSource.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
+
+    public void saveViews(ScriptDataSource script, Snapshot snapshot) {
+        // TODO implement later
+    }
+
+    public boolean supportsSaveViewsFor(ScriptDataSource script) {
+        return false;
+    }
+    
 }

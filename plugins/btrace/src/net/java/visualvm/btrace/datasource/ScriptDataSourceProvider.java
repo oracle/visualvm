@@ -85,7 +85,7 @@ public class ScriptDataSourceProvider {
         }
     }
 
-    public void startProbe(final ProbeConfig config, final Application app) throws IOException {
+    public void deploy(final ProbeConfig config, final Application app) throws IOException {
         byte[] code = loadProbeCode(config);
         if (code != null) {
             deployer.submit(new DeployTask(BTraceClientCache.sharedInstance().getClient(app), code) {
@@ -107,7 +107,7 @@ public class ScriptDataSourceProvider {
         }
     }
 
-    public void stopProbe(ScriptDataSource pds) {
+    public void undeploy(ScriptDataSource pds) {
         pds.stop();
     }
     

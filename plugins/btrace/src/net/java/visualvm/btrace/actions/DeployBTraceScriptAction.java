@@ -25,11 +25,8 @@
 package net.java.visualvm.btrace.actions;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.explorer.ExplorerActionDescriptor;
-import com.sun.tools.visualvm.core.explorer.ExplorerActionsProvider;
-import com.sun.tools.visualvm.core.explorer.ExplorerContextMenuFactory;
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -40,9 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
-import javax.swing.AbstractAction;
+import javax.swing.Action;
 import net.java.visualvm.btrace.config.ConfigParser;
 import net.java.visualvm.btrace.config.ProbeConfig;
 import net.java.visualvm.btrace.datasource.ScriptDataSourceProvider;
@@ -60,66 +55,41 @@ import org.xml.sax.XMLReader;
  *
  * @author Jaroslav Bachorik
  */
-public class ApplicationActionsProvider implements ExplorerActionsProvider<Application> {
+public class DeployBTraceScriptAction extends SingleDataSourceAction<Application> {
 
-    private final static ApplicationActionsProvider INSTANCE = new ApplicationActionsProvider();
+    public DeployBTraceScriptAction() {
+        super(Application.class);
+        putValue(Action.NAME, "Deploy BTrace Script...");
+        putValue(Action.SHORT_DESCRIPTION, "Opens wizard for deployment of a BTrace script");
+    }
 
-    private class DeployAction extends AbstractAction {
-
-        private Application app;
-
-        public DeployAction(Application app) {
-            super("Deploy BTrace Script");
-            this.app = app;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            WizardDescriptor.Iterator iterator = new ScriptsWizardIterator(loadProbes());
-            WizardDescriptor wizardDescriptor = new WizardDescriptor(iterator);
-            // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-            // {1} will be replaced by WizardDescriptor.Iterator.name()
-            wizardDescriptor.setTitleFormat(new MessageFormat("{0} ({1})"));
-            wizardDescriptor.setTitle("Deploy BTrace Script");
-            Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
-            dialog.setVisible(true);
-            dialog.toFront();
-            boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
-            if (!cancelled) {
-                try {
-                    ScriptDataSourceProvider.sharedInstance().startProbe((ProbeConfig) wizardDescriptor.getProperty("probe"), app);
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+    @Override
+    protected void actionPerformed(Application application, ActionEvent event) {
+        WizardDescriptor.Iterator iterator = new ScriptsWizardIterator(loadProbes());
+        WizardDescriptor wizardDescriptor = new WizardDescriptor(iterator);
+        // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
+        // {1} will be replaced by WizardDescriptor.Iterator.name()
+        wizardDescriptor.setTitleFormat(new MessageFormat("{0} ({1})"));
+        wizardDescriptor.setTitle("Deploy BTrace Script");
+        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
+        dialog.setVisible(true);
+        dialog.toFront();
+        boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
+        if (!cancelled) {
+            try {
+                ScriptDataSourceProvider.sharedInstance().deploy((ProbeConfig) wizardDescriptor.getProperty("probe"), application);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
             }
         }
+    }
 
-        @Override
-        public boolean isEnabled() {
-            return ScriptDataSourceProvider.sharedInstance().isReady();
+    @Override
+    protected boolean isEnabled(Application application) {
+        if (!application.isLocalApplication()) {
+            return false;
         }
-    }
-
-    public Set<ExplorerActionDescriptor> getActions(Application app) {
-        Jvm jvm = JvmFactory.getJVMFor(app);
-        if (app.isLocalApplication() && jvm.isMonitoringSupported() && probesRegistered()) {
-            Set<ExplorerActionDescriptor> actions = new HashSet<ExplorerActionDescriptor>();
-            actions.add(new ExplorerActionDescriptor(null, 50));
-            actions.add(new ExplorerActionDescriptor(new DeployAction(app), 51));
-            return actions;
-        }
-        return Collections.EMPTY_SET;
-    }
-
-    public ExplorerActionDescriptor getDefaultAction(Application app) {
-        return null;
-    }
-
-    public static void initialize() {
-        ExplorerContextMenuFactory.sharedInstance().addExplorerActionsProvider(INSTANCE, Application.class);
-    }
-
-    public static void shutdown() {
-        ExplorerContextMenuFactory.sharedInstance().removeExplorerActionsProvider(INSTANCE);
+        return JvmFactory.getJVMFor(application).isAttachable() && probesRegistered() && ScriptDataSourceProvider.sharedInstance().isReady();
     }
 
     private boolean probesRegistered() {
@@ -169,22 +139,5 @@ public class ApplicationActionsProvider implements ExplorerActionsProvider<Appli
             baseURL = new String(probeManifestPath.substring(0, Math.min(len, index)));
         }
         return new URL(baseURL);
-    }
-
-    public ExplorerActionDescriptor getDefaultAction(Set<Application> apps) {
-        return null;
-    }
-
-    public Set<ExplorerActionDescriptor> getActions(Set<Application> apps) {
-        Set<ExplorerActionDescriptor> actionDescriptors = null;
-        for(Application app : apps) {
-            Set<ExplorerActionDescriptor> currentActions = getActions(app);
-            if (actionDescriptors == null) {
-                actionDescriptors = new HashSet<ExplorerActionDescriptor>(currentActions);
-            } else {
-                actionDescriptors.retainAll(currentActions);
-            }
-        }
-        return actionDescriptors;
     }
 }

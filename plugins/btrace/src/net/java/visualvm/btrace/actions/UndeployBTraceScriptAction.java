@@ -22,27 +22,35 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.visualvm.btrace;
 
+package net.java.visualvm.btrace.actions;
+
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import java.awt.event.ActionEvent;
+import javax.swing.Action;
+import net.java.visualvm.btrace.datasource.ScriptDataSource;
 import net.java.visualvm.btrace.datasource.ScriptDataSourceProvider;
-import net.java.visualvm.btrace.views.ScriptViewProvider;
-import org.openide.modules.ModuleInstall;
 
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
+ *
+ * @author Jaroslav Bachorik
  */
-public class Installer extends ModuleInstall {
-    @Override
-    public void restored() {
-        ScriptViewProvider.initialize();
-        ScriptDataSourceProvider.initialize();
+public class UndeployBTraceScriptAction extends SingleDataSourceAction<ScriptDataSource> {
+
+    public UndeployBTraceScriptAction() {
+        super(ScriptDataSource.class);
+        putValue(Action.NAME, "Undeploy");
+        putValue(Action.SHORT_DESCRIPTION, "Stops the selected BTrace script and undeploys it from the target application");
     }
 
     @Override
-    public void uninstalled() {
-        ScriptViewProvider.shutdown();
-        ScriptDataSourceProvider.shutdown();
-        super.uninstalled();
+    protected void actionPerformed(ScriptDataSource script, ActionEvent event) {
+        ScriptDataSourceProvider.sharedInstance().undeploy(script);
     }
+
+    @Override
+    protected boolean isEnabled(ScriptDataSource script) {
+        return true;
+    }
+
 }

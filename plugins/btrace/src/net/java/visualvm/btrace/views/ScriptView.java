@@ -67,7 +67,7 @@ public class ScriptView extends DataSourceView {
     };
 
     public ScriptView(ScriptDataSource probe) {
-        super(DataSourceDescriptorFactory.getDescriptor(probe).getName(), DataSourceDescriptorFactory.getDescriptor(probe).getIcon(), POSITION_AT_THE_END);
+        super(probe, DataSourceDescriptorFactory.getDescriptor(probe).getName(), DataSourceDescriptorFactory.getDescriptor(probe).getIcon(), POSITION_AT_THE_END, true);
         this.probe = probe;
         JvmstatModelFactory.getJvmstatFor(probe.getApplication()).addJvmstatListener(mdl);
     }
@@ -126,11 +126,6 @@ public class ScriptView extends DataSourceView {
         }
         dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Console Output", true), DataViewComponent.BOTTOM_RIGHT);
         dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, new OutputPane(probe.getReader()), null), DataViewComponent.BOTTOM_RIGHT);
-    }
-
-    @Override
-    public boolean isClosable() {
-        return true;
     }
 
     private String getProbeInfo() {
