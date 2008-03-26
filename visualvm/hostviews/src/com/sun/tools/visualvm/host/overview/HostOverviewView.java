@@ -121,7 +121,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                 });
             }
         });
-        timer.setInitialDelay(0);
+        timer.setInitialDelay(800);
         timer.start();
         ((Host)getDataSource()).notifyWhenRemoved(this);
         
