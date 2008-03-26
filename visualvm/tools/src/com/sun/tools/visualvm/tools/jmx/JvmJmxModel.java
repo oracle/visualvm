@@ -79,7 +79,7 @@ public class JvmJmxModel extends Model {
         app = application;
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
         if (jmxModel != null) {
-            mbsc = jmxModel.getCachedMBeanServerConnection();
+            mbsc = jmxModel.getMBeanServerConnection();
         }
     }
     

@@ -77,7 +77,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     
     protected void willBeAdded() {
         jvm = JvmFactory.getJVMFor(application);
-        threadsManager = new ThreadMXBeanDataManager(application, threadBean);
+        threadsManager = new ThreadMXBeanDataManager(threadBean);
     }
         
     public DataViewComponent getView() {

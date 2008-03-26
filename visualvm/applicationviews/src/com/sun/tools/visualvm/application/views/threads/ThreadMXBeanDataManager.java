@@ -25,15 +25,12 @@
 
 package com.sun.tools.visualvm.application.views.threads;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.management.MBeanServerConnection;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
@@ -48,12 +45,10 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
   private static final Logger LOGGER = Logger.getLogger(ThreadMXBeanDataManager.class.getName());
   
   private ThreadMXBean threadBean;
-  private MBeanServerConnection serverConnection;
   private Set<Long> threadIdSet = new HashSet();
   private boolean refreshRunning;
 
-  public ThreadMXBeanDataManager(Application app, ThreadMXBean tb) {
-    serverConnection = JmxModelFactory.getJmxModelFor(app).getCachedMBeanServerConnection();
+  public ThreadMXBeanDataManager(ThreadMXBean tb) {
     threadBean = tb;
   }
   
@@ -64,10 +59,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
     NBSwingWorker worker = new NBSwingWorker() {
       protected void doInBackground() {
         try {
-          ThreadMonitoredDataResponce resp = new ThreadMonitoredDataResponce();
-          if (serverConnection != null) { // flush data
-//            serverConnection.flush();
-          }
+          ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
           resp.fillInThreadData();
           processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));
         } catch (Exception ex) {
@@ -88,9 +80,9 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
       return threadBean.getThreadCount();
   }  
   
-  class ThreadMonitoredDataResponce extends MonitoredNumbersResponse {
+  class ThreadMonitoredDataResponse extends MonitoredNumbersResponse {
     
-    ThreadMonitoredDataResponce() {
+    ThreadMonitoredDataResponse() {
       super(dummyLong);
       setGCstartFinishData(dummyLong,dummyLong);
     }
