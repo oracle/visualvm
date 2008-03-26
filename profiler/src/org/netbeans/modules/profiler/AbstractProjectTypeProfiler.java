@@ -287,35 +287,40 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
 
     private void addImplementorMethods(final MethodMarker marker, final TypeElement superElement, final List<String> restrictors,
                                        final boolean inclusive, final Mark mark, final CompilationController controller) {
-        // get all implementors of the superclass and add their marker methods
-        final Set<ClassIndex.SearchKind> kind = new HashSet<ClassIndex.SearchKind>(Arrays.asList(new ClassIndex.SearchKind[] {
-                                                                                                     ClassIndex.SearchKind.IMPLEMENTORS
-                                                                                                 }));
+        try {
+            controller.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
+            // get all implementors of the superclass and add their marker methods
+            final Set<ClassIndex.SearchKind> kind = new HashSet<ClassIndex.SearchKind>(Arrays.asList(new ClassIndex.SearchKind[] {
+                                                                                                         ClassIndex.SearchKind.IMPLEMENTORS
+                                                                                                     }));
 
-        //    final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[]{ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES}));
-        final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[] {
-                                                                                                        ClassIndex.SearchScope.SOURCE
-                                                                                                    }));
+            //    final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[]{ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES}));
+            final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[] {
+                                                                                                            ClassIndex.SearchScope.SOURCE
+                                                                                                        }));
 
-        Set<ElementHandle<TypeElement>> allImplementors = new HashSet<ElementHandle<TypeElement>>();
-        Set<ElementHandle<TypeElement>> implementors = controller.getClasspathInfo().getClassIndex()
-                                                                 .getElements(ElementHandle.create(superElement), kind, scope);
+            Set<ElementHandle<TypeElement>> allImplementors = new HashSet<ElementHandle<TypeElement>>();
+            Set<ElementHandle<TypeElement>> implementors = controller.getClasspathInfo().getClassIndex()
+                                                                     .getElements(ElementHandle.create(superElement), kind, scope);
 
-        do {
-            Set<ElementHandle<TypeElement>> tmpImplementors = new HashSet<ElementHandle<TypeElement>>();
-            allImplementors.addAll(implementors);
+            do {
+                Set<ElementHandle<TypeElement>> tmpImplementors = new HashSet<ElementHandle<TypeElement>>();
+                allImplementors.addAll(implementors);
 
-            for (ElementHandle<TypeElement> element : implementors) {
-                tmpImplementors.addAll(controller.getClasspathInfo().getClassIndex().getElements(element, kind, scope));
+                for (ElementHandle<TypeElement> element : implementors) {
+                    tmpImplementors.addAll(controller.getClasspathInfo().getClassIndex().getElements(element, kind, scope));
+                }
+
+                implementors = tmpImplementors;
+            } while (!implementors.isEmpty());
+
+            for (ElementHandle<TypeElement> handle : allImplementors) {
+                // resolve the implementor's type element
+                TypeElement implementor = handle.resolve(controller);
+                addTypeMethods(marker, implementor, restrictors, inclusive, mark, controller);
             }
-
-            implementors = tmpImplementors;
-        } while (!implementors.isEmpty());
-
-        for (ElementHandle<TypeElement> handle : allImplementors) {
-            // resolve the implementor's type element
-            TypeElement implementor = handle.resolve(controller);
-            addTypeMethods(marker, implementor, restrictors, inclusive, mark, controller);
+        } catch (IOException e) {
+            LOGGER.throwing(AbstractProjectTypeProfiler.class.getName(), "addImplementorMethods", e); // NOI18N
         }
     }
 
@@ -324,20 +329,25 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
         if ((marker == null) || (type == null) || (restrictors == null) || (mark == null) || (controller == null)) {
             return;
         }
+        try {
+            controller.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
 
-        // process all methods from the implementor
-        for (ExecutableElement method : ElementFilter.methodsIn(type.getEnclosedElements())) {
-            if ((method.getKind() == ElementKind.METHOD) && !method.getModifiers().contains(Modifier.ABSTRACT)) {
-                if ((inclusive && restrictors.contains(method.getSimpleName().toString()))
-                        || (!inclusive && !restrictors.contains(method.getSimpleName().toString()))) {
-                    try {
-                        marker.addMethodMark(ElementUtilities.getBinaryName(type), method.getSimpleName().toString(),
-                                             SourceUtils.getVMMethodSignature(method, controller), mark);
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
+            // process all methods from the implementor
+            for (ExecutableElement method : ElementFilter.methodsIn(type.getEnclosedElements())) {
+                if ((method.getKind() == ElementKind.METHOD) && !method.getModifiers().contains(Modifier.ABSTRACT)) {
+                    if ((inclusive && restrictors.contains(method.getSimpleName().toString()))
+                            || (!inclusive && !restrictors.contains(method.getSimpleName().toString()))) {
+                        try {
+                            marker.addMethodMark(ElementUtilities.getBinaryName(type), method.getSimpleName().toString(),
+                                                 SourceUtils.getVMMethodSignature(method, controller), mark);
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
+        } catch (IOException e) {
+            LOGGER.throwing(AbstractProjectTypeProfiler.class.getName(), "addTypeMethods", e); // NOI18N
         }
     }
 
