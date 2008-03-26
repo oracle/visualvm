@@ -85,6 +85,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             tabbedContainer.addViewTab(dataSource, singleViewContainer.getView());
             tabbedContainer.addViewTab(dataSource, view);
             doLayout();
+            singleViewContainer.getCaption().finish();
             singleViewContainer = null;
         } else {
             tabbedContainer.addViewTab(dataSource, view);
@@ -104,6 +105,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         if (viewsCount == 1) {
             if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
             remove(singleViewContainer);
+            singleViewContainer.getCaption().finish();
             singleViewContainer = null;
         } else {
             int viewIndex = indexOf(view);

@@ -39,6 +39,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
@@ -101,40 +102,51 @@ class OverviewViewSupport {
 
  // --- Snapshots -----------------------------------------------------------
     
-    static class SnapshotsViewSupport extends JPanel  {
+    static class SnapshotsViewSupport extends JPanel implements DataChangeListener {
         
-        public SnapshotsViewSupport(DataSource ds) {
-            initComponents(ds);
+        private DataSource dataSource;
+        private HTMLTextArea area;
+        
+        
+        public SnapshotsViewSupport(DataSource dataSource) {
+            this.dataSource = dataSource;
+            initComponents();
+            dataSource.getRepository().addDataChangeListener(this, Snapshot.class);
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView("Saved data", null, this, null);
         }
         
-        private void initComponents(final DataSource ds) {
+        private void initComponents() {
             setLayout(new BorderLayout());
             
-            final HTMLTextArea area = new HTMLTextArea();
+            area = new HTMLTextArea();
+            updateSavedData();
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             setBackground(area.getBackground());
-            
-            ds.getRepository().addDataChangeListener(new DataChangeListener() {
-                public void dataChanged(DataChangeEvent event) {
-                    area.setText("<nobr>" + getSavedData(ds) + "</nobr>");
-                }                
-            }, Snapshot.class);
             
             add(new ScrollableContainer(area), BorderLayout.CENTER);
         }
         
-        private String getSavedData(DataSource ds) {
+                public void dataChanged(DataChangeEvent event) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { updateSavedData(); }
+            });
+                }                
+            
+        void removed() {
+            dataSource.getRepository().removeDataChangeListener(this);
+        }
+        
+        private void updateSavedData() {
             StringBuilder data = new StringBuilder();
             
             List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
             for (SnapshotCategory category : snapshotCategories)
-                data.append("<b>" + category.getName() + ":</b> " + ds.getRepository().getDataSources(category.getType()).size() + "<br>");
+                data.append("<b>" + category.getName() + ":</b> " + dataSource.getRepository().getDataSources(category.getType()).size() + "<br>");
 
-            return data.toString();
+            area.setText("<nobr>" + data.toString() + "</nobr>");
         }
         
     }

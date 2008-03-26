@@ -43,6 +43,7 @@ class ApplicationOverviewView extends DataSourceView {
     private ApplicationOverviewModel model;
     
     private DataViewComponent view;
+    private OverviewViewSupport.SnapshotsViewSupport snapshotsView;
     
 
     public ApplicationOverviewView(DataSource dataSource, ApplicationOverviewModel model) {
@@ -60,6 +61,10 @@ class ApplicationOverviewView extends DataSourceView {
         return view;
     }
     
+    protected void removed() {
+        snapshotsView.removed();
+    }
+    
     
     ApplicationOverviewModel getModel() {
         return model;
@@ -73,8 +78,9 @@ class ApplicationOverviewView extends DataSourceView {
         
         dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
         
+        snapshotsView = new OverviewViewSupport.SnapshotsViewSupport(model.getSource());
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Saved data", true), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(new OverviewViewSupport.SnapshotsViewSupport(model.getSource()).getDetailsView(), DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(snapshotsView.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(model.getJvmArgs()).getDetailsView(), DataViewComponent.TOP_RIGHT);
