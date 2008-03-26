@@ -26,8 +26,9 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,26 +40,37 @@ import java.util.Set;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-class MBeansViewProvider implements DataSourceViewsProvider<Application> {
+public class MBeansViewProvider implements DataSourceViewsProvider<Application> {
 
-    private Map<Application, DataSourceView> viewsCache = new HashMap();
-
-    private MBeansViewProvider() {
-    }
+    private final Map<Application, DataSourceView> viewsCache = new HashMap();
 
     public boolean supportsViewsFor(Application application) {
         return true;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(Application application) {
+    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
         DataSourceView view = viewsCache.get(application);
         if (view == null) {
-            view = new MBeansView(application);
+            view = new MBeansView(application) {
+                @Override
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(application);
+                }
+            };
+            viewsCache.put(application, view);
         }
         return Collections.singleton(view);
     }
 
-    static void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(new MBeansViewProvider(), Application.class);
+    public boolean supportsSaveViewsFor(Application application) {
+        return false;
+    }
+
+    public void saveViews(Application application, Snapshot snapshot) {
+    }
+
+    public void initialize() {
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
 }

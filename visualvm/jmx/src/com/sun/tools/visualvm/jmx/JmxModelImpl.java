@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.jmx.application.ApplicationSecurityConfigurator;
 import com.sun.tools.visualvm.jmx.application.JmxApplication;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
@@ -88,6 +89,7 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnector;
 import javax.management.remote.rmi.RMIServer;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import org.openide.util.RequestProcessor;
 import sun.rmi.server.UnicastRef2;
 import sun.rmi.transport.LiveRef;
 
@@ -127,6 +129,7 @@ public class JmxModelImpl extends JmxModel {
     private static final String PROPERTY_PASSWORD = "prop_password";
     private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());
     private ProxyClient client;
+    private ApplicationRemovedListener listener;
 
     /**
      * Creates an instance of {@code JmxModel} for a {@link JvmstatApplication}.
@@ -202,7 +205,8 @@ public class JmxModelImpl extends JmxModel {
             }
             if (proxyClient != null) {
                 client = proxyClient;
-                connect(application, proxyClient);
+                listener = new ApplicationRemovedListener(proxyClient);
+                connect(application, proxyClient, listener);
             }
         } catch (Exception e) {
             LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e);
@@ -224,17 +228,19 @@ public class JmxModelImpl extends JmxModel {
             final ProxyClient proxyClient =
                     new ProxyClient(this, url.toString(), username, password);
             client = proxyClient;
-            connect(application, proxyClient);
+            listener = new ApplicationRemovedListener(proxyClient);
+            connect(application, proxyClient, listener);
         } catch (Exception e) {
             LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e);
             client = null;
         }
     }
 
-    private void connect(Application application, ProxyClient proxyClient) {
+    private void connect(Application application, ProxyClient proxyClient, ApplicationRemovedListener listener) {
         while (true) {
             try {
                 proxyClient.connect();
+                application.notifyWhenRemoved(listener);
                 break;
             } catch (SecurityException e) {
                 if (supplyCredentials(application, proxyClient) == null) {
@@ -316,6 +322,26 @@ public class JmxModelImpl extends JmxModel {
             return client.getUrl();
         }
         return null;        
+    }
+
+    /**
+     * Disconnect from JMX agent when the application is removed.
+     */
+    static class ApplicationRemovedListener implements DataRemovedListener<Application> {
+
+        private ProxyClient proxyClient;
+
+        public ApplicationRemovedListener(ProxyClient proxyClient) {
+            this.proxyClient = proxyClient;
+        }
+
+        public void dataRemoved(Application application) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    proxyClient.disconnect();
+                }
+            });
+        }
     }
 
     static class ProxyClient implements NotificationListener {

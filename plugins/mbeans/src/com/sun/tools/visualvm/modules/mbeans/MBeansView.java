@@ -46,7 +46,7 @@ class MBeansView extends DataSourceView {
     private DataViewComponent view;
 
     public MBeansView(Application application) {
-        super("MBeans", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50);
+        super(application, "MBeans", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false);
         this.application = application;
         view = createViewComponent();
     }

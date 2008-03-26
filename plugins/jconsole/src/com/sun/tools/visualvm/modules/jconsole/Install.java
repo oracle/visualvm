@@ -48,8 +48,8 @@ public class Install extends ModuleInstall {
             URL thisJarUrl = Install.class.getProtectionDomain().getCodeSource().getLocation();
             URL jconsoleUrl = jconsoleFile.toURI().toURL();
             ClassLoader jconsoleLoader = new JConsoleClassLoader(thisJarUrl, jconsoleUrl);
-            Class<JConsoleViewProvider> jconsoleViewProvider = (Class<JConsoleViewProvider>) Class.forName("com.sun.tools.visualvm.modules.jconsole.JConsoleViewProvider", true, jconsoleLoader);
-            Method method = jconsoleViewProvider.getDeclaredMethod("initialize");
+            Class<JConsoleViewsSupport> jconsoleViewsSupport = (Class<JConsoleViewsSupport>) Class.forName("com.sun.tools.visualvm.modules.jconsole.JConsoleViewsSupport", true, jconsoleLoader);
+            Method method = jconsoleViewsSupport.getDeclaredMethod("sharedInstance");
             method.setAccessible(true);
             method.invoke(null);
         } catch (Exception e) {
