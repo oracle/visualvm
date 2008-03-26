@@ -50,9 +50,9 @@ public final class DataSourceViewsManager {
     
     
     /**
-     * Returns singleton instance of DataSourceViewsFactory.
+     * Returns singleton instance of DataSourceViewsManager.
      * 
-     * @return singleton instance of DataSourceViewsFactory.
+     * @return singleton instance of DataSourceViewsManager.
      */
     public static synchronized DataSourceViewsManager sharedInstance() {
         if (sharedInstance == null) sharedInstance = new DataSourceViewsManager();
