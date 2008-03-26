@@ -24,8 +24,6 @@
  */
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
@@ -38,7 +36,7 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-class AddVMCoredumpAction extends SingleDataSourceAction<DataSource> {
+class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     
     private boolean notSupported;
     private boolean tracksSelection = false;
@@ -56,7 +54,7 @@ class AddVMCoredumpAction extends SingleDataSourceAction<DataSource> {
         return action;
     }
     
-    public void actionPerformed(DataSource dataSource, ActionEvent e) {
+    public void actionPerformed(CoreDumpsContainer contanier, ActionEvent e) {
         CoreDumpConfigurator newCoreDumpConfiguration = CoreDumpConfigurator.defineCoreDump();
         if (newCoreDumpConfiguration != null) {
             CoreDumpProvider.createCoreDump(newCoreDumpConfiguration.getCoreDumpFile(),
@@ -66,13 +64,13 @@ class AddVMCoredumpAction extends SingleDataSourceAction<DataSource> {
     }
     
     
-    protected boolean isEnabled(DataSource dataSource) {
-        return dataSource instanceof DataSourceRoot || dataSource instanceof CoreDumpsContainer;
+    protected boolean isEnabled(CoreDumpsContainer contanier) {
+        return true;
     }
     
-    protected void updateState(Set<DataSource> selectedDataSources) {
+    protected void updateState(Set<CoreDumpsContainer> coreDumpsContainerSet) {
         if (notSupported) return;
-        if (tracksSelection) super.updateState(selectedDataSources);
+        if (tracksSelection) super.updateState(coreDumpsContainerSet);
     }
     
     protected void initialize() {
@@ -84,13 +82,13 @@ class AddVMCoredumpAction extends SingleDataSourceAction<DataSource> {
     
     private AddVMCoredumpAction trackSelection() {
         tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources());
+        updateState(ActionUtils.getSelectedDataSources(CoreDumpsContainer.class));
         return this;
     }
     
     
     private AddVMCoredumpAction() {
-        super(DataSource.class);
+        super(CoreDumpsContainer.class);
         putValue(NAME, "Add VM Coredump...");
         putValue(SHORT_DESCRIPTION, "Add VM Coredump");
     }

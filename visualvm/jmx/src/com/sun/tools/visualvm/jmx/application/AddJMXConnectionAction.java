@@ -25,8 +25,6 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
@@ -39,7 +37,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class AddJMXConnectionAction extends SingleDataSourceAction<DataSource> {
+class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     private boolean tracksSelection = false;
     
@@ -57,7 +55,7 @@ class AddJMXConnectionAction extends SingleDataSourceAction<DataSource> {
     }
     
     
-    protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
+    protected void actionPerformed(Host host, ActionEvent actionEvent) {
         final JmxApplicationConfigurator appConfig =
                 JmxApplicationConfigurator.addJmxConnection();
         if (appConfig != null) {
@@ -70,24 +68,24 @@ class AddJMXConnectionAction extends SingleDataSourceAction<DataSource> {
         }
     }
     
-    protected boolean isEnabled(DataSource dataSource) {
-        return dataSource instanceof DataSourceRoot || (dataSource instanceof Host && dataSource != Host.UNKNOWN_HOST);
+    protected boolean isEnabled(Host host) {
+        return host != Host.UNKNOWN_HOST;
     }
     
-    protected void updateState(Set<DataSource> selectedDataSources) {
-        if (tracksSelection) super.updateState(selectedDataSources);
+    protected void updateState(Set<Host> selectedHosts) {
+        if (tracksSelection) super.updateState(selectedHosts);
     }
     
     
     private AddJMXConnectionAction trackSelection() {
         tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources());
+        updateState(ActionUtils.getSelectedDataSources(Host.class));
         return this;
     }
     
     
     private AddJMXConnectionAction() {
-        super(DataSource.class);
+        super(Host.class);
         putValue(NAME, "Add JMX Connection...");
         putValue(SHORT_DESCRIPTION, "Add JMX Connection");
     }

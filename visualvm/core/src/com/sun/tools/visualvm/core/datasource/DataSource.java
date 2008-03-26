@@ -53,7 +53,7 @@ public abstract class DataSource {
      * Virtual root of DataSource tree.
      * ROOT corresponds to invisible root of explorer tree.
      */
-    public static final DataSource ROOT = new DataSourceRoot();
+    public static final DataSource ROOT = new DataSource() {};
     
     
     private DataSource owner;

@@ -24,8 +24,6 @@
  */
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.HostsSupport;
@@ -39,7 +37,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class AddRemoteHostAction extends SingleDataSourceAction<DataSource> {
+class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
     private boolean tracksSelection = false;
     
@@ -57,7 +55,7 @@ class AddRemoteHostAction extends SingleDataSourceAction<DataSource> {
     }
     
     
-    protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
+    protected void actionPerformed(RemoteHostsContainer remoteHostsContainer, ActionEvent actionEvent) {
         final HostProperties hostDescriptor = HostCustomizer.defineHost();
         if (hostDescriptor != null) {
             RequestProcessor.getDefault().post(new Runnable() {
@@ -68,24 +66,24 @@ class AddRemoteHostAction extends SingleDataSourceAction<DataSource> {
         }
     }
     
-    protected boolean isEnabled(DataSource dataSource) {
-        return dataSource instanceof DataSourceRoot || dataSource instanceof RemoteHostsContainer;
+    protected boolean isEnabled(RemoteHostsContainer remoteHostsContainer) {
+        return true;
     }
     
-    protected void updateState(Set<DataSource> selectedDataSources) {
-        if (tracksSelection) super.updateState(selectedDataSources);
+    protected void updateState(Set<RemoteHostsContainer> remoteHostsContainerSet) {
+        if (tracksSelection) super.updateState(remoteHostsContainerSet);
     }
     
     
     private AddRemoteHostAction trackSelection() {
         tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources());
+        updateState(ActionUtils.getSelectedDataSources(RemoteHostsContainer.class));
         return this;
     }
     
     
     private AddRemoteHostAction() {
-        super(DataSource.class);
+        super(RemoteHostsContainer.class);
         putValue(NAME, "Add Remote Host...");
         putValue(SHORT_DESCRIPTION, "Add Remote Host");
     }
