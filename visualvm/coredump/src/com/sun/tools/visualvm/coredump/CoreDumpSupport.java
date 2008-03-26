@@ -31,7 +31,6 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.coredump.impl.CoreDumpActionsProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
 import com.sun.tools.visualvm.coredump.overview.OverviewViewSupport;
@@ -109,9 +108,8 @@ public final class CoreDumpSupport {
         
         DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
         CoreDumpsContainer.sharedInstance();
-        CoreDumpActionsProvider.register();
         CoreDumpProvider.register();
-        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
         OverviewViewSupport.getInstance();
     }
 

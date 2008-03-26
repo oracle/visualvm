@@ -26,21 +26,42 @@
 -->
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    
     <folder name="Actions">
         <folder name="Other">
             <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpAction.getInstance"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpAction.create"/>
             </file>
         </folder>
     </folder>
+    
     <folder name="Menu">
          <folder name="Applications">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
-            <attr name="position" intvalue="200"/>
             <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance"/>
-                <attr name="position" intvalue="1100"/>
+                <attr name="position" intvalue="2200"/>
             </file>
         </folder>
     </folder>
+    
+    <folder name="VisualVM">
+        <folder name="ExplorerPopupSelection">
+            
+            <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance"/>
+                <attr name="position" intvalue="1200"/>
+            </file>
+            
+            <file name="HeapDumpOnOOMEAction-Separator-1940.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1940"/>
+            </file>
+            <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpOnOOMEAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpOnOOMEAction.create"/>
+                <attr name="position" intvalue="1950"/>
+            </file>
+            
+        </folder>
+    </folder>
+    
 </filesystem>

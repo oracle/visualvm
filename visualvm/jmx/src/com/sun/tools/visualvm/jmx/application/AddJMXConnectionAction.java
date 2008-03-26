@@ -25,21 +25,39 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import java.util.Set;
 import org.openide.util.RequestProcessor;
 
-public final class AddJMXConnectionAction extends AbstractAction {
     
-    private static AddJMXConnectionAction instance;
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+class AddJMXConnectionAction extends SingleDataSourceAction<DataSource> {
     
-    public static synchronized AddJMXConnectionAction getInstance() {
-        if (instance == null) instance = new AddJMXConnectionAction();
-        return instance;
+    private boolean tracksSelection = false;
+    
+    
+    public static AddJMXConnectionAction alwaysEnabled() {
+        AddJMXConnectionAction action = new AddJMXConnectionAction();
+        action.initialize();
+        return action;
     }
     
-    public void actionPerformed(ActionEvent e) {
+    public static AddJMXConnectionAction selectionAware() {
+        AddJMXConnectionAction action = new AddJMXConnectionAction().trackSelection();
+        action.initialize();
+        return action;
+    }
+    
+    
+    protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
         final JmxApplicationConfigurator appConfig =
                 JmxApplicationConfigurator.addJmxConnection();
         if (appConfig != null) {
@@ -52,8 +70,25 @@ public final class AddJMXConnectionAction extends AbstractAction {
         }
     }
     
+    protected boolean isEnabled(DataSource dataSource) {
+        return dataSource instanceof DataSourceRoot || (dataSource instanceof Host && dataSource != Host.UNKNOWN_HOST);
+    }
+    
+    protected void updateState(Set<DataSource> selectedDataSources) {
+        if (tracksSelection) super.updateState(selectedDataSources);
+    }
+    
+    
+    private AddJMXConnectionAction trackSelection() {
+        tracksSelection = true;
+        updateState(ActionUtils.getSelectedDataSources());
+        return this;
+    }
+    
+    
     private AddJMXConnectionAction() {
-        putValue(Action.NAME, "Add JMX Connection...");
-        putValue(Action.SHORT_DESCRIPTION, "Add JMX Connection");
+        super(DataSource.class);
+        putValue(NAME, "Add JMX Connection...");
+        putValue(SHORT_DESCRIPTION, "Add JMX Connection");
     }
 }

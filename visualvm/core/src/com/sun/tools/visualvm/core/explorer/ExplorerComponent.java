@@ -140,7 +140,7 @@ class ExplorerComponent extends JPanel {
     
     
     private static Action getDefaultAction(Set<DataSource> dataSources) {
-        return ExplorerContextMenuFactory.sharedInstance().getDefaultActionFor(dataSources);
+        return ExplorerContextMenuFactory.instance().getDefaultActionFor(dataSources);
     }
     
     private void performDefaultAction() {
@@ -150,12 +150,7 @@ class ExplorerComponent extends JPanel {
     }
     
     private void displayContextMenu(int x, int y) {
-        // Determine the node for which to display context menu
-        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
-        if (selectedDataSources.isEmpty()) selectedDataSources = Collections.singleton(DataSource.ROOT);
-
-        // Create popup menu and display it
-        JPopupMenu popupMenu = ExplorerContextMenuFactory.sharedInstance().createPopupMenuFor(selectedDataSources);
+        JPopupMenu popupMenu = ExplorerContextMenuFactory.instance().createPopupMenu();
         if (popupMenu != null) popupMenu.show(explorerTree, x, y);
     }
     
@@ -187,7 +182,6 @@ class ExplorerComponent extends JPanel {
     
     private class ExplorerTreeMouseAdapter extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
-            if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
                 // Select path on location or clear selection
                 TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
                 if (path != null) {
@@ -197,7 +191,6 @@ class ExplorerComponent extends JPanel {
                     explorerTree.clearSelection();
                 }
             }
-        }
     
         public void mouseClicked(MouseEvent e) {
             if (e.getModifiers() == InputEvent.BUTTON3_MASK) {

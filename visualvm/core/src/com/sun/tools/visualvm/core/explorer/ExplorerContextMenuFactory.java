@@ -26,32 +26,35 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import org.openide.cookies.InstanceCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileSystem;
+import org.openide.filesystems.Repository;
+import org.openide.loaders.DataFolder;
+import org.openide.loaders.DataObject;
 
 /**
  * Class responsible for building explorer context menu.
  *
  * @author Jiri Sedlacek
  */
-public final class ExplorerContextMenuFactory {
+final class ExplorerContextMenuFactory {
+
+    private static final Logger LOGGER = Logger.getLogger(ExplorerContextMenuFactory.class.getName());
+    private static final String SELECTION_ACTIONS_FILE = "VisualVM/ExplorerPopupSelection";
+    private static final String NOSELECTION_ACTIONS_FILE = "VisualVM/ExplorerPopupNoSelection";
 
     private static ExplorerContextMenuFactory sharedInstance;
-
-    private final Map<ExplorerActionsProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
 
 
     /**
@@ -59,35 +62,15 @@ public final class ExplorerContextMenuFactory {
      * 
      * @return singleton instance of ExplorerContextMenuFactory.
      */
-    public static synchronized ExplorerContextMenuFactory sharedInstance() {
+    static synchronized ExplorerContextMenuFactory instance() {
         if (sharedInstance == null) sharedInstance = new ExplorerContextMenuFactory();
         return sharedInstance;
     }
 
 
-    /**
-     * Adds a new ExplorerActionsProvider for DataSource instances compatible with given scope.
-     * 
-     * @param provider ExplorerActionsProvider to be added,
-     * @param scope scope of ExplorerNode instances for which the ExplorerActionsProvider provides the actions.
-     */
-    public void addExplorerActionsProvider(ExplorerActionsProvider provider, Class<? extends DataSource> scope) {
-        providers.put(provider, scope);
-    }
-    
-    /**
-     * Removes a ExplorerActionsProvider.
-     * 
-     * @param provider ExplorerActionsProvider to be removed.
-     */
-    public void removeExplorerActionsProvider(ExplorerActionsProvider provider) {
-        providers.remove(provider);
-    }
-    
-    
-    JPopupMenu createPopupMenuFor(Set<DataSource> dataSources) {
+    JPopupMenu createPopupMenu() {
         // Get actions for the node
-        List<Action>[] actionsArray = getActions(dataSources);
+        List<Action>[] actionsArray = getActions();
         List<Action> defaultActions = actionsArray[0];
         List<Action> actions = actionsArray[1];
 
@@ -101,7 +84,7 @@ public final class ExplorerContextMenuFactory {
         boolean realDefaultAction = true;
         if (!defaultActions.isEmpty()) {
             for (Action defaultAction : defaultActions) {
-                JMenuItem defaultItem = new DataSourceItem(dataSources, defaultAction);
+                JMenuItem defaultItem = new DataSourceItem(defaultAction);
                 if (realDefaultAction) {
                     defaultItem.setFont(defaultItem.getFont().deriveFont(Font.BOLD));
                     realDefaultAction = false;
@@ -117,7 +100,7 @@ public final class ExplorerContextMenuFactory {
         if (!actions.isEmpty()) {
             for (Action action : actions) {
                 if (action == null) popupMenu.addSeparator();
-                else popupMenu.add(new DataSourceItem(dataSources, action));
+                else popupMenu.add(new DataSourceItem(action));
             }
         }
         
@@ -127,107 +110,121 @@ public final class ExplorerContextMenuFactory {
     
     Action getDefaultActionFor(Set<DataSource> dataSources) {
         if (dataSources.isEmpty()) return null;
+        List<Action> defaultActions = getActions()[0];
+        return defaultActions.isEmpty() ? null : defaultActions.get(0);
+    }
         
-        Set<ExplorerActionsProvider> filteredProviders = getProvidersFor(dataSources);
-        List<ExplorerActionDescriptor> defaultActionsDescriptors = new ArrayList();
+    private List<Action>[] getActions() {
+        if (ExplorerSupport.sharedInstance().getSelectedDataSources().isEmpty()) return getNoSelectionActions();
+        else return getSelectionActions();
+    }
         
-        // Create lists of ExplorerActionDescriptors
-        for (ExplorerActionsProvider provider : filteredProviders) {
-            ExplorerActionDescriptor defaultAction = provider.getDefaultAction(dataSources);
-            if (defaultAction != null) defaultActionsDescriptors.add(defaultAction);
+    private List<Action>[] getSelectionActions() {
+        // Find entrypoint into layer
+        FileSystem defaultFS = Repository.getDefault().getDefaultFileSystem();
+        FileObject actionsFO = defaultFS.getRoot().getFileObject(SELECTION_ACTIONS_FILE);
+        return getActions(actionsFO, true);
         }
         
-        // Sort ExplorerActionDescriptors according to actionOrder
-        Collections.sort(defaultActionsDescriptors, Positionable.COMPARATOR);
-        
-        return defaultActionsDescriptors.isEmpty() ? null : defaultActionsDescriptors.get(0).getAction();
+    private List<Action>[] getNoSelectionActions() {
+        // Find entrypoint into layer
+        FileSystem defaultFS = Repository.getDefault().getDefaultFileSystem();
+        FileObject actionsFO = defaultFS.getRoot().getFileObject(NOSELECTION_ACTIONS_FILE);
+        return getActions(actionsFO, false);
     }
     
-    private List<Action>[] getActions(Set<DataSource> dataSources) {
-        Set<ExplorerActionsProvider> filteredProviders = getProvidersFor(dataSources);
-        List<ExplorerActionDescriptor> defaultActionsDescriptors = new ArrayList();
-        List<ExplorerActionDescriptor> actionsDescriptors = new ArrayList();
+    private List<Action>[] getActions(FileObject actionsFO, boolean allowDefaultActions) {
+        // Init caches for default and regular context menu actions
+        List<Action> defaultActions = new ArrayList();
+        List<Action> actions = new ArrayList();
         
-        // Create lists of ExplorerActionDescriptors
-        for (ExplorerActionsProvider provider : filteredProviders) {
-            ExplorerActionDescriptor defaultAction = provider.getDefaultAction(dataSources);
-            if (defaultAction != null) defaultActionsDescriptors.add(defaultAction);
-            actionsDescriptors.addAll(provider.getActions(dataSources));
+        if (actionsFO != null) {
+            
+            DataFolder actionsDF = DataFolder.findFolder(actionsFO);
+            DataObject[] menuItems = actionsDF.getChildren();
+            
+            for (DataObject menuItemDO : menuItems) {
+                
+                FileObject fobj = menuItemDO.getPrimaryFile();
+                
+                if (fobj.isFolder()) {
+                    LOGGER.log(Level.WARNING, "Nested menus not supported for Applications context menu: " + fobj, fobj);
+                } else {
+                    InstanceCookie menuItemCookie = (InstanceCookie)menuItemDO.getCookie(InstanceCookie.class);
+                    try {
+                        Object menuItem = menuItemCookie.instanceCreate();
+                        
+                        boolean isDefaultAction = false;
+                        Object isDefaultActionObj = fobj.getAttribute("default");
+                        if (isDefaultActionObj != null) try {
+                            isDefaultAction = (Boolean)isDefaultActionObj;
+                            if (!allowDefaultActions && isDefaultAction)
+                                LOGGER.log(Level.WARNING, "Default actions not supported for " + actionsFO.getPath() + ": " + menuItem, menuItem);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING, "Cannot determine whether context menu action is default: " + isDefaultActionObj, isDefaultActionObj);
         }
         
-        // Sort ExplorerActionDescriptors according to actionOrder
-        Collections.sort(defaultActionsDescriptors, Positionable.COMPARATOR);
-        Collections.sort(actionsDescriptors, Positionable.COMPARATOR);
+                        List<Action> actionsList = isDefaultAction ? defaultActions : actions;
         
-        // Create sorted lists of actions
-        List<Action> defaultActions = new ArrayList(defaultActionsDescriptors.size());
-        for (ExplorerActionDescriptor defaultActionDescriptor : defaultActionsDescriptors) {
-            Action defaultAction = defaultActionDescriptor.getAction();
-            if (defaultAction.isEnabled()) defaultActions.add(defaultAction);
+                        if (menuItem instanceof Action) {
+                            Action action = (Action)menuItem;
+                            if (action.isEnabled()) actionsList.add(action);
+                        } else if (menuItem instanceof JSeparator) {
+                            if (isDefaultAction) {
+                                LOGGER.log(Level.WARNING, "Separator cannot be added to default actions " + menuItem, menuItem);
+                            } else {
+                                actionsList.add(null);
+        }
+                        } else {
+                            LOGGER.log(Level.WARNING, "Unsupported context menu item: " + menuItem, menuItem);
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, "Unable to resolve context menu action: " + menuItemDO, menuItemDO);
+                    }
+                }
+            }
+        
         }
         
-        List<Action> actions = new ArrayList(actionsDescriptors.size());
-        for (ExplorerActionDescriptor actionDescriptor : actionsDescriptors) {
-            Action action = actionDescriptor.getAction();
-            if (action == null || action.isEnabled()) actions.add(action);
-        }
-        
-        return new List[] { defaultActions, actions };
+        // Return actions
+        return new List[] { cleanupActions(defaultActions), cleanupActions(actions) };
     }
     
     
-    private Set<ExplorerActionsProvider> getProvidersFor(Set<DataSource> dataSources) {
-        Map<ExplorerActionsProvider, Class<? extends DataSource>> currentProviders = new HashMap(providers);
-        Set<ExplorerActionsProvider> currentProvidersSet = currentProviders.keySet();
-        Set<ExplorerActionsProvider> filteredProviders = new HashSet();
-        for (ExplorerActionsProvider provider : currentProvidersSet)
-            if (Utils.getFilteredSet(dataSources, currentProviders.get(provider)).size() == dataSources.size())
-                filteredProviders.add(provider);
-        return filteredProviders;
+    private List<Action> cleanupActions(List<Action> actions) {
+        boolean leadingNull = true;
+        Action lastAction = null;
+        List<Action> cleanActions = new ArrayList();
+        
+        for (Action action : actions) {
+            if (action == null) {
+                if (!leadingNull && lastAction != null)
+                    cleanActions.add(null);
+            } else {
+                cleanActions.add(action);
+                leadingNull = false;
     }
+            lastAction = action;
+        }
     
+        if (!cleanActions.isEmpty()) {
+            int lastItemIndex = cleanActions.size() - 1;
+            Action lastCleanAction = cleanActions.get(lastItemIndex);
+            if (lastCleanAction == null) cleanActions.remove(lastItemIndex);
+        }
     
-    private ExplorerContextMenuFactory() {
+        return cleanActions;
     }
     
     
     private static class DataSourceItem extends JMenuItem {
         
-        private Set<DataSource> dataSources;
-        
-        public DataSourceItem(Set<DataSource> dataSources, Action action) {
+        public DataSourceItem(Action action) {
             super(action);
             setIcon(null);
             setToolTipText(null);
-            
-            this.dataSources = dataSources;
         }
         
-        protected void fireActionPerformed(ActionEvent event) {
-            // Guaranteed to return a non-null array
-            Object[] listeners = listenerList.getListenerList();
-            ActionEvent e = null;
-            // Process the listeners last to first, notifying
-            // those that are interested in this event
-            for (int i = listeners.length-2; i>=0; i-=2) {
-                if (listeners[i]==ActionListener.class) {
-                    // Lazily create the event:
-                    if (e == null) {
-                          String actionCommand = event.getActionCommand();
-                          if(actionCommand == null) {
-                             actionCommand = getActionCommand();
                           }
-                          e = new ActionEvent(dataSources,
-                                              ActionEvent.ACTION_PERFORMED,
-                                              actionCommand,
-                                              event.getWhen(),
-                                              event.getModifiers());
-                    }
-                    ((ActionListener)listeners[i+1]).actionPerformed(e);
-                }          
-            }
-        }
         
     }
-
-}

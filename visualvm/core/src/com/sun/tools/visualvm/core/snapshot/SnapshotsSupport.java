@@ -93,7 +93,6 @@ public final class SnapshotsSupport {
     private SnapshotsSupport() {
 //        DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
 //        new SnapshotsContainerProvider().initialize();
-        SnapshotActionProvider.getInstance().initialize();
     }
 
 }

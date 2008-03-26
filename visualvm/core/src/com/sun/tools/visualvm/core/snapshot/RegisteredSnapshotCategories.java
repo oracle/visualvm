@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// TODO: synchronize
 /**
  * A repository of registered SnapshotCategory instances.
  *
@@ -41,6 +42,7 @@ public final class RegisteredSnapshotCategories {
 
     private static RegisteredSnapshotCategories sharedInstance;
 
+    private final Set<SnapshotCategoriesListener> listeners = Collections.synchronizedSet(new HashSet());
     private final Set<SnapshotCategory> categories = Collections.synchronizedSet(new HashSet());
 
 
@@ -55,14 +57,23 @@ public final class RegisteredSnapshotCategories {
     }
 
 
+    public void addCategoriesListener(SnapshotCategoriesListener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeCategoriesListener(SnapshotCategoriesListener listener) {
+        listeners.remove(listener);
+    }
+    
+
     /**
      * Registers a SnapshotCategory.
      * 
      * @param category SnapshotCategory.
      */
-    public void addCategory(SnapshotCategory category) {
+    public void registerCategory(SnapshotCategory category) {
         categories.add(category);
-        LoadSnapshotAction.getInstance().updateEnabled();
+        fireCategoryRegistered(category);
     }
 
     /**
@@ -70,9 +81,9 @@ public final class RegisteredSnapshotCategories {
      * 
      * @param category SnapshotCategory.
      */
-    public void removeCategory(SnapshotCategory category) {
+    public void unregisterCategory(SnapshotCategory category) {
         categories.remove(category);
-        LoadSnapshotAction.getInstance().updateEnabled();
+        fireCategoryUnregistered(category);
     }
 
     /**
@@ -110,6 +121,19 @@ public final class RegisteredSnapshotCategories {
         List<SnapshotCategory> allCategories = new ArrayList(categories);
         Collections.sort(allCategories, Positionable.COMPARATOR);
         return allCategories;
+    }
+    
+    
+    private void fireCategoryRegistered(SnapshotCategory category) {
+        Set<SnapshotCategoriesListener> listenersSet = new HashSet(listeners);
+        for (SnapshotCategoriesListener listener : listenersSet)
+            listener.categoryRegistered(category);
+    }
+    
+    private void fireCategoryUnregistered(SnapshotCategory category) {
+        Set<SnapshotCategoriesListener> listenersSet = new HashSet(listeners);
+        for (SnapshotCategoriesListener listener : listenersSet)
+            listener.categoryUnregistered(category);
     }
     
     

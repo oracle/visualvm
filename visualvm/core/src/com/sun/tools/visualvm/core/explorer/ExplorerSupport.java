@@ -112,16 +112,6 @@ public final class ExplorerSupport {
         });
     }
     
-    /**
-     * Returns DataSource selected in explorer tree or null if no DataSource is selected.
-     * 
-     * @return DataSource selected in explorer tree or null if no DataSource is selected.
-     */
-    public DataSource getSelectedDataSource() {
-        Set<DataSource> selectedDataSources = getSelectedDataSources();
-        return selectedDataSources.size() == 1 ? selectedDataSources.iterator().next() : null;
-    }
-    
     public Set<DataSource> getSelectedDataSources() {
         TreePath[] selectedPaths = mainTree.getSelectionPaths();
         if (selectedPaths == null) return Collections.EMPTY_SET;
@@ -217,7 +207,6 @@ public final class ExplorerSupport {
         mainTree = ExplorerComponent.instance().getTree();
         mainTree.addTreeSelectionListener(new ExplorerTreeSelectionListener());
         mainTree.addTreeExpansionListener(new ExplorerTreeExpansionListener());
-        OpenDataSourceSupport.getInstance().initialize();
     }
     
     

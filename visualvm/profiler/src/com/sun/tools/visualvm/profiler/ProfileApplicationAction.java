@@ -25,89 +25,59 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Set;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.util.RequestProcessor;
 
-public final class ProfileApplicationAction extends AbstractAction {
     
-    private static ProfileApplicationAction instance;
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+class ProfileApplicationAction extends SingleDataSourceAction<Application> {
     
-    
-    public static synchronized ProfileApplicationAction getInstance() {
-        if (instance == null) instance = new ProfileApplicationAction();
-        return instance;
+    private Application lastSelectedApplication;
+    private final PropertyChangeListener stateListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateState(ActionUtils.getSelectedDataSources(Application.class));
     }
+    };
     
-    public void actionPerformed(ActionEvent e) {
-        final Application selectedApplication = getSelectedApplication();
         
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                if (isAvailable(selectedApplication)) {
-                    ProfilerSupport.getInstance().selectProfilerView(selectedApplication);
-                } else {
-                    NetBeansProfiler.getDefaultNB().displayError("Cannot profile " + DataSourceDescriptorFactory.getDescriptor(selectedApplication).getName());
+    public static ProfileApplicationAction create() {
+        ProfileApplicationAction action = new ProfileApplicationAction();
+        action.initialize();
+        return action;
                 }
+    
+        
+    protected void actionPerformed(Application application, ActionEvent actionEvent) {
+        ProfilerSupport.getInstance().selectProfilerView(application);
             }
-        });
+    
+    protected boolean isEnabled(Application application) {
+        // TODO: Listener should only be registered when profiling the application is supported
+        lastSelectedApplication = application;
+        lastSelectedApplication.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        return ProfilerSupport.getInstance().supportsProfiling(application);
     }
     
-    private void updateEnabled() {
-        final Application selectedApplication = getSelectedApplication();
-        
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() {
-                setEnabled(isEnabled(selectedApplication));
-            }
-        });
+    protected void updateState(Set<Application> applications) {
+        if (lastSelectedApplication != null) {
+            lastSelectedApplication.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+            lastSelectedApplication = null;
     }
-    
-    // Safe to be called from AWT EDT (the result doesn't mean the action is really available)
-    boolean isEnabled(Application application) {
-        if (application == null) return false;
-        if (application.getHost() != Host.LOCALHOST) return false;
-        if (Application.CURRENT_APPLICATION.equals(application)) return false;
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-        
-        return true;
-    }
-    
-    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
-    boolean isAvailable(Application application) {
-        if (!isEnabled(application)) return false;
-        
-        Jvm jvm = JvmFactory.getJVMFor(application);
-        return jvm != null && jvm.isAttachable() && !jvm.is14() && !jvm.is15();
-    }
-    
-    private Application getSelectedApplication() {
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
-        return (selectedDataSource != null && selectedDataSource instanceof Application) ? (Application)selectedDataSource : null;
+        super.updateState(applications);
     }
     
     
     private ProfileApplicationAction() {
-        putValue(Action.NAME, "Profile");
-        putValue(Action.SHORT_DESCRIPTION, "Profile");
-        
-        updateEnabled();
-        ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(Set<DataSource> selected) {
-                updateEnabled();
+        super(Application.class);
+        putValue(NAME, "Profile");
+        putValue(SHORT_DESCRIPTION, "Profile");
             }
-        });
     }
-}

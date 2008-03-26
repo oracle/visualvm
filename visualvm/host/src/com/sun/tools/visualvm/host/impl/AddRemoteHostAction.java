@@ -24,22 +24,40 @@
  */
 package com.sun.tools.visualvm.host.impl;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.HostsSupport;
+import com.sun.tools.visualvm.host.RemoteHostsContainer;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import java.util.Set;
 import org.openide.util.RequestProcessor;
 
-public final class AddRemoteHostAction extends AbstractAction {
     
-    private static AddRemoteHostAction instance;
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+class AddRemoteHostAction extends SingleDataSourceAction<DataSource> {
     
-    public static synchronized AddRemoteHostAction getInstance() {
-        if (instance == null) instance = new AddRemoteHostAction();
-        return instance;
+    private boolean tracksSelection = false;
+    
+    
+    public static AddRemoteHostAction alwaysEnabled() {
+        AddRemoteHostAction action = new AddRemoteHostAction();
+        action.initialize();
+        return action;
     }
     
-    public void actionPerformed(ActionEvent e) {
+    public static AddRemoteHostAction selectionAware() {
+        AddRemoteHostAction action = new AddRemoteHostAction().trackSelection();
+        action.initialize();
+        return action;
+    }
+    
+    
+    protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
         final HostProperties hostDescriptor = HostCustomizer.defineHost();
         if (hostDescriptor != null) {
             RequestProcessor.getDefault().post(new Runnable() {
@@ -50,9 +68,25 @@ public final class AddRemoteHostAction extends AbstractAction {
         }
     }
     
+    protected boolean isEnabled(DataSource dataSource) {
+        return dataSource instanceof DataSourceRoot || dataSource instanceof RemoteHostsContainer;
+    }
+    
+    protected void updateState(Set<DataSource> selectedDataSources) {
+        if (tracksSelection) super.updateState(selectedDataSources);
+    }
+    
+    
+    private AddRemoteHostAction trackSelection() {
+        tracksSelection = true;
+        updateState(ActionUtils.getSelectedDataSources());
+        return this;
+    }
+    
     
     private AddRemoteHostAction() {
-        putValue(Action.NAME, "Add Remote Host...");
-        putValue(Action.SHORT_DESCRIPTION, "Add Remote Host");
+        super(DataSource.class);
+        putValue(NAME, "Add Remote Host...");
+        putValue(SHORT_DESCRIPTION, "Add Remote Host");
     }
 }

@@ -26,19 +26,43 @@
 -->
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.threaddump.impl.ThreadDumpAction.getInstance"/>
+            <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.host.impl.AddRemoteHostAction.alwaysEnabled"/>
             </file>
         </folder>
     </folder>
+    
     <folder name="Menu">
         <folder name="Applications">
-            <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance"/>
-                <attr name="position" intvalue="1000"/>
+            <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.instance"/>
+                <attr name="position" intvalue="100"/>
             </file>
         </folder>
     </folder>
+    
+    <folder name="VisualVM">
+        <folder name="ExplorerPopupSelection">
+            
+            <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-selectionAware.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.host.impl.AddRemoteHostAction.selectionAware"/>
+                <attr name="position" intvalue="0"/>
+                <attr name="default" boolvalue="true"/>
+            </file>
+            
+        </folder>
+        
+        <folder name="ExplorerPopupNoSelection">
+            
+            <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            
+        </folder>
+    </folder>
+    
 </filesystem>

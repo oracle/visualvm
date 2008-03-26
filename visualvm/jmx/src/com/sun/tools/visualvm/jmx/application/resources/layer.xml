@@ -26,21 +26,42 @@
 -->
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.application.AddJMXConnectionAction.getInstance"/>
+            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.application.AddJMXConnectionAction.alwaysEnabled"/>
             </file>
         </folder>
     </folder>
+    
     <folder name="Menu">
          <folder name="Applications">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
-            <attr name="position" intvalue="200"/>
-            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction.instance"/>
+            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
         </folder>
     </folder>
+    
+    <folder name="VisualVM">
+        <folder name="ExplorerPopupSelection">
+            
+            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-selectionAware.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.application.AddJMXConnectionAction.selectionAware"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            
+        </folder>
+        
+        <folder name="ExplorerPopupNoSelection">
+            
+            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+            
+        </folder>
+    </folder>
+    
 </filesystem>

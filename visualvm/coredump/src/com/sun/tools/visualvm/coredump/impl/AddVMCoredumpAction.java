@@ -24,21 +24,39 @@
  */
 package com.sun.tools.visualvm.coredump.impl;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRoot;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import java.util.Set;
 import org.openide.util.Utilities;
 
-public final class AddVMCoredumpAction extends AbstractAction {
     
-    private static AddVMCoredumpAction instance;
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+class AddVMCoredumpAction extends SingleDataSourceAction<DataSource> {
     
-    public static synchronized AddVMCoredumpAction getInstance() {
-        if (instance == null) instance = new AddVMCoredumpAction();
-        return instance;
+    private boolean notSupported;
+    private boolean tracksSelection = false;
+    
+    
+    public static AddVMCoredumpAction alwaysEnabled() {
+        AddVMCoredumpAction action = new AddVMCoredumpAction();
+        action.initialize();
+        return action;
     }
     
-    public void actionPerformed(ActionEvent e) {
+    public static AddVMCoredumpAction selectionAware() {
+        AddVMCoredumpAction action = new AddVMCoredumpAction().trackSelection();
+        action.initialize();
+        return action;
+    }
+    
+    public void actionPerformed(DataSource dataSource, ActionEvent e) {
         CoreDumpConfigurator newCoreDumpConfiguration = CoreDumpConfigurator.defineCoreDump();
         if (newCoreDumpConfiguration != null) {
             CoreDumpProvider.createCoreDump(newCoreDumpConfiguration.getCoreDumpFile(),
@@ -48,10 +66,33 @@ public final class AddVMCoredumpAction extends AbstractAction {
     }
     
     
+    protected boolean isEnabled(DataSource dataSource) {
+        return dataSource instanceof DataSourceRoot || dataSource instanceof CoreDumpsContainer;
+    }
+    
+    protected void updateState(Set<DataSource> selectedDataSources) {
+        if (notSupported) return;
+        if (tracksSelection) super.updateState(selectedDataSources);
+    }
+    
+    protected void initialize() {
+        super.initialize();
+        notSupported = Utilities.isWindows();
+        setEnabled(!notSupported);
+    }
+    
+    
+    private AddVMCoredumpAction trackSelection() {
+        tracksSelection = true;
+        updateState(ActionUtils.getSelectedDataSources());
+        return this;
+    }
+    
+    
     private AddVMCoredumpAction() {
-        setEnabled(!Utilities.isWindows());
-        putValue(Action.NAME, "Add VM Coredump...");
-        putValue(Action.SHORT_DESCRIPTION, "Add VM Coredump");
+        super(DataSource.class);
+        putValue(NAME, "Add VM Coredump...");
+        putValue(SHORT_DESCRIPTION, "Add VM Coredump");
     }
     
 }

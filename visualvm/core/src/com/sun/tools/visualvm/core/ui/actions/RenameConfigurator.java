@@ -23,8 +23,9 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.datasource.descriptor;
+package com.sun.tools.visualvm.core.ui.actions;
 
+import com.sun.tools.visualvm.core.datasource.descriptor.*;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.Dialog;
 import java.awt.Dimension;

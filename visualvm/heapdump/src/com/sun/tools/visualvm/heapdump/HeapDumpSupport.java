@@ -29,9 +29,10 @@ import com.sun.tools.visualvm.heapdump.impl.HeapDumpPluggableView;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpCategory;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpViewProvider;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpProvider;
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpActionsProvider;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
@@ -70,6 +71,11 @@ public final class HeapDumpSupport {
      */
     public SnapshotCategory getCategory() {
         return category;
+    }
+    
+    public boolean supportsHeapDump(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        return JvmFactory.getJVMFor(application).isTakeHeapDumpSupported();
     }
     
     /**
@@ -111,10 +117,9 @@ public final class HeapDumpSupport {
         heapDumpPluggableView = new HeapDumpPluggableView();
         
         heapDumpViewProvider = new HeapDumpViewProvider();
-        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
 
         heapDumpViewProvider.initialize();
-        new HeapDumpActionsProvider().initialize();
     }
 
 }

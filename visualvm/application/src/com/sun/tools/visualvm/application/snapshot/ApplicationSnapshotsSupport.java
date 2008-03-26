@@ -109,10 +109,9 @@ public final class ApplicationSnapshotsSupport {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationSnapshotDescriptorProvider());
         snapshotProvider = ApplicationSnapshotProvider.sharedInstance();
         
-        RegisteredSnapshotCategories.sharedInstance().addCategory(snapshotCategory);
+        RegisteredSnapshotCategories.sharedInstance().registerCategory(snapshotCategory);
         SnapshotsContainer.sharedInstance(); // Notify SnapshotsContainer
         snapshotProvider.initialize();
-        ApplicationSnapshotActionProvider.getInstance().initialize();
     }
 
 }

@@ -125,11 +125,27 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.openide.loaders</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>6.7.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.openide.modules</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>7.2</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.openide.nodes</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>7.2.1.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -159,6 +175,7 @@
                 <package>com.sun.tools.visualvm.core.scheduler</package>
                 <package>com.sun.tools.visualvm.core.snapshot</package>
                 <package>com.sun.tools.visualvm.core.ui</package>
+                <package>com.sun.tools.visualvm.core.ui.actions</package>
                 <package>com.sun.tools.visualvm.core.ui.components</package>
             </public-packages>
         </data>

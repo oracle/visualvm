@@ -28,99 +28,75 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
-import java.util.Collections;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.util.RequestProcessor;
 
-public final class ThreadDumpAction extends AbstractAction {
     
-    private static ThreadDumpAction instance;
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
+    
+    private Set<Application> lastSelectedApplications = new HashSet();
+    private final PropertyChangeListener stateListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateState(ActionUtils.getSelectedDataSources());
+        }
+    };
     
     
-    public static synchronized ThreadDumpAction getInstance() {
-        if (instance == null) instance = new ThreadDumpAction();
-        return instance;
+    public static ThreadDumpAction create() {
+        ThreadDumpAction action = new ThreadDumpAction();
+        action.initialize();
+        return action;
     }
     
-    public void actionPerformed(final ActionEvent e) {
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                if (isAvailable()) {
-                    Set<DataSource> threadDumpAbleDataSources = getThreadDumpAbleDataSources();
-                    for (DataSource dataSource : threadDumpAbleDataSources) {
+    
+    protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {
+        for (DataSource dataSource : dataSources) {
                         if (dataSource instanceof Application) {
                             Application application = (Application)dataSource;
-                            ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                ThreadDumpSupport.getInstance().takeThreadDump(application, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
                         } else if (dataSource instanceof CoreDump) {
                             CoreDump coreDump = (CoreDump)dataSource;
-                            ThreadDumpSupport.getInstance().takeThreadDump(coreDump, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                ThreadDumpSupport.getInstance().takeThreadDump(coreDump, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
                         }
                     }
-                } else {
-                    NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for selected item(s).");
                 }
-            }
-        });
-    }
     
-    private void updateEnabled() {
-        Set<DataSource> threadDumpAbleDataSources = getThreadDumpAbleDataSources();
-        final boolean isEnabled = !threadDumpAbleDataSources.isEmpty();
         
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() {
-                setEnabled(isEnabled);
-            }
-        });
-    }
-    
-    // Not to be called from AWT EDT (the result reflects that the action can/cannot be invoked)
-    boolean isAvailable() {
-        if (!isEnabled()) return false;
-        Set<DataSource> threadDumpAbleDataSources = getThreadDumpAbleDataSources();
-        for (DataSource dataSource : threadDumpAbleDataSources)
+    protected boolean isEnabled(Set<DataSource> dataSources) {
+        for (DataSource dataSource : dataSources)
             if (dataSource instanceof Application) {
-                Application application = (Application) dataSource;
-                Jvm jvm = JvmFactory.getJVMFor(application);
-                if (jvm == null || !jvm.isTakeThreadDumpSupported()) return false;
-            }
+                // TODO: Listener should only be registered when thread dump is supported for the application
+                Application application = (Application)dataSource;
+                lastSelectedApplications.add(application);
+                application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+                if (!ThreadDumpSupport.getInstance().supportsThreadDump((Application)dataSource)) return false;
+            } else if (!(dataSource instanceof CoreDump)) return false;
         return true;
     }
     
-    private Set<DataSource> getThreadDumpAbleDataSources() {
-        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
-        Set<DataSource> threadDumpAbleDataSources = new HashSet();
-        for (DataSource dataSource : selectedDataSources)
-            if ((dataSource instanceof Application && ((Application)dataSource).getState() == Stateful.STATE_AVAILABLE) || dataSource instanceof CoreDump)
-                threadDumpAbleDataSources.add(dataSource);
-            else return Collections.EMPTY_SET;
-        return threadDumpAbleDataSources;
+    protected void updateState(Set<DataSource> dataSources) {
+        if (lastSelectedApplications == null) lastSelectedApplications = new HashSet();
+        if (!lastSelectedApplications.isEmpty())
+            for (Application application : lastSelectedApplications)
+                application.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        super.updateState(dataSources);
     }
     
     
     private ThreadDumpAction() {
-        putValue(Action.NAME, "Thread Dump");
-        putValue(Action.SHORT_DESCRIPTION, "Thread Dump");
-        
-        updateEnabled();
-        // TODO: should also listen for selected Applications availability (see ApplicationSnapshotAction implementation)
-        ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
-            public void selectionChanged(Set<DataSource> selected) {
-                updateEnabled();
+        super(DataSource.class);
+        putValue(NAME, "Thread Dump");
+        putValue(SHORT_DESCRIPTION, "Thread Dump");
             }
-        });
     }
-}

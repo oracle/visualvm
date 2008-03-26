@@ -44,7 +44,6 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
         if (dsDescFactory == null) {
             dsDescFactory = new DataSourceDescriptorFactory();
             dsDescFactory.registerFactory(dsDescFactory);
-            DataSourceDescriptorActionProvider.getInstance().initialize();
         }
         return dsDescFactory;
     }

@@ -24,20 +24,38 @@
  */
 package com.sun.tools.visualvm.application.snapshot;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
+import java.util.Set;
 import javax.swing.Action;
 
-public final class AddApplicationSnapshotAction extends AbstractAction {
     
-    private static AddApplicationSnapshotAction instance;
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+class AddApplicationSnapshotAction extends SingleDataSourceAction<DataSource> {
     
-    public static synchronized AddApplicationSnapshotAction getInstance() {
-        if (instance == null) instance = new AddApplicationSnapshotAction();
-        return instance;
+    private boolean tracksSelection = false;
+    
+    
+    public static AddApplicationSnapshotAction alwaysEnabled() {
+        AddApplicationSnapshotAction action = new AddApplicationSnapshotAction();
+        action.initialize();
+        return action;
     }
     
-    public void actionPerformed(ActionEvent e) {
+    public static AddApplicationSnapshotAction selectionAware() {
+        AddApplicationSnapshotAction action = new AddApplicationSnapshotAction().trackSelection();
+        action.initialize();
+        return action;
+    }
+    
+    
+    protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
         ApplicationSnapshotConfigurator newSnapshotConfiguration = ApplicationSnapshotConfigurator.defineSnapshot();
         if (newSnapshotConfiguration != null) {
             ApplicationSnapshotProvider provider = ApplicationSnapshotsSupport.getInstance().getSnapshotProvider();
@@ -45,8 +63,23 @@ public final class AddApplicationSnapshotAction extends AbstractAction {
         }
     }
     
+    protected boolean isEnabled(DataSource dataSource) {
+        return dataSource == DataSource.ROOT || dataSource instanceof SnapshotsContainer;
+    }
+    
+    protected void updateState(Set<DataSource> selectedDataSources) {
+        if (tracksSelection) super.updateState(selectedDataSources);
+    }
+    
+    private AddApplicationSnapshotAction trackSelection() {
+        tracksSelection = true;
+        updateState(ActionUtils.getSelectedDataSources());
+        return this;
+    }
+    
     
     private AddApplicationSnapshotAction() {
+        super(DataSource.class);
         putValue(Action.NAME, "Add Application Snapshot...");
         putValue(Action.SHORT_DESCRIPTION, "Add Application Snapshot");
     }

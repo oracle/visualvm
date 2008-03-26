@@ -36,6 +36,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -103,8 +104,10 @@ class JmxApplicationConfigurator extends JPanel {
         connectionField.setText("");
         displaynameField.setText("");
         
-        DataSource selectedDataSource = ExplorerSupport.sharedInstance().getSelectedDataSource();
-        if (selectedDataSource == null || !(selectedDataSource instanceof Host)) return;
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
+        if (selectedDataSources.size() != 1) return;
+        DataSource selectedDataSource = selectedDataSources.iterator().next();
+        if (!(selectedDataSource instanceof Host)) return;
         Host host = (Host)selectedDataSource;
         connectionField.setText(host.getHostName() + ":");
     }

@@ -81,6 +81,5 @@ public class JmxApplicationsSupport {
     public static void register() {
         DataSourceDescriptorFactory.getDefault().registerFactory(new JmxApplicationDescriptorProvider());
         JmxApplicationProvider.initialize();
-        JmxApplicationActionsProvider.initialize();
     }
 }

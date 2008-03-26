@@ -29,7 +29,6 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.host.impl.HostActionsProvider;
 import com.sun.tools.visualvm.host.impl.HostDescriptorProvider;
 import com.sun.tools.visualvm.host.impl.HostProperties;
 import com.sun.tools.visualvm.host.impl.HostProvider;
@@ -120,8 +119,6 @@ public final class HostsSupport {
         DataSource.ROOT.getRepository().addDataSource(container);
         
         hostProvider.initialize();
-
-        new HostActionsProvider().initialize();
     }
 
 }

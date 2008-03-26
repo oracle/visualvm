@@ -26,11 +26,15 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import com.sun.tools.visualvm.host.Host;
 import java.io.File;
 import java.util.Set;
 import java.util.logging.Level;
@@ -66,6 +70,14 @@ public final class ProfilerSupport {
         return category;
     }
     
+    
+    boolean supportsProfiling(Application application) {
+        if (application.getHost() != Host.LOCALHOST) return false;
+        if (Application.CURRENT_APPLICATION.equals(application)) return false;
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        Jvm jvm = JvmFactory.getJVMFor(application);
+        return jvm.isAttachable() && !jvm.is14() && !jvm.is15();
+    }
     
     ProfilerSnapshotsProvider getSnapshotsProvider() {
         return profilerSnapshotsProvider;
@@ -172,12 +184,10 @@ public final class ProfilerSupport {
         new ProfilerSnapshotViewProvider().initialize();
         
         category = new ProfilerSnapshotCategory();
-        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
         
         profilerSnapshotsProvider = new ProfilerSnapshotsProvider();
         profilerSnapshotsProvider.initialize();
-        
-        ProfilerActionsProvider.getInstance().initialize();
         
         checkCalibration();
         

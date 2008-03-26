@@ -26,26 +26,45 @@
 -->
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    
     <folder name="Actions">
         <folder name="Other">
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.getInstance"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.create"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.getInstance"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.create"/>
             </file>
         </folder>
     </folder>
+    
     <folder name="Menu">
         <folder name="Applications">
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="1200"/>
+                <attr name="position" intvalue="2300"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
-                <attr name="position" intvalue="1300"/>
+                <attr name="position" intvalue="2400"/>
             </file>
         </folder>
     </folder>
+    
+    <folder name="VisualVM">
+        <folder name="ExplorerPopupSelection">
+            
+            <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
+                <attr name="position" intvalue="1300"/>
+            </file>
+            
+            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+                <attr name="position" intvalue="1400"/>
+            </file>
+            
+        </folder>
+    </folder>
+    
 </filesystem>

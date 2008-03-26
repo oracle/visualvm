@@ -27,12 +27,13 @@ package com.sun.tools.visualvm.threaddump;
 
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpPluggableView;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpActionsProvider;
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpCategory;
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpDescriptorProvider;
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpProvider;
@@ -73,6 +74,11 @@ public final class ThreadDumpSupport {
         return category;
     }
     
+    public boolean supportsThreadDump(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        return JvmFactory.getJVMFor(application).isTakeThreadDumpSupported();
+    }
+    
     /**
      * Takes thread dump from Application.
      * 
@@ -106,10 +112,9 @@ public final class ThreadDumpSupport {
         
         threadDumpViewProvider = new ThreadDumpViewProvider();
         
-        RegisteredSnapshotCategories.sharedInstance().addCategory(category);
+        RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
         
         threadDumpViewProvider.initialize();
-        new ThreadDumpActionsProvider().initialize();
     }
 
 }
