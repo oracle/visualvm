@@ -34,6 +34,10 @@ import org.openide.util.Utilities;
 
 class GeneralOptionsCategory extends OptionsCategory {
 
+    public static GeneralOptionsCategory instance() {
+        return new GeneralOptionsCategory();
+    }
+
     public Icon getIcon() {
         return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/options.png"));
     }

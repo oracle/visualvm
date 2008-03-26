@@ -164,6 +164,7 @@
     
     <folder name="OptionsDialog">
         <file name="com-sun-tools-visualvm-core-options-GeneralOptionsCategory.instance">
+            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.options.GeneralOptionsCategory.instance"/>
             <attr name="position" intvalue="790"/>
         </file>
     </folder>
