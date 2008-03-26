@@ -23,7 +23,7 @@ class TransactionServiceView extends DataSourceView {
     private ScheduledTask transRefreshTask;
 
     public TransactionServiceView(Application app, TransactionServiceMonitor monitor) {
-        super("Transaction Service", new ImageIcon(Utilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END);
+        super(app, "Transaction Service", new ImageIcon(Utilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END, false);
         this.monitor = monitor;
 
         initComponents();

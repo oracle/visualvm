@@ -39,9 +39,10 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -103,7 +104,7 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public GlassfishWebModuleView(GlassFishWebModule webModule) {
-            super("Overview", NODE_ICON, 0);
+            super(webModule, "Overview", NODE_ICON, 0, true);
 
             module = webModule;
 
@@ -301,15 +302,23 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     }
 
     public static void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 
     public boolean supportsViewsFor(GlassFishWebModule dataSource) {
         return true;
+    }
+    
+    public void saveViews(GlassFishWebModule module, Snapshot snapshot) {
+        // TODO implement later
+    }
+
+    public boolean supportsSaveViewsFor(GlassFishWebModule module) {
+        return false;
     }
 }

@@ -31,8 +31,9 @@ import com.sun.appserv.management.monitor.TransactionServiceMonitor;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -134,16 +135,24 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
     }
     
     public static void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, Application.class);
     }
 
     public static void shutdown() {
-        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.httpServiceViewMap.clear();
         INSTANCE.transServiceViewMap.clear();
     }
 
     public boolean supportsViewsFor(Application dataSource) {
         return (ApplicationTypeFactory.getApplicationTypeFor(dataSource) instanceof GlassFishApplicationType);
+    }
+
+    public void saveViews(Application app, Snapshot snapshot) {
+        // TODO implement later
+    }
+
+    public boolean supportsSaveViewsFor(Application app) {
+        return false;
     }
 }

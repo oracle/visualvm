@@ -30,8 +30,9 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
@@ -77,7 +78,7 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public GlassfishServletView(GlassFishServlet servlet) {
-            super(servlet.getName(), NODE_ICON, 0);
+            super(servlet, servlet.getName(), NODE_ICON, 0, true);
 
             this.servlet = servlet;
 
@@ -129,11 +130,6 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
             }, Quantum.seconds(3));
         }
 
-        @Override
-        public boolean isClosable() {
-            return true;
-        }
-
         //~ Methods --------------------------------------------------------------------------------------------------------------
         @Override
         public DataViewComponent getView() {
@@ -173,15 +169,24 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
     }
 
     public static void initialize() {
-        DataSourceViewsFactory.sharedInstance().addViewProvider(INSTANCE, GlassFishServlet.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, GlassFishServlet.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsFactory.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 
     public boolean supportsViewsFor(GlassFishServlet dataSource) {
         return true;
     }
+    
+    public void saveViews(GlassFishServlet servlet, Snapshot snapshot) {
+        // TODO implement later
+    }
+
+    public boolean supportsSaveViewsFor(GlassFishServlet servlet) {
+        return false;
+    }
+    
 }

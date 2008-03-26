@@ -33,7 +33,7 @@ class HTTPServiceView extends DataSourceView {
     private ScheduledTask kaRefreshTask;
 
     public HTTPServiceView(Application app, HTTPServiceMonitor monitor) {
-        super("HTTP Service", new ImageIcon(Utilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END);
+        super(app, "HTTP Service", new ImageIcon(Utilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END, false);
         this.monitor = monitor;
         initComponents();
     }
