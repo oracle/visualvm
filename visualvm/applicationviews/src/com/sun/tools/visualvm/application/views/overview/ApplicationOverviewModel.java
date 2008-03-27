@@ -110,7 +110,13 @@ final class ApplicationOverviewModel {
     public String getVmId() { return vmId; }
     public String getJavaHome() { return javaHome; }
     public String getJvmFlags() { return jvmFlags; }
-    public String oomeEnabled() { return oomeEnabled; }
+    public String oomeEnabled() {
+        if (basicInfoSupported() && source instanceof Application) {
+            Jvm jvm = JvmFactory.getJVMFor((Application)source);
+            oomeEnabled = jvm.isDumpOnOOMEnabled() ? "enabled" : "disabled";
+        }
+        return oomeEnabled;
+    }
     public String getJvmArgs() { return jvmArgs; }
     public String getSystemProperties() { return systemProperties; }
     

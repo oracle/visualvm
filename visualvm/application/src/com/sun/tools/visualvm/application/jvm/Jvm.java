@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.application.jvm;
 
 import com.sun.tools.visualvm.core.model.Model;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -38,6 +40,10 @@ import java.util.logging.Logger;
  */
 public abstract class Jvm extends Model {
     protected static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
+    
+    public static final String PROPERTY_DUMP_OOME_ENABLED = "prop_oome";
+    
+    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     
     /**
      * Tests if target JVM is JRE 1.4.
@@ -247,4 +253,17 @@ public abstract class Jvm extends Model {
      * @return Returns {@link String} of the thread dump from target JVM.
      */
     public abstract File takeThreadDump() throws IOException;
+    
+    public final void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public final void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+    
+    protected final void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        changeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+    
 }

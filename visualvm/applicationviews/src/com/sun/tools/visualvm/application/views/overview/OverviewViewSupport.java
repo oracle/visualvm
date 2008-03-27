@@ -25,6 +25,9 @@
 
 package com.sun.tools.visualvm.application.views.overview;
 
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -35,12 +38,15 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.WeakListeners;
 
 /**
  * A public entrypoint to the Overview subtab.
@@ -50,57 +56,71 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
  */
 class OverviewViewSupport {
 
- // --- General data --------------------------------------------------------
-
+    // --- General data --------------------------------------------------------
+    
     static class MasterViewSupport extends JPanel  {
-
-    public MasterViewSupport(ApplicationOverviewModel model) {
-        initComponents(model);
+        private PropertyChangeListener oomeListener;
+        
+        public MasterViewSupport(ApplicationOverviewModel model) {
+            initComponents(model);
+        }
+        
+        
+        public DataViewComponent.MasterView getMasterView() {
+            return new DataViewComponent.MasterView("Overview", null, this);
+        }
+        
+        
+        private void initComponents(final ApplicationOverviewModel model) {
+            setLayout(new BorderLayout());
+            
+            final HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>");
+            area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            setBackground(area.getBackground());
+            
+            DataSource source = model.getSource();
+            if (source instanceof Application) {
+                oomeListener = new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if (Jvm.PROPERTY_DUMP_OOME_ENABLED.equals(evt.getPropertyName())) {
+                            int selStart = area.getSelectionStart();
+                            int selEnd   = area.getSelectionEnd();
+                            area.setText("<nobr>" + getGeneralProperties(model) + "</nobr>");
+                            area.select(selStart, selEnd);
+                        }
+                    }
+                };
+                Jvm jvm = JvmFactory.getJVMFor((Application)source);
+                jvm.addPropertyChangeListener(WeakListeners.propertyChange(oomeListener,jvm));
+            }
+            add(area, BorderLayout.CENTER);
+        }
+        
+        private String getGeneralProperties(ApplicationOverviewModel model) {
+            StringBuilder data = new StringBuilder();
+            
+            // Application information
+            data.append("<b>PID:</b> " + model.getPid() + "<br>");
+            data.append("<b>Host:</b> " + model.getHostName() + "<br>");
+            
+            if (model.basicInfoSupported()) {
+                data.append("<b>Main class:</b> " + model.getMainClass() + "<br>");
+                data.append("<b>Arguments:</b> " + model.getMainArgs() + "<br>");
+                
+                data.append("<br>");
+                data.append("<b>JVM:</b> " + model.getVmId() + "<br>");
+                data.append("<b>Java Home:</b> " + model.getJavaHome() + "<br>");
+                data.append("<b>JVM Flags:</b> " + model.getJvmFlags() + "<br><br>");
+                data.append("<b>Heap dump on OOME:</b> " + model.oomeEnabled() + "<br>");
+            }
+            
+            return data.toString();
+            
+        }
+        
     }
-
-
-    public DataViewComponent.MasterView getMasterView() {
-        return new DataViewComponent.MasterView("Overview", null, this);
-    }
-
-
-    private void initComponents(ApplicationOverviewModel model) {
-        setLayout(new BorderLayout());
-
-        HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>");
-        area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-        setBackground(area.getBackground());
-
-        // TODO: implement listener for Application.oomeHeapDumpEnabled
-
-        add(area, BorderLayout.CENTER);
-    }
-
-    private String getGeneralProperties(ApplicationOverviewModel model) {
-      StringBuilder data = new StringBuilder();
-
-      // Application information
-      data.append("<b>PID:</b> " + model.getPid() + "<br>");
-      data.append("<b>Host:</b> " + model.getHostName() + "<br>");
-
-      if (model.basicInfoSupported()) {
-        data.append("<b>Main class:</b> " + model.getMainClass() + "<br>");
-        data.append("<b>Arguments:</b> " + model.getMainArgs() + "<br>");
-
-        data.append("<br>");
-        data.append("<b>JVM:</b> " + model.getVmId() + "<br>");
-        data.append("<b>Java Home:</b> " + model.getJavaHome() + "<br>");
-        data.append("<b>JVM Flags:</b> " + model.getJvmFlags() + "<br><br>");
-        data.append("<b>Heap dump on OOME:</b> " + model.oomeEnabled() + "<br>");
-      }
-
-      return data.toString();
-      
-    }
-
-}
-
- // --- Snapshots -----------------------------------------------------------
+    
+    // --- Snapshots -----------------------------------------------------------
     
     static class SnapshotsViewSupport extends JPanel implements DataChangeListener {
         
@@ -112,7 +132,7 @@ class OverviewViewSupport {
             this.dataSource = dataSource;
             initComponents();
             dataSource.getRepository().addDataChangeListener(this, Snapshot.class);
-        }        
+        }
         
         public DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView("Saved data", null, this, null);
@@ -133,7 +153,7 @@ class OverviewViewSupport {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() { updateSavedData(); }
             });
-                }                
+        }
             
         void removed() {
             dataSource.getRepository().removeDataChangeListener(this);
@@ -145,7 +165,7 @@ class OverviewViewSupport {
             List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
             for (SnapshotCategory category : snapshotCategories)
                 data.append("<b>" + category.getName() + ":</b> " + dataSource.getRepository().getDataSources(category.getType()).size() + "<br>");
-
+            
             area.setText("<nobr>" + data.toString() + "</nobr>");
         }
         
@@ -158,7 +178,7 @@ class OverviewViewSupport {
         
         public JVMArgumentsViewSupport(String jvmargs) {
             initComponents(jvmargs);
-        }        
+        }
         
         public DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView("JVM arguments", null, this, null);
@@ -191,7 +211,7 @@ class OverviewViewSupport {
         
         public SystemPropertiesViewSupport(String properties) {
             initComponents(properties);
-        }        
+        }
         
         public DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView("System properties", null, this, null);

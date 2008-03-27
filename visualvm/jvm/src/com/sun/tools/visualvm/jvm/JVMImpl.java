@@ -281,7 +281,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
     }
     
-    public void setDumpOnOOMEnabled(boolean enabled) {
+    public synchronized void setDumpOnOOMEnabled(boolean enabled) {
         if (!isDumpOnOOMEnabledSupported()) {
             throw new UnsupportedOperationException();
         }
@@ -298,7 +298,9 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 hsDiagnostic.setVMOption("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
             }
         }
+        Boolean oldVlue = isDumpOnOOMEnabled;
         isDumpOnOOMEnabled = Boolean.valueOf(enabled);
+        firePropertyChange(PROPERTY_DUMP_OOME_ENABLED,oldVlue,isDumpOnOOMEnabled);
     }
     
     public boolean isTakeHeapDumpSupported() {
