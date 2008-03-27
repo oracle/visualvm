@@ -52,13 +52,13 @@ import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.netbeans.modules.profiler.spi.OpenSourceProvider;
+import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class OpenJavaSourceProvider implements OpenSourceProvider {
+public class GoToJavaSourceProvider implements GoToSourceProvider {
 
     public boolean openSource(final Project project, final String className, final String methodName, final String signature) {
         final JavaSource js = SourceUtils.getSources(project);

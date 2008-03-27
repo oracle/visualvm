@@ -141,7 +141,7 @@ import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.netbeans.modules.profiler.utils.SourceOpener;
+import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.openide.execution.ExecutorTask;
 
@@ -1399,7 +1399,7 @@ public final class NetBeansProfiler extends Profiler {
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    SourceOpener.openSource(project, className, methodName, className);
+                    GoToSourceHelper.openSource(project, className, methodName, className);
 //                    SourceUtils.openSource(project, className, methodName, methodSig);
                 }
             });

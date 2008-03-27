@@ -37,46 +37,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.utils;
+package org.netbeans.modules.profiler.spi;
 
-import org.netbeans.modules.profiler.spi.*;
-import java.text.MessageFormat;
-import java.util.Collection;
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
-import org.openide.awt.StatusDisplayer;
-import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-final public class SourceOpener {
-    public static boolean openSource(Project project, String className, String methodName, String signature) {
-        // *** logging stuff ***
-        ProfilerLogger.debug("Open Source: Project: " + ((project == null) ? "null" : ProjectUtilities.getProjectName(project))); // NOI18N
-        ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N
-        ProfilerLogger.debug("Open Source: Method name: " + methodName); // NOI18N
-        ProfilerLogger.debug("Open Source: Method sig: " + signature); // NOI18N
-        
-        Collection<? extends OpenSourceProvider> implementations = Lookup.getDefault().lookupAll(OpenSourceProvider.class);
-        
-        String st = MessageFormat.format(NbBundle.getMessage(SourceOpener.class, "OpeningSourceMsg"),
-                                                             new Object[] { className }); // NOI18N
-        final String finalStatusText = st + " ..."; // NOI18N
-        StatusDisplayer.getDefault().setStatusText(finalStatusText);
-        
-        for(OpenSourceProvider impl : implementations) {
-            if (impl.openSource(project, className, methodName, signature)) return true;
-        }
-        
-        Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(SourceOpener.class,
-                                                                                        "NoSourceFoundMessage"), // NOI18N
-                                                                                        new Object[] { className }));
-        
-        return false;
-    }
+public interface GoToSourceProvider {
+    public boolean openSource(Project project, String className, String methodName, String signature);
 }
