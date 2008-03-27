@@ -60,17 +60,28 @@ import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RemoteObject;
 import java.rmi.server.RemoteObjectInvocationHandler;
 import java.rmi.server.RemoteRef;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.Notification;
 import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
@@ -98,9 +109,9 @@ import sun.rmi.transport.LiveRef;
  * }
  * </pre>
  *
- * {@link CachedMBeanServerConnectionFactory.getCachedMBeanServerConnectionFor(MBeanServerConnection)}
- * can be used to work with a {@link CachedMBeanServerConnection} instead of
- * a plain {@link MBeanServerConnection}.
+ * {@link JmxModel.getCachedMBeanServerConnection()} should be called
+ * if you want to get a {@link CachedMBeanServerConnection} instead of
+ * a plain MBeanServerConnection.
  *
  * In case the JMX connection is not established yet, you could register
  * a listener on the {@code JmxModel} for ConnectionState property changes.
@@ -285,6 +296,23 @@ public class JmxModelImpl extends JmxModel {
     }
 
     /**
+     * Returns the {@link CachedMBeanServerConnection cached MBeanServerConnection}
+     * for the connection to an application. The returned {@code CachedMBeanServerConnection}
+     * object becomes invalid when the connection state is changed to the
+     * {@link ConnectionState#DISCONNECTED DISCONNECTED} state.
+     *
+     * @return the {@code CachedMBeanServerConnection} for the
+     * connection to an application. It returns {@code null}
+     * if the JMX connection couldn't be established.
+     */
+    public CachedMBeanServerConnection getCachedMBeanServerConnection() {
+        if (client != null) {
+            return client.getCachedMBeanServerConnection();
+        }
+        return null;
+    }
+
+    /**
      * Returns the {@link JMXServiceURL} associated to this (@code JmxModel}.
      *
      * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
@@ -310,7 +338,7 @@ public class JmxModelImpl extends JmxModel {
         public void dataRemoved(Application application) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    proxyClient.markAsDead();
+                    proxyClient.disconnect();
                 }
             });
         }
@@ -327,6 +355,7 @@ public class JmxModelImpl extends JmxModel {
         private LocalVirtualMachine lvm;
         private JMXServiceURL jmxUrl = null;
         private MBeanServerConnection conn = null;
+        private CachedMBeanServerConnection cachedConn = null;
         private JMXConnector jmxc = null;
         private RMIServer stub = null;
         private static final SslRMIClientSocketFactory sslRMIClientSocketFactory =
@@ -533,6 +562,12 @@ public class JmxModelImpl extends JmxModel {
             return connectionState;
         }
 
+        void flush() {
+            if (cachedConn != null) {
+                cachedConn.flush();
+            }
+        }
+
         void connect() {
             setConnectionState(ConnectionState.CONNECTING);
             try {
@@ -553,7 +588,9 @@ public class JmxModelImpl extends JmxModel {
         private void tryConnect() throws IOException {
             if (jmxUrl == null && "localhost".equals(hostName) && port == 0) {
                 jmxc = null;
-                conn = ManagementFactory.getPlatformMBeanServer();
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                conn = mbs;
+                cachedConn = Snapshot.newSnapshot(mbs);
             } else {
                 if (lvm != null) {
                     if (!lvm.isManageable()) {
@@ -602,6 +639,7 @@ public class JmxModelImpl extends JmxModel {
                 }
                 MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
                 conn = Checker.newChecker(this, mbsc);
+                cachedConn = Snapshot.newSnapshot(conn);
             }
             isDead = false;
         }
@@ -642,6 +680,10 @@ public class JmxModelImpl extends JmxModel {
 
         public MBeanServerConnection getMBeanServerConnection() {
             return conn;
+        }
+
+        public CachedMBeanServerConnection getCachedMBeanServerConnection() {
+            return cachedConn;
         }
 
         public JMXServiceURL getUrl() {
@@ -738,6 +780,119 @@ public class JmxModelImpl extends JmxModel {
 
         private void dispose() {
             JmxModelImpl.this.removePropertyChangeListener(this);
+        }
+    }
+
+    static class Snapshot {
+
+        private Snapshot() {
+        }
+
+        public static CachedMBeanServerConnection newSnapshot(MBeanServerConnection mbsc) {
+            final InvocationHandler ih = new SnapshotInvocationHandler(mbsc);
+            return (CachedMBeanServerConnection) Proxy.newProxyInstance(
+                    Snapshot.class.getClassLoader(),
+                    new Class[]{CachedMBeanServerConnection.class},
+                    ih);
+        }
+    }
+
+    static class SnapshotInvocationHandler implements InvocationHandler {
+
+        private final MBeanServerConnection conn;
+        private Map<ObjectName, NameValueMap> cachedValues = newMap();
+        private Map<ObjectName, Set<String>> cachedNames = newMap();
+
+        @SuppressWarnings("serial")
+        private static final class NameValueMap
+                extends HashMap<String, Object> {
+        }
+
+        SnapshotInvocationHandler(MBeanServerConnection conn) {
+            this.conn = conn;
+        }
+
+        synchronized void flush() {
+            cachedValues = newMap();
+        }
+
+        public Object invoke(Object proxy, Method method, Object[] args)
+                throws Throwable {
+            final String methodName = method.getName();
+            if (methodName.equals("getAttribute")) {
+                return getAttribute((ObjectName) args[0], (String) args[1]);
+            } else if (methodName.equals("getAttributes")) {
+                return getAttributes((ObjectName) args[0], (String[]) args[1]);
+            } else if (methodName.equals("flush")) {
+                flush();
+                return null;
+            } else {
+                try {
+                    return method.invoke(conn, args);
+                } catch (InvocationTargetException e) {
+                    throw e.getCause();
+                }
+            }
+        }
+
+        private Object getAttribute(ObjectName objName, String attrName)
+                throws MBeanException, InstanceNotFoundException,
+                AttributeNotFoundException, ReflectionException, IOException {
+            final NameValueMap values = getCachedAttributes(
+                    objName, Collections.singleton(attrName));
+            Object value = values.get(attrName);
+            if (value != null || values.containsKey(attrName)) {
+                return value;
+            }
+            // Not in cache, presumably because it was omitted from the
+            // getAttributes result because of an exception.  Following
+            // call will probably provoke the same exception.
+            return conn.getAttribute(objName, attrName);
+        }
+
+        private AttributeList getAttributes(
+                ObjectName objName, String[] attrNames) throws
+                InstanceNotFoundException, ReflectionException, IOException {
+            final NameValueMap values = getCachedAttributes(
+                    objName,
+                    new TreeSet<String>(Arrays.asList(attrNames)));
+            final AttributeList list = new AttributeList();
+            for (String attrName : attrNames) {
+                final Object value = values.get(attrName);
+                if (value != null || values.containsKey(attrName)) {
+                    list.add(new Attribute(attrName, value));
+                }
+            }
+            return list;
+        }
+
+        private synchronized NameValueMap getCachedAttributes(
+                ObjectName objName, Set<String> attrNames) throws
+                InstanceNotFoundException, ReflectionException, IOException {
+            NameValueMap values = cachedValues.get(objName);
+            if (values != null && values.keySet().containsAll(attrNames)) {
+                return values;
+            }
+            attrNames = new TreeSet<String>(attrNames);
+            Set<String> oldNames = cachedNames.get(objName);
+            if (oldNames != null) {
+                attrNames.addAll(oldNames);
+            }
+            values = new NameValueMap();
+            final AttributeList attrs = conn.getAttributes(
+                    objName,
+                    attrNames.toArray(new String[attrNames.size()]));
+            for (Attribute attr : attrs.asList()) {
+                values.put(attr.getName(), attr.getValue());
+            }
+            cachedValues.put(objName, values);
+            cachedNames.put(objName, attrNames);
+            return values;
+        }
+
+        // See http://www.artima.com/weblogs/viewpost.jsp?thread=79394
+        private static <K, V> Map<K, V> newMap() {
+            return new HashMap<K, V>();
         }
     }
 

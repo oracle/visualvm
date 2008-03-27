@@ -50,9 +50,9 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * }
  * </pre>
  *
- * {@link CachedMBeanServerConnectionFactory.getCachedMBeanServerConnectionFor(MBeanServerConnection)}
- * can be used to work with a {@link CachedMBeanServerConnection} instead of
- * a plain {@link MBeanServerConnection}.
+ * {@link JmxModel.getCachedMBeanServerConnection()} should be called
+ * if you want to get a {@link CachedMBeanServerConnection} instead of
+ * a plain MBeanServerConnection.
  *
  * In case the JMX connection is not established yet, you could register
  * a listener on the {@code JmxModel} for ConnectionState property changes.
@@ -158,6 +158,18 @@ public abstract class JmxModel extends Model {
      * if the JMX connection couldn't be established.
      */
     public abstract MBeanServerConnection getMBeanServerConnection();
+
+    /**
+     * Returns the {@link CachedMBeanServerConnection cached MBeanServerConnection}
+     * for the connection to an application. The returned {@code CachedMBeanServerConnection}
+     * object becomes invalid when the connection state is changed to the
+     * {@link ConnectionState#DISCONNECTED DISCONNECTED} state.
+     *
+     * @return the {@code CachedMBeanServerConnection} for the
+     * connection to an application. It returns {@code null}
+     * if the JMX connection couldn't be established.
+     */
+    public abstract CachedMBeanServerConnection getCachedMBeanServerConnection();
 
     /**
      * Returns the {@link JMXServiceURL} associated to this (@code JmxModel}.
