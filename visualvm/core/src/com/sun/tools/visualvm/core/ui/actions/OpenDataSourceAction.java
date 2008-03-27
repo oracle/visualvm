@@ -36,10 +36,14 @@ import java.util.Set;
  */
 class OpenDataSourceAction extends MultiDataSourceAction<DataSource> {
     
-    public static OpenDataSourceAction create() {
-        OpenDataSourceAction action = new OpenDataSourceAction();
-        action.initialize();
-        return action;
+    private static OpenDataSourceAction instance;
+    
+    public static synchronized OpenDataSourceAction instance() {
+        if (instance == null) {
+            instance = new OpenDataSourceAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     

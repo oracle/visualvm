@@ -52,11 +52,14 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
         }
     };
     
+    private static ThreadDumpAction instance;
     
-    public static ThreadDumpAction create() {
-        ThreadDumpAction action = new ThreadDumpAction();
-        action.initialize();
-        return action;
+    public static synchronized ThreadDumpAction instance() {
+        if (instance == null) {
+            instance = new ThreadDumpAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     

@@ -30,7 +30,7 @@
     <folder name="Actions">
         <folder name="Other">
             <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpAction.instance"/>
             </file>
         </folder>
     </folder>
@@ -57,7 +57,7 @@
                 <attr name="position" intvalue="1940"/>
             </file>
             <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpOnOOMEAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpOnOOMEAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpOnOOMEAction.instance"/>
                 <attr name="position" intvalue="1950"/>
             </file>
             

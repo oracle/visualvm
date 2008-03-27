@@ -46,25 +46,34 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     private boolean notSupported;
     private boolean tracksSelection = false;
     
+    private static AddVMCoredumpAction alwaysEnabled;
+    private static AddVMCoredumpAction toolbarInstance;
+    private static AddVMCoredumpAction selectionAware;
     
-    public static AddVMCoredumpAction alwaysEnabled() {
-        AddVMCoredumpAction action = new AddVMCoredumpAction();
-        action.initialize();
-        return action;
+    public static synchronized AddVMCoredumpAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddVMCoredumpAction();
+            alwaysEnabled.initialize();
+    }
+        return alwaysEnabled;
     }
     
-    public static AddVMCoredumpAction toolbarInstance() {
-        AddVMCoredumpAction action = new AddVMCoredumpAction();
-        action.putValue(SMALL_ICON, new ImageIcon(ICON));
-        action.putValue("iconBase", ICON_PATH);
-        action.initialize();
-        return action;
+    public static synchronized AddVMCoredumpAction toolbarInstance() {
+        if (toolbarInstance == null) {
+            toolbarInstance = new AddVMCoredumpAction();
+            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
+            toolbarInstance.putValue("iconBase", ICON_PATH);
+            toolbarInstance.initialize();
+    }
+        return toolbarInstance;
     }
     
-    public static AddVMCoredumpAction selectionAware() {
-        AddVMCoredumpAction action = new AddVMCoredumpAction().trackSelection();
-        action.initialize();
-        return action;
+    public static synchronized AddVMCoredumpAction selectionAware() {
+        if (selectionAware == null) {
+            selectionAware = new AddVMCoredumpAction().trackSelection();
+            selectionAware.initialize();
+    }
+        return selectionAware;
     }
     
     public void actionPerformed(CoreDumpsContainer contanier, ActionEvent e) {

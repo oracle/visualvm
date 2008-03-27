@@ -35,10 +35,14 @@ import java.util.Set;
  */
 class RemoveDataSourceAction extends MultiDataSourceAction<DataSource> {
     
-    public static RemoveDataSourceAction create() {
-        RemoveDataSourceAction action = new RemoveDataSourceAction();
-        action.initialize();
-        return action;
+    private static RemoveDataSourceAction instance;
+    
+    public static synchronized RemoveDataSourceAction instance() {
+        if (instance == null) {
+            instance = new RemoveDataSourceAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     

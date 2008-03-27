@@ -47,24 +47,34 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
     private boolean tracksSelection = false;
     
     
-    public static AddApplicationSnapshotAction alwaysEnabled() {
-        AddApplicationSnapshotAction action = new AddApplicationSnapshotAction();
-        action.initialize();
-        return action;
+    private static AddApplicationSnapshotAction alwaysEnabled;
+    private static AddApplicationSnapshotAction toolbarInstance;
+    private static AddApplicationSnapshotAction selectionAware;
+    
+    public static synchronized AddApplicationSnapshotAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddApplicationSnapshotAction();
+            alwaysEnabled.initialize();
+    }
+        return alwaysEnabled;
     }
     
-    public static AddApplicationSnapshotAction toolbarInstance() {
-        AddApplicationSnapshotAction action = new AddApplicationSnapshotAction();
-        action.putValue(SMALL_ICON, new ImageIcon(ICON));
-        action.putValue("iconBase", ICON_PATH);
-        action.initialize();
-        return action;
+    public static synchronized AddApplicationSnapshotAction toolbarInstance() {
+        if (toolbarInstance == null) {
+            toolbarInstance = new AddApplicationSnapshotAction();
+            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
+            toolbarInstance.putValue("iconBase", ICON_PATH);
+            toolbarInstance.initialize();
+    }
+        return toolbarInstance;
     }
     
-    public static AddApplicationSnapshotAction selectionAware() {
-        AddApplicationSnapshotAction action = new AddApplicationSnapshotAction().trackSelection();
-        action.initialize();
-        return action;
+    public static synchronized AddApplicationSnapshotAction selectionAware() {
+        if (selectionAware == null) {
+            selectionAware = new AddApplicationSnapshotAction().trackSelection();
+            selectionAware.initialize();
+    }
+        return selectionAware;
     }
     
     

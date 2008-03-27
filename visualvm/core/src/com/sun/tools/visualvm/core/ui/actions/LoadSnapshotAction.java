@@ -47,16 +47,19 @@ class LoadSnapshotAction extends AbstractAction {
     private String lastFile = null;
     
     
-    public static LoadSnapshotAction create() {
-        final LoadSnapshotAction action = new LoadSnapshotAction();
+    private static LoadSnapshotAction instance;
         
-        action.updateEnabled();
+    public static synchronized LoadSnapshotAction instance() {
+        if (instance == null) {
+            instance = new LoadSnapshotAction();
+
+            instance.updateEnabled();
         RegisteredSnapshotCategories.sharedInstance().addCategoriesListener(new SnapshotCategoriesListener() {
-            public void categoryRegistered(SnapshotCategory category) { action.updateEnabled(); }
-            public void categoryUnregistered(SnapshotCategory category) { action.updateEnabled(); }
+                public void categoryRegistered(SnapshotCategory category) { instance.updateEnabled(); }
+                public void categoryUnregistered(SnapshotCategory category) { instance.updateEnabled(); }
         });
-        
-        return action;
+    }
+        return instance;
     }
     
     public void actionPerformed(ActionEvent e) {

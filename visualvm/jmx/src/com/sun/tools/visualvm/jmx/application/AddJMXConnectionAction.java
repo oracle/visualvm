@@ -47,25 +47,35 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     private boolean tracksSelection = false;
     
+    private static AddJMXConnectionAction alwaysEnabled;
+    private static AddJMXConnectionAction toolbarInstance;
+    private static AddJMXConnectionAction selectionAware;
     
-    public static AddJMXConnectionAction alwaysEnabled() {
-        AddJMXConnectionAction action = new AddJMXConnectionAction();
-        action.initialize();
-        return action;
+    
+    public static synchronized AddJMXConnectionAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddJMXConnectionAction();
+            alwaysEnabled.initialize();
+    }
+        return alwaysEnabled;
     }
     
-    public static AddJMXConnectionAction toolbarInstance() {
-        AddJMXConnectionAction action = new AddJMXConnectionAction();
-        action.putValue(SMALL_ICON, new ImageIcon(ICON));
-        action.putValue("iconBase", ICON_PATH);
-        action.initialize();
-        return action;
+    public static synchronized AddJMXConnectionAction toolbarInstance() {
+        if (toolbarInstance == null) {
+            toolbarInstance = new AddJMXConnectionAction();
+            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
+            toolbarInstance.putValue("iconBase", ICON_PATH);
+            toolbarInstance.initialize();
+    }
+        return toolbarInstance;
     }
     
-    public static AddJMXConnectionAction selectionAware() {
-        AddJMXConnectionAction action = new AddJMXConnectionAction().trackSelection();
-        action.initialize();
-        return action;
+    public static synchronized AddJMXConnectionAction selectionAware() {
+        if (selectionAware == null) {
+            selectionAware = new AddJMXConnectionAction().trackSelection();
+            selectionAware.initialize();
+    }
+        return selectionAware;
     }
     
     

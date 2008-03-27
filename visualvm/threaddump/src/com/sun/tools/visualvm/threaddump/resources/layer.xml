@@ -30,7 +30,7 @@
     <folder name="Actions">
         <folder name="Other">
             <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.threaddump.impl.ThreadDumpAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.threaddump.impl.ThreadDumpAction.instance"/>
             </file>
         </folder>
     </folder>

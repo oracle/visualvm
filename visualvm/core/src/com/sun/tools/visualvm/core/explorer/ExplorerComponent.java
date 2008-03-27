@@ -37,7 +37,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collections;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -67,7 +66,7 @@ class ExplorerComponent extends JPanel {
     private boolean vetoTreeExpansion = false;
     
     
-    public static ExplorerComponent instance() {
+    public static synchronized ExplorerComponent instance() {
         if (instance == null) instance = new ExplorerComponent();
         return instance;
     }

@@ -44,10 +44,14 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     
     private Set<Application> lastSelectedApplications;
     
-    public static ApplicationSnapshotAction create() {
-        ApplicationSnapshotAction action = new ApplicationSnapshotAction();
-        action.initialize();
-        return action;
+    private static ApplicationSnapshotAction instance;
+    
+    public static synchronized ApplicationSnapshotAction instance() {
+        if (instance == null) {
+            instance = new ApplicationSnapshotAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     

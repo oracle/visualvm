@@ -34,10 +34,14 @@ import java.awt.event.ActionEvent;
  */
 class RenameDataSourceAction extends SingleDataSourceAction<DataSource> {
     
-    public static RenameDataSourceAction create() {
-        RenameDataSourceAction action = new RenameDataSourceAction();
-        action.initialize();
-        return action;
+    private static RenameDataSourceAction instance;
+    
+    public static synchronized RenameDataSourceAction instance() {
+        if (instance == null) {
+            instance = new RenameDataSourceAction();
+            instance.initialize();
+    }
+        return instance;
     }
 
     

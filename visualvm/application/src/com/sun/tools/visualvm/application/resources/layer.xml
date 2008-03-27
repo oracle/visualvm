@@ -33,7 +33,7 @@
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.AddApplicationSnapshotAction.alwaysEnabled"/>
             </file>
             <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotAction.instance"/>
             </file>
         </folder>
     </folder>

@@ -48,11 +48,15 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
     };
     
         
-    public static ProfileApplicationAction create() {
-        ProfileApplicationAction action = new ProfileApplicationAction();
-        action.initialize();
-        return action;
-                }
+    private static ProfileApplicationAction instance;
+    
+    public static synchronized ProfileApplicationAction instance() {
+        if (instance == null) {
+            instance = new ProfileApplicationAction();
+            instance.initialize();
+        }
+        return instance;
+    }
     
         
     protected void actionPerformed(Application application, ActionEvent actionEvent) {

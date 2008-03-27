@@ -38,11 +38,14 @@ class DeleteSnapshotAction extends MultiDataSourceAction<Snapshot> {
 //    private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png");
 //    private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot24.png");
     
+    private static DeleteSnapshotAction instance;
     
-    public static DeleteSnapshotAction create() {
-        DeleteSnapshotAction action = new DeleteSnapshotAction();
-        action.initialize();
-        return action;
+    public static DeleteSnapshotAction instance() {
+        if (instance == null) {
+            instance = new DeleteSnapshotAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     

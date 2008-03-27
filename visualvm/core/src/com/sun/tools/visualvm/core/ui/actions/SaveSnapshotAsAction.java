@@ -40,11 +40,14 @@ class SaveSnapshotAsAction extends SingleDataSourceAction<Snapshot> {
     private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png";
     private static final Image ICON = Utilities.loadImage(ICON_PATH);
     
+    private static SaveSnapshotAsAction instance;
     
-    public static SaveSnapshotAsAction create() {
-        SaveSnapshotAsAction action = new SaveSnapshotAsAction();
-        action.initialize();
-        return action;
+    public static synchronized SaveSnapshotAsAction instance() {
+        if (instance == null) {
+            instance = new SaveSnapshotAsAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     

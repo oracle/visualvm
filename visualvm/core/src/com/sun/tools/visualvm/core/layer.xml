@@ -30,27 +30,27 @@
     <folder name="Actions">
         <folder name="Other">
             <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.LoadSnapshotAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.LoadSnapshotAction.instance"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.SaveSnapshotAsAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.SaveSnapshotAsAction.instance"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.DeleteSnapshotAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.DeleteSnapshotAction.instance"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.OpenDataSourceAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.OpenDataSourceAction.instance"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-RenameDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RenameDataSourceAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RenameDataSourceAction.instance"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RemoveDataSourceAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RemoveDataSourceAction.instance"/>
             </file>
         </folder>
         <folder name="Window">
             <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.ExplorerTopComponentAction.getInstance"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.ExplorerTopComponentAction.instance"/>
             </file>
         </folder>
     </folder>

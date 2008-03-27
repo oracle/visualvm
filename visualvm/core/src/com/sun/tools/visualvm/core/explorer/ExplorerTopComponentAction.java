@@ -38,13 +38,12 @@ import org.openide.util.Utilities;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-// TODO: should be moved to private package
 class ExplorerTopComponentAction extends AbstractAction {
     
     private static Action instance;
     
     
-    public static Action getInstance() {
+    public static synchronized Action instance() {
         if (instance == null) instance = new ExplorerTopComponentAction();
         return instance;
     }

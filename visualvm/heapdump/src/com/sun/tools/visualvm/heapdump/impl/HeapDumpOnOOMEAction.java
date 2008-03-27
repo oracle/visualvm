@@ -41,10 +41,14 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     
     private boolean oomeEnabled;
     
-    public static HeapDumpOnOOMEAction create() {
-        HeapDumpOnOOMEAction action = new HeapDumpOnOOMEAction();
-        action.initialize();
-        return action;
+    private static HeapDumpOnOOMEAction instance;
+    
+    public static synchronized HeapDumpOnOOMEAction instance() {
+        if (instance == null) {
+            instance = new HeapDumpOnOOMEAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
 

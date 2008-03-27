@@ -47,25 +47,34 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
     private boolean tracksSelection = false;
     
+    private static AddRemoteHostAction alwaysEnabled;
+    private static AddRemoteHostAction toolbarInstance;
+    private static AddRemoteHostAction selectionAware;
     
-    public static AddRemoteHostAction alwaysEnabled() {
-        AddRemoteHostAction action = new AddRemoteHostAction();
-        action.initialize();
-        return action;
+    public static synchronized AddRemoteHostAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddRemoteHostAction();
+            alwaysEnabled.initialize();
+    }
+        return alwaysEnabled;
     }
     
-    public static AddRemoteHostAction toolbarInstance() {
-        AddRemoteHostAction action = new AddRemoteHostAction();
-        action.putValue(SMALL_ICON, new ImageIcon(ICON));
-        action.putValue("iconBase", ICON_PATH);
-        action.initialize();
-        return action;
+    public static synchronized AddRemoteHostAction toolbarInstance() {
+        if (toolbarInstance == null) {
+            toolbarInstance = new AddRemoteHostAction();
+            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
+            toolbarInstance.putValue("iconBase", ICON_PATH);
+            toolbarInstance.initialize();
+    }
+        return toolbarInstance;
     }
     
-    public static AddRemoteHostAction selectionAware() {
-        AddRemoteHostAction action = new AddRemoteHostAction().trackSelection();
-        action.initialize();
-        return action;
+    public static synchronized AddRemoteHostAction selectionAware() {
+        if (selectionAware == null) {
+            selectionAware = new AddRemoteHostAction().trackSelection();
+            selectionAware.initialize();
+    }
+        return selectionAware;
     }
     
     

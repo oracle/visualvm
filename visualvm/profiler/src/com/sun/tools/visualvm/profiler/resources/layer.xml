@@ -30,10 +30,10 @@
     <folder name="Actions">
         <folder name="Other">
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.instance"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.create"/>
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.instance"/>
             </file>
         </folder>
     </folder>

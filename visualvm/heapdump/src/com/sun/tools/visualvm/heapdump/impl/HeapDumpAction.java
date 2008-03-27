@@ -52,11 +52,14 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
         }
     };
     
+    private static HeapDumpAction instance;
     
-    public static HeapDumpAction create() {
-        HeapDumpAction action = new HeapDumpAction();
-        action.initialize();
-        return action;
+    public static synchronized HeapDumpAction instance() {
+        if (instance == null) {
+            instance = new HeapDumpAction();
+            instance.initialize();
+    }
+        return instance;
     }
     
     
