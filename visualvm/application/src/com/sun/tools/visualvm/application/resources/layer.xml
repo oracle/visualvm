@@ -51,6 +51,15 @@
         </folder>
     </folder>
     
+    <folder name="Toolbars">
+        <folder name="Application">
+            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-toolbarInstance.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.AddApplicationSnapshotAction.toolbarInstance"/>
+                <attr name="position" intvalue="400"/>
+            </file>
+        </folder>
+    </folder>
+    
     <folder name="VisualVM">
         <folder name="ExplorerPopupSelection">
             

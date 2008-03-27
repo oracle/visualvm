@@ -44,6 +44,15 @@
         </folder>
     </folder>
     
+    <folder name="Toolbars">
+        <folder name="Application">
+            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-toolbarInstance.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.application.AddJMXConnectionAction.toolbarInstance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+        </folder>
+    </folder>
+    
     <folder name="VisualVM">
         <folder name="ExplorerPopupSelection">
             

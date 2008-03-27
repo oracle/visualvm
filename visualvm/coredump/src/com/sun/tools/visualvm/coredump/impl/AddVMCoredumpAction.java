@@ -27,8 +27,10 @@ package com.sun.tools.visualvm.coredump.impl;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
+import javax.swing.ImageIcon;
 import org.openide.util.Utilities;
 
     
@@ -38,12 +40,23 @@ import org.openide.util.Utilities;
  */
 class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     
+    private static final String ICON_PATH = "com/sun/tools/visualvm/coredump/resources/addCoredump.png";
+    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
+    
     private boolean notSupported;
     private boolean tracksSelection = false;
     
     
     public static AddVMCoredumpAction alwaysEnabled() {
         AddVMCoredumpAction action = new AddVMCoredumpAction();
+        action.initialize();
+        return action;
+    }
+    
+    public static AddVMCoredumpAction toolbarInstance() {
+        AddVMCoredumpAction action = new AddVMCoredumpAction();
+        action.putValue(SMALL_ICON, new ImageIcon(ICON));
+        action.putValue("iconBase", ICON_PATH);
         action.initialize();
         return action;
     }

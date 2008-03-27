@@ -27,9 +27,12 @@ package com.sun.tools.visualvm.application.snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
+import org.openide.util.Utilities;
 
     
 /**
@@ -38,11 +41,22 @@ import javax.swing.Action;
  */
 class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsContainer> {
     
+    private static final String ICON_PATH = "com/sun/tools/visualvm/application/resources/addApplicationSnapshot.png";
+    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
+    
     private boolean tracksSelection = false;
     
     
     public static AddApplicationSnapshotAction alwaysEnabled() {
         AddApplicationSnapshotAction action = new AddApplicationSnapshotAction();
+        action.initialize();
+        return action;
+    }
+    
+    public static AddApplicationSnapshotAction toolbarInstance() {
+        AddApplicationSnapshotAction action = new AddApplicationSnapshotAction();
+        action.putValue(SMALL_ICON, new ImageIcon(ICON));
+        action.putValue("iconBase", ICON_PATH);
         action.initialize();
         return action;
     }

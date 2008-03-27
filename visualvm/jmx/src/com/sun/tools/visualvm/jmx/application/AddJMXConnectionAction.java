@@ -28,9 +28,12 @@ package com.sun.tools.visualvm.jmx.application;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
+import javax.swing.ImageIcon;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 
     
 /**
@@ -39,11 +42,22 @@ import org.openide.util.RequestProcessor;
  */
 class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
+    private static final String ICON_PATH = "com/sun/tools/visualvm/jmx/application/resources/addJmxApplication.png";
+    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
+    
     private boolean tracksSelection = false;
     
     
     public static AddJMXConnectionAction alwaysEnabled() {
         AddJMXConnectionAction action = new AddJMXConnectionAction();
+        action.initialize();
+        return action;
+    }
+    
+    public static AddJMXConnectionAction toolbarInstance() {
+        AddJMXConnectionAction action = new AddJMXConnectionAction();
+        action.putValue(SMALL_ICON, new ImageIcon(ICON));
+        action.putValue("iconBase", ICON_PATH);
         action.initialize();
         return action;
     }

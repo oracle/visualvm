@@ -28,9 +28,12 @@ import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
+import javax.swing.ImageIcon;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 
     
 /**
@@ -39,11 +42,22 @@ import org.openide.util.RequestProcessor;
  */
 class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
+    private static final String ICON_PATH = "com/sun/tools/visualvm/host/resources/addRemoteHost.png";
+    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
+    
     private boolean tracksSelection = false;
     
     
     public static AddRemoteHostAction alwaysEnabled() {
         AddRemoteHostAction action = new AddRemoteHostAction();
+        action.initialize();
+        return action;
+    }
+    
+    public static AddRemoteHostAction toolbarInstance() {
+        AddRemoteHostAction action = new AddRemoteHostAction();
+        action.putValue(SMALL_ICON, new ImageIcon(ICON));
+        action.putValue("iconBase", ICON_PATH);
         action.initialize();
         return action;
     }
