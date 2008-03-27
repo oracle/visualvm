@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -53,6 +54,7 @@ class MBeansTab extends JPanel implements
     private XSheet sheet;
     private XDataViewer viewer;
     private Worker worker;
+    private CachedMBeanServerConnection cachedMBSC;
     
     public static String getTabName() {
         return Resources.getText("MBeans");
@@ -174,8 +176,11 @@ class MBeansTab extends JPanel implements
     }
     
     public CachedMBeanServerConnection getCachedMBeanServerConnection() {
-        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-        return jmx == null ? null : jmx.getCachedMBeanServerConnection();
+        if (cachedMBSC == null) {
+            cachedMBSC = CachedMBeanServerConnectionFactory.getCachedMBeanServerConnectionFor(
+                    getMBeanServerConnection());
+        }
+        return cachedMBSC;
     }
     
     private void setupTab() {
