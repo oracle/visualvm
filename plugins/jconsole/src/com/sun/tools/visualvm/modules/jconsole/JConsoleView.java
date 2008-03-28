@@ -222,12 +222,11 @@ class JConsoleView extends DataSourceView {
                     jconsoleView = vmPanel;
                 } else {
                     JTextArea textArea = new JTextArea(
-                            "\n\nJConsole Plugins not available.\n\nUsage:\n\n" +
-                            "$ visualvm -J-Djconsole.plugin.path=<plugin-path>" +
-                            "\n\nwhere <plugin-path> specifies the paths " +
-                            "to the jar files of the\nJConsole plugins to look up." +
-                            " Multiple paths are separated by\nthe path separator " +
-                            "character of the platform.");
+                            "\n\nJConsole Plugins not available.\n\nThe paths " +
+                            "to the jar files of the JConsole plugins to look " +
+                            "up can be specified using the \"Plugins Path\" option." +
+                            "\n\nChoose \"Tools > Options\" from the main menu, " +
+                            "then click on the \"JConsole Plugins\" icon.");
                     textArea.setEditable(false);
                     jconsoleView = textArea;
                 }
