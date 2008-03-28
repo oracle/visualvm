@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler;
 
+import java.util.prefs.BackingStoreException;
 import org.netbeans.lib.profiler.common.GlobalProfilingSettings;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -89,24 +90,38 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Map<String, String> dnsaMap;
+    
+    // Keys for tracked properties
+    private final String AUTO_OPEN_SNAPSHOT_KEY_55 = "autoOpenSnapshot"; // NOI18N
+    private final String AUTO_SAVE_SNAPSHOT_KEY_55 = "autoSaveSnapshot"; // NOI18N
+    private final String CALIBRATION_PORT_NO_KEY_55 = "calibrationPortNo"; // NOI18N
+    private final String CPU_TASK_KEY_55 = "cpuTaskDefault"; // NOI18N
+    private final String LIVE_CPU_KEY_55 = "displayLiveResultsCPU"; // NOI18N
+    private final String LIVE_FRAGMENT_KEY_55 = "displayLiveResultsFragment"; // NOI18N
+    private final String LIVE_MEMORY_KEY_55 = "displayLiveResultsMemory"; // NOI18N
+    private final String MEMORY_TASK_ALLOCATIONS_KEY_55 = "memoryTaskAllocationsDefault"; // NOI18N
+    private final String PLATFORM_NAME_KEY_55 = "javaPlatformForProfiling"; // NOI18N
+    private final String PORT_NO_KEY_55 = "portNo"; // NOI18N
+    private final String RECORD_STACK_TRACES_KEY_55 = "recordStackTracesDefault"; // NOI18N
+    private final String THREADS_MONITORING_KEY_55 = "threadsMonitoringDefault"; // NOI18N
+    private final String TO_BEHAVIOR_KEY_55 = "telemetryOverviewBehavior"; // NOI18N
+    private final String TRACK_EVERY_KEY_55 = "trackEveryDefault"; // NOI18N
+    private final String TV_BEHAVIOR_KEY_55 = "threadsViewBehavior"; // NOI18N
+
+    // Keys for tracked properties
     private final String AUTO_OPEN_SNAPSHOT_KEY = "AUTO_OPEN_SNAPSHOT"; // NOI18N
     private final String AUTO_SAVE_SNAPSHOT_KEY = "AUTO_SAVE_SNAPSHOT"; // NOI18N
     private final String CALIBRATION_PORT_NO_KEY = "CALIBRATION_PORT_NO"; // NOI18N
     private final String CPU_TASK_KEY = "CPU_TASK"; // NOI18N
-    private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
     private final String CUSTOM_HEAPDUMP_PATH_KEY = "CUSTOM_HEAPDUMP_PATH"; // NOI18N
-
-    // Keys and defaults for tracked properties
     private final String DNSA_SETTINGS_KEY = "DNSA_SETTINGS"; // NOI18N
     private final String HEAPWALKER_ANALYSIS_ENABLED_KEY = "HEAPWALKER_ANALYSIS_ENABLED"; // NOI18N
-    private final String INSTR_FILTER_DEFAULT = "###"; // NOI18N // Shouldn't be matched, this is intention (logic for default is in CPUPerformanceConfigPanelLarge)
     private final String INSTR_FILTER_KEY = "INSTR_FILTER"; // NOI18N
     private final String LIVE_CPU_KEY = "LIVE_CPU"; // NOI18N
     private final String LIVE_FRAGMENT_KEY = "LIVE_FRAGMENT"; // NOI18N
     private final String LIVE_MEMORY_KEY = "LIVE_MEMORY"; // NOI18N
     private final String MEMORY_TASK_ALLOCATIONS_KEY = "MEMORY_TASK_ALLOCATIONS"; // NOI18N
     private final String OOME_DETECTION_MODE_KEY = "OOME_DETECTION_MODE"; // NOI18N
-    private final String PLATFORM_NAME_DEFAULT = "PLATFORM_NAME_DEFAULT"; // NOI18N // replaces original null, means platform defined by project
     private final String PLATFORM_NAME_KEY = "PLATFORM_NAME"; // NOI18N
     private final String PORT_NO_KEY = "PORT_NO"; // NOI18N
     private final String PPOINTS_DEPENDENCIES_INCLUDE_KEY = "PPOINTS_DEPENDENCIES_INCLUDE"; // NOI18N
@@ -115,6 +130,11 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String TO_BEHAVIOR_KEY = "TO_BEHAVIOR"; // NOI18N
     private final String TRACK_EVERY_KEY = "TRACK_EVERY"; // NOI18N
     private final String TV_BEHAVIOR_KEY = "TV_BEHAVIOR"; // NOI18N
+    
+    // Defaults for tracked properties
+    private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
+    private final String PLATFORM_NAME_DEFAULT = "PLATFORM_NAME_DEFAULT"; // NOI18N // replaces original null, means platform defined by project
+    private final String INSTR_FILTER_DEFAULT = "###"; // NOI18N // Shouldn't be matched, this is intention (logic for default is in CPUPerformanceConfigPanelLarge)
     private final boolean AUTO_OPEN_SNAPSHOT_DEFAULT = true;
     private final boolean AUTO_SAVE_SNAPSHOT_DEFAULT = false;
     private final boolean HEAPWALKER_ANALYSIS_ENABLED_DEFAULT = false;
@@ -138,15 +158,86 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     public static ProfilerIDESettings getInstance() {
         return defaultInstance;
     }
+    
+    private ProfilerIDESettings() {
+        try {
+            if (contains55Settings()) convert55Settings();
+        } catch (BackingStoreException e) {
+            // Silently skip exception in NB55 settings
+        }
+    }
+    
+    
+    //~ Conversion of 5.5 / 5.5.1 settings ---------------------------------------------------------------------------------------
+    
+    private boolean contains55Settings() {
+        return getPreferences().getInt(PORT_NO_KEY_55, Integer.MIN_VALUE) != Integer.MIN_VALUE;
+    }
+    
+    private void convert55Settings() throws BackingStoreException {
+        Preferences preferences = getPreferences();
+        String[] keys = preferences.keys();
+        
+        for (String key : keys) {
+            if (AUTO_OPEN_SNAPSHOT_KEY_55.equals(key))
+                convertBoolean(AUTO_OPEN_SNAPSHOT_KEY_55, AUTO_OPEN_SNAPSHOT_KEY, AUTO_OPEN_SNAPSHOT_DEFAULT, preferences);
+            else if (AUTO_SAVE_SNAPSHOT_KEY_55.equals(key))
+                convertBoolean(AUTO_SAVE_SNAPSHOT_KEY_55, AUTO_SAVE_SNAPSHOT_KEY, AUTO_SAVE_SNAPSHOT_DEFAULT, preferences);
+            else if (CALIBRATION_PORT_NO_KEY_55.equals(key))
+                convertInteger(CALIBRATION_PORT_NO_KEY_55, CALIBRATION_PORT_NO_KEY, CALIBRATION_PORT_NO_DEFAULT, preferences);
+            else if (CPU_TASK_KEY_55.equals(key))
+                convertInteger(CPU_TASK_KEY_55, CPU_TASK_KEY, CPU_TASK_DEFAULT, preferences);
+            else if (LIVE_CPU_KEY_55.equals(key))
+                convertBoolean(LIVE_CPU_KEY_55, LIVE_CPU_KEY, LIVE_CPU_DEFAULT, preferences);
+            else if (LIVE_FRAGMENT_KEY_55.equals(key))
+                convertBoolean(LIVE_FRAGMENT_KEY_55, LIVE_FRAGMENT_KEY, LIVE_FRAGMENT_DEFAULT, preferences);
+            else if (LIVE_MEMORY_KEY_55.equals(key))
+                convertBoolean(LIVE_MEMORY_KEY_55, LIVE_MEMORY_KEY, LIVE_MEMORY_DEFAULT, preferences);
+            else if (MEMORY_TASK_ALLOCATIONS_KEY_55.equals(key))
+                convertBoolean(MEMORY_TASK_ALLOCATIONS_KEY_55, MEMORY_TASK_ALLOCATIONS_KEY, MEMORY_TASK_ALLOCATIONS_DEFAULT, preferences);
+            else if (PLATFORM_NAME_KEY_55.equals(key))
+                convertString(PLATFORM_NAME_KEY_55, PLATFORM_NAME_KEY, PLATFORM_NAME_DEFAULT, preferences);
+            else if (PORT_NO_KEY_55.equals(key))
+                convertInteger(PORT_NO_KEY_55, PORT_NO_KEY, PORT_NO_DEFAULT, preferences);
+            else if (RECORD_STACK_TRACES_KEY_55.equals(key))
+                convertBoolean(RECORD_STACK_TRACES_KEY_55, RECORD_STACK_TRACES_KEY, RECORD_STACK_TRACES_DEFAULT, preferences);
+            else if (THREADS_MONITORING_KEY_55.equals(key))
+                convertBoolean(THREADS_MONITORING_KEY_55, THREADS_MONITORING_KEY, THREADS_MONITORING_DEFAULT, preferences);
+            else if (TO_BEHAVIOR_KEY_55.equals(key))
+                convertInteger(TO_BEHAVIOR_KEY_55, TO_BEHAVIOR_KEY, TO_BEHAVIOR_DEFAULT, preferences);
+            else if (TRACK_EVERY_KEY_55.equals(key))
+                convertInteger(TRACK_EVERY_KEY_55, TRACK_EVERY_KEY, TRACK_EVERY_DEFAULT, preferences);
+            else if (TV_BEHAVIOR_KEY_55.equals(key))
+                convertInteger(TV_BEHAVIOR_KEY_55, TV_BEHAVIOR_KEY, TV_BEHAVIOR_DEFAULT, preferences);
+        }
+    }
+    
+    private static void convertBoolean(String oldKey, String newKey, boolean defaultValue, Preferences preferences) {
+        boolean value = preferences.getBoolean(oldKey, defaultValue);
+        preferences.remove(oldKey);
+        preferences.putBoolean(newKey, value);
+    }
+    
+    private static void convertInteger(String oldKey, String newKey, int defaultValue, Preferences preferences) {
+        int value = preferences.getInt(oldKey, defaultValue);
+        preferences.remove(oldKey);
+        preferences.putInt(newKey, value);
+    }
+    
+    private static void convertString(String oldKey, String newKey, String defaultValue, Preferences preferences) {
+        String value = preferences.get(oldKey, defaultValue);
+        preferences.remove(oldKey);
+        preferences.put(newKey, value);
+    }
 
+    // Properties --------------------------------------------------------------------------------------------------------
+    
     /** Determines whether snapshots are automatically opened.
      * @param value true if snapshot should be automatically opened after taking it, false otherwise
      */
     public void setAutoOpenSnapshot(final boolean value) {
         getPreferences().putBoolean(AUTO_OPEN_SNAPSHOT_KEY, value);
     }
-
-    // Properties --------------------------------------------------------------------------------------------------------
 
     /** Determines whether snapshots are automatically opened.
      * @return true if snapshot should be automatically opened after taking it, false otherwise
