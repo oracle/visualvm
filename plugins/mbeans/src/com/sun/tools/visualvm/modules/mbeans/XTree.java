@@ -29,27 +29,13 @@ import java.util.*;
 import javax.management.*;
 import javax.swing.*;
 import javax.swing.tree.*;
+import com.sun.tools.visualvm.modules.mbeans.options.GlobalPreferences;
 import static com.sun.tools.visualvm.modules.mbeans.XNodeInfo.Type;
 
 @SuppressWarnings("serial")
 class XTree extends JTree {
 
-    private static final List<String> orderedKeyPropertyList =
-            new ArrayList<String>();
-
-    static {
-        String keyPropertyList =
-                System.getProperty("com.sun.tools.jconsole.mbeans.keyPropertyList");
-        if (keyPropertyList == null) {
-            orderedKeyPropertyList.add("type");
-            orderedKeyPropertyList.add("j2eeType");
-        } else {
-            StringTokenizer st = new StringTokenizer(keyPropertyList, ",");
-            while (st.hasMoreTokens()) {
-                orderedKeyPropertyList.add(st.nextToken());
-            }
-        }
-    }
+    private List<String> orderedKeyPropertyList;
     private MBeansTab mbeansTab;
     private Map<String, DefaultMutableTreeNode> nodes =
             new HashMap<String, DefaultMutableTreeNode>();
@@ -60,6 +46,7 @@ class XTree extends JTree {
         setRootVisible(false);
         setShowsRootHandles(true);
         ToolTipManager.sharedInstance().registerComponent(this);
+        orderedKeyPropertyList = getOrderedKeyPropertyList();
     }
 
     /**
@@ -147,7 +134,7 @@ class XTree extends JTree {
         // which are leaves and non XMBean.
         //
         DefaultMutableTreeNode node = null;
-        Dn dn = new Dn(mbean);
+        Dn dn = new Dn(mbean, orderedKeyPropertyList);
         if (dn.getTokenCount() > 0) {
             DefaultTreeModel model = (DefaultTreeModel) getModel();
             Token token = dn.getToken(0);
@@ -194,7 +181,7 @@ class XTree extends JTree {
     public synchronized void addMBeansToView(Set<ObjectName> mbeans) {
         Set<Dn> dns = new TreeSet<Dn>();
         for (ObjectName mbean : mbeans) {
-            Dn dn = new Dn(mbean);
+            Dn dn = new Dn(mbean, orderedKeyPropertyList);
             dns.add(dn);
         }
         for (Dn dn : dns) {
@@ -211,7 +198,7 @@ class XTree extends JTree {
         XMBean xmbean = new XMBean(mbean, mbeansTab);
         // Build Dn for the given MBean
         //
-        Dn dn = new Dn(mbean);
+        Dn dn = new Dn(mbean, orderedKeyPropertyList);
         // Add the new nodes to the MBean tree from leaf to root
         //
         addMBeanToView(mbean, xmbean, dn);
@@ -358,6 +345,23 @@ class XTree extends JTree {
         return xmbean;
     }
 
+    private List<String> getOrderedKeyPropertyList() {
+        if (orderedKeyPropertyList == null) {
+            orderedKeyPropertyList = new ArrayList<String>();
+            String keyPropertyList = GlobalPreferences.sharedInstance().getOrderedKeyPropertyList();
+            if (keyPropertyList.isEmpty()) {
+                orderedKeyPropertyList.add("type");
+                orderedKeyPropertyList.add("j2eeType");
+            } else {
+                String[] tokens = keyPropertyList.split(",");
+                for (String token : tokens) {
+                    orderedKeyPropertyList.add(token);
+                }
+            }
+        }
+        return orderedKeyPropertyList;
+    }
+
     /**
      * Parses the MBean ObjectName comma-separated properties string and puts
      * the individual key/value pairs into the map. Key order in the properties
@@ -390,7 +394,8 @@ class XTree extends JTree {
      * in the comma-separated key property list does not apply to the given
      * MBean then it will be discarded.
      */
-    private static String getKeyPropertyListString(ObjectName mbean) {
+    private static String getKeyPropertyListString(
+            ObjectName mbean, List<String> orderedKeyPropertyList) {
         String props = mbean.getKeyPropertyListString();
         Map<String, String> map = extractKeyValuePairs(props, mbean);
         StringBuilder sb = new StringBuilder();
@@ -460,10 +465,10 @@ class XTree extends JTree {
         private String hashDn;
         private List<Token> tokens = new ArrayList<Token>();
 
-        public Dn(ObjectName mbean) {
+        public Dn(ObjectName mbean, List<String> orderedKeyPropertyList) {
             this.mbean = mbean;
             this.domain = mbean.getDomain();
-            this.keyPropertyList = getKeyPropertyListString(mbean);
+            this.keyPropertyList = getKeyPropertyListString(mbean, orderedKeyPropertyList);
 
             if (isTreeView()) {
                 // Tree view

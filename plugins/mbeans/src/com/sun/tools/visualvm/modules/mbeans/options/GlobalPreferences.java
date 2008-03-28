@@ -49,10 +49,12 @@ import org.openide.util.NbPreferences;
 public class GlobalPreferences implements PreferenceChangeListener {
     private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.modules.mbeans.options");
 
-    private static final String INT_KEY_PLOTTERS_POLL = "PlottersPoll";
-    
-    private final static int PLOTTERS_POLL_DEFAULT = 4;
-    
+    private static final String INT_KEY_PLOTTERS_POLL = "PlottersPoll";    
+    private static final int PLOTTERS_POLL_DEFAULT = 4;
+
+    private static final String STRING_KEY_ORDERED_KEY_PROPERTY_LIST = "OrderedKeyPropertyList";
+    private static final String ORDERED_KEY_PROPERTY_LIST_DEFAULT = "";
+
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
     private final Preferences prefs;
     private final Map<String, Set<ComparableWeakReference<PreferenceChangeListener>>> listenerMap = new HashMap<String, Set<ComparableWeakReference<PreferenceChangeListener>>>();
@@ -105,6 +107,22 @@ public class GlobalPreferences implements PreferenceChangeListener {
         addListener(INT_KEY_PLOTTERS_POLL, pcl);
     }
     
+    public String getOrderedKeyPropertyList() {
+        synchronized(prefs) {
+            return prefs.get(STRING_KEY_ORDERED_KEY_PROPERTY_LIST, ORDERED_KEY_PROPERTY_LIST_DEFAULT);
+        }
+    }
+    
+    public void setOrderedKeyPropertyList(String value) {
+        synchronized(prefs) {
+            prefs.put(STRING_KEY_ORDERED_KEY_PROPERTY_LIST, value);
+        }
+    }
+    
+    public void watchOrderedKeyPropertyList(PreferenceChangeListener pcl) {
+        addListener(STRING_KEY_ORDERED_KEY_PROPERTY_LIST, pcl);
+    }
+
     public boolean store() {
         try {
             prefs.sync();
