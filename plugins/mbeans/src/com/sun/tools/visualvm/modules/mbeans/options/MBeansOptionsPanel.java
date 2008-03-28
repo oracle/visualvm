@@ -70,7 +70,7 @@ final class MBeansOptionsPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Polling");
 
-        jLabel2.setDisplayedMnemonic('h');
+        jLabel2.setDisplayedMnemonic('P');
         jLabel2.setLabelFor(plottersRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Plotters:");
 
@@ -78,7 +78,7 @@ final class MBeansOptionsPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "MBeans Tree");
 
-        jLabel5.setDisplayedMnemonic('h');
+        jLabel5.setDisplayedMnemonic('O');
         jLabel5.setLabelFor(orderedKeyPropertyList);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Ordered Key Property List:");
         jLabel5.setToolTipText("Comma-separated list of keys");

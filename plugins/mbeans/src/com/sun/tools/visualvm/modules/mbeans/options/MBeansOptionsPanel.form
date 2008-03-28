@@ -84,7 +84,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="displayedMnemonic" type="int" value="104"/>
+        <Property name="displayedMnemonic" type="int" value="80"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="plottersRefresh"/>
         </Property>
@@ -107,7 +107,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
-        <Property name="displayedMnemonic" type="int" value="104"/>
+        <Property name="displayedMnemonic" type="int" value="79"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="orderedKeyPropertyList"/>
         </Property>
