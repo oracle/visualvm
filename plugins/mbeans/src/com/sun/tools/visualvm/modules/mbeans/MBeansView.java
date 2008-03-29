@@ -100,6 +100,8 @@ class MBeansView extends DataSourceView {
             dvc.addDetailsView(new DataViewComponent.DetailsView("Operations", null, mbeansOperationsView, null), DataViewComponent.TOP_RIGHT);
             dvc.addDetailsView(new DataViewComponent.DetailsView("Notifications", null, mbeansNotificationsView, null), DataViewComponent.TOP_RIGHT);
             dvc.addDetailsView(new DataViewComponent.DetailsView("Metadata", null, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT);
+
+            mbeansTab.setView(dvc);
         }
         return dvc;
     }

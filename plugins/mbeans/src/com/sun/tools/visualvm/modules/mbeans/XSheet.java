@@ -535,11 +535,17 @@ class XSheet extends JPanel
             return;
         }
         invalidate();
-//        JComponent captionArea = (JComponent) mbeansTab.getDisplayArea().getComponent(0);
-//        JComponent tabsContainer = (JComponent) captionArea.getComponent(0);
-//        JComponent tabButtonContainer = (JComponent) tabsContainer.getComponent(2);
-//        JButton tabButton = (JButton) tabButtonContainer.getComponent(0);
-//        tabButton.setText(label);
+        JComponent containerPanel = (JComponent) mbeansTab.getView().getComponent(0);
+        JComponent detailsPanel = (JComponent) containerPanel.getComponent(1);
+        JSplitPane detailsVerticalSplitter = (JSplitPane) detailsPanel.getComponent(0);
+        JComponent detailsTopPanel = (JComponent) detailsVerticalSplitter.getLeftComponent();
+        JSplitPane detailsTopHorizontalSplitter = (JSplitPane) detailsTopPanel.getComponent(0);
+        JComponent detailsTopRightArea = (JComponent) detailsTopHorizontalSplitter.getRightComponent();
+        JComponent captionArea = (JComponent) detailsTopRightArea.getComponent(0);
+        JComponent tabsContainer = (JComponent) captionArea.getComponent(0);
+        JComponent tabButtonContainer = (JComponent) tabsContainer.getComponent(2);
+        JButton tabButton = (JButton) tabButtonContainer.getComponent(0);
+        tabButton.setText(label);
         validate();
         repaint();
     }

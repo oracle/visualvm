@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
@@ -49,6 +50,7 @@ class MBeansTab extends JPanel implements
     private final static Logger LOGGER = Logger.getLogger(MBeansTab.class.getName());
     
     private Application application;
+    private DataViewComponent view;
     private XTree tree;
     private XSheet sheet;
     private XDataViewer viewer;
@@ -99,7 +101,15 @@ class MBeansTab extends JPanel implements
     public JPanel getMetadataPanel() {
         return sheet.getMetadata();
     }
-    
+
+    public DataViewComponent getView() {
+        return view;
+    }
+
+    public void setView(DataViewComponent view) {
+        this.view = view;
+    }
+
     public void dispose() {
         if (worker != null) {
             worker.stopWorker();
