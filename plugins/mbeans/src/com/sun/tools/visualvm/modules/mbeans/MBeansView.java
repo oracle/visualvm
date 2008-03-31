@@ -48,11 +48,11 @@ class MBeansView extends DataSourceView {
     public MBeansView(Application application) {
         super(application, "MBeans", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false);
         this.application = application;
-        view = createViewComponent();
     }
 
     @Override
-    public DataViewComponent getView() {
+    public synchronized DataViewComponent getView() {
+        if (view == null) view = createViewComponent();
         return view;
     }
 

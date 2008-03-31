@@ -81,11 +81,11 @@ class JConsoleView extends DataSourceView {
     public JConsoleView(Application application) {
         super(application, "JConsole Plugins", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
         this.application = application;
-        view = createViewComponent();
     }
 
     @Override
-    public DataViewComponent getView() {
+    public synchronized DataViewComponent getView() {
+        if (view == null) view = createViewComponent();
         return view;
     }
 
