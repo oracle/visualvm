@@ -72,8 +72,8 @@ public final class AboutAction extends AbstractAction {
                 aboutDialog = AboutDialog.createInstance(WindowManager.getDefault().getMainWindow(), splashImage);
                 aboutDialog.setCaption("About VisualVM");
                 aboutDialog.setBuildID("Version: " + versionString + " (Build " + getBuildNumber() + ")");
-                aboutDialog.setMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2 with Classpath Exception. " + /*"It is built on NetBeans Platform. " + */ "For more information, please visit https://visualvm.dev.java.net.");
-                aboutDialog.setHTMLMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2 with Classpath Exception. " + /*"It is built on <a href=\"http://www.netbeans.org/products/platform/\">NetBeans Platform</a>. " +*/ "For more information, please visit <a href=\"https://visualvm.dev.java.net\">https://visualvm.dev.java.net</a>.");
+                aboutDialog.setMessage("<b>VisualVM</b> has been licensed under the GNU General Public License (GPL) Version 2 with Classpath Exception. " + "Visit https://visualvm.dev.java.net for more information. Built on NetBeans Platform.");
+                aboutDialog.setHTMLMessage("<b>VisualVM</b> has been licensed under the GNU General Public License (GPL) Version 2 with Classpath Exception. " + "Visit <a href=\"https://visualvm.dev.java.net\">https://visualvm.dev.java.net</a> for more information. Built on <a href=\"http://platform.netbeans.org\">NetBeans Platform</a>.");
                 aboutDialog.setDetails(getDetails());
                 aboutDialog.setLogfile(getLogfile());
             } catch (Exception e) {
