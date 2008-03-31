@@ -28,8 +28,8 @@ package com.sun.tools.visualvm.core.snapshot;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
-import org.openide.util.RequestProcessor;
 
 /**
  * Abstract implementation of Snapshot.
@@ -116,6 +116,7 @@ public abstract class Snapshot extends DataSource {
     }
     
     public void delete() {
+        DataSourceWindowManager.sharedInstance().closeDataSource(this);
         getOwner().getRepository().removeDataSource(this);
     }
     
