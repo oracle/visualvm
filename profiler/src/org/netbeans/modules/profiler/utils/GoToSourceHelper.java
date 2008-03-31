@@ -70,7 +70,11 @@ final public class GoToSourceHelper {
         StatusDisplayer.getDefault().setStatusText(finalStatusText);
         
         for(GoToSourceProvider impl : implementations) {
-            if (impl.openSource(project, className, methodName, signature)) return true;
+            try {
+                if (impl.openSource(project, className, methodName, signature)) return true;
+            } catch (Exception e) {
+                ProfilerLogger.log(e);
+            }
         }
         
         Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class,
