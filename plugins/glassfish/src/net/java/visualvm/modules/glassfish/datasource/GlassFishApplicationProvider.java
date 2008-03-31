@@ -130,10 +130,13 @@ public class GlassFishApplicationProvider implements DataChangeListener<GlassFis
             }
             try {
                 JmxModel jmx = JmxModelFactory.getJmxModelFor(model.getApplication());
-                if ((jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) && beenNotified.compareAndSet(false, true)){
-                    NotifyDescriptor nd = new NotifyDescriptor.Message("Cannot establish JMX connection", NotifyDescriptor.ERROR_MESSAGE);
-                    DialogDisplayer.getDefault().notifyLater(nd);
-                    model.setVisible(false);
+                if ((jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED)){
+                    if (beenNotified.compareAndSet(false, true)) {
+                        NotifyDescriptor nd = new NotifyDescriptor.Message("Cannot establish JMX connection", NotifyDescriptor.ERROR_MESSAGE);
+                        DialogDisplayer.getDefault().notifyLater(nd);
+                        model.setVisible(false);
+                    }
+                    return;
                 }
                 if (jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
                     model.setVisible(true);
