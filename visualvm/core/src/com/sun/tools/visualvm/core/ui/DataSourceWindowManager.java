@@ -96,14 +96,25 @@ public final class DataSourceWindowManager {
                 final DataSourceWindow window = openedWindows.get(viewMaster);
                 if (window == null) return; // Window not opened
                 
-                // Remove all views of the dataSource
-                final Set<DataSourceView> views = openedViews.get(dataSource);
-                if (views != null) SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        for (DataSourceView view : views)
-                            if (window.containsView(view)) window.removeView(view);
+                if (dataSource == viewMaster) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            window.removeAllViews();
+                        }
+                    });
+                } else {
+                    // Remove all views of the dataSource
+                    Set<DataSourceView> views = openedViews.get(dataSource);
+                    if (views != null) {
+                        final Set<DataSourceView> viewsF = new HashSet(views);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                for (DataSourceView view : viewsF)
+                                    if (window.containsView(view)) window.removeView(view);
+                            }
+                        });
                     }
-                });
+                }
             }
         });
     }
@@ -204,7 +215,7 @@ public final class DataSourceWindowManager {
                 openedViews.put(dataSource, cachedViews);
             }
             cachedViews.add(view);
-
+            
             view.willBeAdded();
         }
 
