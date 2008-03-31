@@ -24,7 +24,6 @@
  */
 package net.java.visualvm.modules.glassfish.dataview;
 
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -51,13 +50,11 @@ import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
 import net.java.visualvm.modules.glassfish.ui.Chart;
-import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Image;
-import java.awt.event.MouseAdapter;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,12 +63,12 @@ import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 
 
 /**
@@ -114,21 +111,18 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             HTMLTextArea generalDataArea = new HTMLTextArea();
             generalDataArea.setText(buildInfo());
             generalDataArea.setBorder(BorderFactory.createEmptyBorder());
-            generalDataArea.setOpaque(false);
+//            generalDataArea.setOpaque(false);
             
             JScrollPane generalDataScroll = new JScrollPane(generalDataArea);
             generalDataScroll.setViewportBorder(BorderFactory.createEmptyBorder());
             generalDataScroll.setBorder(BorderFactory.createEmptyBorder());
             generalDataScroll.setOpaque(false);
             
-            JLabel appLink = new JLabel("<html><body><h2>Application hosted by <a href=\"#\">" + DataSourceDescriptorFactory.getDescriptor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>");
-            appLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            appLink.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent e) {
+            HTMLLabel appLink = new HTMLLabel("<html><body><h2>Application hosted by <a href=\"#\">" + DataSourceDescriptorFactory.getDescriptor(module.getGlassFishRoot().getApplication()).getName()+ "</a></h2></body></html>") {
+                protected void showURL(URL url) {
                     DataSourceWindowManager.sharedInstance().openDataSource(module.getGlassFishRoot().getApplication());
                 }
-            });
+            };
             masterPanel.add(generalDataScroll, BorderLayout.CENTER);
             masterPanel.add(appLink, BorderLayout.NORTH);
             
@@ -175,10 +169,9 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
 
             StatsTable servletsTable = new StatsTable(servletsModel);
             servletsTable.setRowSorter(servletsRowSorter);
-            servletsTable.setOpaque(false);
 
             JScrollPane servletsScroller = new JScrollPane(servletsTable);
-            servletsScroller.setOpaque(false);
+            servletsScroller.getViewport().setBackground(generalDataArea.getBackground());
             servletsPanel.add(servletsScroller, BorderLayout.CENTER);
 
             JPanel wsPanel = new JPanel(new BorderLayout());
@@ -189,10 +182,9 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
 
             StatsTable wsTable = new StatsTable(wsModel);
             wsTable.setRowSorter(wsRowSorter);
-            wsTable.setOpaque(false);
 
             JScrollPane wsScroller = new JScrollPane(wsTable);
-            wsScroller.setOpaque(false);
+            wsScroller.getViewport().setBackground(generalDataArea.getBackground());
             wsPanel.add(wsScroller, BorderLayout.CENTER);
 
             DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Overview", null, masterPanel);
