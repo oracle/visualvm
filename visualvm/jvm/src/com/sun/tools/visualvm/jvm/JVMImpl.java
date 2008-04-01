@@ -189,11 +189,13 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             if (attach != null) {
                 args = attach.printFlag(HEAP_DUMP_ON_OOME);
             }
-            HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-            if (args == null && hsDiagnostic != null) {
-                String value = hsDiagnostic.getVMOption(HEAP_DUMP_ON_OOME).getValue();
-                isDumpOnOOMEnabled = Boolean.valueOf(value);
-                return isDumpOnOOMEnabled.booleanValue();
+            if (args == null) {
+                HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
+                if (hsDiagnostic != null) {
+                    String value = hsDiagnostic.getVMOption(HEAP_DUMP_ON_OOME).getValue();
+                    isDumpOnOOMEnabled = Boolean.valueOf(value);
+                    return isDumpOnOOMEnabled.booleanValue();
+                }
             }
             if (args == null && monitoredVm != null) {
                 args = getJvmFlags().concat(getJvmArgs());
