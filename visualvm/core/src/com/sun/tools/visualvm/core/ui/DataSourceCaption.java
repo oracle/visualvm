@@ -194,8 +194,6 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     
     private void initComponents() {
         setLayout(new BorderLayout());
-        setOpaque(true);
-        
         presenter = new JLabel();
         presenter.setIconTextGap(6);
         add(presenter, BorderLayout.CENTER);
