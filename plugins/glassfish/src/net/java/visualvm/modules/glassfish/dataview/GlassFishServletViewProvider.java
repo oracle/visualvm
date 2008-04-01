@@ -125,7 +125,12 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
             refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
                 public void onSchedule(long timeStamp) {
+                    try {
                     refreshData(timeStamp);
+                    } catch (Exception e) {
+                        Scheduler.sharedInstance().unschedule(refreshTask);
+                        refreshTask = null;
+                    }
                 }
             }, Quantum.seconds(3));
         }

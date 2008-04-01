@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import java.util.Set;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -41,6 +42,11 @@ import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
 public class GlassFishModelProvider implements DataChangeListener<Application>, DataRemovedListener<Application> {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final GlassFishModelProvider INSTANCE = new GlassFishModelProvider();
+    private final DataRemovedListener<Application> removalListener = new DataRemovedListener<Application>() {
+        public void dataRemoved(Application app) {
+            processFinishedApplication(app);
+        }
+    };
     
     private GlassFishModelProvider() {
     }
@@ -85,15 +91,13 @@ public class GlassFishModelProvider implements DataChangeListener<Application>, 
 
     private void processNewApplication(final Application app) {
         if (ApplicationTypeFactory.getApplicationTypeFor(app) instanceof GlassFishApplicationType) {
-            GlassFishModel gfm = new GlassFishModel(app);
-            app.getRepository().addDataSource(gfm);
-
-            app.notifyWhenRemoved(new DataRemovedListener() {
-
-                public void dataRemoved(Object dataSource) {
-                    processFinishedApplication(app);
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    GlassFishModel gfm = new GlassFishModel(app);
+                    app.getRepository().addDataSource(gfm);
+                    app.notifyWhenRemoved(removalListener);
                 }
-            });
+            }, 500);
         }
     }
 }

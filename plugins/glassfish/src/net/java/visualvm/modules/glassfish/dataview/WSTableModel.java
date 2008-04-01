@@ -23,6 +23,7 @@ class WSTableModel extends AbstractStatsTableModel<WebModuleVirtualServerMonitor
 
     @Override
     protected boolean isDisplayable(WebServiceEndpointAggregateStats stats) {
-        return stats.getTotalFaults().getCount() + stats.getTotalNumSuccess().getCount() > 0;
+        return true;
+//        return stats.getTotalFaults().getCount() + stats.getTotalNumSuccess().getCount() > 0;
     }
 }

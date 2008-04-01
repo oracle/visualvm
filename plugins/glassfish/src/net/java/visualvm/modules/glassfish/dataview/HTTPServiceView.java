@@ -38,11 +38,6 @@ class HTTPServiceView extends DataSourceView {
         initComponents();
     }
 
-    //~ Methods --------------------------------------------------------------------------------------------------------------
-    public boolean isCloseable() {
-        return true;
-    }
-
     @Override
     public DataViewComponent getView() {
         return dvc;
@@ -120,8 +115,13 @@ class HTTPServiceView extends DataSourceView {
 
             @Override
             public void onSchedule(long timeStamp) {
-                model.refresh(timeStamp);
-                model.notifyObservers();
+                try {
+                    model.refresh(timeStamp);
+                    model.notifyObservers();
+                } catch (Exception e) {
+                    Scheduler.sharedInstance().unschedule(queueRefreshTask);
+                    queueRefreshTask = null;
+                }
             }
         }, Quantum.seconds(1));
 
@@ -185,8 +185,13 @@ class HTTPServiceView extends DataSourceView {
 
             @Override
             public void onSchedule(long timeStamp) {
+                try {
                 model.refresh(timeStamp);
                 model.notifyObservers();
+                } catch (Exception e) {
+                    Scheduler.sharedInstance().unschedule(cacheRefreshTask);
+                    cacheRefreshTask = null;
+                }
             }
         }, Quantum.seconds(1));
 
@@ -256,8 +261,13 @@ class HTTPServiceView extends DataSourceView {
 
             @Override
             public void onSchedule(long timeStamp) {
+                try {
                 model.refresh(timeStamp);
                 model.notifyObservers();
+                } catch (Exception e) {
+                    Scheduler.sharedInstance().unschedule(kaRefreshTask);
+                    kaRefreshTask = null;
+                }
             }
         }, Quantum.seconds(1));
 

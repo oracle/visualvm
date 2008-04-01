@@ -25,6 +25,8 @@
 package net.java.visualvm.modules.glassfish.dataview;
 
 import com.sun.appserv.management.DomainRoot;
+import com.sun.appserv.management.config.ModuleMonitoringLevelValues;
+import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.monitor.HTTPServiceMonitor;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
 import com.sun.appserv.management.monitor.TransactionServiceMonitor;
@@ -70,7 +72,7 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
             return Collections.EMPTY_SET;
         }
 
-        JmxModel model = JmxModelFactory.getJmxModelFor(application);
+        final JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null) {
             return Collections.EMPTY_SET;
         }
@@ -91,15 +93,18 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
             return new HashSet<DataSourceView>() {
 
                 {
-                    HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
-                    TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
-
-                    if (httpMonitor != null) {
-                        add(getHTTPServiceView(application, httpMonitor));
+                    ModuleMonitoringLevelsConfig monitorConfig = AMXUtil.getMonitoringConfig(model);
+                    if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
+                        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
+                        if (httpMonitor != null) {
+                            add(getHTTPServiceView(application, httpMonitor));
+                        }
                     }
-
-                    if (transMonitor != null) {
-                        add(getTransactionServiceView(application, transMonitor));
+                    if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
+                        TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
+                        if (transMonitor != null) {
+                            add(getTransactionServiceView(application, transMonitor));
+                        }
                     }
                 }
                 };

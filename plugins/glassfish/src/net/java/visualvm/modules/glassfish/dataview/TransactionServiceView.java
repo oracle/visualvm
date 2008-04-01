@@ -72,8 +72,13 @@ class TransactionServiceView extends DataSourceView {
 
             @Override
             public void onSchedule(long timeStamp) {
+                try {
                 model.refresh(timeStamp);
                 model.notifyObservers();
+                } catch (Exception e) {
+                    Scheduler.sharedInstance().unschedule(transRefreshTask);
+                    transRefreshTask = null;
+                }
             }
         }, Quantum.seconds(1));
         dvc.addDetailsView(new DataViewComponent.DetailsView("Transactional Service", null, panel, null), DataViewComponent.BOTTOM_RIGHT);

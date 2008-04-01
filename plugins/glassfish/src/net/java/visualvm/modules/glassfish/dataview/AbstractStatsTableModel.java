@@ -26,7 +26,6 @@
 package net.java.visualvm.modules.glassfish.dataview;
 
 import com.sun.appserv.management.monitor.MonitoringStats;
-import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
@@ -60,6 +59,7 @@ public abstract class AbstractStatsTableModel<PM, M extends MonitoringStats, S e
         refresh = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             public void onSchedule(long timeStamp) {
+                try {
                 synchronized (statsList) {
                     statsList.clear();
                     for (Map.Entry<String, M> monitor : getMonitorMap().entrySet()) {
@@ -71,6 +71,10 @@ public abstract class AbstractStatsTableModel<PM, M extends MonitoringStats, S e
                         statsList.add(new Touple(monitor.getKey(), stats));
                     }
                     fireTableDataChanged();
+                }
+                } catch (Exception e) {
+                    Scheduler.sharedInstance().unschedule(refresh);
+                    refresh = null;
                 }
             }
         }, refreshInterval, true);

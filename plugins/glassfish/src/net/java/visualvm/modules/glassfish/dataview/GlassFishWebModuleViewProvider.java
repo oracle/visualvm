@@ -208,7 +208,12 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             
             refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
                 public void onSchedule(long timeStamp) {
-                    refreshData(timeStamp);
+                    try {
+                        refreshData(timeStamp);
+                    } catch (Exception e) {
+                        Scheduler.sharedInstance().unschedule(refreshTask);
+                        refreshTask = null;
+                    }
                 }
             }, Quantum.seconds(5));
         }

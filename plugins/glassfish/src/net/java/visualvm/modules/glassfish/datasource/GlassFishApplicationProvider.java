@@ -234,6 +234,9 @@ public class GlassFishApplicationProvider implements DataChangeListener<GlassFis
     public void dataRemoved(GlassFishModel model) {
         // removing the reference to the ScheduledTask practically unschedules the task
         Scheduler.sharedInstance().unschedule(taskMap.remove(model));
+        
+        Set<GlassFishApplication> roots = model.getRepository().getDataSources(GlassFishApplication.class);
+        model.getRepository().removeDataSources(roots);
     }
 
     public static void initialize() {
