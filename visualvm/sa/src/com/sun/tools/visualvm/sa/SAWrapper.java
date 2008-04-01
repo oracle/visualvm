@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 /**
  *
  * @author Tomas Hurka
- * @author Luis-Miguel Alventosa
  */
 class SAWrapper {
     private static final Logger LOGGER = Logger.getLogger(SAWrapper.class.getName());
@@ -65,43 +64,9 @@ class SAWrapper {
                 File library = new File(libraryPath, name);
                 LOGGER.fine("Library " + library.getAbsolutePath());
                 if (library.exists() && library.canRead()) {
-                    String absPath = temporaryLibrary(library);
-                    if (absPath != null) {
-                        return absPath;
-                    }
+                    return library.getAbsolutePath();
                 }
                 return super.findLibrary(libname);
-            }
-            
-            /**
-             * Copy the specified native library into the temporary directory
-             * and return the absolute path. Returns null, if we fail to copy
-             * the library.
-             */
-            private synchronized String temporaryLibrary(File library) {
-                try {
-                    InputStream is = new FileInputStream(library);
-                    if (is != null) {
-                        File file =
-                                File.createTempFile(library.getName() + ".", null);
-                        file.deleteOnExit();
-                        FileOutputStream fileOutput = new FileOutputStream(file);
-                        int c;
-                        while ((c = is.read()) != -1) {
-                            fileOutput.write(c);
-                        }
-                        is.close();
-                        fileOutput.close();
-                        if (file.exists()) {
-                            return file.getAbsolutePath();
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.warning("Failed to load library (" +
-                            library.getName() + "): " + e);
-                    return null;
-                }
-                return null;
             }
         };
     }

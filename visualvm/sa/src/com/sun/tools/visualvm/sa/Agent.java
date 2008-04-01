@@ -29,7 +29,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.HashMap;
 
 /**
  *
@@ -37,7 +37,7 @@ import java.util.WeakHashMap;
  */
 class Agent {
 
-    private static Map<File,Agent> agentMap = new WeakHashMap();
+    private static Map<File,Agent> agentMap = new HashMap();
     
     static Agent getAgent(File jdkHome,File saJarFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException  {
         synchronized (agentMap) {
@@ -49,6 +49,7 @@ class Agent {
             return agent;
         }
     }
+    
     private SAWrapper saClassLoader;
     private final SAObject bugspotAgent;
     private VM vm;
