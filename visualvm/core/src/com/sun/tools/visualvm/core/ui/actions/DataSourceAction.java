@@ -29,10 +29,9 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 
@@ -41,12 +40,9 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
  * @author Jiri Sedlacek
  */
 public abstract class DataSourceAction<X extends DataSource> extends AbstractAction {
-    
-    private static final Logger LOGGER = Logger.getLogger(DataSourceAction.class.getName());
 
     private final Class<X> scope;
     private boolean initialized = false;
-    private boolean initializedChecked = false;
 
 
     public DataSourceAction(Class<X> scope) {
@@ -76,12 +72,19 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
         updateState(ActionUtils.getSelectedDataSources(getScope()));
     }
     
-    public Object getValue(String key) {
-        if (!initializedChecked) {
-            initializedChecked = true;
-            if (!initialized) LOGGER.log(Level.WARNING, "Registered action not initialized: " + this, this);
-        }
+    public final Object getValue(String key) {
+        initialize();
         return super.getValue(key);
+    }
+    
+    public final boolean isEnabled() {
+        initialize();
+        return super.isEnabled();
+    }
+    
+    public final void addPropertyChangeListener(PropertyChangeListener listener) {
+        initialize();
+        super.addPropertyChangeListener(listener);
     }
 
 
