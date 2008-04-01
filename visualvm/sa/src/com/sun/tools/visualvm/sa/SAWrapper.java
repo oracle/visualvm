@@ -54,6 +54,7 @@ class SAWrapper {
         URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
         String osArch = System.getProperty("os.arch");
         if ("x86".equals(osArch)) {
+            osArch = "i386";
         }
         libraryPath = new File(jdkHome, "jre/lib/" + osArch);
         LOGGER.fine("Path " + libraryPath.getAbsolutePath());
