@@ -44,10 +44,8 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     private static HeapDumpOnOOMEAction instance;
     
     public static synchronized HeapDumpOnOOMEAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new HeapDumpOnOOMEAction();
-            instance.initialize();
-    }
         return instance;
     }
     

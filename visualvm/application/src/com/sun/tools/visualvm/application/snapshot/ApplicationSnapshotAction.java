@@ -47,10 +47,8 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     private static ApplicationSnapshotAction instance;
     
     public static synchronized ApplicationSnapshotAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new ApplicationSnapshotAction();
-            instance.initialize();
-    }
         return instance;
     }
     

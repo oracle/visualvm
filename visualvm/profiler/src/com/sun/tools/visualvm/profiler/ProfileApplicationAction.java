@@ -51,10 +51,8 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
     private static ProfileApplicationAction instance;
     
     public static synchronized ProfileApplicationAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new ProfileApplicationAction();
-            instance.initialize();
-        }
         return instance;
     }
     

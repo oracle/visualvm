@@ -43,10 +43,8 @@ class SaveSnapshotAsAction extends SingleDataSourceAction<Snapshot> {
     private static SaveSnapshotAsAction instance;
     
     public static synchronized SaveSnapshotAsAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new SaveSnapshotAsAction();
-            instance.initialize();
-    }
         return instance;
     }
     

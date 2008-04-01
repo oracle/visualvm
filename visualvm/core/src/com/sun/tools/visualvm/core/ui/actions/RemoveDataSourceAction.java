@@ -38,10 +38,8 @@ class RemoveDataSourceAction extends MultiDataSourceAction<DataSource> {
     private static RemoveDataSourceAction instance;
     
     public static synchronized RemoveDataSourceAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new RemoveDataSourceAction();
-            instance.initialize();
-    }
         return instance;
     }
     

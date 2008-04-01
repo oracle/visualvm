@@ -41,10 +41,8 @@ class DeleteSnapshotAction extends MultiDataSourceAction<Snapshot> {
     private static DeleteSnapshotAction instance;
     
     public static DeleteSnapshotAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new DeleteSnapshotAction();
-            instance.initialize();
-    }
         return instance;
     }
     

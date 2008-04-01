@@ -37,10 +37,8 @@ class RenameDataSourceAction extends SingleDataSourceAction<DataSource> {
     private static RenameDataSourceAction instance;
     
     public static synchronized RenameDataSourceAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new RenameDataSourceAction();
-            instance.initialize();
-    }
         return instance;
     }
 

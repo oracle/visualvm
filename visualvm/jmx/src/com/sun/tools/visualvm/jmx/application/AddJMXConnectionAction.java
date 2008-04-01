@@ -53,10 +53,8 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     
     public static synchronized AddJMXConnectionAction alwaysEnabled() {
-        if (alwaysEnabled == null) {
+        if (alwaysEnabled == null) 
             alwaysEnabled = new AddJMXConnectionAction();
-            alwaysEnabled.initialize();
-    }
         return alwaysEnabled;
     }
     
@@ -65,16 +63,13 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
             toolbarInstance = new AddJMXConnectionAction();
             toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
             toolbarInstance.putValue("iconBase", ICON_PATH);
-            toolbarInstance.initialize();
     }
         return toolbarInstance;
     }
     
     public static synchronized AddJMXConnectionAction selectionAware() {
-        if (selectionAware == null) {
+        if (selectionAware == null) 
             selectionAware = new AddJMXConnectionAction().trackSelection();
-            selectionAware.initialize();
-    }
         return selectionAware;
     }
     

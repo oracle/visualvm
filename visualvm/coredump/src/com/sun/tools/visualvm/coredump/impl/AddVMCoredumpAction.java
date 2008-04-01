@@ -51,10 +51,8 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     private static AddVMCoredumpAction selectionAware;
     
     public static synchronized AddVMCoredumpAction alwaysEnabled() {
-        if (alwaysEnabled == null) {
+        if (alwaysEnabled == null) 
             alwaysEnabled = new AddVMCoredumpAction();
-            alwaysEnabled.initialize();
-    }
         return alwaysEnabled;
     }
     
@@ -63,16 +61,13 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
             toolbarInstance = new AddVMCoredumpAction();
             toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
             toolbarInstance.putValue("iconBase", ICON_PATH);
-            toolbarInstance.initialize();
     }
         return toolbarInstance;
     }
     
     public static synchronized AddVMCoredumpAction selectionAware() {
-        if (selectionAware == null) {
+        if (selectionAware == null) 
             selectionAware = new AddVMCoredumpAction().trackSelection();
-            selectionAware.initialize();
-    }
         return selectionAware;
     }
     

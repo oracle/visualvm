@@ -51,10 +51,8 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     private static ProfilerSnapshotAction instance;
     
     public static synchronized ProfilerSnapshotAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new ProfilerSnapshotAction();
-            instance.initialize();
-    }
         return instance;
     }
     

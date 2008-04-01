@@ -39,10 +39,8 @@ class OpenDataSourceAction extends MultiDataSourceAction<DataSource> {
     private static OpenDataSourceAction instance;
     
     public static synchronized OpenDataSourceAction instance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new OpenDataSourceAction();
-            instance.initialize();
-    }
         return instance;
     }
     

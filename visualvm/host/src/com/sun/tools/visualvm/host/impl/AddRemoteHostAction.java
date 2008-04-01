@@ -52,10 +52,8 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     private static AddRemoteHostAction selectionAware;
     
     public static synchronized AddRemoteHostAction alwaysEnabled() {
-        if (alwaysEnabled == null) {
+        if (alwaysEnabled == null) 
             alwaysEnabled = new AddRemoteHostAction();
-            alwaysEnabled.initialize();
-    }
         return alwaysEnabled;
     }
     
@@ -64,16 +62,13 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
             toolbarInstance = new AddRemoteHostAction();
             toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
             toolbarInstance.putValue("iconBase", ICON_PATH);
-            toolbarInstance.initialize();
     }
         return toolbarInstance;
     }
     
     public static synchronized AddRemoteHostAction selectionAware() {
-        if (selectionAware == null) {
+        if (selectionAware == null) 
             selectionAware = new AddRemoteHostAction().trackSelection();
-            selectionAware.initialize();
-    }
         return selectionAware;
     }
     

@@ -52,10 +52,8 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
     private static AddApplicationSnapshotAction selectionAware;
     
     public static synchronized AddApplicationSnapshotAction alwaysEnabled() {
-        if (alwaysEnabled == null) {
+        if (alwaysEnabled == null)
             alwaysEnabled = new AddApplicationSnapshotAction();
-            alwaysEnabled.initialize();
-    }
         return alwaysEnabled;
     }
     
@@ -64,16 +62,13 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
             toolbarInstance = new AddApplicationSnapshotAction();
             toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
             toolbarInstance.putValue("iconBase", ICON_PATH);
-            toolbarInstance.initialize();
     }
         return toolbarInstance;
     }
     
     public static synchronized AddApplicationSnapshotAction selectionAware() {
-        if (selectionAware == null) {
+        if (selectionAware == null)
             selectionAware = new AddApplicationSnapshotAction().trackSelection();
-            selectionAware.initialize();
-    }
         return selectionAware;
     }
     
