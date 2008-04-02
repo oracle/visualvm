@@ -181,22 +181,24 @@ class ExplorerComponent extends JPanel {
     
     private class ExplorerTreeMouseAdapter extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
-                // Select path on location or clear selection
-                TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
-                if (path != null) {
-                    if (!explorerTree.isPathSelected(path))
-                        explorerTree.setSelectionPath(path);
-                } else {
-                    explorerTree.clearSelection();
-                }
+            // Select path on location or clear selection
+            TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
+            if (path != null) {
+                if (!explorerTree.isPathSelected(path))
+                    explorerTree.setSelectionPath(path);
+            } else {
+                explorerTree.clearSelection();
             }
+        }
+        
+        public void mouseReleased(MouseEvent e) {
+            if (e.getModifiers() == InputEvent.BUTTON3_MASK)
+                displayContextMenu(e.getX(), e.getY());
+        }
     
         public void mouseClicked(MouseEvent e) {
-            if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                displayContextMenu(e.getX(), e.getY());                
-            } else if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() == explorerTree.getToggleClickCount()) {
+            if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() == explorerTree.getToggleClickCount())
                 performDefaultAction();
-            }
         }
     }
 
