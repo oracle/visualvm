@@ -25,10 +25,6 @@
 
 package com.sun.tools.visualvm.modules.jconsole;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.logging.Logger;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -38,22 +34,8 @@ import org.openide.modules.ModuleInstall;
  * @author Luis-Miguel Alventosa
  */
 public class Install extends ModuleInstall {
-    private final static Logger LOGGER = Logger.getLogger(Install.class.getName());
-    
     @Override
     public void restored() {
-        try {
-            String javahome = System.getProperty("jdk.home"); // NOI18N
-            File jconsoleFile = new File(javahome, "lib/jconsole.jar"); // NOI18N
-            URL thisJarUrl = Install.class.getProtectionDomain().getCodeSource().getLocation();
-            URL jconsoleUrl = jconsoleFile.toURI().toURL();
-            ClassLoader jconsoleLoader = new JConsoleClassLoader(thisJarUrl, jconsoleUrl);
-            Class<JConsoleViewsSupport> jconsoleViewsSupport = (Class<JConsoleViewsSupport>) Class.forName("com.sun.tools.visualvm.modules.jconsole.JConsoleViewsSupport", true, jconsoleLoader);
-            Method method = jconsoleViewsSupport.getDeclaredMethod("sharedInstance");
-            method.setAccessible(true);
-            method.invoke(null);
-        } catch (Exception e) {
-            LOGGER.throwing(Install.class.getName(), "restored", e);
-        }
+        JConsoleViewsSupport.sharedInstance();
     }
 }

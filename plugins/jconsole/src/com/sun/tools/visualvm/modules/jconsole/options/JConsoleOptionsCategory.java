@@ -46,7 +46,7 @@ public final class JConsoleOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole.png"));
+        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole.png")); // NOI18N
     }
 
     public OptionsPanelController create() {
