@@ -62,7 +62,7 @@ class CoreDumpImpl extends CoreDump {
     }
     
     
-    protected void remove(DataSource removeRoot) {
+    protected void remove() {
         File file = getFile();
         if (CoreDumpSupport.getStorageDirectory().equals(file.getParentFile())) Utils.delete(file, true);
         setFile(null);

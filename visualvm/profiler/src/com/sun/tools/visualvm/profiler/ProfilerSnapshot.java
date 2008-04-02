@@ -58,7 +58,7 @@ class ProfilerSnapshot extends Snapshot {
         return true;
     }
     
-    public void remove() {
+    protected void remove() {
         super.remove();
         ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
     }
