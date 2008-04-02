@@ -24,12 +24,10 @@
  */
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.util.Set;
 import javax.swing.ImageIcon;
 import org.openide.util.Utilities;
 
@@ -43,7 +41,6 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     private static final String ICON_PATH = "com/sun/tools/visualvm/coredump/resources/addCoredump.png";
     private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
-    private boolean notSupported;
     private boolean tracksSelection = false;
     
     private static AddVMCoredumpAction alwaysEnabled;
@@ -60,8 +57,10 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     }
     
     public static synchronized AddVMCoredumpAction selectionAware() {
-        if (selectionAware == null) 
-            selectionAware = new AddVMCoredumpAction().trackSelection();
+        if (selectionAware == null) {
+            selectionAware = new AddVMCoredumpAction();
+            selectionAware.tracksSelection = true;
+        }
         return selectionAware;
     }
     
@@ -79,22 +78,9 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
         return true;
     }
     
-    protected void updateState(Set<CoreDumpsContainer> coreDumpsContainerSet) {
-        if (notSupported) return;
-        if (tracksSelection) super.updateState(coreDumpsContainerSet);
-    }
-    
     protected void initialize() {
-        notSupported = Utilities.isWindows();
-        setEnabled(!notSupported);
-        super.initialize();
-    }
-    
-    
-    private AddVMCoredumpAction trackSelection() {
-        tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources(CoreDumpsContainer.class));
-        return this;
+        if (Utilities.isWindows()) setEnabled(false);
+        else if (tracksSelection) super.initialize();
     }
     
     
