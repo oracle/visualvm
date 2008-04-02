@@ -39,11 +39,14 @@
     </folder>
     
     <folder name="Menu">
-        <folder name="Applications">
+        <folder name="File">
             <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
+        </folder>        
+        
+        <folder name="Applications">
             <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
                 <attr name="position" intvalue="2500"/>
@@ -52,9 +55,9 @@
     </folder>
     
     <folder name="Toolbars">
-        <folder name="Application">
-            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-toolbarInstance.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.AddApplicationSnapshotAction.toolbarInstance"/>
+        <folder name="File">
+            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
         </folder>

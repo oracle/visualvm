@@ -36,7 +36,7 @@
     </folder>
     
     <folder name="Menu">
-        <folder name="Applications">
+        <folder name="File">
             <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="100"/>
@@ -45,9 +45,9 @@
     </folder>
     
     <folder name="Toolbars">
-        <folder name="Application">
-            <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-toolbarInstance.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.host.impl.AddRemoteHostAction.toolbarInstance"/>
+        <folder name="File">
+            <file name="com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-host-impl-AddRemoteHostAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>
         </folder>

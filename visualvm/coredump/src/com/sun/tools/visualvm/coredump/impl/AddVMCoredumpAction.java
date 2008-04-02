@@ -47,22 +47,16 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     private boolean tracksSelection = false;
     
     private static AddVMCoredumpAction alwaysEnabled;
-    private static AddVMCoredumpAction toolbarInstance;
     private static AddVMCoredumpAction selectionAware;
     
-    public static synchronized AddVMCoredumpAction alwaysEnabled() {
-        if (alwaysEnabled == null) 
-            alwaysEnabled = new AddVMCoredumpAction();
-        return alwaysEnabled;
-    }
     
-    public static synchronized AddVMCoredumpAction toolbarInstance() {
-        if (toolbarInstance == null) {
-            toolbarInstance = new AddVMCoredumpAction();
-            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
-            toolbarInstance.putValue("iconBase", ICON_PATH);
-    }
-        return toolbarInstance;
+    public static synchronized AddVMCoredumpAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddVMCoredumpAction();
+            alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
+            alwaysEnabled.putValue("iconBase", ICON_PATH);
+        }
+        return alwaysEnabled;
     }
     
     public static synchronized AddVMCoredumpAction selectionAware() {

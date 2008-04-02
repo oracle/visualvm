@@ -48,23 +48,16 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     private boolean tracksSelection = false;
     
     private static AddJMXConnectionAction alwaysEnabled;
-    private static AddJMXConnectionAction toolbarInstance;
     private static AddJMXConnectionAction selectionAware;
     
     
     public static synchronized AddJMXConnectionAction alwaysEnabled() {
-        if (alwaysEnabled == null) 
+        if (alwaysEnabled == null) {
             alwaysEnabled = new AddJMXConnectionAction();
+            alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
+            alwaysEnabled.putValue("iconBase", ICON_PATH);
+        }
         return alwaysEnabled;
-    }
-    
-    public static synchronized AddJMXConnectionAction toolbarInstance() {
-        if (toolbarInstance == null) {
-            toolbarInstance = new AddJMXConnectionAction();
-            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
-            toolbarInstance.putValue("iconBase", ICON_PATH);
-    }
-        return toolbarInstance;
     }
     
     public static synchronized AddJMXConnectionAction selectionAware() {

@@ -58,27 +58,27 @@
     <folder name="Menu">
         
         <folder name="File">
+            <file name="File-Separator-500.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="500"/>
+            </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
-                <attr name="position" intvalue="100"/>
+                <attr name="position" intvalue="600"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
-                <attr name="position" intvalue="200"/>
+                <attr name="position" intvalue="700"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
-                <attr name="position" intvalue="300"/>
+                <attr name="position" intvalue="800"/>
             </file>
         </folder>
         
          <folder name="Applications">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
             <attr name="position" intvalue="200"/>
-            <file name="Applications-Separator-1000.instance">
-                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                <attr name="position" intvalue="1000"/>
-            </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
                 <attr name="position" intvalue="1100"/>
@@ -108,6 +108,11 @@
     
     <folder name="Toolbars">
         <folder name="File">
+            <attr name="position" intvalue="100"/>
+        </folder>
+        
+        <folder name="Snapshot">
+            <attr name="position" intvalue="200"/>
             <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="100"/>

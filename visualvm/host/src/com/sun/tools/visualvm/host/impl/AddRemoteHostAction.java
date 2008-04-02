@@ -48,22 +48,16 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     private boolean tracksSelection = false;
     
     private static AddRemoteHostAction alwaysEnabled;
-    private static AddRemoteHostAction toolbarInstance;
     private static AddRemoteHostAction selectionAware;
     
-    public static synchronized AddRemoteHostAction alwaysEnabled() {
-        if (alwaysEnabled == null) 
-            alwaysEnabled = new AddRemoteHostAction();
-        return alwaysEnabled;
-    }
     
-    public static synchronized AddRemoteHostAction toolbarInstance() {
-        if (toolbarInstance == null) {
-            toolbarInstance = new AddRemoteHostAction();
-            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
-            toolbarInstance.putValue("iconBase", ICON_PATH);
-    }
-        return toolbarInstance;
+    public static synchronized AddRemoteHostAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddRemoteHostAction();
+            alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
+            alwaysEnabled.putValue("iconBase", ICON_PATH);
+        }
+        return alwaysEnabled;
     }
     
     public static synchronized AddRemoteHostAction selectionAware() {

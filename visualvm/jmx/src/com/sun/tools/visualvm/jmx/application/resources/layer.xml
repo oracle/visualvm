@@ -36,7 +36,7 @@
     </folder>
     
     <folder name="Menu">
-         <folder name="Applications">
+         <folder name="File">
             <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="200"/>
@@ -45,9 +45,9 @@
     </folder>
     
     <folder name="Toolbars">
-        <folder name="Application">
-            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-toolbarInstance.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.application.AddJMXConnectionAction.toolbarInstance"/>
+        <folder name="File">
+            <file name="com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-application-AddJMXConnectionAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
         </folder>

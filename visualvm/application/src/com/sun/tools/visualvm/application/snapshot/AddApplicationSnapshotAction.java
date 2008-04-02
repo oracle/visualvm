@@ -48,22 +48,16 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
     
     
     private static AddApplicationSnapshotAction alwaysEnabled;
-    private static AddApplicationSnapshotAction toolbarInstance;
     private static AddApplicationSnapshotAction selectionAware;
     
-    public static synchronized AddApplicationSnapshotAction alwaysEnabled() {
-        if (alwaysEnabled == null)
-            alwaysEnabled = new AddApplicationSnapshotAction();
-        return alwaysEnabled;
-    }
     
-    public static synchronized AddApplicationSnapshotAction toolbarInstance() {
-        if (toolbarInstance == null) {
-            toolbarInstance = new AddApplicationSnapshotAction();
-            toolbarInstance.putValue(SMALL_ICON, new ImageIcon(ICON));
-            toolbarInstance.putValue("iconBase", ICON_PATH);
-    }
-        return toolbarInstance;
+    public static synchronized AddApplicationSnapshotAction alwaysEnabled() {
+        if (alwaysEnabled == null) {
+            alwaysEnabled = new AddApplicationSnapshotAction();
+            alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
+            alwaysEnabled.putValue("iconBase", ICON_PATH);
+        }
+        return alwaysEnabled;
     }
     
     public static synchronized AddApplicationSnapshotAction selectionAware() {
