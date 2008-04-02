@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import com.sun.tools.visualvm.tools.sa.SaModel;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,7 +82,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                 try {
                     return new SaModelImpl(jdkHome,saJar,executable,coreFile);
                 } catch (Exception ex) {
-                    LOGGER.log(Level.FINE, "Unable to retrieve SA agent", ex);
+                    LOGGER.log(Level.INFO, "Unable to retrieve SA agent", ex);
                 }
                 return null;
             }
@@ -91,12 +92,16 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
     
     static File getSaJar(File jdkHome) {
         File saJar = new File(jdkHome,SA_JAR);
-        if (saJar.exists()){
-            return saJar;
-        }
-        saJar = new File(new File(jdkHome,".."),SA_JAR);
-        if (saJar.exists()) {
-            return saJar;
+        try {
+            if (saJar.exists()) {
+                return saJar.getCanonicalFile();
+            }
+            saJar = new File(new File(jdkHome, ".."), SA_JAR);
+            if (saJar.exists()) {
+                return saJar.getCanonicalFile();
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, saJar.getPath(), ex);            
         }
         return null;
     }
