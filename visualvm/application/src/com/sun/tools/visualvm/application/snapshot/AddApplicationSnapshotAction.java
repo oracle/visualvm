@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.application.snapshot;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -61,8 +60,10 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
     }
     
     public static synchronized AddApplicationSnapshotAction selectionAware() {
-        if (selectionAware == null)
-            selectionAware = new AddApplicationSnapshotAction().trackSelection();
+        if (selectionAware == null) {
+            selectionAware = new AddApplicationSnapshotAction();
+            selectionAware.tracksSelection = true;
+        }
         return selectionAware;
     }
     
@@ -81,12 +82,6 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
     
     protected void updateState(Set<SnapshotsContainer> snapshotsContainerSet) {
         if (tracksSelection) super.updateState(snapshotsContainerSet);
-    }
-    
-    private AddApplicationSnapshotAction trackSelection() {
-        tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources(SnapshotsContainer.class));
-        return this;
     }
     
     

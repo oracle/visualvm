@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.Image;
@@ -61,8 +60,10 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     }
     
     public static synchronized AddJMXConnectionAction selectionAware() {
-        if (selectionAware == null) 
-            selectionAware = new AddJMXConnectionAction().trackSelection();
+        if (selectionAware == null) {
+            selectionAware = new AddJMXConnectionAction();
+            selectionAware.tracksSelection = true;
+        }
         return selectionAware;
     }
     
@@ -86,13 +87,6 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     protected void updateState(Set<Host> selectedHosts) {
         if (tracksSelection) super.updateState(selectedHosts);
-    }
-    
-    
-    private AddJMXConnectionAction trackSelection() {
-        tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources(Host.class));
-        return this;
     }
     
     

@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
@@ -61,8 +60,10 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     }
     
     public static synchronized AddRemoteHostAction selectionAware() {
-        if (selectionAware == null) 
-            selectionAware = new AddRemoteHostAction().trackSelection();
+        if (selectionAware == null) {
+            selectionAware = new AddRemoteHostAction();
+            selectionAware.tracksSelection = true;
+        }
         return selectionAware;
     }
     
@@ -84,13 +85,6 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
     protected void updateState(Set<RemoteHostsContainer> remoteHostsContainerSet) {
         if (tracksSelection) super.updateState(remoteHostsContainerSet);
-    }
-    
-    
-    private AddRemoteHostAction trackSelection() {
-        tracksSelection = true;
-        updateState(ActionUtils.getSelectedDataSources(RemoteHostsContainer.class));
-        return this;
     }
     
     
