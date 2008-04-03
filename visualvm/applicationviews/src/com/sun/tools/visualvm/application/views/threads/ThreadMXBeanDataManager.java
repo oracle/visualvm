@@ -48,8 +48,8 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
     private Set<Long> threadIdSet = new HashSet();
     private boolean refreshRunning;
 
-    public ThreadMXBeanDataManager(ThreadMXBean threadBean) {
-        this.threadBean = threadBean;
+    public ThreadMXBeanDataManager(ThreadMXBean tb) {
+        threadBean = tb;
     }
 
     public void refreshThreads() {
