@@ -25,23 +25,37 @@
 
 package com.sun.tools.visualvm.modules.jconsole;
 
+import com.sun.tools.jconsole.JConsoleContext;
+import static com.sun.tools.jconsole.JConsoleContext.*;
+import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
+import javax.management.MBeanServerConnection;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
+import javax.swing.event.SwingPropertyChangeSupport;
 import org.openide.util.NbBundle;
 
 class JConsolePluginWrapper {
@@ -106,7 +120,7 @@ class JConsolePluginWrapper {
                 pluginService = plugins;
             } catch (ServiceConfigurationError e) {
                 // Error occurs during initialization of plugin
-                
+
                 LOGGER.finer("Warning: Fail to load plugin: " + e.getMessage()); // NOI18N
                 LOGGER.throwing(JConsolePluginWrapper.class.getName(), "initPluginService", e); // NOI18N
             } catch (MalformedURLException e) {
@@ -166,5 +180,226 @@ class JConsolePluginWrapper {
             name = name + "/"; // NOI18N
         }
         return new URL("file", "", name); // NOI18N
+    }
+
+    class ProxyClient implements JConsoleContext, PropertyChangeListener {
+
+        private ConnectionState connectionState = ConnectionState.DISCONNECTED;
+
+        // The SwingPropertyChangeSupport will fire events on the EDT
+        private SwingPropertyChangeSupport propertyChangeSupport =
+                new SwingPropertyChangeSupport(this, true);
+        private volatile boolean isDead = true;
+        private JmxModel jmxModel = null;
+        private MBeanServerConnection server = null;
+
+        ProxyClient(JmxModel jmxModel) {
+            this.jmxModel = jmxModel;
+        }
+
+        private void setConnectionState(ConnectionState state) {
+            ConnectionState oldState = this.connectionState;
+            this.connectionState = state;
+            propertyChangeSupport.firePropertyChange(CONNECTION_STATE_PROPERTY,
+                    oldState, state);
+        }
+
+        public ConnectionState getConnectionState() {
+            return this.connectionState;
+        }
+
+        void connect() {
+            setConnectionState(ConnectionState.CONNECTING);
+            try {
+                tryConnect();
+                setConnectionState(ConnectionState.CONNECTED);
+            } catch (Exception e) {
+                e.printStackTrace();
+                setConnectionState(ConnectionState.DISCONNECTED);
+            }
+        }
+
+        private void tryConnect() throws IOException {
+            jmxModel.addPropertyChangeListener(this);
+            this.server = jmxModel.getMBeanServerConnection();
+            this.isDead = false;
+        }
+
+        public MBeanServerConnection getMBeanServerConnection() {
+            return server;
+        }
+
+        synchronized void disconnect() {
+            jmxModel.removePropertyChangeListener(this);
+            // Set connection state to DISCONNECTED
+            if (!isDead) {
+                isDead = true;
+                setConnectionState(ConnectionState.DISCONNECTED);
+            }
+        }
+
+        boolean isDead() {
+            return isDead;
+        }
+
+        boolean isConnected() {
+            return !isDead();
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener listener) {
+            propertyChangeSupport.addPropertyChangeListener(listener);
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener listener) {
+            propertyChangeSupport.removePropertyChangeListener(listener);
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            String prop = evt.getPropertyName();
+            if (CONNECTION_STATE_PROPERTY.equals(prop)) {
+                com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState newState = (com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState) evt.getNewValue();
+                setConnectionState(ConnectionState.valueOf(newState.name()));
+            }
+        }
+    }
+
+    class VMPanel extends JTabbedPane implements PropertyChangeListener {
+
+        private Application application;
+        private ProxyClient proxyClient;
+        private Timer timer;
+        private int updateInterval = JConsoleSettings.getDefault().getPolling() * 1000;
+        private boolean wasConnected = false;
+
+        // Each VMPanel has its own instance of the JConsolePlugin.
+        // A map of JConsolePlugin to the previous SwingWorker.
+        private Map<JConsolePlugin, SwingWorker<?, ?>> plugins = null;
+        private boolean pluginTabsAdded = false;
+
+        VMPanel(Application application, JConsolePluginWrapper wrapper, ProxyClient proxyClient) {
+            this.application = application;
+            this.proxyClient = proxyClient;
+            plugins = new LinkedHashMap<JConsolePlugin, SwingWorker<?, ?>>();
+            for (JConsolePlugin p : wrapper.getPlugins()) {
+                p.setContext(proxyClient);
+                plugins.put(p, null);
+            }
+            // Start listening to connection state events
+            //
+            proxyClient.addPropertyChangeListener(this);
+        }
+
+        boolean isConnected() {
+            return proxyClient.isConnected();
+        }
+
+        // Call on EDT
+        void connect() {
+            if (isConnected()) {
+                // Create plugin tabs if not done
+                createPluginTabs();
+                // Start/Restart update timer on connect/reconnect
+                startUpdateTimer();
+            } else {
+                proxyClient.connect();
+            }
+        }
+
+        // Call on EDT
+        void disconnect() {
+            // Disconnect
+            proxyClient.disconnect();
+            for (JConsolePlugin p : plugins.keySet()) {
+                p.dispose();
+            }
+            // Cancel pending update tasks
+            //
+            if (timer != null) {
+                timer.cancel();
+            }
+            // Stop listening to connection state events
+            //
+            proxyClient.removePropertyChangeListener(this);
+        }
+
+        // Called on EDT
+        public void propertyChange(PropertyChangeEvent ev) {
+            String prop = ev.getPropertyName();
+            if (CONNECTION_STATE_PROPERTY.equals(prop)) {
+                ConnectionState newState = (ConnectionState) ev.getNewValue();
+                switch (newState) {
+                    case CONNECTED:
+                        // Create tabs if not done
+                        createPluginTabs();
+                        repaint();
+                        // Start/Restart update timer on connect/reconnect
+                        startUpdateTimer();
+                        break;
+                    case DISCONNECTED:
+                        disconnect();
+                        break;
+                }
+            }
+        }
+
+        private void startUpdateTimer() {
+            if (timer != null) {
+                timer.cancel();
+            }
+            TimerTask timerTask = new TimerTask() {
+                public void run() {
+                    update();
+                }
+            };
+            String timerName = "Timer-" + application.getId(); // NOI18N
+            timer = new Timer(timerName, true);
+            timer.schedule(timerTask, 0, updateInterval);
+        }
+
+        // Note: This method is called on a TimerTask thread. Any GUI manipulation
+        // must be performed with invokeLater() or invokeAndWait().
+        private Object lockObject = new Object();
+
+        private void update() {
+            synchronized (lockObject) {
+                if (!isConnected()) {
+                    if (wasConnected) {
+                        disconnect();
+                    }
+                    wasConnected = false;
+                    return;
+                } else {
+                    wasConnected = true;
+                }
+                // Plugin GUI update
+                for (JConsolePlugin p : plugins.keySet()) {
+                    SwingWorker<?, ?> sw = p.newSwingWorker();
+                    SwingWorker<?, ?> prevSW = plugins.get(p);
+                    // Schedule SwingWorker to run only if the previous
+                    // SwingWorker has finished its task and it hasn't started.
+                    if (prevSW == null || prevSW.isDone()) {
+                        if (sw == null || sw.getState() == SwingWorker.StateValue.PENDING) {
+                            plugins.put(p, sw);
+                            if (sw != null) {
+                                sw.execute();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void createPluginTabs() {
+            // Add plugin tabs if not done
+            if (!pluginTabsAdded) {
+                for (JConsolePlugin p : plugins.keySet()) {
+                    Map<String, JPanel> tabs = p.getTabs();
+                    for (Map.Entry<String, JPanel> e : tabs.entrySet()) {
+                        addTab(e.getKey(), e.getValue());
+                    }
+                }
+                pluginTabsAdded = true;
+            }
+        }
     }
 }
