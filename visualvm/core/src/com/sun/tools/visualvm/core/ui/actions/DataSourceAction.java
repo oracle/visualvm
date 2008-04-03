@@ -56,10 +56,7 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
         NetBeansProfiler.getDefaultNB().displayError("Cannot perform action in this context");
     }
     
-    protected synchronized void initialize() {
-        if (initialized) return;
-        initialized = true;
-        
+    protected void initialize() {
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
             public void selectionChanged(Set<DataSource> selected) {
                 if (selected.isEmpty()) selected = Collections.singleton(DataSource.ROOT);
@@ -73,23 +70,30 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
     }
     
     public final Object getValue(String key) {
-        initialize();
+        doInitialize();
         return super.getValue(key);
     }
     
     public final boolean isEnabled() {
-        initialize();
+        doInitialize();
         return super.isEnabled();
     }
     
     public final void addPropertyChangeListener(PropertyChangeListener listener) {
-        initialize();
+        doInitialize();
         super.addPropertyChangeListener(listener);
     }
 
 
     public final Class<X> getScope() {
         return scope;
+    }
+    
+    
+    private synchronized void doInitialize() {
+        if (initialized) return;
+        initialized = true;
+        initialize();
     }
     
 }
