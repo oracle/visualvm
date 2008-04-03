@@ -26,13 +26,10 @@
 package com.sun.tools.visualvm.tools.jmx;
 
 import com.sun.tools.visualvm.core.model.Model;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.event.SwingPropertyChangeSupport;
-
 
 /**
  * This class encapsulates the JMX functionality of the target Java application.
@@ -79,7 +76,6 @@ public abstract class JmxModel extends Model {
      * <i>ConnectionState</i>} bound property.
      */
     public enum ConnectionState {
-
         /**
          * The connection has been successfully established.
          */
@@ -109,13 +105,6 @@ public abstract class JmxModel extends Model {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    private void addWeakPropertyChangeListener(PropertyChangeListener listener) {
-        if (!(listener instanceof WeakPCL)) {
-            listener = new WeakPCL(listener);
-        }
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
     /**
      * Removes a {@link java.beans.PropertyChangeListener PropertyChangeListener}
      * from the listener list. This
@@ -128,15 +117,6 @@ public abstract class JmxModel extends Model {
      * @param listener the {@code PropertyChangeListener} to be removed.
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        if (!(listener instanceof WeakPCL)) {
-            // Search for the WeakPCL holding this listener (if any)
-            for (PropertyChangeListener pcl : propertyChangeSupport.getPropertyChangeListeners()) {
-                if (pcl instanceof WeakPCL && ((WeakPCL) pcl).get() == listener) {
-                    listener = pcl;
-                    break;
-                }
-            }
-        }
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
@@ -165,33 +145,4 @@ public abstract class JmxModel extends Model {
      * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
      */
     public abstract JMXServiceURL getJMXServiceURL();
-
-    /**
-     * The PropertyChangeListener is handled via a WeakReference
-     * so as not to pin down the listener.
-     */
-    private class WeakPCL extends WeakReference<PropertyChangeListener>
-            implements PropertyChangeListener {
-
-        WeakPCL(PropertyChangeListener referent) {
-            super(referent);
-        }
-
-        public void propertyChange(PropertyChangeEvent pce) {
-            PropertyChangeListener pcl = get();
-
-            if (pcl == null) {
-                // The referent listener was GC'ed, we're no longer
-                // interested in PropertyChanges, remove the listener.
-                dispose();
-            } else {
-                pcl.propertyChange(pce);
-            }
-        }
-
-        private void dispose() {
-            JmxModel.this.removePropertyChangeListener(this);
-        }
-    }
-
 }

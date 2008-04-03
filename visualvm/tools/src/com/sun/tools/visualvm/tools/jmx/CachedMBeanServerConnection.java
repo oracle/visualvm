@@ -44,6 +44,7 @@ import javax.management.MBeanServerConnection;
  * - The attributes cache uses a learning approach and only the attributes
  *   that are in the cache will be retrieved between two subsequent updates.
  *
+ * @author Eamonn McManus
  * @author Luis-Miguel Alventosa
  */
 public interface CachedMBeanServerConnection extends MBeanServerConnection {
