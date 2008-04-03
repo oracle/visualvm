@@ -53,15 +53,12 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         asc.setupDefineCredentials();
 
         final String title = "Supply Security Credentials: " + url;
-        final JLabel titleLabel = new JLabel(title);
         final DialogDescriptor dd = new DialogDescriptor(
                 asc, title, true,
                 new Object[]{asc.okButton, DialogDescriptor.CANCEL_OPTION},
                 asc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
         d.pack();
-        d.setSize(titleLabel.getPreferredSize().width + 200,
-                d.getPreferredSize().height);
         d.setVisible(true);
 
         if (dd.getValue() == asc.okButton) {
@@ -119,7 +116,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         // usernameField
         usernameField = new JTextField();
         usernameField.setPreferredSize(
-                new Dimension(200, usernameField.getPreferredSize().height));
+                new Dimension(320, usernameField.getPreferredSize().height));
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();

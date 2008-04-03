@@ -33,8 +33,8 @@ import com.sun.tools.visualvm.jmx.application.ApplicationSecurityConfigurator;
 import com.sun.tools.visualvm.jmx.application.JmxApplication;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
@@ -243,8 +243,10 @@ public class JmxModelImpl extends JmxModel {
      */
     private ApplicationSecurityConfigurator supplyCredentials(
             Application application, ProxyClient proxyClient) {
+        String displayName = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
+        if (displayName == null) displayName = proxyClient.getUrl().toString();
         ApplicationSecurityConfigurator jsc =
-                ApplicationSecurityConfigurator.supplyCredentials(proxyClient.getUrl().toString());
+                ApplicationSecurityConfigurator.supplyCredentials(displayName);
         if (jsc != null) {
             proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
             Storage storage = application.getStorage();
