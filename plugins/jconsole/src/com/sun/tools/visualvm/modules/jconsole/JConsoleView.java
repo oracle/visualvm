@@ -41,6 +41,7 @@ class JConsoleView extends DataSourceView {
     
     private Application application;
     private DataViewComponent view;
+    private JConsolePluginWrapper wrapper;
 
     public JConsoleView(Application application) {
         super(application, "JConsole Plugins", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
@@ -53,9 +54,15 @@ class JConsoleView extends DataSourceView {
         return view;
     }
 
+    @Override
+    protected void removed() {
+        wrapper.releasePlugins();
+    }
+
     private DataViewComponent createViewComponent() {
+        wrapper = new JConsolePluginWrapper(application);
         return new DataViewComponent(
-                new DataViewComponent.MasterView("JConsole Plugins", null, new JConsolePluginWrapper(application).getView()),
+                new DataViewComponent.MasterView("JConsole Plugins", null, wrapper.getView()),
                 new DataViewComponent.MasterViewConfiguration(true));
     }
 }

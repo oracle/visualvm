@@ -63,6 +63,7 @@ class JConsolePluginWrapper {
     private static final Logger LOGGER = Logger.getLogger(JConsolePluginWrapper.class.getName());
     private ServiceLoader<JConsolePlugin> pluginService;
     private JComponent jconsoleView;
+    private VMPanel vmPanel;
 
     JConsolePluginWrapper(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
@@ -73,7 +74,7 @@ class JConsolePluginWrapper {
         } else {
             boolean availablePlugins = getPlugins().iterator().hasNext();
             if (availablePlugins) {
-                VMPanel vmPanel = new VMPanel(application, this, new ProxyClient(jmxModel));
+                vmPanel = new VMPanel(application, this, new ProxyClient(jmxModel));
                 vmPanel.connect();
                 jconsoleView = vmPanel;
             } else {
@@ -86,6 +87,11 @@ class JConsolePluginWrapper {
 
     JComponent getView() {
         return jconsoleView;
+    }
+    void releasePlugins() {
+        if (vmPanel != null) {
+            vmPanel.disconnect();
+        }
     }
 
     // Return a list of newly instantiated JConsolePlugin objects
