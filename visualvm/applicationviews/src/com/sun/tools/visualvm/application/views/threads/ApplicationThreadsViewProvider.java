@@ -41,10 +41,9 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application>{
-    
+public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application> {
+
     private final Map<Application, DataSourceView> viewsCache = new HashMap();
-    
 
     public boolean supportsViewsFor(Application application) {
         JvmJmxModel jmx = JvmJmxModelFactory.getJvmJmxModelFor(application);
@@ -54,7 +53,8 @@ public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<A
     public synchronized Set<? extends DataSourceView> getViews(final Application application) {
         DataSourceView view = viewsCache.get(application);
         if (view == null) {
-            view = new ApplicationThreadsView(application, JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean()) {
+            view = new ApplicationThreadsView(application) {
+                @Override
                 public void removed() {
                     super.removed();
                     viewsCache.remove(application);
@@ -68,14 +68,11 @@ public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<A
     public boolean supportsSaveViewsFor(Application dataSource) {
         return false;
     }
-    
+
     public void saveViews(Application dataSource, Snapshot snapshot) {
-        
     }
-    
 
     public void initialize() {
         DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
-
 }

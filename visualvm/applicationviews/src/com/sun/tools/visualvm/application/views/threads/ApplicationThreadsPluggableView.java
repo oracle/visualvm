@@ -39,7 +39,9 @@ public class ApplicationThreadsPluggableView extends PluggableViewSupport<Applic
         switch (location) {
             case DataViewComponent.TOP_LEFT:
                 return false;
-            default: return true; // TODO: should return true only if the area hasn't been configured yet (false after first plugin configured it)
+            default:
+                return true; // TODO: should return true only if the area hasn't been configured yet (false after first plugin configured it)
+
         }
     }
 
@@ -50,5 +52,4 @@ public class ApplicationThreadsPluggableView extends PluggableViewSupport<Applic
     <X extends Application> void makeCustomizations(DataViewComponent view, X dataSource) {
         super.customizeView(view, dataSource);
     }
-
 }
