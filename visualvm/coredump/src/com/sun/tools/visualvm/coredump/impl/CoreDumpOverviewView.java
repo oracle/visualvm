@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.coredump.overview;
+package com.sun.tools.visualvm.coredump.impl;
 
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -46,21 +46,13 @@ class CoreDumpOverviewView extends DataSourceView {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/overview.png";
     
-    private DataViewComponent view;
-    
     
     public CoreDumpOverviewView(CoreDump coreDump) {
         super(coreDump, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);
-        view = createViewComponent(coreDump);
-        OverviewViewSupport.getInstance().getCoreDumpOverviewPluggableView().makeCustomizations(view, coreDump);
     }
     
-    public DataViewComponent getView() {
-        return view;
-    }
-    
-    
-    private DataViewComponent createViewComponent(CoreDump coreDump) {
+    protected DataViewComponent createComponent() {
+        CoreDump coreDump = (CoreDump)getDataSource();
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport(coreDump).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));

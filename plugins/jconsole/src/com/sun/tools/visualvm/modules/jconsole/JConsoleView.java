@@ -40,7 +40,6 @@ class JConsoleView extends DataSourceView {
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole.png"; // NOI18N
     
     private Application application;
-    private DataViewComponent view;
     private JConsolePluginWrapper wrapper;
 
     public JConsoleView(Application application) {
@@ -49,17 +48,11 @@ class JConsoleView extends DataSourceView {
     }
 
     @Override
-    public synchronized DataViewComponent getView() {
-        if (view == null) view = createViewComponent();
-        return view;
-    }
-
-    @Override
     protected void removed() {
         wrapper.releasePlugins();
     }
 
-    private DataViewComponent createViewComponent() {
+    protected DataViewComponent createComponent() {
         wrapper = new JConsolePluginWrapper(application);
         return new DataViewComponent(
                 new DataViewComponent.MasterView("JConsole Plugins", null, wrapper.getView()),

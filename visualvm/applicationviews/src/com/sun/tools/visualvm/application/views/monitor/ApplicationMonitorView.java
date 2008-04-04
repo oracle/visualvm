@@ -71,7 +71,6 @@ class ApplicationMonitorView extends DataSourceView {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/monitor.png";
 
-    private DataViewComponent view;
     private Jvm jvm;
     private MemoryMXBean memoryMXBean;
     private MonitoredDataListener monitoredDataListener;
@@ -88,23 +87,12 @@ class ApplicationMonitorView extends DataSourceView {
         memoryMXBean = jvmJmxModel == null ? null : jvmJmxModel.getMemoryMXBean();
     }
         
-    public DataViewComponent getView() {
-        if (view == null) {
-            Application application = (Application)getDataSource();
-            view = createViewComponent(application);
-            ApplicationMonitorPluggableView pluggableView = (ApplicationMonitorPluggableView)ApplicationViewsSupport.sharedInstance().getMonitorView();
-            pluggableView.makeCustomizations(view, application);
-        }
-        
-        return view;
-    }
-    
     protected void removed() {
         if (jvm != null) jvm.removeMonitoredDataListener(monitoredDataListener);
     }
     
-    
-    private DataViewComponent createViewComponent(Application application) {
+    protected DataViewComponent createComponent() {
+        Application application = (Application)getDataSource();
         final MasterViewSupport masterViewSupport = new MasterViewSupport(application, jvm, memoryMXBean);
         DataViewComponent dvc = new DataViewComponent(
                 masterViewSupport.getMasterView(),
@@ -275,7 +263,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Heap", null, this, null);
+            return new DataViewComponent.DetailsView("Heap", null, 10, this, null);
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -387,7 +375,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("PermGen", null, this, null);
+            return new DataViewComponent.DetailsView("PermGen", null, 10, this, null);
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -499,7 +487,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Classes", null, this, null);
+            return new DataViewComponent.DetailsView("Classes", null, 10, this, null);
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -622,7 +610,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Threads", null, this, null);
+            return new DataViewComponent.DetailsView("Threads", null, 10, this, null);
         }
         
         public void refresh(MonitoredData data, long time) {

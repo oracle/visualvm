@@ -31,9 +31,11 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
+import com.sun.tools.visualvm.coredump.impl.CoreDumpOverviewViewProvider;
 import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
-import com.sun.tools.visualvm.coredump.overview.OverviewViewSupport;
 import java.io.File;
 import org.openide.util.Utilities;
 
@@ -52,11 +54,16 @@ public final class CoreDumpSupport {
     // @GuardedBy coredumpsStorageDirectoryStringLock
     private static String coredumpsStorageDirectoryString;
     
+    private static CoreDumpOverviewViewProvider viewProvider = new CoreDumpOverviewViewProvider();
     private static CoreDumpCategory category = new CoreDumpCategory();
     private static final Object currentJDKHomeLock = new Object();
     // @GuardedBy currentJDKHomeLock
     private static String currentJDKHome;
     
+    
+    public static PluggableDataSourceViewProvider<CoreDump> getOverviewView() {
+        return viewProvider;
+    } 
     
     public static SnapshotCategory getCategory() {
         return category;
@@ -110,7 +117,7 @@ public final class CoreDumpSupport {
         CoreDumpsContainer.sharedInstance();
         CoreDumpProvider.register();
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
-        OverviewViewSupport.getInstance();
+        DataSourceViewsManager.sharedInstance().addViewsProvider(viewProvider, CoreDump.class);
     }
 
 }

@@ -31,7 +31,6 @@ import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
@@ -55,8 +54,6 @@ import org.openide.util.RequestProcessor;
 class ThreadDumpView extends DataSourceView {
     private static final Logger LOGGER = Logger.getLogger(ThreadDumpView.class.getName());
     
-    private DataViewComponent view;
-
     public ThreadDumpView(ThreadDump threadDump) {
         this(threadDump, DataSourceDescriptorFactory.getDescriptor(threadDump));
         
@@ -64,17 +61,10 @@ class ThreadDumpView extends DataSourceView {
     
     private ThreadDumpView(ThreadDump threadDump, DataSourceDescriptor descriptor) {
         super(threadDump, descriptor.getName(), descriptor.getIcon(), 0, true);
-        view = createViewComponent(threadDump);
-        ThreadDumpPluggableView pluggableView = (ThreadDumpPluggableView)ThreadDumpSupport.getInstance().getThreadDumpView();
-        pluggableView.makeCustomizations(view, threadDump);
     }
         
-    public DataViewComponent getView() {
-        return view;
-    }
-    
-    
-    private DataViewComponent createViewComponent(ThreadDump threadDump) {
+    protected DataViewComponent createComponent() {
+        ThreadDump threadDump = (ThreadDump)getDataSource();
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport(threadDump).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));

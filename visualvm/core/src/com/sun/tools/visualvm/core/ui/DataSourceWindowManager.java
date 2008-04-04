@@ -216,7 +216,7 @@ public final class DataSourceWindowManager {
             }
             cachedViews.add(view);
             
-            view.willBeAdded();
+            view.viewWillBeAdded();
         }
 
         try {
@@ -231,7 +231,7 @@ public final class DataSourceWindowManager {
         }
 
         // Blocking notification that the view has been added
-        for (DataSourceView view : newViews) view.added();
+        for (DataSourceView view : newViews) view.viewAdded();
     }
     
     void unregisterClosedWindow(DataSourceWindow window) {

@@ -26,53 +26,29 @@
 package com.sun.tools.visualvm.application.views.threads;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
 import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationThreadsViewProvider implements DataSourceViewsProvider<Application> {
+public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvider<Application> {
 
-    private final Map<Application, DataSourceView> viewsCache = new HashMap();
-
-    public boolean supportsViewsFor(Application application) {
+    protected boolean supportsViewFor(Application application) {
         JvmJmxModel jmx = JvmJmxModelFactory.getJvmJmxModelFor(application);
         return jmx != null && jmx.getThreadMXBean() != null;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
-        DataSourceView view = viewsCache.get(application);
-        if (view == null) {
-            view = new ApplicationThreadsView(application) {
-                @Override
-                public void removed() {
-                    super.removed();
-                    viewsCache.remove(application);
-                }
-            };
-            viewsCache.put(application, view);
-        }
-        return Collections.singleton(view);
+    protected DataSourceView createView(Application application) {
+        return new ApplicationThreadsView(application);
     }
-
-    public boolean supportsSaveViewsFor(Application dataSource) {
-        return false;
+    
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
     }
-
-    public void saveViews(Application dataSource, Snapshot snapshot) {
-    }
-
-    public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, Application.class);
-    }
+    
 }

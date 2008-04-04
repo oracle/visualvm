@@ -76,20 +76,14 @@ class ApplicationProfilerView extends DataSourceView {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/profiler/resources/profiler.png";
 
-    private DataViewComponent view;
     
-
     public ApplicationProfilerView(Application application) {
         super(application, "Profiler", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);
-        view = createViewComponent(application);
     }
         
-    public DataViewComponent getView() {
-        return view;
-    }
     
-    
-    private DataViewComponent createViewComponent(Application application) {
+    protected DataViewComponent createComponent() {
+        Application application = (Application)getDataSource();
         ProfilingResultsViewSupport profilingResultsViewSupport = new ProfilingResultsViewSupport();
         
         DataViewComponent dvc = new DataViewComponent(
@@ -536,7 +530,7 @@ class ApplicationProfilerView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Profiling results", null, this, null);
+            return new DataViewComponent.DetailsView("Profiling results", null, 10, this, null);
         }
         
         public void setProfilingResultsDisplay(JComponent profilingResultsDisplay) {

@@ -95,6 +95,7 @@
             </module-dependencies>
             <public-packages>
                 <package>com.sun.tools.visualvm.coredump</package>
+                <package>com.sun.tools.visualvm.coredump.overview</package>
             </public-packages>
         </data>
     </configuration>

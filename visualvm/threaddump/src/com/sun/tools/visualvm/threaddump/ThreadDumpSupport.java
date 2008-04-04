@@ -25,14 +25,13 @@
 
 package com.sun.tools.visualvm.threaddump;
 
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpPluggableView;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpCategory;
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpDescriptorProvider;
@@ -51,7 +50,6 @@ public final class ThreadDumpSupport {
     private final SnapshotCategory category = new ThreadDumpCategory();
     private final ThreadDumpProvider threadDumpProvider;
     private final ThreadDumpViewProvider threadDumpViewProvider;
-    private final ThreadDumpPluggableView threadDumpPluggableView;
 
 
     /**
@@ -98,8 +96,8 @@ public final class ThreadDumpSupport {
      * 
      * @return PluggableView instance to be used to customize the thread dump view.
      */
-    public PluggableViewSupport getThreadDumpView() {
-        return threadDumpPluggableView;
+    public PluggableDataSourceViewProvider<ThreadDump> getThreadDumpView() {
+        return threadDumpViewProvider;
     }
 
 
@@ -107,8 +105,6 @@ public final class ThreadDumpSupport {
         DataSourceDescriptorFactory.getDefault().registerFactory(new ThreadDumpDescriptorProvider());
         threadDumpProvider = new ThreadDumpProvider();
         threadDumpProvider.initialize();
-        
-        threadDumpPluggableView = new ThreadDumpPluggableView();
         
         threadDumpViewProvider = new ThreadDumpViewProvider();
         

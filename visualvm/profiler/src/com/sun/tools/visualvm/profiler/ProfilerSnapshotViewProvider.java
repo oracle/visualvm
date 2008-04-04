@@ -25,49 +25,23 @@
 
 package com.sun.tools.visualvm.profiler;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshotViewProvider implements DataSourceViewsProvider<ProfilerSnapshot>{
+class ProfilerSnapshotViewProvider extends DataSourceViewProvider<ProfilerSnapshot>{
     
-    private final Map<ProfilerSnapshot, DataSourceView> viewsCache = new HashMap();
-    
-
-    public boolean supportsViewsFor(ProfilerSnapshot snapshot) {
+    protected boolean supportsViewFor(ProfilerSnapshot snapshot) {
         return true;
     }
     
-    public synchronized Set<? extends DataSourceView> getViews(final ProfilerSnapshot snapshot) {
-        DataSourceView view = viewsCache.get(snapshot);
-        if (view == null) {
-            view = new ProfilerSnapshotView(snapshot) {
-                protected void removed() {
-                    super.removed();
-                    viewsCache.remove(snapshot);
-                }
-            };
-            viewsCache.put(snapshot, view);
-        }
-        return Collections.singleton(view);
+    protected DataSourceView createView(ProfilerSnapshot snapshot) {
+        return new ProfilerSnapshotView(snapshot);
     }
-
-    public boolean supportsSaveViewsFor(ProfilerSnapshot dataSource) {
-        return false;
-    }
-
-    public void saveViews(ProfilerSnapshot dataSource, Snapshot snapshot) {
-        
-}
     
 
     void initialize() {

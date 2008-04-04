@@ -31,8 +31,6 @@ import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpPluggableView;
-import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -56,27 +54,17 @@ import org.openide.util.RequestProcessor;
 class HeapDumpView extends DataSourceView {
     private final static Logger LOGGER = Logger.getLogger(HeapDumpView.class.getName());
     
-    private DataViewComponent view;
-    
-
     public HeapDumpView(HeapDump heapDump) {
         this(heapDump, DataSourceDescriptorFactory.getDescriptor(heapDump));
     }
     
     private HeapDumpView(HeapDump heapDump, DataSourceDescriptor descriptor) {
         super(heapDump, descriptor.getName(), descriptor.getIcon(), 0, true);
-        view = createViewComponent(heapDump);
-        HeapDumpPluggableView pluggableView = (HeapDumpPluggableView)HeapDumpSupport.getInstance().getHeapDumpView();
-        pluggableView.makeCustomizations(view, heapDump);
     }
     
         
-    public DataViewComponent getView() {
-        return view;
-    }
-    
-    
-    private DataViewComponent createViewComponent(HeapDump heapDump) {
+    protected DataViewComponent createComponent() {
+        HeapDump heapDump = (HeapDump)getDataSource();
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport(heapDump).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));

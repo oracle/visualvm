@@ -23,29 +23,30 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.views.monitor;
+package com.sun.tools.visualvm.host.views.overview;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-
+import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.host.model.HostOverviewFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationMonitorPluggableView extends PluggableViewSupport<Application> {
-
-    public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
-        return false;
+public class HostOverviewViewProvider extends PluggableDataSourceViewProvider<Host> {
+    
+    protected boolean supportsViewFor(Host host) {
+        return HostOverviewFactory.getSystemOverviewFor(host) != null;
     }
 
-    public <X extends Application> boolean allowsNewView(X dataSource, int location) {
-        return true;
+    protected DataSourceView createView(Host host) {
+        return new HostOverviewView(host);
     }
-
-    <X extends Application> void makeCustomizations(DataViewComponent view, X dataSource) {
-        super.customizeView(view, dataSource);
+    
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
     }
 
 }

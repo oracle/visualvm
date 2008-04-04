@@ -43,20 +43,13 @@ class MBeansView extends DataSourceView {
 
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans.png"; // NOI18N
     private Application application;
-    private DataViewComponent view;
-
+    
     public MBeansView(Application application) {
         super(application, "MBeans", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false);
         this.application = application;
     }
 
-    @Override
-    public synchronized DataViewComponent getView() {
-        if (view == null) view = createViewComponent();
-        return view;
-    }
-
-    private DataViewComponent createViewComponent() {
+    protected DataViewComponent createComponent() {
         DataViewComponent dvc = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         if (jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
@@ -93,13 +86,13 @@ class MBeansView extends DataSourceView {
         
             dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.33, 0, -1, -1, -1, -1));
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("MBeans", false), DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("MBeans", null, mbeansTreeView, null), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("MBeans", null, 10, mbeansTreeView, null), DataViewComponent.TOP_LEFT);
             
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", false), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Attributes", null, mbeansAttributesView, null), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Operations", null, mbeansOperationsView, null), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Notifications", null, mbeansNotificationsView, null), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Metadata", null, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Attributes", null, 10, mbeansAttributesView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Operations", null, 20, mbeansOperationsView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Notifications", null, 30, mbeansNotificationsView, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Metadata", null, 40, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT);
 
             mbeansTab.setView(dvc);
         }

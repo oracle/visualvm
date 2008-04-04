@@ -26,67 +26,37 @@
 package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationOverviewViewProvider implements DataSourceViewsProvider<Application> {
+public class ApplicationOverviewViewProvider extends PluggableDataSourceViewProvider<Application> {
     
-    private final Map<Application, ApplicationOverviewView> viewsCache = new HashMap();
-    
-
-    public boolean supportsViewsFor(Application application) {
+    protected boolean supportsViewFor(Application application) {
         return true;
     }
 
-    public Set<? extends DataSourceView> getViews(final Application application) {
-        synchronized(viewsCache) {
-            ApplicationOverviewView view = viewsCache.get(application);
-        if (view == null) {
-                view = new ApplicationOverviewView(application, ApplicationOverviewModel.create(application)) {
-                    DataViewComponent createViewComponent() {
-                        DataViewComponent viewComponent = super.createViewComponent();
-                        ApplicationOverviewPluggableView pluggableView = (ApplicationOverviewPluggableView)ApplicationViewsSupport.sharedInstance().getOverviewView();
-                        pluggableView.makeCustomizations(viewComponent, application);
-                        return viewComponent;
-                    }
-                public void removed() {
-                    super.removed();
-                    viewsCache.remove(application);
-                }
-            };
-            viewsCache.put(application, view);
-        }
-        return Collections.singleton(view);
+    protected DataSourceView createView(Application application) {
+        return new ApplicationOverviewView(application, ApplicationOverviewModel.create(application));
     }
+    
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
     }
 
-    public boolean supportsSaveViewsFor(Application dataSource) {
+    protected boolean supportsSaveViewFor(Application application) {
         return true;
     }
     
-    public void saveViews(Application dataSource, Snapshot snapshot) {
-        synchronized(viewsCache) {
-            ApplicationOverviewView view = viewsCache.get(dataSource);
-            if (view != null) view.getModel().save(snapshot);
-            else ApplicationOverviewModel.create(dataSource).save(snapshot);
-        }
-    }
-    
-
-    public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, Application.class);
+    protected void saveView(Application application, Snapshot snapshot) {
+        ApplicationOverviewView view = (ApplicationOverviewView)getCachedView(application);
+        if (view != null) view.getModel().save(snapshot);
+        else ApplicationOverviewModel.create(application).save(snapshot);
     }
 
 }

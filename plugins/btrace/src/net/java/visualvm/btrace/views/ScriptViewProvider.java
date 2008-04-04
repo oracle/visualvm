@@ -25,30 +25,27 @@
 
 package net.java.visualvm.btrace.views;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import net.java.visualvm.btrace.datasource.ScriptDataSource;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ScriptViewProvider implements DataSourceViewsProvider<ScriptDataSource> {
+public class ScriptViewProvider extends DataSourceViewProvider<ScriptDataSource> {
     private final static ScriptViewProvider INSTANCE = new ScriptViewProvider();
     
     private final Map<ScriptDataSource, ScriptView> viewMap = new  HashMap<ScriptDataSource, ScriptView>();
     
-    public Set<? extends DataSourceView> getViews(ScriptDataSource dataSource) {
-        return Collections.singleton(getView(dataSource));
+    protected DataSourceView createView(ScriptDataSource dataSource) {
+        return view(dataSource);
     }
     
-    private DataSourceView getView(ScriptDataSource dataSource) {
+    private DataSourceView view(ScriptDataSource dataSource) {
         synchronized(viewMap) {
             if (viewMap.containsKey(dataSource)) {
                 return viewMap.get(dataSource);
@@ -59,7 +56,7 @@ public class ScriptViewProvider implements DataSourceViewsProvider<ScriptDataSou
         }
     }
 
-    public boolean supportsViewsFor(ScriptDataSource dataSource) {
+    protected boolean supportsViewFor(ScriptDataSource dataSource) {
         return true;
     }
     
@@ -70,14 +67,6 @@ public class ScriptViewProvider implements DataSourceViewsProvider<ScriptDataSou
     public static void shutdown() {
         DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
         INSTANCE.viewMap.clear();
-    }
-
-    public void saveViews(ScriptDataSource script, Snapshot snapshot) {
-        // TODO implement later
-    }
-
-    public boolean supportsSaveViewsFor(ScriptDataSource script) {
-        return false;
     }
     
 }

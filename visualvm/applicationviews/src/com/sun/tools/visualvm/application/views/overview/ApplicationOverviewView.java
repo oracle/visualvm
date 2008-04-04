@@ -42,7 +42,6 @@ class ApplicationOverviewView extends DataSourceView {
 
     private ApplicationOverviewModel model;
     
-    private DataViewComponent view;
     private OverviewViewSupport.SnapshotsViewSupport snapshotsView;
     
 
@@ -56,11 +55,6 @@ class ApplicationOverviewView extends DataSourceView {
         model.initialize();
     }
     
-    public DataViewComponent getView() {
-        if (view == null) view = createViewComponent();
-        return view;
-    }
-    
     protected void removed() {
         snapshotsView.removed();
     }
@@ -71,7 +65,7 @@ class ApplicationOverviewView extends DataSourceView {
     }
     
     
-    DataViewComponent createViewComponent() {
+    protected DataViewComponent createComponent() {
         DataViewComponent dvc = new DataViewComponent(
                 new OverviewViewSupport.MasterViewSupport(model).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
@@ -89,4 +83,4 @@ class ApplicationOverviewView extends DataSourceView {
         return dvc;
     }
     
-        }
+}

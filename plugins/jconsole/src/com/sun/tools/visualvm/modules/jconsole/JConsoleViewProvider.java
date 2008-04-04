@@ -26,48 +26,23 @@
 package com.sun.tools.visualvm.modules.jconsole;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-public class JConsoleViewProvider implements DataSourceViewsProvider<Application> {
+public class JConsoleViewProvider extends DataSourceViewProvider<Application> {
 
-    private final Map<Application, DataSourceView> viewsCache = new HashMap();
-
-    public boolean supportsViewsFor(Application application) {
+    protected boolean supportsViewFor(Application application) {
         return true;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
-        DataSourceView view = viewsCache.get(application);
-        if (view == null) {
-            view = new JConsoleView(application) {
-                @Override
-                public void removed() {
-                    super.removed();
-                    viewsCache.remove(application);
-                }
-            };
-            viewsCache.put(application, view);
-        }
-        return Collections.singleton(view);
-    }
-
-    public boolean supportsSaveViewsFor(Application application) {
-        return false;
-    }
-
-    public void saveViews(Application application, Snapshot snapshot) {
+    protected DataSourceView createView(Application application) {
+        return new JConsoleView(application);
     }
 
     public void initialize() {

@@ -132,7 +132,8 @@ class ApplicationSnapshotProvider {
         DataSourceViewsManager.sharedInstance().saveViewsFor(application, snapshot);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         
-        if (interactive) DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
+        if (interactive && DataSourceWindowManager.sharedInstance().canOpenDataSource(snapshot))
+            DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
     }
     
     private static String getDisplayNameSuffix(Application application) {

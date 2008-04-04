@@ -26,55 +26,21 @@
 package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.ApplicationSnapshot;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationSnapshotOverviewViewProvider implements DataSourceViewsProvider<ApplicationSnapshot> {
+public class ApplicationSnapshotOverviewViewProvider extends DataSourceViewProvider<ApplicationSnapshot> {
     
-    private final Map<ApplicationSnapshot, ApplicationOverviewView> viewsCache = new HashMap();
-    
-
-    public boolean supportsViewsFor(ApplicationSnapshot snapshot) {
+    protected boolean supportsViewFor(ApplicationSnapshot snapshot) {
         return snapshot.getStorage().getCustomProperty(ApplicationOverviewModel.SNAPSHOT_VERSION) != null;
     }
 
-    public Set<? extends DataSourceView> getViews(final ApplicationSnapshot snapshot) {
-        synchronized(viewsCache) {
-            ApplicationOverviewView view = viewsCache.get(snapshot);
-            if (view == null) {
-                view = new ApplicationOverviewView(snapshot, ApplicationOverviewModel.create(snapshot)) {
-                    public void removed() {
-                        super.removed();
-                        viewsCache.remove(snapshot);
-                    }
-                };
-                viewsCache.put(snapshot, view);
-            }
-            return Collections.singleton(view);
-        }
-    }
-    
-    public boolean supportsSaveViewsFor(ApplicationSnapshot snapshot) {
-        return false;
-    }
-    
-    public void saveViews(ApplicationSnapshot appSnapshot, Snapshot snapshot) {
-        throw new UnsupportedOperationException("Cannot save snapshot views");
-    }
-    
-
-    public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, ApplicationSnapshot.class);
+    protected DataSourceView createView(ApplicationSnapshot snapshot) {
+        return new ApplicationOverviewView(snapshot, ApplicationOverviewModel.create(snapshot));
     }
 
 }

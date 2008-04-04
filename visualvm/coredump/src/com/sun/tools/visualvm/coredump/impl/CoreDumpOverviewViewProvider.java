@@ -23,33 +23,29 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.coredump.CoreDump;
+import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import java.util.Set;
 
 /**
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class ApplicationThreadsPluggableView extends PluggableViewSupport<Application> {
-
-    public <X extends Application> boolean allowsNewArea(X dataSource, int location) {
-        switch (location) {
-            case DataViewComponent.TOP_LEFT:
-                return false;
-            default:
-                return true; // TODO: should return true only if the area hasn't been configured yet (false after first plugin configured it)
-
-        }
-    }
-
-    public <X extends Application> boolean allowsNewView(X dataSource, int location) {
+public class CoreDumpOverviewViewProvider extends PluggableDataSourceViewProvider<CoreDump>{
+    
+    protected boolean supportsViewFor(CoreDump coreDump) {
         return true;
     }
 
-    <X extends Application> void makeCustomizations(DataViewComponent view, X dataSource) {
-        super.customizeView(view, dataSource);
+    protected DataSourceView createView(CoreDump coreDump) {
+        return new CoreDumpOverviewView(coreDump);
     }
+    
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
+    }
+
 }

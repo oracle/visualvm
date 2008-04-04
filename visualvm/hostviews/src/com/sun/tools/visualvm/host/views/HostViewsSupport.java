@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.host.views;
 
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.overview.HostOverviewPluggableView;
-import com.sun.tools.visualvm.host.overview.HostOverviewViewProvider;
+import com.sun.tools.visualvm.host.views.overview.HostOverviewViewProvider;
 
 /**
  *
@@ -38,7 +38,7 @@ public final class HostViewsSupport {
     
     private static HostViewsSupport sharedInstance;
     
-    private PluggableViewSupport<Host> overviewPluggableView = new HostOverviewPluggableView();
+    private HostOverviewViewProvider viewProvider = new HostOverviewViewProvider();
     
     
     public static synchronized HostViewsSupport sharedInstance() {
@@ -46,14 +46,13 @@ public final class HostViewsSupport {
         return sharedInstance;
     }
     
-    
-    public PluggableViewSupport<Host> getOverviewView() {
-        return overviewPluggableView;
+    public PluggableDataSourceViewProvider<Host> getOverviewView() {
+        return viewProvider;
     }
     
     
     private HostViewsSupport() {
-        new HostOverviewViewProvider().initialize();
+        DataSourceViewsManager.sharedInstance().addViewsProvider(viewProvider, Host.class);
     }
     
 }

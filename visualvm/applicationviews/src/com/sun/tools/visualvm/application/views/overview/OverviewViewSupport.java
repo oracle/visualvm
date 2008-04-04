@@ -135,7 +135,7 @@ class OverviewViewSupport {
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Saved data", null, this, null);
+            return new DataViewComponent.DetailsView("Saved data", null, 10, this, null);
         }
         
         private void initComponents() {
@@ -181,7 +181,7 @@ class OverviewViewSupport {
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("JVM arguments", null, this, null);
+            return new DataViewComponent.DetailsView("JVM arguments", null, 10, this, null);
         }
         
         private void initComponents(String jvmargs) {
@@ -214,7 +214,7 @@ class OverviewViewSupport {
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("System properties", null, this, null);
+            return new DataViewComponent.DetailsView("System properties", null, 20, this, null);
         }
         
         private void initComponents(String properties) {

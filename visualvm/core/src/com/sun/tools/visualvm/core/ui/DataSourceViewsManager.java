@@ -46,7 +46,7 @@ public final class DataSourceViewsManager {
     private static DataSourceViewsManager sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
-    private final Map<DataSourceViewsProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
     
     
     /**
@@ -66,7 +66,7 @@ public final class DataSourceViewsManager {
      * @param provider DataSourceViewProvider to be added,
      * @param scope scope of DataSource types for which the provider provides views.
      */
-    public void addViewsProvider(DataSourceViewsProvider provider, Class<? extends DataSource> scope) {
+    public void addViewsProvider(DataSourceViewProvider provider, Class<? extends DataSource> scope) {
         providers.put(provider, scope);
     }
     
@@ -75,48 +75,48 @@ public final class DataSourceViewsManager {
      * 
      * @param provider DataSourceViewProvider to be removed.
      */
-    public void removeViewsProvider(DataSourceViewsProvider provider) {
+    public void removeViewsProvider(DataSourceViewProvider provider) {
         providers.remove(provider);
     }
     
     public boolean canSaveViewsFor(DataSource dataSource) {
-        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
-        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewsFor(dataSource) && compatibleProvider.supportsSaveViewsFor(dataSource))
+        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+            if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource))
                 return true;
         return false;
     }
     
     public void saveViewsFor(DataSource dataSource, Snapshot snapshot) {
-        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
-        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewsFor(dataSource) && compatibleProvider.supportsSaveViewsFor(dataSource))
-                compatibleProvider.saveViews(dataSource, snapshot);
+        Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+            if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource))
+                compatibleProvider.saveView(dataSource, snapshot);
     }
     
     boolean hasViewsFor(DataSource dataSource) {
-        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
-        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewsFor(dataSource)) return true;
+        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+            if (compatibleProvider.supportsViewFor(dataSource)) return true;
         return false;
     }
     
     List<? extends DataSourceView> getViews(DataSource dataSource) {
         List<DataSourceView> views = new ArrayList();
-        Set<DataSourceViewsProvider> compatibleProviders = getCompatibleProviders(dataSource);
-        for (DataSourceViewsProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewsFor(dataSource))
-                views.addAll(compatibleProvider.getViews(dataSource));
+        Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
+        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+            if (compatibleProvider.supportsViewFor(dataSource))
+                views.add(compatibleProvider.getView(dataSource));
         Collections.sort(views, Positionable.COMPARATOR);
         return views;
     }
     
-    private Set<DataSourceViewsProvider> getCompatibleProviders(DataSource dataSource) {
-        Set<DataSourceViewsProvider> compatibleProviders = new HashSet();
-        Set<DataSourceViewsProvider> providersSet = providers.keySet();
-        for (DataSourceViewsProvider provider : providersSet)
+    private Set<DataSourceViewProvider> getCompatibleProviders(DataSource dataSource) {
+        Set<DataSourceViewProvider> compatibleProviders = new HashSet();
+        Set<DataSourceViewProvider> providersSet = providers.keySet();
+        for (DataSourceViewProvider provider : providersSet)
             if (providers.get(provider).isInstance(dataSource))
                 compatibleProviders.add(provider);
         return compatibleProviders;

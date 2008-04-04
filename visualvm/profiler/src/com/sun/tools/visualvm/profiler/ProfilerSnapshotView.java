@@ -43,7 +43,6 @@ import org.netbeans.modules.profiler.SnapshotResultsWindow;
  */
 class ProfilerSnapshotView extends DataSourceView {
     
-    private DataViewComponent view;
     private LoadedSnapshot loadedSnapshot;
     
 
@@ -57,17 +56,11 @@ class ProfilerSnapshotView extends DataSourceView {
     }
     
         
-    public DataViewComponent getView() {
-        if (view == null) view = createViewComponent();
-        return view;
-    }
-    
     protected void removed() {
         loadedSnapshot = null;
     }
     
-    
-    private DataViewComponent createViewComponent() {
+    protected DataViewComponent createComponent() {
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport().getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));

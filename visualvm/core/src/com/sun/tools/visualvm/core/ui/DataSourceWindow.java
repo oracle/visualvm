@@ -122,7 +122,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         }
         
         RequestProcessor.getDefault().post(new Runnable() {
-            public void run() { view.removed(); }
+            public void run() { view.viewRemoved(); }
         });
         
         DataSourceWindowManager.sharedInstance().unregisterClosedView(view);

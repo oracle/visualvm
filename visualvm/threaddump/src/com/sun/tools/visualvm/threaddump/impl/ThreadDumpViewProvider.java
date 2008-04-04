@@ -25,49 +25,28 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDump>{
+public class ThreadDumpViewProvider extends PluggableDataSourceViewProvider<ThreadDump>{
     
-    private final Map<ThreadDump, DataSourceView> viewsCache = new HashMap();
-    
-
-    public boolean supportsViewsFor(ThreadDump threadDump) {
+    protected boolean supportsViewFor(ThreadDump threadDump) {
         return true;
     }
     
-    public synchronized Set<? extends DataSourceView> getViews(final ThreadDump threadDump) {
-        DataSourceView view = viewsCache.get(threadDump);
-        if (view == null) {
-            view = new ThreadDumpView(threadDump) {
-                protected void removed() {
-                    super.removed();
-                    viewsCache.remove(threadDump);
-                }
-            };
-            viewsCache.put(threadDump, view);
-        }
-        return Collections.singleton(view);
-    }
-
-    public boolean supportsSaveViewsFor(ThreadDump dataSource) {
-        return false;
+    protected DataSourceView createView(ThreadDump threadDump) {
+        return new ThreadDumpView(threadDump);
     }
     
-    public void saveViews(ThreadDump dataSource, Snapshot snapshot) {
-        
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
     }
     
 

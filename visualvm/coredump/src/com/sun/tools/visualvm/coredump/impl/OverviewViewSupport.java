@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.host.overview;
+package com.sun.tools.visualvm.coredump.impl;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
@@ -31,7 +31,6 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
@@ -64,7 +63,7 @@ public final class OverviewViewSupport {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Saved data", null, this, null);
+            return new DataViewComponent.DetailsView("Saved data", null, 10, this, null);
         }
         
         private void initComponents(final DataSource ds) {
@@ -105,7 +104,7 @@ public final class OverviewViewSupport {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("JVM arguments", null, this, null);
+            return new DataViewComponent.DetailsView("JVM arguments", null, 10, this, null);
         }
         
         private void initComponents(String jvmargs) {
@@ -162,7 +161,7 @@ public final class OverviewViewSupport {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("System properties", null, this, null);
+            return new DataViewComponent.DetailsView("System properties", null, 20, this, null);
         }
         
         private void initComponents(Properties properties) {

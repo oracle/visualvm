@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.host.overview;
+package com.sun.tools.visualvm.host.views.overview;
 
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import org.netbeans.lib.profiler.ui.graphs.GraphPanel;

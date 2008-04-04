@@ -26,48 +26,27 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ApplicationProfilerViewProvider implements DataSourceViewsProvider<Application>{
+class ApplicationProfilerViewProvider extends DataSourceViewProvider<Application>{
     
-    private final Map<Application, DataSourceView> viewsCache = new HashMap();
-    
-
-    public boolean supportsViewsFor(Application application) {
+    protected boolean supportsViewFor(Application application) {
         return ProfilerSupport.getInstance().supportsProfiling(application);
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(final Application application) {
-        DataSourceView view = viewsCache.get(application);
-        if (view == null) {
-            view = new ApplicationProfilerView(application) {
-                public void removed() {
-                    super.removed();
-                    viewsCache.remove(application);
-                }
-            };
-            viewsCache.put(application, view);
-        }
-        return Collections.singleton(view);
-    }
-
-    public boolean supportsSaveViewsFor(Application dataSource) {
-        return false;
+    protected DataSourceView createView(Application application) {
+        return new ApplicationProfilerView(application);
     }
     
-    public void saveViews(Application dataSource, Snapshot snapshot) {
-        
+    
+    DataSourceView view(Application application) {
+        return super.getView(application);
     }
     
 

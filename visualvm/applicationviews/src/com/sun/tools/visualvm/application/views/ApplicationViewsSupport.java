@@ -25,15 +25,14 @@
 
 package com.sun.tools.visualvm.application.views;
 
-import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsPluggableView;
-import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewPluggableView;
-import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorPluggableView;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationSnapshotOverviewViewProvider;
 import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsViewProvider;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 
 /**
  *
@@ -43,9 +42,10 @@ public final class ApplicationViewsSupport {
     
     private static ApplicationViewsSupport sharedInstance;
     
-    private PluggableViewSupport<Application> overviewPluggableView = new ApplicationOverviewPluggableView();
-    private PluggableViewSupport<Application> monitorPluggableView = new ApplicationMonitorPluggableView();
-    private PluggableViewSupport<Application> threadsPluggableView = new ApplicationThreadsPluggableView();
+    private ApplicationSnapshotOverviewViewProvider applicationSnapshotOverviewView = new ApplicationSnapshotOverviewViewProvider();
+    private ApplicationOverviewViewProvider overviewPluggableView = new ApplicationOverviewViewProvider();
+    private ApplicationMonitorViewProvider monitorPluggableView = new ApplicationMonitorViewProvider();
+    private ApplicationThreadsViewProvider threadsPluggableView = new ApplicationThreadsViewProvider();
     
     
     public static synchronized ApplicationViewsSupport sharedInstance() {
@@ -54,24 +54,24 @@ public final class ApplicationViewsSupport {
     }
     
     
-    public PluggableViewSupport<Application> getOverviewView() {
+    public PluggableDataSourceViewProvider<Application> getOverviewView() {
         return overviewPluggableView;
     }
     
-    public PluggableViewSupport getMonitorView() {
+    public PluggableDataSourceViewProvider getMonitorView() {
         return monitorPluggableView;
     }
     
-    public PluggableViewSupport getThreadsView() {
+    public PluggableDataSourceViewProvider getThreadsView() {
         return threadsPluggableView;
     }
     
     
     private ApplicationViewsSupport() {
-        new ApplicationOverviewViewProvider().initialize();
-        new ApplicationSnapshotOverviewViewProvider().initialize();
-        new ApplicationMonitorViewProvider().initialize();
-        new ApplicationThreadsViewProvider().initialize();
+        DataSourceViewsManager.sharedInstance().addViewsProvider(overviewPluggableView, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(applicationSnapshotOverviewView, ApplicationSnapshot.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(monitorPluggableView, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(threadsPluggableView, Application.class);
     }
     
 }

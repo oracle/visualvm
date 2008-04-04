@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -112,21 +113,22 @@ public final class DataViewComponent extends JPanel {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) {
             detailsPanel.setVisible(true);
-            displayArea.addTab(detailsView.getTab());
+//            displayArea.addTab(detailsView.getTab());
+            displayArea.insertTab(detailsView.getTab(), detailsView.getPreferredPosition());
             revalidate();
             repaint();
         }
     }
         
-    public void addDetailsView(DetailsView detailsView, int location, int preferredPosition) {
-        DisplayArea displayArea = getDisplayArea(location);
-        if (displayArea != null) {
-            detailsPanel.setVisible(true);
-            displayArea.insertTab(detailsView.getTab(), preferredPosition);
-            revalidate();
-            repaint();
-        }
-    }
+//    public void addDetailsView(DetailsView detailsView, int location, int preferredPosition) {
+//        DisplayArea displayArea = getDisplayArea(location);
+//        if (displayArea != null) {
+//            detailsPanel.setVisible(true);
+//            displayArea.insertTab(detailsView.getTab(), preferredPosition);
+//            revalidate();
+//            repaint();
+//        }
+//    }
     
     // Removes a tab from details area
     public void removeDetailsView(DetailsView detailsView) {
@@ -331,15 +333,19 @@ public final class DataViewComponent extends JPanel {
         
     }
     
-    public static class DetailsView {
+    public static class DetailsView implements Positionable {
         
+        private int preferredPosition;
         private DisplayArea.Tab tab;
         
-        public DetailsView(String name, String description, JComponent view, JComponent[] options) {
+        public DetailsView(String name, String description, int preferredPosition, JComponent view, JComponent[] options) {
+            this.preferredPosition = preferredPosition;
             tab = new DisplayArea.Tab(name, description, view, options);
         }
         
         private DisplayArea.Tab getTab() { return tab; }
+
+        public final int getPreferredPosition() { return preferredPosition; }
         
     }
     

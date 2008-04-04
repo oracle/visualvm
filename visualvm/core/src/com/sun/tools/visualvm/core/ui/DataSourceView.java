@@ -42,6 +42,8 @@ public abstract class DataSourceView implements Positionable {
     private Image icon;
     private int preferredPosition;
     private boolean isClosable;
+    private DataViewComponent component;
+    private DataSourceViewProvider controller;
 
 
     /**
@@ -102,7 +104,7 @@ public abstract class DataSourceView implements Positionable {
      * 
      * @return DataViewComponent implementing the view.
      */
-    public abstract DataViewComponent getView();
+    protected abstract DataViewComponent createComponent();
 
     /**
      * Returns preferred position of the view among all other views for the DataSource.
@@ -145,6 +147,35 @@ public abstract class DataSourceView implements Positionable {
      * This notification comes from a thread other than EDT
      */
     protected void removed() {
+    }
+    
+    
+    DataViewComponent getView() {
+        if (component == null) {
+            component = createComponent();
+            if (component == null) throw new NullPointerException("Null view component from " + this);
+            controller.processCreatedComponent(this, component);
+        }
+        return component;
+    }
+    
+    void viewWillBeAdded() {
+        willBeAdded();
+        controller.viewWillBeAdded(this);
+    }
+    
+    void viewAdded() {
+        added();
+        controller.viewAdded(this);
+    }
+    
+    void viewRemoved() {
+        removed();
+        controller.viewRemoved(this);
+    }
+    
+    void setController(DataSourceViewProvider controller) {
+        this.controller = controller;
     }
 
 }

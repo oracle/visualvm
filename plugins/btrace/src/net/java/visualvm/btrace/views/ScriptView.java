@@ -50,7 +50,6 @@ import net.java.visualvm.btrace.utils.HTMLTextArea;
  */
 public class ScriptView extends DataSourceView {
 
-    private DataViewComponent dataView = null;
     private ScriptDataSource probe;
     volatile private StatsPanel statsPanel = null;
     volatile private DynamicGraph graph = null;
@@ -70,14 +69,6 @@ public class ScriptView extends DataSourceView {
         super(probe, DataSourceDescriptorFactory.getDescriptor(probe).getName(), DataSourceDescriptorFactory.getDescriptor(probe).getIcon(), POSITION_AT_THE_END, true);
         this.probe = probe;
         JvmstatModelFactory.getJvmstatFor(probe.getApplication()).addJvmstatListener(mdl);
-    }
-
-    @Override
-    public synchronized DataViewComponent getView() {
-        if (dataView == null) {
-            initialize();
-        }
-        return dataView;
     }
 
     private List<ValueProvider> getValueProviders() {
@@ -104,7 +95,7 @@ public class ScriptView extends DataSourceView {
         return new ArrayList<ValueProvider>();
     }
 
-    private void initialize() {
+    protected DataViewComponent createComponent() {
         HTMLTextArea generalDataArea = new HTMLTextArea();
         generalDataArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
         generalDataArea.setText(getProbeInfo());
@@ -112,7 +103,7 @@ public class ScriptView extends DataSourceView {
         DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("", null, generalDataArea);
         DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
 
-        dataView = new DataViewComponent(masterView, masterConfiguration);
+        DataViewComponent dataView = new DataViewComponent(masterView, masterConfiguration);
 
         statsPanel = new StatsPanel(probe.getConfig().getConnections());
         
@@ -122,10 +113,12 @@ public class ScriptView extends DataSourceView {
 
         if (!probe.getConfig().getConnections().isEmpty()) {
             dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Monitored Data", true), DataViewComponent.TOP_RIGHT);
-            dataView.addDetailsView(new DataViewComponent.DetailsView("Monitored Data", null, graph, null), DataViewComponent.TOP_RIGHT);
+            dataView.addDetailsView(new DataViewComponent.DetailsView("Monitored Data", null, 10, graph, null), DataViewComponent.TOP_RIGHT);
         }
         dataView.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Console Output", true), DataViewComponent.BOTTOM_RIGHT);
-        dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, new OutputPane(probe.getReader()), null), DataViewComponent.BOTTOM_RIGHT);
+        dataView.addDetailsView(new DataViewComponent.DetailsView("Console Output", null, 10, new OutputPane(probe.getReader()), null), DataViewComponent.BOTTOM_RIGHT);
+        
+        return dataView;
     }
 
     private String getProbeInfo() {

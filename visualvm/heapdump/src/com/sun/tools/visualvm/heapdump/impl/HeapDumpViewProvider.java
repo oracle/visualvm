@@ -25,49 +25,28 @@
 
 package com.sun.tools.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
+public class HeapDumpViewProvider extends PluggableDataSourceViewProvider<HeapDump>{
     
-    private Map<HeapDump, DataSourceView> viewsCache = new HashMap();
-    
-
-    public boolean supportsViewsFor(HeapDump heapDump) {
+    protected boolean supportsViewFor(HeapDump heapDump) {
         return true;
     }
 
-    public synchronized Set<? extends DataSourceView> getViews(final HeapDump heapDump) {
-        DataSourceView view = viewsCache.get(heapDump);
-        if (view == null) {
-            view = new HeapDumpView(heapDump) {
-                public void removed() {
-                    super.removed();
-                    viewsCache.remove(heapDump);
-                }
-            };
-            viewsCache.put(heapDump, view);
-        }
-        return Collections.singleton(view);
-    }
-
-    public boolean supportsSaveViewsFor(HeapDump dataSource) {
-        return false;
+    protected DataSourceView createView(HeapDump heapDump) {
+        return new HeapDumpView(heapDump);
     }
     
-    public void saveViews(HeapDump dataSource, Snapshot snapshot) {
-        
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
     }
     
 

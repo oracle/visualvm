@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.heapdump;
 
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpPluggableView;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpCategory;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpViewProvider;
 import com.sun.tools.visualvm.heapdump.impl.HeapDumpProvider;
@@ -35,7 +34,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableViewSupport;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.coredump.CoreDump;
 
 /**
@@ -50,7 +49,6 @@ public final class HeapDumpSupport {
     private final SnapshotCategory category = new HeapDumpCategory();
     private final HeapDumpProvider heapDumpProvider;
     private final HeapDumpViewProvider heapDumpViewProvider;
-    private final HeapDumpPluggableView heapDumpPluggableView;
 
 
     /**
@@ -104,8 +102,8 @@ public final class HeapDumpSupport {
      * 
      * @return PluggableView instance to be used to customize the heap dump view.
      */
-    public PluggableViewSupport getHeapDumpView() {
-        return heapDumpPluggableView;
+    public PluggableDataSourceViewProvider<HeapDump> getHeapDumpView() {
+        return heapDumpViewProvider;
     }
 
 
@@ -113,8 +111,6 @@ public final class HeapDumpSupport {
         DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorProvider());
         heapDumpProvider = new HeapDumpProvider();
         heapDumpProvider.initialize();
-        
-        heapDumpPluggableView = new HeapDumpPluggableView();
         
         heapDumpViewProvider = new HeapDumpViewProvider();
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);

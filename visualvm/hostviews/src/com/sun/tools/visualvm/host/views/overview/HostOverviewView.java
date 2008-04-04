@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.host.overview;
+package com.sun.tools.visualvm.host.views.overview;
 
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.host.model.HostOverviewFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
-import com.sun.tools.visualvm.host.views.HostViewsSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -61,7 +60,6 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";
 
-    private DataViewComponent view;
     private Timer timer;
     private HostOverview hostOverview;
     
@@ -74,16 +72,6 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         hostOverview = HostOverviewFactory.getSystemOverviewFor((Host)getDataSource());
     }
         
-    public DataViewComponent getView() {
-        if (view == null) {
-            view = createViewComponent();
-            HostOverviewPluggableView pluggableView = (HostOverviewPluggableView)HostViewsSupport.sharedInstance().getOverviewView();
-            pluggableView.makeCustomizations(view, (Host)getDataSource());
-        }
-        
-        return view;
-    }
-    
     protected void removed() {
         timer.stop();
     }
@@ -93,7 +81,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     }
     
     
-    private DataViewComponent createViewComponent() {
+    protected DataViewComponent createComponent() {
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport((Host)getDataSource()).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
@@ -197,7 +185,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("CPU load", null, this, null);
+            return new DataViewComponent.DetailsView("CPU load", null, 10, this, null);
         }
         
         public void refresh(HostOverview hostOverview, long time) {
@@ -282,7 +270,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Physical memory", null, this, null);
+            return new DataViewComponent.DetailsView("Physical memory", null, 10, this, null);
         }
         
         public void refresh(HostOverview hostOverview, long time) {
@@ -371,7 +359,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Swap memory", null, this, null);
+            return new DataViewComponent.DetailsView("Swap memory", null, 20, this, null);
         }
         
         public void refresh(HostOverview hostOverview, long time) {

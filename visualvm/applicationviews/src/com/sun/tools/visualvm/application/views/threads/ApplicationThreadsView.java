@@ -29,7 +29,6 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -59,7 +58,6 @@ import org.openide.util.Utilities;
 class ApplicationThreadsView extends DataSourceView implements DataRemovedListener<Application> {
 
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";
-    private DataViewComponent view;
     private Jvm jvm;
     private ThreadMXBeanDataManager threadsManager;
     private Timer timer;
@@ -75,17 +73,6 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         threadsManager = new ThreadMXBeanDataManager(JvmJmxModelFactory.getJvmJmxModelFor(application).getThreadMXBean());
     }
 
-    public DataViewComponent getView() {
-        if (view == null) {
-            Application application = (Application) getDataSource();
-            view = createViewComponent(application);
-            ApplicationThreadsPluggableView pluggableView = (ApplicationThreadsPluggableView) ApplicationViewsSupport.sharedInstance().getThreadsView();
-            pluggableView.makeCustomizations(view, application);
-        }
-
-        return view;
-    }
-
     @Override
     protected void removed() {
         timer.stop();
@@ -95,7 +82,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         timer.stop();
     }
 
-    private DataViewComponent createViewComponent(Application application) {
+    protected DataViewComponent createComponent() {
+        Application application = (Application)getDataSource();
         timer = new Timer(GlobalPreferences.sharedInstance().getThreadsPoll() * 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 threadsManager.refreshThreads();
@@ -224,7 +212,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Timeline", null, this, null);
+            return new DataViewComponent.DetailsView("Timeline", null, 10, this, null);
         }
 
         private void initComponents(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
@@ -248,7 +236,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Details", null, this, null);
+            return new DataViewComponent.DetailsView("Details", null, 20, this, null);
         }
 
         public void showDetails(int[] indexes) {
