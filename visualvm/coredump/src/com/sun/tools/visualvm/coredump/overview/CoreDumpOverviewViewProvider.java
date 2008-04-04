@@ -74,7 +74,7 @@ class CoreDumpOverviewViewProvider implements DataSourceViewsProvider<CoreDump>{
     
 
     static void register() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(new CoreDumpOverviewViewProvider(), CoreDump.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(new CoreDumpOverviewViewProvider(), CoreDump.class);
     }
 
 }

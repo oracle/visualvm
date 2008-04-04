@@ -64,11 +64,11 @@ public class ScriptViewProvider implements DataSourceViewsProvider<ScriptDataSou
     }
     
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, ScriptDataSource.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, ScriptDataSource.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 

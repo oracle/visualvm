@@ -66,7 +66,7 @@ public final class DataSourceViewsManager {
      * @param provider DataSourceViewProvider to be added,
      * @param scope scope of DataSource types for which the provider provides views.
      */
-    public void addViewProvider(DataSourceViewsProvider provider, Class<? extends DataSource> scope) {
+    public void addViewsProvider(DataSourceViewsProvider provider, Class<? extends DataSource> scope) {
         providers.put(provider, scope);
     }
     
@@ -75,7 +75,7 @@ public final class DataSourceViewsManager {
      * 
      * @param provider DataSourceViewProvider to be removed.
      */
-    public void removeViewProvider(DataSourceViewsProvider provider) {
+    public void removeViewsProvider(DataSourceViewsProvider provider) {
         providers.remove(provider);
     }
     

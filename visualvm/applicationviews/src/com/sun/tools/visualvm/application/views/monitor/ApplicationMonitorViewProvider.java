@@ -75,7 +75,7 @@ public class ApplicationMonitorViewProvider implements DataSourceViewsProvider<A
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(this, Application.class);
     }
 
 }

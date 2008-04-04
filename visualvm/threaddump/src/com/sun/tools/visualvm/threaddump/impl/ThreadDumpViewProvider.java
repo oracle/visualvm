@@ -72,7 +72,7 @@ public class ThreadDumpViewProvider implements DataSourceViewsProvider<ThreadDum
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, ThreadDump.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(this, ThreadDump.class);
     }
 
 }

@@ -72,7 +72,7 @@ public class HeapDumpViewProvider implements DataSourceViewsProvider<HeapDump>{
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, HeapDump.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(this, HeapDump.class);
     }
 
 }

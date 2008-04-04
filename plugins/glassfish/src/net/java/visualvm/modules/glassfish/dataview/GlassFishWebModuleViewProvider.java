@@ -299,11 +299,11 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     }
 
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, GlassFishWebModule.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 

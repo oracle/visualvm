@@ -74,7 +74,7 @@ public class ApplicationSnapshotOverviewViewProvider implements DataSourceViewsP
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, ApplicationSnapshot.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(this, ApplicationSnapshot.class);
     }
 
 }

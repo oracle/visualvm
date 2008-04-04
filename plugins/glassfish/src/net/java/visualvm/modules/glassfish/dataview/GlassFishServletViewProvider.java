@@ -174,11 +174,11 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
     }
 
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, GlassFishServlet.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, GlassFishServlet.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 

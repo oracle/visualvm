@@ -73,7 +73,7 @@ public class HostOverviewViewProvider implements DataSourceViewsProvider<Host>{
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, Host.class);
+        DataSourceViewsManager.sharedInstance().addViewsProvider(this, Host.class);
     }
 
 }
