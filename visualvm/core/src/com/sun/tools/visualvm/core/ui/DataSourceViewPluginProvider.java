@@ -39,10 +39,14 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
     
     private final Map<X, DataSourceViewPlugin> pluginsCache = new HashMap();
     
-
-    public abstract DataSourceViewPlugin createPlugin(X dataSource);
     
-    public void savePlugin(X dataSource, Snapshot snapshot) {};
+    protected abstract boolean supportsPluginFor(X dataSource);
+
+    protected abstract DataSourceViewPlugin createPlugin(X dataSource);
+    
+    protected boolean supportsSavePluginFor(X dataSource) { return false; };
+    
+    protected void savePlugin(X dataSource, Snapshot snapshot) {};
     
     
     protected final DataSourceViewPlugin getCachedPlugin(X dataSource) {
@@ -64,7 +68,7 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
         }
     }
     
-    DataSourceViewPlugin getPlugin(X dataSource) {
+    protected final DataSourceViewPlugin getPlugin(X dataSource) {
         synchronized(pluginsCache) {
             DataSourceViewPlugin plugin = getCachedPlugin(dataSource);
             if (plugin == null) {

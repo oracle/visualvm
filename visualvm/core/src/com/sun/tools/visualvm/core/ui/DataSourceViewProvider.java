@@ -69,6 +69,10 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
         }
     }
     
+    void viewSaveView(X dataSource, Snapshot snapshot) {
+        saveView(dataSource, snapshot);
+    }
+    
     void processCreatedComponent(DataSourceView view, DataViewComponent component) {
     }
         

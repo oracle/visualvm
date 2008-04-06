@@ -29,9 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -50,7 +48,6 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
     }
     
     private final Set<DataSourceViewPluginProvider<X>> pluginProviders = Collections.synchronizedSet(new HashSet());
-    private final Map<DataSourceView, Set<DataSourceViewPlugin>> viewPlugins = Collections.synchronizedMap(new HashMap());
     
     
     public final void registerPluginProvider(DataSourceViewPluginProvider<X> pluginProvider) {
@@ -65,52 +62,60 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
     
     
     protected void saveView(X dataSource, Snapshot snapshot) {
-        super.saveView(dataSource, snapshot);
-        Set<DataSourceViewPluginProvider<X>> providers = new HashSet(pluginProviders);
-        for (DataSourceViewPluginProvider<X> provider : providers)
-            provider.savePlugin(dataSource, snapshot);
     };
     
     
+    void viewSaveView(X dataSource, Snapshot snapshot) {
+        super.viewSaveView(dataSource, snapshot);
+        Set<DataSourceViewPluginProvider<X>> providers = getProviders(dataSource);
+        for (DataSourceViewPluginProvider<X> provider : providers)
+            if (provider.supportsSavePluginFor(dataSource))
+                provider.savePlugin(dataSource, snapshot);
+    }
+    
     void processCreatedComponent(DataSourceView view, DataViewComponent component) {
-        Set<DataSourceViewPluginProvider<X>> providers = new HashSet(pluginProviders);
-        Set<DataSourceViewPlugin> plugins = new HashSet();
+        X dataSource = (X)view.getDataSource();
+        Set<DataSourceViewPluginProvider<X>> providers = getProviders(dataSource);
         for (DataSourceViewPluginProvider<X> provider : providers) {
-            X dataSource = ((X)view.getDataSource());
             Set<Integer> pluggableLocations = getPluggableLocations(view);
             DataSourceViewPlugin plugin = provider.getPlugin(dataSource);
             for (int pluggableLocation : pluggableLocations) {
                 DataViewComponent.DetailsView pluginView = plugin.createView(pluggableLocation);
-                if (pluginView != null) {
-                    plugins.add(plugin);
-                    component.addDetailsView(pluginView, pluggableLocation);
-                }
+                if (pluginView != null) component.addDetailsView(pluginView, pluggableLocation);
             }
         }
-        if (!plugins.isEmpty()) viewPlugins.put(view, plugins);
     }
     
     void viewWillBeAdded(DataSourceView view) {
-        Set<DataSourceViewPlugin> plugins = getPlugins(view);
-        for (DataSourceViewPlugin plugin : plugins) plugin.willBeAdded();
+        X dataSource = (X)view.getDataSource();
+        Set<DataSourceViewPluginProvider<X>> providers = getProviders(dataSource);
+        for (DataSourceViewPluginProvider<X> provider : providers)
+            provider.getPlugin(dataSource).pluginWillBeAdded();
     }
     
     void viewAdded(DataSourceView view) {
-        Set<DataSourceViewPlugin> plugins = getPlugins(view);
-        for (DataSourceViewPlugin plugin : plugins) plugin.added();
+        X dataSource = (X)view.getDataSource();
+        Set<DataSourceViewPluginProvider<X>> providers = getProviders(dataSource);
+        for (DataSourceViewPluginProvider<X> provider : providers)
+            provider.getPlugin(dataSource).pluginAdded();
     }
     
     void viewRemoved(DataSourceView view) {
-        Set<DataSourceViewPlugin> plugins = getPlugins(view);
-        for (DataSourceViewPlugin plugin : plugins) plugin.removed();
-        viewPlugins.remove(view);
+        X dataSource = (X)view.getDataSource();
+        Set<DataSourceViewPluginProvider<X>> providers = getProviders(dataSource);
+        for (DataSourceViewPluginProvider<X> provider : providers)
+            provider.getPlugin(dataSource).pluginRemoved();
         super.viewRemoved(view);
     }
     
     
-    private Set<DataSourceViewPlugin> getPlugins(DataSourceView view) {
-        Set<DataSourceViewPlugin> plugins = viewPlugins.get(view);
-        return plugins != null ? new HashSet(plugins) : Collections.EMPTY_SET;
+    private Set<DataSourceViewPluginProvider<X>> getProviders(X dataSource) {
+        Set<DataSourceViewPluginProvider<X>> providers = new HashSet(pluginProviders);
+        Set<DataSourceViewPluginProvider<X>> compatibleProviders = new HashSet();
+        for (DataSourceViewPluginProvider<X> provider : providers)
+            if (provider.supportsPluginFor(dataSource))
+                compatibleProviders.add(provider);
+        return compatibleProviders;
     }
 
 }

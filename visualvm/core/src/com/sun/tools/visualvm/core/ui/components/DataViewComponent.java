@@ -105,30 +105,20 @@ public final class DataViewComponent extends JPanel {
     private void createMasterView(MasterView masterView) {
         masterPanel.setVisible(true);
         JComponent[] options = new JComponent[] { detailsTopLeftArea.getPresenter(), detailsTopRightArea.getPresenter(), detailsBottomLeftArea.getPresenter(), detailsBottomRightArea.getPresenter() };
-        masterArea.addTab(new DisplayArea.Tab(masterView.getName(), masterView.getDescription(), masterView.getView(), options));
+        masterArea.addTab(new DisplayArea.Tab(masterView.getName(), masterView.getDescription(), 0, masterView.getView(), options));
     }
     
     // Adds a tab to details area
     public void addDetailsView(DetailsView detailsView, int location) {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) {
+            if ("".equals(displayArea.getCaption())) displayArea.setCaption(detailsView.getTab().getName());
             detailsPanel.setVisible(true);
-//            displayArea.addTab(detailsView.getTab());
-            displayArea.insertTab(detailsView.getTab(), detailsView.getPreferredPosition());
+            displayArea.addTab(detailsView.getTab());
             revalidate();
             repaint();
         }
     }
-        
-//    public void addDetailsView(DetailsView detailsView, int location, int preferredPosition) {
-//        DisplayArea displayArea = getDisplayArea(location);
-//        if (displayArea != null) {
-//            detailsPanel.setVisible(true);
-//            displayArea.insertTab(detailsView.getTab(), preferredPosition);
-//            revalidate();
-//            repaint();
-//        }
-//    }
     
     // Removes a tab from details area
     public void removeDetailsView(DetailsView detailsView) {
@@ -333,19 +323,15 @@ public final class DataViewComponent extends JPanel {
         
     }
     
-    public static class DetailsView implements Positionable {
+    public static class DetailsView {
         
-        private int preferredPosition;
         private DisplayArea.Tab tab;
         
         public DetailsView(String name, String description, int preferredPosition, JComponent view, JComponent[] options) {
-            this.preferredPosition = preferredPosition;
-            tab = new DisplayArea.Tab(name, description, view, options);
+            tab = new DisplayArea.Tab(name, description, preferredPosition, view, options);
         }
         
         private DisplayArea.Tab getTab() { return tab; }
-
-        public final int getPreferredPosition() { return preferredPosition; }
         
     }
     

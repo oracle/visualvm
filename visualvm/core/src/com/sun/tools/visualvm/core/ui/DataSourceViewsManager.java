@@ -92,7 +92,7 @@ public final class DataSourceViewsManager {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource))
-                compatibleProvider.saveView(dataSource, snapshot);
+                compatibleProvider.viewSaveView(dataSource, snapshot);
     }
     
     boolean hasViewsFor(DataSource dataSource) {

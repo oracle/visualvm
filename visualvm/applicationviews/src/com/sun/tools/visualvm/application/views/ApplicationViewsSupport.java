@@ -58,6 +58,10 @@ public final class ApplicationViewsSupport {
         return overviewPluggableView;
     }
     
+    public PluggableDataSourceViewProvider<ApplicationSnapshot> getSnapshotOverviewView() {
+        return applicationSnapshotOverviewView;
+    }
+    
     public PluggableDataSourceViewProvider getMonitorView() {
         return monitorPluggableView;
     }

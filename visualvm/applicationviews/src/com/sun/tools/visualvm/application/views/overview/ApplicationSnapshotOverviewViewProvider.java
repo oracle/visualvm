@@ -27,13 +27,14 @@ package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import java.util.Set;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationSnapshotOverviewViewProvider extends DataSourceViewProvider<ApplicationSnapshot> {
+public class ApplicationSnapshotOverviewViewProvider extends PluggableDataSourceViewProvider<ApplicationSnapshot> {
     
     protected boolean supportsViewFor(ApplicationSnapshot snapshot) {
         return snapshot.getStorage().getCustomProperty(ApplicationOverviewModel.SNAPSHOT_VERSION) != null;
@@ -41,6 +42,10 @@ public class ApplicationSnapshotOverviewViewProvider extends DataSourceViewProvi
 
     protected DataSourceView createView(ApplicationSnapshot snapshot) {
         return new ApplicationOverviewView(snapshot, ApplicationOverviewModel.create(snapshot));
+    }
+    
+    public Set<Integer> getPluggableLocations(DataSourceView view) {
+        return ALL_LOCATIONS;
     }
 
 }

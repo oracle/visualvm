@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.core.ui.components;
 
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -35,6 +36,7 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,32 +102,7 @@ class DisplayArea extends JComponent {
         if (tabButton != null) {
             optionsContainer.addOptions(tab);
             updateTabbed();
-            if (tabsContainer.getTabsCount() == 1) setSelectedTab(tab);
-            final Tab tabF = tab;
-            tabButton.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) { if (SwingUtilities.isLeftMouseButton(e)) setSelectedTab(tabF); }
-            });
-            tabButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { setSelectedTab(tabF); }
-            });
-        }
-        
-        if (tabsContainer.getTabsCount() > 0) setVisible(true);
-        updatePresenter();
-    }
-    
-    public void insertTab(Tab tab, int position) {
-        // adding the tab to the last available position
-        if (position >= tabsContainer.getTabsCount()) {
-            addTab(tab);
-            return;
-        } 
-        
-        DisplayAreaSupport.TabButton tabButton = tabsContainer.insertTab(tab, position);
-        if (tabButton != null) {
-            optionsContainer.addOptions(tab);
-            updateTabbed();
-            if (position == 0) setSelectedTab(tab);
+            if (tabsContainer.indexOfTab(tab) == 0) setSelectedTab(tab);
             final Tab tabF = tab;
             tabButton.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) { if (SwingUtilities.isLeftMouseButton(e)) setSelectedTab(tabF); }
@@ -269,18 +246,19 @@ class DisplayArea extends JComponent {
     }
     
     
-    public static class Tab {
+    public static class Tab implements Positionable {
         
         private String name;
         private String description;
+        private int preferredPosition;
         private JComponent view;
         private JComponent[] options;
         
-        public Tab(String name) { this(name, null, null, null); }
-        public Tab(String name, JComponent view) { this(name, null, view, null); }
-        public Tab(String name, String description, JComponent view, JComponent[] options) {
+        public Tab(String name, JComponent view) { this(name, null, POSITION_AT_THE_END, view, null); }
+        public Tab(String name, String description, int preferredPosition, JComponent view, JComponent[] options) {
             setName(name);
             setDescription(description);
+            setPreferredPosition(preferredPosition);
             setView(view);
             setOptions(options);
         }
@@ -290,6 +268,9 @@ class DisplayArea extends JComponent {
         
         public void setDescription(String description) { this.description = description; }
         public String getDescription() { return description; }
+        
+        public void setPreferredPosition(int preferredPosition) { this.preferredPosition = preferredPosition; }
+        public int getPreferredPosition() { return preferredPosition; }
         
         public void setView(JComponent view) { this.view = view; }
         public JComponent getView() { return view; }
@@ -317,35 +298,24 @@ class DisplayArea extends JComponent {
             
             if (getLayout() == null) setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             tabs.add(tab);
+            Collections.sort(tabs, Positionable.COMPARATOR);
             
             DisplayAreaSupport.TabButton tabButton = new DisplayAreaSupport.TabButton(tab.getName(), tab.getDescription());
             DisplayAreaSupport.TabButtonContainer tabButtonContainer = new DisplayAreaSupport.TabButtonContainer(tabButton);
             tabButtonContainer.setAlignmentY(JComponent.TOP_ALIGNMENT);
-            add(tabButtonContainer);
+            add(tabButtonContainer, tabs.indexOf(tab));
             
             updateTabButtons();
             
             return tabButton;
         }
         
-        private DisplayAreaSupport.TabButton insertTab(Tab tab, int position) {
-            if (tabs.contains(tab)) return null;
-            
-            if (getLayout() == null) setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            tabs.add(position, tab);
-            
-            DisplayAreaSupport.TabButton tabButton = new DisplayAreaSupport.TabButton(tab.getName(), tab.getDescription());
-            DisplayAreaSupport.TabButtonContainer tabButtonContainer = new DisplayAreaSupport.TabButtonContainer(tabButton);
-            tabButtonContainer.setAlignmentY(JComponent.TOP_ALIGNMENT);
-            add(tabButtonContainer, position);
-            
-            updateTabButtons();
-            
-            return tabButton;
+        private int indexOfTab(Tab tab) {
+            return tabs.indexOf(tab);
         }
 
         private boolean removeTab(Tab tab) {
-            int index = tabs.indexOf(tab);
+            int index = indexOfTab(tab);
             if (index != -1) {
                 tabs.remove(index);
                 remove(index);
@@ -492,23 +462,12 @@ class DisplayArea extends JComponent {
     
     private static class ViewArea extends JPanel {
         
-//        private JScrollPane viewScroll;
-        
         private ViewArea() {
-//            viewScroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//            viewScroll.setBorder(BorderFactory.createEmptyBorder());
-//            viewScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-//            viewScroll.setOpaque(false);
-//            viewScroll.getViewport().setOpaque(false);
-            
             setLayout(new BorderLayout());
             setOpaque(false);
-            
-//            add(viewScroll, BorderLayout.CENTER);
         }
         
         private void setSelectedView(JComponent component) {
-//            viewScroll.setViewportView(component);
             synchronized (getTreeLock()) {
                 removeAll();
                 if (component != null) add(component, BorderLayout.CENTER);
