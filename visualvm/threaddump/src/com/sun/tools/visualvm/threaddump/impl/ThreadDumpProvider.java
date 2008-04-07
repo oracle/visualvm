@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.tools.sa.SaModel;
@@ -56,18 +56,20 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapshot> {
+public class ThreadDumpProvider implements DataChangeListener<Snapshot> {
     
     
-    public void dataChanged(DataChangeEvent<ApplicationSnapshot> event) {
-        Set<ApplicationSnapshot> snapshots = event.getAdded();
-        for (ApplicationSnapshot snapshot : snapshots) processNewSnapshot(snapshot);
+    public void dataChanged(DataChangeEvent<Snapshot> event) {
+        Set<Snapshot> snapshots = event.getAdded();
+        for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
     }
     
     
-    private void processNewSnapshot(ApplicationSnapshot snapshot) {
+    private void processNewSnapshot(Snapshot snapshot) {
+        if (snapshot instanceof ThreadDumpImpl) return;
         Set<ThreadDumpImpl> threadDumps = new HashSet();
         File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
         for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
         snapshot.getRepository().addDataSources(threadDumps);
     }
@@ -148,7 +150,7 @@ public class ThreadDumpProvider implements DataChangeListener<ApplicationSnapsho
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, Snapshot.class);
     }
     
 }

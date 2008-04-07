@@ -28,8 +28,8 @@ package com.sun.tools.visualvm.profiler;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.HashSet;
@@ -39,34 +39,31 @@ import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerSnapshotsProvider implements DataChangeListener<ApplicationSnapshot> {
+public class ProfilerSnapshotsProvider implements DataChangeListener<Snapshot> {
     
     
-    public void dataChanged(DataChangeEvent<ApplicationSnapshot> event) {
-        Set<ApplicationSnapshot> snapshots = event.getAdded();
-        for (ApplicationSnapshot snapshot : snapshots) processNewSnapshot(snapshot);
+    public void dataChanged(DataChangeEvent<Snapshot> event) {
+        Set<Snapshot> snapshots = event.getAdded();
+        for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
     }
     
     
-    private void processNewSnapshot(final ApplicationSnapshot snapshot) {
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                Set<ProfilerSnapshot> snapshots = new HashSet();
-                File[] files = snapshot.getFile().listFiles(ProfilerSupport.getInstance().getCategory().getFilenameFilter());
-                FileObject[] fileObjects = new FileObject[files.length];
-                for (int i = 0; i < files.length; i++) fileObjects[i] = FileUtil.toFileObject(FileUtil.normalizeFile(files[i]));
-                LoadedSnapshot[] loadedSnapshots = ResultsManager.getDefault().loadSnapshots(fileObjects);
-                for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-                    if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
-                snapshot.getRepository().addDataSources(snapshots);
-            }
-        });
+    private void processNewSnapshot(Snapshot snapshot) {
+        if (snapshot instanceof ProfilerSnapshot) return;
+        Set<ProfilerSnapshot> snapshots = new HashSet();
+        File[] files = snapshot.getFile().listFiles(ProfilerSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
+        FileObject[] fileObjects = new FileObject[files.length];
+        for (int i = 0; i < files.length; i++) fileObjects[i] = FileUtil.toFileObject(FileUtil.normalizeFile(files[i]));
+        LoadedSnapshot[] loadedSnapshots = ResultsManager.getDefault().loadSnapshots(fileObjects);
+        for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
+            if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
+        snapshot.getRepository().addDataSources(snapshots);
     }
     
     
@@ -80,7 +77,7 @@ public class ProfilerSnapshotsProvider implements DataChangeListener<Application
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, Snapshot.class);
     }
     
 }

@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.heapdump.impl;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -34,6 +33,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.tools.sa.SaModel;
@@ -54,18 +54,20 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot> {
+public class HeapDumpProvider implements DataChangeListener<Snapshot> {
     
     
-    public void dataChanged(DataChangeEvent<ApplicationSnapshot> event) {
-        Set<ApplicationSnapshot> snapshots = event.getAdded();
-        for (ApplicationSnapshot snapshot : snapshots) processNewSnapshot(snapshot);
+    public void dataChanged(DataChangeEvent<Snapshot> event) {
+        Set<Snapshot> snapshots = event.getAdded();
+        for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
     }
     
     
-    private void processNewSnapshot(ApplicationSnapshot snapshot) {
+    private void processNewSnapshot(Snapshot snapshot) {
+        if (snapshot instanceof HeapDumpImpl) return;
         Set<HeapDumpImpl> heapDumps = new HashSet();
         File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
         for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
         snapshot.getRepository().addDataSources(heapDumps);
     }
@@ -142,7 +144,7 @@ public class HeapDumpProvider implements DataChangeListener<ApplicationSnapshot>
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, ApplicationSnapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, Snapshot.class);
     }
     
 }
