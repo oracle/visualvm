@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="VisualVM">
+        <folder name="ExplorerPopupSelection">
+            <file name="org-netbeans-modules-consumerentrypoints-NetBeansApplicationTypeAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.consumervisualvm.api.ApplicationTypeAction.newAction"/>
+                <attr name="mainClassName" stringvalue="org.netbeans.Main"/>
+                <attr name="pluginCodeName" stringvalue="org.netbeans.modules.modulemanager"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.consumerentrypoints.resources.Bundle"/>
+                <attr name="ActionName" stringvalue="org-netbeans-modules-consumerentrypoints-NetBeansApplicationTypeAction" />
+                <attr name="position" intvalue="2304"/>
+            </file>
+        </folder>
+    </folder>
+</filesystem>
