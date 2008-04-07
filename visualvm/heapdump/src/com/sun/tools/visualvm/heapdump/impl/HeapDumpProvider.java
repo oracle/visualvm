@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.heapdump.impl;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.ApplicationSnapshot;
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;

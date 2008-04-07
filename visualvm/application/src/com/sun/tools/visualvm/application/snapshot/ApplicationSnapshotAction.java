@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.application.snapshot;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;

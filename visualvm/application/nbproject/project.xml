@@ -87,6 +87,7 @@
             <public-packages>
                 <package>com.sun.tools.visualvm.application</package>
                 <package>com.sun.tools.visualvm.application.jvm</package>
+                <package>com.sun.tools.visualvm.application.snapshot</package>
                 <package>com.sun.tools.visualvm.application.type</package>
             </public-packages>
         </data>

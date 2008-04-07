@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.application.views.overview;
 
-import com.sun.tools.visualvm.application.ApplicationSnapshot;
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;

@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.views;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.ApplicationSnapshot;
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationSnapshotOverviewViewProvider;

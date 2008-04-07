@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.jvmcap;
 
-import com.sun.tools.visualvm.application.ApplicationSnapshot;
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
 import com.sun.tools.visualvm.core.ui.DataSourceViewPluginProvider;

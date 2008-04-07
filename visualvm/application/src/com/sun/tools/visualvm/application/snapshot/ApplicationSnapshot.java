@@ -23,9 +23,8 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.application;
+package com.sun.tools.visualvm.application.snapshot;
 
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotsSupport;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
