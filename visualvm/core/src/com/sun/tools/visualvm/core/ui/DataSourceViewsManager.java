@@ -79,11 +79,11 @@ public final class DataSourceViewsManager {
         providers.remove(provider);
     }
     
-    public boolean canSaveViewsFor(DataSource dataSource) {
+    public boolean canSaveViewsFor(DataSource dataSource, Class<? extends Snapshot> snapshotClass) {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource))
+            if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource, snapshotClass))
                 return true;
         return false;
     }
@@ -91,7 +91,7 @@ public final class DataSourceViewsManager {
     public void saveViewsFor(DataSource dataSource, Snapshot snapshot) {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
-            if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource))
+            if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource, snapshot.getClass()))
                 compatibleProvider.viewSaveView(dataSource, snapshot);
     }
     

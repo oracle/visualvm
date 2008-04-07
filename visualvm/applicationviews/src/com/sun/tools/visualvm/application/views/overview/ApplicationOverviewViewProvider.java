@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.application.views.overview;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
@@ -49,8 +50,8 @@ public class ApplicationOverviewViewProvider extends PluggableDataSourceViewProv
         return ALL_LOCATIONS;
     }
 
-    protected boolean supportsSaveViewFor(Application application) {
-        return true;
+    protected boolean supportsSaveViewFor(Application application, Class<? extends Snapshot> snapshotClass) {
+        return ApplicationSnapshot.class.isAssignableFrom(snapshotClass);
     }
     
     protected void saveView(Application application, Snapshot snapshot) {

@@ -44,7 +44,7 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
 
     protected abstract DataSourceView createView(X dataSource);
     
-    protected boolean supportsSaveViewFor(X dataSource) { return false; };
+    protected boolean supportsSaveViewFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; };
     
     protected void saveView(X dataSource, Snapshot snapshot) {};
     

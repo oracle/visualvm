@@ -99,7 +99,7 @@ class ApplicationSnapshotProvider {
     
     private void createSnapshotImpl(final Application application, final boolean interactive) {
         Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
-        if (snapshots.isEmpty() && !DataSourceViewsManager.sharedInstance().canSaveViewsFor(application)) return;
+        if (snapshots.isEmpty() && !DataSourceViewsManager.sharedInstance().canSaveViewsFor(application, ApplicationSnapshot.class)) return;
         
         File snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
         if (!Utils.prepareDirectory(snapshotDirectory))

@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.jvmcap;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.ApplicationSnapshot;
 import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
@@ -45,8 +46,8 @@ class ApplicationViewPluginProvider extends DataSourceViewPluginProvider<Applica
         return true;
     }
     
-    protected boolean supportsSavePluginFor(Application application) {
-        return true;
+    protected boolean supportsSavePluginFor(Application application, Class<? extends Snapshot> snapshotClass) {
+        return ApplicationSnapshot.class.isAssignableFrom(snapshotClass);
     }
     
     protected void savePlugin(Application application, Snapshot snapshot) {

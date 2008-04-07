@@ -44,7 +44,7 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
 
     protected abstract DataSourceViewPlugin createPlugin(X dataSource);
     
-    protected boolean supportsSavePluginFor(X dataSource) { return false; };
+    protected boolean supportsSavePluginFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; };
     
     protected void savePlugin(X dataSource, Snapshot snapshot) {};
     

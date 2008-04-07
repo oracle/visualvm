@@ -69,7 +69,7 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
         super.viewSaveView(dataSource, snapshot);
         Set<DataSourceViewPluginProvider<X>> providers = getProviders(dataSource);
         for (DataSourceViewPluginProvider<X> provider : providers)
-            if (provider.supportsSavePluginFor(dataSource))
+            if (provider.supportsSavePluginFor(dataSource, snapshot.getClass()))
                 provider.savePlugin(dataSource, snapshot);
     }
     
