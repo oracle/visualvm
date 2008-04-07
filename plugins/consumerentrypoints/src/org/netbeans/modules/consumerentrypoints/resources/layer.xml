@@ -7,10 +7,5 @@
             <attr name="codeName" stringvalue="net.java.visualvm.modules.glassfish"/>
             <attr name="pluginLayer" urlvalue="nbresloc:/org/netbeans/modules/consumerentrypoints/resources/glassfish.xml"/>
         </file>
-        <file name="netbeans.instance">
-            <attr name="instanceCreate" methodvalue="org.netbeans.modules.consumervisualvm.api.PluginInfo.create"/>
-            <attr name="codeName" stringvalue="org.netbeans.modules.modulemanager"/>
-            <attr name="pluginLayer" urlvalue="nbresloc:/org/netbeans/modules/consumerentrypoints/resources/netbeans.xml"/>
-        </file>
     </folder>
 </filesystem>
