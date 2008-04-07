@@ -32,8 +32,8 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -54,7 +54,7 @@ import net.java.visualvm.modules.glassfish.ui.Chart;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishServletViewProvider implements DataSourceViewsProvider<GlassFishServlet> {
+public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFishServlet> {
     private final static GlassFishServletViewProvider INSTANCE = new GlassFishServletViewProvider();
     private final Map<GlassFishServlet, GlassfishServletView> viewMap = new  HashMap<GlassFishServlet, GlassFishServletViewProvider.GlassfishServletView>();
     
@@ -114,12 +114,12 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Time Profile", true),
                                      DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Time Profile", null, chartTimesPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Time Profile", null, 10, chartTimesPanel, null),
                                DataViewComponent.TOP_LEFT);
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Requests", true),
                                      DataViewComponent.BOTTOM_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Requests", null, chartReqsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Requests", null, 10, chartReqsPanel, null),
                                DataViewComponent.BOTTOM_LEFT);
 
             refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
@@ -137,7 +137,7 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
         @Override
-        public DataViewComponent getView() {
+        public DataViewComponent createComponent() {
             return dvc;
         }
 
@@ -158,20 +158,18 @@ public class GlassFishServletViewProvider implements DataSourceViewsProvider<Gla
     }
 
     private GlassFishServletViewProvider() {}
+
+    @Override
+    protected DataSourceView createView(GlassFishServlet servlet) {
+        return new GlassfishServletView(servlet);
+    }
+
+    @Override
+    protected boolean supportsViewFor(GlassFishServlet servlet) {
+        return true;
+    }
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public Set<?extends DataSourceView> getViews(GlassFishServlet dataSource) {
-        synchronized(viewMap) {
-            if (viewMap.containsKey(dataSource)) {
-                return Collections.singleton(viewMap.get(dataSource));
-            } else {
-                GlassfishServletView view = new GlassfishServletView(dataSource);
-                viewMap.put(dataSource, view);
-                return Collections.singleton(view);
-            }
-        }
-    }
 
     public static void initialize() {
         DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, GlassFishServlet.class);

@@ -55,7 +55,7 @@ public class Installer extends ModuleInstall {
         GlassFishServletProvider.initialize();
         GlassFishWebModuleViewProvider.initialize();
         GlassFishServletViewProvider.initialize();
-        GlassFishOverview.initialize();
+        GlassFishOverviewPluginProvider.initialize();
         GlassFishDataSourceDescriptorProvider.initialize();
         GlassFishApplicationProvider.initialize();
     }
@@ -68,7 +68,7 @@ public class Installer extends ModuleInstall {
         GlassFishServletProvider.shutdown();
         GlassFishWebModuleViewProvider.shutdown();
         GlassFishServletViewProvider.shutdown();
-        GlassFishOverview.shutdown();
+        GlassFishOverviewPluginProvider.shutdown();
         GlassFishDataSourceDescriptorProvider.shutdown();
         GlassFishApplicationProvider.shutdown();
         super.uninstalled();

@@ -38,11 +38,10 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -55,10 +54,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -75,7 +72,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLLabel;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<GlassFishWebModule> {
+public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<GlassFishWebModule> {
     private final static GlassFishWebModuleViewProvider INSTANCE = new GlassFishWebModuleViewProvider();
     private final static Logger LOGGER = Logger.getLogger(GlassFishWebModuleViewProvider.class.getName());
     
@@ -191,19 +188,19 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
             dvc = new DataViewComponent(masterView, masterConfiguration);
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Sessions", true), DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Active", null, chartActiveSessionsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Active", null, 10, chartActiveSessionsPanel, null),
                                DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Total", null, chartTotalSessionsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Total", null, 20, chartTotalSessionsPanel, null),
                                DataViewComponent.TOP_LEFT);
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("JSPs", true), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("JSPs", null, chartJspPanel, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("JSPs", null, 10, chartJspPanel, null), DataViewComponent.TOP_RIGHT);
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Runtime", true),
                                      DataViewComponent.BOTTOM_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Servlets", null, servletsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Servlets", null, 10, servletsPanel, null),
                                DataViewComponent.BOTTOM_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("WebServices", null, wsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("WebServices", null, 20, wsPanel, null),
                                DataViewComponent.BOTTOM_LEFT);
             
             refreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
@@ -216,6 +213,11 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
                     }
                 }
             }, Quantum.seconds(5));
+        }
+
+        @Override
+        protected DataViewComponent createComponent() {
+            return dvc;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -252,11 +254,6 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
             return sb.toString();
         }
         
-        @Override
-        public DataViewComponent getView() {
-            return dvc;
-        }
-
         private void refreshData(long sampleTime) {
             WebModuleVirtualServerMonitor monitor = module.getMonitor();
             WebModuleVirtualServerStats stats = monitor.getWebModuleVirtualServerStats();
@@ -285,19 +282,6 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
     private GlassFishWebModuleViewProvider() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public Set<?extends DataSourceView> getViews(GlassFishWebModule dataSource) {
-        synchronized(viewMap) {
-            if (viewMap.containsKey(dataSource)) {
-                return Collections.singleton(viewMap.get(dataSource));
-            } else {
-                GlassfishWebModuleView view = new GlassfishWebModuleView(dataSource);
-                viewMap.put(dataSource, view);
-                return Collections.singleton(view);
-            }
-        }
-    }
-
     public static void initialize() {
         DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, GlassFishWebModule.class);
     }
@@ -307,15 +291,13 @@ public class GlassFishWebModuleViewProvider implements DataSourceViewsProvider<G
         INSTANCE.viewMap.clear();
     }
 
-    public boolean supportsViewsFor(GlassFishWebModule dataSource) {
-        return true;
-    }
-    
-    public void saveViews(GlassFishWebModule module, Snapshot snapshot) {
-        // TODO implement later
+    @Override
+    protected DataSourceView createView(GlassFishWebModule webModule) {
+        return new GlassfishWebModuleView(webModule);
     }
 
-    public boolean supportsSaveViewsFor(GlassFishWebModule module) {
-        return false;
+    @Override
+    protected boolean supportsViewFor(GlassFishWebModule webModule) {
+        return true;
     }
 }

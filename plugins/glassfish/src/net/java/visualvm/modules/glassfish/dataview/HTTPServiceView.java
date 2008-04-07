@@ -39,7 +39,7 @@ class HTTPServiceView extends DataSourceView {
     }
 
     @Override
-    public DataViewComponent getView() {
+    public DataViewComponent createComponent() {
         return dvc;
     }
 
@@ -126,7 +126,7 @@ class HTTPServiceView extends DataSourceView {
         }, Quantum.seconds(1));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Connection Queue", true), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView("Connection Queue", null, cqp, null), DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("Connection Queue", null, 10, cqp, null), DataViewComponent.TOP_LEFT);
     }
 
     private void configureFileCacheVisualizer() {
@@ -196,7 +196,7 @@ class HTTPServiceView extends DataSourceView {
         }, Quantum.seconds(1));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("File Cache", true), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView("File Cache", null, fcp, null), DataViewComponent.BOTTOM_LEFT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("File Cache", null, 10, fcp, null), DataViewComponent.BOTTOM_LEFT);
     }
 
     private void configureHttpServiceVisualizer() {
@@ -272,7 +272,7 @@ class HTTPServiceView extends DataSourceView {
         }, Quantum.seconds(1));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Keep Alive", true), DataViewComponent.BOTTOM_RIGHT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView("Keep Alive", null, kap, null), DataViewComponent.BOTTOM_RIGHT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("Keep Alive", null, 10, kap, null), DataViewComponent.BOTTOM_RIGHT);
     }
 
     private void initComponents() {

@@ -30,7 +30,7 @@ class TransactionServiceView extends DataSourceView {
     }
 
     @Override
-    public DataViewComponent getView() {
+    public DataViewComponent createComponent() {
         return dvc;
     }
 
@@ -81,7 +81,7 @@ class TransactionServiceView extends DataSourceView {
                 }
             }
         }, Quantum.seconds(1));
-        dvc.addDetailsView(new DataViewComponent.DetailsView("Transactional Service", null, panel, null), DataViewComponent.BOTTOM_RIGHT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("Transactional Service", null, 10, panel, null), DataViewComponent.BOTTOM_RIGHT);
     }
 
     private void initComponents() {

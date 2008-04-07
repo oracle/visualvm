@@ -31,20 +31,16 @@ import com.sun.appserv.management.monitor.HTTPServiceMonitor;
 import com.sun.appserv.management.monitor.ServerRootMonitor;
 import com.sun.appserv.management.monitor.TransactionServiceMonitor;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import net.java.visualvm.modules.glassfish.GlassFishApplicationType;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
@@ -53,70 +49,103 @@ import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishApplicationViewProvider implements DataSourceViewsProvider<Application> {
-    
+public class GlassFishApplicationViewProvider extends DataSourceViewProvider<Application> {
+
     private final static GlassFishApplicationViewProvider INSTANCE = new GlassFishApplicationViewProvider();
     private final static Logger LOGGER = Logger.getLogger(GlassFishApplicationViewProvider.class.getName());
-    
-    private final Map<Application, HTTPServiceView> httpServiceViewMap = new  HashMap<Application, HTTPServiceView>();
-    private final Map<Application, TransactionServiceView> transServiceViewMap = new  HashMap<Application, TransactionServiceView>();
-    
+    private final Map<Application, HTTPServiceView> httpServiceViewMap = new HashMap<Application, HTTPServiceView>();
+    private final Map<Application, TransactionServiceView> transServiceViewMap = new HashMap<Application, TransactionServiceView>();
+
     private GlassFishApplicationViewProvider() {
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
     @Override
-    public Set<? extends DataSourceView> getViews(final Application application) {
-        ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(application);
-        if (!(at instanceof GlassFishApplicationType)) {
-            return Collections.EMPTY_SET;
-        }
-
-        final JmxModel model = JmxModelFactory.getJmxModelFor(application);
+    protected DataSourceView createView(Application app) {
+        final JmxModel model = JmxModelFactory.getJmxModelFor(app);
         if (model == null) {
-            return Collections.EMPTY_SET;
+            return null;
         }
 
         DomainRoot dr = AMXUtil.getDomainRoot(model);
         if (dr == null) {
-            return Collections.EMPTY_SET;
+            return null;
         }
 
-        try {
-            final Map<String, ServerRootMonitor> serverMonitors = dr.getMonitoringRoot().getServerRootMonitorMap();
-            final String serverName = JMXUtil.getServerName(model);
+        final Map<String, ServerRootMonitor> serverMonitors = dr.getMonitoringRoot().getServerRootMonitorMap();
+        final String serverName = JMXUtil.getServerName(model);
 
-            if (serverMonitors.get(serverName) == null) {
-                return Collections.EMPTY_SET;
+        if (serverMonitors.get(serverName) == null) {
+            return null;
+        }
+
+        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
+        ModuleMonitoringLevelsConfig monitorConfig = AMXUtil.getMonitoringConfig(model);
+        if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
+            if (httpMonitor != null) {
+                return getHTTPServiceView(app, httpMonitor);
             }
-
-            return new HashSet<DataSourceView>() {
-
-                {
-                    ModuleMonitoringLevelsConfig monitorConfig = AMXUtil.getMonitoringConfig(model);
-                    if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
-                        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
-                        if (httpMonitor != null) {
-                            add(getHTTPServiceView(application, httpMonitor));
-                        }
-                    }
-                    if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
-                        TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
-                        if (transMonitor != null) {
-                            add(getTransactionServiceView(application, transMonitor));
-                        }
-                    }
-                }
-                };
-        } catch (Exception e) {
-            LOGGER.throwing(GlassFishApplicationViewProvider.class.getName(), "getViews", e);
         }
-
-        return Collections.EMPTY_SET;
+        return null;
     }
 
+    @Override
+    protected boolean supportsViewFor(Application app) {
+        return ApplicationTypeFactory.getApplicationTypeFor(app) instanceof GlassFishApplicationType;
+    }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
+//    @Override
+//    public Set<? extends DataSourceView> getViews(final Application application) {
+//        ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(application);
+//        if (!(at instanceof GlassFishApplicationType)) {
+//            return Collections.EMPTY_SET;
+//        }
+//
+//        final JmxModel model = JmxModelFactory.getJmxModelFor(application);
+//        if (model == null) {
+//            return Collections.EMPTY_SET;
+//        }
+//
+//        DomainRoot dr = AMXUtil.getDomainRoot(model);
+//        if (dr == null) {
+//            return Collections.EMPTY_SET;
+//        }
+//
+//        try {
+//            final Map<String, ServerRootMonitor> serverMonitors = dr.getMonitoringRoot().getServerRootMonitorMap();
+//            final String serverName = JMXUtil.getServerName(model);
+//
+//            if (serverMonitors.get(serverName) == null) {
+//                return Collections.EMPTY_SET;
+//            }
+//
+//            return new HashSet<DataSourceView>() {
+//
+//                {
+//                    ModuleMonitoringLevelsConfig monitorConfig = AMXUtil.getMonitoringConfig(model);
+//                    if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
+//                        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
+//                        if (httpMonitor != null) {
+//                            add(getHTTPServiceView(application, httpMonitor));
+//                        }
+//                    }
+//                    if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
+//                        TransactionServiceMonitor transMonitor = serverMonitors.get(serverName).getTransactionServiceMonitor();
+//                        if (transMonitor != null) {
+//                            add(getTransactionServiceView(application, transMonitor));
+//                        }
+//                    }
+//                }
+//            };
+//        } catch (Exception e) {
+//            LOGGER.throwing(GlassFishApplicationViewProvider.class.getName(), "getViews", e);
+//        }
+//
+//        return Collections.EMPTY_SET;
+//    }
+
     private HTTPServiceView getHTTPServiceView(Application app, HTTPServiceMonitor monitor) {
-        synchronized(httpServiceViewMap) {
+        synchronized (httpServiceViewMap) {
             if (httpServiceViewMap.containsKey(app)) {
                 return httpServiceViewMap.get(app);
             } else {
@@ -126,9 +155,9 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
             }
         }
     }
-    
+
     private TransactionServiceView getTransactionServiceView(Application app, TransactionServiceMonitor monitor) {
-        synchronized(transServiceViewMap) {
+        synchronized (transServiceViewMap) {
             if (transServiceViewMap.containsKey(app)) {
                 return transServiceViewMap.get(app);
             } else {
@@ -138,7 +167,7 @@ public class GlassFishApplicationViewProvider implements DataSourceViewsProvider
             }
         }
     }
-    
+
     public static void initialize() {
         DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, Application.class);
     }

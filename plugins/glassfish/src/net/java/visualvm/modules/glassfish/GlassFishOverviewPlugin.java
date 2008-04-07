@@ -33,27 +33,21 @@ import com.sun.appserv.management.config.IIOPServiceConfig;
 import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.config.SystemPropertiesAccess;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
-import com.sun.tools.visualvm.core.ui.ViewPlugin;
+import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import javax.swing.event.HyperlinkEvent;
 import net.java.visualvm.modules.glassfish.jmx.AMXUtil;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkListener;
 import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
@@ -62,64 +56,41 @@ import net.java.visualvm.modules.glassfish.jmx.JMXUtil;
  *
  * @author Jaroslav Bachorik
  */
-public class GlassFishOverview implements ViewPlugin<Application> {
-
-    private static final GlassFishOverview INSTANCE = new GlassFishOverview();
-
+public class GlassFishOverviewPlugin extends DataSourceViewPlugin {
+    private JmxModel model = null;
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-    private static class GlassfishViewDescriptor implements ViewDescriptor {
+    private static class GlassfishOverviewPanel extends HTMLTextArea {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
         private DomainRoot domainRoot;
         private String serverName,  configName;
         private JmxModel jmxModel;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
-        public GlassfishViewDescriptor(DomainRoot root, JmxModel jmx) {
+        public GlassfishOverviewPanel(DomainRoot root, JmxModel jmx) {
             domainRoot = root;
             jmxModel = jmx;
             assert domainRoot != null && jmxModel != null;
             serverName = JMXUtil.getServerName(jmx);
             configName = JMXUtil.getServerConfig(jmx);
             assert serverName != null && configName != null;
+            initComponents();
         }
 
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-        public int getLocation() {
-            return DataViewComponent.TOP_RIGHT;
-        }
-
-        public int getPreferredPosition() {
-            return 0;
-        }
-
-        public DetailsView getView() {
-            JPanel panel = new JPanel(new BorderLayout());
-            panel.setOpaque(false);
-            panel.setBorder(BorderFactory.createEmptyBorder());
-            
-            final HTMLTextArea area = new HTMLTextArea();
-            area.setOpaque(true);
-            area.setBorder(BorderFactory.createEmptyBorder());
-            area.addHyperlinkListener(new HyperlinkListener() {
+        private void initComponents() {
+            setOpaque(true);
+            setBorder(BorderFactory.createEmptyBorder());
+            addHyperlinkListener(new HyperlinkListener() {
                 public void hyperlinkUpdate(HyperlinkEvent e) {
                     if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                         StringTokenizer st = new StringTokenizer(e.getDescription(), "#");
                         String service = st.nextToken();
                         String level = st.nextToken();
                         setMonitoringLevel(AMXUtil.getMonitoringConfig(jmxModel), service, cycleLevel(level));
-                        area.setText(buildInfo());                        
+                        setText(buildInfo());                        
                     }
                 }
             });
-            JScrollPane scrollPane = new JScrollPane(area);
-            scrollPane.setOpaque(false);
-            scrollPane.setBorder(BorderFactory.createEmptyBorder());
-            scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-
-            panel.add(scrollPane, BorderLayout.CENTER);
-
-            DataViewComponent.DetailsView details = new DataViewComponent.DetailsView("SJSAS/GlassFish",
-                    "Application server details", panel, null);
 
            new  SwingWorker<Void, Void>() {
                 private String areaText = null;
@@ -131,12 +102,10 @@ public class GlassFishOverview implements ViewPlugin<Application> {
 
                 @Override
                 protected void done() {
-                    if (areaText != null) area.setText(areaText);
+                    if (areaText != null) setText(areaText);
                 
                 }
             }.execute();
-            
-            return details;
         }
 
         private Collection<String> getHTTPPorts(HTTPServiceConfig config) {
@@ -292,32 +261,18 @@ public class GlassFishOverview implements ViewPlugin<Application> {
         }
     }
 
-    private GlassFishOverview() {
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-    public Set<AreaDescriptor> getAreasFor(Application application) {
-        return Collections.EMPTY_SET;
-    }
-
-    public Set<? extends ViewDescriptor> getViewsFor(Application application) {
-        if (ApplicationTypeFactory.getApplicationTypeFor(application) instanceof GlassFishApplicationType) {
-            JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-            if (jmx != null) {
-                DomainRoot dr = AMXUtil.getDomainRoot(jmx);
-                if (dr != null) {
-                    return Collections.singleton(new GlassfishViewDescriptor(AMXUtil.getDomainRoot(jmx), jmx));
-                }
-            }
+    @Override
+    public DetailsView createView(int position) {
+        if (model == null) return null;
+        if (position == DataViewComponent.TOP_RIGHT) {
+            return new DataViewComponent.DetailsView("Application Server", null, 0,
+                        new ScrollableContainer(new GlassfishOverviewPanel(AMXUtil.getDomainRoot(model), model)), null);
         }
-        return Collections.EMPTY_SET;
+        return null;
     }
 
-    public static void initialize() {
-        ApplicationViewsSupport.sharedInstance().getOverviewView().addPlugin(INSTANCE, Application.class);
-    }
-
-    public static void shutdown() {
-        ApplicationViewsSupport.sharedInstance().getOverviewView().removePlugin(INSTANCE);
+    public GlassFishOverviewPlugin(Application app) {
+        super(app);
+        model = JmxModelFactory.getJmxModelFor(app);
     }
 }
