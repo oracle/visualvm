@@ -50,7 +50,7 @@ import org.openide.windows.WindowManager;
 public final class AboutAction extends AbstractAction {
     private final static Logger LOGGER = Logger.getLogger(AboutAction.class.getName());
     
-    private String versionString = "Dev"; // Use "Dev" for development builds
+    private String versionString = "Beta2"; // Use "Dev" for development builds
 
 
     public AboutAction() {
