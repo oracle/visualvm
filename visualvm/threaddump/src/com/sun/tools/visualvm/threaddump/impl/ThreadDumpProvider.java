@@ -56,24 +56,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class ThreadDumpProvider implements DataChangeListener<Snapshot> {
-    
-    
-    public void dataChanged(DataChangeEvent<Snapshot> event) {
-        Set<Snapshot> snapshots = event.getAdded();
-        for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
-    }
-    
-    
-    private void processNewSnapshot(Snapshot snapshot) {
-        if (snapshot instanceof ThreadDumpImpl) return;
-        Set<ThreadDumpImpl> threadDumps = new HashSet();
-        File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return;
-        for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
-        snapshot.getRepository().addDataSources(threadDumps);
-    }
-    
+public class ThreadDumpProvider {
     
     public void createThreadDump(final Application application, final boolean openView) {
          RequestProcessor.getDefault().post(new Runnable() {
@@ -150,7 +133,53 @@ public class ThreadDumpProvider implements DataChangeListener<Snapshot> {
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, Snapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(new SnapshotListener(), Snapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(new ApplicationListener(), Application.class);
+    }
+    
+    
+    private void processNewSnapshot(Snapshot snapshot) {
+        if (snapshot instanceof ThreadDumpImpl) return;
+        File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
+        Set<ThreadDumpImpl> threadDumps = new HashSet();
+        for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
+        snapshot.getRepository().addDataSources(threadDumps);
+    }
+    
+    private void processNewApplication(Application application) {
+        File[] files = application.getStorage().getDirectory().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
+        Set<ThreadDumpImpl> threadDumps = new HashSet();
+        for (File file : files) threadDumps.add(new ThreadDumpImpl(file, application));
+        application.getRepository().addDataSources(threadDumps);
+    }
+    
+    
+    private class SnapshotListener implements DataChangeListener<Snapshot> {
+        
+        public void dataChanged(DataChangeEvent<Snapshot> event) {
+            final Set<Snapshot> snapshots = event.getAdded();
+            if (!snapshots.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
+                }
+            });
+        }
+        
+    }
+    
+    private class ApplicationListener implements DataChangeListener<Application> {
+        
+        public void dataChanged(DataChangeEvent<Application> event) {
+            final Set<Application> applications = event.getAdded();
+            if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    for (Application application : applications) processNewApplication(application);
+                }
+            });
+        }
+        
     }
     
 }

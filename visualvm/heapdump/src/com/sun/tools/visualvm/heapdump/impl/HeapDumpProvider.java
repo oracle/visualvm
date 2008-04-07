@@ -54,24 +54,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class HeapDumpProvider implements DataChangeListener<Snapshot> {
-    
-    
-    public void dataChanged(DataChangeEvent<Snapshot> event) {
-        Set<Snapshot> snapshots = event.getAdded();
-        for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
-    }
-    
-    
-    private void processNewSnapshot(Snapshot snapshot) {
-        if (snapshot instanceof HeapDumpImpl) return;
-        Set<HeapDumpImpl> heapDumps = new HashSet();
-        File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return;
-        for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
-        snapshot.getRepository().addDataSources(heapDumps);
-    }
-    
+public class HeapDumpProvider {
     
     public void createHeapDump(final Application application, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
@@ -144,7 +127,53 @@ public class HeapDumpProvider implements DataChangeListener<Snapshot> {
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataChangeListener(this, Snapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(new SnapshotListener(), Snapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(new ApplicationListener(), Application.class);
+    }
+    
+    
+    private void processNewSnapshot(Snapshot snapshot) {
+        if (snapshot instanceof HeapDumpImpl) return;
+        File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
+        Set<HeapDumpImpl> heapDumps = new HashSet();
+        for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
+        snapshot.getRepository().addDataSources(heapDumps);
+    }
+    
+    private void processNewApplication(Application application) {
+        File[] files = application.getStorage().getDirectory().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
+        if (files == null) return;
+        Set<HeapDumpImpl> heapDumps = new HashSet();
+        for (File file : files) heapDumps.add(new HeapDumpImpl(file, application));
+        application.getRepository().addDataSources(heapDumps);
+    }
+    
+    
+    private class SnapshotListener implements DataChangeListener<Snapshot> {
+        
+        public void dataChanged(DataChangeEvent<Snapshot> event) {
+            final Set<Snapshot> snapshots = event.getAdded();
+            if (!snapshots.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
+                }
+            });
+        }
+        
+    }
+    
+    private class ApplicationListener implements DataChangeListener<Application> {
+        
+        public void dataChanged(DataChangeEvent<Application> event) {
+            final Set<Application> applications = event.getAdded();
+            if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    for (Application application : applications) processNewApplication(application);
+                }
+            });
+        }
+        
     }
     
 }

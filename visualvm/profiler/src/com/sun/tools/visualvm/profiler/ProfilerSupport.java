@@ -57,7 +57,7 @@ public final class ProfilerSupport {
     private Application profiledApplication;
     private ProfilerSnapshotCategory category;
     private ApplicationProfilerViewProvider profilerViewProvider;
-    private ProfilerSnapshotsProvider profilerSnapshotsProvider;
+    private ProfilerSnapshotProvider profilerSnapshotsProvider;
 
 
     public static synchronized ProfilerSupport getInstance() {
@@ -79,7 +79,7 @@ public final class ProfilerSupport {
         return jvm.isAttachable() && !jvm.is14() && !jvm.is15();
     }
     
-    ProfilerSnapshotsProvider getSnapshotsProvider() {
+    ProfilerSnapshotProvider getSnapshotsProvider() {
         return profilerSnapshotsProvider;
     }
     
@@ -186,7 +186,7 @@ public final class ProfilerSupport {
         category = new ProfilerSnapshotCategory();
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
         
-        profilerSnapshotsProvider = new ProfilerSnapshotsProvider();
+        profilerSnapshotsProvider = new ProfilerSnapshotProvider();
         profilerSnapshotsProvider.initialize();
         
         checkCalibration();
