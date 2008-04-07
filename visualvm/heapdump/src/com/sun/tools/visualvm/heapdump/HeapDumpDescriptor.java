@@ -4,7 +4,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
-class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
+public class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
 
     private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/heapdump/resources/heapdump.png", true);
 

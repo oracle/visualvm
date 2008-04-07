@@ -25,13 +25,13 @@
 
 package com.sun.tools.visualvm.host.impl;
 
+import com.sun.tools.visualvm.host.UnknownHostDescriptor;
+import com.sun.tools.visualvm.host.LocalHostDescriptor;
+import com.sun.tools.visualvm.host.RemoteHostDescriptor;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.host.RemoteHostsContainer;
-import java.awt.Image;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -40,9 +40,6 @@ import org.openide.util.Utilities;
 public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (RemoteHostsContainer.sharedInstance().equals(ds)) {
-            return new HostsContainerDescriptor();
-        }
         if (ds instanceof Host) {
             Host host = (Host) ds;
             if (Host.LOCALHOST.equals(ds)) {
@@ -51,54 +48,8 @@ public class HostDescriptorProvider extends AbstractModelProvider<DataSourceDesc
             if (Host.UNKNOWN_HOST.equals(ds)) {
                 return new UnknownHostDescriptor();
             }
-            return new HostDescriptor(host);
+            return new RemoteHostDescriptor(host);
         }
         return null;
-    }
-    
-    private static class HostDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHost.png", true);
-        
-        HostDescriptor(Host host) {
-            super(host, resolveName(host), null, NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
-        }
-
-        private static String resolveName(Host host) {
-            String persistedName = host.getStorage().getCustomProperty(PROPERTY_NAME);
-            if (persistedName != null) return persistedName;
-            else return host.getHostName();
-        }
-
-        public boolean supportsRename() {
-            return true;
-        }
-        
-    }
-    
-    private static class LocalHostDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/localHost.png", true);
-
-        LocalHostDescriptor() {
-            super(Host.LOCALHOST, "Local", null, NODE_ICON, 0, EXPAND_ON_FIRST_CHILD);
-        }
-        
-    }
-    
-    private static class UnknownHostDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);
-
-        UnknownHostDescriptor() {
-            super(Host.LOCALHOST, "<Unknown Host>", null, NODE_ICON, POSITION_LAST, EXPAND_ON_FIRST_CHILD);
-        }
-        
-    }
-    
-    private static class HostsContainerDescriptor extends DataSourceDescriptor {
-        private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);
-        
-        HostsContainerDescriptor() {
-            super(RemoteHostsContainer.sharedInstance(), "Remote", null, NODE_ICON, 10, EXPAND_ON_EACH_NEW_CHILD);
-        }
-        
     }
 }

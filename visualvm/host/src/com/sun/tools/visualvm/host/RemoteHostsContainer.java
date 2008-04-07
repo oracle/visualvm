@@ -26,6 +26,11 @@
 package com.sun.tools.visualvm.host;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import java.awt.Image;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -43,6 +48,29 @@ public class RemoteHostsContainer extends DataSource {
     
     
     private RemoteHostsContainer() {
+        DataSourceDescriptorFactory.getDefault().registerFactory(new HostsContainerDescriptorProvider());
+//        DataSource.ROOT.getRepository().addDataSource(this);
     }
+    
+    
+    private static class HostsContainerDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+    
+        public DataSourceDescriptor createModelFor(DataSource ds) {
+            if (RemoteHostsContainer.sharedInstance().equals(ds)) {
+                    return new HostsContainerDescriptor();
+                }
+                return null;
+        }
 
+        private static class HostsContainerDescriptor extends DataSourceDescriptor {
+            private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);
+
+            HostsContainerDescriptor() {
+                super(RemoteHostsContainer.sharedInstance(), "Remote", null, NODE_ICON, 10, EXPAND_ON_EACH_NEW_CHILD);
+            }
+
+        }
+
+    }
+    
 }

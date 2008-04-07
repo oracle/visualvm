@@ -23,8 +23,9 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.heapdump;
+package com.sun.tools.visualvm.heapdump.impl;
 
+import com.sun.tools.visualvm.heapdump.*;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
@@ -34,9 +35,6 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
  * @author Tomas Hurka
  */
 public class HeapDumpDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
-    
-    HeapDumpDescriptorProvider() {
-    }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {
         if (ds instanceof HeapDump) {
