@@ -41,13 +41,11 @@ import org.openide.util.Utilities;
 public class HelloWorldView extends DataSourceView {
 
     private DataViewComponent dvc;
-    private Application application;
-    //Make sure there is an image at this location in your project:
+    //Reusing an image from the sources:
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/coredump.png"; // NOI18N
 
     public HelloWorldView(Application application) {
         super(application,"Hello World", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
-        this.application = application;
     }
 
     @Override
