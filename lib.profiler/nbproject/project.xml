@@ -47,14 +47,19 @@ made subject to such option by the copyright holder.
             <code-name-base>org.netbeans.lib.profiler</code-name-base>
             <module-dependencies/>
             <friend-packages>
-                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.lib.profiler.common</friend>
                 <friend>org.netbeans.lib.profiler.ui</friend>
+                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
+                <friend>org.netbeans.modules.profiler.projectsupport</friend>
+                <friend>org.netbeans.modules.profiler.selector.spi</friend>
+                <friend>org.netbeans.modules.profiler.selector.ui</friend>
+                <friend>org.netbeans.modules.profiler.utilities</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <package>org.netbeans.lib.profiler</package>
                 <package>org.netbeans.lib.profiler.classfile</package>
                 <package>org.netbeans.lib.profiler.client</package>
