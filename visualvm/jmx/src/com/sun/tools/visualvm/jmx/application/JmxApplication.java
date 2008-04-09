@@ -29,8 +29,9 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import java.lang.management.RuntimeMXBean;
 import javax.management.remote.JMXServiceURL;
 
@@ -63,9 +64,10 @@ public final class JmxApplication extends Application {
     @Override
     public int getPid() {
         if (pid == UNKNOWN_PID) {
-            JvmJmxModel jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(this);
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
             if (jmxModel != null) {
-                RuntimeMXBean rt = jmxModel.getRuntimeMXBean();
+                JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+                RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
                 if (rt != null) {
                     String name = rt.getName();
                     if (name != null && name.indexOf("@") != -1) {
@@ -78,10 +80,12 @@ public final class JmxApplication extends Application {
         return pid;
     }
 
+    @Override
     public boolean supportsUserRemove() {
         return true;
     }
     
+    @Override
     protected Storage createStorage() {
         return storage;
     }

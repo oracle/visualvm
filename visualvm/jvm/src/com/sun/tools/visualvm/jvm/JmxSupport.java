@@ -25,14 +25,14 @@
 
 package com.sun.tools.visualvm.jvm;
 
-
 import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.management.LockInfo;
@@ -47,7 +47,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.swing.Timer;
@@ -64,7 +63,7 @@ public class JmxSupport implements DataRemovedListener {
     private static final String PERM_GEN = "Perm Gen";
     private static final String PS_PERM_GEN = "PS Perm Gen";
     private Application application;
-    private JvmJmxModel jmxModel;
+    private JvmMXBeans mxbeans;
     private JVMImpl jvm;
     // HotspotDiagnostic
     private boolean hotspotDiagnosticInitialized;
@@ -80,16 +79,17 @@ public class JmxSupport implements DataRemovedListener {
     }
     
     RuntimeMXBean getRuntime() {
-        JvmJmxModel jmx = getJmxModel();
+        JvmMXBeans jmx = getJvmMXBeans();
         if (jmx != null) return jmx.getRuntimeMXBean();
         return null;
     }
     
-    synchronized JvmJmxModel getJmxModel() {
-        if (jmxModel == null) {
-            jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
+    synchronized JvmMXBeans getJvmMXBeans() {
+        if (mxbeans == null) {
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+            mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
         }
-        return jmxModel;
+        return mxbeans;
     }
     
     Properties getSystemProperties() {
@@ -120,7 +120,7 @@ public class JmxSupport implements DataRemovedListener {
             if (hotspotDiagnosticInitialized) {
                 return hotspotDiagnosticMXBean;
             }
-            JvmJmxModel jmx = getJmxModel();
+            JvmMXBeans jmx = getJvmMXBeans();
             if (jmx != null) {
                 try {
                     hotspotDiagnosticMXBean = jmx.getMXBean(
@@ -140,7 +140,7 @@ public class JmxSupport implements DataRemovedListener {
     }
     
     String takeThreadDump() {
-        JvmJmxModel jmx = getJmxModel();
+        JvmMXBeans jmx = getJvmMXBeans();
         RuntimeMXBean runtimeMXBean;
         ThreadMXBean threadMXBean;
         
@@ -225,7 +225,7 @@ public class JmxSupport implements DataRemovedListener {
     
     MemoryPoolMXBean getPermGenPool() {
         if (permGenPool == null) {
-            Collection<MemoryPoolMXBean> pools = getJmxModel().getMemoryPoolMXBeans();
+            Collection<MemoryPoolMXBean> pools = getJvmMXBeans().getMemoryPoolMXBeans();
             for (MemoryPoolMXBean pool : pools) {
                 if (pool.getType().equals(MemoryType.NON_HEAP) &&
                         (PERM_GEN.equals(pool.getName()) ||
@@ -240,7 +240,7 @@ public class JmxSupport implements DataRemovedListener {
     
     void initTimer() {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
-        final JvmJmxModel jmx = getJmxModel();
+        final JvmMXBeans jmx = getJvmMXBeans();
         timer = new Timer(interval, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 RequestProcessor.getDefault().post(new Runnable() {

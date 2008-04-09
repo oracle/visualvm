@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.jvm;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.MemoryUsage;
@@ -74,7 +74,7 @@ public class MonitoredDataImpl extends MonitoredData {
     jvm = vm;
   }
 
-  MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport,JvmJmxModel jmxModel) {
+  MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport,JvmMXBeans jmxModel) {
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();

@@ -27,42 +27,36 @@ package com.sun.tools.visualvm.jvm;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.lang.management.RuntimeMXBean;
-
 
 /**
  *
  * @author Tomas Hurka
  */
 public class JRockitJvmProvider extends JvmProvider {
-    
+
+    @Override
     public Jvm createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         JRockitJVMImpl jvm = null;
-        
         if (jvmstat != null) {
-            String vmName = jvmstat.findByName("java.property.java.vm.name");   // NOI18N
-            
-            if (vmName != null && "BEA JRockit(R)".equals(vmName)) {  // NOI18N            
-                jvm = new JRockitJVMImpl(app,jvmstat);
+            String vmName = jvmstat.findByName("java.property.java.vm.name"); // NOI18N
+            if (vmName != null && "BEA JRockit(R)".equals(vmName)) { // NOI18N
+                jvm = new JRockitJVMImpl(app, jvmstat);
             }
         } else {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-               JvmJmxModel jvmJmxModel = JvmJmxModelFactory.getJvmJmxModelFor(app);
-               RuntimeMXBean runtime = jvmJmxModel.getRuntimeMXBean();
-               
-               if (runtime != null && runtime.getVmName().equals("BEA JRockit(R)")) {
-                   jvm = new JRockitJVMImpl(app,JvmJmxModelFactory.getJvmJmxModelFor(app));
-               }
+                JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+                RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
+                if (runtime != null && runtime.getVmName().equals("BEA JRockit(R)")) {
+                    jvm = new JRockitJVMImpl(app, mxbeans);
+                }
             }
         }
         return jvm;
