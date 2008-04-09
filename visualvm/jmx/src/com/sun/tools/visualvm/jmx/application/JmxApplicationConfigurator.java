@@ -199,7 +199,7 @@ class JmxApplicationConfigurator extends JPanel {
         Font normalLabelFont = connectionLabel.getFont();
         Font smallLabelFont =
                 normalLabelFont.deriveFont(normalLabelFont.getSize2D() - 1);
-        usageLabel = new JLabel("<html><b>Usage</b>: &lt;hostname&gt;:&lt;port&gt; OR service:jmx:&lt;protocol&gt;:&lt;sap&gt;</html>");
+        usageLabel = new JLabel("<html><nobr><b>Usage</b>: &lt;hostname&gt;:&lt;port&gt; OR service:jmx:&lt;protocol&gt;:&lt;sap&gt;</nobr></html>");
         usageLabel.setFont(smallLabelFont);
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
