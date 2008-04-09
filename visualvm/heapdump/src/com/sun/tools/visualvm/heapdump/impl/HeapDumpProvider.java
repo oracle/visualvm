@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
@@ -134,19 +135,25 @@ public class HeapDumpProvider {
     
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof HeapDumpImpl) return;
-        File[] files = snapshot.getFile().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return;
-        Set<HeapDumpImpl> heapDumps = new HashSet();
-        for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
-        snapshot.getRepository().addDataSources(heapDumps);
+        File snapshotFile = snapshot.getFile();
+        if (snapshotFile != null && snapshotFile.isDirectory()) {
+            File[] files = snapshotFile.listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
+            if (files == null) return;
+            Set<HeapDumpImpl> heapDumps = new HashSet();
+            for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
+            snapshot.getRepository().addDataSources(heapDumps);
+        }
     }
     
     private void processNewApplication(Application application) {
-        File[] files = application.getStorage().getDirectory().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return;
-        Set<HeapDumpImpl> heapDumps = new HashSet();
-        for (File file : files) heapDumps.add(new HeapDumpImpl(file, application));
-        application.getRepository().addDataSources(heapDumps);
+        Storage storage = application.getStorage();
+        if (storage.directoryExists()) {
+            File[] files = storage.getDirectory().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
+            if (files == null) return;
+            Set<HeapDumpImpl> heapDumps = new HashSet();
+            for (File file : files) heapDumps.add(new HeapDumpImpl(file, application));
+            application.getRepository().addDataSources(heapDumps);
+        }
     }
     
     
