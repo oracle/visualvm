@@ -104,7 +104,8 @@ public final class JvmMXBeansFactory {
      * 
      * @throws IllegalArgumentException if the supplied interval is negative.
      */
-    public static JvmMXBeans getJvmMXBeans(MBeanServerConnection mbsc, int interval) {
+    public static JvmMXBeans getJvmMXBeans(MBeanServerConnection mbsc, int interval)
+            throws IllegalArgumentException {
         if (interval < 0) {
             throw new IllegalArgumentException("interval cannot be negative");
         }
@@ -147,7 +148,8 @@ public final class JvmMXBeansFactory {
      * 
      * @throws IllegalArgumentException if the supplied interval is negative.
      */
-    public static JvmMXBeans getJvmMXBeans(JmxModel jmx, int interval) {
+    public static JvmMXBeans getJvmMXBeans(JmxModel jmx, int interval)
+            throws IllegalArgumentException {
         if (interval < 0) {
             throw new IllegalArgumentException("interval cannot be negative");
         }
@@ -192,7 +194,7 @@ public final class JvmMXBeansFactory {
          * @param jmx the {@link JmxModel} instance.
          */
         public JvmMXBeansImpl(JmxModel jmx) {
-            this.mbsc = jmx.getMBeanServerConnection();
+            this.mbsc = jmx == null ? null : jmx.getMBeanServerConnection();
         }
 
         /**

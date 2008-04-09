@@ -93,7 +93,9 @@ public final class CachedMBeanServerConnectionFactory {
      * 
      * @throws IllegalArgumentException if the supplied interval is negative.
      */
-    public static CachedMBeanServerConnection getCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval) {
+    public static CachedMBeanServerConnection
+            getCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval)
+            throws IllegalArgumentException {
         if (interval < 0) {
             throw new IllegalArgumentException("interval cannot be negative");
         }
@@ -128,7 +130,9 @@ public final class CachedMBeanServerConnectionFactory {
      *
      * @throws IllegalArgumentException if the supplied interval is negative.
      */
-    public static CachedMBeanServerConnection getCachedMBeanServerConnection(JmxModel jmx, int interval) {
+    public static CachedMBeanServerConnection
+            getCachedMBeanServerConnection(JmxModel jmx, int interval)
+            throws IllegalArgumentException {
         if (interval < 0) {
             throw new IllegalArgumentException("interval cannot be negative");
         }
