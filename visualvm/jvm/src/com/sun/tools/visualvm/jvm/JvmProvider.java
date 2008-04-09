@@ -30,7 +30,6 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 
@@ -48,7 +47,7 @@ public class JvmProvider extends AbstractModelProvider<Jvm, Application> {
         } else {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-                jvm = new JVMImpl(app, new JvmMXBeans(jmxModel.getMBeanServerConnection()));
+                jvm = new JVMImpl(app);
             }
         }
         return jvm;

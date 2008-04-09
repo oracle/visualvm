@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 
 /**
@@ -39,8 +38,8 @@ public class JRockitJVMImpl extends JVMImpl {
         super(app,jvms);
     }
     
-    JRockitJVMImpl(Application app,JvmMXBeans jmx) {
-        super(app,jmx);
+    JRockitJVMImpl(Application app) {
+        super(app);
     }
         
     @Override

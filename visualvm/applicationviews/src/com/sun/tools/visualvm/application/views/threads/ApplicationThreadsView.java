@@ -73,8 +73,12 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         Application application = (Application) getDataSource();
         jvm = JvmFactory.getJVMFor(application);
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
-        threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+        if (jmxModel == null) {
+            threadsManager = null;
+        } else {
+            JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+            threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+        }
     }
 
     @Override

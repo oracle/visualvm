@@ -41,8 +41,11 @@ public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvi
 
     protected boolean supportsViewFor(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
-        return mxbeans != null && mxbeans.getThreadMXBean() != null;
+        if (jmxModel != null) {
+            JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+            return mxbeans.getThreadMXBean() != null;
+        }
+        return false;
     }
 
     protected DataSourceView createView(Application application) {

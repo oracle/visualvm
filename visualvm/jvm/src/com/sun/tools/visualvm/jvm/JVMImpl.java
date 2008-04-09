@@ -35,7 +35,6 @@ import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
@@ -87,7 +86,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         listeners = new HashSet();
     }
     
-    JVMImpl(Application app,JvmMXBeans jmx) {
+    JVMImpl(Application app) {
         application = app;
         jmxSupport = new JmxSupport(app,this);
         listeners = new HashSet();

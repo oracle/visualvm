@@ -85,10 +85,15 @@ class ApplicationMonitorView extends DataSourceView {
         Application application = (Application)getDataSource();
         jvm = JvmFactory.getJVMFor(application);
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
-        memoryMXBean = mxbeans == null ? null : mxbeans.getMemoryMXBean();
+        if (jmxModel == null) {
+            memoryMXBean = null;
+        } else {
+            JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+            memoryMXBean = mxbeans.getMemoryMXBean();
+        }
     }
         
+    @Override
     protected void removed() {
         if (jvm != null) jvm.removeMonitoredDataListener(monitoredDataListener);
     }

@@ -87,7 +87,9 @@ public class JmxSupport implements DataRemovedListener {
     synchronized JvmMXBeans getJvmMXBeans() {
         if (mxbeans == null) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-            mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+            if (jmxModel != null) {
+                mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+            }
         }
         return mxbeans;
     }
@@ -225,13 +227,16 @@ public class JmxSupport implements DataRemovedListener {
     
     MemoryPoolMXBean getPermGenPool() {
         if (permGenPool == null) {
-            Collection<MemoryPoolMXBean> pools = getJvmMXBeans().getMemoryPoolMXBeans();
-            for (MemoryPoolMXBean pool : pools) {
-                if (pool.getType().equals(MemoryType.NON_HEAP) &&
-                        (PERM_GEN.equals(pool.getName()) ||
-                        PS_PERM_GEN.equals(pool.getName()))) {
-                    permGenPool = pool;
-                    break;
+            JvmMXBeans jmx = getJvmMXBeans();
+            if (jmx != null) {
+                Collection<MemoryPoolMXBean> pools = jmx.getMemoryPoolMXBeans();
+                for (MemoryPoolMXBean pool : pools) {
+                    if (pool.getType().equals(MemoryType.NON_HEAP) &&
+                            (PERM_GEN.equals(pool.getName()) ||
+                            PS_PERM_GEN.equals(pool.getName()))) {
+                        permGenPool = pool;
+                        break;
+                    }
                 }
             }
         }
