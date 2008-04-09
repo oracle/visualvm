@@ -161,7 +161,9 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     }
     
     private void updateDescription() {
-        presenter.setToolTipText(description);
+        if (description == null || description.trim().length() == 0)
+            presenter.setToolTipText(null);
+        else presenter.setToolTipText(description);
     }
     
     private void createTimer() {
