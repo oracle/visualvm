@@ -37,7 +37,7 @@ import javax.management.MBeanServerConnection;
  *   cached. Every subsequent time getAttribute is called for that attribute
  *   the cached result is returned.
  *
- * - When the {@link CachedMBeanServerConnection.flush()} method is invoked the
+ * - When the {@link CachedMBeanServerConnection#flush()} method is invoked the
  *   attributes cache is flushed. Then any subsequent call to getAttribute will
  *   retrieve all the values for the attributes that are known to the cache.
  *
@@ -53,4 +53,29 @@ public interface CachedMBeanServerConnection extends MBeanServerConnection {
      * Flush all cached values of attributes.
      */
     public void flush();
+
+    /**
+     * Get the flush interval.
+     *
+     * @return the flush interval in milliseconds.
+     */
+    public int getInterval();
+
+    /**
+     * Add a {@code CachedMBeansListener}. The given listener is added to
+     * the list of {@code CachedMBeansListener} objects to be notified of
+     * {@link CachedMBeanServerConnection} related events.
+     *
+     * @param listener the {@code CachedMBeansListener} to add.
+     */
+    void addCachedMBeansListener(CachedMBeansListener listener);
+
+    /**
+     * Remove a {@code CachedMBeansListener}. The given listener is removed
+     * from the list of`{@code CachedMBeansListener} objects to be notified
+     * of {@link CachedMBeanServerConnection}`related events.
+     *
+     * @param listener the {@code CachedMBeansListener} to be removed.
+     */
+    void removeCachedMBeansListener(CachedMBeansListener listener);
 }
