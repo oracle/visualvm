@@ -62,12 +62,21 @@
             <file name="org-openide-actions-NewAction.instance_hidden"/>
             <file name="org-openide-actions-NewTemplateAction.instance_hidden"/>
             <file name="org-openide-actions-OpenAction.instance_hidden"/>
+            <file name="org-openide-actions-PageSetupAction.instance_hidden"/>
             <file name="org-openide-actions-PopupAction.instance_hidden"/>
+            <file name="org-openide-actions-PrintAction.instance_hidden"/>
             <file name="org-openide-actions-RenameAction.instance_hidden"/>
             <file name="org-openide-actions-ReorderAction.instance_hidden"/>
             <file name="org-openide-actions-SaveAction.instance_hidden"/>
             <file name="org-openide-actions-SaveAllAction.instance_hidden"/>
             <file name="org-openide-actions-SaveAsAction.instance_hidden"/>
+        </folder>
+        <folder name="View">
+            <file name="org-netbeans-core-actions-HTMLViewAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-LogAction.instance_hidden"/>
+        </folder>
+        <folder name="Window">
+            <file name="org-netbeans-core-actions-GlobalPropertiesAction.instance_hidden"/>
         </folder>
     </folder>
     <folder name="Menu">
