@@ -47,35 +47,5 @@ import javax.management.MBeanServerConnection;
  * @author Eamonn McManus
  * @author Luis-Miguel Alventosa
  */
-public interface CachedMBeanServerConnection extends MBeanServerConnection {
-
-    /**
-     * Flush all cached values of attributes.
-     */
-    public void flush();
-
-    /**
-     * Get the flush interval.
-     *
-     * @return the flush interval in milliseconds.
-     */
-    public int getInterval();
-
-    /**
-     * Add a {@code CachedMBeansListener}. The given listener is added to
-     * the list of {@code CachedMBeansListener} objects to be notified of
-     * {@link CachedMBeanServerConnection} related events.
-     *
-     * @param listener the {@code CachedMBeansListener} to add.
-     */
-    void addCachedMBeansListener(CachedMBeansListener listener);
-
-    /**
-     * Remove a {@code CachedMBeansListener}. The given listener is removed
-     * from the list of`{@code CachedMBeansListener} objects to be notified
-     * of {@link CachedMBeanServerConnection}`related events.
-     *
-     * @param listener the {@code CachedMBeansListener} to be removed.
-     */
-    void removeCachedMBeansListener(CachedMBeansListener listener);
+public interface CachedMBeanServerConnection extends MBeanServerConnection, MBeanCacheOperations {
 }

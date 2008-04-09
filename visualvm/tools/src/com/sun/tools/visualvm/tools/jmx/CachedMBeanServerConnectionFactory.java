@@ -51,10 +51,9 @@ import javax.management.ReflectionException;
  * {@link MBeanServerConnection} or {@link JmxModel}.
  * 
  * The factory methods allow to supply an interval value at which the cache will
- * be automatically flushed and interested {@link CachedMBeansListener}s notified.
+ * be automatically flushed and interested {@link MBeanCacheListener}s notified.
  * 
- * If the factory methods which do not take an interval value are used or the
- * ones taking it are used with an interval value equal or less than zero then
+ * If the factory methods which do not take an interval value are used then
  * no automatic flush is performed and the user will be in charge of flushing
  * the cache by calling {@link CachedMBeanServerConnection#flush()}.
  *
@@ -70,7 +69,7 @@ public final class CachedMBeanServerConnectionFactory {
      * Factory method for obtaining the {@link CachedMBeanServerConnection} for
      * the given {@link MBeanServerConnection}.
      * 
-     * @param mbsc MBeanServerConnection.
+     * @param mbsc an MBeanServerConnection.
      * 
      * @return a {@link CachedMBeanServerConnection} instance which caches the
      * attribute values of the supplied {@link MBeanServerConnection}.
@@ -82,16 +81,22 @@ public final class CachedMBeanServerConnectionFactory {
     /**
      * Factory method for obtaining the {@link CachedMBeanServerConnection} for
      * the given {@link MBeanServerConnection}. The cache will be flushed at the
-     * given interval and the {@link CachedMBeansListener}s will be notified.
+     * given interval and the interested {@link MBeanCacheListener}s will be notified.
      * 
-     * @param mbsc MBeanServerConnection.
-     * @param interval Interval (in milliseconds) at which the cache is flushed.
+     * @param mbsc an MBeanServerConnection.
+     * @param interval the interval (in milliseconds) at which the cache is flushed.
+     * An interval equal to zero means no automatic flush of the MBean cache.
      * 
      * @return a {@link CachedMBeanServerConnection} instance which caches the
      * attribute values of the supplied {@link MBeanServerConnection} and is
      * flushed at the end of every interval period.
+     * 
+     * @throws IllegalArgumentException if the supplied interval is negative.
      */
     public static CachedMBeanServerConnection getCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval) {
+        if (interval < 0) {
+            throw new IllegalArgumentException("interval cannot be negative");
+        }
         return Snapshot.newSnapshot(mbsc);
     }
 
@@ -99,7 +104,7 @@ public final class CachedMBeanServerConnectionFactory {
      * Factory method for obtaining the {@link CachedMBeanServerConnection} for
      * the given {@link JmxModel}.
      * 
-     * @param jmx JmxModel.
+     * @param jmx a JmxModel.
      * 
      * @return a {@link CachedMBeanServerConnection} instance which caches the
      * attribute values of the supplied {@link JmxModel}.
@@ -110,17 +115,23 @@ public final class CachedMBeanServerConnectionFactory {
 
     /**
      * Factory method for obtaining the {@link CachedMBeanServerConnection} for
-     * the given {@link JmxModel}. The cache will be flushed at the
-     * given interval and the {@link CachedMBeansListener}s will be notified.
+     * the given {@link JmxModel}. The cache will be flushed at the given interval
+     * and the interested {@link MBeanCacheListener}s will be notified.
      * 
-     * @param jmx JmxModel.
-     * @param interval Interval (in milliseconds) at which the cache is flushed.
+     * @param jmx a JmxModel.
+     * @param interval the interval (in milliseconds) at which the cache is flushed.
+     * An interval equal to zero means no automatic flush of the MBean cache.
      * 
      * @return a {@link CachedMBeanServerConnection} instance which caches the
      * attribute values of the supplied {@link JmxModel} and is flushed at the
      * end of every interval period.
+     *
+     * @throws IllegalArgumentException if the supplied interval is negative.
      */
     public static CachedMBeanServerConnection getCachedMBeanServerConnection(JmxModel jmx, int interval) {
+        if (interval < 0) {
+            throw new IllegalArgumentException("interval cannot be negative");
+        }
         return Snapshot.newSnapshot(jmx.getMBeanServerConnection());
     }
 

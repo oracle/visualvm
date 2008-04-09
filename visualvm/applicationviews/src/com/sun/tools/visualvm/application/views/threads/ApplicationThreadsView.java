@@ -33,9 +33,9 @@ import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -72,11 +72,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     protected void willBeAdded() {
         Application application = (Application) getDataSource();
         jvm = JvmFactory.getJVMFor(application);
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null) {
-            threadsManager = null;
-        } else {
-            JvmMXBeans mxbeans = new JvmMXBeans(jmxModel.getMBeanServerConnection());
+        threadsManager = null;
+        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(application));
+        if (mxbeans != null) {
             threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
         }
     }

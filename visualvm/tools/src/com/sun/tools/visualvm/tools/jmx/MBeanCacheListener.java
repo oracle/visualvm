@@ -23,36 +23,18 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package com.sun.tools.visualvm.tools.jmx;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
-import java.util.Set;
+import java.util.EventListener;
 
 /**
+ * Interface for listeners of MBean cache events.
  *
- * @author Jiri Sedlacek
+ * @author Luis-Miguel Alventosa
  */
-public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvider<Application> {
-
-    protected boolean supportsViewFor(Application application) {
-        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(application));
-        if (mxbeans != null) {
-            return mxbeans.getThreadMXBean() != null;
-        }
-        return false;
-    }
-
-    protected DataSourceView createView(Application application) {
-        return new ApplicationThreadsView(application);
-    }
-    
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
-    }
-    
+public interface MBeanCacheListener extends EventListener {
+    /**
+     * Invoked when the MBean cache is flushed.
+     */
+    public void flushed();
 }

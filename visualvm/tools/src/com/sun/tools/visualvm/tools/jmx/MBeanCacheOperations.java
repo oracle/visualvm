@@ -25,16 +25,40 @@
 
 package com.sun.tools.visualvm.tools.jmx;
 
-import java.util.EventListener;
-
 /**
- * Interface for listeners of {@link CachedMBeanServerConnection} events.
- *
+ * MBean cache operations.
+ * 
  * @author Luis-Miguel Alventosa
  */
-public interface CachedMBeansListener extends EventListener {
+public interface MBeanCacheOperations {
+
     /**
-     * Invoked when the MBean cache is flushed.
+     * Flush all cached values of attributes.
      */
-    public void flushed();
+    public void flush();
+
+    /**
+     * Get the flush interval.
+     *
+     * @return the flush interval in milliseconds.
+     */
+    public int getInterval();
+
+    /**
+     * Add a {@code MBeanCacheListener}. The given listener is added to
+     * the list of {@code MBeanCacheListener} objects to be notified of
+     * MBean cache related events.
+     *
+     * @param listener the {@code MBeanCacheListener} to add.
+     */
+    public void addMBeanCacheListener(MBeanCacheListener listener);
+
+    /**
+     * Remove a {@code MBeanCacheListener}. The given listener is removed
+     * from the list of {@code MBeanCacheListener} objects to be notified
+     * of MBean cache related events.
+     *
+     * @param listener the {@code MBeanCacheListener} to be removed.
+     */
+    public void removeMBeanCacheListener(MBeanCacheListener listener);
 }
