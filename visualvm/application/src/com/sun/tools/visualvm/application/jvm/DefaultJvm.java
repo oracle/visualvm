@@ -96,6 +96,10 @@ class DefaultJvm extends Jvm {
     throw new UnsupportedOperationException();
   }
   
+  public String getVMVendor() {
+    throw new UnsupportedOperationException();
+  }
+  
   public Properties getSystemProperties() {
     throw new UnsupportedOperationException();
   }

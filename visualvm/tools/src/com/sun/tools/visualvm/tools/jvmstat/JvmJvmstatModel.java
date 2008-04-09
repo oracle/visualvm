@@ -94,6 +94,10 @@ public abstract class JvmJvmstatModel extends Model {
         return jvmstat.findByName("java.property.java.vm.version");
     }
     
+    public String getVmVendor() {
+        return jvmstat.findByName("java.property.java.vm.vendor");
+    }
+    
     public String getClassPath() {
         return jvmstat.findByName("java.property.java.class.path");        
     }

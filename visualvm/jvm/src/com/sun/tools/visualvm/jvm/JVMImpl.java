@@ -76,6 +76,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     private String javaHome;
     private String vmInfo;
     private String vmName;
+    private String vmVendor;
 
  
     JVMImpl(Application app,JvmstatModel jvms) {
@@ -146,6 +147,11 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     public String getVMName() {
         initStaticData();
         return vmName;
+    }
+    
+    public String getVMVendor() {
+        initStaticData();
+        return vmVendor;
     }
     
     public boolean is14() {
@@ -387,6 +393,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 javaHome = jvmstatModel.getJavaHome();
                 vmInfo = jvmstatModel.getVMInfo();
                 vmName = jvmstatModel.getVMName();
+                vmVendor = jvmstatModel.getVmVendor();
             } else {
                 jvmArgs = jmxSupport.getJvmArgs();
                 Properties prop = jmxSupport.getSystemProperties();
@@ -395,6 +402,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                     javaHome = prop.getProperty("java.home");
                     vmInfo = prop.getProperty("java.vm.info");
                     vmName = prop.getProperty("java.vm.name");
+                    vmVendor = prop.getProperty("java.vm.vendor");
                 }
             }
             staticDataInitialized = true;
