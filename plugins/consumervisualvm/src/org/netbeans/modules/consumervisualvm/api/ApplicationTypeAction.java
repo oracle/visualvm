@@ -103,7 +103,8 @@ public class ApplicationTypeAction extends MultiDataSourceAction<Application> {
                     DecoratedFileSystem.getInstance ().refresh ();
                 } else {
                     DialogDisplayer.getDefault ().notifyLater (new NotifyDescriptor.Message (
-                            NbBundle.getMessage (ApplicationTypeAction.class, "ApplicationTypeAction_NoPluginAvailable", pluginCodeName)));
+                            NbBundle.getMessage (ApplicationTypeAction.class, "ApplicationTypeAction_ProblemDescription",
+                            findModules.getProblemDescription ())));
                 }
             }
         }); 
