@@ -130,7 +130,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                         // First event for this Host
                         // NOTE: already existing applications are treated as new on this host
                         if (LOGGER.isLoggable(Level.FINER)) {
-                            LOGGER.finer("Monitored Host (" + host.getHostName() + ") status changed - adding all active applications");
+                            LOGGER.finer("Monitored Host (" + host.getHostName() + ") status changed - adding all active applications");    // NOI18N
                         }
                         firstEvent[0] = false;
                         processNewApplicationsByPids(host, e.getActive());

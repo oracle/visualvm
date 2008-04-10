@@ -47,7 +47,7 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
     static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
         if (app.isRemoved() || app.getPid() == Application.UNKNOWN_PID) return null;
         
-        String vmId = "//" + app.getPid() + "?mode=r";
+        String vmId = "//" + app.getPid() + "?mode=r";  // NOI18N
         try {
             MonitoredHost monitoredHost = MonitoredHost.getMonitoredHost(app.getHost().getHostName());
             int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
@@ -58,7 +58,7 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         } catch (Exception ex) { 
             // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows, 
             // when opening shared memory file (java.lang.Exception: Could not open PerfMemory)
-            LOGGER.log(Level.INFO,"getMonitoredVm failed",ex);
+            LOGGER.log(Level.INFO,"getMonitoredVm failed",ex);  // NOI18N
             return null;            
         }
     }

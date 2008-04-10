@@ -214,7 +214,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
      * @param event the object describing the event.
      */
     public void disconnected(VmEvent event) {
-        ErrorManager.getDefault().log("Disconnect "+event.getMonitoredVm().getVmIdentifier());
+        ErrorManager.getDefault().log("Disconnect "+event.getMonitoredVm().getVmIdentifier());  // NOI18N
         disableListeners();
         monitoredVm.detach();
     }
