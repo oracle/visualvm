@@ -75,7 +75,9 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     JmxApplicationProvider.sharedInstance().createJmxApplication(
-                            appConfig.getConnection(), appConfig.getDisplayName());
+                            appConfig.getConnection(), appConfig.getDisplayName(),
+                            appConfig.getUsername(), appConfig.getPassword(),
+                            appConfig.getSaveCredentialsFlag());
                 }
             });
         }

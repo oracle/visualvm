@@ -138,7 +138,8 @@ class JmxApplicationProvider {
         return Host.UNKNOWN_HOST;
     }
     
-    public void createJmxApplication(String connectionName, final String displayName) {
+    public void createJmxApplication(String connectionName, final String displayName,
+            String username, String password, boolean saveCredentials) {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionName);
         final JMXServiceURL serviceURL = getServiceURL(normalizedConnectionName);
@@ -173,17 +174,25 @@ class JmxApplicationProvider {
             };
 
             String hostName = getHostName(serviceURL);
+            hostName = hostName == null ? "" : hostName;
+            String user = "";
+            String passwd = "";
+            if (saveCredentials) {
+                user = username;
+                passwd = password;
+            }
             String[] values = new String[]{
                 CURRENT_SNAPSHOT_VERSION,
                 normalizedConnectionName,
-                hostName == null ? "" : hostName,
-                "", // Populated from dialog defining the JmxApplication if security is enabled
-                "", // Populated from dialog defining the JmxApplication if security is enabled
+                hostName,
+                user,
+                passwd,
                 displayName
             };
 
             storage.setCustomProperties(keys, values);
-            addJmxApplication(serviceURL, normalizedConnectionName, hostName, storage);
+            addJmxApplication(serviceURL, normalizedConnectionName,
+                    hostName, username, password, saveCredentials, storage);
         } finally {
             final ProgressHandle pHandleF = pHandle;
             SwingUtilities.invokeLater(new Runnable() {
@@ -197,7 +206,9 @@ class JmxApplicationProvider {
     }
 
     private void addJmxApplication(JMXServiceURL serviceURL,
-            final String connectionName, final String hostName, Storage storage) {
+            final String connectionName, final String hostName,
+            String username, String password, boolean saveCredentials,
+            Storage storage) {
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) serviceURL = getServiceURL(connectionName);
         if (serviceURL == null) {
@@ -227,7 +238,8 @@ class JmxApplicationProvider {
         }
         
         // Create the JmxApplication
-        JmxApplication application = new JmxApplication(host, serviceURL, storage);
+        JmxApplication application =
+                new JmxApplication(host, serviceURL, username, password, saveCredentials, storage);
         
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
@@ -333,8 +345,7 @@ class JmxApplicationProvider {
                             final String[] values = storage.getCustomProperties(keys);
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
-                                    addJmxApplication(null, values[0],
-                                            values[1].length() == 0 ? null : values[1], storage);
+                                    addJmxApplication(null, values[0], values[1], values[2], values[3], false, storage);
                                 }
                             });
                         }

@@ -128,9 +128,6 @@ public class JmxModelImpl extends JmxModel {
      */
     public JmxModelImpl(Application application,JvmstatModel jvmstat) {
         try {
-            Storage storage = application.getStorage();
-            String username = storage.getCustomProperty(PROPERTY_USERNAME);
-            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
             JvmJvmstatModel jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(application);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
             ProxyClient proxyClient = null;
@@ -162,8 +159,8 @@ public class JmxModelImpl extends JmxModel {
                 List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
                 if (urls.size() != 0) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
-                    proxyClient = new ProxyClient(this, urls.get(0), username, password);
-                    if (username != null && "true".equals(auths.get(0))) {
+                    proxyClient = new ProxyClient(this, urls.get(0), null, null);
+                    if ("true".equals(auths.get(0))) {
                         supplyCredentials(application, proxyClient);
                     }
                 } else {
@@ -184,10 +181,8 @@ public class JmxModelImpl extends JmxModel {
                         }
                     }
                     if (port != -1) {
-                        proxyClient = new ProxyClient(this,
-                                application.getHost().getHostName(),
-                                port, username, password);
-                        if (username != null && authenticate) {
+                        proxyClient = new ProxyClient(this, application.getHost().getHostName(), port, null, null);
+                        if (authenticate) {
                             supplyCredentials(application, proxyClient);
                         }
                     }
@@ -212,9 +207,8 @@ public class JmxModelImpl extends JmxModel {
     public JmxModelImpl(JmxApplication application) {
         try {
             JMXServiceURL url = application.getJMXServiceURL();
-            Storage storage = application.getStorage();
-            String username = storage.getCustomProperty(PROPERTY_USERNAME);
-            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+            String username = application.getUsername();
+            String password = application.getPassword();
             final ProxyClient proxyClient =
                     new ProxyClient(this, url.toString(), username, password);
             client = proxyClient;
@@ -246,14 +240,18 @@ public class JmxModelImpl extends JmxModel {
     private ApplicationSecurityConfigurator supplyCredentials(
             Application application, ProxyClient proxyClient) {
         String displayName = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
-        if (displayName == null) displayName = proxyClient.getUrl().toString();
+        if (displayName == null) {
+            displayName = proxyClient.getUrl().toString();
+        }
         ApplicationSecurityConfigurator jsc =
                 ApplicationSecurityConfigurator.supplyCredentials(displayName);
         if (jsc != null) {
             proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
-            Storage storage = application.getStorage();
-            storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
-            storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+            if (application instanceof JmxApplication && ((JmxApplication) application).getSaveCredentialsFlag()) {
+                Storage storage = application.getStorage();
+                storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
+                storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+            }
         }
         return jsc;
     }

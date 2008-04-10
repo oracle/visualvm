@@ -45,20 +45,39 @@ public final class JmxApplication extends Application {
     
     private int pid;
     private final JMXServiceURL url;
+    private final String username;
+    private final String password;
+    private final boolean saveCredentials;
     private final Storage storage;
     // since getting JVM for the first time can take a long time
     // hard reference jvm from application so we are sure that it is not garbage collected
     Jvm jvm;
 
-    public JmxApplication(Host host, JMXServiceURL url, Storage storage) {
+    public JmxApplication(Host host, JMXServiceURL url, String username,
+            String password, boolean saveCredentials, Storage storage) {
         super(host, url.toString());
         pid = UNKNOWN_PID;
         this.url = url;
+        this.username = username;
+        this.password = password;
+        this.saveCredentials = saveCredentials;
         this.storage = storage;
     }
 
     public JMXServiceURL getJMXServiceURL() {
         return url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean getSaveCredentialsFlag() {
+        return saveCredentials;
     }
 
     @Override
