@@ -35,6 +35,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
@@ -84,7 +86,7 @@ import sun.rmi.transport.LiveRef;
 /**
  * This class encapsulates the JMX functionality of the target Java application.
  *
- * Call {@link JmxModelFactory.getJmxModelFor()} to get an instance of the
+ * Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
  * {@link JmxModel} class.
  *
  * Usually this class will be used as follows:
@@ -97,9 +99,9 @@ import sun.rmi.transport.LiveRef;
  * }
  * </pre>
  *
- * {@link CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection(MBeanServerConnection)}
- * can be used to work with a {@link CachedMBeanServerConnection} instead of
- * a plain {@link MBeanServerConnection}.
+ * Several factory methods are available in {@link CachedMBeanServerConnectionFactory}
+ * that can be used to work with a {@link CachedMBeanServerConnection} instead of a
+ * plain {@link MBeanServerConnection}.
  *
  * In case the JMX connection is not established yet, you could register
  * a listener on the {@code JmxModel} for ConnectionState property changes.
@@ -108,7 +110,7 @@ import sun.rmi.transport.LiveRef;
  * be the source for any generated events.
  *
  * Polling for the ConnectionState is also possible by calling
- * {@link JmxModel.getConnectionState()}.
+ * {@link JmxModel#getConnectionState()}.
  *
  * @author Luis-Miguel Alventosa
  */
@@ -269,9 +271,9 @@ public class JmxModelImpl extends JmxModel {
     }
 
     /**
-     * Returns the {@link MBeanServerConnection MBeanServerConnection} for the
-     * connection to an application. The returned {@code MBeanServerConnection}
-     * object becomes invalid when the connection state is changed to the
+     * Returns the {@link MBeanServerConnection} for the connection to
+     * an application. The returned {@code MBeanServerConnection} object
+     * becomes invalid when the connection state is changed to the
      * {@link ConnectionState#DISCONNECTED DISCONNECTED} state.
      *
      * @return the {@code MBeanServerConnection} for the
