@@ -121,7 +121,7 @@ class JmxApplicationConfigurator extends JPanel {
         usernameField.setText("");
         passwordField.setText("");
         saveCheckbox.setSelected(false);
-        saveCheckbox.setEnabled(true);
+        saveCheckbox.setEnabled(false);
         
         Set<DataSource> selectedDataSources =
                 ExplorerSupport.sharedInstance().getSelectedDataSources();
@@ -151,6 +151,7 @@ class JmxApplicationConfigurator extends JPanel {
 
                 usernameField.setEnabled(securityCheckbox.isSelected());
                 passwordField.setEnabled(securityCheckbox.isSelected());
+                saveCheckbox.setEnabled(securityCheckbox.isSelected());
 
                 okButton.setEnabled(enableOkButton(url, displayname));
             }
