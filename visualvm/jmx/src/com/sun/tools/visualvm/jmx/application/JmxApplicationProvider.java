@@ -32,7 +32,9 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.io.File;
@@ -221,7 +223,6 @@ class JmxApplicationProvider {
             });
             return;
         }
-        
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
         Host host;
         try {
@@ -236,11 +237,32 @@ class JmxApplicationProvider {
             });
             return;            
         }
-        
         // Create the JmxApplication
-        JmxApplication application =
+        final JmxApplication application =
                 new JmxApplication(host, serviceURL, username, password, saveCredentials, storage);
-        
+        // Check if the given JmxApplication has been already added to the application tree
+        final Set<JmxApplication> jmxapps = host.getRepository().getDataSources(JmxApplication.class);
+        if (jmxapps.contains(application)) {
+            storage.deleteCustomPropertiesStorage();
+            JmxApplication tempapp = null;
+            for (JmxApplication jmxapp : jmxapps) {
+                if (jmxapp.equals(application)) {
+                    tempapp = jmxapp;
+                    break;
+                }
+            }
+            final JmxApplication app = tempapp;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ExplorerSupport.sharedInstance().selectDataSource(application);
+                    NetBeansProfiler.getDefaultNB().displayWarning("<html>JMX connection " +
+                            application.getId() + " already exists as " +
+                            DataSourceDescriptorFactory.getDescriptor(app).getName() +
+                            "</html>");
+                }
+            });
+            return;
+        }
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {

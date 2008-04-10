@@ -55,7 +55,7 @@ public final class JmxApplication extends Application {
 
     public JmxApplication(Host host, JMXServiceURL url, String username,
             String password, boolean saveCredentials, Storage storage) {
-        super(host, url.toString());
+        super(host, url.toString() + (username == null ? "" : " (" + username + ")"));
         pid = UNKNOWN_PID;
         this.url = url;
         this.username = username;
