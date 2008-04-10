@@ -97,7 +97,7 @@ public final class CachedMBeanServerConnectionFactory {
             getCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");
+            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
         }
         return Snapshot.newSnapshot(mbsc);
     }
@@ -134,7 +134,7 @@ public final class CachedMBeanServerConnectionFactory {
             getCachedMBeanServerConnection(JmxModel jmx, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");
+            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
         }
         return Snapshot.newSnapshot(jmx.getMBeanServerConnection());
     }
@@ -175,11 +175,11 @@ public final class CachedMBeanServerConnectionFactory {
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
             final String methodName = method.getName();
-            if (methodName.equals("getAttribute")) {
+            if (methodName.equals("getAttribute")) {    // NOI18N
                 return getAttribute((ObjectName) args[0], (String) args[1]);
-            } else if (methodName.equals("getAttributes")) {
+            } else if (methodName.equals("getAttributes")) {    // NOI18N
                 return getAttributes((ObjectName) args[0], (String[]) args[1]);
-            } else if (methodName.equals("flush")) {
+            } else if (methodName.equals("flush")) {    // NOI18N
                 flush();
                 return null;
             } else {

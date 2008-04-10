@@ -69,7 +69,7 @@ public abstract class JmxModel extends Model {
     /**
      * The {@link ConnectionState ConnectionState} bound property name.
      */
-    public static final String CONNECTION_STATE_PROPERTY = "connectionState";
+    public static final String CONNECTION_STATE_PROPERTY = "connectionState";   // NOI18N
 
     /**
      * Values for the {@linkplain #CONNECTION_STATE_PROPERTY

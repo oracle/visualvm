@@ -107,7 +107,7 @@ public final class JvmMXBeansFactory {
     public static JvmMXBeans getJvmMXBeans(MBeanServerConnection mbsc, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");
+            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
         }
         // TODO: Check is mbsc is an instance of CachedMBeanServerConnection
         return new JvmMXBeansImpl(mbsc);
@@ -151,7 +151,7 @@ public final class JvmMXBeansFactory {
     public static JvmMXBeans getJvmMXBeans(JmxModel jmx, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");
+            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
         }
         // TODO: Check is mbsc is an instance of CachedMBeanServerConnection
         return new JvmMXBeansImpl(jmx);
@@ -251,7 +251,7 @@ public final class JvmMXBeansFactory {
                 if (mbeans != null) {
                     garbageCollectorMXBeans = new ArrayList<GarbageCollectorMXBean>();
                     for (ObjectName on : mbeans) {
-                        String name = GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");
+                        String name = GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");  // NOI18N
                         try {
                             GarbageCollectorMXBean mbean = newPlatformMXBeanProxy(mbsc, name, GarbageCollectorMXBean.class);
                             garbageCollectorMXBeans.add(mbean);
@@ -288,7 +288,7 @@ public final class JvmMXBeansFactory {
                 if (mbeans != null) {
                     memoryManagerMXBeans = new ArrayList<MemoryManagerMXBean>();
                     for (ObjectName on : mbeans) {
-                        String name = MEMORY_MANAGER_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");
+                        String name = MEMORY_MANAGER_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name"); // NOI18N
                         try {
                             MemoryManagerMXBean mbean = newPlatformMXBeanProxy(mbsc, name, MemoryManagerMXBean.class);
                             memoryManagerMXBeans.add(mbean);
@@ -335,7 +335,7 @@ public final class JvmMXBeansFactory {
                 if (mbeans != null) {
                     memoryPoolMXBeans = new ArrayList<MemoryPoolMXBean>();
                     for (ObjectName on : mbeans) {
-                        String name = MEMORY_POOL_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");
+                        String name = MEMORY_POOL_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");    // NOI18N
                         try {
                             MemoryPoolMXBean mbean = newPlatformMXBeanProxy(mbsc, name, MemoryPoolMXBean.class);
                             memoryPoolMXBeans.add(mbean);
@@ -399,19 +399,19 @@ public final class JvmMXBeansFactory {
         }
 
         public void addMBeanCacheListener(MBeanCacheListener listener) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         public void removeMBeanCacheListener(MBeanCacheListener listener) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         public void flush() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         public int getInterval() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
     }
 }
