@@ -184,7 +184,7 @@ class ExplorerComponent extends JPanel {
             // Select path on location or clear selection
             TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
             if (path != null) {
-                if (!explorerTree.isPathSelected(path))
+                if (e.getModifiers() == InputEvent.BUTTON3_MASK && !explorerTree.isPathSelected(path))
                     explorerTree.setSelectionPath(path);
             } else {
                 explorerTree.clearSelection();
