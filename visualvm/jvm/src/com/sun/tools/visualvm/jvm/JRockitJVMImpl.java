@@ -45,7 +45,7 @@ public class JRockitJVMImpl extends JVMImpl {
     @Override
     public boolean is14() {
         String ver = getVmVersion();
-        if (ver != null && ver.contains("1.4.2")) {
+        if (ver != null && ver.contains("1.4.2")) { // NOI18N
             return true;
         }
         return false;
@@ -54,7 +54,7 @@ public class JRockitJVMImpl extends JVMImpl {
     @Override
     public boolean is15() {
         String ver = getVmVersion();
-        if (ver != null && ver.contains("1.5.0")) {
+        if (ver != null && ver.contains("1.5.0")) { // NOI18N
             return true;
         }
         return false;
@@ -63,7 +63,7 @@ public class JRockitJVMImpl extends JVMImpl {
     @Override
     public boolean is16() {
         String ver = getVmVersion();
-        if (ver != null && ver.contains("1.6.0")) {
+        if (ver != null && ver.contains("1.6.0")) { // NOI18N
             return true;
         }
         return false;

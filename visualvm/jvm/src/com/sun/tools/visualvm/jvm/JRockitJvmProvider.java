@@ -56,7 +56,7 @@ public class JRockitJvmProvider extends JvmProvider {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                 if (mxbeans != null) {
                     RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
-                    if (runtime != null && runtime.getVmName().equals("BEA JRockit(R)")) {
+                    if (runtime != null && runtime.getVmName().equals("BEA JRockit(R)")) {  // NOI18N
                         jvm = new JRockitJVMImpl(app);
                     }
                 }

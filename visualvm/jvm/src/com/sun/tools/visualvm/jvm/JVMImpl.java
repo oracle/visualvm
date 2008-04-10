@@ -56,7 +56,7 @@ import java.util.Set;
  * @author Tomas Hurka
  */
 public class JVMImpl extends Jvm implements JvmstatListener {
-    private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";
+    private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";   // NOI18N
     Application application;
     Boolean isDumpOnOOMEnabled;
     JvmstatModel monitoredVm;
@@ -156,7 +156,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is14() {
         String ver = getVmVersion();
-        if (ver != null && ver.startsWith("1.4.")) {
+        if (ver != null && ver.startsWith("1.4.")) {    // NOI18N
             return true;
         }
         return false;
@@ -164,7 +164,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is15() {
         String ver = getVmVersion();
-        if (ver != null && ver.startsWith("1.5.")) {
+        if (ver != null && ver.startsWith("1.5.")) {    // NOI18N
             return true;
         }
         return false;
@@ -172,7 +172,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is16() {
         String ver = getVmVersion();
-        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.0"))) {
+        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.0"))) {    // NOI18N
             return true;
         }
         return false;
@@ -180,7 +180,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is17() {
         String ver = getVmVersion();
-        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("11.0") || ver.startsWith("12.0"))) {
+        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("11.0") || ver.startsWith("12.0"))) {  // NOI18N
             return true;
         }
         return false;
@@ -204,7 +204,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             if (args == null && monitoredVm != null) {
                 args = getJvmFlags().concat(getJvmArgs());
             }
-            if (args != null && args.contains("-XX:+"+HEAP_DUMP_ON_OOME)) {
+            if (args != null && args.contains("-XX:+"+HEAP_DUMP_ON_OOME)) { // NOI18N
                 isDumpOnOOMEnabled = Boolean.TRUE;
             } else {
                 isDumpOnOOMEnabled = Boolean.FALSE;
@@ -293,15 +293,15 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         AttachModel attach = getAttach();
         if (attach!=null) {
-            attach.setFlag(HEAP_DUMP_ON_OOME,enabled?"1":"0");
+            attach.setFlag(HEAP_DUMP_ON_OOME,enabled?"1":"0");  // NOI18N
             if (enabled) {
-                attach.setFlag("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
+                attach.setFlag("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());   // NOI18N
             }
         } else {
             HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-            hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,enabled?"true":"false");
+            hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,enabled?"true":"false"); // NOI18N
             if (enabled) {
-                hsDiagnostic.setVMOption("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());
+                hsDiagnostic.setVMOption("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath()); // NOI18N
             }
         }
         Boolean oldVlue = isDumpOnOOMEnabled;
@@ -359,13 +359,13 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             if (!isTakeThreadDumpSupported()) {
             throw new UnsupportedOperationException();
             }
-            threadDump = "Take Thread Dump failed";
+            threadDump = org.openide.util.NbBundle.getMessage(JVMImpl.class, "MSG_ThreadDumpfailed");   // NOI18N
         }
         File snapshotDir = application.getStorage().getDirectory();
         String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
         File dumpFile = new File(snapshotDir,name);
         OutputStream os = new FileOutputStream(dumpFile);
-        os.write(threadDump.getBytes("UTF-8"));
+        os.write(threadDump.getBytes("UTF-8")); // NOI18N
         os.close();
         return dumpFile;
     }
@@ -398,11 +398,11 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 jvmArgs = jmxSupport.getJvmArgs();
                 Properties prop = jmxSupport.getSystemProperties();
                 if (prop != null) {
-                    vmVersion = prop.getProperty("java.vm.version");
-                    javaHome = prop.getProperty("java.home");
-                    vmInfo = prop.getProperty("java.vm.info");
-                    vmName = prop.getProperty("java.vm.name");
-                    vmVendor = prop.getProperty("java.vm.vendor");
+                    vmVersion = prop.getProperty("java.vm.version");    // NOI18N
+                    javaHome = prop.getProperty("java.home");   // NOI18N
+                    vmInfo = prop.getProperty("java.vm.info");  // NOI18N
+                    vmName = prop.getProperty("java.vm.name");  // NOI18N
+                    vmVendor = prop.getProperty("java.vm.vendor");  // NOI18N
                 }
             }
             staticDataInitialized = true;
