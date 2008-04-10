@@ -64,12 +64,17 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         try {
             vm = getMonitoredVm(app);
             if (vm != null) {
-                JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
-                app.notifyWhenRemoved(jvmstat);
-                return jvmstat;
+                // check that the target VM is accessible
+                if (vm.findByName("java.property.java.vm.version") != null) {   // NOI18N
+                    JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
+                    app.notifyWhenRemoved(jvmstat);
+                    return jvmstat;
+                } else {
+                   LOGGER.log(Level.INFO, "java.property.java.vm.version is null"); // NOI18N
+                }
             }
         } catch (MonitorException ex) {
-            LOGGER.log(Level.FINE, "Could not get MonitoredVM", ex); // NOI18N
+            LOGGER.log(Level.INFO, "Could not get MonitoredVM", ex); // NOI18N
         }
         if (vm != null) {
             vm.detach();
