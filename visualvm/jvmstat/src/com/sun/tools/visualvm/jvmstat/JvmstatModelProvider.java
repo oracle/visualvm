@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.ErrorManager;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -54,8 +53,13 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
             int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
             return monitoredHost.getMonitoredVm(new VmIdentifier(vmId),refreshInterval);
         } catch (URISyntaxException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.EXCEPTION,ex);
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
             return null;
+        } catch (Exception ex) { 
+            // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows, 
+            // when opening shared memory file (java.lang.Exception: Could not open PerfMemory)
+            LOGGER.log(Level.INFO,"getMonitoredVm failed",ex);
+            return null;            
         }
     }
     
