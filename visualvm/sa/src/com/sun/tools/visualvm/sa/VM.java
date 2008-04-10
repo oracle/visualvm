@@ -42,19 +42,19 @@ class VM {
     }
 
     Properties getSystemProperties() throws IllegalAccessException, InvocationTargetException {
-        return (Properties) vm.invoke("getSystemProperties");
+        return (Properties) vm.invoke("getSystemProperties");   // NOI18N
     }
 
     SAObject getThreads() throws IllegalAccessException, InvocationTargetException {
-        return vm.invokeSA("getThreads");
+        return vm.invokeSA("getThreads");   // NOI18N
     }
 
     SAObject getObjectHeap() throws IllegalAccessException, InvocationTargetException {
-        return vm.invokeSA("getObjectHeap");
+        return vm.invokeSA("getObjectHeap");    // NOI18N
     }
 
     SAObject getSystemDictionary() throws IllegalAccessException, InvocationTargetException {
-        return vm.invokeSA("getSystemDictionary");
+        return vm.invokeSA("getSystemDictionary");  // NOI18N
     }
     
 }

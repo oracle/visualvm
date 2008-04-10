@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource>  {
     private static final Logger LOGGER = Logger.getLogger(SaModelProvider.class.getName());
     
-    private static final String SA_JAR = "lib/sa-jdi.jar";
+    private static final String SA_JAR = "lib/sa-jdi.jar";  // NOI18N
 
     SaModelProvider() {
     }
@@ -64,7 +64,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                 try {
                     return new SaModelImpl(jdkHome,saJar,app.getPid());
                 } catch (Exception ex) {
-                    LOGGER.log(Level.INFO, "Error getting SA agent", ex);
+                    LOGGER.log(Level.INFO, "Error getting SA agent", ex);   // NOI18N
                 }
                 return null;
             }
@@ -82,7 +82,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                 try {
                     return new SaModelImpl(jdkHome,saJar,executable,coreFile);
                 } catch (Exception ex) {
-                    LOGGER.log(Level.INFO, "Unable to retrieve SA agent", ex);
+                    LOGGER.log(Level.INFO, "Unable to retrieve SA agent", ex);  // NOI18N
                 }
                 return null;
             }

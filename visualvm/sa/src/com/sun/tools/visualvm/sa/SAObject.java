@@ -80,7 +80,7 @@ class SAObject {
         Method method = null;
         
         if (methods == null) {
-            throw new IllegalAccessException("No method "+mid);
+            throw new IllegalAccessException("No method "+mid); // NOI18N
         }
         if (methods.size()==1) {
             method = methods.get(0);
@@ -112,14 +112,14 @@ class SAObject {
     }
     
     private static String methodId(String name,int pars) {
-        return name.concat("#").concat(Integer.toString(pars));
+        return name.concat("#").concat(Integer.toString(pars)); // NOI18N
     }
     
     public String toString() {
         if (instance != null) {
             return instance.toString();
         }
-        return "<null>";
+        return "<null>";    // NOI18N
     }
 
     public int hashCode() {

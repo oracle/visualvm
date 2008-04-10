@@ -40,15 +40,15 @@ class Arguments {
     }
 
     String getJVMFlags() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return (String) arguments.getMethod("getJVMFlags").invoke(null);
+        return (String) arguments.getMethod("getJVMFlags").invoke(null);    // NOI18N
     }
 
     String getJVMArgs()  throws NoSuchMethodException, IllegalAccessException, InvocationTargetException{
-        return (String) arguments.getMethod("getJVMArgs").invoke(null);
+        return (String) arguments.getMethod("getJVMArgs").invoke(null); // NOI18N
     }
 
     String getJavaCommand()  throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return (String) arguments.getMethod("getJavaCommand").invoke(null);
+        return (String) arguments.getMethod("getJavaCommand").invoke(null); // NOI18N
     }
 
 

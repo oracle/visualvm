@@ -43,31 +43,31 @@ class StackTrace {
     StackTrace(VM v) throws IllegalAccessException, InvocationTargetException {
         vm = v;
         heap = vm.getObjectHeap();
-        objectClass = vm.getSystemDictionary().invokeSA("getObjectKlass");
+        objectClass = vm.getSystemDictionary().invokeSA("getObjectKlass");  // NOI18N
     }
 
     public String getStackTrace() throws IllegalAccessException, InvocationTargetException {
         ByteArrayOutputStream data = new ByteArrayOutputStream(4096);
         PrintStream out = new PrintStream(data);
         SAObject threads = vm.getThreads();
-        SAObject curThread = threads.invokeSA("first");
+        SAObject curThread = threads.invokeSA("first"); // NOI18N
 
-        for (;!curThread.isNull();curThread=curThread.invokeSA("next")) {
-            Boolean isJavaThread = (Boolean) curThread.invoke("isJavaThread");
+        for (;!curThread.isNull();curThread=curThread.invokeSA("next")) {   // NOI18N
+            Boolean isJavaThread = (Boolean) curThread.invoke("isJavaThread");  // NOI18N
             if (!isJavaThread.booleanValue()) {
-                out.print("VM ");
+                out.print("VM ");   // NOI18N
             }
-            out.print("Thread ");
-            curThread.invoke("printThreadIDOn",out);
-            out.print(" \""+curThread.invoke("getThreadName")+"\"");
-            out.print(": (state = ");
-            out.print(curThread.invoke("getThreadState"));
+            out.print("Thread ");   // NOI18N
+            curThread.invoke("printThreadIDOn",out);    // NOI18N
+            out.print(" \""+curThread.invoke("getThreadName")+"\"");    // NOI18N
+            out.print(": (state = ");   // NOI18N
+            out.print(curThread.invoke("getThreadState"));  // NOI18N
             out.println(")");
             if (isJavaThread.booleanValue()) { // Java thread
-                SAObject javaFrame = curThread.invokeSA("getLastJavaVFrameDbg");
-                Object waitingToLockMonitor = curThread.invoke("getCurrentPendingMonitor");
+                SAObject javaFrame = curThread.invokeSA("getLastJavaVFrameDbg");    // NOI18N
+                Object waitingToLockMonitor = curThread.invoke("getCurrentPendingMonitor"); // NOI18N
                 boolean objectWaitFrame = isJavaLangObjectWaitFrame(javaFrame);
-                for (;!javaFrame.isNull();javaFrame=javaFrame.invokeSA("javaSender")) {
+                for (;!javaFrame.isNull();javaFrame=javaFrame.invokeSA("javaSender")) { // NOI18N
                     printJavaFrame(out, javaFrame);
                     printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
                     waitingToLockMonitor = null;
@@ -81,11 +81,11 @@ class StackTrace {
     
     private boolean isJavaLangObjectWaitFrame(SAObject javaFrame) throws IllegalAccessException, InvocationTargetException {
         if (!javaFrame.isNull()) {
-            SAObject method = javaFrame.invokeSA("getMethod");
-            SAObject klass = method.invokeSA("getMethodHolder");
-            Boolean isNative = (Boolean) method.invoke("isNative");
+            SAObject method = javaFrame.invokeSA("getMethod");  // NOI18N
+            SAObject klass = method.invokeSA("getMethodHolder");    // NOI18N
+            Boolean isNative = (Boolean) method.invoke("isNative"); // NOI18N
             if (objectClass.equals(klass) && isNative.booleanValue()) {
-                if ("wait".equals(method.invokeSA("getName").invoke("asString"))) {
+                if ("wait".equals(method.invokeSA("getName").invoke("asString"))) { // NOI18N
                     return true;
                 }
             }
@@ -98,25 +98,25 @@ class StackTrace {
             Object waitingToLockMonitor, boolean objectWaitFrame)
             throws IllegalAccessException, InvocationTargetException {
         if (objectWaitFrame) {
-            SAObject stackValueCollection = javaFrame.invokeSA("getLocals");
-            Boolean isEmpty = (Boolean) stackValueCollection.invoke("isEmpty");
+            SAObject stackValueCollection = javaFrame.invokeSA("getLocals");    // NOI18N
+            Boolean isEmpty = (Boolean) stackValueCollection.invoke("isEmpty"); // NOI18N
             if (!isEmpty.booleanValue()) {
-                Object oopHandle = stackValueCollection.invoke("oopHandleAt", 0);
-                printMonitor(out, oopHandle, "waiting on");
+                Object oopHandle = stackValueCollection.invoke("oopHandleAt", 0);   // NOI18N
+                printMonitor(out, oopHandle, "waiting on"); // NOI18N
             }
         }
         try {
-            List mList = (List) javaFrame.invoke("getMonitors");
+            List mList = (List) javaFrame.invoke("getMonitors");    // NOI18N
             Object[] monitors = mList.toArray();
             for (int i = monitors.length - 1; i >= 0; i--) {
                 SAObject monitorInfo = new SAObject(monitors[i]);
-                Object ownerHandle = monitorInfo.invoke("owner");
+                Object ownerHandle = monitorInfo.invoke("owner");   // NOI18N
                 if (ownerHandle != null) {
-                    String state = "locked";
+                    String state = "locked";    // NOI18N
                     if (waitingToLockMonitor != null) {
-                        Object objectHandle = new SAObject(waitingToLockMonitor).invoke("object");
+                        Object objectHandle = new SAObject(waitingToLockMonitor).invoke("object");  // NOI18N
                         if (objectHandle.equals(ownerHandle)) {
-                            state = "waiting to lock";
+                            state = "waiting to lock";  // NOI18N
                         }
                     }
                     printMonitor(out, ownerHandle, state);
@@ -133,7 +133,7 @@ class StackTrace {
             final String state) {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("\t- " + state + " <" + ownerHandle + "> ");
+            sb.append("\t- " + state + " <" + ownerHandle + "> ");  // NOI18N
             printOop(sb, ownerHandle);
             out.println(sb.toString());
         } catch (Exception e) {
@@ -143,40 +143,40 @@ class StackTrace {
 
     private void printOop(StringBuilder sb, Object oopHandle)
             throws IllegalAccessException, InvocationTargetException {
-        SAObject oop = heap.invokeSA("newOop", oopHandle);
+        SAObject oop = heap.invokeSA("newOop", oopHandle);  // NOI18N
         if (!oop.isNull()) {
-            sb.append("(a ");
-            String monitorClassName = (String) oop.invokeSA("getKlass").invokeSA("getName").invoke("asString");
+            sb.append("(a ");   // NOI18N
+            String monitorClassName = (String) oop.invokeSA("getKlass").invokeSA("getName").invoke("asString"); // NOI18N
             sb.append(monitorClassName.replace('/', '.'));
             sb.append(")");
         } else {
-            sb.append("(Raw Monitor)");
+            sb.append("(Raw Monitor)"); // NOI18N
         }
     }
     
     private void printJavaFrame(final PrintStream out, final SAObject javaFrame) throws IllegalAccessException, InvocationTargetException {
-        SAObject method = javaFrame.invokeSA("getMethod");
+        SAObject method = javaFrame.invokeSA("getMethod");  // NOI18N
         
-        out.print("\tat ");
-        SAObject klass = method.invokeSA("getMethodHolder");
-        String className = (String) klass.invokeSA("getName").invoke("asString");
+        out.print("\tat "); // NOI18N
+        SAObject klass = method.invokeSA("getMethodHolder");    // NOI18N
+        String className = (String) klass.invokeSA("getName").invoke("asString");   // NOI18N
         out.print(className.replace('/','.'));
         out.print(".");
-        out.print(method.invokeSA("getName").invoke("asString"));
-        Integer bci = (Integer) javaFrame.invoke("getBCI");
+        out.print(method.invokeSA("getName").invoke("asString"));   // NOI18N
+        Integer bci = (Integer) javaFrame.invoke("getBCI"); // NOI18N
         out.print("(");
-        if (((Boolean)method.invoke("isNative")).booleanValue()) {
-            out.print("Native Method");
+        if (((Boolean)method.invoke("isNative")).booleanValue()) {  // NOI18N
+            out.print("Native Method"); // NOI18N
         } else {
-            Integer lineNumber = (Integer) method.invoke("getLineNumberFromBCI",bci);
-            SAObject sourceName = klass.invokeSA("getSourceFileName");
+            Integer lineNumber = (Integer) method.invoke("getLineNumberFromBCI",bci);   // NOI18N
+            SAObject sourceName = klass.invokeSA("getSourceFileName");  // NOI18N
             
             if (lineNumber.intValue()!=-1  && !sourceName.isNull()) {
-                out.print(sourceName.invoke("asString"));
+                out.print(sourceName.invoke("asString"));   // NOI18N
                 out.print(":");
                 out.print(lineNumber);
             } else {
-                out.print("bci=");
+                out.print("bci=");  // NOI18N
                 out.print(bci);
             }
         }

@@ -69,7 +69,7 @@ public class SaModelImpl extends SaModel {
                 try {
                     if (attach()) {
                         SAObject hprofWrite = agent.getHeapHprofBinWriter();
-                        hprofWrite.invoke("write",file);
+                        hprofWrite.invoke("write",file);    // NOI18N
                         return true;
                     }
                 } finally {
