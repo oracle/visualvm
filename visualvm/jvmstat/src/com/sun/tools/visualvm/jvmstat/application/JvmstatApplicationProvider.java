@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
@@ -225,16 +226,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         } catch (Exception e) {
             return;
         }
+        String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_Link")
+                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_NoLink");
         
-        String message = DesktopUtils.isBrowseAvailable() ? "<html><b>Local Java applications cannot be detected.</b><br><br>" +
-                "Please see the Troubleshooting guide for VisualVM for more<br>" +
-                "information and steps to fix the problem.<br><br>" +
-                "<a href=\"https://visualvm.dev.java.net/troubleshooting.html#jpswin\">https://visualvm.dev.java.net/troubleshooting.html#jpswin</a></html>"
-                :
-            "<html><b>Local applications cannot be detected.</b><br><br>" +
-            "Please see the Troubleshooting guide for VisualVM for more<br>" +
-            "information and steps to fix the problem.<br><br>" +
-            "<nobr>https://visualvm.dev.java.net/troubleshooting.html#jpswin</nobr></html>";
+        String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps", link);
         final HTMLLabel label = new HTMLLabel(message) {
             protected void showURL(URL url) {
                 try {
