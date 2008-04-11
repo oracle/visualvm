@@ -260,8 +260,11 @@ class ApplicationProfilerView extends DataSourceView {
                     } else {
                       statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + "</a> in progress</nobr>");
                       disableControlButtons();
+                      profilingResultsView.setProfilingResultsDisplay(null);
                     }
 
+                    profilingResultsView.revalidate();
+                    profilingResultsView.repaint();
                     revalidate();
                     repaint();
 
@@ -556,8 +559,7 @@ class ApplicationProfilerView extends DataSourceView {
         
         public void setProfilingResultsDisplay(JComponent profilingResultsDisplay) {
             removeAll();
-            add(profilingResultsDisplay);
-            doLayout();
+            if (profilingResultsDisplay != null) add(profilingResultsDisplay);
         }
         
         private void initComponents() {
