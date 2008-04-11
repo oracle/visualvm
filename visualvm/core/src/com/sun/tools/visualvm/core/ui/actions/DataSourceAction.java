@@ -59,7 +59,6 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
     protected void initialize() {
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
             public void selectionChanged(Set<DataSource> selected) {
-                if (selected.isEmpty()) selected = Collections.singleton(DataSource.ROOT);
                 Set<X> selectedFiltered = Utils.getFilteredSet(selected, getScope());
                 if (selectedFiltered.size() == selected.size()) DataSourceAction.this.updateState(selectedFiltered);
                 else updateState(Collections.EMPTY_SET);
