@@ -90,7 +90,31 @@ public class GlassFishApplicationViewProvider extends DataSourceViewProvider<App
 
     @Override
     protected boolean supportsViewFor(Application app) {
-        return ApplicationTypeFactory.getApplicationTypeFor(app) instanceof GlassFishApplicationType;
+        if (!(ApplicationTypeFactory.getApplicationTypeFor(app) instanceof GlassFishApplicationType)) return false;
+        
+        final JmxModel model = JmxModelFactory.getJmxModelFor(app);
+        if (model == null) {
+            return false;
+        }
+
+        DomainRoot dr = AMXUtil.getDomainRoot(model);
+        if (dr == null) {
+            return false;
+        }
+
+        final Map<String, ServerRootMonitor> serverMonitors = dr.getMonitoringRoot().getServerRootMonitorMap();
+        final String serverName = JMXUtil.getServerName(model);
+
+        if (serverMonitors.get(serverName) == null) {
+            return false;
+        }
+
+        HTTPServiceMonitor httpMonitor = serverMonitors.get(serverName).getHTTPServiceMonitor();
+        ModuleMonitoringLevelsConfig monitorConfig = AMXUtil.getMonitoringConfig(model);
+        if (!monitorConfig.getHTTPService().equals(ModuleMonitoringLevelValues.OFF)) {
+            return httpMonitor != null;
+        }
+        return false;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

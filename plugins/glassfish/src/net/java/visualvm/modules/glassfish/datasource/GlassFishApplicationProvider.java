@@ -43,6 +43,8 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -200,6 +202,9 @@ public class GlassFishApplicationProvider implements DataChangeListener<GlassFis
                     model.getRepository().removeDataSources(toRemove);
 //                    model.getRepository().updateDataSources(toAdd, toRemove);
                 }
+            } catch (UndeclaredThrowableException e) {
+                // this is caused by disappearing of the underlying JMX connection
+                // just ignore it
             } finally {
                 isProcessing.set(false);
             }
