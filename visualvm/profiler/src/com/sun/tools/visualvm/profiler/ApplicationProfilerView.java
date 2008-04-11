@@ -233,6 +233,7 @@ class ApplicationProfilerView extends DataSourceView {
               public void run() {
                 switch (state) {
                   case NetBeansProfiler.PROFILING_INACTIVE:
+                    ProfilerSupport.getInstance().setProfiledApplication(null); // Necessary to set here when profiled app finished
                     statusValueLabel.setText("profiling inactive");
                     resetControlButtons();
                     RequestProcessor.getDefault().post(new Runnable() {
@@ -254,6 +255,7 @@ class ApplicationProfilerView extends DataSourceView {
                     if (application.equals(profiledApplication)) {
                       statusValueLabel.setText("profiling running (" + NetBeansProfiler.getDefaultNB().getLastProfilingSettings().getSettingsName() + ")");
                       enableControlButtons();
+                      updateControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
                     } else {
                       statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + "</a> in progress</nobr>");
@@ -279,6 +281,22 @@ class ApplicationProfilerView extends DataSourceView {
           cpuButton.setSelected(false);
           memoryButton.setSelected(false);
           internalChange = false;
+        }
+        
+        private void updateControlButtons() {
+            ProfilingSettings currentSettings = NetBeansProfiler.getDefaultNB().getLastProfilingSettings();
+            int currentProfilingType = currentSettings != null ? currentSettings.getProfilingType() : Integer.MIN_VALUE;
+            if (cpuSettings.getProfilingType() == currentProfilingType && !cpuButton.isSelected()) {
+                internalChange = true;
+                cpuButton.setSelected(true);
+                memoryButton.setSelected(false);
+                internalChange = false;
+            } else if (memorySettings.getProfilingType() == currentProfilingType && !memoryButton.isSelected()) {
+                internalChange = true;
+                cpuButton.setSelected(false);
+                memoryButton.setSelected(true);
+                internalChange = false;
+            }
         }
 
         private void enableControlButtons() {
