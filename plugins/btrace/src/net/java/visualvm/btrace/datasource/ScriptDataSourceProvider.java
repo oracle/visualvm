@@ -25,10 +25,8 @@
 package net.java.visualvm.btrace.datasource;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.IOException;
 import java.io.InputStream;
