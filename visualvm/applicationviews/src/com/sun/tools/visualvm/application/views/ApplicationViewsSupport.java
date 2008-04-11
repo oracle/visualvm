@@ -72,10 +72,10 @@ public final class ApplicationViewsSupport {
     
     
     private ApplicationViewsSupport() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(overviewPluggableView, Application.class);
-        DataSourceViewsManager.sharedInstance().addViewsProvider(applicationSnapshotOverviewView, ApplicationSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewsProvider(monitorPluggableView, Application.class);
-        DataSourceViewsManager.sharedInstance().addViewsProvider(threadsPluggableView, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(overviewPluggableView, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(applicationSnapshotOverviewView, ApplicationSnapshot.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(monitorPluggableView, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(threadsPluggableView, Application.class);
     }
     
 }

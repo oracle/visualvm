@@ -45,7 +45,7 @@ class ProfilerSnapshotViewProvider extends DataSourceViewProvider<ProfilerSnapsh
     
 
     void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, ProfilerSnapshot.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, ProfilerSnapshot.class);
     }
 
 }

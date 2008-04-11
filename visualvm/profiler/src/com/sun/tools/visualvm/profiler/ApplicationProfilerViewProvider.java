@@ -51,7 +51,7 @@ class ApplicationProfilerViewProvider extends DataSourceViewProvider<Application
     
 
     void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
 
 }

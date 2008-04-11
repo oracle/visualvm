@@ -52,11 +52,11 @@ public class HelloWorldViewProvider extends DataSourceViewProvider<Application> 
     }
 
     static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(instance, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(instance, Application.class);
     }
 
     static void unregister() {
-        DataSourceViewsManager.sharedInstance().removeViewsProvider(instance);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(instance);
     }
     
 }

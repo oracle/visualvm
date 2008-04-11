@@ -52,7 +52,7 @@ public final class HostViewsSupport {
     
     
     private HostViewsSupport() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(viewProvider, Host.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(viewProvider, Host.class);
     }
     
 }

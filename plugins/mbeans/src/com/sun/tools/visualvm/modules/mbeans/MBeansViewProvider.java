@@ -46,6 +46,6 @@ public class MBeansViewProvider extends DataSourceViewProvider<Application> {
     }
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, Application.class);
     }
 }

@@ -51,7 +51,7 @@ public class HeapDumpViewProvider extends PluggableDataSourceViewProvider<HeapDu
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, HeapDump.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, HeapDump.class);
     }
 
 }

@@ -117,7 +117,7 @@ public final class CoreDumpSupport {
         CoreDumpsContainer.sharedInstance();
         CoreDumpProvider.register();
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
-        DataSourceViewsManager.sharedInstance().addViewsProvider(viewProvider, CoreDump.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(viewProvider, CoreDump.class);
     }
 
 }

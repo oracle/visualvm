@@ -169,11 +169,11 @@ public class GlassFishApplicationViewProvider extends DataSourceViewProvider<App
     }
 
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, Application.class);
     }
 
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.httpServiceViewMap.clear();
         INSTANCE.transServiceViewMap.clear();
     }

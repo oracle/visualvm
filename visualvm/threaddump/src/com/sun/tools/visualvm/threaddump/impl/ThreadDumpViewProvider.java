@@ -51,7 +51,7 @@ public class ThreadDumpViewProvider extends PluggableDataSourceViewProvider<Thre
     
 
     public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(this, ThreadDump.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(this, ThreadDump.class);
     }
 
 }
