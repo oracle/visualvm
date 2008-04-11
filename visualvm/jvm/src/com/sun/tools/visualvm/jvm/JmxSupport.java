@@ -154,9 +154,9 @@ public class JmxSupport implements DataRemovedListener {
         StringBuffer sb = new StringBuffer(4096);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
         sb.append(df.format(new Date()) + "\n");
-        sb.append("Full thread dump " + jvm.getVMName() +   // NOI18N
+        sb.append("Full thread dump " + jvm.getVmName() +   // NOI18N
                 " (" + jvm.getVmVersion() + " " +   // NOI18N
-                jvm.getVMInfo() + "):\n");  // NOI18N
+                jvm.getVmInfo() + "):\n");  // NOI18N
         if (jvm.is15()) {
             long[] threadIds = threadMXBean.getAllThreadIds();
             for (long threadId : threadIds) {

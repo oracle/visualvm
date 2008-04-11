@@ -139,17 +139,17 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         return javaHome;
     }
     
-    public String getVMInfo() {
+    public String getVmInfo() {
         initStaticData();
         return vmInfo;
     }
     
-    public String getVMName() {
+    public String getVmName() {
         initStaticData();
         return vmName;
     }
     
-    public String getVMVendor() {
+    public String getVmVendor() {
         initStaticData();
         return vmVendor;
     }
@@ -391,8 +391,8 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 mainClass = jvmstatModel.getMainClass();
                 vmVersion = jvmstatModel.getVmVersion();
                 javaHome = jvmstatModel.getJavaHome();
-                vmInfo = jvmstatModel.getVMInfo();
-                vmName = jvmstatModel.getVMName();
+                vmInfo = jvmstatModel.getVmInfo();
+                vmName = jvmstatModel.getVmName();
                 vmVendor = jvmstatModel.getVmVendor();
             } else {
                 jvmArgs = jmxSupport.getJvmArgs();
@@ -416,7 +416,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             if (args == null) {
                 SaModel sa = getSAAgent();
                 if (sa != null) {
-                    args = sa.getJVMArgs();
+                    args = sa.getJvmArgs();
                 }
             }
             if (args == null || args.length() == 0) {

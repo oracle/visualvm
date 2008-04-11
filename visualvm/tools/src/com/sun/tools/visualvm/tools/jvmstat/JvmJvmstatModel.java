@@ -82,11 +82,11 @@ public abstract class JvmJvmstatModel extends Model {
         return jvmstat.findByName("java.property.java.home");   // NOI18N
     }
     
-    public String getVMInfo() {
+    public String getVmInfo() {
         return jvmstat.findByName("java.property.java.vm.info");    // NOI18N
     }
     
-    public String getVMName() {
+    public String getVmName() {
         return jvmstat.findByName("java.property.java.vm.name");    // NOI18N
     }
     

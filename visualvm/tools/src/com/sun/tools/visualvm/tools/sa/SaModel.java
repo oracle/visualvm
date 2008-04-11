@@ -40,9 +40,9 @@ public abstract class SaModel extends Model {
     
     public abstract String takeThreadDump();
     
-    public abstract String getJVMFlags();
+    public abstract String getJvmFlags();
     
-    public abstract String getJVMArgs();
+    public abstract String getJvmArgs();
     
     public abstract String getJavaCommand();
     
@@ -54,11 +54,11 @@ public abstract class SaModel extends Model {
         return findByName("java.home"); //NOI18N
     }
     
-    public String getVMInfo() {
+    public String getVmInfo() {
         return findByName("java.vm.info"); //NOI18N
     }
     
-    public String getVMName() {
+    public String getVmName() {
         return findByName("java.vm.name"); //NOI18N
     }
     

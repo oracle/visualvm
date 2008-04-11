@@ -101,11 +101,11 @@ public class SaModelImpl extends SaModel {
         return null;
     }
     
-    public String getJVMFlags() {
+    public String getJvmFlags() {
         return jvmFlags;
     }
     
-    public String getJVMArgs() {
+    public String getJvmArgs() {
         return jvmArgs;
     }
     

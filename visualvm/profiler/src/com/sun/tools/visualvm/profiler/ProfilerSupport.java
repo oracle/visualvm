@@ -91,8 +91,8 @@ public final class ProfilerSupport {
         // Profiled application needs to be running JDK 6.0 or 7.0
         if (!jvm.is16() && !jvm.is17()) return false;
         
-        String vmName = jvm.getVMName();
-        String vmVendor = jvm.getVMVendor();
+        String vmName = jvm.getVmName();
+        String vmVendor = jvm.getVmVendor();
         
         // VM has to be a HotSpot VM by Sun Microsystems Inc. or Apple Inc.
         return vmName != null && vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) && vmVendor != null

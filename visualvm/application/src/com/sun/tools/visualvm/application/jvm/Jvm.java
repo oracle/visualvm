@@ -136,21 +136,21 @@ public abstract class Jvm extends Model {
      * the java.vm.info property (which is reflected in the text displayed by "java -version")
      * @return Returns java.vm.info property.
      */
-    public abstract String getVMInfo();
+    public abstract String getVmInfo();
 
     /**
      * Returns the java.vm.name property for the target Java application.
      * java.vm.name property is Java Virtual Machine implementation name.
      * @return Returns java.vm.name property.
      */
-    public abstract String getVMName();
+    public abstract String getVmName();
     
     /**
      * Returns the java.vm.vendor property for the target Java application.
      * java.vm.vendor property is Java Virtual Machine vendor name.
      * @return Returns java.vm.vendor property.
      */
-    public abstract String getVMVendor();
+    public abstract String getVmVendor();
 
     /**
      * Tests if target JVM monitoring is supported. If true, JVM fires

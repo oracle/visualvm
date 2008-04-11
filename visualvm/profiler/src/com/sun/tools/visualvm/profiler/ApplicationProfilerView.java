@@ -323,7 +323,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // classShareWarningLabel
               Jvm jvm = JvmFactory.getJVMFor(application);
-              String vmInfo = jvm.getVMInfo();
+              String vmInfo = jvm.getVmInfo();
               String vmVersion = jvm.getVmVersion();
               boolean classSharingBreaksProfiling = vmInfo.contains("sharing") && !vmVersion.equals("10.0-b23");
               classShareWarningArea = new HTMLTextArea() {

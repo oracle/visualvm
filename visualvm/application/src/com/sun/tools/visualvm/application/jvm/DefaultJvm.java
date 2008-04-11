@@ -88,15 +88,15 @@ class DefaultJvm extends Jvm {
     throw new UnsupportedOperationException();
   }
   
-  public String getVMInfo() {
+  public String getVmInfo() {
     throw new UnsupportedOperationException();
   }
   
-  public String getVMName() {
+  public String getVmName() {
     throw new UnsupportedOperationException();
   }
   
-  public String getVMVendor() {
+  public String getVmVendor() {
     throw new UnsupportedOperationException();
   }
   
