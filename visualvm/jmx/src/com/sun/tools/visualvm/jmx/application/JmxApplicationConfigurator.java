@@ -138,11 +138,13 @@ class JmxApplicationConfigurator extends JPanel {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                String username = getUsername();
                 String url = getConnection();
 
                 if (!displaynameCheckbox.isSelected()) {
                     internalChange = true;
-                    displaynameField.setText(url);
+                    displaynameField.setText(
+                            (username.isEmpty() ? "" : username + "@") + url);
                     internalChange = false;
                 }
 
