@@ -53,7 +53,7 @@ class MBeansView extends DataSourceView {
     protected DataViewComponent createComponent() {
         DataViewComponent dvc = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-        if (jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+        if (jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
             JTextArea textArea = new JTextArea("\n\nData not available in " +
                     "this tab because JMX connection to the JMX agent couldn't " +
                     "be established.");

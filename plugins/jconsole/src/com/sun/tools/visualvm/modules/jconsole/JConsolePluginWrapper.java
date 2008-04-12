@@ -70,7 +70,7 @@ class JConsolePluginWrapper {
 
     JConsolePluginWrapper(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel.getMBeanServerConnection() == null) {
+        if (jmxModel == null || jmxModel.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
             JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "JMX_Not_Available"));
             textArea.setEditable(false);
             jconsoleView = textArea;
