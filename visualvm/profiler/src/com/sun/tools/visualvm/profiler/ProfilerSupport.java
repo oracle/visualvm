@@ -189,7 +189,7 @@ public final class ProfilerSupport {
     
     
     private ProfilerSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new ProfilerSnapshotDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new ProfilerSnapshotDescriptorProvider());
         profilerViewProvider = new ApplicationProfilerViewProvider();
         profilerViewProvider.initialize();
         

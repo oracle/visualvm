@@ -109,7 +109,7 @@ public final class HeapDumpSupport {
 
 
     private HeapDumpSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HeapDumpDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new HeapDumpDescriptorProvider());
         heapDumpProvider = new HeapDumpProvider();
         heapDumpProvider.initialize();
         

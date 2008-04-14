@@ -48,7 +48,7 @@ public final class SnapshotsContainer extends DataSource {
     
     
     private SnapshotsContainer() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new SnapshotsContainerDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new SnapshotsContainerDescriptorProvider());
         DataSource.ROOT.getRepository().addDataSource(this);
     }
     

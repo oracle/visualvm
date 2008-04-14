@@ -43,7 +43,7 @@ public class HostOverviewFactory extends ModelFactory<HostOverview,Host> impleme
   public static synchronized HostOverviewFactory getDefault() {
     if (overviewFactory == null) {
       overviewFactory = new HostOverviewFactory();
-      overviewFactory.registerFactory(overviewFactory);
+      overviewFactory.registerProvider(overviewFactory);
     }
     return overviewFactory;
   }

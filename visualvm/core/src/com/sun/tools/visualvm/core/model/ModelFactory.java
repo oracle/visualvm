@@ -52,10 +52,10 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     
     /** special marker for null model  */
     private final Reference<M> NULL_MODEL;
-    /** set of registered factories */
-    private SortedSet<ModelProvider<M, D>> factories;
-    /** factories cannot be changed, when getModel() is running */
-    private ReadWriteLock factoriesLock;
+    /** set of registered providers */
+    private SortedSet<ModelProvider<M, D>> providers;
+    /** providers cannot be changed, when getModel() is running */
+    private ReadWriteLock providersLock;
     /** model cache */
     private Map<DataSourceKey<D>,Reference<M>> modelCache;    
     /** asynchronous change support */
@@ -63,15 +63,15 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     
     protected ModelFactory() {
         NULL_MODEL = new SoftReference(null);
-        factories = new TreeSet(new ModelProviderComparator());
+        providers = new TreeSet(new ModelProviderComparator());
         modelCache = Collections.synchronizedMap(new HashMap());
         factoryChange = new DataChangeSupport();
-        factoriesLock = new ReentrantReadWriteLock();
+        providersLock = new ReentrantReadWriteLock();
     }
     
     public final M getModel(D dataSource) {
-        // take a read lock for factories
-        Lock rlock = factoriesLock.readLock();
+        // take a read lock for providers
+        Lock rlock = providersLock.readLock();
         rlock.lock();
         try {
             // allow cuncurrent access to cache for different instances of DataSource
@@ -87,12 +87,12 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
                         return null;
                     }
                     model = modelRef.get(); // if model is in cache return it,
-                    if (model != null) {    // otherwise get it from factories
+                    if (model != null) {    // otherwise get it from providers
                         return model;
                     }
                 }
-                // try to get model from registered factories
-                for (ModelProvider<M, D> factory : factories) {
+                // try to get model from registered providers
+                for (ModelProvider<M, D> factory : providers) {
                     model = factory.createModelFor(dataSource);
                     if (model != null) {  // we have model, put it into cache
                         modelCache.put(key,new SoftReference(model));
@@ -109,16 +109,16 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         }
     }
     
-    public final boolean registerFactory(ModelProvider<M, D> newFactory) {
-        // take a write lock on factories
-        Lock wlock = factoriesLock.writeLock();
+    public final boolean registerProvider(ModelProvider<M, D> newProvider) {
+        // take a write lock on providers
+        Lock wlock = providersLock.writeLock();
         wlock.lock();
         try {
-            LOGGER.finer("Registering " + newFactory.getClass().getName());
-            boolean added = factories.add(newFactory);
+            LOGGER.finer("Registering " + newProvider.getClass().getName());
+            boolean added = providers.add(newProvider);
             if (added) {
                 clearCache();
-                factoryChange.fireChange(factories,Collections.singleton(newFactory),null);
+                factoryChange.fireChange(providers,Collections.singleton(newProvider),null);
             }
             return added;
         } finally {
@@ -126,16 +126,16 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         }
     }
     
-    public final boolean unregisterFactory(ModelProvider<M, D> oldFactory) {
-        // take a write lock on factories
-        Lock wlock = factoriesLock.writeLock();
+    public final boolean unregisterProvider(ModelProvider<M, D> oldProvider) {
+        // take a write lock on providers
+        Lock wlock = providersLock.writeLock();
         wlock.lock();
         try {
-            LOGGER.finer("Unregistering " + oldFactory.getClass().getName());
-            boolean removed = factories.remove(oldFactory);
+            LOGGER.finer("Unregistering " + oldProvider.getClass().getName());
+            boolean removed = providers.remove(oldProvider);
             if (removed) {
                 clearCache();
-                factoryChange.fireChange(factories,null,Collections.singleton(oldFactory));
+                factoryChange.fireChange(providers,null,Collections.singleton(oldProvider));
             }
             return removed;
          } finally {
@@ -164,9 +164,9 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
      */
     private class ModelProviderComparator implements Comparator<ModelProvider<M,D>> {
         
-        public int compare(ModelProvider<M, D> factory1, ModelProvider<M, D> factory2) {
-            int thisVal = factory1.priority();
-            int anotherVal = factory2.priority();
+        public int compare(ModelProvider<M, D> provider1, ModelProvider<M, D> provider2) {
+            int thisVal = provider1.priority();
+            int anotherVal = provider2.priority();
             
             if (thisVal<anotherVal) {
                 return 1;
@@ -175,7 +175,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
                 return -1;
             }
             // same depth -> use class name to create artifical ordering
-            return ClassNameComparator.INSTANCE.compare(factory1, factory2);
+            return ClassNameComparator.INSTANCE.compare(provider1, provider2);
         }
     }
     

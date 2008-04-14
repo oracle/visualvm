@@ -49,7 +49,7 @@ public final class JvmFactory extends ModelFactory<Jvm,Application> implements M
     public static synchronized JvmFactory getDefault() {
         if (jvmFactory == null) {
             jvmFactory = new JvmFactory();
-            jvmFactory.registerFactory(jvmFactory);
+            jvmFactory.registerProvider(jvmFactory);
         }
         return jvmFactory;
     }

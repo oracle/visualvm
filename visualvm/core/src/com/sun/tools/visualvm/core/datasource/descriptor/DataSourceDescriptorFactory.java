@@ -43,7 +43,7 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
     public static synchronized DataSourceDescriptorFactory getDefault() {
         if (dsDescFactory == null) {
             dsDescFactory = new DataSourceDescriptorFactory();
-            dsDescFactory.registerFactory(dsDescFactory);
+            dsDescFactory.registerProvider(dsDescFactory);
         }
         return dsDescFactory;
     }

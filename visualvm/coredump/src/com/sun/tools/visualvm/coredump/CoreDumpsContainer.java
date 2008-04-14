@@ -48,7 +48,7 @@ public final class CoreDumpsContainer extends DataSource {
     
     
     private CoreDumpsContainer() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpContainerDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new CoreDumpContainerDescriptorProvider());
         DataSource.ROOT.getRepository().addDataSource(this);
     }
     
