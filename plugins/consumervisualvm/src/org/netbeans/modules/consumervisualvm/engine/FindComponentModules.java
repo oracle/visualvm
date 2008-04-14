@@ -57,6 +57,7 @@ import org.netbeans.api.autoupdate.OperationSupport;
 import org.netbeans.api.autoupdate.UpdateElement;
 import org.netbeans.api.autoupdate.UpdateManager;
 import org.netbeans.api.autoupdate.UpdateUnit;
+import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.RequestProcessor;
 
@@ -66,6 +67,7 @@ import org.openide.util.RequestProcessor;
  */
 public final class FindComponentModules {
     private Collection<String> codeNames;
+    private String problemDescription;
     
     public FindComponentModules (String... components) {
         if (components == null) {
@@ -96,6 +98,10 @@ public final class FindComponentModules {
     public Collection<UpdateElement> getModulesForInstall () {
         assert forInstall != null : "candidates cannot be null if getModulesForInstall() is called.";
         return forInstall;
+    }
+    
+    public String getProblemDescription () {
+        return problemDescription;
     }
     
     public void clearModulesForInstall () {
@@ -169,6 +175,7 @@ public final class FindComponentModules {
 
     private void findComponentModules () {
         Collection<UpdateUnit> units = UpdateManager.getDefault ().getUpdateUnits (UpdateManager.TYPE.MODULE);
+        problemDescription = null;
         
         // install missing modules
         Collection<UpdateElement> elementsForInstall = getMissingModules (units);
@@ -177,6 +184,10 @@ public final class FindComponentModules {
         // install disabled modules
         Collection<UpdateElement> elementsForEnable = getDisabledModules (units);
         forEnable = getAllForEnable (elementsForEnable);
+        
+        if (problemDescription == null && elementsForInstall.isEmpty () && elementsForEnable.isEmpty ()) {
+            problemDescription = NbBundle.getMessage (FindComponentModules.class, "FindComponentModules_Problem_PluginNotFound", codeNames);
+        }
     }
     
     private Collection<UpdateElement> getMissingModules (Collection<UpdateUnit> allUnits) {
@@ -204,6 +215,11 @@ public final class FindComponentModules {
                 if (breaks.isEmpty ()) {
                     all.add (el);
                     all.addAll (reqs);
+                } else {
+                    problemDescription = NbBundle.getMessage (FindComponentModules.class,
+                            "FindComponentModules_Problem_DependingPluginNotFound",
+                            codeNames,
+                            breaks);
                 }
             }
         }
@@ -237,6 +253,11 @@ public final class FindComponentModules {
                 if (breaks.isEmpty ()) {
                     all.add (el);
                     all.addAll (reqs);
+                } else {
+                    problemDescription = NbBundle.getMessage (FindComponentModules.class,
+                            "FindComponentModules_Problem_DependingPluginNotFound",
+                            codeNames,
+                            breaks);
                 }
             }
         }

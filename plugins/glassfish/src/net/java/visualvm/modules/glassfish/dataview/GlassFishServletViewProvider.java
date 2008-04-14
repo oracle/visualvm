@@ -172,11 +172,11 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, GlassFishServlet.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, GlassFishServlet.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 

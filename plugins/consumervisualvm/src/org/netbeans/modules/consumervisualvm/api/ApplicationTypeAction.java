@@ -52,6 +52,8 @@ import org.netbeans.modules.consumervisualvm.DecoratedFileSystem;
 import org.netbeans.modules.consumervisualvm.engine.FindComponentModules;
 import org.netbeans.modules.consumervisualvm.engine.ModulesActivator;
 import org.netbeans.modules.consumervisualvm.engine.ModulesInstaller;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -74,7 +76,6 @@ public class ApplicationTypeAction extends MultiDataSourceAction<Application> {
         return new ApplicationTypeAction (fo);
     }
     
-    @SuppressWarnings({"unchecked"})
     private ApplicationTypeAction (FileObject fo) {
         super (Application.class);
         mainClassName = (String) fo.getAttribute (MAIN_CLASS_NAME);
@@ -100,6 +101,10 @@ public class ApplicationTypeAction extends MultiDataSourceAction<Application> {
                     ModulesActivator enabler = new ModulesActivator (toEnable);
                     enabler.getEnableTask ().waitFinished ();
                     DecoratedFileSystem.getInstance ().refresh ();
+                } else {
+                    DialogDisplayer.getDefault ().notifyLater (new NotifyDescriptor.Message (
+                            NbBundle.getMessage (ApplicationTypeAction.class, "ApplicationTypeAction_ProblemDescription",
+                            findModules.getProblemDescription ())));
                 }
             }
         }); 

@@ -33,6 +33,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -51,6 +53,7 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -67,7 +70,7 @@ class JConsolePluginWrapper {
 
     JConsolePluginWrapper(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel.getMBeanServerConnection() == null) {
+        if (jmxModel == null || jmxModel.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
             JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "JMX_Not_Available"));
             textArea.setEditable(false);
             jconsoleView = textArea;
@@ -76,7 +79,11 @@ class JConsolePluginWrapper {
             if (availablePlugins) {
                 vmPanel = new VMPanel(application, this, new ProxyClient(jmxModel));
                 vmPanel.connect();
-                jconsoleView = vmPanel;
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.setBackground(Color.WHITE);
+                panel.add(new JLabel(" "), BorderLayout.NORTH);
+                panel.add(vmPanel, BorderLayout.CENTER);
+                jconsoleView = panel;
             } else {
                 JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "PluginPath_Not_Available"));
                 textArea.setEditable(false);

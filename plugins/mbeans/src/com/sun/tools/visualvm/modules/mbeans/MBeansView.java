@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import org.openide.util.Utilities;
 
@@ -52,13 +53,13 @@ class MBeansView extends DataSourceView {
     protected DataViewComponent createComponent() {
         DataViewComponent dvc = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
-        if (jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+        if (jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
             JTextArea textArea = new JTextArea("\n\nData not available in " +
                     "this tab because JMX connection to the JMX agent couldn't " +
                     "be established.");
             textArea.setEditable(false);
             dvc = new DataViewComponent(
-                new DataViewComponent.MasterView("MBeans", null, textArea),
+                new DataViewComponent.MasterView("MBeans Browser", null, textArea),
                 new DataViewComponent.MasterViewConfiguration(true));
         } else {           
             // MBeansTab
@@ -80,7 +81,7 @@ class MBeansView extends DataSourceView {
             // MBeansMetadataView
             MBeansMetadataView mbeansMetadataView = new MBeansMetadataView(mbeansTab);
 
-            DataViewComponent.MasterView monitoringMasterView = new DataViewComponent.MasterView("", null, null);
+            DataViewComponent.MasterView monitoringMasterView = new DataViewComponent.MasterView("MBeans Browser", null, new JLabel(" "));
             DataViewComponent.MasterViewConfiguration monitoringMasterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
             dvc = new DataViewComponent(monitoringMasterView, monitoringMasterConfiguration);
         

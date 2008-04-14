@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: true
 OpenIDE-Module: org.netbeans.modules.consumerentrypoints
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/consumerentrypoints/resources/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0

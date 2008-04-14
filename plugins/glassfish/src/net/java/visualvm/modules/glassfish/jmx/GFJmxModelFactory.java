@@ -98,11 +98,11 @@ public class GFJmxModelFactory extends ModelFactory<JmxModel, Application> imple
     }
     
     public static void initialize() {
-        JmxModelFactory.getDefault().registerFactory(INSTANCE);
+        JmxModelFactory.getDefault().registerProvider(INSTANCE);
     }
 
     public static void shutdown() {
-        JmxModelFactory.getDefault().unregisterFactory(INSTANCE);
+        JmxModelFactory.getDefault().unregisterProvider(INSTANCE);
     }
     
     private synchronized  DialogDescriptor getDialogDescriptor() {

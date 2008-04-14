@@ -61,11 +61,11 @@ public class ScriptViewProvider extends DataSourceViewProvider<ScriptDataSource>
     }
     
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, ScriptDataSource.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, ScriptDataSource.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
     

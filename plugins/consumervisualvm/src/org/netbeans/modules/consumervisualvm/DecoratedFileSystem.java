@@ -75,7 +75,7 @@ public class DecoratedFileSystem extends MultiFileSystem implements Runnable {
             Class.forName ("org.netbeans.modules.consumervisualvm.api.PluginInfo");
         } catch (ClassNotFoundException ex) {
             // XXX: why ClassNotFoundException sometime?
-            LOG.log (Level.INFO, ex.getLocalizedMessage (), ex);
+            LOG.log (Level.FINE, ex.getLocalizedMessage (), ex);
             return;
         }
         Lookup.Result<PluginInfo> result = l.lookupResult (PluginInfo.class);

@@ -25,10 +25,8 @@
 package net.java.visualvm.btrace.datasource;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,11 +61,11 @@ public class ScriptDataSourceProvider {
     }
 
     public static void initialize() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(DESC_FACTORY);
+        DataSourceDescriptorFactory.getDefault().registerProvider(DESC_FACTORY);
     }
 
     public static void shutdown() {
-        DataSourceDescriptorFactory.getDefault().unregisterFactory(DESC_FACTORY);
+        DataSourceDescriptorFactory.getDefault().unregisterProvider(DESC_FACTORY);
     }
 
     public static ScriptDataSourceProvider sharedInstance() {

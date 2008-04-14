@@ -283,11 +283,11 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     public static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewsProvider(INSTANCE, GlassFishWebModule.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, GlassFishWebModule.class);
     }
     
     public static void shutdown() {
-        DataSourceViewsManager.sharedInstance().removeViewsProvider(INSTANCE);
+        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
         INSTANCE.viewMap.clear();
     }
 
