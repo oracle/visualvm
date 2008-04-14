@@ -233,7 +233,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
         XMBean mbean = (XMBean) ((XNodeInfo) node.getUserObject()).getData();
         if (!subscribed) {
             try {
-                mbean.getCachedMBeanServerConnection().addNotificationListener(
+                mbean.getMBeanServerConnection().addNotificationListener(
                         MBeanServerDelegate.DELEGATE_NAME, this, null, null);
                 subscribed = true;
             } catch (Exception e) {
@@ -594,7 +594,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
         
         public synchronized void unregister() {
             try {
-                mbean.getCachedMBeanServerConnection().removeNotificationListener(
+                mbean.getMBeanServerConnection().removeNotificationListener(
                         mbean.getObjectName(), this, null, null);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error removing listener", e);
@@ -610,7 +610,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
             clear();
             this.node = node;
             try {
-                mbean.getCachedMBeanServerConnection().addNotificationListener(
+                mbean.getMBeanServerConnection().addNotificationListener(
                         mbean.getObjectName(), this, null, null);
                 unregistered = false;
             } catch (Exception e) {

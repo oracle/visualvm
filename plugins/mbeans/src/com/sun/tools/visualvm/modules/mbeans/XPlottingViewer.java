@@ -158,7 +158,7 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
                             public void run() {
                                 try {
                                     Number n =
-                                        (Number) xmbean.getCachedMBeanServerConnection().getAttribute(xmbean.getObjectName(), attributeName);
+                                        (Number) xmbean.getMBeanServerConnection().getAttribute(xmbean.getObjectName(), attributeName);
                                     long v;
                                     if (n instanceof Float || n instanceof Double) {
                                         plotter.setDecimals(PLOTTER_DECIMALS);

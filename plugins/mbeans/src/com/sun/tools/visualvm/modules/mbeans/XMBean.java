@@ -68,7 +68,7 @@ class XMBean {
         synchronized (broadcasterLock) {
             if (broadcaster == null) {
                 try {
-                    broadcaster = getCachedMBeanServerConnection().isInstanceOf(
+                    broadcaster = getMBeanServerConnection().isInstanceOf(
                             getObjectName(),
                             "javax.management.NotificationBroadcaster");
                 } catch (Exception e) {
@@ -82,14 +82,14 @@ class XMBean {
     }
     
     public Object invoke(String operationName) throws Exception {
-        Object result = getCachedMBeanServerConnection().invoke(
+        Object result = getMBeanServerConnection().invoke(
                 getObjectName(), operationName, new Object[0], new String[0]);
         return result;
     }
     
     public Object invoke(String operationName, Object params[], String sig[])
     throws Exception {
-        Object result = getCachedMBeanServerConnection().invoke(
+        Object result = getMBeanServerConnection().invoke(
                 getObjectName(), operationName, params, sig);
         return result;
     }
@@ -98,7 +98,7 @@ class XMBean {
     throws AttributeNotFoundException, InstanceNotFoundException,
             InvalidAttributeValueException, MBeanException,
             ReflectionException, IOException {
-        getCachedMBeanServerConnection().setAttribute(getObjectName(), attribute);
+        getMBeanServerConnection().setAttribute(getObjectName(), attribute);
     }
     
     public Object getAttribute(String attributeName)
@@ -133,7 +133,7 @@ class XMBean {
             IntrospectionException, ReflectionException, IOException {
         synchronized (mbeanInfoLock) {
             if (mbeanInfo == null) {
-                mbeanInfo = getCachedMBeanServerConnection().getMBeanInfo(objectName);
+                mbeanInfo = getMBeanServerConnection().getMBeanInfo(objectName);
             }
             return mbeanInfo;
         }

@@ -130,7 +130,7 @@ class MBeansTab extends JPanel implements
                 // Register listener for MBean registration/unregistration
                 //
                 try {
-                    getCachedMBeanServerConnection().addNotificationListener(
+                    getMBeanServerConnection().addNotificationListener(
                             MBeanServerDelegate.DELEGATE_NAME,
                             MBeansTab.this,
                             null,
@@ -148,7 +148,7 @@ class MBeansTab extends JPanel implements
                 //
                 Set<ObjectName> mbeans = null;
                 try {
-                    mbeans = getCachedMBeanServerConnection().queryNames(null,null);
+                    mbeans = getMBeanServerConnection().queryNames(null,null);
                 } catch (IOException e) {
                     LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
                     return null;
