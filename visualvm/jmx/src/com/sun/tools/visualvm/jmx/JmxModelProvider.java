@@ -47,8 +47,8 @@ public class JmxModelProvider extends AbstractModelProvider<JmxModel, Applicatio
      *
      * In order to extend the {@code JmxModelFactory} to register your
      * own {@link JmxModel}s for the different types of {@link Application}
-     * call {@link JmxModelFactory.registerFactory()} supplying the new
-     * instance of {@link ModelProvider}.
+     * call {@link JmxModelFactory#registerProvider(ModelProvider)} supplying
+     * the new instance of {@link ModelProvider}.
      *
      * @param app application.
      *

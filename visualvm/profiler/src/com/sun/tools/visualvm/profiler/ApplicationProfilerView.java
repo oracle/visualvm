@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
@@ -232,6 +233,7 @@ class ApplicationProfilerView extends DataSourceView {
               public void run() {
                 switch (state) {
                   case NetBeansProfiler.PROFILING_INACTIVE:
+                    ProfilerSupport.getInstance().setProfiledApplication(null); // Necessary to set here when profiled app finished
                     statusValueLabel.setText("profiling inactive");
                     resetControlButtons();
                     RequestProcessor.getDefault().post(new Runnable() {
@@ -253,12 +255,16 @@ class ApplicationProfilerView extends DataSourceView {
                     if (application.equals(profiledApplication)) {
                       statusValueLabel.setText("profiling running (" + NetBeansProfiler.getDefaultNB().getLastProfilingSettings().getSettingsName() + ")");
                       enableControlButtons();
+                      updateControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
                     } else {
                       statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + "</a> in progress</nobr>");
                       disableControlButtons();
+                      profilingResultsView.setProfilingResultsDisplay(null);
                     }
 
+                    profilingResultsView.revalidate();
+                    profilingResultsView.repaint();
                     revalidate();
                     repaint();
 
@@ -278,6 +284,22 @@ class ApplicationProfilerView extends DataSourceView {
           cpuButton.setSelected(false);
           memoryButton.setSelected(false);
           internalChange = false;
+        }
+        
+        private void updateControlButtons() {
+            ProfilingSettings currentSettings = NetBeansProfiler.getDefaultNB().getLastProfilingSettings();
+            int currentProfilingType = currentSettings != null ? currentSettings.getProfilingType() : Integer.MIN_VALUE;
+            if (cpuSettings.getProfilingType() == currentProfilingType && !cpuButton.isSelected()) {
+                internalChange = true;
+                cpuButton.setSelected(true);
+                memoryButton.setSelected(false);
+                internalChange = false;
+            } else if (memorySettings.getProfilingType() == currentProfilingType && !memoryButton.isSelected()) {
+                internalChange = true;
+                cpuButton.setSelected(false);
+                memoryButton.setSelected(true);
+                internalChange = false;
+            }
         }
 
         private void enableControlButtons() {
@@ -321,21 +343,23 @@ class ApplicationProfilerView extends DataSourceView {
               GridBagConstraints constraints;
 
               // classShareWarningLabel
-              boolean classSharingOn = JvmFactory.getJVMFor(application).getVMInfo().contains("sharing");
+              Jvm jvm = JvmFactory.getJVMFor(application);
+              String vmInfo = jvm.getVmInfo();
+              String vmVersion = jvm.getVmVersion();
+              boolean classSharingBreaksProfiling = vmInfo.contains("sharing") && !vmVersion.equals("10.0-b23");
               classShareWarningArea = new HTMLTextArea() {
                   protected void showURL(URL url) { 
                       try { DesktopUtils.browse(url.toURI()); } catch (Exception e) {}
                   }
               };
-              Color backgroundColor = classShareWarningArea.getBackground();
               classShareWarningArea.setOpaque(true);
               classShareWarningArea.setBackground(new java.awt.Color(255, 180, 180));
               classShareWarningArea.setForeground(new java.awt.Color(0, 0, 0));
               classShareWarningArea.setBorder(BorderFactory.createLineBorder(new java.awt.Color(180, 180, 180)));
               classShareWarningArea.setBorder(BorderFactory.createCompoundBorder(classShareWarningArea.getBorder(),
                       BorderFactory.createMatteBorder(5, 5, 5, 5, classShareWarningArea.getBackground())));
-              classShareWarningArea.setVisible(classSharingOn); // NOI18N
-              if (classSharingOn) {
+              classShareWarningArea.setVisible(classSharingBreaksProfiling); // NOI18N
+              if (classSharingBreaksProfiling) {
                   if (DesktopUtils.isBrowseAvailable()) {
                       classShareWarningArea.setText("<b>WARNING!</b> Class sharing is enabled for this JVM. This can cause problems when profiling the application and eventually may crash it. Please see the Troubleshooting guide for more information and steps to fix the problem: <a href=\"https://visualvm.dev.java.net/troubleshooting.html#xshare\">https://visualvm.dev.java.net/troubleshooting.html#xshare</a>.");
                   } else {
@@ -535,8 +559,7 @@ class ApplicationProfilerView extends DataSourceView {
         
         public void setProfilingResultsDisplay(JComponent profilingResultsDisplay) {
             removeAll();
-            add(profilingResultsDisplay);
-            doLayout();
+            if (profilingResultsDisplay != null) add(profilingResultsDisplay);
         }
         
         private void initComponents() {

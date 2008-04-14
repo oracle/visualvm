@@ -48,7 +48,14 @@ import javax.management.ReflectionException;
 /**
  * The {@code CachedMBeanServerConnectionFactory} class is a factory class that
  * allows to get instances of {@link CachedMBeanServerConnection} for a given
- * {@link MBeanServerConnection}.
+ * {@link MBeanServerConnection} or {@link JmxModel}.
+ * 
+ * The factory methods allow to supply an interval value at which the cache will
+ * be automatically flushed and interested {@link MBeanCacheListener}s notified.
+ * 
+ * If the factory methods which do not take an interval value are used then
+ * no automatic flush is performed and the user will be in charge of flushing
+ * the cache by calling {@link CachedMBeanServerConnection#flush()}.
  *
  * @author Eamonn McManus
  * @author Luis-Miguel Alventosa
@@ -62,13 +69,74 @@ public final class CachedMBeanServerConnectionFactory {
      * Factory method for obtaining the {@link CachedMBeanServerConnection} for
      * the given {@link MBeanServerConnection}.
      * 
-     * @param mbsc MBeanServerConnection.
+     * @param mbsc an MBeanServerConnection.
      * 
      * @return a {@link CachedMBeanServerConnection} instance which caches the
      * attribute values of the supplied {@link MBeanServerConnection}.
      */
     public static CachedMBeanServerConnection getCachedMBeanServerConnection(MBeanServerConnection mbsc) {
         return Snapshot.newSnapshot(mbsc);
+    }
+
+    /**
+     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * the given {@link MBeanServerConnection}. The cache will be flushed at the
+     * given interval and the interested {@link MBeanCacheListener}s will be notified.
+     * 
+     * @param mbsc an MBeanServerConnection.
+     * @param interval the interval (in milliseconds) at which the cache is flushed.
+     * An interval equal to zero means no automatic flush of the MBean cache.
+     * 
+     * @return a {@link CachedMBeanServerConnection} instance which caches the
+     * attribute values of the supplied {@link MBeanServerConnection} and is
+     * flushed at the end of every interval period.
+     * 
+     * @throws IllegalArgumentException if the supplied interval is negative.
+     */
+    public static CachedMBeanServerConnection
+            getCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval)
+            throws IllegalArgumentException {
+        if (interval < 0) {
+            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
+        }
+        return Snapshot.newSnapshot(mbsc);
+    }
+
+    /**
+     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * the given {@link JmxModel}.
+     * 
+     * @param jmx a JmxModel.
+     * 
+     * @return a {@link CachedMBeanServerConnection} instance which caches the
+     * attribute values of the supplied {@link JmxModel}.
+     */
+    public static CachedMBeanServerConnection getCachedMBeanServerConnection(JmxModel jmx) {
+        return Snapshot.newSnapshot(jmx.getMBeanServerConnection());
+    }
+
+    /**
+     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * the given {@link JmxModel}. The cache will be flushed at the given interval
+     * and the interested {@link MBeanCacheListener}s will be notified.
+     * 
+     * @param jmx a JmxModel.
+     * @param interval the interval (in milliseconds) at which the cache is flushed.
+     * An interval equal to zero means no automatic flush of the MBean cache.
+     * 
+     * @return a {@link CachedMBeanServerConnection} instance which caches the
+     * attribute values of the supplied {@link JmxModel} and is flushed at the
+     * end of every interval period.
+     *
+     * @throws IllegalArgumentException if the supplied interval is negative.
+     */
+    public static CachedMBeanServerConnection
+            getCachedMBeanServerConnection(JmxModel jmx, int interval)
+            throws IllegalArgumentException {
+        if (interval < 0) {
+            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
+        }
+        return Snapshot.newSnapshot(jmx.getMBeanServerConnection());
     }
 
     static class Snapshot {
@@ -107,11 +175,11 @@ public final class CachedMBeanServerConnectionFactory {
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
             final String methodName = method.getName();
-            if (methodName.equals("getAttribute")) {
+            if (methodName.equals("getAttribute")) {    // NOI18N
                 return getAttribute((ObjectName) args[0], (String) args[1]);
-            } else if (methodName.equals("getAttributes")) {
+            } else if (methodName.equals("getAttributes")) {    // NOI18N
                 return getAttributes((ObjectName) args[0], (String[]) args[1]);
-            } else if (methodName.equals("flush")) {
+            } else if (methodName.equals("flush")) {    // NOI18N
                 flush();
                 return null;
             } else {

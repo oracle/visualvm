@@ -203,7 +203,7 @@ final class ApplicationOverviewModel {
             mainArgs = jvm.getMainArgs();
             if (mainArgs == null) mainArgs = "<none>";
 
-            vmId = jvm.getVMName() + " (" + jvm.getVmVersion() + ", " + jvm.getVMInfo() + ")";
+            vmId = jvm.getVmName() + " (" + jvm.getVmVersion() + ", " + jvm.getVmInfo() + ")";
 
             javaHome = jvm.getJavaHome();
 

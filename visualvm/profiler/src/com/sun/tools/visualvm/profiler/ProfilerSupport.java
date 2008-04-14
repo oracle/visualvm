@@ -36,21 +36,19 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
 import java.io.File;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
-import org.netbeans.modules.profiler.ResultsManager;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class ProfilerSupport {
-    private static final Logger LOGGER = Logger.getLogger(ProfilerSupport.class.getName());
+    private static final boolean FORCE_PROFILING_SUPPORTED = Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");
+    private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";
+    private static final String SUN_VM_VENDOR_PREFIX = "Sun ";
+    private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";
     
     private static ProfilerSupport instance;
     
@@ -72,11 +70,33 @@ public final class ProfilerSupport {
     
     
     boolean supportsProfiling(Application application) {
+        // Remote profiling is not supported
         if (application.getHost() != Host.LOCALHOST) return false;
+        
+        // Profiling current VisualVM instance is not supported
         if (Application.CURRENT_APPLICATION.equals(application)) return false;
+        
+        // Profiled application has to be running
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        
+        
         Jvm jvm = JvmFactory.getJVMFor(application);
-        return jvm.isAttachable() && !jvm.is14() && !jvm.is15();
+        
+        // Basic info has to be supported and VM has to be attachable
+        if (!jvm.isBasicInfoSupported() || !jvm.isAttachable()) return false;
+        
+        // User explicitly requests to profile any VM
+        if (FORCE_PROFILING_SUPPORTED) return true;
+        
+        // Profiled application needs to be running JDK 6.0 or 7.0
+        if (!jvm.is16() && !jvm.is17()) return false;
+        
+        String vmName = jvm.getVmName();
+        String vmVendor = jvm.getVmVendor();
+        
+        // VM has to be a HotSpot VM by Sun Microsystems Inc. or Apple Inc.
+        return vmName != null && vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) && vmVendor != null
+                && (vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX));
     }
     
     ProfilerSnapshotProvider getSnapshotsProvider() {
@@ -100,14 +120,6 @@ public final class ProfilerSupport {
         DataSourceView activeView = profilerViewProvider.view(application);
         if (activeView == null) return;
         DataSourceWindowManager.sharedInstance().selectView(activeView);
-    }
-    
-    void takeSnapshot(boolean openView) {
-        LoadedSnapshot snapshot = ResultsManager.getDefault().takeSnapshot();
-        File file = new File(profiledApplication.getStorage().getDirectory() + File.separator + category.createFileName());
-        if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("About to save file to " + file);
-        }
     }
     
     
@@ -177,7 +189,7 @@ public final class ProfilerSupport {
     
     
     private ProfilerSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new ProfilerSnapshotDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new ProfilerSnapshotDescriptorProvider());
         profilerViewProvider = new ApplicationProfilerViewProvider();
         profilerViewProvider.initialize();
         

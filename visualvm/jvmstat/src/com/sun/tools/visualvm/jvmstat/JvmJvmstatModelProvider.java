@@ -40,7 +40,7 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
     public JvmJvmstatModel createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         if (jvmstat != null) {
-            String vmVersion = jvmstat.findByName("java.property.java.vm.version");
+            String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
 
             JvmJvmstatModel model = null;
             // Check for Sun VM (and maybe other?)

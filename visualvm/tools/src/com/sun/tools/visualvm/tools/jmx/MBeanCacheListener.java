@@ -23,35 +23,18 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.heapdump.impl;
+package com.sun.tools.visualvm.tools.jmx;
 
-import com.sun.tools.visualvm.heapdump.HeapDump;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import java.util.Set;
+import java.util.EventListener;
 
 /**
+ * Interface for listeners of MBean cache events.
  *
- * @author Jiri Sedlacek
+ * @author Luis-Miguel Alventosa
  */
-public class HeapDumpViewProvider extends PluggableDataSourceViewProvider<HeapDump>{
-    
-    protected boolean supportsViewFor(HeapDump heapDump) {
-        return true;
-    }
-
-    protected DataSourceView createView(HeapDump heapDump) {
-        return new HeapDumpView(heapDump);
-    }
-    
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
-    }
-    
-
-    public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, HeapDump.class);
-    }
-
+public interface MBeanCacheListener extends EventListener {
+    /**
+     * Invoked when the MBean cache is flushed.
+     */
+    public void flushed();
 }

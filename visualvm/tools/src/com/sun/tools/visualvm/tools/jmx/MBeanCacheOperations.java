@@ -23,35 +23,42 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.heapdump.impl;
-
-import com.sun.tools.visualvm.heapdump.HeapDump;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import java.util.Set;
+package com.sun.tools.visualvm.tools.jmx;
 
 /**
- *
- * @author Jiri Sedlacek
+ * MBean cache operations.
+ * 
+ * @author Luis-Miguel Alventosa
  */
-public class HeapDumpViewProvider extends PluggableDataSourceViewProvider<HeapDump>{
-    
-    protected boolean supportsViewFor(HeapDump heapDump) {
-        return true;
-    }
+public interface MBeanCacheOperations {
 
-    protected DataSourceView createView(HeapDump heapDump) {
-        return new HeapDumpView(heapDump);
-    }
-    
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
-    }
-    
+    /**
+     * Flush all cached values of attributes.
+     */
+    public void flush();
 
-    public void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, HeapDump.class);
-    }
+    /**
+     * Get the flush interval.
+     *
+     * @return the flush interval in milliseconds.
+     */
+    public int getInterval();
 
+    /**
+     * Add a {@code MBeanCacheListener}. The given listener is added to
+     * the list of {@code MBeanCacheListener} objects to be notified of
+     * MBean cache related events.
+     *
+     * @param listener the {@code MBeanCacheListener} to add.
+     */
+    public void addMBeanCacheListener(MBeanCacheListener listener);
+
+    /**
+     * Remove a {@code MBeanCacheListener}. The given listener is removed
+     * from the list of {@code MBeanCacheListener} objects to be notified
+     * of MBean cache related events.
+     *
+     * @param listener the {@code MBeanCacheListener} to be removed.
+     */
+    public void removeMBeanCacheListener(MBeanCacheListener listener);
 }

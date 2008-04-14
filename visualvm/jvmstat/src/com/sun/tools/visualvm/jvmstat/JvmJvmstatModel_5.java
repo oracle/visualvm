@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
  * @author Tomas Hurka
  */
 class JvmJvmstatModel_5 extends JvmJvmstatModel {
-    private static final String PERM_GEN_PREFIX = "sun.gc.generation.2.";
+    private static final String PERM_GEN_PREFIX = "sun.gc.generation.2.";   // NOI18N
 
     JvmJvmstatModel_5(Application app,JvmstatModel stat) {
         super(app,stat);
@@ -43,21 +43,21 @@ class JvmJvmstatModel_5 extends JvmJvmstatModel {
     }
 
     private void initMonitoredVales() {
-      loadedClasses = jvmstat.findMonitoredValueByName("java.cls.loadedClasses");
-      sharedLoadedClasses = jvmstat.findMonitoredValueByName("java.cls.sharedLoadedClasses");
-      sharedUnloadedClasses = jvmstat.findMonitoredValueByName("java.cls.sharedUnloadedClasses");
-      unloadedClasses = jvmstat.findMonitoredValueByName("java.cls.unloadedClasses");
-      threadsDaemon = jvmstat.findMonitoredValueByName("java.threads.daemon");
-      threadsLive = jvmstat.findMonitoredValueByName("java.threads.live");
-      threadsLivePeak = jvmstat.findMonitoredValueByName("java.threads.livePeak");
-      threadsStarted = jvmstat.findMonitoredValueByName("java.threads.started");
-      applicationTime = jvmstat.findMonitoredValueByName("sun.rt.applicationTime");
-      upTime = jvmstat.findMonitoredValueByName("sun.os.hrt.ticks");
-      MonitoredValue osFrequencyMon = jvmstat.findMonitoredValueByName("sun.os.hrt.frequency");
+      loadedClasses = jvmstat.findMonitoredValueByName("java.cls.loadedClasses");   // NOI18N
+      sharedLoadedClasses = jvmstat.findMonitoredValueByName("java.cls.sharedLoadedClasses");   // NOI18N
+      sharedUnloadedClasses = jvmstat.findMonitoredValueByName("java.cls.sharedUnloadedClasses");   // NOI18N
+      unloadedClasses = jvmstat.findMonitoredValueByName("java.cls.unloadedClasses");   // NOI18N
+      threadsDaemon = jvmstat.findMonitoredValueByName("java.threads.daemon");  // NOI18N
+      threadsLive = jvmstat.findMonitoredValueByName("java.threads.live");  // NOI18N
+      threadsLivePeak = jvmstat.findMonitoredValueByName("java.threads.livePeak");  // NOI18N
+      threadsStarted = jvmstat.findMonitoredValueByName("java.threads.started");    // NOI18N
+      applicationTime = jvmstat.findMonitoredValueByName("sun.rt.applicationTime"); // NOI18N
+      upTime = jvmstat.findMonitoredValueByName("sun.os.hrt.ticks");    // NOI18N
+      MonitoredValue osFrequencyMon = jvmstat.findMonitoredValueByName("sun.os.hrt.frequency"); // NOI18N
       osFrequency = getLongValue(osFrequencyMon);
-      genCapacity = jvmstat.findMonitoredValueByPattern("sun.gc.generation.[0-9]+.capacity");
-      genUsed = jvmstat.findMonitoredValueByPattern("sun.gc.generation.[0-9]+.space.[0-9]+.used");
-      genMaxCapacity=getGenerationSum(jvmstat.findMonitoredValueByPattern("sun.gc.generation.[0-9]+.maxCapacity"));
+      genCapacity = jvmstat.findMonitoredValueByPattern("sun.gc.generation.[0-9]+.capacity");   // NOI18N
+      genUsed = jvmstat.findMonitoredValueByPattern("sun.gc.generation.[0-9]+.space.[0-9]+.used");  // NOI18N
+      genMaxCapacity=getGenerationSum(jvmstat.findMonitoredValueByPattern("sun.gc.generation.[0-9]+.maxCapacity")); // NOI18N
     }
 
     protected String getPermGenPrefix() {

@@ -61,28 +61,28 @@ class Agent {
     }
 
     boolean attach(int pid) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("attach",pid);
+        bugspotAgent.invoke("attach",pid);  // NOI18N
         return isJavaMode();
     }
 
     boolean attach(String executable,String coredump) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("attach",executable,coredump);
+        bugspotAgent.invoke("attach",executable,coredump);  // NOI18N
         return isJavaMode();
     }
     
     boolean attach(String remoteServer) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("attach",remoteServer);
+        bugspotAgent.invoke("attach",remoteServer); // NOI18N
         return isJavaMode();
     }
     
     void detach() throws IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("detach");
+        bugspotAgent.invoke("detach");  // NOI18N
     }
 
     VM getVM() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (vm == null) {
             Class vmClass = saClassLoader.VM();
-            Object saVM = vmClass.getMethod("getVM").invoke(null);
+            Object saVM = vmClass.getMethod("getVM").invoke(null);  // NOI18N
             vm = new VM(saVM);
         }
         return vm;
@@ -101,7 +101,7 @@ class Agent {
     
     
     private boolean isJavaMode() throws IllegalAccessException, InvocationTargetException {
-        Boolean b = (Boolean) bugspotAgent.invoke("isJavaMode");
+        Boolean b = (Boolean) bugspotAgent.invoke("isJavaMode");    // NOI18N
         return b.booleanValue();
     }    
     

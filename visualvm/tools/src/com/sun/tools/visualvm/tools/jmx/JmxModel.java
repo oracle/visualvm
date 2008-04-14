@@ -34,7 +34,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
 /**
  * This class encapsulates the JMX functionality of the target Java application.
  *
- * Call {@link JmxModelFactory.getJmxModelFor()} to get an instance of the
+ * Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
  * {@link JmxModel} class.
  *
  * Usually this class will be used as follows:
@@ -47,7 +47,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * }
  * </pre>
  *
- * {@link CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection(MBeanServerConnection)}
+ * {@link CachedMBeanServerConnectionFactory#getCachedMBeanServerConnection(MBeanServerConnection)}
  * can be used to work with a {@link CachedMBeanServerConnection} instead of
  * a plain {@link MBeanServerConnection}.
  *
@@ -58,7 +58,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * be the source for any generated events.
  *
  * Polling for the ConnectionState is also possible by calling
- * {@link JmxModel.getConnectionState()}.
+ * {@link JmxModel#getConnectionState()}.
  *
  * @author Luis-Miguel Alventosa
  */
@@ -69,7 +69,7 @@ public abstract class JmxModel extends Model {
     /**
      * The {@link ConnectionState ConnectionState} bound property name.
      */
-    public static final String CONNECTION_STATE_PROPERTY = "connectionState";
+    public static final String CONNECTION_STATE_PROPERTY = "connectionState";   // NOI18N
 
     /**
      * Values for the {@linkplain #CONNECTION_STATE_PROPERTY

@@ -81,6 +81,10 @@ public final class Storage {
     }
     
     
+    public boolean directoryExists() {
+        return directory.exists();
+    }
+    
     public File getDirectory() {
         if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);
         return directory;

@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
@@ -140,19 +141,25 @@ public class ThreadDumpProvider {
     
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof ThreadDumpImpl) return;
-        File[] files = snapshot.getFile().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return;
-        Set<ThreadDumpImpl> threadDumps = new HashSet();
-        for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
-        snapshot.getRepository().addDataSources(threadDumps);
+        File snapshotFile = snapshot.getFile();
+        if (snapshotFile != null && snapshotFile.isDirectory()) {
+            File[] files = snapshotFile.listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
+            if (files == null) return;
+            Set<ThreadDumpImpl> threadDumps = new HashSet();
+            for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
+            snapshot.getRepository().addDataSources(threadDumps);
+        }
     }
     
     private void processNewApplication(Application application) {
-        File[] files = application.getStorage().getDirectory().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return;
-        Set<ThreadDumpImpl> threadDumps = new HashSet();
-        for (File file : files) threadDumps.add(new ThreadDumpImpl(file, application));
-        application.getRepository().addDataSources(threadDumps);
+        Storage storage = application.getStorage();
+        if (storage.directoryExists()) {
+            File[] files = storage.getDirectory().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
+            if (files == null) return;
+            Set<ThreadDumpImpl> threadDumps = new HashSet();
+            for (File file : files) threadDumps.add(new ThreadDumpImpl(file, application));
+            application.getRepository().addDataSources(threadDumps);
+        }
     }
     
     

@@ -31,13 +31,13 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -80,13 +80,18 @@ class ApplicationMonitorView extends DataSourceView {
         super(application, "Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);
     }
     
+    @Override
     protected void willBeAdded() {
-        Application application = (Application)getDataSource();
+        Application application = (Application) getDataSource();
         jvm = JvmFactory.getJVMFor(application);
-        JvmJmxModel jvmJmxModel = JvmJmxModelFactory.getJvmJmxModelFor(application);
-        memoryMXBean = jvmJmxModel == null ? null : jvmJmxModel.getMemoryMXBean();
+        memoryMXBean = null;
+        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(application));
+        if (mxbeans != null) {
+            memoryMXBean = mxbeans.getMemoryMXBean();
+        }
     }
         
+    @Override
     protected void removed() {
         if (jvm != null) jvm.removeMonitoredDataListener(monitoredDataListener);
     }

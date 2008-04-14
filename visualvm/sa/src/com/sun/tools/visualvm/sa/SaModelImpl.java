@@ -69,7 +69,7 @@ public class SaModelImpl extends SaModel {
                 try {
                     if (attach()) {
                         SAObject hprofWrite = agent.getHeapHprofBinWriter();
-                        hprofWrite.invoke("write",file);
+                        hprofWrite.invoke("write",file);    // NOI18N
                         return true;
                     }
                 } finally {
@@ -101,11 +101,11 @@ public class SaModelImpl extends SaModel {
         return null;
     }
     
-    public String getJVMFlags() {
+    public String getJvmFlags() {
         return jvmFlags;
     }
     
-    public String getJVMArgs() {
+    public String getJvmArgs() {
         return jvmArgs;
     }
     

@@ -59,7 +59,7 @@ class CoreDumpOverviewView extends DataSourceView {
         
         SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
         Properties jvmProperties = saAgent.getSystemProperties();
-        String jvmargs = saAgent.getJVMArgs();
+        String jvmargs = saAgent.getJvmArgs();
         
         dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
         
@@ -123,10 +123,10 @@ class CoreDumpOverviewView extends DataSourceView {
             }
             
             // JVM information
-            String jvmFlags = saAgent.getJVMFlags();
+            String jvmFlags = saAgent.getJvmFlags();
             
             data.append("<br>");
-            data.append("<b>JVM:</b> " + saAgent.getVMName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVMInfo() + ")<br>");
+            data.append("<b>JVM:</b> " + saAgent.getVmName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVmInfo() + ")<br>");
             data.append("<b>Java Home:</b> " + saAgent.getJavaHome() + "<br>");
             data.append("<b>JVM Flags:</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? "none" : jvmFlags) + "<br><br>");
             

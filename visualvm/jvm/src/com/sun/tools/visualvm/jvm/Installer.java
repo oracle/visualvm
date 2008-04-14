@@ -35,8 +35,8 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        JvmFactory.getDefault().registerFactory(new JvmProvider());
-        JvmFactory.getDefault().registerFactory(new JRockitJvmProvider());
+        JvmFactory.getDefault().registerProvider(new JvmProvider());
+        JvmFactory.getDefault().registerProvider(new JRockitJvmProvider());
     }
     
 }

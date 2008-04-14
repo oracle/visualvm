@@ -44,11 +44,11 @@ public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,A
   public static synchronized ApplicationTypeFactory getDefault() {
     if (appTypeFactory == null) {
       appTypeFactory = new ApplicationTypeFactory();
-      appTypeFactory.registerFactory(appTypeFactory);
-      appTypeFactory.registerFactory(new MainClassApplicationTypeFactory());
-      appTypeFactory.registerFactory(new NetBeansApplicationTypeFactory());
-      appTypeFactory.registerFactory(new JavaPluginApplicationTypeFactory());
-      appTypeFactory.registerFactory(new JavaWebStartApplicationTypeFactory());
+      appTypeFactory.registerProvider(appTypeFactory);
+      appTypeFactory.registerProvider(new MainClassApplicationTypeFactory());
+      appTypeFactory.registerProvider(new NetBeansApplicationTypeFactory());
+      appTypeFactory.registerProvider(new JavaPluginApplicationTypeFactory());
+      appTypeFactory.registerProvider(new JavaWebStartApplicationTypeFactory());
     }
     return appTypeFactory;
   }

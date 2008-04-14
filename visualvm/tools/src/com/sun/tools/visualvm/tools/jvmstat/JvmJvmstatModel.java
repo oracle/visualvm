@@ -67,39 +67,43 @@ public abstract class JvmJvmstatModel extends Model {
     }
     
     public String getCommandLine() {
-        return jvmstat.findByName("sun.rt.javaCommand");
+        return jvmstat.findByName("sun.rt.javaCommand"); // NOI18N
     }
     
     public String getJvmArgs() {
-        return jvmstat.findByName("java.rt.vmArgs");
+        return jvmstat.findByName("java.rt.vmArgs");    // NOI18N
     }
     
     public String getJvmFlags() {
-        return jvmstat.findByName("java.rt.vmFlags");
-    }
+        return jvmstat.findByName("java.rt.vmFlags");   // NOI18N
+    }   
     
     public String getJavaHome() {
-        return jvmstat.findByName("java.property.java.home");
+        return jvmstat.findByName("java.property.java.home");   // NOI18N
     }
     
-    public String getVMInfo() {
-        return jvmstat.findByName("java.property.java.vm.info");
+    public String getVmInfo() {
+        return jvmstat.findByName("java.property.java.vm.info");    // NOI18N
     }
     
-    public String getVMName() {
-        return jvmstat.findByName("java.property.java.vm.name");
+    public String getVmName() {
+        return jvmstat.findByName("java.property.java.vm.name");    // NOI18N
     }
     
     public String getVmVersion() {
-        return jvmstat.findByName("java.property.java.vm.version");
+        return jvmstat.findByName("java.property.java.vm.version"); // NOI18N
+    }
+    
+    public String getVmVendor() {
+        return jvmstat.findByName("java.property.java.vm.vendor");  // NOI18N
     }
     
     public String getClassPath() {
-        return jvmstat.findByName("java.property.java.class.path");        
+        return jvmstat.findByName("java.property.java.class.path"); // NOI18N
     }
     
     public boolean isAttachable() {
-        String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");
+        String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");  // NOI18N
         if (jvmCapabilities == null) {
              return false;
         }
@@ -128,14 +132,14 @@ public abstract class JvmJvmstatModel extends Model {
                     mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                     assert mainClassName!=null;
                 } catch (IOException ex) {
-                    LOGGER.throwing(JvmJvmstatModel.class.getName(), "getMainClass", ex);
+                    LOGGER.throwing(JvmJvmstatModel.class.getName(), "getMainClass", ex);   // NOI18N
                 }
             }
         }
         
         if (mainClassName.endsWith(JAR_SUFFIX)) {
             mainClassName = mainClassName.replace('\\', '/');
-            int index = mainClassName.lastIndexOf("/");
+            int index = mainClassName.lastIndexOf('/');
             if (index != -1) {
                 mainClassName = mainClassName.substring(index + 1);
             }

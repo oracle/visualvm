@@ -41,6 +41,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -83,6 +84,18 @@ class JmxApplicationConfigurator extends JPanel {
         return displaynameField.getText().trim();
     }
 
+    public String getUsername() {
+        return usernameField.getText().trim();
+    }
+
+    public String getPassword() {
+        return new String(passwordField.getPassword());
+    }
+
+    public boolean getSaveCredentialsFlag() {
+        return saveCheckbox.isSelected();
+    }
+
     private static JmxApplicationConfigurator defaultInstance;
 
     private JmxApplicationConfigurator() {
@@ -99,12 +112,19 @@ class JmxApplicationConfigurator extends JPanel {
 
     private void setupDefineJmxConnection() {
         connectionField.setEnabled(true);
+        connectionField.setText("");
         displaynameCheckbox.setSelected(false);
         displaynameCheckbox.setEnabled(true);
-        connectionField.setText("");
         displaynameField.setText("");
+        securityCheckbox.setSelected(false);
+        securityCheckbox.setEnabled(true);
+        usernameField.setText("");
+        passwordField.setText("");
+        saveCheckbox.setSelected(false);
+        saveCheckbox.setEnabled(false);
         
-        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
+        Set<DataSource> selectedDataSources =
+                ExplorerSupport.sharedInstance().getSelectedDataSources();
         if (selectedDataSources.size() != 1) return;
         DataSource selectedDataSource = selectedDataSources.iterator().next();
         if (!(selectedDataSource instanceof Host)) return;
@@ -118,16 +138,22 @@ class JmxApplicationConfigurator extends JPanel {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                String username = getUsername();
                 String url = getConnection();
 
                 if (!displaynameCheckbox.isSelected()) {
                     internalChange = true;
-                    displaynameField.setText(url);
+                    displaynameField.setText(
+                            (username.isEmpty() ? "" : username + "@") + url);
                     internalChange = false;
                 }
 
                 String displayname = getDisplayName();
                 displaynameField.setEnabled(displaynameCheckbox.isSelected());
+
+                usernameField.setEnabled(securityCheckbox.isSelected());
+                passwordField.setEnabled(securityCheckbox.isSelected());
+                saveCheckbox.setEnabled(securityCheckbox.isSelected());
 
                 okButton.setEnabled(enableOkButton(url, displayname));
             }
@@ -138,7 +164,7 @@ class JmxApplicationConfigurator extends JPanel {
         if (url.startsWith("service:jmx:")) { // NOI18N
             return displayname.length() > 0;
         } else {
-            int index = url.lastIndexOf(":");
+            int index = url.lastIndexOf(":"); // NOI18N
             if (index == -1) {
                 return false;
             }
@@ -199,7 +225,7 @@ class JmxApplicationConfigurator extends JPanel {
         Font normalLabelFont = connectionLabel.getFont();
         Font smallLabelFont =
                 normalLabelFont.deriveFont(normalLabelFont.getSize2D() - 1);
-        usageLabel = new JLabel("<html><b>Usage</b>: &lt;hostname&gt;:&lt;port&gt; OR service:jmx:&lt;protocol&gt;:&lt;sap&gt;</html>");
+        usageLabel = new JLabel("<html><nobr><b>Usage</b>: &lt;hostname&gt;:&lt;port&gt; OR service:jmx:&lt;protocol&gt;:&lt;sap&gt;</nobr></html>");
         usageLabel.setFont(smallLabelFont);
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -250,11 +276,113 @@ class JmxApplicationConfigurator extends JPanel {
         constraints.insets = new Insets(8, 5, 0, 10);
         add(displaynameField, constraints);
 
+        // securityCheckbox
+        securityCheckbox = new JCheckBox("Use security credentials");
+        securityCheckbox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                update();
+            };
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.insets = new Insets(15, 6, 0, 0);
+        add(securityCheckbox, constraints);
+
+        // usernameLabel
+        usernameLabel = new JLabel("Username:");
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.insets = new Insets(8, 10, 0, 0);
+        add(usernameLabel, constraints);
+
+        // usernameField
+        usernameField = new JTextField();
+        usernameField.setPreferredSize(
+                new Dimension(320, usernameField.getPreferredSize().height));
+        usernameField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 4;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(8, 5, 0, 10);
+        add(usernameField, constraints);
+
+        // passwordLabel
+        passwordLabel = new JLabel("Password:");
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 5;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.insets = new Insets(8, 10, 0, 0);
+        add(passwordLabel, constraints);
+
+        // passwordField
+        passwordField = new JPasswordField();
+        passwordField.setPreferredSize(
+                new Dimension(200, passwordField.getPreferredSize().height));
+        passwordField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 5;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(8, 5, 0, 10);
+        add(passwordField, constraints);
+
+        // saveCheckbox
+        saveCheckbox = new JCheckBox("Save security credentials");
+        saveCheckbox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                update();
+            };
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 6;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.insets = new Insets(8, 40, 0, 0);
+        add(saveCheckbox, constraints);
+
         // spacer
         JPanel spacer = Utils.createFillerPanel();
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
-        constraints.gridy = 3;
+        constraints.gridy = 7;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -276,5 +404,11 @@ class JmxApplicationConfigurator extends JPanel {
     private JLabel usageLabel;
     private JCheckBox displaynameCheckbox;
     private JTextField displaynameField;
+    private JCheckBox securityCheckbox;
+    private JLabel usernameLabel;
+    private JTextField usernameField;
+    private JLabel passwordLabel;
+    private JPasswordField passwordField;
+    private JCheckBox saveCheckbox;
     private JButton okButton;
 }

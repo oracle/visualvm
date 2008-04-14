@@ -113,7 +113,7 @@ public final class HostsSupport {
 
 
     private HostsSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HostDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new HostDescriptorProvider());
         
         RemoteHostsContainer container = RemoteHostsContainer.sharedInstance();
         DataSource.ROOT.getRepository().addDataSource(container);

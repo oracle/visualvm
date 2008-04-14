@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
@@ -64,19 +65,25 @@ public class ProfilerSnapshotProvider {
     
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof ProfilerSnapshot) return;
-        Set<ProfilerSnapshot> snapshots = new HashSet();
-        LoadedSnapshot[] loadedSnapshots = findSnapshots(snapshot.getFile());
-        for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-            if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
-        snapshot.getRepository().addDataSources(snapshots);
+        File snapshotFile = snapshot.getFile();
+        if (snapshotFile != null && snapshotFile.isDirectory()) {
+            Set<ProfilerSnapshot> snapshots = new HashSet();
+            LoadedSnapshot[] loadedSnapshots = findSnapshots(snapshotFile);
+            for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
+                if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
+            snapshot.getRepository().addDataSources(snapshots);
+        }
     }
     
     private void processNewApplication(Application application) {
-        Set<ProfilerSnapshot> snapshots = new HashSet();
-        LoadedSnapshot[] loadedSnapshots = findSnapshots(application.getStorage().getDirectory());
-        for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-            if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, application));
-        application.getRepository().addDataSources(snapshots);
+        Storage storage = application.getStorage();
+        if (storage.directoryExists()) {
+            Set<ProfilerSnapshot> snapshots = new HashSet();
+            LoadedSnapshot[] loadedSnapshots = findSnapshots(storage.getDirectory());
+            for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
+                if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, application));
+            application.getRepository().addDataSources(snapshots);
+        }
     }
     
     private LoadedSnapshot[] findSnapshots(File directory) {

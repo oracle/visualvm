@@ -26,11 +26,12 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceContainer;
+import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -50,7 +51,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class ExplorerModelBuilder {
+class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     private static final RequestProcessor queue = new RequestProcessor("Explorer Builder Processor");
     
@@ -61,7 +62,6 @@ class ExplorerModelBuilder {
     
     private final Map<DataSource, ExplorerNode> nodes;
     private final Map<DataSource, PropertyChangeListener> visibilityListeners = new HashMap();
-    private final Map<DataSourceContainer, DataChangeListener> repositoryListeners = new HashMap();
     private final Map<DataSourceDescriptor, PropertyChangeListener> descriptorListeners = new HashMap();
     
     
@@ -79,115 +79,101 @@ class ExplorerModelBuilder {
         return nodes.get(dataSource);
     }
     
-    boolean isNodeInTree(DataSource dataSource) {
-        return getNodeFor(dataSource) != null;
-    }
     
-    
-    private void processAddedDataSources(final Set<DataSource> added) {
+    public void dataChanged(final DataChangeEvent event) {
         queue.post(new Runnable() {
             public void run() {
-                final Set<ExplorerNode> addedNodes = new HashSet();
+                Set<DataSource> removed = event.getRemoved();
+                Set<DataSource> added = event.getAdded();
 
-                for (DataSource dataSource : added) {
-
-                    if (dataSource.isVisible()) {
-                        // Process DataSource
-                        if (dataSource != DataSource.ROOT) {
-                            final ExplorerNode node = new ExplorerNode(dataSource);
-                            addedNodes.add(node);
-
-                            DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-                            PropertyChangeListener descriptorListener = new PropertyChangeListener() {
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                    updateNode(node, evt);
-                                }
-                            };
-                            descriptor.addPropertyChangeListener(descriptorListener);
-                            descriptorListeners.put(descriptor, descriptorListener);
-                            updateNode(node, descriptor);
-                        }
-
-                        // Process repository of the DataSource
-                        DataSourceContainer repository = dataSource.getRepository();
-                        DataChangeListener repositoryListener = new DataChangeListener() {
-                            public void dataChanged(DataChangeEvent event) {
-                                Set<DataSource> added = event.getAdded();
-                                Set<DataSource> removed = event.getRemoved();
-                                if (!removed.isEmpty()) processRemovedDataSources(removed);
-                                if (!added.isEmpty()) processAddedDataSources(added);
-                            }
-                        };
-                        repository.addDataChangeListener(repositoryListener, DataSource.class);
-                        repositoryListeners.put(repository, repositoryListener);
-                    }
-
-                }
-
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        addNodes(addedNodes);
-                        
-                        for (DataSource dataSource : added) {
-                            // Track visibility of the DataSource
-                            PropertyChangeListener visibilityListener = new PropertyChangeListener() {
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                    processRemovedDataSources(Collections.singleton((DataSource)evt.getSource()));
-                                    processAddedDataSources(Collections.singleton((DataSource)evt.getSource()));
-                                }
-                            };
-                            dataSource.addPropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
-                            visibilityListeners.put(dataSource, visibilityListener);
-                        }
-                    }
-                });
+                if (!removed.isEmpty()) processRemovedDataSources(removed);
+                if (!added.isEmpty()) processAddedDataSources(added);
             }
         });
     }
     
-    private void processRemovedDataSources(final Set<DataSource> removed) {
-        queue.post(new Runnable() {
-            public void run() {
-                final Set<ExplorerNode> removedNodes = new HashSet();
+    private void processAddedDataSources(Set<DataSource> added) {
+        for (DataSource dataSource : added) installVisibilityListener(dataSource);
+        processIndependentAddedDataSources(Utils.getIndependentDataSources(added));
+    }
+    
+    private void processIndependentAddedDataSources(Set<DataSource> added) {
+        Set<DataSource> addedDisplayable = new HashSet();
 
-                for (DataSource dataSource : removed) {
+        for (DataSource dataSource : added) {
+            if (isDisplayed(dataSource) && dataSource != DataSource.ROOT) return;
+            if (isDisplayable(dataSource)) addedDisplayable.add(dataSource);
+        }
 
-                    // Track visibility of the DataSource
-                    PropertyChangeListener visibilityListener = visibilityListeners.get(dataSource);
-                    dataSource.removePropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
-                    visibilityListeners.remove(dataSource);
-
-                    // Process repository of the DataSource
-                    DataSourceContainer repository = dataSource.getRepository();
-                    DataChangeListener repositoryListener = repositoryListeners.get(repository);
-                    if (repositoryListener != null) {
-                        repository.removeDataChangeListener(repositoryListener);
-                        repositoryListeners.remove(repository);
-                        processRemovedDataSources(repository.getDataSources());
-
-                        // Process DataSource
-                        ExplorerNode node = getNodeFor(dataSource);
-                        // NOTE: parent node should be available here,
-                        // null means there's something wrong outside of ExplorerModelBuilder code
-                        assert(node != null);
-                        if (node != null) {
-                            removedNodes.add(node);
-                        }
-
-                        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-                        descriptor.removePropertyChangeListener(descriptorListeners.get(descriptor));
-                        descriptorListeners.remove(descriptor);
+        if (!addedDisplayable.isEmpty()) processAddedDisplayableDataSources(addedDisplayable);
+    }
+    
+    private void processRemovedDataSources(Set<DataSource> removed) {
+        for (DataSource dataSource : removed) uninstallVisibilityListener(dataSource);
+        processIndependentRemovedDataSources(Utils.getIndependentDataSources(removed));
+    }
+    
+    private void processIndependentRemovedDataSources(Set<DataSource> removed) {
+        Set<DataSource> removedDisplayed = new HashSet();
+        
+        for (DataSource dataSource : removed)
+            if (isDisplayed(dataSource)) removedDisplayed.add(dataSource);
+        
+        if (!removedDisplayed.isEmpty()) processRemovedDisplayedDataSources(removedDisplayed);
+    }
+    
+    private void processAddedDisplayableDataSources(Set<DataSource> addedDisplayable) {
+        final Set<ExplorerNode> addedNodes = new HashSet();
+        
+        for (DataSource dataSource : addedDisplayable) {
+            if (dataSource != DataSource.ROOT) {
+                final ExplorerNode node = new ExplorerNode(dataSource);
+                addedNodes.add(node);
+                DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+                PropertyChangeListener descriptorListener = new PropertyChangeListener() {
+                    public void propertyChange(final PropertyChangeEvent evt) {
+                        queue.post(new Runnable() {
+                            public void run() { updateNode(node, evt); }
+                        });
                     }
-
-                }
-
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        removeNodes(removedNodes);
-                    }
-                });
+                };
+                descriptor.addPropertyChangeListener(descriptorListener);
+                descriptorListeners.put(descriptor, descriptorListener);
+                updateNode(node, descriptor);
             }
-        });
+        }
+        
+        try { SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() { addNodes(addedNodes); }
+        }); } catch (Exception e) {}
+        
+        Set<DataSource> addedChildren = new HashSet();
+        for (DataSource dataSource : addedDisplayable)
+            addedChildren.addAll(dataSource.getRepository().getDataSources());
+        if (!addedChildren.isEmpty()) processIndependentAddedDataSources(addedChildren);
+    }
+    
+    private void processRemovedDisplayedDataSources(Set<DataSource> removedDisplayed) {
+        Set<DataSource> removedChildren = new HashSet();
+        for (DataSource dataSource : removedDisplayed)
+            removedChildren.addAll(dataSource.getRepository().getDataSources());
+        if (!removedChildren.isEmpty()) processIndependentRemovedDataSources(removedChildren);
+        
+        final Set<ExplorerNode> removedNodes = new HashSet();
+        
+        for (DataSource dataSource : removedDisplayed) {
+            DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+            PropertyChangeListener descriptorListener = descriptorListeners.get(descriptor);
+            descriptor.removePropertyChangeListener(descriptorListener);
+            descriptorListeners.remove(descriptor);
+            
+            ExplorerNode node = nodes.get(dataSource);
+            removedNodes.add(node);
+        }
+        
+        try { SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() { removeNodes(removedNodes); }
+        }); } catch (Exception e) {}
     }
     
     private void updateNode(ExplorerNode node, DataSourceDescriptor descriptor) {
@@ -198,35 +184,37 @@ class ExplorerModelBuilder {
     }
     
     private void updateNode(final ExplorerNode node, final PropertyChangeEvent evt) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                String property = evt.getPropertyName();
-                Object newValue = evt.getNewValue();
+        String property = evt.getPropertyName();
+        Object newValue = evt.getNewValue();
 
-                // Node name needs to be updated
-                if (DataSourceDescriptor.PROPERTY_NAME.equals(property)) {
-                    String name = (String)newValue;
-                    node.setName(name);
-                    explorerModel.nodeChanged(node);
-                // Node icon needs to be updated
-                } else if (DataSourceDescriptor.PROPERTY_ICON.equals(property)) {
-                    Image icon = (Image)newValue;
-                    node.setIcon(icon == null ? null : new ImageIcon(icon));
-                    explorerModel.nodeChanged(node);
-                // Node position within its parent needs to be updated
-                } else if (DataSourceDescriptor.PROPERTY_PREFERRED_POSITION.equals(property)) {
-                    Integer preferredPosition = (Integer)newValue;
-                    node.setPreferredPosition(preferredPosition);
-                    ExplorerNode parent = (ExplorerNode)node.getParent();
-                    if (parent != null) {
-                        parent.addNode(node);
-                        explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) });
-                    }
-                } else if (DataSourceDescriptor.PROPERTY_EXPANSION_POLICY.equals(property)) {
-                    node.setAutoExpansionPolicy((Integer)evt.getNewValue());
-                }
+        // Node name needs to be updated
+        if (DataSourceDescriptor.PROPERTY_NAME.equals(property)) {
+            String name = (String)newValue;
+            node.setName(name);
+            try { SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() { explorerModel.nodeChanged(node); }
+            }); } catch (Exception e) {}
+        // Node icon needs to be updated
+        } else if (DataSourceDescriptor.PROPERTY_ICON.equals(property)) {
+            Image icon = (Image)newValue;
+            node.setIcon(icon == null ? null : new ImageIcon(icon));
+            try { SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() { explorerModel.nodeChanged(node); }
+            }); } catch (Exception e) {}
+        // Node position within its parent needs to be updated
+        } else if (DataSourceDescriptor.PROPERTY_PREFERRED_POSITION.equals(property)) {
+            Integer preferredPosition = (Integer)newValue;
+            node.setPreferredPosition(preferredPosition);
+            final ExplorerNode parent = (ExplorerNode)node.getParent();
+            if (parent != null) {
+                parent.addNode(node);
+                try { SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() { explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) }); }
+                }); } catch (Exception e) {}
             }
-        });
+        } else if (DataSourceDescriptor.PROPERTY_EXPANSION_POLICY.equals(property)) {
+            node.setAutoExpansionPolicy((Integer)evt.getNewValue());
+        }
     }
     
     private void addNodes(Set<ExplorerNode> added) {
@@ -304,16 +292,51 @@ class ExplorerModelBuilder {
         ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
     
+    private void installVisibilityListener(final DataSource dataSource) {
+        PropertyChangeListener visibilityListener = new PropertyChangeListener() {
+            public void propertyChange(final PropertyChangeEvent evt) {
+                queue.post(new Runnable() {
+                    public void run() {
+                        if ((Boolean)evt.getNewValue()) {
+                            if (isDisplayed(dataSource.getOwner()) && !isDisplayed(dataSource))
+                                processAddedDisplayableDataSources(Collections.singleton(dataSource));
+                        } else {
+                            if (isDisplayed(dataSource))
+                                processRemovedDisplayedDataSources(Collections.singleton(dataSource));
+                        }
+                    }
+                });
+            }
+        };
+        dataSource.addPropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
+        visibilityListeners.put(dataSource, visibilityListener);
+    }
+    
+    private void uninstallVisibilityListener(DataSource dataSource) {
+        PropertyChangeListener visibilityListener = visibilityListeners.get(dataSource);
+        dataSource.removePropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
+        visibilityListeners.remove(dataSource);
+    }
+    
+    private boolean isDisplayed(DataSource dataSource) {
+        return nodes.get(dataSource) != null;
+    }
+    
+    private boolean isDisplayable(DataSource dataSource) {
+        if (dataSource == DataSource.ROOT) return true;
+        return dataSource.isVisible() && isDisplayed(dataSource.getOwner());
+    }
+    
     
     private ExplorerModelBuilder() {
         explorerRoot = new ExplorerNode(DataSource.ROOT);
         explorerRoot.setAutoExpansionPolicy(DataSourceDescriptor.EXPAND_ON_EACH_FIRST_CHILD);
         explorerModel = new DefaultTreeModel(explorerRoot);
         
-        nodes = Collections.synchronizedMap(new HashMap());
+        nodes = new HashMap();
         nodes.put(DataSource.ROOT, explorerRoot);
         
-        processAddedDataSources(Collections.singleton(DataSource.ROOT));
+        DataSourceRepository.sharedInstance().addDataChangeListener(this, DataSource.class);
     }
     
     

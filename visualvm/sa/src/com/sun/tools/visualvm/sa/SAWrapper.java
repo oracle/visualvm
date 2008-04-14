@@ -49,21 +49,21 @@ class SAWrapper {
         // and Windows process debugger to windbg debugger. SA expects
         // special properties to be set to choose other debuggers.
         // We will set those here before attaching to SA agent.
-        System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true");
-        System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");
+        System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true"); // NOI18N
+        System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");   // NOI18N
         URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
-        String osArch = System.getProperty("os.arch");
+        String osArch = System.getProperty("os.arch");  // NOI18N
         if ("x86".equals(osArch)) {
             osArch = "i386";
         }
-        libraryPath = new File(jdkHome, "jre/lib/" + osArch);
-        LOGGER.fine("Path " + libraryPath.getAbsolutePath());
+        libraryPath = new File(jdkHome, "jre/lib/" + osArch);   // NOI18N
+        LOGGER.fine("Path " + libraryPath.getAbsolutePath());   // NOI18N
         loader = new URLClassLoader(saJarUrls) {
             @Override
             protected String findLibrary(String libname) {
                 String name = System.mapLibraryName(libname);
                 File library = new File(libraryPath, name);
-                LOGGER.fine("Library " + library.getAbsolutePath());
+                LOGGER.fine("Library " + library.getAbsolutePath());    // NOI18N
                 if (library.exists() && library.canRead()) {
                     return library.getAbsolutePath();
                 }
@@ -93,6 +93,6 @@ class SAWrapper {
     }
     
     Class Arguments() throws ClassNotFoundException {
-        return classForName("sun.jvm.hotspot.runtime.Arguments");
+        return classForName("sun.jvm.hotspot.runtime.Arguments");   // NOI18N
     }
 }

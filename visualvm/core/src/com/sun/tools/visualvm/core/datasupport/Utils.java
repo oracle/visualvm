@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.datasupport;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -33,8 +34,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,6 +80,62 @@ public final class Utils {
         return filteredSet;
     }
     
+    public static Set<DataSource> getIndependentDataSources(Set<DataSource> dataSources) {
+        Map<Integer, Set<DataSource>> independentDataSourcesMap = new HashMap();
+        
+        List<DataSourcePath> dataSourcePaths = new ArrayList();
+        for (DataSource dataSource : dataSources) dataSourcePaths.add(new DataSourcePath(dataSource));
+        Collections.sort(dataSourcePaths);
+        
+        for (DataSourcePath dataSourcePath : dataSourcePaths) {
+            boolean independent = true;
+            for (int i = 0; i < dataSourcePath.size(); i++) {
+                DataSource dataSource = dataSourcePath.get(i);
+                Set<DataSource> set = independentDataSourcesMap.get(i);
+                if (set != null && set.contains(dataSource)) {
+                    independent = false;
+                    break;
+                }
+            }
+            
+            if (independent) {
+                Set<DataSource> set = independentDataSourcesMap.get(dataSourcePath.size() - 1);
+                if (set == null) {
+                    set = new HashSet();
+                    independentDataSourcesMap.put(dataSourcePath.size() - 1, set);
+                }
+                set.add(dataSourcePath.getDataSource());
+            }
+        }
+        
+        Set<DataSource> independentDataSources = new HashSet();
+        Collection<Set<DataSource>> independentSetsCollection = independentDataSourcesMap.values();
+        for (Set<DataSource> independentSet : independentSetsCollection)
+            independentDataSources.addAll(independentSet);
+        return independentDataSources;
+    }
+    
+    private static class DataSourcePath extends ArrayList<DataSource> implements Comparable<DataSourcePath> {
+        
+        public DataSourcePath(DataSource dataSource) {
+            super();
+            while(dataSource != null) {
+                add(0, dataSource);
+                dataSource = dataSource.getOwner();
+            }
+        }
+
+        public int compareTo(DataSourcePath dataSourcePath) {
+            Integer thisSize = size();
+            return thisSize.compareTo(dataSourcePath.size());
+        }
+        
+        public DataSource getDataSource() {
+            return get(size() - 1);
+        }
+        
+    }
+    
     
     public static String getFileBase(String fileName) {
         int extIndex = fileName.lastIndexOf(".");
@@ -101,7 +164,8 @@ public final class Utils {
     
     public static synchronized boolean prepareDirectory(File directory) {
         if (directory.exists()) return true;
-        return directory.mkdirs();
+        directory.mkdirs();
+        return directory.exists();
     }
     
     public static boolean copyFile(File file, File copy) {

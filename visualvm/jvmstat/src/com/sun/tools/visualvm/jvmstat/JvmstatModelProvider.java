@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.ErrorManager;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -48,14 +47,19 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
     static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
         if (app.isRemoved() || app.getPid() == Application.UNKNOWN_PID) return null;
         
-        String vmId = "//" + app.getPid() + "?mode=r";
+        String vmId = "//" + app.getPid() + "?mode=r";  // NOI18N
         try {
             MonitoredHost monitoredHost = MonitoredHost.getMonitoredHost(app.getHost().getHostName());
             int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
             return monitoredHost.getMonitoredVm(new VmIdentifier(vmId),refreshInterval);
         } catch (URISyntaxException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.EXCEPTION,ex);
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
             return null;
+        } catch (Exception ex) { 
+            // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows, 
+            // when opening shared memory file (java.lang.Exception: Could not open PerfMemory)
+            LOGGER.log(Level.INFO,"getMonitoredVm failed",ex);  // NOI18N
+            return null;            
         }
     }
     
@@ -64,12 +68,17 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         try {
             vm = getMonitoredVm(app);
             if (vm != null) {
-                JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
-                app.notifyWhenRemoved(jvmstat);
-                return jvmstat;
+                // check that the target VM is accessible
+                if (vm.findByName("java.property.java.vm.version") != null) {   // NOI18N
+                    JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
+                    app.notifyWhenRemoved(jvmstat);
+                    return jvmstat;
+                } else {
+                   LOGGER.log(Level.INFO, "java.property.java.vm.version is null"); // NOI18N
+                }
             }
         } catch (MonitorException ex) {
-            LOGGER.log(Level.FINE, "Could not get MonitoredVM", ex); // NOI18N
+            LOGGER.log(Level.INFO, "Could not get MonitoredVM", ex); // NOI18N
         }
         if (vm != null) {
             vm.detach();

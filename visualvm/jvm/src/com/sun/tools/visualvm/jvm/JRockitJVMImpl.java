@@ -25,33 +25,8 @@
 
 package com.sun.tools.visualvm.jvm;
 
-import com.sun.management.HotSpotDiagnosticMXBean;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.MonitoredData;
-import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.attach.AttachModel;
-import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import com.sun.tools.visualvm.tools.sa.SaModel;
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  *
@@ -63,54 +38,63 @@ public class JRockitJVMImpl extends JVMImpl {
         super(app,jvms);
     }
     
-    JRockitJVMImpl(Application app,JvmJmxModel jmx) {
-        super(app,jmx);
+    JRockitJVMImpl(Application app) {
+        super(app);
     }
         
+    @Override
     public boolean is14() {
         String ver = getVmVersion();
-        if (ver != null && ver.contains("1.4.2")) {
+        if (ver != null && ver.contains("1.4.2")) { // NOI18N
             return true;
         }
         return false;
     }
     
+    @Override
     public boolean is15() {
         String ver = getVmVersion();
-        if (ver != null && ver.contains("1.5.0")) {
+        if (ver != null && ver.contains("1.5.0")) { // NOI18N
             return true;
         }
         return false;
     }
     
+    @Override
     public boolean is16() {
         String ver = getVmVersion();
-        if (ver != null && ver.contains("1.6.0")) {
+        if (ver != null && ver.contains("1.6.0")) { // NOI18N
             return true;
         }
         return false;
     }
     
+    @Override
     public boolean is17() {
         return false;
     }
     
+    @Override
     public boolean isDumpOnOOMEnabled() {
         return false;
     }
         
+    @Override
     public boolean isGetSystemPropertiesSupported() {
         return (is16() && getAttach() != null) || jmxSupport.getRuntime() != null;
     }
         
+    @Override
     public boolean isDumpOnOOMEnabledSupported() {
         return false;
     }
         
+    @Override
     public boolean isTakeHeapDumpSupported() {
         return false;
     }
         
+    @Override
     public boolean isTakeThreadDumpSupported() {
         return getAttach() != null || jmxSupport.getRuntime() != null;
     }

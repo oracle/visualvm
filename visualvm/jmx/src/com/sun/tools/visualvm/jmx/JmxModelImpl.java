@@ -35,6 +35,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
+import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
@@ -84,7 +86,7 @@ import sun.rmi.transport.LiveRef;
 /**
  * This class encapsulates the JMX functionality of the target Java application.
  *
- * Call {@link JmxModelFactory.getJmxModelFor()} to get an instance of the
+ * Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
  * {@link JmxModel} class.
  *
  * Usually this class will be used as follows:
@@ -97,9 +99,9 @@ import sun.rmi.transport.LiveRef;
  * }
  * </pre>
  *
- * {@link CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection(MBeanServerConnection)}
- * can be used to work with a {@link CachedMBeanServerConnection} instead of
- * a plain {@link MBeanServerConnection}.
+ * Several factory methods are available in {@link CachedMBeanServerConnectionFactory}
+ * that can be used to work with a {@link CachedMBeanServerConnection} instead of a
+ * plain {@link MBeanServerConnection}.
  *
  * In case the JMX connection is not established yet, you could register
  * a listener on the {@code JmxModel} for ConnectionState property changes.
@@ -108,7 +110,7 @@ import sun.rmi.transport.LiveRef;
  * be the source for any generated events.
  *
  * Polling for the ConnectionState is also possible by calling
- * {@link JmxModel.getConnectionState()}.
+ * {@link JmxModel#getConnectionState()}.
  *
  * @author Luis-Miguel Alventosa
  */
@@ -126,9 +128,6 @@ public class JmxModelImpl extends JmxModel {
      */
     public JmxModelImpl(Application application,JvmstatModel jvmstat) {
         try {
-            Storage storage = application.getStorage();
-            String username = storage.getCustomProperty(PROPERTY_USERNAME);
-            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
             JvmJvmstatModel jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(application);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
             ProxyClient proxyClient = null;
@@ -160,8 +159,8 @@ public class JmxModelImpl extends JmxModel {
                 List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
                 if (urls.size() != 0) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
-                    proxyClient = new ProxyClient(this, urls.get(0), username, password);
-                    if (username != null && "true".equals(auths.get(0))) {
+                    proxyClient = new ProxyClient(this, urls.get(0), null, null);
+                    if ("true".equals(auths.get(0))) {
                         supplyCredentials(application, proxyClient);
                     }
                 } else {
@@ -182,10 +181,8 @@ public class JmxModelImpl extends JmxModel {
                         }
                     }
                     if (port != -1) {
-                        proxyClient = new ProxyClient(this,
-                                application.getHost().getHostName(),
-                                port, username, password);
-                        if (username != null && authenticate) {
+                        proxyClient = new ProxyClient(this, application.getHost().getHostName(), port, null, null);
+                        if (authenticate) {
                             supplyCredentials(application, proxyClient);
                         }
                     }
@@ -210,9 +207,8 @@ public class JmxModelImpl extends JmxModel {
     public JmxModelImpl(JmxApplication application) {
         try {
             JMXServiceURL url = application.getJMXServiceURL();
-            Storage storage = application.getStorage();
-            String username = storage.getCustomProperty(PROPERTY_USERNAME);
-            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+            String username = application.getUsername();
+            String password = application.getPassword();
             final ProxyClient proxyClient =
                     new ProxyClient(this, url.toString(), username, password);
             client = proxyClient;
@@ -244,14 +240,18 @@ public class JmxModelImpl extends JmxModel {
     private ApplicationSecurityConfigurator supplyCredentials(
             Application application, ProxyClient proxyClient) {
         String displayName = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
-        if (displayName == null) displayName = proxyClient.getUrl().toString();
+        if (displayName == null) {
+            displayName = proxyClient.getUrl().toString();
+        }
         ApplicationSecurityConfigurator jsc =
                 ApplicationSecurityConfigurator.supplyCredentials(displayName);
         if (jsc != null) {
             proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
-            Storage storage = application.getStorage();
-            storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
-            storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+            if (application instanceof JmxApplication && ((JmxApplication) application).getSaveCredentialsFlag()) {
+                Storage storage = application.getStorage();
+                storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
+                storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+            }
         }
         return jsc;
     }
@@ -269,9 +269,9 @@ public class JmxModelImpl extends JmxModel {
     }
 
     /**
-     * Returns the {@link MBeanServerConnection MBeanServerConnection} for the
-     * connection to an application. The returned {@code MBeanServerConnection}
-     * object becomes invalid when the connection state is changed to the
+     * Returns the {@link MBeanServerConnection} for the connection to
+     * an application. The returned {@code MBeanServerConnection} object
+     * becomes invalid when the connection state is changed to the
      * {@link ConnectionState#DISCONNECTED DISCONNECTED} state.
      *
      * @return the {@code MBeanServerConnection} for the

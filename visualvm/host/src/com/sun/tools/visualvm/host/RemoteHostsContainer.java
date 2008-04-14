@@ -48,7 +48,7 @@ public class RemoteHostsContainer extends DataSource {
     
     
     private RemoteHostsContainer() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new HostsContainerDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new HostsContainerDescriptorProvider());
 //        DataSource.ROOT.getRepository().addDataSource(this);
     }
     

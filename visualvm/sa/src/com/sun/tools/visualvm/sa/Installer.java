@@ -35,7 +35,7 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        SaModelFactory.getDefault().registerFactory(new SaModelProvider());
+        SaModelFactory.getDefault().registerProvider(new SaModelProvider());
     }
     
 }

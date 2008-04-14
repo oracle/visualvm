@@ -113,11 +113,11 @@ public final class CoreDumpSupport {
     public static void register() {
         if (Utilities.isWindows()) return;
         
-        DataSourceDescriptorFactory.getDefault().registerFactory(new CoreDumpDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new CoreDumpDescriptorProvider());
         CoreDumpsContainer.sharedInstance();
         CoreDumpProvider.register();
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
-        DataSourceViewsManager.sharedInstance().addViewsProvider(viewProvider, CoreDump.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(viewProvider, CoreDump.class);
     }
 
 }

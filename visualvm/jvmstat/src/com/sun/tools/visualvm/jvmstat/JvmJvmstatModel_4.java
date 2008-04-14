@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
  * @author Tomas Hurka
  */
 class JvmJvmstatModel_4 extends JvmJvmstatModel {
-    private static final String PERM_GEN_PREFIX = "hotspot.gc.generation.2.";
+    private static final String PERM_GEN_PREFIX = "hotspot.gc.generation.2.";   // NOI18N
 
     JvmJvmstatModel_4(Application app,JvmstatModel stat) {
         super(app,stat);
@@ -43,15 +43,15 @@ class JvmJvmstatModel_4 extends JvmJvmstatModel {
     }
 
     private void initMonitoredVales() {
-      loadedClasses = jvmstat.findMonitoredValueByName("hotspot.rt.cl.classes.loaded");
-      unloadedClasses = jvmstat.findMonitoredValueByName("hotspot.rt.cl.classes.unloaded");
-      applicationTime = jvmstat.findMonitoredValueByName("sun.rt.applicationTime");
-      upTime = jvmstat.findMonitoredValueByName("hotspot.rt.hrt.ticks");
-      MonitoredValue osFrequencyMon = jvmstat.findMonitoredValueByName("hotspot.rt.hrt.frequency");
+      loadedClasses = jvmstat.findMonitoredValueByName("hotspot.rt.cl.classes.loaded"); // NOI18N
+      unloadedClasses = jvmstat.findMonitoredValueByName("hotspot.rt.cl.classes.unloaded"); // NOI18N
+      applicationTime = jvmstat.findMonitoredValueByName("sun.rt.applicationTime"); // NOI18N
+      upTime = jvmstat.findMonitoredValueByName("hotspot.rt.hrt.ticks");    // NOI18N
+      MonitoredValue osFrequencyMon = jvmstat.findMonitoredValueByName("hotspot.rt.hrt.frequency"); // NOI18N
       osFrequency = getLongValue(osFrequencyMon);
-      genCapacity = jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.capacity.current");
-      genUsed = jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.space.[0-9]+.used");
-      genMaxCapacity = getGenerationSum(jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.capacity.max"));
+      genCapacity = jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.capacity.current");   // NOI18N
+      genUsed = jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.space.[0-9]+.used");  // NOI18N
+      genMaxCapacity = getGenerationSum(jvmstat.findMonitoredValueByPattern("hotspot.gc.generation.[0-9]+.capacity.max"));  // NOI18N
     }
 
     protected String getPermGenPrefix() {

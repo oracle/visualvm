@@ -29,8 +29,9 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModel;
-import com.sun.tools.visualvm.tools.jmx.JvmJmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.lang.management.RuntimeMXBean;
 import javax.management.remote.JMXServiceURL;
 
@@ -44,15 +45,22 @@ public final class JmxApplication extends Application {
     
     private int pid;
     private final JMXServiceURL url;
+    private final String username;
+    private final String password;
+    private final boolean saveCredentials;
     private final Storage storage;
     // since getting JVM for the first time can take a long time
     // hard reference jvm from application so we are sure that it is not garbage collected
     Jvm jvm;
 
-    public JmxApplication(Host host, JMXServiceURL url, Storage storage) {
-        super(host, url.toString());
+    public JmxApplication(Host host, JMXServiceURL url, String username,
+            String password, boolean saveCredentials, Storage storage) {
+        super(host, url.toString() + (username == null ? "" : " (" + username + ")"));
         pid = UNKNOWN_PID;
         this.url = url;
+        this.username = username;
+        this.password = password;
+        this.saveCredentials = saveCredentials;
         this.storage = storage;
     }
 
@@ -60,12 +68,24 @@ public final class JmxApplication extends Application {
         return url;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean getSaveCredentialsFlag() {
+        return saveCredentials;
+    }
+
     @Override
     public int getPid() {
         if (pid == UNKNOWN_PID) {
-            JvmJmxModel jmxModel = JvmJmxModelFactory.getJvmJmxModelFor(this);
-            if (jmxModel != null) {
-                RuntimeMXBean rt = jmxModel.getRuntimeMXBean();
+            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(this));
+            if (mxbeans != null) {
+                RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
                 if (rt != null) {
                     String name = rt.getName();
                     if (name != null && name.indexOf("@") != -1) {
@@ -78,10 +98,12 @@ public final class JmxApplication extends Application {
         return pid;
     }
 
+    @Override
     public boolean supportsUserRemove() {
         return true;
     }
     
+    @Override
     protected Storage createStorage() {
         return storage;
     }

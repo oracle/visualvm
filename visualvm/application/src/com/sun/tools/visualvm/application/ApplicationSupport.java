@@ -65,7 +65,7 @@ final class ApplicationSupport {
     }
 
     private ApplicationSupport() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(new ApplicationDescriptorProvider());
+        DataSourceDescriptorFactory.getDefault().registerProvider(new ApplicationDescriptorProvider());
         initCurrentApplication();
     }
 
