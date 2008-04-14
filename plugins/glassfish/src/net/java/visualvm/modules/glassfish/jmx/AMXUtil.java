@@ -31,10 +31,13 @@ import com.sun.appserv.management.client.ProxyFactory;
 import com.sun.appserv.management.config.ConfigConfig;
 import com.sun.appserv.management.config.ModuleMonitoringLevelsConfig;
 import com.sun.appserv.management.monitor.MonitoringRoot;
+import com.sun.appserv.management.util.jmx.MBeanServerConnectionConnectionSource;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 
 /**
@@ -42,6 +45,8 @@ import javax.management.MBeanServerConnection;
  * @author Jaroslav Bachorik
  */
 public class AMXUtil {
+    private static final Logger LOGGER = Logger.getLogger(AMXUtil.class.getName());
+    
     private static final Map<MBeanServerConnection, WeakReference<ProxyFactory>> proxyMap = new WeakHashMap<MBeanServerConnection, WeakReference<ProxyFactory>>();
     
     public static MonitoringRoot getMonitoringRoot(MBeanServerConnection connection) throws Exception {
@@ -64,6 +69,7 @@ public class AMXUtil {
             domainRoot.waitAMXReady();
             return domainRoot;
         } catch (Exception e) {
+            LOGGER.log(Level.FINER, "", e);
             return null;
         }
     }
@@ -76,12 +82,15 @@ public class AMXUtil {
     public static ProxyFactory getAMXProxyFactory(MBeanServerConnection connection) throws Exception {
         WeakReference<ProxyFactory> pfref = proxyMap.get(connection);
         ProxyFactory pf = null;
-        if (pfref == null || pfref.get() == null) {
-            pf = ProxyFactory.getInstance(connection);
-            proxyMap.put(connection, new WeakReference<ProxyFactory>(pf));
-        } else {
+        if (pfref != null && pfref.get() != null && pfref.get().getDomainRoot() != null) {
             pf = pfref.get();
+            try {
+                pf.getDomainRoot().getAMXReady();
+                return pf;
+            } catch (Exception e) {}
         }
+        pf = ProxyFactory.getInstance(new MBeanServerConnectionConnectionSource(connection), false);
+        proxyMap.put(connection, new WeakReference<ProxyFactory>(pf));
         return pf;
     }
        
