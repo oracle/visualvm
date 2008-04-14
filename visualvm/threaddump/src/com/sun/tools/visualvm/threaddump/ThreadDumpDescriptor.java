@@ -35,7 +35,7 @@ import org.openide.util.Utilities;
  */
 public class ThreadDumpDescriptor extends SnapshotDescriptor<ThreadDump> {
         
-    private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/threaddump/resources/threaddump.png", true);
+    private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/threaddump/resources/threaddump.png", true);  // NOI18N
 
     public ThreadDumpDescriptor(ThreadDump threadDump) {
         super(threadDump, ICON);

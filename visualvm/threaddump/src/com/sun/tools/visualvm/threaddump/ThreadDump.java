@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
+import org.openide.util.NbBundle;
 
 /**
  * Abstract implementation of ThreadDump.
@@ -61,7 +62,7 @@ public abstract class ThreadDump extends Snapshot {
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, "Save Thread Dump As");
+        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(ThreadDump.class, "MSG_Save_Thread_Dump_As")); // NOI18N
     }
 
 }

@@ -50,6 +50,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.ErrorManager;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -66,7 +67,7 @@ public class ThreadDumpProvider {
                 if (!jvm.isTakeThreadDumpSupported()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError("Cannot take thread dump for " + DataSourceDescriptorFactory.getDescriptor(application).getName());
+                            NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Cannot_take_thread_dump_for_") + DataSourceDescriptorFactory.getDescriptor(application).getName());  // NOI18N
                         }
                     });
                     return;
@@ -74,7 +75,7 @@ public class ThreadDumpProvider {
                 
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Creating Thread Dump...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
@@ -101,7 +102,7 @@ public class ThreadDumpProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Creating Thread Dump...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     File snapshotDir = coreDump.getStorage().getDirectory();
@@ -112,7 +113,7 @@ public class ThreadDumpProvider {
                     if (dump != null) {
                         try {
                             OutputStream os = new FileOutputStream(dumpFile);
-                            os.write(dump.getBytes("UTF-8"));
+                            os.write(dump.getBytes("UTF-8"));    // NOI18N
                             os.close();
                             final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);

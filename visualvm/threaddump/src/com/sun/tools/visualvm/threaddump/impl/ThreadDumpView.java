@@ -44,6 +44,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -87,14 +88,14 @@ class ThreadDumpView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Thread dump", null, new ScrollableContainer(this));
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadDumpView.class, "MSG_Thread_Dump"), null, new ScrollableContainer(this));  // NOI18N
         }
         
         
         private void initComponents() {
             setLayout(new BorderLayout());
             
-            progressLabel = new JLabel("Loading Thread Dump...", SwingConstants.CENTER);
+            progressLabel = new JLabel(NbBundle.getMessage(ThreadDumpView.class, "MSG_Loading_Thread_Dump"), SwingConstants.CENTER);     // NOI18N
         
             contentsPanel = new JPanel(new BorderLayout());
             contentsPanel.add(progressLabel, BorderLayout.CENTER);
@@ -104,7 +105,7 @@ class ThreadDumpView extends DataSourceView {
         }
 
         private static String htmlize(String value) {
-            return value.replace("&", "&amp;").replace("<", "&lt;");
+            return value.replace("&", "&amp;").replace("<", "&lt;");     // NOI18N
         }
 
         private static String transform(String value) {
@@ -113,11 +114,11 @@ class ThreadDumpView extends DataSourceView {
             for (int i = 0; i < result.length; i++) {
                 String line = result[i];
                 if (line.isEmpty()) {
-                    sb.append("<span>" + line + "\n</span>");
+                    sb.append("<span>" + line + "\n</span>");    // NOI18N
                 } else if (line.substring(0, 1).matches("\\s")) {
-                    sb.append("<span style=\"color: #CC3300\">" + line + "\n</span>");
+                    sb.append("<span style=\"color: #CC3300\">" + line + "\n</span>");   // NOI18N
                 } else {
-                    sb.append("<span style=\"color: #0033CC\">" + line + "\n</span>");
+                    sb.append("<span style=\"color: #0033CC\">" + line + "\n</span>");   // NOI18N
                 }
             }
             return sb.toString();
@@ -133,12 +134,12 @@ class ThreadDumpView extends DataSourceView {
                 try {
                   is.read(data);
                 } catch (IOException ex) {
-                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
+                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
                 }
                 try {
-                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" +
-                          transform(htmlize(new String(data, "UTF-8"))) +
-                          "</pre></nobr>");
+                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" +   // NOI18N
+                          transform(htmlize(new String(data, "UTF-8"))) +    // NOI18N
+                          "</pre></nobr>");  // NOI18N
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
@@ -147,10 +148,10 @@ class ThreadDumpView extends DataSourceView {
                   contentsPanel.repaint();
 //                  contentsPanel.doLayout();
                 } catch (Exception ex) {
-                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
+                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
                 }
               } catch (FileNotFoundException ex) {
-                LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);
+                LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);   // NOI18N
               } finally {
                   if (is != null) {
                       try {

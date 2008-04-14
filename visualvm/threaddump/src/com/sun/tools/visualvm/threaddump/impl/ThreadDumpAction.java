@@ -37,6 +37,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
     
 /**
@@ -97,7 +98,7 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
     
     private ThreadDumpAction() {
         super(DataSource.class);
-        putValue(NAME, "Thread Dump");
-        putValue(SHORT_DESCRIPTION, "Thread Dump");
-            }
+        putValue(NAME, NbBundle.getMessage(ThreadDumpAction.class, "MSG_Thread_Dump"));  // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ThreadDumpAction.class, "MSG_Thread_Dump"));     // NOI18N
     }
+}

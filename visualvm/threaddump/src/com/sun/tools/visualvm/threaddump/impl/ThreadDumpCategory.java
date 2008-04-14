@@ -36,9 +36,9 @@ import java.io.File;
  */
 public class ThreadDumpCategory extends SnapshotCategory<ThreadDump> {
     
-    private static final String NAME = "Thread Dumps";
-    private static final String PREFIX = "threaddump";
-    private static final String SUFFIX = ".tdump";
+    private static final String NAME = org.openide.util.NbBundle.getMessage(ThreadDumpCategory.class, "MSG_Thread_Dumps"); // NOI18N
+    private static final String PREFIX = "threaddump";   // NOI18N
+    private static final String SUFFIX = ".tdump";   // NOI18N
     
     public ThreadDumpCategory() {
         super(NAME, ThreadDump.class, PREFIX, SUFFIX, 10);
