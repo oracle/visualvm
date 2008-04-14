@@ -48,10 +48,10 @@ public class GlassFishDataSourceDescriptorProvider extends AbstractModelProvider
     }
     
     public static void initialize() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(INSTANCE);
+        DataSourceDescriptorFactory.getDefault().registerProvider(INSTANCE);
     }
 
     public static void shutdown() {
-        DataSourceDescriptorFactory.getDefault().unregisterFactory(INSTANCE);
+        DataSourceDescriptorFactory.getDefault().unregisterProvider(INSTANCE);
     }
 }

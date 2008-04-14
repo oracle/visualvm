@@ -68,7 +68,7 @@ public final class JvmFactory extends ModelFactory<Jvm,Application> implements M
     /**
      * Default {@link ModelProvider} implementation, which creates 
      * dummy {@link JVM} instances. If you want to extend JVMFactory use 
-     * {@link JVMFactory#registerFactory()} to register the new instances
+     * {@link JVMFactory#registerProvider()} to register the new instances
      * of {@link ModelProvider} for the different types of {@link Application}.
      * @param app application
      * @return dummy instance of {@link JVM}

@@ -46,11 +46,11 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
     private GlassFishApplicationTypeFactory() {}
     
     public static void initialize() {
-        ApplicationTypeFactory.getDefault().registerFactory(INSTANCE);
+        ApplicationTypeFactory.getDefault().registerProvider(INSTANCE);
     }
     
     public static void shutdown() {
-        ApplicationTypeFactory.getDefault().unregisterFactory(INSTANCE);
+        ApplicationTypeFactory.getDefault().unregisterProvider(INSTANCE);
     }
 
     @Override

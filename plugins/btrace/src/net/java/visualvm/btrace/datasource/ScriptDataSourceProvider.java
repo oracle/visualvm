@@ -61,11 +61,11 @@ public class ScriptDataSourceProvider {
     }
 
     public static void initialize() {
-        DataSourceDescriptorFactory.getDefault().registerFactory(DESC_FACTORY);
+        DataSourceDescriptorFactory.getDefault().registerProvider(DESC_FACTORY);
     }
 
     public static void shutdown() {
-        DataSourceDescriptorFactory.getDefault().unregisterFactory(DESC_FACTORY);
+        DataSourceDescriptorFactory.getDefault().unregisterProvider(DESC_FACTORY);
     }
 
     public static ScriptDataSourceProvider sharedInstance() {
