@@ -32,33 +32,36 @@ import javax.management.remote.JMXServiceURL;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
- * This class encapsulates the JMX functionality of the target Java application.
+ * <p>This class encapsulates the JMX functionality of the target Java application.</p>
  *
- * Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
- * {@link JmxModel} class.
+ * <p>Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
+ * {@link JmxModel} class.</p>
  *
- * Usually this class will be used as follows:
+ * <p>Usually this class will be used as follows:</p>
  *
  * <pre>
  * JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
- * MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
- * if (mbsc != null) {
- *    // Invoke JMX operations...
+ * if (jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+ *     // JMX connection not available...
+ * } else {
+ *     MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
+ *     if (mbsc != null) {
+ *         // Invoke JMX operations...
+ *     }
  * }
  * </pre>
  *
- * {@link CachedMBeanServerConnectionFactory#getCachedMBeanServerConnection(MBeanServerConnection)}
- * can be used to work with a {@link CachedMBeanServerConnection} instead of
- * a plain {@link MBeanServerConnection}.
+ * <p>Any of the {@link CachedMBeanServerConnectionFactory CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection}
+ * methods can be used to work with a {@link CachedMBeanServerConnection} instead of a plain {@link MBeanServerConnection}.</p>
  *
- * In case the JMX connection is not established yet, you could register
+ * <p>In case the JMX connection is not established yet, you could register
  * a listener on the {@code JmxModel} for ConnectionState property changes.
  * The JmxModel notifies any PropertyChangeListeners about the ConnectionState
  * property change to CONNECTED and DISCONNECTED. The JmxModel instance will
- * be the source for any generated events.
+ * be the source for any generated events.</p>
  *
- * Polling for the ConnectionState is also possible by calling
- * {@link JmxModel#getConnectionState()}.
+ * <p>Polling for the ConnectionState is also possible by calling
+ * {@link JmxModel#getConnectionState()}.</p>
  *
  * @author Luis-Miguel Alventosa
  */
@@ -69,7 +72,7 @@ public abstract class JmxModel extends Model {
     /**
      * The {@link ConnectionState ConnectionState} bound property name.
      */
-    public static final String CONNECTION_STATE_PROPERTY = "connectionState";   // NOI18N
+    public static final String CONNECTION_STATE_PROPERTY = "connectionState"; // NOI18N
 
     /**
      * Values for the {@linkplain #CONNECTION_STATE_PROPERTY

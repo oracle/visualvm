@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.tools.jmx;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -33,9 +35,11 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -44,30 +48,35 @@ import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.swing.Timer;
+import org.openide.util.RequestProcessor;
 
 /**
- * The {@code CachedMBeanServerConnectionFactory} class is a factory class that
+ * <p>The {@code CachedMBeanServerConnectionFactory} class is a factory class that
  * allows to get instances of {@link CachedMBeanServerConnection} for a given
- * {@link MBeanServerConnection} or {@link JmxModel}.
+ * {@link MBeanServerConnection} or {@link JmxModel}.</p>
  * 
- * The factory methods allow to supply an interval value at which the cache will
- * be automatically flushed and interested {@link MBeanCacheListener}s notified.
+ * <p>The factory methods allow to supply an interval value at which the cache will
+ * be automatically flushed and interested {@link MBeanCacheListener}s notified.</p>
  * 
- * If the factory methods which do not take an interval value are used then
+ * <p>If the factory methods which do not take an interval value are used then
  * no automatic flush is performed and the user will be in charge of flushing
- * the cache by calling {@link CachedMBeanServerConnection#flush()}.
+ * the cache by calling {@link CachedMBeanServerConnection#flush()}.</p>
  *
  * @author Eamonn McManus
  * @author Luis-Miguel Alventosa
  */
 public final class CachedMBeanServerConnectionFactory {
 
+    private static Map<Integer, Map<MBeanServerConnection, CachedMBeanServerConnection>> snapshots =
+            new HashMap<Integer, Map<MBeanServerConnection, CachedMBeanServerConnection>>();
+
     private CachedMBeanServerConnectionFactory() {
     }
 
     /**
-     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
-     * the given {@link MBeanServerConnection}.
+     * <p>Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * the given {@link MBeanServerConnection}.</p>
      * 
      * @param mbsc an MBeanServerConnection.
      * 
@@ -75,13 +84,13 @@ public final class CachedMBeanServerConnectionFactory {
      * attribute values of the supplied {@link MBeanServerConnection}.
      */
     public static CachedMBeanServerConnection getCachedMBeanServerConnection(MBeanServerConnection mbsc) {
-        return Snapshot.newSnapshot(mbsc);
+        return getCachedMBeanServerConnection(mbsc, 0);
     }
 
     /**
-     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * <p>Factory method for obtaining the {@link CachedMBeanServerConnection} for
      * the given {@link MBeanServerConnection}. The cache will be flushed at the
-     * given interval and the interested {@link MBeanCacheListener}s will be notified.
+     * given interval and the interested {@link MBeanCacheListener}s will be notified.</p>
      * 
      * @param mbsc an MBeanServerConnection.
      * @param interval the interval (in milliseconds) at which the cache is flushed.
@@ -97,14 +106,14 @@ public final class CachedMBeanServerConnectionFactory {
             getCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
+            throw new IllegalArgumentException("interval cannot be negative"); // NOI18N
         }
-        return Snapshot.newSnapshot(mbsc);
+        return retrieveCachedMBeanServerConnection(mbsc, interval);
     }
 
     /**
-     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
-     * the given {@link JmxModel}.
+     * <p>Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * the given {@link JmxModel}.</p>
      * 
      * @param jmx a JmxModel.
      * 
@@ -112,13 +121,13 @@ public final class CachedMBeanServerConnectionFactory {
      * attribute values of the supplied {@link JmxModel}.
      */
     public static CachedMBeanServerConnection getCachedMBeanServerConnection(JmxModel jmx) {
-        return Snapshot.newSnapshot(jmx.getMBeanServerConnection());
+        return getCachedMBeanServerConnection(jmx.getMBeanServerConnection(), 0);
     }
 
     /**
-     * Factory method for obtaining the {@link CachedMBeanServerConnection} for
+     * <p>Factory method for obtaining the {@link CachedMBeanServerConnection} for
      * the given {@link JmxModel}. The cache will be flushed at the given interval
-     * and the interested {@link MBeanCacheListener}s will be notified.
+     * and the interested {@link MBeanCacheListener}s will be notified.</p>
      * 
      * @param jmx a JmxModel.
      * @param interval the interval (in milliseconds) at which the cache is flushed.
@@ -133,10 +142,30 @@ public final class CachedMBeanServerConnectionFactory {
     public static CachedMBeanServerConnection
             getCachedMBeanServerConnection(JmxModel jmx, int interval)
             throws IllegalArgumentException {
-        if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
+        return getCachedMBeanServerConnection(jmx.getMBeanServerConnection(), interval);
+    }
+
+    private static synchronized CachedMBeanServerConnection
+            retrieveCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval) {
+        Map<MBeanServerConnection, CachedMBeanServerConnection> mbscMap =
+                snapshots.get(interval);
+        if (mbscMap == null) {
+            CachedMBeanServerConnection cmbsc = Snapshot.newSnapshot(mbsc, interval);
+            Map<MBeanServerConnection, CachedMBeanServerConnection> mbscMapNew =
+                    new HashMap<MBeanServerConnection, CachedMBeanServerConnection>();
+            mbscMapNew.put(mbsc, cmbsc);
+            snapshots.put(interval, mbscMapNew);
+            return cmbsc;
+        } else {
+            CachedMBeanServerConnection cmbsc = mbscMap.get(mbsc);
+            if (cmbsc == null) {
+                cmbsc = Snapshot.newSnapshot(mbsc, interval);
+                mbscMap.put(mbsc, cmbsc);
+                return cmbsc;                
+            } else {
+                return cmbsc;
+            }
         }
-        return Snapshot.newSnapshot(jmx.getMBeanServerConnection());
     }
 
     static class Snapshot {
@@ -144,8 +173,8 @@ public final class CachedMBeanServerConnectionFactory {
         private Snapshot() {
         }
 
-        public static CachedMBeanServerConnection newSnapshot(MBeanServerConnection mbsc) {
-            final InvocationHandler ih = new SnapshotInvocationHandler(mbsc);
+        public static CachedMBeanServerConnection newSnapshot(MBeanServerConnection mbsc, int interval) {
+            final InvocationHandler ih = new SnapshotInvocationHandler(mbsc, interval);
             return (CachedMBeanServerConnection) Proxy.newProxyInstance(
                     Snapshot.class.getClassLoader(),
                     new Class[]{CachedMBeanServerConnection.class},
@@ -156,31 +185,79 @@ public final class CachedMBeanServerConnectionFactory {
     static class SnapshotInvocationHandler implements InvocationHandler {
 
         private final MBeanServerConnection conn;
+        private final int interval;
+        private Timer timer = null;
         private Map<ObjectName, NameValueMap> cachedValues = newMap();
         private Map<ObjectName, Set<String>> cachedNames = newMap();
+        private List<MBeanCacheListener> listenerList = new CopyOnWriteArrayList<MBeanCacheListener>();
 
         @SuppressWarnings("serial")
         private static final class NameValueMap
                 extends HashMap<String, Object> {
         }
 
-        SnapshotInvocationHandler(MBeanServerConnection conn) {
+        SnapshotInvocationHandler(MBeanServerConnection conn, int interval) {
             this.conn = conn;
+            this.interval = interval;
+            if (interval > 0) {
+                timer = new Timer(interval, new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        intervalElapsed();
+                    }
+                });
+                timer.setCoalesce(true);
+                timer.start();
+            }
+        }
+
+        synchronized void intervalElapsed() {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    flush();
+                    notifyListeners();
+                }
+            });
+        }
+
+        synchronized void notifyListeners() {
+            for (MBeanCacheListener listener : listenerList) {
+                listener.flushed();
+            }
         }
 
         synchronized void flush() {
             cachedValues = newMap();
         }
 
+        int getInterval() {
+            return interval;
+        }
+
+        void addMBeanCacheListener(MBeanCacheListener listener) {
+            listenerList.add(listener);
+        }
+
+        void removeMBeanCacheListener(MBeanCacheListener listener) {
+            listenerList.remove(listener);            
+        }
+
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
             final String methodName = method.getName();
-            if (methodName.equals("getAttribute")) {    // NOI18N
+            if (methodName.equals("getAttribute")) { // NOI18N
                 return getAttribute((ObjectName) args[0], (String) args[1]);
-            } else if (methodName.equals("getAttributes")) {    // NOI18N
+            } else if (methodName.equals("getAttributes")) { // NOI18N
                 return getAttributes((ObjectName) args[0], (String[]) args[1]);
-            } else if (methodName.equals("flush")) {    // NOI18N
+            } else if (methodName.equals("flush")) { // NOI18N
                 flush();
+                return null;
+            } else if (methodName.equals("getInterval")) { // NOI18N
+                return getInterval();
+            } else if (methodName.equals("addMBeanCacheListener")) { // NOI18N
+                addMBeanCacheListener((MBeanCacheListener) args[0]);
+                return null;
+            } else if (methodName.equals("removeMBeanCacheListener")) { // NOI18N
+                removeMBeanCacheListener((MBeanCacheListener) args[0]);
                 return null;
             } else {
                 try {

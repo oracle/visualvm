@@ -48,16 +48,16 @@ import javax.management.ObjectName;
 import org.openide.ErrorManager;
 
 /**
- * The {@code JvmMXBeansFactory} class is a factory class that
+ * <p>The {@code JvmMXBeansFactory} class is a factory class that
  * allows to get instances of {@link JvmMXBeans} for a given
- * {@link MBeanServerConnection} or {@link JmxModel}.
+ * {@link MBeanServerConnection} or {@link JmxModel}.</p>
  * 
- * The factory methods allow to supply an interval value at which the
+ * <p>The factory methods allow to supply an interval value at which the
  * internal MBean cache will be automatically flushed and interested
- * {@link MBeanCacheListener}s notified.
+ * {@link MBeanCacheListener}s notified.</p>
  * 
- * If the factory methods which do not take an interval value are used
- * then no MBean caching is performed at all.
+ * <p>If the factory methods which do not take an interval value are used
+ * then no MBean caching is performed at all.</p>
  *
  * @see CachedMBeanServerConnection
  * @see CachedMBeanServerConnectionFactory
@@ -70,8 +70,8 @@ public final class JvmMXBeansFactory {
     }
 
     /**
-     * Factory method for obtaining the {@link JvmMXBeans} for
-     * the given {@link MBeanServerConnection}.
+     * <p>Factory method for obtaining the {@link JvmMXBeans} for
+     * the given {@link MBeanServerConnection}.</p>
      * 
      * @param mbsc an MBeanServerConnection.
      * 
@@ -85,12 +85,12 @@ public final class JvmMXBeansFactory {
     }
 
     /**
-     * Factory method for obtaining the {@link JvmMXBeans} for
-     * the given {@link MBeanServerConnection}.
+     * <p>Factory method for obtaining the {@link JvmMXBeans} for
+     * the given {@link MBeanServerConnection}.</p>
      * 
-     * The MBeans in this {@link MBeanServerConnection} will be cached.
+     * <p>The MBeans in this {@link MBeanServerConnection} will be cached.
      * The MBean cache will be flushed at the given interval and the
-     * interested {@link MBeanCacheListener}s will be notified.
+     * interested {@link MBeanCacheListener}s will be notified.</p>
      * 
      * @param mbsc an MBeanServerConnection.
      * @param interval the interval (in milliseconds) at which the MBean
@@ -107,15 +107,14 @@ public final class JvmMXBeansFactory {
     public static JvmMXBeans getJvmMXBeans(MBeanServerConnection mbsc, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
+            throw new IllegalArgumentException("interval cannot be negative"); // NOI18N
         }
-        // TODO: Check is mbsc is an instance of CachedMBeanServerConnection
-        return new JvmMXBeansImpl(mbsc);
+        return new JvmMXBeansImpl(CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection(mbsc, interval));
     }
 
     /**
-     * Factory method for obtaining the {@link JvmMXBeans} for
-     * the given {@link JmxModel}.
+     * <p>Factory method for obtaining the {@link JvmMXBeans} for
+     * the given {@link JmxModel}.</p>
      * 
      * @param jmx a JmxModel.
      * 
@@ -125,16 +124,16 @@ public final class JvmMXBeansFactory {
      * {@link JmxModel}.
      */
     public static JvmMXBeans getJvmMXBeans(JmxModel jmx) {
-        return new JvmMXBeansImpl(jmx);
+        return new JvmMXBeansImpl(jmx.getMBeanServerConnection());
     }
 
     /**
-     * Factory method for obtaining the {@link JvmMXBeans} for the given
-     * {@link JmxModel}.
+     * <p>Factory method for obtaining the {@link JvmMXBeans} for the given
+     * {@link JmxModel}.</p>
      * 
-     * The MBeans in this {@link JmxModel} will be cached. The MBean
+     * <p>The MBeans in this {@link JmxModel} will be cached. The MBean
      * cache will be flushed at the given interval and the interested
-     * {@link MBeanCacheListener}s will be notified.
+     * {@link MBeanCacheListener}s will be notified.</p>
      *
      * @param jmx a JmxModel.
      * @param interval the interval (in milliseconds) at which the MBean
@@ -151,10 +150,9 @@ public final class JvmMXBeansFactory {
     public static JvmMXBeans getJvmMXBeans(JmxModel jmx, int interval)
             throws IllegalArgumentException {
         if (interval < 0) {
-            throw new IllegalArgumentException("interval cannot be negative");  // NOI18N
+            throw new IllegalArgumentException("interval cannot be negative"); // NOI18N
         }
-        // TODO: Check is mbsc is an instance of CachedMBeanServerConnection
-        return new JvmMXBeansImpl(jmx);
+        return new JvmMXBeansImpl(CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection(jmx.getMBeanServerConnection(), interval));
     }
 
     /**
@@ -185,16 +183,6 @@ public final class JvmMXBeansFactory {
          */
         public JvmMXBeansImpl(MBeanServerConnection mbsc) {
             this.mbsc = mbsc;
-        }
-
-        /**
-         * Creates an instance of {@code JvmMXBeans} for the given
-         * {@link JmxModel}.
-         *
-         * @param jmx the {@link JmxModel} instance.
-         */
-        public JvmMXBeansImpl(JmxModel jmx) {
-            this.mbsc = jmx == null ? null : jmx.getMBeanServerConnection();
         }
 
         /**
@@ -251,7 +239,7 @@ public final class JvmMXBeansFactory {
                 if (mbeans != null) {
                     garbageCollectorMXBeans = new ArrayList<GarbageCollectorMXBean>();
                     for (ObjectName on : mbeans) {
-                        String name = GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");  // NOI18N
+                        String name = GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name"); // NOI18N
                         try {
                             GarbageCollectorMXBean mbean = newPlatformMXBeanProxy(mbsc, name, GarbageCollectorMXBean.class);
                             garbageCollectorMXBeans.add(mbean);
@@ -335,7 +323,7 @@ public final class JvmMXBeansFactory {
                 if (mbeans != null) {
                     memoryPoolMXBeans = new ArrayList<MemoryPoolMXBean>();
                     for (ObjectName on : mbeans) {
-                        String name = MEMORY_POOL_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name");    // NOI18N
+                        String name = MEMORY_POOL_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name"); // NOI18N
                         try {
                             MemoryPoolMXBean mbean = newPlatformMXBeanProxy(mbsc, name, MemoryPoolMXBean.class);
                             memoryPoolMXBeans.add(mbean);
@@ -399,19 +387,35 @@ public final class JvmMXBeansFactory {
         }
 
         public void addMBeanCacheListener(MBeanCacheListener listener) {
-            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
+            if (mbsc instanceof CachedMBeanServerConnection) {
+                ((CachedMBeanServerConnection) mbsc).addMBeanCacheListener(listener);
+            } else {
+                throw new UnsupportedOperationException("The underlying MBeanServerConnection does not support caching."); // NOI18N
+            }
         }
 
         public void removeMBeanCacheListener(MBeanCacheListener listener) {
-            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
+            if (mbsc instanceof CachedMBeanServerConnection) {
+                ((CachedMBeanServerConnection) mbsc).removeMBeanCacheListener(listener);
+            } else {
+                throw new UnsupportedOperationException("The underlying MBeanServerConnection does not support caching."); // NOI18N
+            }
         }
 
         public void flush() {
-            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
+            if (mbsc instanceof CachedMBeanServerConnection) {
+                ((CachedMBeanServerConnection) mbsc).flush();
+            } else {
+                throw new UnsupportedOperationException("The underlying MBeanServerConnection does not support caching."); // NOI18N
+            }
         }
 
         public int getInterval() {
-            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
+            if (mbsc instanceof CachedMBeanServerConnection) {
+                return ((CachedMBeanServerConnection) mbsc).getInterval();
+            } else {
+                throw new UnsupportedOperationException("The underlying MBeanServerConnection does not support caching."); // NOI18N
+            }
         }
     }
 }

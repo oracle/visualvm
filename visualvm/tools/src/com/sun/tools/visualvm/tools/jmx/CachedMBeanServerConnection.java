@@ -28,21 +28,21 @@ package com.sun.tools.visualvm.tools.jmx;
 import javax.management.MBeanServerConnection;
 
 /**
- * Cached MBeanServerConnection:
+ * <p>Cached MBeanServerConnection:</p>
  *
- * This is an object that wraps an existing MBeanServerConnection and adds
- * caching to it, as follows:
+ * <p>This is an object that wraps an existing MBeanServerConnection and adds
+ * caching to it, as follows:</p>
  *
- * - The first time an attribute is called in a given MBean, the result is
- *   cached. Every subsequent time getAttribute is called for that attribute
- *   the cached result is returned.
- *
- * - When the {@link CachedMBeanServerConnection#flush()} method is invoked the
- *   attributes cache is flushed. Then any subsequent call to getAttribute will
- *   retrieve all the values for the attributes that are known to the cache.
- *
- * - The attributes cache uses a learning approach and only the attributes
- *   that are in the cache will be retrieved between two subsequent updates.
+ * <ul>
+ * <li>The first time an attribute is called in a given MBean, the result is
+ * cached. Every subsequent time getAttribute is called for that attribute
+ * the cached result is returned.</li>
+ * <li>When the {@link CachedMBeanServerConnection#flush()} method is invoked the
+ * attributes cache is flushed. Then any subsequent call to getAttribute will
+ * retrieve all the values for the attributes that are known to the cache.</li>
+ * <li>The attributes cache uses a learning approach and only the attributes
+ * that are in the cache will be retrieved between two subsequent updates.</li>
+ * </ul>
  *
  * @author Eamonn McManus
  * @author Luis-Miguel Alventosa
