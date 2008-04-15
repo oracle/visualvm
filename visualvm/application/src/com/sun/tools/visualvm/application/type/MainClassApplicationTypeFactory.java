@@ -47,7 +47,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
 
         // Application servers
         {"com.sun.enterprise.server.PELaunch","GlassFish","com/sun/tools/visualvm/application/type/resources/GlassFish.png"},
-        {"com.sun.enterprise.ee.nodeagent.NodeAgentMain", "GlassFish Node", "com/sun/tools/visualvm/application/type/resources/GlassFishNode.png"},
+        {"com.sun.enterprise.ee.nodeagent.NodeAgentMain", "GlassFish Node", "com/sun/tools/visualvm/application/type/resources/GlassFish.png"},
         {"org.apache.catalina.startup.Bootstrap","Tomcat","com/sun/tools/visualvm/application/type/resources/Tomcat.png"},
         {"org.jboss.Main","JBoss","com/sun/tools/visualvm/application/resources/application.png"},
         
