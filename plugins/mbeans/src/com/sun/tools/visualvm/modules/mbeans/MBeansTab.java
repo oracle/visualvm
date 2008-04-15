@@ -189,7 +189,7 @@ class MBeansTab extends JPanel implements
         if (cachedMBSC == null) {
             cachedMBSC =
                 CachedMBeanServerConnectionFactory.getCachedMBeanServerConnection(
-                    getMBeanServerConnection());
+                    getMBeanServerConnection(), getUpdateInterval());
         }
         return cachedMBSC;
     }
