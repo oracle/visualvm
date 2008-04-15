@@ -32,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
     
 /**
@@ -79,7 +80,7 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
     
     private ProfileApplicationAction() {
         super(Application.class);
-        putValue(NAME, "Profile");
-        putValue(SHORT_DESCRIPTION, "Profile");
-            }
+        putValue(NAME, NbBundle.getMessage(ProfileApplicationAction.class, "MSG_Profile")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfileApplicationAction.class, "MSG_Profile"));    // NOI18N
     }
+}

@@ -39,9 +39,9 @@ import org.openide.util.Utilities;
 public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
     
-    private static final Image CPU_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);
-    private static final Image MEMORY_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png", true);
-    private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
+    private static final Image CPU_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
+    private static final Image MEMORY_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png", true);  // NOI18N
+    private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     
 
     public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
@@ -58,7 +58,7 @@ public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnaps
                 return Utilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
             else return null;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to determine profiler snapshot type", e);
+            LOGGER.log(Level.SEVERE, "Failed to determine profiler snapshot type", e);  // NOI18N
             return null;
         }
     }

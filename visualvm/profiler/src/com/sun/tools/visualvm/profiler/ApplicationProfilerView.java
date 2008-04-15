@@ -66,6 +66,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
@@ -75,11 +76,11 @@ import org.openide.util.Utilities;
  */
 class ApplicationProfilerView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/profiler/resources/profiler.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/profiler/resources/profiler.png";  // NOI18N
 
     
     public ApplicationProfilerView(Application application) {
-        super(application, "Profiler", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);
+        super(application, NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);    // NOI18N
     }
         
     
@@ -91,7 +92,7 @@ class ApplicationProfilerView extends DataSourceView {
                 new MasterViewSupport(application, profilingResultsViewSupport).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Profiling results", false), DataViewComponent.TOP_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiling_results"), false), DataViewComponent.TOP_LEFT);   // NOI18N
         dvc.addDetailsView(profilingResultsViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         return dvc;
@@ -131,14 +132,14 @@ class ApplicationProfilerView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Profiler", null, this);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), null, this);    // NOI18N
         }
         
         public void dataRemoved(Application application) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     disableControlButtons();
-                    statusValueLabel.setText("application terminated");
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_application_terminated")); // NOI18N
                     NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
                 }
             });
@@ -234,31 +235,31 @@ class ApplicationProfilerView extends DataSourceView {
                 switch (state) {
                   case NetBeansProfiler.PROFILING_INACTIVE:
                     ProfilerSupport.getInstance().setProfiledApplication(null); // Necessary to set here when profiled app finished
-                    statusValueLabel.setText("profiling inactive");
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_inactive"));    // NOI18N
                     resetControlButtons();
                     RequestProcessor.getDefault().post(new Runnable() {
                       public void run() { enableControlButtons(); } // Wait for the application to finish
                     }, 500);
                     break;
                   case NetBeansProfiler.PROFILING_STARTED:
-                    statusValueLabel.setText("profiling started");
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_started")); // NOI18N
                     break;
                   case NetBeansProfiler.PROFILING_PAUSED:
-                    statusValueLabel.setText("profiling paused");
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_paused"));   // NOI18N
                     break;
                   case NetBeansProfiler.PROFILING_IN_TRANSITION:
-                    statusValueLabel.setText("refreshing...");
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_refreshing")); // NOI18N
                     disableControlButtons();
                     break;
                   case NetBeansProfiler.PROFILING_RUNNING:
 
                     if (application.equals(profiledApplication)) {
-                      statusValueLabel.setText("profiling running (" + NetBeansProfiler.getDefaultNB().getLastProfilingSettings().getSettingsName() + ")");
+                      statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running") + NetBeansProfiler.getDefaultNB().getLastProfilingSettings().getSettingsName() + ")");   // NOI18N
                       enableControlButtons();
                       updateControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
                     } else {
-                      statusValueLabel.setText("<nobr>profiling of <a href='#'>" + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + "</a> in progress</nobr>");
+                      statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_of") + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + NbBundle.getMessage(ApplicationProfilerView.class, "MSG_in_progress"));  // NOI18N
                       disableControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(null);
                     }
@@ -270,7 +271,7 @@ class ApplicationProfilerView extends DataSourceView {
 
                     break;
                   case NetBeansProfiler.PROFILING_STOPPED:
-                    statusValueLabel.setText("profiling stopped");
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_stopped"));  // NOI18N
                     break;
                 }
               }
@@ -318,7 +319,7 @@ class ApplicationProfilerView extends DataSourceView {
 
         private void initSettings() {
           // Profiling settings defaults
-          javaCoreClassesFilter = new SimpleFilter("Exclude Java Core Classes", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, "com.apple., com.sun., java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa.");
+          javaCoreClassesFilter = new SimpleFilter(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Exclude_Java_Core_Classes"), SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, "com.apple., com.sun., java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa."); // NOI18N
           cpuSettings = ProfilingSettingsPresets.createCPUPreset();
           cpuSettings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
           
@@ -346,7 +347,7 @@ class ApplicationProfilerView extends DataSourceView {
               Jvm jvm = JvmFactory.getJVMFor(application);
               String vmInfo = jvm.getVmInfo();
               String vmVersion = jvm.getVmVersion();
-              boolean classSharingBreaksProfiling = vmInfo.contains("sharing") && !vmVersion.equals("10.0-b23");
+              boolean classSharingBreaksProfiling = vmInfo.contains("sharing") && !vmVersion.equals("10.0-b23");    // NOI18N
               classShareWarningArea = new HTMLTextArea() {
                   protected void showURL(URL url) { 
                       try { DesktopUtils.browse(url.toURI()); } catch (Exception e) {}
@@ -360,11 +361,14 @@ class ApplicationProfilerView extends DataSourceView {
                       BorderFactory.createMatteBorder(5, 5, 5, 5, classShareWarningArea.getBackground())));
               classShareWarningArea.setVisible(classSharingBreaksProfiling); // NOI18N
               if (classSharingBreaksProfiling) {
+                  String link;
                   if (DesktopUtils.isBrowseAvailable()) {
-                      classShareWarningArea.setText("<b>WARNING!</b> Class sharing is enabled for this JVM. This can cause problems when profiling the application and eventually may crash it. Please see the Troubleshooting guide for more information and steps to fix the problem: <a href=\"https://visualvm.dev.java.net/troubleshooting.html#xshare\">https://visualvm.dev.java.net/troubleshooting.html#xshare</a>.");
+                      link = NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Class_Sharing_Link");  // NOI18N
                   } else {
-                      classShareWarningArea.setText("<b>WARNING!</b> Class sharing is enabled for this JVM. This can cause problems when profiling the application and eventually may crash it. Please see the Troubleshooting guide for more information and steps to fix the problem: <nobr>https://visualvm.dev.java.net/troubleshooting.html#xshare</nobr>.");
+                      link = NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Class_Sharing_Nolink");    // NOI18N
                   }
+                  String message = NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Class_Sharing", link);   // NOI18N
+                  classShareWarningArea.setText(message);
               }
               constraints = new GridBagConstraints();
               constraints.gridx = 0;
@@ -376,7 +380,7 @@ class ApplicationProfilerView extends DataSourceView {
               controlPanel.add(classShareWarningArea, constraints);
 
               // modeLabel
-              modeLabel = new JLabel("Profile:");
+              modeLabel = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile"));    // NOI18N
               modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
               modeLabel.setOpaque(false);
               constraints = new GridBagConstraints();
@@ -389,8 +393,8 @@ class ApplicationProfilerView extends DataSourceView {
               controlPanel.add(modeLabel, constraints);
 
               // cpuButton
-              cpuButton = new OneWayToggleButton("CPU");
-              cpuButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/cpu.png", true)));
+              cpuButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Cpu"));    // NOI18N
+              cpuButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/cpu.png", true))); // NOI18N
               cpuButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleCPUProfiling(); }
               });
@@ -404,8 +408,8 @@ class ApplicationProfilerView extends DataSourceView {
               controlPanel.add(cpuButton, constraints);
 
               // memoryButton
-              memoryButton = new OneWayToggleButton("Memory");
-              memoryButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/memory.png", true)));
+              memoryButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Memory"));  // NOI18N
+              memoryButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/memory.png", true)));   // NOI18N
               memoryButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleMemoryProfiling(); }
               });
@@ -419,8 +423,8 @@ class ApplicationProfilerView extends DataSourceView {
               controlPanel.add(memoryButton, constraints);
 
               // stopButton
-              stopButton = new JButton("Stop");
-              stopButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/stop.png", true)));
+              stopButton = new JButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Stop")); // NOI18N
+              stopButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/stop.png", true)));   // NOI18N
               stopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
               });
@@ -449,7 +453,7 @@ class ApplicationProfilerView extends DataSourceView {
               controlPanel.add(filler1, constraints);
 
               // statusLabel
-              statusLabel = new JLabel("Status:");
+              statusLabel = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Status"));   // NOI18N
               statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
               statusLabel.setOpaque(false);
               constraints = new GridBagConstraints();
@@ -464,7 +468,7 @@ class ApplicationProfilerView extends DataSourceView {
               // statusValueLabel
               statusValueLabel = new HTMLLabel() {
                 public void setText(String text) {
-                  super.setText("<nobr>" + text + "</nobr>");
+                  super.setText("<nobr>" + text + "</nobr>");   // NOI18N
                 }
                 protected void showURL(URL url) {
                   ProfilerSupport.getInstance().selectActiveProfilerView();
@@ -528,7 +532,7 @@ class ApplicationProfilerView extends DataSourceView {
         private JButton stopButton;
         private JLabel statusLabel;
         private HTMLLabel statusValueLabel;
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
         
     }
     
@@ -554,7 +558,7 @@ class ApplicationProfilerView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Profiling results", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Profiling_results"), null, 10, this, null);    // NOI18N
         }
         
         public void setProfilingResultsDisplay(JComponent profilingResultsDisplay) {

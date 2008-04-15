@@ -37,6 +37,7 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -46,9 +47,9 @@ import org.openide.util.RequestProcessor;
 class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotCategory.class.getName());
     
-    private static final String NAME = "Profiler Snapshots";
-    private static final String PREFIX = "snapshot";
-    private static final String SUFFIX = ".nps";
+    private static final String NAME = NbBundle.getMessage(ProfilerSnapshotCategory.class, "MSG_Profiler_Snapshots");   // NOI18N
+    private static final String PREFIX = "snapshot";    // NOI18N
+    private static final String SUFFIX = ".nps";    // NOI18N
     
     public ProfilerSnapshotCategory() {
         super(NAME, ProfilerSnapshot.class, PREFIX, SUFFIX, 30);
@@ -64,7 +65,7 @@ class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Opening Profiler Snapshot...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ProfilerSnapshotCategory.class, "MSG_Opening_Profiler_Snapshot")); // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
@@ -74,9 +75,9 @@ class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
                             public void run() { ResultsManager.getDefault().openSnapshot(loadedSnapshot); }
                         });
                     } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "Error loading profiler snapshot", e);
+                        LOGGER.log(Level.INFO, "Error loading profiler snapshot", e); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { NetBeansProfiler.getDefaultNB().displayError("Opening snapshot failed."); }
+                            public void run() { NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ProfilerSnapshotCategory.class, "MSG_Opening_snapshot_failed.")); }    // NOI18N
                         });
                     }
                 } finally {

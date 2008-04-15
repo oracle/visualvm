@@ -35,6 +35,7 @@ import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotsListener;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 
     
@@ -91,7 +92,7 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     
     private ProfilerSnapshotAction() {
         super(Application.class);
-        putValue(NAME, "Profiler Snapshot");
-        putValue(SHORT_DESCRIPTION, "Profiler Snapshot");
-}
+        putValue(NAME, NbBundle.getMessage(ProfilerSnapshotAction.class, "MSG_Profiler_Snapshot")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfilerSnapshotAction.class, "MSG_Profiler_Snapshot"));    // NOI18N
+    }
 }

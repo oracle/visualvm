@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -64,7 +65,7 @@ class ProfilerSnapshot extends Snapshot {
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, "Save Profiler Snapshot As");
+        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(ProfilerSnapshot.class, "MSG_Save_Profiler_Snapshot_As"));  // NOI18N
     }
 
 }

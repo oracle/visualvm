@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -76,7 +77,7 @@ class ProfilerSnapshotView extends DataSourceView {
         public DataViewComponent.MasterView getMasterView() {
             SnapshotResultsWindow srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
             srw.setPreferredSize(new Dimension(1, 1));
-            return new DataViewComponent.MasterView("Profiler Snapshot", null, srw);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ProfilerSnapshotView.class, "MSG_Profiler_Snapshot"), null, srw);   // NOI18N
         }
         
     }

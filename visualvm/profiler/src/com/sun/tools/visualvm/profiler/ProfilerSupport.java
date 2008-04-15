@@ -39,16 +39,17 @@ import java.io.File;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class ProfilerSupport {
-    private static final boolean FORCE_PROFILING_SUPPORTED = Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");
-    private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";
-    private static final String SUN_VM_VENDOR_PREFIX = "Sun ";
-    private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";
+    private static final boolean FORCE_PROFILING_SUPPORTED = Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");   // NOI18N
+    private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";    // NOI18N
+    private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
+    private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -159,7 +160,7 @@ public final class ProfilerSupport {
         pes.setSystemArchitecture(architecture);
         pes.setPortNo(ProfilerIDESettings.getInstance().getCalibrationPortNo());
         pes.setInstrumentationFilter(new org.netbeans.lib.profiler.global.InstrumentationFilter());
-        pes.setMainClassPath(""); //NOI18N
+        pes.setMainClassPath(""); // NOI18N
 
         // Perform calibration if necessary
         if (!NetBeansProfiler.getDefaultNB().getTargetAppRunner().readSavedCalibrationData()) result = calibrateJVM();
@@ -179,7 +180,7 @@ public final class ProfilerSupport {
         // TODO: this should be performed after all modules are loaded & initialized to not bias the calibration!!!
         
         // Display blocking notification
-        NetBeansProfiler.getDefaultNB().displayInfoAndWait("<html><b>Calibration will be performed.</b><br><br>Profiler will perform initial JDK calibration. Please make sure that other applications<br>are not placing a noticeable load on your machine at this time and click the OK button.</html>");
+        NetBeansProfiler.getDefaultNB().displayInfoAndWait(NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
 
         // Perform calibration
         boolean result = NetBeansProfiler.getDefaultNB().runConfiguredCalibration();
