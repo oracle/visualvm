@@ -54,6 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
@@ -156,9 +157,22 @@ class ApplicationProfilerView extends DataSourceView {
           if (internalChange) return;
 
           if (cpuButton.isSelected())  {
+              Jvm jvm = JvmFactory.getJVMFor(application);
+              String mainClass = jvm.getMainClass();
+              if (mainClass == null || mainClass.trim().length() == 0) mainClass = "";
+              int dotIndex = mainClass.lastIndexOf(".");
+              if (dotIndex != -1) mainClass = mainClass.substring(0, dotIndex + 1) + "*";
+              ClientUtils.SourceCodeSelection root1 = "".equals(mainClass) ? null : new ClientUtils.SourceCodeSelection(mainClass, "*", null);
+            // Don't profile Core Java Classes
             if (!GlobalPreferences.sharedInstance().isProfilerInstrFilter()) {
+                if (root1 != null) cpuSettings.setInstrumentationRootMethods(new ClientUtils.SourceCodeSelection[] { root1 });
                 cpuSettings.setSelectedInstrumentationFilter(javaCoreClassesFilter);
+            // Profile Core Java Classes
             } else {
+                ClientUtils.SourceCodeSelection root2 = new ClientUtils.SourceCodeSelection("java.awt.EventQueue", "*", null);
+                ClientUtils.SourceCodeSelection root3 = new ClientUtils.SourceCodeSelection("java.awt.EventDispatchThread", "*", null);
+                if (root1 != null) cpuSettings.setInstrumentationRootMethods(new ClientUtils.SourceCodeSelection[] { root1, root2, root3 });
+                else cpuSettings.setInstrumentationRootMethods(new ClientUtils.SourceCodeSelection[] { root2, root3 });
                 cpuSettings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
             }
             internalChange = true;
@@ -322,6 +336,7 @@ class ApplicationProfilerView extends DataSourceView {
           javaCoreClassesFilter = new SimpleFilter(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Exclude_Java_Core_Classes"), SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, "com.apple., com.sun., java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa."); // NOI18N
           cpuSettings = ProfilingSettingsPresets.createCPUPreset();
           cpuSettings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
+          
           
           memorySettings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
 
