@@ -166,7 +166,7 @@ public class JmxSupport implements DataRemovedListener {
                             "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
                     sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
                     if (thread.getLockName() != null) {
-                        sb.append(" on " + thread.getLockName());
+                        sb.append(" on " + thread.getLockName());   // NOI18N
                         if (thread.getLockOwnerName() != null) {
                             sb.append(" owned by: " + thread.getLockOwnerName());   // NOI18N
                         }

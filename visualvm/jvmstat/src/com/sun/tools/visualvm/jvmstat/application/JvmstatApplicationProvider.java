@@ -226,10 +226,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         } catch (Exception e) {
             return;
         }
-        String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_Link")
-                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_NoLink");
+        String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_Link")   // NOI18N
+                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_NoLink");   // NOI18N
         
-        String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps", link);
+        String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps", link); // NOI18N
         final HTMLLabel label = new HTMLLabel(message) {
             protected void showURL(URL url) {
                 try {
