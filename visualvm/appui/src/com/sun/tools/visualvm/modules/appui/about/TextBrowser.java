@@ -41,7 +41,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
@@ -69,17 +68,21 @@ public class TextBrowser {
         this.preferredSize = preferredSize;
     }
     
-    void showText(String text) {
-        showHTMLText("<pre><font face=\"" + UIManager.getFont("TextField.font").getName() + "\">" + text + "</font></pre>"); // NOI18N
-    }
-    
-    void showCodeText(String codeText) {
-        showHTMLText("<pre><code>" + codeText + "</code></pre>"); // NOI18N
-    }
-    
-    void showHTMLText(String htmlText) {
-        textDisplayer.setText(htmlText);
+    void showCodeText(String text) {
+        textDisplayer.setText(text);
+        displayerScrollPane.setViewportView(textDisplayer);
         try { textDisplayer.setCaretPosition(0); } catch (Exception e) {}
+        displayerScrollPane.setPreferredSize(preferredSize);
+        dialog.pack();
+        closeButton.requestFocusInWindow();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+    
+    void showHTMLText(String text) {
+        htmlTextDisplayer.setText(text);
+        displayerScrollPane.setViewportView(htmlTextDisplayer);
+        try { htmlTextDisplayer.setCaretPosition(0); } catch (Exception e) {}
         displayerScrollPane.setPreferredSize(preferredSize);
         dialog.pack();
         closeButton.requestFocusInWindow();
@@ -103,17 +106,21 @@ public class TextBrowser {
             public void windowClosed(WindowEvent e) { cleanup(); }
         });
 
-        JComponent contentPane = (JComponent)dialog.getContentPane();
+        contentPane = (JComponent)dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                  .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_ACTION"); // NOI18N
         contentPane.getActionMap().put("CLOSE_ACTION", new AbstractAction() { // NOI18N
                 public void actionPerformed(ActionEvent e) { close(); }});
         
+        textDisplayer = new TextViewerComponent();
+        htmlTextDisplayer = new HTMLTextArea();
         displayerScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
-        textDisplayer = new HTMLTextArea();
-        displayerScrollPane.setViewportView(textDisplayer);
+        textDisplayer.setForeground(htmlTextDisplayer.getForeground());
+        textDisplayer.setBackground(htmlTextDisplayer.getBackground());
+        textDisplayer.setSelectionColor(htmlTextDisplayer.getSelectionColor());
+        textDisplayer.setSelectedTextColor(htmlTextDisplayer.getSelectedTextColor());
         
         closeButton = new JButton("Close");
         closeButton.setDefaultCapable(true);
@@ -140,14 +147,18 @@ public class TextBrowser {
     }
     
     private void cleanup() {
+        displayerScrollPane.getViewport().removeAll();
         textDisplayer.setText(""); // NOI18N
+        htmlTextDisplayer.setText(""); // NOI18N
     }
     
     private static TextBrowser instance;
     
     private JDialog dialog;
+    private JComponent contentPane;
     private JButton closeButton;
-    private HTMLTextArea textDisplayer;
+    private TextViewerComponent textDisplayer;
+    private HTMLTextArea htmlTextDisplayer;
     private JScrollPane displayerScrollPane;
     private Dimension preferredSize = new Dimension(400, 300);
 
