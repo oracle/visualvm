@@ -41,11 +41,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import java.util.logging.LoggingMXBean;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import org.openide.ErrorManager;
 
 /**
  * <p>The {@code JvmMXBeansFactory} class is a factory class that
@@ -174,6 +174,7 @@ public final class JvmMXBeansFactory {
         private List<GarbageCollectorMXBean> garbageCollectorMXBeans = null;
         private List<MemoryManagerMXBean> memoryManagerMXBeans = null;
         private List<MemoryPoolMXBean> memoryPoolMXBeans = null;
+        private final static Logger LOGGER = Logger.getLogger(JvmMXBeansImpl.class.getName());
 
         /**
          * Creates an instance of {@code JvmMXBeans} for the given
@@ -226,14 +227,14 @@ public final class JvmMXBeansFactory {
                     gcName = new ObjectName(GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",*");
                 } catch (MalformedObjectNameException e) {
                     // Should never happen
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getGarbageCollectorMXBeans", e); // NOI18N
                     return null;
                 }
                 Set<ObjectName> mbeans;
                 try {
                     mbeans = mbsc.queryNames(gcName, null);
                 } catch (Exception e) {
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getGarbageCollectorMXBeans", e); // NOI18N
                     return null;
                 }
                 if (mbeans != null) {
@@ -244,7 +245,7 @@ public final class JvmMXBeansFactory {
                             GarbageCollectorMXBean mbean = newPlatformMXBeanProxy(mbsc, name, GarbageCollectorMXBean.class);
                             garbageCollectorMXBeans.add(mbean);
                         } catch (Exception e) {
-                            ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                            LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getGarbageCollectorMXBeans", e); // NOI18N
                         }
                     }
                 }
@@ -263,14 +264,14 @@ public final class JvmMXBeansFactory {
                     managerName = new ObjectName(MEMORY_MANAGER_MXBEAN_DOMAIN_TYPE + ",*");
                 } catch (MalformedObjectNameException e) {
                     // Should never happen
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMemoryManagerMXBeans", e); // NOI18N
                     return null;
                 }
                 Set<ObjectName> mbeans;
                 try {
                     mbeans = mbsc.queryNames(managerName, null);
                 } catch (Exception e) {
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMemoryManagerMXBeans", e); // NOI18N
                     return null;
                 }
                 if (mbeans != null) {
@@ -281,7 +282,7 @@ public final class JvmMXBeansFactory {
                             MemoryManagerMXBean mbean = newPlatformMXBeanProxy(mbsc, name, MemoryManagerMXBean.class);
                             memoryManagerMXBeans.add(mbean);
                         } catch (Exception e) {
-                            ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                            LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMemoryManagerMXBeans", e); // NOI18N
                         }
                     }
                 }
@@ -310,14 +311,14 @@ public final class JvmMXBeansFactory {
                     poolName = new ObjectName(MEMORY_POOL_MXBEAN_DOMAIN_TYPE + ",*");
                 } catch (MalformedObjectNameException e) {
                     // Should never happen
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMemoryPoolMXBeans", e); // NOI18N
                     return null;
                 }
                 Set<ObjectName> mbeans;
                 try {
                     mbeans = mbsc.queryNames(poolName, null);
                 } catch (Exception e) {
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMemoryPoolMXBeans", e); // NOI18N
                     return null;
                 }
                 if (mbeans != null) {
@@ -328,7 +329,7 @@ public final class JvmMXBeansFactory {
                             MemoryPoolMXBean mbean = newPlatformMXBeanProxy(mbsc, name, MemoryPoolMXBean.class);
                             memoryPoolMXBeans.add(mbean);
                         } catch (Exception e) {
-                            ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                            LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMemoryPoolMXBeans", e); // NOI18N
                         }
                     }
                 }
@@ -380,7 +381,7 @@ public final class JvmMXBeansFactory {
                 try {
                     return newPlatformMXBeanProxy(mbsc, objectNameStr, interfaceClass);
                 } catch (IOException e) {
-                    ErrorManager.getDefault().notify(ErrorManager.USER, e);
+                    LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMXBean", e); // NOI18N
                 }
             }
             return null;
