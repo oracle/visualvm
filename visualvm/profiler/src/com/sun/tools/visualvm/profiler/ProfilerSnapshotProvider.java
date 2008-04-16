@@ -50,6 +50,7 @@ public class ProfilerSnapshotProvider {
     
     public void createSnapshot(LoadedSnapshot loadedSnapshot, final boolean openView) {
         Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
+        if (profiledApplication == null) return;
         final ProfilerSnapshot snapshot = new ProfilerSnapshot(loadedSnapshot, profiledApplication);
         profiledApplication.getRepository().addDataSource(snapshot);
         if (openView) SwingUtilities.invokeLater(new Runnable() {
