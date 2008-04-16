@@ -90,10 +90,10 @@ class CoreDumpOverviewView extends DataSourceView {
         
         private void initComponents(CoreDump coreDump) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(coreDump) + "</nobr>");
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            setBackground(area.getBackground());
             
             // TODO: implement listener for CoreDump.oomeHeapDumpEnabled
             

@@ -142,8 +142,33 @@ public final class DataViewComponent extends JPanel {
         JComponent contents = null;
 
         if (isMasterViewResizable) {
-            JExtendedSplitPane mainVerticalSplitter = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT, masterPanel, detailsPanel);
-            tweakSplitPaneUI(mainVerticalSplitter);
+            final CustomizedSplitPaneUI mainVerticalSplitterUI = new CustomizedSplitPaneUI();
+            JExtendedSplitPane mainVerticalSplitter = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT, masterPanel, detailsPanel){
+                public void updateUI() {
+                    if (getUI() != mainVerticalSplitterUI)
+                        setUI(mainVerticalSplitterUI);
+
+                    setBorder(null);
+                    setOpaque(false);
+                    setDividerSize(6);
+                    setContinuousLayout(true);
+
+                    final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
+                    divider.setBackground(Color.WHITE);
+                    divider.setBorder(null);
+
+                    divider.addMouseListener(new MouseAdapter() {
+                        public void mouseEntered(MouseEvent e) {
+                            divider.setBackground(new Color(235, 235, 235));
+                            divider.repaint();
+                        }
+                        public void mouseExited(MouseEvent e) {
+                            divider.setBackground(Color.WHITE);
+                            divider.repaint();
+                        }
+                    });
+                }
+            };
             mainVerticalSplitter.setResizeWeight(0);
 
             contents = mainVerticalSplitter;
@@ -199,6 +224,8 @@ public final class DataViewComponent extends JPanel {
 
         final JPanel detailsTopPanel = new JPanel(new BorderLayout());
         detailsTopPanel.setOpaque(false);
+        
+        final CustomizedSplitPaneUI detailsTopHorizontalSplitterUI = new CustomizedSplitPaneUI();
         detailsTopHorizontalSplitter = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, detailsTopLeftArea, detailsTopRightArea) {
             public void setVisible(boolean visible) {
                 super.setVisible(visible);
@@ -206,8 +233,31 @@ public final class DataViewComponent extends JPanel {
                 revalidate();
                 repaint();
             }
+            public void updateUI() {
+                if (getUI() != detailsTopHorizontalSplitterUI)
+                    setUI(detailsTopHorizontalSplitterUI);
+                
+                setBorder(null);
+                setOpaque(false);
+                setDividerSize(6);
+                setContinuousLayout(true);
+
+                final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
+                divider.setBackground(Color.WHITE);
+                divider.setBorder(null);
+                
+                divider.addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) {
+                        divider.setBackground(new Color(235, 235, 235));
+                        divider.repaint();
+                    }
+                    public void mouseExited(MouseEvent e) {
+                        divider.setBackground(Color.WHITE);
+                        divider.repaint();
+                    }
+                });
+            }
         };
-        tweakSplitPaneUI(detailsTopHorizontalSplitter);
         detailsTopHorizontalSplitter.setResizeWeight(0.5d);
         detailsTopHorizontalSplitter.setDividerLocation(0.5d);
         detailsTopPanel.add(detailsTopHorizontalSplitter, BorderLayout.CENTER);
@@ -220,6 +270,8 @@ public final class DataViewComponent extends JPanel {
 
         final JPanel detailsBottomPanel = new JPanel(new BorderLayout());            
         detailsBottomPanel.setOpaque(false);
+        
+        final CustomizedSplitPaneUI detailsBottomHorizontalSplitterUI = new CustomizedSplitPaneUI();
         detailsBottomHorizontalSplitter = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT, detailsBottomLeftArea, detailsBottomRightArea) {
             public void setVisible(boolean visible) {
                 super.setVisible(visible);
@@ -227,8 +279,31 @@ public final class DataViewComponent extends JPanel {
                 revalidate();
                 repaint();
             }
+            public void updateUI() {
+                if (getUI() != detailsBottomHorizontalSplitterUI)
+                    setUI(detailsBottomHorizontalSplitterUI);
+                
+                setBorder(null);
+                setOpaque(false);
+                setDividerSize(6);
+                setContinuousLayout(true);
+
+                final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
+                divider.setBackground(Color.WHITE);
+                divider.setBorder(null);
+                
+                divider.addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) {
+                        divider.setBackground(new Color(235, 235, 235));
+                        divider.repaint();
+                    }
+                    public void mouseExited(MouseEvent e) {
+                        divider.setBackground(Color.WHITE);
+                        divider.repaint();
+                    }
+                });
+            }
         };
-        tweakSplitPaneUI(detailsBottomHorizontalSplitter);
         detailsBottomHorizontalSplitter.setResizeWeight(0.5d);
         detailsBottomHorizontalSplitter.setDividerLocation(0.5d);
         detailsBottomPanel.add(detailsBottomHorizontalSplitter, BorderLayout.CENTER);
@@ -240,6 +315,7 @@ public final class DataViewComponent extends JPanel {
         detailsPanel.setOpaque(false);
         detailsPanel.setVisible(false);
 
+        final CustomizedSplitPaneUI detailsVerticalSplitterUI = new CustomizedSplitPaneUI();
         detailsVerticalSplitter = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT, detailsTopPanel, detailsBottomPanel) {
             public void setVisible(boolean visible) {
                 super.setVisible(visible);
@@ -247,8 +323,31 @@ public final class DataViewComponent extends JPanel {
                 revalidate();
                 repaint();
             }
+            public void updateUI() {
+                if (getUI() != detailsVerticalSplitterUI)
+                    setUI(detailsVerticalSplitterUI);
+                
+                setBorder(null);
+                setOpaque(false);
+                setDividerSize(6);
+                setContinuousLayout(true);
+
+                final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
+                divider.setBackground(Color.WHITE);
+                divider.setBorder(null);
+                
+                divider.addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) {
+                        divider.setBackground(new Color(235, 235, 235));
+                        divider.repaint();
+                    }
+                    public void mouseExited(MouseEvent e) {
+                        divider.setBackground(Color.WHITE);
+                        divider.repaint();
+                    }
+                });
+            }
         };
-        tweakSplitPaneUI(detailsVerticalSplitter);
         detailsVerticalSplitter.setResizeWeight(0.5d);
         detailsVerticalSplitter.setDividerLocation(0.5d);
         detailsPanel.add(detailsVerticalSplitter, BorderLayout.CENTER);
@@ -271,38 +370,17 @@ public final class DataViewComponent extends JPanel {
         setBackground(Color.WHITE);
         setLayout(new BorderLayout());
     }
-
-    private static void tweakSplitPaneUI(final JSplitPane splitPane) {
-        splitPane.setUI(new BasicSplitPaneUI() {
-            public BasicSplitPaneDivider createDefaultDivider() {
-                return new BasicSplitPaneDivider(this) {
-                    public void paint(Graphics g) {
-                        Dimension size = getSize();
-                        g.setColor(getBackground());
-                        g.fillRect(0, 0, size.width, size.height);
-                    }
-                };
-            }
-        });
-        splitPane.setBorder(null);
-        splitPane.setOpaque(false);
-        splitPane.setDividerSize(6);
-        splitPane.setContinuousLayout(true);
-
-        final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) splitPane.getUI()).getDivider();
-        divider.setBackground(Color.WHITE);
-        divider.setBorder(null);
-
-        divider.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                divider.setBackground(new Color(235, 235, 235));
-                divider.repaint();
-            }
-            public void mouseExited(MouseEvent e) {
-                divider.setBackground(Color.WHITE);
-                divider.repaint();
-            }
-        });
+    
+    private static class CustomizedSplitPaneUI extends BasicSplitPaneUI {
+        public BasicSplitPaneDivider createDefaultDivider() {
+            return new BasicSplitPaneDivider(this) {
+                public void paint(Graphics g) {
+                    Dimension size = getSize();
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, size.width, size.height);
+                }
+            };
+        }
     }
     
     public static class MasterView {

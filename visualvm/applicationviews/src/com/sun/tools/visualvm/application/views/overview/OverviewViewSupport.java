@@ -73,10 +73,10 @@ class OverviewViewSupport {
         
         private void initComponents(final ApplicationOverviewModel model) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             final HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>");
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            setBackground(area.getBackground());
             
             DataSource source = model.getSource();
             if (source instanceof Application) {
@@ -140,11 +140,11 @@ class OverviewViewSupport {
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             area = new HTMLTextArea();
             updateSavedData();
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            setBackground(area.getBackground());
             
             add(new ScrollableContainer(area), BorderLayout.CENTER);
         }
@@ -186,6 +186,7 @@ class OverviewViewSupport {
         
         private void initComponents(String jvmargs) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -193,7 +194,6 @@ class OverviewViewSupport {
                 HTMLTextArea area = new HTMLTextArea("<nobr>" + jvmargs + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                setBackground(area.getBackground());
                 contents = area;
             } else {
                 contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);
@@ -219,6 +219,7 @@ class OverviewViewSupport {
         
         private void initComponents(String properties) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -226,7 +227,6 @@ class OverviewViewSupport {
                 HTMLTextArea area = new HTMLTextArea("<nobr>" + properties + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                setBackground(area.getBackground());
                 contents = area;
             } else {
                 contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);

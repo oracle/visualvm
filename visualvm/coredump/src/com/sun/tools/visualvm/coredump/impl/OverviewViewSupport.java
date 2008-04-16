@@ -68,10 +68,10 @@ public final class OverviewViewSupport {
         
         private void initComponents(final DataSource ds) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             final HTMLTextArea area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            setBackground(area.getBackground());
             
             ds.getRepository().addDataChangeListener(new DataChangeListener() {
                 public void dataChanged(DataChangeEvent event) {
@@ -109,6 +109,7 @@ public final class OverviewViewSupport {
         
         private void initComponents(String jvmargs) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -116,7 +117,6 @@ public final class OverviewViewSupport {
                 HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                setBackground(area.getBackground());
                 contents = area;
             } else {
                 contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);
@@ -166,6 +166,7 @@ public final class OverviewViewSupport {
         
         private void initComponents(Properties properties) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -173,7 +174,6 @@ public final class OverviewViewSupport {
                 HTMLTextArea area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                setBackground(area.getBackground());
                 contents = area;
             } else {
                 contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);

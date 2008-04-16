@@ -133,10 +133,10 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         
         private void initComponents(Host host) {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralInfo(host) + "</nobr>");
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            setBackground(area.getBackground());
             
             add(area, BorderLayout.CENTER);
         }
@@ -199,6 +199,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -287,6 +288,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
               // MemoryMetricsPanel
               usedMemoryLabel = new HTMLLabel() {
@@ -376,6 +378,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
               // SwapMetricsPanel
               usedSwapMemoryLabel = new HTMLLabel() {

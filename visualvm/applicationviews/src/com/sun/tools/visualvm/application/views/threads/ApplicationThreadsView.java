@@ -155,11 +155,11 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager) {
             setLayout(new BorderLayout());
+            setOpaque(false);
 
             area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             updateThreadsCounts(threadsManager);
-            setBackground(area.getBackground());
 
             add(area, BorderLayout.CENTER);
 
@@ -171,9 +171,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             threadDumpButton.setEnabled(jvm.isTakeThreadDumpSupported());
 
             JPanel buttonsArea = new JPanel(new BorderLayout());
-            buttonsArea.setBackground(area.getBackground());
+            buttonsArea.setOpaque(false);
             JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
-            buttonsContainer.setBackground(area.getBackground());
+            buttonsContainer.setOpaque(false);
             buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
             buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
@@ -227,6 +227,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private void initComponents(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
             setLayout(new BorderLayout());
+            setOpaque(false);
 
             ThreadsPanel threadsPanel = new ThreadsPanel(threadsManager, callback, true);
             threadsPanel.threadsMonitoringEnabled();
@@ -255,6 +256,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private void initComponents(ThreadMXBeanDataManager threadsManager) {
             setLayout(new BorderLayout());
+            setOpaque(false);
+            
             threadsDetailsPanel = new ThreadsDetailsPanel(threadsManager, true);
             add(threadsDetailsPanel, BorderLayout.CENTER);
         }

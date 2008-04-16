@@ -29,7 +29,6 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
  *
@@ -47,8 +46,8 @@ public final class NotSupportedDisplayer extends JPanel {
         notSupportedLabel.setEnabled(false);
 
         setLayout(new BorderLayout());
-        setOpaque(true);
-        setBackground(new HTMLTextArea().getBackground());
+        setOpaque(false);
+        
         add(notSupportedLabel, BorderLayout.CENTER);
     }
 

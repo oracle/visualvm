@@ -181,10 +181,10 @@ class ApplicationMonitorView extends DataSourceView {
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             area = new HTMLTextArea(getBasicTelemetry(null));
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            setBackground(area.getBackground());
             
             // TODO: implement listener for Application.oomeHeapDumpEnabled
             
@@ -211,9 +211,9 @@ class ApplicationMonitorView extends DataSourceView {
             heapDumpButton.setEnabled(jvm.isTakeHeapDumpSupported());
             
             JPanel buttonsArea = new JPanel(new BorderLayout());
-            buttonsArea.setBackground(area.getBackground());
+            buttonsArea.setOpaque(false);
             JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
-            buttonsContainer.setBackground(area.getBackground());
+            buttonsContainer.setOpaque(false);
             buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             buttonsContainer.add(gcButton, BorderLayout.WEST);
             buttonsContainer.add(heapDumpButton, BorderLayout.EAST);
