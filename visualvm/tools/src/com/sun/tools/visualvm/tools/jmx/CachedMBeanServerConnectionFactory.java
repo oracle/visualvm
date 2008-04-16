@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.tools.jmx;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -68,8 +70,8 @@ import org.openide.util.RequestProcessor;
  */
 public final class CachedMBeanServerConnectionFactory {
 
-    private static Map<Integer, Map<MBeanServerConnection, CachedMBeanServerConnection>> snapshots =
-            new HashMap<Integer, Map<MBeanServerConnection, CachedMBeanServerConnection>>();
+    private static final Map<Integer, Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>> snapshots =
+            new HashMap<Integer, Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>>();
 
     private CachedMBeanServerConnectionFactory() {
     }
@@ -147,24 +149,22 @@ public final class CachedMBeanServerConnectionFactory {
 
     private static synchronized CachedMBeanServerConnection
             retrieveCachedMBeanServerConnection(MBeanServerConnection mbsc, int interval) {
-        Map<MBeanServerConnection, CachedMBeanServerConnection> mbscMap =
-                snapshots.get(interval);
+        Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> mbscMap = snapshots.get(interval);
         if (mbscMap == null) {
             CachedMBeanServerConnection cmbsc = Snapshot.newSnapshot(mbsc, interval);
-            Map<MBeanServerConnection, CachedMBeanServerConnection> mbscMapNew =
-                    new HashMap<MBeanServerConnection, CachedMBeanServerConnection>();
-            mbscMapNew.put(mbsc, cmbsc);
+            Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> mbscMapNew =
+                    new WeakHashMap<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>();
+            mbscMapNew.put(mbsc, new WeakReference<CachedMBeanServerConnection>(cmbsc));
             snapshots.put(interval, mbscMapNew);
             return cmbsc;
         } else {
-            CachedMBeanServerConnection cmbsc = mbscMap.get(mbsc);
+            WeakReference<CachedMBeanServerConnection> cmbscRef = mbscMap.get(mbsc);
+            CachedMBeanServerConnection cmbsc = (cmbscRef == null) ? null : cmbscRef.get();
             if (cmbsc == null) {
                 cmbsc = Snapshot.newSnapshot(mbsc, interval);
-                mbscMap.put(mbsc, cmbsc);
-                return cmbsc;                
-            } else {
-                return cmbsc;
+                mbscMap.put(mbsc, new WeakReference<CachedMBeanServerConnection>(cmbsc));
             }
+            return cmbsc;
         }
     }
 
