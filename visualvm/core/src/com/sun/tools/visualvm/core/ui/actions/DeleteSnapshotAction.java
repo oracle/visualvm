@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.core.ui.actions;
 
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -54,7 +55,7 @@ class DeleteSnapshotAction extends MultiDataSourceAction<Snapshot> {
     protected boolean isEnabled(Set<Snapshot> snapshots) {
         for (Snapshot snapshot : snapshots)
             if (!snapshot.supportsDelete()) return false;
-        return true;
+        return Utils.areDataSourcesIndependent(snapshots);
     }
     
     

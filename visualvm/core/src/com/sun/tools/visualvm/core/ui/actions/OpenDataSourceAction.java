@@ -25,8 +25,10 @@
 package com.sun.tools.visualvm.core.ui.actions;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Set;
 
 
@@ -46,7 +48,8 @@ class OpenDataSourceAction extends MultiDataSourceAction<DataSource> {
     
     
     protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {
-        for (DataSource dataSource : dataSources)
+        List<DataSource> sortedDataSources = Utils.getSortedDataSources(dataSources);
+        for (DataSource dataSource : sortedDataSources)
             DataSourceWindowManager.sharedInstance().openDataSource(dataSource);
     }
 

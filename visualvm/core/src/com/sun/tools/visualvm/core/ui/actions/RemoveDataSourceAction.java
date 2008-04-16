@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.core.ui.actions;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 
@@ -53,7 +54,7 @@ class RemoveDataSourceAction extends MultiDataSourceAction<DataSource> {
     protected boolean isEnabled(Set<DataSource> dataSources) {
         for (DataSource dataSource : dataSources)
             if (!dataSource.supportsUserRemove()) return false;
-        return true;
+        return Utils.areDataSourcesIndependent(dataSources);
     }
     
     

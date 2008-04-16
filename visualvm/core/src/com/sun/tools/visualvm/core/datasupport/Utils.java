@@ -80,18 +80,29 @@ public final class Utils {
         return filteredSet;
     }
     
-    public static Set<DataSource> getIndependentDataSources(Set<DataSource> dataSources) {
-        Map<Integer, Set<DataSource>> independentDataSourcesMap = new HashMap();
+    public static <X extends DataSource> List<X> getSortedDataSources(Set<X> dataSources) {
+        List<DataSourcePath<X>> dataSourcePaths = getSortedDataSourcePaths(dataSources);
+        List<X> sortedDataSources = new ArrayList();
         
-        List<DataSourcePath> dataSourcePaths = new ArrayList();
-        for (DataSource dataSource : dataSources) dataSourcePaths.add(new DataSourcePath(dataSource));
-        Collections.sort(dataSourcePaths);
+        for (DataSourcePath<X> dataSourcePath : dataSourcePaths)
+            sortedDataSources.add(dataSourcePath.getDataSource());
         
-        for (DataSourcePath dataSourcePath : dataSourcePaths) {
+        return sortedDataSources;
+    }
+    
+    public static <X extends DataSource> boolean areDataSourcesIndependent(Set<X> dataSources) {
+        return dataSources.size() == getIndependentDataSources(dataSources).size();
+    }
+    
+    public static <X extends DataSource> Set<X> getIndependentDataSources(Set<X> dataSources) {
+        Map<Integer, Set<X>> independentDataSourcesMap = new HashMap();
+        List<DataSourcePath<X>> dataSourcePaths = getSortedDataSourcePaths(dataSources);
+        
+        for (DataSourcePath<X> dataSourcePath : dataSourcePaths) {
             boolean independent = true;
             for (int i = 0; i < dataSourcePath.size(); i++) {
                 DataSource dataSource = dataSourcePath.get(i);
-                Set<DataSource> set = independentDataSourcesMap.get(i);
+                Set<X> set = independentDataSourcesMap.get(i);
                 if (set != null && set.contains(dataSource)) {
                     independent = false;
                     break;
@@ -99,7 +110,7 @@ public final class Utils {
             }
             
             if (independent) {
-                Set<DataSource> set = independentDataSourcesMap.get(dataSourcePath.size() - 1);
+                Set<X> set = independentDataSourcesMap.get(dataSourcePath.size() - 1);
                 if (set == null) {
                     set = new HashSet();
                     independentDataSourcesMap.put(dataSourcePath.size() - 1, set);
@@ -108,20 +119,28 @@ public final class Utils {
             }
         }
         
-        Set<DataSource> independentDataSources = new HashSet();
-        Collection<Set<DataSource>> independentSetsCollection = independentDataSourcesMap.values();
-        for (Set<DataSource> independentSet : independentSetsCollection)
+        Set<X> independentDataSources = new HashSet();
+        Collection<Set<X>> independentSetsCollection = independentDataSourcesMap.values();
+        for (Set<X> independentSet : independentSetsCollection)
             independentDataSources.addAll(independentSet);
         return independentDataSources;
     }
     
-    private static class DataSourcePath extends ArrayList<DataSource> implements Comparable<DataSourcePath> {
+    private static <X extends DataSource> List<DataSourcePath<X>> getSortedDataSourcePaths(Set<X> dataSources) {
+        List<DataSourcePath<X>> dataSourcePaths = new ArrayList();
+        for (DataSource dataSource : dataSources) dataSourcePaths.add(new DataSourcePath(dataSource));
+        Collections.sort(dataSourcePaths);
+        return dataSourcePaths;
+    }
+    
+    private static class DataSourcePath<X extends DataSource> extends ArrayList<DataSource> implements Comparable<DataSourcePath> {
         
-        public DataSourcePath(DataSource dataSource) {
+        public DataSourcePath(X dataSource) {
             super();
-            while(dataSource != null) {
-                add(0, dataSource);
-                dataSource = dataSource.getOwner();
+            DataSource ds = dataSource;
+            while(ds != null) {
+                add(0, ds);
+                ds = ds.getOwner();
             }
         }
 
@@ -130,8 +149,8 @@ public final class Utils {
             return thisSize.compareTo(dataSourcePath.size());
         }
         
-        public DataSource getDataSource() {
-            return get(size() - 1);
+        public X getDataSource() {
+            return (X)get(size() - 1);
         }
         
     }
