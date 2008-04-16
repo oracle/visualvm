@@ -100,9 +100,12 @@ class ApplicationSnapshotProvider {
         Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
         if (snapshots.isEmpty() && !DataSourceViewsManager.sharedInstance().canSaveViewsFor(application, ApplicationSnapshot.class)) return;
         
-        File snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
-        if (!Utils.prepareDirectory(snapshotDirectory))
-            throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
+        File snapshotDirectory = null;
+        synchronized(ApplicationSnapshotProvider.this) {
+            snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
+            if (!Utils.prepareDirectory(snapshotDirectory))
+                throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
+        }
         
         for (Snapshot snapshot : snapshots) {
             try {

@@ -168,10 +168,12 @@ public final class Utils {
         return fileName.substring(extIndex);
     }
     
+    // NOTE: the query is synchronized, however creating a new file has to be synchronized in custom code
     public static File getUniqueFile(File directory, String file) {
         return getUniqueFile(directory, getFileBase(file), getFileExt(file));
     }
     
+    // NOTE: the query is synchronized, however creating a new file has to be synchronized in custom code
     public synchronized static File getUniqueFile(File directory, String fileName, String fileExt) {
         File newFile = new File(directory, fileName + fileExt);
         while (newFile.exists()) {

@@ -81,11 +81,11 @@ public final class Storage {
     }
     
     
-    public boolean directoryExists() {
+    public synchronized boolean directoryExists() {
         return directory.exists();
     }
     
-    public File getDirectory() {
+    public synchronized File getDirectory() {
         if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);
         return directory;
     }
@@ -94,7 +94,7 @@ public final class Storage {
         return getCustomProperties(new String[] { key })[0];
     }
     
-    public String[] getCustomProperties(String[] keys) {
+    public synchronized String[] getCustomProperties(String[] keys) {
         String[] values = new String[keys.length];
         Properties prop = getCustomProperties();
         for (int i = 0; i < keys.length; i++) values[i] = prop.getProperty(keys[i]);
@@ -105,13 +105,13 @@ public final class Storage {
         setCustomProperties(new String[] { key }, new String[] { value });
     }
     
-    public void setCustomProperties(String[] keys, String[] values) {
+    public synchronized void setCustomProperties(String[] keys, String[] values) {
         Properties prop = getCustomProperties();
         for (int i = 0; i < keys.length; i++) prop.put(keys[i], values[i]);
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
     }
     
-    public void saveCustomPropertiesTo(File file) {
+    public synchronized void saveCustomPropertiesTo(File file) {
         if (file == null) throw new NullPointerException("File cannot be null");
         if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);
         
@@ -119,7 +119,7 @@ public final class Storage {
         if (!prop.isEmpty()) storeProperties(prop, file);
     }
     
-    public void deleteCustomPropertiesStorage() {
+    public synchronized void deleteCustomPropertiesStorage() {
         if (propertiesFile != null && propertiesFile.exists())
             if (!propertiesFile.delete()) propertiesFile.deleteOnExit();
     }
