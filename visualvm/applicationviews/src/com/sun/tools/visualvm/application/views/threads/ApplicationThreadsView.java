@@ -36,9 +36,9 @@ import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
+import com.sun.tools.visualvm.tools.jmx.MBeanCacheListener;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -46,7 +46,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
@@ -61,8 +60,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";
     private Jvm jvm;
+    private JvmMXBeans mxbeans;
     private ThreadMXBeanDataManager threadsManager;
-    private Timer timer;
+    private MBeanCacheListener listener;
 
     public ApplicationThreadsView(Application application) {
         super(application, "Threads", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);
@@ -73,7 +73,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         Application application = (Application) getDataSource();
         jvm = JvmFactory.getJVMFor(application);
         threadsManager = null;
-        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(application));
+        mxbeans = JvmMXBeansFactory.getJvmMXBeans(
+                JmxModelFactory.getJmxModelFor(application),
+                GlobalPreferences.sharedInstance().getThreadsPoll() * 1000);
         if (mxbeans != null) {
             threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
         }
@@ -81,27 +83,35 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     @Override
     protected void removed() {
-        timer.stop();
+        if (mxbeans != null) {
+            mxbeans.removeMBeanCacheListener(listener);
+            mxbeans = null;
+        }
     }
 
     public void dataRemoved(Application dataSource) {
-        timer.stop();
+        if (mxbeans != null) {
+            mxbeans.removeMBeanCacheListener(listener);
+            mxbeans = null;
+        }
     }
 
     protected DataViewComponent createComponent() {
-        Application application = (Application)getDataSource();
-        timer = new Timer(GlobalPreferences.sharedInstance().getThreadsPoll() * 1000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                threadsManager.refreshThreads();
-            }
-        });
-        timer.setInitialDelay(0);
-        timer.start();
+        Application application = (Application) getDataSource();
+        final MasterViewSupport mvs =
+                new MasterViewSupport(application, jvm, threadsManager);
+        if (mxbeans != null) {
+            listener = new MBeanCacheListener() {
+                public void flushed() {
+                    threadsManager.refreshThreads();
+                    mvs.updateThreadsCounts(threadsManager);
+                }
+            };
+            mxbeans.addMBeanCacheListener(listener);
+        }
         application.notifyWhenRemoved(this);
 
-        final DataViewComponent dvc = new DataViewComponent(
-                new MasterViewSupport(application, jvm, threadsManager, timer).getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
+        final DataViewComponent dvc = new DataViewComponent(mvs.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Threads visualization", true), DataViewComponent.TOP_LEFT);
 
@@ -127,8 +137,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         private HTMLTextArea area;
         private JButton threadDumpButton;
 
-        public MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager, Timer timer) {
-            initComponents(application, jvm, threadsManager, timer);
+        public MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
+            initComponents(application, jvm, threadsManager);
         }
 
         public DataViewComponent.MasterView getMasterView() {
@@ -143,19 +153,13 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             });
         }
 
-        private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager, Timer timer) {
+        private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager) {
             setLayout(new BorderLayout());
 
             area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             updateThreadsCounts(threadsManager);
             setBackground(area.getBackground());
-
-            timer.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    updateThreadsCounts(threadsManager);
-                }
-            });
 
             add(area, BorderLayout.CENTER);
 
