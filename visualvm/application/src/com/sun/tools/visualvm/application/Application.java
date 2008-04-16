@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.application;
 
-import com.sun.tools.visualvm.application.ApplicationSupport;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -87,7 +86,7 @@ public abstract class Application extends DataSource implements Stateful {
     }
     
     
-    public final int getState() {
+    public final synchronized int getState() {
         return state;
     }
     
@@ -97,23 +96,26 @@ public abstract class Application extends DataSource implements Stateful {
         getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
     }
     
-    
+    @Override
     public final int hashCode() {
         return getId().hashCode();
     }
 
+    @Override
     public final boolean equals(Object obj) {
         if (!(obj instanceof Application)) return false;
         Application app = (Application) obj;
         return getId().equals(app.getId());
     }
     
+    @Override
     public String toString() {
         return "Application [id: " + getId() + ", pid: " + getPid() + ", host: " + getHost().getHostName() + "]";
     }
     
     
     // <system_temp>/visualvm.dat/<application_id>
+    @Override
     protected Storage createStorage() {
         File directory = new File(Storage.getTemporaryStorageDirectoryString() + File.separator + getId());
         return new Storage(directory);
