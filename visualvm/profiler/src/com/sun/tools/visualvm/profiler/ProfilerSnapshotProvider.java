@@ -48,11 +48,9 @@ import org.openide.util.RequestProcessor;
  */
 public class ProfilerSnapshotProvider {
     
-    public void createSnapshot(LoadedSnapshot loadedSnapshot, final boolean openView) {
-        Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
-        if (profiledApplication == null) return;
-        final ProfilerSnapshot snapshot = new ProfilerSnapshot(loadedSnapshot, profiledApplication);
-        profiledApplication.getRepository().addDataSource(snapshot);
+    public void createSnapshot(LoadedSnapshot loadedSnapshot, Application application, final boolean openView) {
+        final ProfilerSnapshot snapshot = new ProfilerSnapshot(loadedSnapshot, application);
+        application.getRepository().addDataSource(snapshot);
         if (openView) SwingUtilities.invokeLater(new Runnable() {
             public void run() { DataSourceWindowManager.sharedInstance().openDataSource(snapshot); }
         });

@@ -25,12 +25,16 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotsListener;
@@ -44,6 +48,9 @@ import org.openide.util.actions.SystemAction;
  * @author Jiri Sedlacek
  */
 class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
+    
+    private static final String NB_PROFILER_SNAPSHOTS_STORAGE = "config" + File.separator + "Services" + File.separator + "org-netbeans-modules-profiler";
+    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotAction.class.getName());
     
     private final TakeSnapshotAction originalAction = SystemAction.get(TakeSnapshotAction.class);
     private boolean openNextSnapshot = true;
@@ -78,13 +85,24 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
         });
         
         ResultsManager.getDefault().addSnapshotsListener(new SnapshotsListener() {
-            public void snapshotLoaded(LoadedSnapshot arg0) {}
-            public void snapshotRemoved(LoadedSnapshot arg0) {}
-            public void snapshotTaken(LoadedSnapshot arg0) {}
+            public void snapshotLoaded(LoadedSnapshot snapshot) {}
+            public void snapshotRemoved(LoadedSnapshot snapshot) {}
+            public void snapshotTaken(LoadedSnapshot snapshot) {}
             
-            public void snapshotSaved(LoadedSnapshot arg0) {
-                ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(arg0, openNextSnapshot);
-                openNextSnapshot = true;
+            public void snapshotSaved(LoadedSnapshot snapshot) {
+                try {
+                    Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
+                    File snapshotFile = snapshot.getFile();
+                    if (profiledApplication != null && snapshotFile.getCanonicalPath().contains(NB_PROFILER_SNAPSHOTS_STORAGE)) {
+                        File newSnapshotFile = Utils.getUniqueFile(profiledApplication.getStorage().getDirectory(), snapshotFile.getName());
+                        snapshotFile.renameTo(newSnapshotFile);
+                        snapshot.setFile(newSnapshotFile);
+                        ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
+                        openNextSnapshot = true;
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e);
+                }
             }
         });
     }
