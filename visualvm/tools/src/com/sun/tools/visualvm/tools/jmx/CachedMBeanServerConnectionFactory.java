@@ -51,7 +51,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.swing.Timer;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.openide.util.RequestProcessor;
 
 /**
  * <p>The {@code CachedMBeanServerConnectionFactory} class is a factory class that
@@ -211,12 +211,12 @@ public final class CachedMBeanServerConnectionFactory {
         }
 
         synchronized void intervalElapsed() {
-            new NBSwingWorker() {
-                protected void doInBackground() {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
                     flush();
                     notifyListeners();
                 }
-            }.execute();
+            });
         }
 
         synchronized void notifyListeners() {
