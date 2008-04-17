@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -188,7 +189,7 @@ class JmxApplicationProvider {
                 normalizedConnectionName,
                 hostName,
                 user,
-                passwd,
+                Utils.encodePassword(passwd),
                 displayName
             };
 
@@ -367,7 +368,7 @@ class JmxApplicationProvider {
                             final String[] values = storage.getCustomProperties(keys);
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
-                                    addJmxApplication(null, values[0], values[1], values[2], values[3], false, storage);
+                                    addJmxApplication(null, values[0], values[1], values[2], Utils.decodePassword(values[3]), false, storage);
                                 }
                             });
                         }

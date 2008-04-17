@@ -314,6 +314,14 @@ public final class Utils {
         return directory;
     }
     
+    public static String encodePassword(String value) {
+        return Base64.byteArrayToBase64(value.getBytes());
+    }
+    
+    public static String decodePassword(String value) {
+        return new String(Base64.base64ToByteArray(value));
+    }
+    
     public static String imageToString(Image image, String format) {
         byte[] imageBytes = imageToBytes(image, format);
         return imageBytes != null ? Base64.byteArrayToBase64(imageBytes) : null;
@@ -322,7 +330,6 @@ public final class Utils {
     public static Image stringToImage(String string) {
         return Toolkit.getDefaultToolkit().createImage(Base64.base64ToByteArray(string));
     }
-    
     
     private static BufferedImage imageToBuffered(Image image) {
         if (image instanceof BufferedImage) return (BufferedImage)image;

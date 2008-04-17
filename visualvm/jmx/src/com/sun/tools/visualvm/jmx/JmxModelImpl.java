@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -250,7 +251,7 @@ public class JmxModelImpl extends JmxModel {
             if (application instanceof JmxApplication && ((JmxApplication) application).getSaveCredentialsFlag()) {
                 Storage storage = application.getStorage();
                 storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
-                storage.setCustomProperty(PROPERTY_PASSWORD, jsc.getPassword());
+                storage.setCustomProperty(PROPERTY_PASSWORD, Utils.encodePassword(jsc.getPassword()));
             }
         }
         return jsc;
