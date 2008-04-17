@@ -55,6 +55,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
@@ -67,19 +68,19 @@ import org.openide.windows.WindowManager;
 class JmxApplicationProvider {
     private static final Logger LOGGER = Logger.getLogger(JmxApplicationProvider.class.getName());
     
-    private static final String SNAPSHOT_VERSION = "snapshot_version";
+    private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION =
             CURRENT_SNAPSHOT_VERSION_MAJOR +
             SNAPSHOT_VERSION_DIVIDER +
             CURRENT_SNAPSHOT_VERSION_MINOR;
     
-    private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";
-    private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";
-    private static final String PROPERTY_USERNAME = "prop_username";
-    private static final String PROPERTY_PASSWORD = "prop_password";
+    private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
+    private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
+    private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
+    private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
 
     private static JmxApplicationProvider sharedInstance;
     
@@ -150,8 +151,8 @@ class JmxApplicationProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
-                            "<html>Invalid JMX connection: " +
-                            normalizedConnectionName + "</html>");
+                            NbBundle.getMessage(JmxApplicationProvider.class, 
+                            "MSG_Invalid_JMX_connection",normalizedConnectionName));    // NOI18N
                 }
             });
             return;
@@ -160,7 +161,7 @@ class JmxApplicationProvider {
         // Create Host & JmxApplication
         ProgressHandle pHandle = null;
         try {
-            pHandle = ProgressHandleFactory.createHandle("Adding " + displayName + "...");
+            pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(JmxApplicationProvider.class, "LBL_Adding") + displayName + "...");    // NOI18N
             pHandle.setInitialDelay(0);
             pHandle.start();
             
@@ -219,7 +220,8 @@ class JmxApplicationProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
-                            "<html>Invalid JMX connection: " + connectionName + "</html>");
+                            NbBundle.getMessage(JmxApplicationProvider.class, 
+                            "MSG_Invalid_JMX_connection",connectionName));  // NOI18N
                 }
             });
             return;
@@ -233,7 +235,8 @@ class JmxApplicationProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
-                            "<html>Cannot resolve host " + hostName + "</html>");
+                            NbBundle.getMessage(JmxApplicationProvider.class, 
+                            "MSG_Cannot_resolve_host",hostName));   // NOI18N
                 }
             });
             return;            
@@ -256,10 +259,10 @@ class JmxApplicationProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ExplorerSupport.sharedInstance().selectDataSource(application);
-                    NetBeansProfiler.getDefaultNB().displayWarning("<html>JMX connection " +
-                            application.getId() + " already exists as " +
-                            DataSourceDescriptorFactory.getDescriptor(app).getName() +
-                            "</html>");
+                    NetBeansProfiler.getDefaultNB().displayWarning(
+                            NbBundle.getMessage(JmxApplicationProvider.class, "MSG_JMX_connection") +   // NOI18N
+                            application.getId() + NbBundle.getMessage(JmxApplicationProvider.class, "MSG_already_exists") + // NOI18N
+                            DataSourceDescriptorFactory.getDescriptor(app).getName());
                 }
             });
             return;
@@ -271,7 +274,7 @@ class JmxApplicationProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
-                            "<html>Cannot connect using " + connectionName + "</html>");
+                            NbBundle.getMessage(JmxApplicationProvider.class, "MSG_Cannot_connect_using") + connectionName);    // NOI18N
                 }
             });
             return;
@@ -283,8 +286,8 @@ class JmxApplicationProvider {
     }
     
     private String normalizeConnectionName(String connectionName) {
-        if (connectionName.startsWith("service:jmx:")) return connectionName;
-        return "service:jmx:rmi:///jndi/rmi://" + connectionName + "/jmxrmi"; // hostname:port
+        if (connectionName.startsWith("service:jmx:")) return connectionName;   // NOI18N
+        return "service:jmx:rmi:///jndi/rmi://" + connectionName + "/jmxrmi";   // NOI18N  hostname:port
     }
     
     private String getHostName(JMXServiceURL serviceURL) {
@@ -295,12 +298,12 @@ class JmxApplicationProvider {
             hostname = null;
             // Try to compute the Host instance from the JNDI/RMI
             // Registry Service urlPath in the JMXServiceURL.
-            if ("rmi".equals(serviceURL.getProtocol()) &&
-                    serviceURL.getURLPath().startsWith("/jndi/rmi://")) {
+            if ("rmi".equals(serviceURL.getProtocol()) &&   // NOI18N
+                    serviceURL.getURLPath().startsWith("/jndi/rmi://")) {   // NOI18N
                 String urlPath =
-                        serviceURL.getURLPath().substring("/jndi/rmi://".length());
+                        serviceURL.getURLPath().substring("/jndi/rmi://".length()); // NOI18N
                 if ('/' == urlPath.charAt(0)) {
-                    hostname = "localhost";
+                    hostname = "localhost"; // NOI18N
                 } else {
                     int colonIndex = urlPath.indexOf(":");
                     int slashIndex = urlPath.indexOf("/");
@@ -310,7 +313,7 @@ class JmxApplicationProvider {
                     }
                     hostname = urlPath.substring(0, min);
                     if (hostname.isEmpty()) {
-                        hostname = "localhost";
+                        hostname = "localhost"; // NOI18N
                     }
                 }
             }
@@ -322,7 +325,7 @@ class JmxApplicationProvider {
         try {
             return new JMXServiceURL(connectionString);
         } catch (MalformedURLException e) {
-            LOGGER.throwing(JMXServiceURL.class.getName(), "getServiceURL", e);
+            LOGGER.throwing(JMXServiceURL.class.getName(), "getServiceURL", e); // NOI18N
             return null;
         }
     }

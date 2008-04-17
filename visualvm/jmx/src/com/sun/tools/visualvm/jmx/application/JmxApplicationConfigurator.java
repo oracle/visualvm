@@ -49,6 +49,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -62,7 +63,7 @@ class JmxApplicationConfigurator extends JPanel {
         JmxApplicationConfigurator hc = getDefault();
         hc.setupDefineJmxConnection();
 
-        final DialogDescriptor dd = new DialogDescriptor(hc, "Add JMX Connection",
+        final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Add_JMX_Connection"),   // NOI18N
                 true, new Object[]{hc.okButton, DialogDescriptor.CANCEL_OPTION},
                 hc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
@@ -187,7 +188,7 @@ class JmxApplicationConfigurator extends JPanel {
         GridBagConstraints constraints;
 
         // connectionLabel
-        connectionLabel = new JLabel("Connection:");
+        connectionLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Connection"));  // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -225,7 +226,7 @@ class JmxApplicationConfigurator extends JPanel {
         Font normalLabelFont = connectionLabel.getFont();
         Font smallLabelFont =
                 normalLabelFont.deriveFont(normalLabelFont.getSize2D() - 1);
-        usageLabel = new JLabel("<html><nobr><b>Usage</b>: &lt;hostname&gt;:&lt;port&gt; OR service:jmx:&lt;protocol&gt;:&lt;sap&gt;</nobr></html>");
+        usageLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Usage"));    // NOI18N
         usageLabel.setFont(smallLabelFont);
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -237,7 +238,7 @@ class JmxApplicationConfigurator extends JPanel {
         add(usageLabel, constraints);
 
         // displaynameCheckbox
-        displaynameCheckbox = new JCheckBox("Display name:");
+        displaynameCheckbox = new JCheckBox(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Display_name")); // NOI18N
         displaynameCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();
@@ -277,7 +278,7 @@ class JmxApplicationConfigurator extends JPanel {
         add(displaynameField, constraints);
 
         // securityCheckbox
-        securityCheckbox = new JCheckBox("Use security credentials");
+        securityCheckbox = new JCheckBox(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Use_security_credentials"));    // NOI18N
         securityCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();
@@ -293,7 +294,7 @@ class JmxApplicationConfigurator extends JPanel {
         add(securityCheckbox, constraints);
 
         // usernameLabel
-        usernameLabel = new JLabel("Username:");
+        usernameLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Username"));  // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
@@ -328,7 +329,7 @@ class JmxApplicationConfigurator extends JPanel {
         add(usernameField, constraints);
 
         // passwordLabel
-        passwordLabel = new JLabel("Password:");
+        passwordLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Password"));  // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 5;
@@ -363,7 +364,7 @@ class JmxApplicationConfigurator extends JPanel {
         add(passwordField, constraints);
 
         // saveCheckbox
-        saveCheckbox = new JCheckBox("Save security credentials");
+        saveCheckbox = new JCheckBox(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Save_security_credentials"));   // NOI18N
         saveCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();
@@ -392,7 +393,7 @@ class JmxApplicationConfigurator extends JPanel {
         add(spacer, constraints);
 
         // okButton
-        okButton = new JButton("OK");
+        okButton = new JButton(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_OK"));    // NOI18N
         okButton.setEnabled(false);
 
         // UI tweaks

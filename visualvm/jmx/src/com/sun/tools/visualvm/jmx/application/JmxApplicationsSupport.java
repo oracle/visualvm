@@ -40,7 +40,7 @@ import java.io.File;
  */
 public class JmxApplicationsSupport {
     
-    private static final String STORAGE_DIRNAME = "jmxapplications";
+    private static final String STORAGE_DIRNAME = "jmxapplications";    // NOI18N
     
     private static final Object storageDirectoryLock = new Object();
     // @GuardedBy storageDirectoryLock
@@ -64,11 +64,11 @@ public class JmxApplicationsSupport {
                 String storageString = getStorageDirectoryString();
                 storageDirectory = new File(storageString);
                 if (storageDirectory.exists() && storageDirectory.isFile())
-                    throw new IllegalStateException("Cannot create hosts storage directory " + storageString + ", file in the way");
-                if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite()))
-                    throw new IllegalStateException("Cannot access hosts storage directory " + storageString + ", read&write permission required");
+                    throw new IllegalStateException("Cannot create hosts storage directory " + storageString + ", file in the way");    // NOI18N
+                if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite())) 
+                    throw new IllegalStateException("Cannot access hosts storage directory " + storageString + ", read&write permission required"); // NOI18N
                 if (!Utils.prepareDirectory(storageDirectory))
-                    throw new IllegalStateException("Cannot create hosts storage directory " + storageString);
+                    throw new IllegalStateException("Cannot create hosts storage directory " + storageString);  // NOI18N
             }
             return storageDirectory;
         }

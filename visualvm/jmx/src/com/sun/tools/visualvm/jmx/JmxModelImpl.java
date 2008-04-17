@@ -116,8 +116,8 @@ import sun.rmi.transport.LiveRef;
  * @author Luis-Miguel Alventosa
  */
 public class JmxModelImpl extends JmxModel {
-    private static final String PROPERTY_USERNAME = "prop_username";
-    private static final String PROPERTY_PASSWORD = "prop_password";
+    private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
+    private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
     private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());
     private ProxyClient client;
     private ApplicationRemovedListener listener;
@@ -138,16 +138,16 @@ public class JmxModelImpl extends JmxModel {
             } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvmstat.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
-                String javaHome = jvmstat.findByName("java.property.java.home");
+                String javaHome = jvmstat.findByName("java.property.java.home");    // NOI18N
                 LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvmstatModel.isAttachable(), connectorAddress, javaHome);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
                         proxyClient = new ProxyClient(this, lvm);
                     } else {
                         if (LOGGER.isLoggable(Level.WARNING)) {
-                            LOGGER.warning("The JMX management agent " +
-                                    "cannot be enabled in this application (pid " +
-                                    application.getPid() + ")"); // NOI18N
+                            LOGGER.warning("The JMX management agent " +    // NOI18N
+                                    "cannot be enabled in this application (pid " + // NOI18N
+                                    application.getPid() + ")"); 
                         }
                     }
                 } else {
@@ -161,7 +161,7 @@ public class JmxModelImpl extends JmxModel {
                 if (urls.size() != 0) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
                     proxyClient = new ProxyClient(this, urls.get(0), null, null);
-                    if ("true".equals(auths.get(0))) {
+                    if ("true".equals(auths.get(0))) {  // NOI18N
                         supplyCredentials(application, proxyClient);
                     }
                 } else {
@@ -195,7 +195,7 @@ public class JmxModelImpl extends JmxModel {
                 connect(application, proxyClient, listener);
             }
         } catch (Exception e) {
-            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e);
+            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
             client = null;
         }
     }
@@ -216,7 +216,7 @@ public class JmxModelImpl extends JmxModel {
             listener = new ApplicationRemovedListener(proxyClient);
             connect(application, proxyClient, listener);
         } catch (Exception e) {
-            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e);
+            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
             client = null;
         }
     }
@@ -347,16 +347,16 @@ public class JmxModelImpl extends JmxModel {
             this.model = model;
             this.connectionName = getConnectionName(hostName, port, userName);
             this.displayName = connectionName;
-            if (hostName.equals("localhost") && port == 0) {
+            if (hostName.equals("localhost") && port == 0) {    // NOI18N
                 // Monitor self
                 this.hostName = hostName;
                 this.port = port;
             } else {
                 // Create an RMI connector client and connect it to
                 // the RMI connector server
-                final String urlPath = "/jndi/rmi://" + hostName + ":" + port +
-                        "/jmxrmi";
-                JMXServiceURL url = new JMXServiceURL("rmi", "", 0, urlPath);
+                final String urlPath = "/jndi/rmi://" + hostName + ":" + port + // NOI18N
+                        "/jmxrmi";  // NOI18N
+                JMXServiceURL url = new JMXServiceURL("rmi", "", 0, urlPath);   // NOI18N
                 setParameters(url, userName, password);
                 vmConnector = true;
                 registryHostName = hostName;
@@ -399,14 +399,14 @@ public class JmxModelImpl extends JmxModel {
             if (stub.getClass() != stubClass) {
                 if (!Proxy.isProxyClass(stub.getClass())) {
                     throw new SecurityException(
-                            "Expecting a " + stubClass.getName() + " stub!");
+                            "Expecting a " + stubClass.getName() + " stub!");   // NOI18N
                 } else {
                     InvocationHandler handler = Proxy.getInvocationHandler(stub);
                     if (handler.getClass() != RemoteObjectInvocationHandler.class) {
                         throw new SecurityException(
-                                "Expecting a dynamic proxy instance with a " +
+                                "Expecting a dynamic proxy instance with a " +  // NOI18N
                                 RemoteObjectInvocationHandler.class.getName() +
-                                " invocation handler!");
+                                " invocation handler!");    // NOI18N
                     } else {
                         stub = (Remote) handler;
                     }
@@ -418,8 +418,8 @@ public class JmxModelImpl extends JmxModel {
             RemoteRef ref = ((RemoteObject) stub).getRef();
             if (ref.getClass() != UnicastRef2.class) {
                 throw new SecurityException(
-                        "Expecting a " + UnicastRef2.class.getName() +
-                        " remote reference in stub!");
+                        "Expecting a " + UnicastRef2.class.getName() +  // NOI18N
+                        " remote reference in stub!");  // NOI18N
             }
             // Check RMIClientSocketFactory in stub is from the expected class
             // "javax.rmi.ssl.SslRMIClientSocketFactory".
@@ -428,12 +428,12 @@ public class JmxModelImpl extends JmxModel {
             RMIClientSocketFactory csf = liveRef.getClientSocketFactory();
             if (csf == null || csf.getClass() != SslRMIClientSocketFactory.class) {
                 throw new SecurityException(
-                        "Expecting a " + SslRMIClientSocketFactory.class.getName() +
-                        " RMI client socket factory in stub!");
+                        "Expecting a " + SslRMIClientSocketFactory.class.getName() +    // NOI18N
+                        " RMI client socket factory in stub!"); // NOI18N
             }
         }
         private static final String rmiServerImplStubClassName =
-                "javax.management.remote.rmi.RMIServerImpl_Stub";
+                "javax.management.remote.rmi.RMIServerImpl_Stub";   // NOI18N
         private static final Class<? extends Remote> rmiServerImplStubClass;
         
 
@@ -457,7 +457,7 @@ public class JmxModelImpl extends JmxModel {
                 registry = LocateRegistry.getRegistry(registryHostName,
                         registryPort, sslRMIClientSocketFactory);
                 try {
-                    stub = (RMIServer) registry.lookup("jmxrmi");
+                    stub = (RMIServer) registry.lookup("jmxrmi");   // NOI18N
                 } catch (NotBoundException nbe) {
                     throw (IOException) new IOException(nbe.getMessage()).initCause(nbe);
                 }
@@ -466,7 +466,7 @@ public class JmxModelImpl extends JmxModel {
                 registry =
                         LocateRegistry.getRegistry(registryHostName, registryPort);
                 try {
-                    stub = (RMIServer) registry.lookup("jmxrmi");
+                    stub = (RMIServer) registry.lookup("jmxrmi");   // NOI18N
                 } catch (NotBoundException nbe) {
                     throw (IOException) new IOException(nbe.getMessage()).initCause(nbe);
                 }
@@ -493,8 +493,8 @@ public class JmxModelImpl extends JmxModel {
             //
             if (!isVmConnector()) {
                 throw new UnsupportedOperationException(
-                        "ProxyClient.isSslRmiRegistry() is only supported if this " +
-                        "ProxyClient is a JMX connector for a JMX VM agent");
+                        "ProxyClient.isSslRmiRegistry() is only supported if this " +   // NOI18N
+                        "ProxyClient is a JMX connector for a JMX VM agent");   // NOI18N
             }
             return sslRegistry;
         }
@@ -510,8 +510,8 @@ public class JmxModelImpl extends JmxModel {
             //
             if (!isVmConnector()) {
                 throw new UnsupportedOperationException(
-                        "ProxyClient.isSslRmiStub() is only supported if this " +
-                        "ProxyClient is a JMX connector for a JMX VM agent");
+                        "ProxyClient.isSslRmiStub() is only supported if this " +   // NOI18N
+                        "ProxyClient is a JMX connector for a JMX VM agent");   // NOI18N
             }
             return sslStub;
         }
@@ -546,14 +546,14 @@ public class JmxModelImpl extends JmxModel {
             } catch (Exception e) {
                 setConnectionState(ConnectionState.DISCONNECTED);
                 // Workaround for GlassFish's LoginException class not found
-                if (e.toString().contains("com.sun.enterprise.security.LoginException")) {
-                    throw new SecurityException("Authentication failed! Invalid username or password");
+                if (e.toString().contains("com.sun.enterprise.security.LoginException")) {  // NOI18N
+                    throw new SecurityException("Authentication failed! Invalid username or password"); // NOI18N
                 }
             }
         }
 
         private void tryConnect() throws IOException {
-            if (jmxUrl == null && "localhost".equals(hostName) && port == 0) {
+            if (jmxUrl == null && "localhost".equals(hostName) && port == 0) {  // NOI18N
                 jmxc = null;
                 conn = ManagementFactory.getPlatformMBeanServer();
             } else {
@@ -562,7 +562,7 @@ public class JmxModelImpl extends JmxModel {
                         lvm.startManagementAgent();
                         if (!lvm.isManageable()) {
                             // FIXME: what to throw
-                            throw new IOException(lvm + " not manageable");
+                            throw new IOException(lvm + " not manageable"); // NOI18N
                         }
                     }
                     if (jmxUrl == null) {
@@ -773,8 +773,8 @@ public class JmxModelImpl extends JmxModel {
                 if (EventQueue.isDispatchThread()) {
                     Throwable thrwbl = new Throwable();
 
-                    LOGGER.log(Level.FINE, createTracedMessage("MBeanServerConnection call " +
-                            "performed on Event Dispatch Thread!", thrwbl));
+                    LOGGER.log(Level.FINE, createTracedMessage("MBeanServerConnection call " +  // NOI18N
+                            "performed on Event Dispatch Thread!", thrwbl));    // NOI18N
                 }
             }
             // Invoke MBeanServerConnection call
@@ -830,15 +830,15 @@ public class JmxModelImpl extends JmxModel {
             }
 
             if (!isAttachable()) {
-                throw new IOException("This virtual machine \"" + vmid +
-                        "\" does not support dynamic attach.");
+                throw new IOException("This virtual machine \"" + vmid +    // NOI18N
+                        "\" does not support dynamic attach."); // NOI18N
             }
 
             loadManagementAgent();
             // fails to load or start the management agent
             if (address == null) {
                 // should never reach here
-                throw new IOException("Fails to find connector address");
+                throw new IOException("Fails to find connector address");   // NOI18N
             }
         }
 
@@ -847,7 +847,7 @@ public class JmxModelImpl extends JmxModel {
             return address;
         }
         private static final String LOCAL_CONNECTOR_ADDRESS_PROP =
-                "com.sun.management.jmxremote.localConnectorAddress";
+                "com.sun.management.jmxremote.localConnectorAddress";   // NOI18N
 
         // load the management agent into the target VM
         private synchronized void loadManagementAgent() throws IOException {
@@ -863,21 +863,21 @@ public class JmxModelImpl extends JmxModel {
             // Normally in ${java.home}/jre/lib/management-agent.jar but might
             // be in ${java.home}/lib in build environments.
 
-            String agent = javaHome + File.separator + "jre" + File.separator +
-                    "lib" + File.separator + "management-agent.jar";
+            String agent = javaHome + File.separator + "jre" + File.separator + // NOI18N
+                    "lib" + File.separator + "management-agent.jar";    // NOI18N
             File f = new File(agent);
             if (!f.exists()) {
-                agent = javaHome + File.separator + "lib" + File.separator +
-                        "management-agent.jar";
+                agent = javaHome + File.separator + "lib" + File.separator +    // NOI18N
+                        "management-agent.jar"; // NOI18N
                 f = new File(agent);
                 if (!f.exists()) {
-                    throw new IOException("Management agent not found");
+                    throw new IOException("Management agent not found");    // NOI18N
                 }
             }
 
             agent = f.getCanonicalPath();
             try {
-                vm.loadAgent(agent, "com.sun.management.jmxremote");
+                vm.loadAgent(agent, "com.sun.management.jmxremote");    // NOI18N
             } catch (AgentLoadException x) {
                 IOException ioe = new IOException(x.getMessage());
                 ioe.initCause(x);

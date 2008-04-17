@@ -41,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -52,7 +53,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         ApplicationSecurityConfigurator asc = new ApplicationSecurityConfigurator();
         asc.setupDefineCredentials();
 
-        final String title = "Supply Security Credentials: " + url;
+        final String title = NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Supply_Security_Credentials") + url;   // NOI18N
         final DialogDescriptor dd = new DialogDescriptor(
                 asc, title, true,
                 new Object[]{asc.okButton, DialogDescriptor.CANCEL_OPTION},
@@ -103,7 +104,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         GridBagConstraints constraints;
 
         // usernameLabel
-        usernameLabel = new JLabel("Username:");
+        usernameLabel = new JLabel(NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Username")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -138,7 +139,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         add(usernameField, constraints);
 
         // passwordLabel
-        passwordLabel = new JLabel("Password:");
+        passwordLabel = new JLabel(NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Password")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -186,7 +187,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         add(spacer, constraints);
 
         // okButton
-        okButton = new JButton("OK");
+        okButton = new JButton(NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_OK"));   // NOI18N
     }
 
     private JLabel usernameLabel;

@@ -31,6 +31,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
@@ -41,7 +42,7 @@ import org.openide.util.Utilities;
  */
 class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/jmx/application/resources/addJmxApplication.png";
+    private static final String ICON_PATH = "com/sun/tools/visualvm/jmx/application/resources/addJmxApplication.png";   // NOI18N
     private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;
@@ -54,7 +55,7 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
         if (alwaysEnabled == null) {
             alwaysEnabled = new AddJMXConnectionAction();
             alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
-            alwaysEnabled.putValue("iconBase", ICON_PATH);
+            alwaysEnabled.putValue("iconBase", ICON_PATH);  // NOI18N
         }
         return alwaysEnabled;
     }
@@ -94,7 +95,7 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     private AddJMXConnectionAction() {
         super(Host.class);
-        putValue(NAME, "Add JMX Connection...");
-        putValue(SHORT_DESCRIPTION, "Add JMX Connection");
+        putValue(NAME, NbBundle.getMessage(AddJMXConnectionAction.class, "MSG_Add_JMX_Connection"));    // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(AddJMXConnectionAction.class, "ToolTip_Add_JMX_Connection"));   // NOI18N
     }
 }

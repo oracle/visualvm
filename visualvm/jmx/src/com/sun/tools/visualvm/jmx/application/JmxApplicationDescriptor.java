@@ -35,7 +35,7 @@ import org.openide.util.Utilities;
  */
 public class JmxApplicationDescriptor extends ApplicationDescriptor {
      
-    private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/jmx/application/resources/jmxBadge.png", true);
+    private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/jmx/application/resources/jmxBadge.png", true); // NOI18N
      
 
     protected JmxApplicationDescriptor(JmxApplication application) {
