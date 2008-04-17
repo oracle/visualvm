@@ -50,6 +50,7 @@ import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
+import sun.net.util.IPAddressUtil;
 
 /**
  *
@@ -113,14 +114,14 @@ class JmxApplicationConfigurator extends JPanel {
 
     private void setupDefineJmxConnection() {
         connectionField.setEnabled(true);
-        connectionField.setText("");
+        connectionField.setText(""); // NOI18N
         displaynameCheckbox.setSelected(false);
         displaynameCheckbox.setEnabled(true);
-        displaynameField.setText("");
+        displaynameField.setText(""); // NOI18N
         securityCheckbox.setSelected(false);
         securityCheckbox.setEnabled(true);
-        usernameField.setText("");
-        passwordField.setText("");
+        usernameField.setText(""); // NOI18N
+        passwordField.setText(""); // NOI18N
         saveCheckbox.setSelected(false);
         saveCheckbox.setEnabled(false);
         
@@ -130,7 +131,7 @@ class JmxApplicationConfigurator extends JPanel {
         DataSource selectedDataSource = selectedDataSources.iterator().next();
         if (!(selectedDataSource instanceof Host)) return;
         Host host = (Host)selectedDataSource;
-        connectionField.setText(host.getHostName() + ":");
+        connectionField.setText(host.getHostName() + ":"); // NOI18N
     }
 
     private void update() {
@@ -145,7 +146,7 @@ class JmxApplicationConfigurator extends JPanel {
                 if (!displaynameCheckbox.isSelected()) {
                     internalChange = true;
                     displaynameField.setText(
-                            (username.isEmpty() ? "" : username + "@") + url);
+                            (username.isEmpty() ? "" : username + "@") + url); // NOI18N
                     internalChange = false;
                 }
 
@@ -162,25 +163,63 @@ class JmxApplicationConfigurator extends JPanel {
     }
 
     private boolean enableOkButton(String url, String displayname) {
-        if (url.startsWith("service:jmx:")) { // NOI18N
-            return displayname.length() > 0;
-        } else {
-            int index = url.lastIndexOf(":"); // NOI18N
-            if (index == -1) {
-                return false;
-            }
-            String host = url.substring(0, index);
-            String port = url.substring(index + 1);
-            if (host.length() > 0 && port.length() > 0) {
-                try {
-                    Integer.parseInt(port.trim());
-                    return displayname.length() > 0;
-                } catch (NumberFormatException e) {
-                    return false;
+        return isValidRemoteString(url) && displayname.length() > 0;
+    }
+
+    private static boolean isValidRemoteString(String txt) {
+        boolean valid = false;
+        if (txt != null) {
+            txt = txt.trim();
+            if (txt.startsWith("service:jmx:")) { // NOI18N
+                if (txt.length() > "service:jmx:".length()) { // NOI18N
+                    valid = true;
+                }
+            } else {
+                //---------------------------------------
+                // Supported host and port combinations:
+                //     hostname:port
+                //     IPv4Address:port
+                //     [IPv6Address]:port
+                //---------------------------------------
+
+                // Is literal IPv6 address?
+                //
+                if (txt.startsWith("[")) { // NOI18N
+                    int index = txt.indexOf("]:"); // NOI18N
+                    if (index != -1) {
+                        // Extract literal IPv6 address
+                        //
+                        String address = txt.substring(1, index);
+                        if (IPAddressUtil.isIPv6LiteralAddress(address)) {
+                            // Extract port
+                            //
+                            try {
+                                String portStr = txt.substring(index + 2);
+                                int port = Integer.parseInt(portStr);
+                                if (port >= 0 && port <= 0xFFFF) {
+                                    valid = true;
+                                }
+                            } catch (NumberFormatException ex) {
+                                valid = false;
+                            }
+                        }
+                    }
+                } else {
+                    String[] s = txt.split(":"); // NOI18N
+                    if (s.length == 2) {
+                        try {
+                            int port = Integer.parseInt(s[1]);
+                            if (port >= 0 && port <= 0xFFFF) {
+                                valid = true;
+                            }
+                        } catch (NumberFormatException ex) {
+                            valid = false;
+                        }
+                    }
                 }
             }
         }
-        return false;
+        return valid;
     }
 
     private void initComponents() {
