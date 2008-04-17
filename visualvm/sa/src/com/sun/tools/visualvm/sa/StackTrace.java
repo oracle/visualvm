@@ -29,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -53,26 +55,31 @@ class StackTrace {
         SAObject curThread = threads.invokeSA("first"); // NOI18N
 
         for (;!curThread.isNull();curThread=curThread.invokeSA("next")) {   // NOI18N
-            Boolean isJavaThread = (Boolean) curThread.invoke("isJavaThread");  // NOI18N
-            if (!isJavaThread.booleanValue()) {
-                out.print("VM ");   // NOI18N
-            }
-            out.print("Thread ");   // NOI18N
-            curThread.invoke("printThreadIDOn",out);    // NOI18N
-            out.print(" \""+curThread.invoke("getThreadName")+"\"");    // NOI18N
-            out.print(": (state = ");   // NOI18N
-            out.print(curThread.invoke("getThreadState"));  // NOI18N
-            out.println(")");
-            if (isJavaThread.booleanValue()) { // Java thread
-                SAObject javaFrame = curThread.invokeSA("getLastJavaVFrameDbg");    // NOI18N
-                Object waitingToLockMonitor = curThread.invoke("getCurrentPendingMonitor"); // NOI18N
-                boolean objectWaitFrame = isJavaLangObjectWaitFrame(javaFrame);
-                for (;!javaFrame.isNull();javaFrame=javaFrame.invokeSA("javaSender")) { // NOI18N
-                    printJavaFrame(out, javaFrame);
-                    printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
-                    waitingToLockMonitor = null;
-                    objectWaitFrame = false;
+            try {
+                Boolean isJavaThread = (Boolean) curThread.invoke("isJavaThread");  // NOI18N
+                if (!isJavaThread.booleanValue()) {
+                    out.print("VM ");   // NOI18N
                 }
+                out.print("Thread ");   // NOI18N
+                curThread.invoke("printThreadIDOn",out);    // NOI18N
+                out.print(" \""+curThread.invoke("getThreadName")+"\"");    // NOI18N
+                out.print(": (state = ");   // NOI18N
+                out.print(curThread.invoke("getThreadState"));  // NOI18N
+                out.println(")");
+                if (isJavaThread.booleanValue()) { // Java thread
+                    SAObject javaFrame = curThread.invokeSA("getLastJavaVFrameDbg");    // NOI18N
+                    Object waitingToLockMonitor = curThread.invoke("getCurrentPendingMonitor"); // NOI18N
+                    boolean objectWaitFrame = isJavaLangObjectWaitFrame(javaFrame);
+                    for (;!javaFrame.isNull();javaFrame=javaFrame.invokeSA("javaSender")) { // NOI18N
+                        printJavaFrame(out, javaFrame);
+                        printMonitors(out, javaFrame, waitingToLockMonitor, objectWaitFrame);
+                        waitingToLockMonitor = null;
+                        objectWaitFrame = false;
+                    }
+                }
+            } catch (Exception ex) {
+                out.println("\t-- Error occurred during stack walking");
+                Logger.getLogger(StackTrace.class.getName()).log(Level.INFO,"getStackTrace",ex);
             }
             out.println();
         }
