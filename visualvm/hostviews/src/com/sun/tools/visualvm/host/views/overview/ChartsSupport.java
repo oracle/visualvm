@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -120,7 +121,7 @@ class ChartsSupport {
   public static class CPUMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"Load average"}, new Color[] { new Color(255, 127, 127)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Load_average")}, new Color[] { new Color(255, 127, 127)} );   // NOI18N
     }
 
     protected SynchronousXYChart createChart() {
@@ -154,7 +155,7 @@ class ChartsSupport {
   public static class PhysicalMemoryMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"Used memory"}, new Color[] { new Color(255, 127, 127)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Used_memory")}, new Color[] { new Color(255, 127, 127)} );    // NOI18N
     }
 
     protected SynchronousXYChart createChart() {
@@ -188,7 +189,7 @@ class ChartsSupport {
   public static class SwapMemoryMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"Used swap"}, new Color[] { new Color(255, 127, 127)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Used_swap")}, new Color[] { new Color(255, 127, 127)} );  // NOI18N
     }
 
     protected SynchronousXYChart createChart() {

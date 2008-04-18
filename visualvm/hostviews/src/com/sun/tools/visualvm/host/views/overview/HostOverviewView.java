@@ -50,6 +50,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -58,14 +59,14 @@ import org.openide.util.Utilities;
  */
 class HostOverviewView extends DataSourceView implements DataRemovedListener<Host> {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";    // NOI18N
 
     private Timer timer;
     private HostOverview hostOverview;
     
 
     public HostOverviewView(Host host) {
-        super(host, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);
+        super(host, NbBundle.getMessage(HostOverviewView.class, "LBL_Overview"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
     protected void willBeAdded() {
@@ -87,11 +88,11 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                 new DataViewComponent.MasterViewConfiguration(false));
         
         final CpuLoadViewSupport cpuLoadViewSupport = new CpuLoadViewSupport(hostOverview);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("CPU", true), DataViewComponent.TOP_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(HostOverviewView.class, "LBL_CPU"), true), DataViewComponent.TOP_LEFT); // NOI18N
         dvc.addDetailsView(cpuLoadViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         final PhysicalMemoryViewSupport physicalMemoryViewSupport = new PhysicalMemoryViewSupport();
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Memory", true), DataViewComponent.TOP_RIGHT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(HostOverviewView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT); // NOI18N
         dvc.addDetailsView(physicalMemoryViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
         final SwapMemoryViewSupport swapMemoryViewSupport = new SwapMemoryViewSupport();
@@ -127,7 +128,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Overview", null, this);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(HostOverviewView.class, "LBL_Overview"), null, this);   // NOI18N
         }
         
         
@@ -135,29 +136,37 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralInfo(host) + "</nobr>");
+            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralInfo(host) + "</nobr>");  // NOI18N
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             
             add(area, BorderLayout.CENTER);
         }
         
         String getGeneralInfo(Host host) {
-            HostOverview os = HostOverviewFactory.getSystemOverviewFor(host);
+            HostOverview so = HostOverviewFactory.getSystemOverviewFor(host);
             StringBuilder data = new StringBuilder();
+            String hostIp = NbBundle.getMessage(HostOverviewView.class, "LBL_Host_IP"); // NOI18N
+            data.append("<b>"+ hostIp + ":</b>"+ so.getHostAddress() + "<br>"); // NOI18N
+            
+            String hostname = NbBundle.getMessage(HostOverviewView.class, "LBL_Hostname");  // NOI18N
+            data.append("<b>"+ hostname + ":</b>" + so.getHostName() + "<br><br>"); // NOI18N
 
-            data.append("<b>Host IP:</b> " + os.getHostAddress() + "<br>");
-            data.append("<b>Hostname:</b> " + os.getHostName() + "<br><br>");
+            String name = so.getName();
+            String ver = so.getVersion();
+            String patch = so.getPatchLevel();
 
-            String name = os.getName();
-            String ver = os.getVersion();
-            String patch = os.getPatchLevel();
-
-            patch = "unknown".equals(patch) ? "" : patch;
-            data.append("<b>OS:</b> " + name + " (" + ver + ")" + " " + patch + "<br>");
-            data.append("<b>Architecture:</b> " + os.getArch() + "<br>");
-            data.append("<b>Processors:</b> " + os.getAvailableProcessors() + "<br><br>");
-            data.append("<b>Total physical memory size:</b> " + formatBytes(os.getTotalPhysicalMemorySize()) + " MB<br>");
-            data.append("<b>Swap size:</b> " + formatBytes(os.getTotalSwapSpaceSize()) + " MB<br>");
+            patch = "unknown".equals(patch) ? "" : patch;   // NOI18N
+            String os = NbBundle.getMessage(HostOverviewView.class, "LBL_OS");  // NOI18N
+            String arch = NbBundle.getMessage(HostOverviewView.class, "LBL_Architecture");  // NOI18N
+            String proc = NbBundle.getMessage(HostOverviewView.class, "LBL_Processors");    // NOI18N
+            String memory = NbBundle.getMessage(HostOverviewView.class, "LBL_Total_memory_size");    // NOI18N
+            String swap = NbBundle.getMessage(HostOverviewView.class, "LBL_Swap_size"); // NOI18N
+            String mb = NbBundle.getMessage(HostOverviewView.class, "LBL_MB");  // NOI18N
+            data.append("<b>"+os+":</b> " + name + " (" + ver + ")" + " " + patch + "<br>");    // NOI18N
+            data.append("<b>"+arch+":</b> " + so.getArch() + "<br>");   // NOI18N
+            data.append("<b>"+proc+":</b> " + so.getAvailableProcessors() + "<br><br>");    // NOI18N
+            data.append("<b>"+memory+":</b> " + formatBytes(so.getTotalPhysicalMemorySize()) + " "+mb+"<br>");  // NOI18N
+            data.append("<b>"+swap+":</b> " + formatBytes(so.getTotalSwapSpaceSize()) + " "+mb+"<br>"); // NOI18N
 
             return data.toString();
         }
@@ -177,7 +186,8 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         private ChartsSupport.Chart cpuMetricsChart;
         private HTMLLabel loadLabel;
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String LOAD_AVERAGE = NbBundle.getMessage(HostOverviewView.class, "LBL_Load_average"); // NOI18N
         
         public CpuLoadViewSupport(HostOverview hostOverview) {
             cpuMonitoringSupported = hostOverview.getSystemLoadAverage() >= 0;
@@ -185,15 +195,15 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("CPU load", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(HostOverviewView.class, "LBL_CPU_load"), null, 10, this, null);    // NOI18N
         }
         
         public void refresh(HostOverview hostOverview, long time) {
             if (cpuMonitoringSupported) {
                 double load = hostOverview.getSystemLoadAverage();
                 cpuMetricsChart.getModel().addItemValues(time, new long[] { (long)(load*1000) });
-                loadLabel.setText("<nobr><b>Load average:</b> " + formatter.format(load) + " </nobr>");
-                cpuMetricsChart.setToolTipText("<html><nobr><b>Load average:</b> " + formatter.format(load) + " </nobr></html>");
+                loadLabel.setText("<nobr><b>"+LOAD_AVERAGE+":</b> " + formatter.format(load) + " </nobr>"); // NOI18N
+                cpuMetricsChart.setToolTipText("<html><nobr><b>"+LOAD_AVERAGE+":</b> " + formatter.format(load) + " </nobr></html>");   // NOI18N
             }
         }
         
@@ -210,7 +220,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              loadLabel.setText("<nobr><b>Load average:</b></nobr>");
+              loadLabel.setText("<nobr><b>"+LOAD_AVERAGE+":</b></nobr>");   // NOI18N
               loadLabel.setOpaque(false);
               final JPanel cpuMetricsDataPanel = new JPanel(new GridLayout(1, 2));
               cpuMetricsDataPanel.setOpaque(false);
@@ -264,14 +274,16 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         private HTMLLabel usedMemoryLabel;
         private HTMLLabel totalMemoryLabel;
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
-        
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static String USED_MEMORY = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_memory"); // NOI18N
+        private static String TOTAL_MEMORY = NbBundle.getMessage(HostOverviewView.class, "LBL_Total_memory");   // NOI18N
+
         public PhysicalMemoryViewSupport() {
             initComponents();
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Physical memory", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(HostOverviewView.class, "LBL_Physical_memory"), null, 10, this, null); // NOI18N
         }
         
         public void refresh(HostOverview hostOverview, long time) {
@@ -279,11 +291,11 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             long memoryUsed = memoryMax - hostOverview.getFreePhysicalMemorySize();
 
             memoryMetricsChart.getModel().addItemValues(time, new long[] { memoryUsed });
-            usedMemoryLabel.setText("<nobr><b>Used memory:</b> " + formatter.format(memoryUsed) + " </nobr>");
-            totalMemoryLabel.setText("<nobr><b>Total memory:</b> " + formatter.format(memoryMax) + " </nobr>");
+            usedMemoryLabel.setText("<nobr><b>"+USED_MEMORY+":</b> " + formatter.format(memoryUsed) + " </nobr>");  // NOI18N
+            totalMemoryLabel.setText("<nobr><b>"+TOTAL_MEMORY+":</b> " + formatter.format(memoryMax) + " </nobr>"); // NOI18N
             memoryMetricsChart.setToolTipText(
-                            "<html><nobr><b>Used memory:</b> " + formatter.format(memoryUsed) + " </nobr>" + "<br>" + 
-                            "<nobr><b>Total memory:</b> " + formatter.format(memoryMax) + " </nobr></html>");
+                            "<html><nobr><b>"+USED_MEMORY+":</b> " + formatter.format(memoryUsed) + " </nobr>" + "<br>" +   // NOI18N
+                            "<nobr><b>"+TOTAL_MEMORY+":</b> " + formatter.format(memoryMax) + " </nobr></html>");   // NOI18N
         }
         
         private void initComponents() {
@@ -296,14 +308,14 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              usedMemoryLabel.setText("<nobr><b>Used memory:</b></nobr>");
+              usedMemoryLabel.setText("<nobr><b>"+USED_MEMORY+":</b></nobr>");  // NOI18N
               usedMemoryLabel.setOpaque(false);
               totalMemoryLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              totalMemoryLabel.setText("<nobr><b>Total memory:</b></nobr>");
+              totalMemoryLabel.setText("<nobr><b>"+TOTAL_MEMORY+":</b></nobr>");    // NOI18N
               totalMemoryLabel.setOpaque(false);
               final JPanel memoryMetricsDataPanel = new JPanel(new GridLayout(1, 2));
               memoryMetricsDataPanel.setOpaque(false);
@@ -354,14 +366,16 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         private HTMLLabel usedSwapMemoryLabel;
         private HTMLLabel totalSwapMemoryLabel;
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
-        
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String USED_SWAP = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_swap");   // NOI18N
+        private static final String TOTAL_SWAP = NbBundle.getMessage(HostOverviewView.class, "LBL_Total_swap"); // NOI18N
+
         public SwapMemoryViewSupport() {
             initComponents();
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Swap memory", null, 20, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(HostOverviewView.class, "LBL_Swap_memory"), null, 20, this, null); // NOI18N
         }
         
         public void refresh(HostOverview hostOverview, long time) {
@@ -369,11 +383,11 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             long memorySwapUsed = memorySwapMax - hostOverview.getFreeSwapSpaceSize();
 
             memorySwapMetricsChart.getModel().addItemValues(time, new long[] { memorySwapUsed });
-            usedSwapMemoryLabel.setText("<nobr><b>Used swap:</b> " + formatter.format(memorySwapUsed) + " </nobr>");
-            totalSwapMemoryLabel.setText("<nobr><b>Total swap:</b> " + formatter.format(memorySwapMax) + " </nobr>");
+            usedSwapMemoryLabel.setText("<nobr><b>"+USED_SWAP+":</b> " + formatter.format(memorySwapUsed) + " </nobr>");    // NOI18N
+            totalSwapMemoryLabel.setText("<nobr><b>"+TOTAL_SWAP+":</b> " + formatter.format(memorySwapMax) + " </nobr>");   // NOI18N
             memorySwapMetricsChart.setToolTipText(
-                            "<html><nobr><b>Used swap:</b> " + formatter.format(memorySwapUsed) + " </nobr>" + "<br>" + 
-                            "<nobr><b>Total swap:</b> " + formatter.format(memorySwapMax) + " </nobr></html>");
+                            "<html><nobr><b>"+USED_SWAP+":</b> " + formatter.format(memorySwapUsed) + " </nobr>" + "<br>" +     // NOI18N
+                            "<nobr><b>"+TOTAL_SWAP+":</b> " + formatter.format(memorySwapMax) + " </nobr></html>"); // NOI18N
         }
         
         private void initComponents() {
@@ -386,14 +400,14 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              usedSwapMemoryLabel.setText("<nobr><b>Used memory:</b></nobr>");
+              usedSwapMemoryLabel.setText("<nobr><b>"+USED_SWAP+":</b></nobr>");    // NOI18N
               usedSwapMemoryLabel.setOpaque(false);
               totalSwapMemoryLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              totalSwapMemoryLabel.setText("<nobr><b>Swap memory:</b></nobr>");
+              totalSwapMemoryLabel.setText("<nobr><b>"+TOTAL_SWAP+":</b></nobr>");  // NOI18N
               totalSwapMemoryLabel.setOpaque(false);
               final JPanel memorySwapMetricsDataPanel = new JPanel(new GridLayout(1, 2));
               memorySwapMetricsDataPanel.setOpaque(false);
