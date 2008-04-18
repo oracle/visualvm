@@ -49,7 +49,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.Exceptions;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.windows.WindowManager;
 
@@ -103,7 +102,7 @@ public class HostProvider {
         }
 
         if (inetAddress != null) {
-            final HostImpl knownHost = getHostByAddress(inetAddress);
+            final Host knownHost = getHostByAddress(inetAddress);
             if (knownHost != null) {
                 if (interactive) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -154,12 +153,15 @@ public class HostProvider {
         if (owner != null) owner.getRepository().removeDataSource(host);
     }
     
-    public HostImpl getHostByAddress(InetAddress inetAddress) {
+    public Host getHostByAddress(InetAddress inetAddress) {
         waitForInitialization();
         
         Set<HostImpl> knownHosts = DataSourceRepository.sharedInstance().getDataSources(HostImpl.class);
         for (HostImpl knownHost : knownHosts)
             if (knownHost.getInetAddress().equals(inetAddress)) return knownHost;
+        
+        if (inetAddress.equals(Host.LOCALHOST.getInetAddress())) return Host.LOCALHOST;
+        
         return null;
     }
     
