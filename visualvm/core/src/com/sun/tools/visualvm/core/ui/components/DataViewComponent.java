@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
-import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -91,6 +90,21 @@ public final class DataViewComponent extends JPanel {
         if (verticalDividerResizeWeight != -1) detailsVerticalSplitter.setResizeWeight(verticalDividerResizeWeight);
         double verticalDividerLocation = detailsViewConfiguration.getVerticalDividerLocation();
         if (verticalDividerLocation != -1) detailsVerticalSplitter.setDividerLocation(verticalDividerLocation);
+    }
+    
+    public void showDetailsArea(int location) {
+        DisplayArea displayArea = getDisplayArea(location);
+        if (displayArea != null) displayArea.setVisible(true);
+    }
+    
+    public void hideDetailsArea(int location) {
+        DisplayArea displayArea = getDisplayArea(location);
+        if (displayArea != null) displayArea.setVisible(false);
+    }
+    
+    public boolean isDetailsAreaShown(int location) {
+        DisplayArea displayArea = getDisplayArea(location);
+        return displayArea != null ? displayArea.isVisible() : false;
     }
     
     // Configures area (closable etc.)
