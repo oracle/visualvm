@@ -304,6 +304,13 @@ class JmxApplicationProvider {
                         serviceURL.getURLPath().substring("/jndi/rmi://".length()); // NOI18N
                 if ('/' == urlPath.charAt(0)) {
                     hostname = "localhost"; // NOI18N
+                } else if ('[' == urlPath.charAt(0)) { // IPv6 address
+                    int closingSquareBracketIndex = urlPath.indexOf("]"); // NOI18N
+                    if (closingSquareBracketIndex == -1) {
+                        hostname = null;
+                    } else {
+                        hostname = urlPath.substring(0, closingSquareBracketIndex + 1);
+                    }
                 } else {
                     int colonIndex = urlPath.indexOf(":");
                     int slashIndex = urlPath.indexOf("/");
