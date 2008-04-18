@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.util.HashSet;
 import java.util.Set;
 
     
@@ -42,7 +43,7 @@ import java.util.Set;
  */
 class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     
-    private Set<Application> lastSelectedApplications;
+    private Set<Application> lastSelectedApplications = new HashSet();
     
     private static ApplicationSnapshotAction instance;
     
@@ -56,7 +57,7 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     private final DataChangeListener changeListener = new DataChangeListener() {
         public void dataChanged(DataChangeEvent event) {
             ApplicationSnapshotAction.super.updateState(ActionUtils.getSelectedDataSources(Application.class));
-    }
+        }
     };
     
         
@@ -79,18 +80,17 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     protected void updateState(Set<Application> selectedApplications) {
         super.updateState(selectedApplications);
     
-                if (lastSelectedApplications != null) {
-                    for (Application application : lastSelectedApplications)
+        if (!lastSelectedApplications.isEmpty())
+            for (Application application : lastSelectedApplications)
                 application.getRepository().removeDataChangeListener(changeListener);
-                    lastSelectedApplications = null;
-                }
+        lastSelectedApplications.clear();
         
-                if (!selectedApplications.isEmpty()) {
-                    lastSelectedApplications = selectedApplications;
-                    for (Application application : lastSelectedApplications)
+        if (!selectedApplications.isEmpty()) {
+            lastSelectedApplications.addAll(selectedApplications);
+            for (Application application : lastSelectedApplications)
                 application.getRepository().addDataChangeListener(changeListener, Snapshot.class);
-                }
-            }
+        }
+    }
 
     
     private ApplicationSnapshotAction() {

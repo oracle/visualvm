@@ -63,15 +63,15 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
     
     protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {
         for (DataSource dataSource : dataSources) {
-                        if (dataSource instanceof Application) {
-                            Application application = (Application)dataSource;
+            if (dataSource instanceof Application) {
+                Application application = (Application)dataSource;
                 HeapDumpSupport.getInstance().takeHeapDump(application, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
-                        } else if (dataSource instanceof CoreDump) {
-                            CoreDump coreDump = (CoreDump)dataSource;
+            } else if (dataSource instanceof CoreDump) {
+                CoreDump coreDump = (CoreDump)dataSource;
                 HeapDumpSupport.getInstance().takeHeapDump(coreDump, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
-                        }
-                    }
-                }
+            }
+        }
+    }
     
     protected boolean isEnabled(Set<DataSource> dataSources) {
         for (DataSource dataSource : dataSources)
@@ -86,10 +86,10 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
     }
     
     protected void updateState(Set<DataSource> dataSources) {
-        if (lastSelectedApplications == null) lastSelectedApplications = new HashSet();
         if (!lastSelectedApplications.isEmpty())
             for (Application application : lastSelectedApplications)
                 application.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        lastSelectedApplications.clear();
         super.updateState(dataSources);
     }
     

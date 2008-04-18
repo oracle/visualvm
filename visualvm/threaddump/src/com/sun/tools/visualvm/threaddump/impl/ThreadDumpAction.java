@@ -64,23 +64,23 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
     
     protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {
         for (DataSource dataSource : dataSources) {
-                        if (dataSource instanceof Application) {
-                            Application application = (Application)dataSource;
+            if (dataSource instanceof Application) {
+                Application application = (Application)dataSource;
                 ThreadDumpSupport.getInstance().takeThreadDump(application, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
-                        } else if (dataSource instanceof CoreDump) {
-                            CoreDump coreDump = (CoreDump)dataSource;
+            } else if (dataSource instanceof CoreDump) {
+                CoreDump coreDump = (CoreDump)dataSource;
                 ThreadDumpSupport.getInstance().takeThreadDump(coreDump, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
-                        }
-                    }
-                }
+            }
+        }
+    }
     
-        
+    
     protected boolean isEnabled(Set<DataSource> dataSources) {
         for (DataSource dataSource : dataSources)
             if (dataSource instanceof Application) {
                 // TODO: Listener should only be registered when thread dump is supported for the application
                 Application application = (Application)dataSource;
-                lastSelectedApplications.add(application);
+                    lastSelectedApplications.add(application);
                 application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
                 if (!ThreadDumpSupport.getInstance().supportsThreadDump((Application)dataSource)) return false;
             } else if (!(dataSource instanceof CoreDump)) return false;
@@ -88,10 +88,10 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
     }
     
     protected void updateState(Set<DataSource> dataSources) {
-        if (lastSelectedApplications == null) lastSelectedApplications = new HashSet();
         if (!lastSelectedApplications.isEmpty())
             for (Application application : lastSelectedApplications)
                 application.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        lastSelectedApplications.clear();
         super.updateState(dataSources);
     }
     
