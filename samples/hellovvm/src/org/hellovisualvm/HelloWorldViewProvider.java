@@ -26,15 +26,10 @@
 package org.hellovisualvm;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-
-/**
- *
- * @author geertjan
- */
 public class HelloWorldViewProvider extends DataSourceViewProvider<Application> {
 
     private static DataSourceViewProvider<Application> instance = new HelloWorldViewProvider();
@@ -46,9 +41,15 @@ public class HelloWorldViewProvider extends DataSourceViewProvider<Application> 
     }
 
     @Override
-    public synchronized DataSourceView createView(final Application application) {
+    protected DataSourceView createView(Application application) {
         return new HelloWorldView(application);
+    }
 
+    public boolean supportsSaveViewsFor(Application arg0) {
+        return false;
+    }
+
+    public void saveViews(Application arg0, Application arg1) {
     }
 
     static void initialize() {
@@ -58,5 +59,4 @@ public class HelloWorldViewProvider extends DataSourceViewProvider<Application> 
     static void unregister() {
         DataSourceViewsManager.sharedInstance().removeViewProvider(instance);
     }
-    
 }

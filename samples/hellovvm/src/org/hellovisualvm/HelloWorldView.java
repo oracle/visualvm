@@ -34,21 +34,17 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import org.openide.util.Utilities;
 
-/**
- *
- * @author geertjan
- */
 public class HelloWorldView extends DataSourceView {
 
     private DataViewComponent dvc;
-    //Reusing an image from the sources:
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/coredump.png"; // NOI18N
+    //Make sure there is an image at this location in your project:
+    private static final String IMAGE_PATH = "org/hellovisualvm/coredump.png"; // NOI18N
 
-    public HelloWorldView(Application application) {
-        super(application,"Hello World", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
+    public HelloWorldView(Application Application) {
+        //closeable/not = last boolean (closebale views for thread/heap/Application
+        super(Application,"Hello World", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
     }
 
-    @Override
     protected DataViewComponent createComponent() {
 
         //Data area for master view:
@@ -59,36 +55,20 @@ public class HelloWorldView extends DataSourceView {
         JPanel panel = new JPanel();
 
         //Master view:
-        DataViewComponent.MasterView masterView = new DataViewComponent.MasterView
-                ("Hello World Overview", null, generalDataArea);
+        DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Hello World Overview", null, generalDataArea);
 
         //Configuration of master view:
-        DataViewComponent.MasterViewConfiguration masterConfiguration = 
+        DataViewComponent.MasterViewConfiguration masterConfiguration =
                 new DataViewComponent.MasterViewConfiguration(false);
 
         //Add the master view and configuration view to the component:
         dvc = new DataViewComponent(masterView, masterConfiguration);
 
-        //Add configuration details to the component, which are the show/hide checkboxes at the top:
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
-                "Hello World Details 1", true), DataViewComponent.TOP_LEFT);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
-                "Hello World Details 2", true), DataViewComponent.TOP_RIGHT);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
-                "Hello World Details 3 & 4", true), DataViewComponent.BOTTOM_RIGHT);
-
         //Add detail views to the component:
         dvc.addDetailsView(new DataViewComponent.DetailsView(
                 "Hello World Details 1", null, 10, panel, null), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView(
-                "Hello World Details 2", null, 10, panel, null), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView(
-                "Hello World Details 3", null, 10, panel, null), DataViewComponent.BOTTOM_RIGHT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView(
-                "Hello World Details 4", null, 10, panel, null), DataViewComponent.BOTTOM_RIGHT);
 
         return dvc;
 
     }
-    
 }
