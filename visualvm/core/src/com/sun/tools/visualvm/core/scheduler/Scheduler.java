@@ -37,6 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.ProfilingResultsProvider.Dispatcher;
 
 /**
  * An interval based scheduler service
@@ -53,7 +54,8 @@ public class Scheduler implements PropertyChangeListener {
     private final Map<Quantum, Set<WeakReference<DefaultScheduledTask>>> interval2recevier = new HashMap<Quantum, Set<WeakReference<DefaultScheduledTask>>>();
     private final ScheduledExecutorService schedulerService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorService intermediateTaskService = Executors.newCachedThreadPool();
-
+    private final ExecutorService dispatcher = Executors.newCachedThreadPool();
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private Scheduler() {
     }
@@ -108,6 +110,7 @@ public class Scheduler implements PropertyChangeListener {
      * @param task The task to be unscheduled
      */
     public final void unschedule(final ScheduledTask task) {
+        if (task == null) return;
         remove((DefaultScheduledTask) task, task.getInterval());
         task.suspend();
     }
@@ -118,6 +121,8 @@ public class Scheduler implements PropertyChangeListener {
     }
 
     private void add(final DefaultScheduledTask task, final Quantum interval) {
+        if (task == null || interval == null) return;
+        
         synchronized (interval2recevier) {
             Set<WeakReference<DefaultScheduledTask>> receivers = interval2recevier.get(interval);
 
@@ -147,7 +152,7 @@ public class Scheduler implements PropertyChangeListener {
                                 int deadRefCounter = notifyReceivers(timeStamp, myReceivers);
 
                                 if (deadRefCounter > 0) {
-                                    Set<WeakReference<DefaultScheduledTask>> cleansed = cleanDeadRefs(interval, myReceivers);
+                                    Set<WeakReference<DefaultScheduledTask>> cleansed = cleanDeadRefs(myReceivers);
 
                                     synchronized (interval2recevier) {
                                         interval2recevier.remove(interval);
@@ -173,7 +178,7 @@ public class Scheduler implements PropertyChangeListener {
         task.addPropertyChangeListener(ScheduledTask.INTERVAL_PROPERTY, this);
     }
 
-    private static Set<WeakReference<DefaultScheduledTask>> cleanDeadRefs(Quantum interval, Set<WeakReference<DefaultScheduledTask>> tasks) {
+    private static Set<WeakReference<DefaultScheduledTask>> cleanDeadRefs(Set<WeakReference<DefaultScheduledTask>> tasks) {
         Set<WeakReference<DefaultScheduledTask>> newSet = new HashSet<WeakReference<DefaultScheduledTask>>();
 
         for (WeakReference<DefaultScheduledTask> task : tasks) {
@@ -185,11 +190,11 @@ public class Scheduler implements PropertyChangeListener {
         return newSet;
     }
 
-    private static int notifyReceivers(long timeStamp, Set<WeakReference<DefaultScheduledTask>> myReceivers) {
+    private int notifyReceivers(final long timeStamp, Set<WeakReference<DefaultScheduledTask>> myReceivers) {
         int deadRefCounter = 0;
 
         for (WeakReference<DefaultScheduledTask> rcvRef : myReceivers) {
-            DefaultScheduledTask rcv = rcvRef.get();
+            final DefaultScheduledTask rcv = rcvRef.get();
 
             if (rcv == null) {
                 deadRefCounter++;
@@ -200,7 +205,11 @@ public class Scheduler implements PropertyChangeListener {
                 continue;
             }
 
-            rcv.onSchedule(timeStamp);
+            dispatcher.submit(new Runnable() {
+                public void run() {
+                    rcv.onSchedule(timeStamp);
+                }
+            });
         }
 
         return deadRefCounter;
@@ -233,7 +242,7 @@ public class Scheduler implements PropertyChangeListener {
                 }
 
                 if (deadRefCounter > 0) {
-                    receivers = cleanDeadRefs(interval, receivers);
+                    receivers = cleanDeadRefs(receivers);
                     interval2recevier.remove(interval);
 
                     if (!receivers.isEmpty()) {

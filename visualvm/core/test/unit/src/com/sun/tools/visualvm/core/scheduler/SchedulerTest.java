@@ -153,7 +153,7 @@ public class SchedulerTest {
         ScheduledTask scheduled = instance.schedule(task, interval, false);
         stasks.add(scheduled);
         try {
-            boolean executed = barrier.await(5, TimeUnit.SECONDS);
+            boolean executed = barrier.await(8, TimeUnit.SECONDS);
             assertTrue(executed);
         } catch (InterruptedException e) {
             fail(e.getMessage());
@@ -206,7 +206,7 @@ public class SchedulerTest {
         final ScheduledTask scheduled = Scheduler.sharedInstance().schedule(task, Quantum.seconds(7), false);
         stasks.add(scheduled);
         try {
-            if (!barrier1.await(7, TimeUnit.SECONDS)) {
+            if (!barrier1.await(10, TimeUnit.SECONDS)) {
                 fail();
             }
             scheduled.setInterval(Quantum.seconds(2));
