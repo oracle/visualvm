@@ -213,7 +213,7 @@ class ApplicationMonitorView extends DataSourceView {
             JPanel buttonsArea = new JPanel(new BorderLayout());
             buttonsArea.setOpaque(false);
             JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
-            buttonsContainer.setOpaque(false);
+            buttonsContainer.setBackground(area.getBackground());
             buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             buttonsContainer.add(gcButton, BorderLayout.WEST);
             buttonsContainer.add(heapDumpButton, BorderLayout.EAST);
