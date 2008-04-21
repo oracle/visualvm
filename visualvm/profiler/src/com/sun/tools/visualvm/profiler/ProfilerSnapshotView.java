@@ -31,11 +31,16 @@ import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -43,9 +48,10 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 class ProfilerSnapshotView extends DataSourceView {
+    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotView.class.getName());
     
-    private LoadedSnapshot loadedSnapshot;
-    
+    private LoadedSnapshot loadedSnapshot = null;
+    private SnapshotResultsWindow srw = null;
 
     public ProfilerSnapshotView(ProfilerSnapshot snapshot) {
         this(snapshot, DataSourceDescriptorFactory.getDescriptor(snapshot));
@@ -58,10 +64,35 @@ class ProfilerSnapshotView extends DataSourceView {
     
         
     protected void removed() {
+        if (srw != null) {
+            IDEUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    try {
+                        Method method = srw.getClass().getDeclaredMethod("componentClosed");
+                        if (method != null) {
+                            method.setAccessible(true);
+                            method.invoke(srw);
+                        }
+                    } catch (NoSuchMethodException noSuchMethodException) {
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", noSuchMethodException);
+                    } catch (SecurityException securityException) {
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", securityException);
+                    } catch (IllegalAccessException illegalAccessException) {
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalAccessException);
+                    } catch (IllegalArgumentException illegalArgumentException) {
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalArgumentException);
+                    } catch (InvocationTargetException invocationTargetException) {
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", invocationTargetException);
+                    }
+                    srw = null;
+                }
+            });
+        }
         loadedSnapshot = null;
     }
     
     protected DataViewComponent createComponent() {
+        srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport().getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));
@@ -75,7 +106,6 @@ class ProfilerSnapshotView extends DataSourceView {
     private class MasterViewSupport extends JPanel  {
         
         public DataViewComponent.MasterView getMasterView() {
-            SnapshotResultsWindow srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
             srw.setPreferredSize(new Dimension(1, 1));
             return new DataViewComponent.MasterView(NbBundle.getMessage(ProfilerSnapshotView.class, "MSG_Profiler_Snapshot"), null, srw);   // NOI18N
         }
