@@ -48,9 +48,12 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.util.NbBundle;
@@ -124,7 +127,7 @@ public class CPUSettingsSupport {
             SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, instrFilterString);
         settings.setSelectedInstrumentationFilter(instrFilter);
         
-        String[] rootValues = getRootValues();
+        String[] rootValues = getRootValue().split(","); // NOI18N
         ClientUtils.SourceCodeSelection[] roots = (rootValues.length == 1 && rootValues[0].isEmpty()) ?
             new ClientUtils.SourceCodeSelection[0] :
             new ClientUtils.SourceCodeSelection[rootValues.length];
@@ -184,10 +187,10 @@ public class CPUSettingsSupport {
         
         if (defaultRootClasses.isEmpty()) {
             defaultInstrFilter = Utilities.isMac() ?
-                "sun.*, sunw.*, com.sun.*,\ncom.apple.*" : "sun.*, sunw.*, com.sun.*"; // NOI18N
+                "sun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*" : "sun.*, sunw.*, com.sun.*"; // NOI18N
         } else {
             defaultInstrFilter = Utilities.isMac() ?
-                "java.*, javax.*,\nsun.*, sunw.*, com.sun.*,\ncom.apple.*" : "java.*, javax.*,\nsun.*, sunw.*, com.sun.*"; // NOI18N
+                "java.*, javax.*,\nsun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*" : "java.*, javax.*,\nsun.*, sunw.*, com.sun.*"; // NOI18N
         }
     }
     
@@ -208,7 +211,26 @@ public class CPUSettingsSupport {
     }
     
     
-    private String[] getRootValues() {
+    private void checkRootValidity() {
+        rootsArea.getTextArea().setForeground(isRootValueValid() ?
+            UIManager.getColor("TextArea.foreground") : Color.RED); // NOI18N
+    }
+    
+    public boolean isRootValueValid() {
+        String[] rootParts = FilterUtils.getSeparateFilters(getRootValue());
+
+        for (int i = 0; i < rootParts.length; i++)
+            if (!FilterUtils.isValidProfilerFilter(rootParts[i]))
+                if (rootParts[i].endsWith("**")) { // NOI18N
+                    if (!FilterUtils.isValidProfilerFilter(rootParts[i].substring(0, rootParts[i].length() - 1))) return false;
+                } else {
+                    return false;
+                }
+
+        return true;
+    }
+    
+    private String getRootValue() {
         StringBuffer convertedValue = new StringBuffer();
 
         String[] rootValues = getRootsValues();
@@ -223,7 +245,25 @@ public class CPUSettingsSupport {
             convertedValue.append(filterValue);
         }
 
-        return convertedValue.toString().split(","); // NOI18N
+        return convertedValue.toString(); // NOI18N
+    }
+    
+    private String[] getRootsValues() {
+        return rootsArea.getTextArea().getText().split("\\n"); // NOI18N
+    }
+    
+    private void checkFilterValidity() {
+        filtersArea.getTextArea().setForeground(isFilterValueValid() ?
+            UIManager.getColor("TextArea.foreground") : Color.RED); // NOI18N
+    }
+    
+    public boolean isFilterValueValid() {
+        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
+
+        for (int i = 0; i < filterParts.length; i++)
+            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
+
+        return true;
     }
     
     private String getFilterValue() {
@@ -242,10 +282,6 @@ public class CPUSettingsSupport {
         }
 
         return convertedValue.toString();
-    }
-    
-    private String[] getRootsValues() {
-        return rootsArea.getTextArea().getText().split("\\n"); // NOI18N
     }
 
     private String[] getFilterValues() {
@@ -272,6 +308,11 @@ public class CPUSettingsSupport {
         panelImpl.add(rootClassesLabel, constraints);
         
         rootsArea = createTextArea(3);
+        rootsArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { checkRootValidity(); }
+            public void removeUpdate(DocumentEvent e) { checkRootValidity(); }
+            public void changedUpdate(DocumentEvent e) { checkRootValidity(); }
+        });
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 2;
@@ -322,6 +363,11 @@ public class CPUSettingsSupport {
         panelImpl.add(exclFilterRadioButton, constraints);
         
         filtersArea = createTextArea(2);
+        filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { checkFilterValidity(); }
+            public void removeUpdate(DocumentEvent e) { checkFilterValidity(); }
+            public void changedUpdate(DocumentEvent e) { checkFilterValidity(); }
+        });
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 5;

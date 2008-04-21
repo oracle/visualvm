@@ -195,19 +195,27 @@ class ApplicationProfilerView extends DataSourceView {
             internalChange = true;
             memoryButton.setSelected(false);
             internalChange = false;
-            cpuSettingsSupport.saveSettings();
-            if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
-              IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() { NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(cpuSettingsSupport.getSettings()); }
-              });
+            if (!cpuSettingsSupport.isRootValueValid() ||
+                    !cpuSettingsSupport.isFilterValueValid()) {
+                internalChange = true;
+                cpuButton.setSelected(false);
+                internalChange = false;
+                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_CPU_settings")); // NOI18N
             } else {
-              disableControlButtons();
-              ProfilerSupport.getInstance().setProfiledApplication(application);
-              IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() {
-                  NetBeansProfiler.getDefaultNB().attachToApp(cpuSettingsSupport.getSettings(), attachSettings);
+                cpuSettingsSupport.saveSettings();
+                if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
+                  IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    public void run() { NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(cpuSettingsSupport.getSettings()); }
+                  });
+                } else {
+                  disableControlButtons();
+                  ProfilerSupport.getInstance().setProfiledApplication(application);
+                  IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    public void run() {
+                      NetBeansProfiler.getDefaultNB().attachToApp(cpuSettingsSupport.getSettings(), attachSettings);
+                    }
+                  });
                 }
-              });
             }
           }
         }
