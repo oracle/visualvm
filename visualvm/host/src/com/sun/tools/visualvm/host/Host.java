@@ -66,8 +66,8 @@ public abstract class Host extends DataSource implements Stateful {
      * @param inetAddress InetAddress instance for the host.
      */
     public Host(String hostName, InetAddress inetAddress) {
-        if (hostName == null) throw new IllegalArgumentException("Host name cannot be null");
-        if (inetAddress == null) throw new IllegalArgumentException("InetAddress cannot be null");
+        if (hostName == null) throw new IllegalArgumentException("Host name cannot be null");   // NOI18N
+        if (inetAddress == null) throw new IllegalArgumentException("InetAddress cannot be null");  // NOI18N
         
         this.hostName = hostName;
         this.inetAddress = inetAddress;
@@ -112,7 +112,7 @@ public abstract class Host extends DataSource implements Stateful {
     }
 
     public String toString() {
-        return getHostName() + " [IP: " + getInetAddress().getHostAddress() + "]";
+        return getHostName() + " [IP: " + getInetAddress().getHostAddress() + "]";  // NOI18N
     }
 
 }

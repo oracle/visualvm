@@ -95,7 +95,7 @@ public class Ping {
     
     Connector() throws IOException {
       sel = Selector.open();
-      setName("Connector");
+      setName("Connector"); // NOI18N
     }
     
     // Initiate a connection sequence to the given target and add the

@@ -29,6 +29,7 @@ import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 
@@ -65,7 +66,7 @@ class LocalHostOverview extends HostOverview  {
     String arch = osMXBean.getArch();
     String bits = System.getProperty("sun.arch.data.model"); // NOI18N
     if (bits != null) {
-      arch += " "+bits+"bit";
+      arch += " "+bits+"bit";   // NOI18N
     }
     return arch;
   }
@@ -74,7 +75,7 @@ class LocalHostOverview extends HostOverview  {
     try {
       return InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException ex) {
-      return "<Unknown>";
+      return NbBundle.getMessage(LocalHostOverview.class, "LBL_Unknown");   // NOI18N
     }
   }
   
@@ -104,7 +105,7 @@ class LocalHostOverview extends HostOverview  {
     try {
       return InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException ex) {
-      return "127.0.0.1";
+      return "127.0.0.1";   // NOI18N
     }
   }
 

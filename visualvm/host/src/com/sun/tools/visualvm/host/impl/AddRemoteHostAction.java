@@ -31,6 +31,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
@@ -41,7 +42,7 @@ import org.openide.util.Utilities;
  */
 class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/host/resources/addRemoteHost.png";
+    private static final String ICON_PATH = "com/sun/tools/visualvm/host/resources/addRemoteHost.png";  // NOI18N
     private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;
@@ -54,7 +55,7 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
         if (alwaysEnabled == null) {
             alwaysEnabled = new AddRemoteHostAction();
             alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
-            alwaysEnabled.putValue("iconBase", ICON_PATH);
+            alwaysEnabled.putValue("iconBase", ICON_PATH);  // NOI18N
         }
         return alwaysEnabled;
     }
@@ -90,7 +91,7 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
     private AddRemoteHostAction() {
         super(RemoteHostsContainer.class);
-        putValue(NAME, "Add Remote Host...");
-        putValue(SHORT_DESCRIPTION, "Add Remote Host");
+        putValue(NAME, NbBundle.getMessage(AddRemoteHostAction.class, "LBL_Add_Remote_Host"));  // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(AddRemoteHostAction.class, "ToolTip_Add_Remote_Host")); // NOI18N
     }
 }

@@ -50,6 +50,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 /**
@@ -60,13 +61,13 @@ import org.openide.windows.WindowManager;
 public class HostProvider {
     private static final Logger LOGGER = Logger.getLogger(HostProvider.class.getName());
     
-    private static final String SNAPSHOT_VERSION = "snapshot_version";
+    private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
-    private static final String PROPERTY_HOSTNAME = "prop_hostname";
+    private static final String PROPERTY_HOSTNAME = "prop_hostname";    // NOI18N
     
     private boolean initializingHosts = true;
     private Semaphore initializingHostsSemaphore = new Semaphore(1);
@@ -80,7 +81,7 @@ public class HostProvider {
         ProgressHandle pHandle = null;
 
         try {
-            pHandle = ProgressHandleFactory.createHandle("Searching for host " + hostName);
+            pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HostProvider.class, "LBL_Searching_for_host") + hostName); // NOI18N
             pHandle.setInitialDelay(0);
             pHandle.start();
             try {
@@ -89,7 +90,8 @@ public class HostProvider {
                 if (interactive) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError("<html><b>Cannot resolve host " + hostName + "</b><br><br>Make sure you have entered correct<br>host name or address.</html>");
+                            String error = NbBundle.getMessage(HostProvider.class, "MSG_Wrong_Host", hostName); // NOI18N
+                            NetBeansProfiler.getDefaultNB().displayError(error);
                         }
                     });
                 }
@@ -108,7 +110,8 @@ public class HostProvider {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             ExplorerSupport.sharedInstance().selectDataSource(knownHost);
-                            NetBeansProfiler.getDefaultNB().displayWarning("<html>Host " + hostName + " already monitored as " + DataSourceDescriptorFactory.getDescriptor(knownHost).getName() + "</html>");
+                            String warning = NbBundle.getMessage(HostProvider.class, "MSG_Already_Monitored",new Object[] {hostName,DataSourceDescriptorFactory.getDescriptor(knownHost).getName()});    // NOI18N
+                            NetBeansProfiler.getDefaultNB().displayWarning(warning);
                         }
                     });
                 }
@@ -133,7 +136,7 @@ public class HostProvider {
                 try {
                     newHost = new HostImpl(hostName, storage);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error creating host", e); // Should never happen
+                    LOGGER.log(Level.SEVERE, "Error creating host", e); // Should never happen  // NOI18N
                 }
                 
                 if (newHost != null) {
@@ -167,18 +170,18 @@ public class HostProvider {
     
     public Host createLocalHost() {
         try {
-            return new Host("localhost") {};
+            return new Host("localhost") {};    // NOI18N
         } catch (UnknownHostException e) {
-            LOGGER.severe("Critical failure: cannot resolve localhost");
+            LOGGER.severe("Critical failure: cannot resolve localhost");    // NOI18N
             return null;
         }
     }
     
     public Host createUnknownHost() {
         try {
-            return new Host("unknown", InetAddress.getByAddress(new byte[] { 0, 0, 0, 0 })) {};
+            return new Host("unknown", InetAddress.getByAddress(new byte[] { 0, 0, 0, 0 })) {}; // NOI18N
         } catch (UnknownHostException e) {
-            LOGGER.severe("Failure: cannot resolve <unknown> host");
+            LOGGER.severe("Failure: cannot resolve <unknown> host");    // NOI18N
             return null;
         }
     }
@@ -217,7 +220,7 @@ public class HostProvider {
                 try {
                     persistedHost = new HostImpl(hostName, storage);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error loading persisted host", e);
+                    LOGGER.log(Level.SEVERE, "Error loading persisted host", e);    // NOI18N
                 }
 
                 if (persistedHost != null) hosts.add(persistedHost);
@@ -239,7 +242,7 @@ public class HostProvider {
         if (initializingHosts) try {
             initializingHostsSemaphore.acquire();
         } catch (InterruptedException ex) {
-            LOGGER.throwing(HostProvider.class.getName(), "waitForInitialization", ex);
+            LOGGER.throwing(HostProvider.class.getName(), "waitForInitialization", ex); // NOI18N
         }
     }
     
@@ -258,7 +261,7 @@ public class HostProvider {
         try {
             initializingHostsSemaphore.acquire();
         } catch (InterruptedException ex) {
-            LOGGER.throwing(HostProvider.class.getName(), "<init>", ex);
+            LOGGER.throwing(HostProvider.class.getName(), "<init>", ex);    // NOI18N
         }
     }
 

@@ -41,7 +41,7 @@ import java.net.InetAddress;
  */
 public final class HostsSupport {
 
-    private static final String HOSTS_STORAGE_DIRNAME = "hosts";
+    private static final String HOSTS_STORAGE_DIRNAME = "hosts";    // NOI18N
     
     private static final Object hostsStorageDirectoryLock = new Object();
     // @GuardedBy hostsStorageDirectoryLock
@@ -88,11 +88,11 @@ public final class HostsSupport {
                 String snapshotsStorageString = getStorageDirectoryString();
                 hostsStorageDirectory = new File(snapshotsStorageString);
                 if (hostsStorageDirectory.exists() && hostsStorageDirectory.isFile())
-                    throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");
+                    throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");   // NOI18N
                 if (hostsStorageDirectory.exists() && (!hostsStorageDirectory.canRead() || !hostsStorageDirectory.canWrite()))
-                    throw new IllegalStateException("Cannot access hosts storage directory " + snapshotsStorageString + ", read&write permission required");
+                    throw new IllegalStateException("Cannot access hosts storage directory " + snapshotsStorageString + ", read&write permission required");    // NOI18N
                 if (!Utils.prepareDirectory(hostsStorageDirectory))
-                    throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString);
+                    throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString); // NOI18N
             }
             return hostsStorageDirectory;
         }

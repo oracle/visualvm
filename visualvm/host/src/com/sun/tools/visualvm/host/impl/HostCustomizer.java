@@ -43,6 +43,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -56,7 +57,7 @@ class HostCustomizer extends JPanel {
     HostCustomizer hc = getInstance();
     hc.setupDefineHost();
     
-    final DialogDescriptor dd = new DialogDescriptor(hc, "Add Remote Host", true, new Object[] {
+    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(HostCustomizer.class, "Title_Add_Remote_Host"), true, new Object[] {   // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
     final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
@@ -120,7 +121,7 @@ class HostCustomizer extends JPanel {
     GridBagConstraints constraints;
     
     // hostnameLabel
-    hostnameLabel = new JLabel("Host name:");
+    hostnameLabel = new JLabel(NbBundle.getMessage(HostCustomizer.class, "LBL_Host_name")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -148,7 +149,7 @@ class HostCustomizer extends JPanel {
     add(hostnameField, constraints);
     
     // displaynameCheckbox
-    displaynameCheckbox = new JCheckBox("Display name:");
+    displaynameCheckbox = new JCheckBox(NbBundle.getMessage(HostCustomizer.class, "LBL_Display_name")); // NOI18N
     displaynameCheckbox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) { update(); };
     });
@@ -192,7 +193,7 @@ class HostCustomizer extends JPanel {
     add(spacer, constraints);
     
     // okButton
-    okButton = new JButton("OK");
+    okButton = new JButton(NbBundle.getMessage(HostCustomizer.class, "LBL_OK"));    // NOI18N
     
     // UI tweaks
     displaynameCheckbox.setBorder(hostnameLabel.getBorder());
