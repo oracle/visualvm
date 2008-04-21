@@ -48,11 +48,11 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
     private Set<Long> threadIdSet = new HashSet();
     private boolean refreshRunning;
 
-    public ThreadMXBeanDataManager(ThreadMXBean tb) {
+    ThreadMXBeanDataManager(ThreadMXBean tb) {
         threadBean = tb;
     }
 
-    public void refreshThreads() {
+    void refreshThreads() {
         if (refreshRunning) {
             return;
         }
@@ -72,11 +72,11 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
         });
     }
 
-    public int getDaemonThreadCount() {
+    int getDaemonThreadCount() {
         return threadBean.getDaemonThreadCount();
     }
 
-    public int getThreadCount() {
+    int getThreadCount() {
         return threadBean.getThreadCount();
     }
 

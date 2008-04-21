@@ -64,7 +64,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     private ThreadMXBeanDataManager threadsManager;
     private MBeanCacheListener listener;
 
-    public ApplicationThreadsView(Application application) {
+    ApplicationThreadsView(Application application) {
         super(application, "Threads", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);
     }
 
@@ -137,11 +137,11 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         private HTMLTextArea area;
         private JButton threadDumpButton;
 
-        public MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
+        MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
             initComponents(application, jvm, threadsManager);
         }
 
-        public DataViewComponent.MasterView getMasterView() {
+        DataViewComponent.MasterView getMasterView() {
             return new DataViewComponent.MasterView("Threads", null, this);
         }
 
@@ -173,7 +173,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             JPanel buttonsArea = new JPanel(new BorderLayout());
             buttonsArea.setOpaque(false);
             JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
-            buttonsContainer.setOpaque(false);
+            buttonsContainer.setBackground(area.getBackground());
             buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
             buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
@@ -217,11 +217,11 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static class TimelineViewSupport extends JPanel {
 
-        public TimelineViewSupport(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
+        TimelineViewSupport(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
             initComponents(threadsManager, callback);
         }
 
-        public DataViewComponent.DetailsView getDetailsView() {
+        DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView("Timeline", null, 10, this, null);
         }
 
@@ -242,15 +242,15 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private ThreadsDetailsPanel threadsDetailsPanel;
 
-        public DetailsViewSupport(ThreadMXBeanDataManager threadsManager) {
+        DetailsViewSupport(ThreadMXBeanDataManager threadsManager) {
             initComponents(threadsManager);
         }
 
-        public DataViewComponent.DetailsView getDetailsView() {
+        DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView("Details", null, 20, this, null);
         }
 
-        public void showDetails(int[] indexes) {
+        void showDetails(int[] indexes) {
             threadsDetailsPanel.showDetails(indexes);
         }
 
