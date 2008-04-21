@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -57,8 +57,8 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
             return;
         }
         refreshRunning = true;
-        NBSwingWorker worker = new NBSwingWorker() {
-            protected void doInBackground() {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
                 try {
                     ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
                     resp.fillInThreadData();
@@ -69,8 +69,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
                     refreshRunning = false;
                 }
             }
-        };
-        worker.execute();
+        });
     }
 
     public int getDaemonThreadCount() {
