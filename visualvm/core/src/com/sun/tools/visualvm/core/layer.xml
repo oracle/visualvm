@@ -51,6 +51,7 @@
         <folder name="Window">
             <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.ExplorerTopComponentAction.instance"/>
+                <attr name="position" intvalue="100"/>
             </file>
         </folder>
     </folder>
