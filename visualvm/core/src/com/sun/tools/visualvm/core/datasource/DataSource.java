@@ -101,7 +101,7 @@ public abstract class DataSource {
         return master;
     }
     
-    public final Storage getStorage() {
+    public final synchronized Storage getStorage() {
         if (storage == null) {
             storage = createStorage();
             if (storage == null) throw new NullPointerException("Storage cannot be null");
@@ -109,7 +109,7 @@ public abstract class DataSource {
         return storage;
     }
 
-    public final DataSourceContainer getRepository() {
+    public final synchronized DataSourceContainer getRepository() {
         if (repository == null) repository = new DataSourceContainer(this);
         return repository;
     }
@@ -196,7 +196,7 @@ public abstract class DataSource {
      * 
      * @return instance of PropertyChangeSupport used for processing property changes.
      */
-    protected final PropertyChangeSupport getChangeSupport() {
+    protected final synchronized PropertyChangeSupport getChangeSupport() {
         if (changeSupport == null) changeSupport = new PropertyChangeSupport(this);
         return changeSupport;
     }
@@ -206,7 +206,7 @@ public abstract class DataSource {
         return removedListeners != null;
     }
     
-    final Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
+    final synchronized Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
         if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet());
         return removedListeners;
     }
