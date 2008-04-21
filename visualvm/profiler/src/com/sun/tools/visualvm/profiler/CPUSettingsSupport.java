@@ -183,7 +183,7 @@ public class CPUSettingsSupport {
         String mainClass = jvm.getMainClass();
         if (mainClass == null || mainClass.trim().length() == 0 || mainClass.endsWith(".jar")) mainClass = ""; // NOI18N
         int dotIndex = mainClass.lastIndexOf("."); // NOI18N
-        if (dotIndex != -1) defaultRootClasses = mainClass.substring(0, dotIndex + 1) + "*"; // NOI18N
+        if (dotIndex != -1) defaultRootClasses = mainClass.substring(0, dotIndex + 1) + "**"; // NOI18N
         
         if (defaultRootClasses.isEmpty()) {
             defaultInstrFilter = Utilities.isMac() ?
