@@ -130,9 +130,10 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     protected boolean isSnapshot(String fileName) {
-        String pref = getPrefix();
+//        String pref = getPrefix();
         String suff = getSuffix();
-        if (pref != null && !fileName.startsWith(pref + PREFIX_DIVIDER)) return false;
+        // Fix for #92 - supported snapshot is detected just based on the SUFFIX by default
+//        if (pref != null && !fileName.startsWith(pref + PREFIX_DIVIDER)) return false;
         if (suff != null && !fileName.endsWith(suff)) return false;
         return true;
     }
