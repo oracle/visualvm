@@ -54,7 +54,6 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     private static final String INT_KEY_MONDATA_POLL = "MonitoredDataPoll";
     private static final String INT_KEY_MONHOST_CACHE = "MonitoredHostCache";
     private static final String INT_KEY_MONDATA_CACHE = "MonitoredDataCache";
-    private static final String BOOL_KEY_PROFILER_FILTER = "ProfilerInstrFilter";
     
     private final static int MONHOST_POLL_DEFAULT = 3;
     private final static int THREADS_POLL_DEFAULT = 1;
@@ -160,22 +159,6 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     
     public void watchMonitoredDataCache(PreferenceChangeListener pcl) {
         addListener(INT_KEY_MONDATA_CACHE, pcl);
-    }
-    
-    public boolean isProfilerInstrFilter() {
-        synchronized(prefs) {
-            return prefs.getBoolean(BOOL_KEY_PROFILER_FILTER, false);
-        }
-    }
-    
-    public void setProfilerInstrFilter(boolean value) {
-        synchronized(prefs) {
-            prefs.put(BOOL_KEY_PROFILER_FILTER, Boolean.toString(value));
-        }
-    }
-    
-    public void watchProfilerInstrFilter(PreferenceChangeListener pcl) {
-        addListener(BOOL_KEY_PROFILER_FILTER, pcl);
     }
     
     public boolean store() {

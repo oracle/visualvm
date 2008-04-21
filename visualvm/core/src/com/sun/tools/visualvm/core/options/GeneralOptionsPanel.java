@@ -62,9 +62,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         dataRefresh = new javax.swing.JSpinner();
         jLabel4 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jLabel5 = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
-        instrFilter = new javax.swing.JCheckBox();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -90,11 +87,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Monitored Data:");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "Polling");
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Profiler");
-
-        instrFilter.setMnemonic('p');
-        org.openide.awt.Mnemonics.setLocalizedText(instrFilter, "Profile Java Core Classes");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel6, "sec.");
 
@@ -123,16 +115,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(instrFilter))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(jLabel5)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)))
-                        .addContainerGap())
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
@@ -214,12 +196,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(jLabel13)
                     .add(jLabel12)
                     .add(dataRefresh1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(18, 18, 18)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jLabel5)
-                    .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(instrFilter)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -237,7 +213,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         thrdRefresh.setValue(GlobalPreferences.sharedInstance().getThreadsPoll());
         mhRefresh1.setValue(GlobalPreferences.sharedInstance().getMonitoredHostCache());
         dataRefresh1.setValue(GlobalPreferences.sharedInstance().getMonitoredDataCache());
-        instrFilter.setSelected(GlobalPreferences.sharedInstance().isProfilerInstrFilter());
     }
 
     void store() {
@@ -246,7 +221,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         GlobalPreferences.sharedInstance().setThreadsPoll((Integer) thrdRefresh.getValue());
         GlobalPreferences.sharedInstance().setMonitoredHostCache((Integer) mhRefresh1.getValue());
         GlobalPreferences.sharedInstance().setMonitoredDataCache((Integer) dataRefresh1.getValue());
-        GlobalPreferences.sharedInstance().setProfilerInstrFilter(instrFilter.isSelected());
         // TODO store modified settings
         // Example:
         // Preferences.userNodeForPackage(CorePanel.class).putBoolean("someFlag", someCheckBox.isSelected());
@@ -273,7 +247,6 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner dataRefresh;
     private javax.swing.JSpinner dataRefresh1;
-    private javax.swing.JCheckBox instrFilter;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -282,13 +255,11 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSpinner mhRefresh;
     private javax.swing.JSpinner mhRefresh1;
