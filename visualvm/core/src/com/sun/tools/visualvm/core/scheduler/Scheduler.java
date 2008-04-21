@@ -163,7 +163,7 @@ public class Scheduler implements PropertyChangeListener {
                                 }
                             }
                         }
-                    }, 0, interval.interval, interval.unit);
+                    }, interval.interval, interval.interval, interval.unit);
                 }
             } else {
                 receivers.add(new WeakReference<DefaultScheduledTask>(task));
