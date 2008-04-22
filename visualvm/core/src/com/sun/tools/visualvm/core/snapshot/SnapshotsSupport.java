@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import java.awt.Image;
 import java.io.File;
 import java.util.Date;
 import javax.swing.JFileChooser;
@@ -34,6 +35,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 
 /**
  * Support for snapshots in VisualVM.
@@ -41,6 +43,8 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 public final class SnapshotsSupport {
+    
+    private static final Image SNAPSHOT_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
     
     private static SnapshotsSupport instance;
 
@@ -87,6 +91,10 @@ public final class SnapshotsSupport {
     
     public String getTimeStamp(long time) {
         return org.netbeans.lib.profiler.utils.StringUtils.formatUserDate(new Date(time));
+    }
+    
+    public Image createSnapshotIcon(Image icon) {
+        return Utilities.mergeImages(icon, SNAPSHOT_BADGE, 0, 0);
     }
     
     
