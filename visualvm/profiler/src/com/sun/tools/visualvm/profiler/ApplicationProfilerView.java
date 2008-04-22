@@ -132,6 +132,7 @@ class ApplicationProfilerView extends DataSourceView {
         private int state = -1;
 
         private boolean internalChange = false;
+        private boolean applicationTerminated = false;
     
         
         public MasterViewSupport(Application application, ProfilingResultsSupport profilingResultsView,
@@ -159,14 +160,19 @@ class ApplicationProfilerView extends DataSourceView {
             return new DataViewComponent.MasterView(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), null, this);    // NOI18N
         }
         
-        public void dataRemoved(Application application) {
+        public synchronized void dataRemoved(Application application) {
+            applicationTerminated = true;
             timer.stop();
             timer.removeActionListener(MasterViewSupport.this);
             NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
+            ProfilerSupport.getInstance().setProfiledApplication(null);
+            lastInstrValue = -1;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    resetControlButtons();
                     disableControlButtons();
                     statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_application_terminated")); // NOI18N
+                    enableSettings();
                 }
             });
         }
@@ -230,8 +236,7 @@ class ApplicationProfilerView extends DataSourceView {
             memorySettingsSupport.saveSettings();
             if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
               IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() { 
-                    
+                public void run() {
                     NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettingsSupport.getSettings()); 
                 }
               });
@@ -265,7 +270,7 @@ class ApplicationProfilerView extends DataSourceView {
         public void instrumentationChanged(int oldInstrType, int currentInstrType) { refreshStatus(); }
 
 
-        private void refreshStatus() {
+        private synchronized void refreshStatus() {
 
           final int newState = NetBeansProfiler.getDefaultNB().getProfilingState();
           final Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
@@ -276,16 +281,18 @@ class ApplicationProfilerView extends DataSourceView {
                 switch (state) {
                   case NetBeansProfiler.PROFILING_INACTIVE:
                     ProfilerSupport.getInstance().setProfiledApplication(null); // Necessary to set here when profiled app finished
-                    timer.stop();
                     lastInstrValue = -1;
-                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_inactive"));    // NOI18N
-                    resetControlButtons();
-                    RequestProcessor.getDefault().post(new Runnable() {
-                      public void run() {
-                          enableControlButtons();
-                          enableSettings();
-                      }
-                    }, 500); // Wait for the application to finish
+                    if (!applicationTerminated) {
+                        timer.stop();
+                        statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_inactive"));    // NOI18N
+                        resetControlButtons();
+                        RequestProcessor.getDefault().post(new Runnable() {
+                          public void run() {
+                              enableControlButtons();
+                              enableSettings();
+                          }
+                        }, 500); // Wait for the application to finish
+                    }
                     break;
                   case NetBeansProfiler.PROFILING_STARTED:
                     timer.stop();
