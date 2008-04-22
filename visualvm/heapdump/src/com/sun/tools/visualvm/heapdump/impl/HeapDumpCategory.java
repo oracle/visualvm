@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import java.io.File;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -36,9 +37,9 @@ import java.io.File;
  */
 public class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     
-    private static final String NAME = "Heap Dumps";
-    private static final String PREFIX = "heapdump";
-    private static final String SUFFIX = ".hprof";
+    private static final String NAME = NbBundle.getMessage(HeapDumpCategory.class, "LBL_Heap_Dumps");   // NOI18N
+    private static final String PREFIX = "heapdump";    // NOI18N
+    private static final String SUFFIX = ".hprof";  // NOI18N
     
     public HeapDumpCategory() {
         super(NAME, HeapDump.class, PREFIX, SUFFIX, 20);

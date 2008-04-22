@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -66,7 +67,12 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     
     private void updateState(Jvm jvm) {
         oomeEnabled = jvm.isDumpOnOOMEnabled();
-        String actionName = oomeEnabled ? "Disable Heap Dump on OOME" : "Enable Heap Dump on OOME";
+        String actionName;
+        if (oomeEnabled) {
+            actionName = NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Disable_Heap_Dump_on_OOME");  // NOI18N
+        } else {
+            actionName = NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Enable_Heap_Dump_on_OOME");   // NOI18N
+        }
         putValue(NAME, actionName);
         putValue(SHORT_DESCRIPTION,actionName);
     }

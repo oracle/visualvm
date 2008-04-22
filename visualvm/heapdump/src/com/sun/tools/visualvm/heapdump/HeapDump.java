@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
+import org.openide.util.NbBundle;
 
 /**
  * Abstract implementation of HeapDump.
@@ -61,7 +62,7 @@ public abstract class HeapDump extends Snapshot {
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, "Save Heap Dump As");
+        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(HeapDump.class, "LBL_Save_Heap_Dump_As"));  // NOI18N
     }
 
 }

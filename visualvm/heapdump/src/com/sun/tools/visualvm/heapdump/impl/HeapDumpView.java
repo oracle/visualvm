@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.heapwalk.HeapWalker;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -87,14 +88,14 @@ class HeapDumpView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Heap dump", null, new ScrollableContainer(this));
+            return new DataViewComponent.MasterView(NbBundle.getMessage(HeapDumpView.class, "LBL_Heap_Dump"), null, new ScrollableContainer(this)); // NOI18N
         }
         
         
         private void initComponents() {
             setLayout(new BorderLayout());
             
-            progressLabel = new JLabel("Loading Heap Dump...", SwingConstants.CENTER);
+            progressLabel = new JLabel(NbBundle.getMessage(HeapDumpView.class, "LBL_Loading_Heap_Dump"), SwingConstants.CENTER);    // NOI18N
         
             contentsPanel = new JPanel(new BorderLayout());
             contentsPanel.add(progressLabel, BorderLayout.CENTER);
@@ -118,9 +119,9 @@ class HeapDumpView extends DataSourceView {
 //                    contentsPanel.doLayout();
                 } });
               } catch (FileNotFoundException ex) {
-                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);
+                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);  // NOI18N
               } catch (IOException ex) {
-                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);
+                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);  // NOI18N
               }
             }
           });

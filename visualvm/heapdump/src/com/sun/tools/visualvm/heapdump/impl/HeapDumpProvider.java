@@ -48,6 +48,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.ErrorManager;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -64,7 +65,7 @@ public class HeapDumpProvider {
                 if (!jvm.isTakeHeapDumpSupported()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError("Cannot take heap dump for " + DataSourceDescriptorFactory.getDescriptor(application).getName());
+                            NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(HeapDumpProvider.class, "MSG_Cannot_take_heap_dump") + DataSourceDescriptorFactory.getDescriptor(application).getName());  // NOI18N
                         }
                     });
                     return;
@@ -72,7 +73,7 @@ public class HeapDumpProvider {
                 
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Creating Heap Dump...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
@@ -99,7 +100,7 @@ public class HeapDumpProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Creating Heap Dump...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     File snapshotDir = coreDump.getStorage().getDirectory();
