@@ -255,6 +255,11 @@ final class ApplicationOverviewModel {
         while (keyIt.hasNext()) {
             String key = (String) keyIt.next();
             String val = properties.getProperty(key);
+            
+            if ("line.separator".equals(key) && val != null) {
+                val = val.replace("\n", "\\n");
+                val = val.replace("\r", "\\r");
+            }
 
             text.append("<b>");
             text.append(key);
