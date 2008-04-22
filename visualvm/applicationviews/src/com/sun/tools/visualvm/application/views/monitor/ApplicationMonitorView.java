@@ -50,6 +50,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.lang.management.MemoryMXBean;
 import java.text.NumberFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -126,11 +127,15 @@ class ApplicationMonitorView extends DataSourceView {
                 final long time = System.currentTimeMillis();
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        masterViewSupport.refresh(data);
-                        heapViewSupport.refresh(data, time);
-                        permGenViewSupport.refresh(data, time);
-                        classesViewSupport.refresh(data, time);
-                        threadsViewSupport.refresh(data, time);
+                        try {
+                            masterViewSupport.refresh(data);
+                            heapViewSupport.refresh(data, time);
+                            permGenViewSupport.refresh(data, time);
+                            classesViewSupport.refresh(data, time);
+                            threadsViewSupport.refresh(data, time);
+                        } catch (Exception ex) {
+                            LOGGER.log(Level.INFO,"monitoredDataEvent",ex);
+                        }
                     }
                 });
             }

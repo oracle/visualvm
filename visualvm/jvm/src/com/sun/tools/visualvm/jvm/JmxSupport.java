@@ -133,7 +133,7 @@ public class JmxSupport implements DataRemovedListener {
                             "Couldn't find HotSpotDiagnosticMXBean: " + // NOI18N
                             e.getLocalizedMessage());
                 } catch (IllegalArgumentException ex) {
-                    ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL,ex);
+                    ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL,ex.getLocalizedMessage());
                 } 
             }
             hotspotDiagnosticInitialized = true;
