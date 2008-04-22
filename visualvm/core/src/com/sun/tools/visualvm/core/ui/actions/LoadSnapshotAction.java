@@ -36,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicFileChooserUI;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Utilities;
 
@@ -54,7 +55,7 @@ class LoadSnapshotAction extends AbstractAction {
             instance = new LoadSnapshotAction();
 
             instance.updateEnabled();
-        RegisteredSnapshotCategories.sharedInstance().addCategoriesListener(new SnapshotCategoriesListener() {
+            RegisteredSnapshotCategories.sharedInstance().addCategoriesListener(new SnapshotCategoriesListener() {
                 public void categoryRegistered(SnapshotCategory category) { instance.updateEnabled(); }
                 public void categoryUnregistered(SnapshotCategory category) { instance.updateEnabled(); }
         });
@@ -69,7 +70,20 @@ class LoadSnapshotAction extends AbstractAction {
         List<FileFilter> fileFilters = new ArrayList();
         for (SnapshotCategory category : categories) fileFilters.add(category.getFileFilter());
         
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = new JFileChooser() {
+            public void setSelectedFile(File file) {
+                super.setSelectedFile(file);
+
+                // safety check
+                if (!(getUI() instanceof BasicFileChooserUI)) {
+                    return;
+                }
+
+                // grab the ui and set the filename
+                BasicFileChooserUI ui = (BasicFileChooserUI) getUI();
+                ui.setFileName(file == null ? "" : file.getName());
+            }            
+        };
         chooser.setDialogTitle("Load");
         if (lastFile != null) chooser.setSelectedFile(new File(lastFile));
         chooser.setAcceptAllFileFilterUsed(false);
