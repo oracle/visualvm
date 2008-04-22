@@ -329,7 +329,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
         if (hsDiagnostic != null) {
-//            hsDiagnostic.dumpHeap(dumpFile.getAbsolutePath(),true);
+            hsDiagnostic.dumpHeap(dumpFile.getAbsolutePath(),true);
             return dumpFile;
         }
         return null;
