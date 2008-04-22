@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
@@ -83,8 +84,9 @@ public final class JmxApplication extends Application {
     @Override
     public int getPid() {
         if (pid == UNKNOWN_PID) {
-            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(this));
-            if (mxbeans != null) {
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
+            if (jmxModel != null) {
+                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                 RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
                 if (rt != null) {
                     String name = rt.getName();

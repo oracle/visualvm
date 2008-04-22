@@ -28,8 +28,8 @@ package com.sun.tools.visualvm.application.views.threads;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.util.Set;
 
@@ -40,11 +40,9 @@ import java.util.Set;
 public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvider<Application> {
 
     protected boolean supportsViewFor(Application application) {
-        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(application));
-        if (mxbeans != null) {
-            return mxbeans.getThreadMXBean() != null;
-        }
-        return false;
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+        if (jmxModel == null) return false;
+        return JvmMXBeansFactory.getJvmMXBeans(jmxModel).getThreadMXBean() != null;
     }
 
     protected DataSourceView createView(Application application) {

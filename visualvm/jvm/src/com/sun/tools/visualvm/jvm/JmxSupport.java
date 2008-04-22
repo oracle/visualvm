@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
@@ -86,7 +87,9 @@ public class JmxSupport implements DataRemovedListener {
     
     synchronized JvmMXBeans getJvmMXBeans() {
         if (mxbeans == null) {
-            mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(application));
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+            mxbeans = jmxModel == null ? null :
+                JvmMXBeansFactory.getJvmMXBeans(jmxModel);
         }
         return mxbeans;
     }

@@ -269,7 +269,7 @@ class JmxApplicationProvider {
         }
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
-        if (model.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+        if (model == null || model.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
             storage.deleteCustomPropertiesStorage();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
