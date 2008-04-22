@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.ui.SwingWorker;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
@@ -61,13 +62,13 @@ import org.openide.windows.WindowManager;
 public class CoreDumpProvider {
     private static final Logger LOGGER = Logger.getLogger(CoreDumpProvider.class.getName());
     
-    private static final String SNAPSHOT_VERSION = "snapshot_version";
-    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
+    private static final String SNAPSHOT_VERSION_DIVIDER = "."; // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
-    private static final String PROPERTY_JAVA_HOME = "prop_java_home";
+    private static final String PROPERTY_JAVA_HOME = "prop_java_home";  // NOI18N
     
     private static class CoreDumpAdder extends SwingWorker {
         volatile private ProgressHandle ph = null;
@@ -96,7 +97,7 @@ public class CoreDumpProvider {
 
         @Override
         protected void nonResponding() {
-            ph = ProgressHandleFactory.createHandle("Inspecting core dump");
+            ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(CoreDumpProvider.class, "LBL_Inspecting_core_dump"));   // NOI18N
             ph.start();
         }
 
@@ -106,7 +107,7 @@ public class CoreDumpProvider {
                 ph.finish();
             }
             if (!success) {
-                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(newCoreDump.getFile().getAbsolutePath() + " is not a valid core dump!"));
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(CoreDumpProvider.class, "MSG_not_valid_core_dump", newCoreDump.getFile().getAbsolutePath())));  // NOI18N
             }
         }
     }
@@ -128,7 +129,7 @@ public class CoreDumpProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ExplorerSupport.sharedInstance().selectDataSource(knownCoreDump);
-                    NetBeansProfiler.getDefaultNB().displayWarning("<html>Core dump " + displayName + " already added as " + DataSourceDescriptorFactory.getDescriptor(knownCoreDump).getName() + "</html>");
+                    NetBeansProfiler.getDefaultNB().displayWarning(NbBundle.getMessage(CoreDumpProvider.class, "MSG_Core_dump_already_added", new Object[] {displayName,DataSourceDescriptorFactory.getDescriptor(knownCoreDump).getName()}));  // NOI18N
                 }
             });
             return;
@@ -137,7 +138,7 @@ public class CoreDumpProvider {
         if (deleteCoreDump) {
             ProgressHandle pHandle = null;
             try {
-                pHandle = ProgressHandleFactory.createHandle("Adding " + displayName + "...");
+                pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(CoreDumpProvider.class, "MSG_Adding", displayName));   // NOI18N
                 pHandle.setInitialDelay(0);
                 pHandle.start();
                 
@@ -176,7 +177,7 @@ public class CoreDumpProvider {
                 new CoreDumpAdder(newCoreDump, storage, propNames, propValues).execute();
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error creating coredump", e);
+            LOGGER.log(Level.SEVERE, "Error creating coredump", e); // NOI18N
             return;
         }
     }
@@ -211,7 +212,7 @@ public class CoreDumpProvider {
             try {
                 persistedCoredump = new CoreDumpImpl(new File(propValues[0]), new File(propValues[1]), storage);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error loading persisted host", e);
+                LOGGER.log(Level.SEVERE, "Error loading persisted host", e);    // NOI18N
             }
             
             if (persistedCoredump != null) coredumps.add(persistedCoredump);

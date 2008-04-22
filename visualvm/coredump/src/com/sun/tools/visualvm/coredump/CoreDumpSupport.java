@@ -45,7 +45,7 @@ import org.openide.util.Utilities;
  */
 public final class CoreDumpSupport {
     
-    private static final String COREDUMPS_STORAGE_DIRNAME = "coredumps";
+    private static final String COREDUMPS_STORAGE_DIRNAME = "coredumps";    // NOI18N
     
     private static final Object coredumpsStorageDirectoryLock = new Object();
     // @GuardedBy coredumpsStorageDirectoryLock
@@ -73,8 +73,8 @@ public final class CoreDumpSupport {
     public static String getCurrentJDKHome() {
         synchronized(currentJDKHomeLock) {
             if (currentJDKHome == null) {
-                currentJDKHome = System.getProperty("java.home");
-                String jreSuffix = File.separator + "jre";
+                currentJDKHome = System.getProperty("java.home");   // NOI18N
+                String jreSuffix = File.separator + "jre";  // NOI18N
                 if (currentJDKHome.endsWith(jreSuffix)) currentJDKHome = currentJDKHome.substring(0, currentJDKHome.length() - jreSuffix.length());
             }
             return currentJDKHome;
@@ -95,11 +95,11 @@ public final class CoreDumpSupport {
                 String snapshotsStorageString = getStorageDirectoryString();
                 coredumpsStorageDirectory = new File(snapshotsStorageString);
                 if (coredumpsStorageDirectory.exists() && coredumpsStorageDirectory.isFile())
-                    throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString + ", file in the way");
+                    throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString + ", file in the way");   // NOI18N
                 if (coredumpsStorageDirectory.exists() && (!coredumpsStorageDirectory.canRead() || !coredumpsStorageDirectory.canWrite()))
-                    throw new IllegalStateException("Cannot access coredumps storage directory " + snapshotsStorageString + ", read&write permission required");
+                    throw new IllegalStateException("Cannot access coredumps storage directory " + snapshotsStorageString + ", read&write permission required");    // NOI18N
                 if (!Utils.prepareDirectory(coredumpsStorageDirectory))
-                    throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString);
+                    throw new IllegalStateException("Cannot create coredumps storage directory " + snapshotsStorageString); // NOI18N
             }
             return coredumpsStorageDirectory;
         }

@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
     
@@ -38,7 +39,7 @@ import org.openide.util.Utilities;
  */
 class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/coredump/resources/addCoredump.png";
+    private static final String ICON_PATH = "com/sun/tools/visualvm/coredump/resources/addCoredump.png";    // NOI18N
     private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;
@@ -51,7 +52,7 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
         if (alwaysEnabled == null) {
             alwaysEnabled = new AddVMCoredumpAction();
             alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
-            alwaysEnabled.putValue("iconBase", ICON_PATH);
+            alwaysEnabled.putValue("iconBase", ICON_PATH);  // NOI18N
         }
         return alwaysEnabled;
     }
@@ -86,8 +87,8 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     
     private AddVMCoredumpAction() {
         super(CoreDumpsContainer.class);
-        putValue(NAME, "Add VM Coredump...");
-        putValue(SHORT_DESCRIPTION, "Add VM Coredump");
+        putValue(NAME, NbBundle.getMessage(AddVMCoredumpAction.class, "LBL_Add_VM_Coredump"));  // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(AddVMCoredumpAction.class, "ToolTip_Add_VM_Coredump")); // NOI18N
     }
     
 }

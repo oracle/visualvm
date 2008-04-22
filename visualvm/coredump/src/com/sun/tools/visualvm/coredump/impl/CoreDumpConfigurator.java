@@ -47,6 +47,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -62,7 +63,7 @@ class CoreDumpConfigurator extends JPanel {
     CoreDumpConfigurator hc = getDefault();
     hc.setupDefineCoreDump();
     
-    final DialogDescriptor dd = new DialogDescriptor(hc, "Add VM Coredump", true, new Object[] {
+    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(CoreDumpConfigurator.class, "Title_Add_VM_Coredump"), true, new Object[] { // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
     final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
@@ -139,7 +140,7 @@ class CoreDumpConfigurator extends JPanel {
   
   private void chooseJavaHome() {
       JFileChooser chooser = new JFileChooser(new File(getJavaHome()));
-      chooser.setDialogTitle("Select JDK Home");
+      chooser.setDialogTitle(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Select_JDK_Home"));   // NOI18N
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       int returnVal = chooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -149,7 +150,7 @@ class CoreDumpConfigurator extends JPanel {
 
   private void chooseCoreDump() {
       JFileChooser chooser = new JFileChooser(new File(getCoreDumpFile()));
-      chooser.setDialogTitle("Select VM Coredump");
+      chooser.setDialogTitle(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Select_VM_Coredump"));    // NOI18N
       chooser.setAcceptAllFileFilterUsed(false);
       chooser.setFileFilter(CoreDumpSupport.getCategory().getFileFilter());
       int returnVal = chooser.showOpenDialog(this);
@@ -163,7 +164,7 @@ class CoreDumpConfigurator extends JPanel {
     GridBagConstraints constraints;
     
     // coreDumpFileLabel
-    coreDumpFileLabel = new JLabel("VM Coredump file:");
+    coreDumpFileLabel = new JLabel(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_VM_Coredump_file"));    // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -192,7 +193,7 @@ class CoreDumpConfigurator extends JPanel {
     add(coreDumpFileField, constraints);
     
     // coreDumpFileButton
-    coreDumpFileButton = new JButton("Browse...");
+    coreDumpFileButton = new JButton(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Browse"));    // NOI18N
     coreDumpFileButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             chooseCoreDump();
@@ -208,7 +209,7 @@ class CoreDumpConfigurator extends JPanel {
     add(coreDumpFileButton, constraints);    
     
     // javaHomeFileLabel
-    javaHomeFileLabel = new JLabel("JDK home:");
+    javaHomeFileLabel = new JLabel(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_JDK_home"));    // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;
@@ -236,7 +237,7 @@ class CoreDumpConfigurator extends JPanel {
     add(javaHomeFileField, constraints);
     
     // javaHomeFileButton
-    javaHomeFileButton = new JButton("Browse...");
+    javaHomeFileButton = new JButton(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Browse"));    // NOI18N
     javaHomeFileButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             chooseJavaHome();
@@ -252,7 +253,7 @@ class CoreDumpConfigurator extends JPanel {
     add(javaHomeFileButton, constraints);        
     
     // displaynameCheckbox
-    displaynameCheckbox = new JCheckBox("Display name:");
+    displaynameCheckbox = new JCheckBox(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Display_name"));   // NOI18N
     displaynameCheckbox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) { update(); };
     });
@@ -283,7 +284,7 @@ class CoreDumpConfigurator extends JPanel {
     add(displaynameField, constraints);
     
     // deleteSourceCheckbox
-    deleteSourceCheckbox = new JCheckBox("Delete source file");
+    deleteSourceCheckbox = new JCheckBox(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Delete_source_file"));    // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 3;
@@ -306,7 +307,7 @@ class CoreDumpConfigurator extends JPanel {
     add(spacer, constraints);
     
     // okButton
-    okButton = new JButton("OK");
+    okButton = new JButton(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_OK"));  // NOI18N
     
     // UI tweaks
     displaynameCheckbox.setBorder(coreDumpFileLabel.getBorder());

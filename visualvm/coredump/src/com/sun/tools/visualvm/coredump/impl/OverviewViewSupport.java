@@ -45,6 +45,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.NbBundle;
 
 /**
  * A public entrypoint to the Overview subtab.
@@ -63,7 +64,7 @@ public final class OverviewViewSupport {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Saved data", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_Saved_data"), null, 10, this, null);   // NOI18N
         }
         
         private void initComponents(final DataSource ds) {
@@ -75,7 +76,7 @@ public final class OverviewViewSupport {
             
             ds.getRepository().addDataChangeListener(new DataChangeListener() {
                 public void dataChanged(DataChangeEvent event) {
-                    area.setText("<nobr>" + getSavedData(ds) + "</nobr>");
+                    area.setText("<nobr>" + getSavedData(ds) + "</nobr>");  // NOI18N
                 }                
             }, Snapshot.class);
             
@@ -87,7 +88,7 @@ public final class OverviewViewSupport {
             
             List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
             for (SnapshotCategory category : snapshotCategories)
-                data.append("<b>" + category.getName() + ":</b> " + ds.getRepository().getDataSources(category.getType()).size() + "<br>");
+                data.append("<b>" + category.getName() + ":</b> " + ds.getRepository().getDataSources(category.getType()).size() + "<br>"); // NOI18N
 
             return data.toString();
         }
@@ -104,7 +105,7 @@ public final class OverviewViewSupport {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("JVM arguments", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_JVM_arguments"), null, 10, this, null);    // NOI18N
         }
         
         private void initComponents(String jvmargs) {
@@ -114,7 +115,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (jvmargs != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");    // NOI18N
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 contents = area;
@@ -126,25 +127,25 @@ public final class OverviewViewSupport {
         }
         
         private String formatJVMArgs(String jvmargs) {
-            String mangledString = " ".concat(jvmargs).replace(" -","\n");
-            StringTokenizer tok = new StringTokenizer(mangledString,"\n");
+            String mangledString = " ".concat(jvmargs).replace(" -","\n");  // NOI18N
+            StringTokenizer tok = new StringTokenizer(mangledString,"\n");  // NOI18N
             StringBuffer text = new StringBuffer(100);
 
             while(tok.hasMoreTokens()) {
-                String arg = tok.nextToken().replace(" ","&nbsp;");
+                String arg = tok.nextToken().replace(" ","&nbsp;"); // NOI18N
                 int equalsSign = arg.indexOf('=');
 
-                text.append("<b>");
-                text.append("-");
+                text.append("<b>"); // NOI18N
+                text.append("-");   // NOI18N
                 if (equalsSign != -1) {
                 text.append(arg.substring(0,equalsSign));
-                text.append("</b>");
+                text.append("</b>");    // NOI18N
                 text.append(arg.substring(equalsSign));
                 } else {
                 text.append(arg);
-                text.append("</b>");
+                text.append("</b>");    // NOI18N
                 }
-                text.append("<br>");
+                text.append("<br>");    // NOI18N
             }
             return text.toString();
         }
@@ -161,7 +162,7 @@ public final class OverviewViewSupport {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("System properties", null, 20, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_System_properties"), null, 20, this, null);    // NOI18N
         }
         
         private void initComponents(Properties properties) {
@@ -171,7 +172,7 @@ public final class OverviewViewSupport {
             JComponent contents;
             
             if (properties != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");    // NOI18N
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 contents = area;
@@ -193,11 +194,11 @@ public final class OverviewViewSupport {
                 String key = (String) keyIt.next();
                 String val = properties.getProperty(key);
 
-                text.append("<b>");
+                text.append("<b>"); // NOI18N
                 text.append(key);
-                text.append("</b>=");
+                text.append("</b>=");   // NOI18N
                 text.append(val);
-                text.append("<br>");
+                text.append("<br>");    // NOI18N
             }
             return text.toString();
         }

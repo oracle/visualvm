@@ -36,6 +36,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -44,11 +45,11 @@ import org.openide.util.Utilities;
  */
 class CoreDumpOverviewView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/overview.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/overview.png";  // NOI18N
     
     
     public CoreDumpOverviewView(CoreDump coreDump) {
-        super(coreDump, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);
+        super(coreDump, NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Overview"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
     protected DataViewComponent createComponent() {
@@ -63,10 +64,10 @@ class CoreDumpOverviewView extends DataSourceView {
         
         dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Saved data", true), DataViewComponent.TOP_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Saved_data"), true), DataViewComponent.TOP_LEFT);  // NOI18N
         dvc.addDetailsView(new OverviewViewSupport.SnapshotsViewSupport(coreDump).getDetailsView(), DataViewComponent.TOP_LEFT);
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.TOP_RIGHT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Details"), true), DataViewComponent.TOP_RIGHT);    // NOI18N 
         dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(jvmargs).getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(jvmProperties).getDetailsView(), DataViewComponent.TOP_RIGHT);
         
@@ -84,7 +85,7 @@ class CoreDumpOverviewView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Overview", null, this);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Overview"), null, this);   // NOI18N
         }
         
         
@@ -92,7 +93,7 @@ class CoreDumpOverviewView extends DataSourceView {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(coreDump) + "</nobr>");
+            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(coreDump) + "</nobr>");    // NOI18N
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             
             // TODO: implement listener for CoreDump.oomeHeapDumpEnabled
@@ -118,17 +119,21 @@ class CoreDumpOverviewView extends DataSourceView {
                     mainClass = commandLine.substring(0,firstSpace);
                     mainArgs = commandLine.substring(firstSpace+1);
                 }
-                data.append("<b>Main class:</b> " + mainClass + "<br>");
-                data.append("<b>Arguments:</b> " + (mainArgs == null ? "none" : mainArgs) + "<br>");
+                String mainClassLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Main_class");    // NOI18N
+                String argsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Arguments");  // NOI18N
+                data.append("<b>"+mainClassLbl+":</b> " + mainClass + "<br>");  // NOI18N
+                data.append("<b>"+argsLbl+":</b> " + (mainArgs == null ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : mainArgs) + "<br>"); // NOI18N
             }
             
             // JVM information
             String jvmFlags = saAgent.getJvmFlags();
-            
-            data.append("<br>");
-            data.append("<b>JVM:</b> " + saAgent.getVmName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVmInfo() + ")<br>");
-            data.append("<b>Java Home:</b> " + saAgent.getJavaHome() + "<br>");
-            data.append("<b>JVM Flags:</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? "none" : jvmFlags) + "<br><br>");
+            String jvmLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM"); // NOI18N
+            String jhLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Home");    // NOI18N
+            String flagsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM_Flags"); // NOI18N
+            data.append("<br>");    // NOI18N
+            data.append("<b>"+jvmLbl+":</b> " + saAgent.getVmName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVmInfo() + ")<br>");    // NOI18N
+            data.append("<b>"+jhLbl+":</b> " + saAgent.getJavaHome() + "<br>"); // NOI18N
+            data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
             
             return data.toString();
             

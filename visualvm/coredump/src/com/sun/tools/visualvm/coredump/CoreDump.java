@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import java.io.IOException;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -50,23 +51,23 @@ public abstract class CoreDump extends Snapshot {
         super(file, CoreDumpSupport.getCategory(), master);
         
         if (!file.exists() || !file.isFile())
-            throw new IOException("File " + file.getAbsolutePath() + " does not exist");
+            throw new IOException("File " + file.getAbsolutePath() + " does not exist");    // NOI18N
         
         if (jdkHome != null) {
             if (!jdkHome.exists() || !jdkHome.isDirectory())
-                throw new IOException("Java Home " + jdkHome.getAbsolutePath() + " does not exist");
+                throw new IOException("Java Home " + jdkHome.getAbsolutePath() + " does not exist");    // NOI18N
             this.jdkHome = jdkHome;
         } else {
-            this.jdkHome = new File(System.getProperty("java.home")).getCanonicalFile();
+            this.jdkHome = new File(System.getProperty("java.home")).getCanonicalFile();    // NOI18N
         }
     }
     
     public final String getExecutable() {
         String home = getJDKHome();
         
-        String exec = home+File.separatorChar+"bin"+File.separatorChar+"java";
+        String exec = home+File.separatorChar+"bin"+File.separatorChar+"java";  // NOI18N
         if (Utilities.isWindows()) {
-            exec +=".exe";
+            exec +=".exe";  // NOI18N
         }
         return exec;
     }
@@ -80,7 +81,7 @@ public abstract class CoreDump extends Snapshot {
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, "Save Core Dump As");
+        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(CoreDump.class, "LBL_Save_Core_Dump_As"));  // NOI18N
     }
 
 }

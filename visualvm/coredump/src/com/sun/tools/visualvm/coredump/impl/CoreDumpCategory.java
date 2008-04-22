@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.coredump.impl;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.coredump.CoreDump;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -34,7 +35,7 @@ import com.sun.tools.visualvm.coredump.CoreDump;
  */
 public class CoreDumpCategory extends SnapshotCategory<CoreDump> {
     
-    private static final String NAME = "Core Dumps";
+    private static final String NAME = NbBundle.getMessage(CoreDumpCategory.class, "LBL_Core_Dumps");   // NOI18N
     private static final String PREFIX = null;
     private static final String SUFFIX = null;
     

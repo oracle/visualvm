@@ -6,7 +6,7 @@ import org.openide.util.Utilities;
 
 public class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
 
-    private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredump.png", true);
+    private static final Image ICON = Utilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredump.png", true);  // NOI18N
 
     public CoreDumpDescriptor(CoreDump coreDump) {
         super(coreDump, ICON);
