@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.options;
 import java.util.logging.Logger;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.ProfilerIDESettings;
 
 final class GeneralOptionsPanel extends javax.swing.JPanel {
 
@@ -73,6 +74,10 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel12 = new javax.swing.JLabel();
         dataRefresh1 = new javax.swing.JSpinner();
         jLabel13 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jSeparator4 = new javax.swing.JSeparator();
+        jButton1 = new javax.swing.JButton();
+        jLabel14 = new javax.swing.JLabel();
 
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
@@ -107,6 +112,17 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel13.setDisplayedMnemonic('m');
         jLabel13.setLabelFor(dataRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "Monitored Data:");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Profiler");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, "Reset");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel14, "Reset Do Not Show Again confirmations:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -158,7 +174,17 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                                 .add(dataRefresh1)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jLabel12)))
-                        .add(91, 91, 91))))
+                        .add(91, 91, 91))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel5)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(jLabel14)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 27, Short.MAX_VALUE)
+                        .add(jButton1)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -196,9 +222,22 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(jLabel13)
                     .add(jLabel12)
                     .add(dataRefresh1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(18, 18, 18)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel5)
+                    .add(jSeparator4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jButton1)
+                    .add(jLabel14))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    ProfilerIDESettings.getInstance().clearDoNotShowAgainMap();
+    jButton1.setEnabled(false);
+}//GEN-LAST:event_jButton1ActionPerformed
 
     void load() {
         // TODO read settings and initialize GUI
@@ -208,6 +247,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         // someCheckBox.setSelected(NbPreferences.forModule(CorePanel.class).getBoolean("someFlag", false));
         // or:
         // someTextField.setText(SomeSystemOption.getDefault().getSomeStringProperty());
+        jButton1.setEnabled(true);
         mhRefresh.setValue(GlobalPreferences.sharedInstance().getMonitoredHostPoll());
         dataRefresh.setValue(GlobalPreferences.sharedInstance().getMonitoredDataPoll());
         thrdRefresh.setValue(GlobalPreferences.sharedInstance().getThreadsPoll());
@@ -247,20 +287,24 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner dataRefresh;
     private javax.swing.JSpinner dataRefresh1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSpinner mhRefresh;
     private javax.swing.JSpinner mhRefresh1;
     private javax.swing.JSpinner thrdRefresh;
