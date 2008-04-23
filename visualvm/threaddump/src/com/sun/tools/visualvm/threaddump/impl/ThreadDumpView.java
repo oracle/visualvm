@@ -110,15 +110,16 @@ class ThreadDumpView extends DataSourceView {
 
         private static String transform(String value) {
             StringBuilder sb = new StringBuilder();
-            String[] result = value.split("\\n");
+            String[] result = value.split("\\n"); // NOI18N
             for (int i = 0; i < result.length; i++) {
                 String line = result[i];
-                if (line.isEmpty()) {
-                    sb.append("<span>" + line + "\n</span>");    // NOI18N
-                } else if (line.substring(0, 1).matches("\\s")) {
-                    sb.append("<span style=\"color: #CC3300\">" + line + "\n</span>");   // NOI18N
+                if (!line.isEmpty() && !Character.isWhitespace(line.charAt(0))) {
+                    sb.append("<span style=\"color: #0033CC\">"); // NOI18N
+                    sb.append(line);
+                    sb.append("</span><br>"); // NOI18N
                 } else {
-                    sb.append("<span style=\"color: #0033CC\">" + line + "\n</span>");   // NOI18N
+                    sb.append(line);
+                    sb.append("<br>"); // NOI18N
                 }
             }
             return sb.toString();
@@ -137,9 +138,10 @@ class ThreadDumpView extends DataSourceView {
                   LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
                 }
                 try {
-                  HTMLTextArea area = new HTMLTextArea("<nobr><pre>" +   // NOI18N
+                  HTMLTextArea area = new HTMLTextArea("<pre>" +   // NOI18N
                           transform(htmlize(new String(data, "UTF-8"))) +    // NOI18N
-                          "</pre></nobr>");  // NOI18N
+                          "</pre>");  // NOI18N
+                  area.setForeground(new Color(0xcc, 0x33, 0));
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
