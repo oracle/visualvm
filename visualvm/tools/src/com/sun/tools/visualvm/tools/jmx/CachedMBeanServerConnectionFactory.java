@@ -206,7 +206,7 @@ public final class CachedMBeanServerConnectionFactory {
                     }
                 });
                 timer.setCoalesce(true);
-                timer.start();
+                timer.setInitialDelay(0);
             }
         }
 
@@ -234,11 +234,13 @@ public final class CachedMBeanServerConnectionFactory {
         }
 
         void addMBeanCacheListener(MBeanCacheListener listener) {
+            if (listenerList.isEmpty()) timer.start();
             listenerList.add(listener);
         }
 
         void removeMBeanCacheListener(MBeanCacheListener listener) {
-            listenerList.remove(listener);            
+            listenerList.remove(listener);
+            if (listenerList.isEmpty()) timer.stop();
         }
 
         public Object invoke(Object proxy, Method method, Object[] args)

@@ -35,10 +35,12 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
@@ -120,7 +122,8 @@ public class JmxModelImpl extends JmxModel {
     private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
     private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());
     private ProxyClient client;
-    private ApplicationRemovedListener listener;
+    private ApplicationRemovedListener removedListener;
+    private ApplicationAvailabilityListener availabilityListener;
 
     /**
      * Creates an instance of {@code JmxModel} for a {@link JvmstatApplication}.
@@ -191,8 +194,9 @@ public class JmxModelImpl extends JmxModel {
             }
             if (proxyClient != null) {
                 client = proxyClient;
-                listener = new ApplicationRemovedListener(proxyClient);
-                connect(application, proxyClient, listener);
+                removedListener = new ApplicationRemovedListener();
+                availabilityListener = new ApplicationAvailabilityListener();
+                connect(application, proxyClient, removedListener, availabilityListener);
             }
         } catch (Exception e) {
             LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
@@ -213,19 +217,22 @@ public class JmxModelImpl extends JmxModel {
             final ProxyClient proxyClient =
                     new ProxyClient(this, url.toString(), username, password);
             client = proxyClient;
-            listener = new ApplicationRemovedListener(proxyClient);
-            connect(application, proxyClient, listener);
+            removedListener = new ApplicationRemovedListener();
+            availabilityListener = new ApplicationAvailabilityListener();
+            connect(application, proxyClient, removedListener, availabilityListener);
         } catch (Exception e) {
             LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
             client = null;
         }
     }
 
-    private void connect(Application application, ProxyClient proxyClient, ApplicationRemovedListener listener) {
+    private void connect(Application application, ProxyClient proxyClient,
+            ApplicationRemovedListener listener, ApplicationAvailabilityListener aListener) {
         while (true) {
             try {
                 proxyClient.connect();
                 application.notifyWhenRemoved(listener);
+                application.addPropertyChangeListener(Stateful.PROPERTY_STATE, aListener);
                 break;
             } catch (SecurityException e) {
                 if (supplyCredentials(application, proxyClient) == null) {
@@ -301,23 +308,30 @@ public class JmxModelImpl extends JmxModel {
     /**
      * Disconnect from JMX agent when the application is removed.
      */
-    static class ApplicationRemovedListener implements DataRemovedListener<Application> {
-
-        private ProxyClient proxyClient;
-
-        public ApplicationRemovedListener(ProxyClient proxyClient) {
-            this.proxyClient = proxyClient;
-        }
+    class ApplicationRemovedListener implements DataRemovedListener<Application> {
 
         public void dataRemoved(Application application) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    proxyClient.markAsDead();
+                    client.markAsDead();
+                    removedListener = null;
                 }
             });
         }
     }
+    
+    class ApplicationAvailabilityListener implements PropertyChangeListener {
 
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (!evt.getNewValue().equals(Stateful.STATE_AVAILABLE)) {
+                ((Application)evt.getSource()).removePropertyChangeListener(
+                        Stateful.PROPERTY_STATE, this);
+                client.disconnectImpl(false);
+                availabilityListener = null;
+            }
+        }
+    }
+    
     static class ProxyClient implements NotificationListener {
 
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;
@@ -669,14 +683,18 @@ public class JmxModelImpl extends JmxModel {
         public String getPassword() {
             return password;
         }
-
+        
         public void disconnect() {
+            disconnectImpl(true);
+        }
+
+        private synchronized void disconnectImpl(boolean sendClose) {
             // Reset remote stub
             stub = null;
             // Close MBeanServer connection
             if (jmxc != null) {
                 try {
-                    jmxc.close();
+                    if (sendClose) jmxc.close();
                 } catch (IOException e) {
                     // Ignore...
                 } finally {

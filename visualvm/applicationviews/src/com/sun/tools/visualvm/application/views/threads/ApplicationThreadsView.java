@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -83,14 +84,15 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     }
 
     @Override
-    protected void removed() {
-        if (mxbeans != null) {
-            mxbeans.removeMBeanCacheListener(listener);
-            mxbeans = null;
-        }
+    protected synchronized void removed() {
+        cleanup();
     }
 
-    public void dataRemoved(Application dataSource) {
+    public synchronized void dataRemoved(Application dataSource) {
+        cleanup();
+    }
+    
+    private synchronized void cleanup() {
         if (mxbeans != null) {
             mxbeans.removeMBeanCacheListener(listener);
             mxbeans = null;
@@ -98,14 +100,18 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     }
 
     protected DataViewComponent createComponent() {
-        Application application = (Application) getDataSource();
+        final Application application = (Application) getDataSource();
         final MasterViewSupport mvs =
                 new MasterViewSupport(application, jvm, threadsManager);
         if (mxbeans != null) {
             listener = new MBeanCacheListener() {
                 public void flushed() {
-                    threadsManager.refreshThreads();
-                    mvs.updateThreadsCounts(threadsManager);
+                    if (application.getState() != Stateful.STATE_AVAILABLE) {
+                        cleanup();
+                    } else {
+                        threadsManager.refreshThreads();
+                        mvs.updateThreadsCounts(threadsManager);
+                    }
                 }
             };
             mxbeans.addMBeanCacheListener(listener);
