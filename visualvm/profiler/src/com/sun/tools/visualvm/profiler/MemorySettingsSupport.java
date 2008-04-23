@@ -97,6 +97,7 @@ public class MemorySettingsSupport {
             ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
         settings.setAllocStackTraceLimit(stackTracesCheckBox.isSelected() ? -1 : 0);
         settings.setRunGCOnGetResultsInMemoryProfiling(runGCCheckBox.isSelected());
+        settings.setAllocTrackEvery(1);
         
         return settings;
     }
