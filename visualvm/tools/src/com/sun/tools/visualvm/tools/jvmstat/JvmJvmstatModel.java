@@ -202,7 +202,7 @@ public abstract class JvmJvmstatModel extends Model {
     }
     
     public long getThreadsLivePeak() {
-        return getLongValue(threadsStarted);
+        return getLongValue(threadsLivePeak);
     }
     
     public long getThreadsStarted() {
