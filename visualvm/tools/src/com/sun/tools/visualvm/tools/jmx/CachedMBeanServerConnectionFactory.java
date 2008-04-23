@@ -210,7 +210,7 @@ public final class CachedMBeanServerConnectionFactory {
             }
         }
 
-        synchronized void intervalElapsed() {
+        void intervalElapsed() {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     flush();
@@ -219,7 +219,7 @@ public final class CachedMBeanServerConnectionFactory {
             });
         }
 
-        synchronized void notifyListeners() {
+        void notifyListeners() {
             for (MBeanCacheListener listener : listenerList) {
                 listener.flushed();
             }
