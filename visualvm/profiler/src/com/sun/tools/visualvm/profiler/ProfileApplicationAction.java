@@ -45,7 +45,7 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
     private final PropertyChangeListener stateListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             updateState(ActionUtils.getSelectedDataSources(Application.class));
-    }
+        }
     };
     
         
@@ -60,12 +60,13 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
         
     protected void actionPerformed(Application application, ActionEvent actionEvent) {
         ProfilerSupport.getInstance().selectProfilerView(application);
-            }
+    }
     
     protected boolean isEnabled(Application application) {
         // TODO: Listener should only be registered when profiling the application is supported
         lastSelectedApplication = application;
         lastSelectedApplication.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         return ProfilerSupport.getInstance().supportsProfiling(application);
     }
     
@@ -73,7 +74,7 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
         if (lastSelectedApplication != null) {
             lastSelectedApplication.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
             lastSelectedApplication = null;
-    }
+        }
         super.updateState(applications);
     }
     

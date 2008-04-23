@@ -82,6 +82,7 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
                 Application application = (Application)dataSource;
                     lastSelectedApplications.add(application);
                 application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+                if (application.getState() != Stateful.STATE_AVAILABLE) return false;
                 if (!ThreadDumpSupport.getInstance().supportsThreadDump((Application)dataSource)) return false;
             } else if (!(dataSource instanceof CoreDump)) return false;
         return true;

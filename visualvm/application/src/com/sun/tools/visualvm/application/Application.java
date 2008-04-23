@@ -90,10 +90,14 @@ public abstract class Application extends DataSource implements Stateful {
         return state;
     }
     
-    protected final synchronized void setState(int newState) {
-        int oldState = state;
+    protected final synchronized void setState(final int newState) {
+        final int oldState = state;
         state = newState;
-        getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
+        if (DataSource.EVENT_QUEUE.isRequestProcessorThread())
+            getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
+        else DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() { getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState); };
+        });
     }
     
     @Override

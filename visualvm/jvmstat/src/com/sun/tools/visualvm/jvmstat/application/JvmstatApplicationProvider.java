@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.host.Host;
@@ -157,7 +158,9 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private void processDisconnectedHost(Host host, MonitoredHost monitoredHost, HostListener listener) {
         try { monitoredHost.removeHostListener(listener); } catch (MonitorException ex) {}
-        host.getRepository().removeDataSources(host.getRepository().getDataSources(JvmstatApplication.class));
+        Set<JvmstatApplication> jvmstatApplications = host.getRepository().getDataSources(JvmstatApplication.class);
+        for (JvmstatApplication application : jvmstatApplications) application.setStateImpl(Stateful.STATE_UNAVAILABLE);
+        host.getRepository().removeDataSources(jvmstatApplications);
     }
     
     private void processNewApplicationsByPids(Host host, Set<Integer> applicationPids) {
@@ -187,7 +190,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
              String appId = createId(host, applicationPid);
              if (applications.containsKey(appId)) {
                 JvmstatApplication application = applications.get(appId);
-                if (application != null) finishedApplications.add(application);
+                if (application != null) {
+                    finishedApplications.add(application);
+                    application.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                }
                 applications.remove(appId);
             }
         }

@@ -55,5 +55,10 @@ final class JvmstatApplication extends Application {
         super.remove();
         JvmstatApplicationProvider.sharedInstance().removeFromMap(this);
     }
+    
+    
+    void setStateImpl(int newState) {
+        setState(newState);
+    }
 
 }

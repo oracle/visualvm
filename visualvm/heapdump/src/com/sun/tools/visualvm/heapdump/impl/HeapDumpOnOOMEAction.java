@@ -28,8 +28,13 @@ package com.sun.tools.visualvm.heapdump.impl;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Set;
 import org.openide.util.NbBundle;
 
 /**
@@ -41,6 +46,12 @@ import org.openide.util.NbBundle;
 class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     
     private boolean oomeEnabled;
+    private Application lastSelectedApplication;
+    private final PropertyChangeListener stateListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateState(ActionUtils.getSelectedDataSources(Application.class));
+        }
+    };
     
     private static HeapDumpOnOOMEAction instance;
     
@@ -58,6 +69,9 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     }
 
     protected boolean isEnabled(Application application) {
+        lastSelectedApplication = application;
+        lastSelectedApplication.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         Jvm jvm = JvmFactory.getJVMFor(application);
         if (!jvm.isDumpOnOOMEnabledSupported()) return false;
         updateState(jvm);
@@ -75,6 +89,14 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
         }
         putValue(NAME, actionName);
         putValue(SHORT_DESCRIPTION,actionName);
+    }
+    
+    protected void updateState(Set<Application> applications) {
+        if (lastSelectedApplication != null) {
+            lastSelectedApplication.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+            lastSelectedApplication = null;
+        }
+        super.updateState(applications);
     }
     
     
