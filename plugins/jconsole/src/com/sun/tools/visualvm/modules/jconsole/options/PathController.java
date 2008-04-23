@@ -40,6 +40,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -117,7 +118,7 @@ public class PathController implements ActionListener, ListSelectionListener, Li
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("add")) {// NOI18N
-            int returnVal = chooser.showOpenDialog(null);
+            int returnVal = chooser.showOpenDialog(WindowManager.getDefault().getMainWindow());
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File[] selection = chooser.getSelectedFiles();
                 int size = selection.length;

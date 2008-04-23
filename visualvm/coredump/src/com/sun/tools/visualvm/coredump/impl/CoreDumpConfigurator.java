@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.coredump.CoreDump;
 import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -48,6 +47,7 @@ import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -142,7 +142,7 @@ class CoreDumpConfigurator extends JPanel {
       JFileChooser chooser = new JFileChooser(new File(getJavaHome()));
       chooser.setDialogTitle(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Select_JDK_Home"));   // NOI18N
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      int returnVal = chooser.showOpenDialog(this);
+      int returnVal = chooser.showOpenDialog(WindowManager.getDefault().getMainWindow());
       if (returnVal == JFileChooser.APPROVE_OPTION) {
           javaHomeFileField.setText(chooser.getSelectedFile().getAbsolutePath());
       }
@@ -153,7 +153,7 @@ class CoreDumpConfigurator extends JPanel {
       chooser.setDialogTitle(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Select_VM_Coredump"));    // NOI18N
       chooser.setAcceptAllFileFilterUsed(false);
       chooser.setFileFilter(CoreDumpSupport.getCategory().getFileFilter());
-      int returnVal = chooser.showOpenDialog(this);
+      int returnVal = chooser.showOpenDialog(WindowManager.getDefault().getMainWindow());
       if (returnVal == JFileChooser.APPROVE_OPTION) {
           coreDumpFileField.setText(chooser.getSelectedFile().getAbsolutePath());
       }

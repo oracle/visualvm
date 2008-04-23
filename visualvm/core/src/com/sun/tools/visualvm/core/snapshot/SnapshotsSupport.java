@@ -36,6 +36,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
+import org.openide.windows.WindowManager;
 
 /**
  * Support for snapshots in VisualVM.
@@ -68,7 +69,7 @@ public final class SnapshotsSupport {
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(snapshot.getCategory().getFileFilter());
 //        chooser.setFileView(category.getFileView());
-        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             final File copy = chooser.getSelectedFile();
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {

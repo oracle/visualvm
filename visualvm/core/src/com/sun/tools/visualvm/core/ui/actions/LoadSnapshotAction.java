@@ -37,8 +37,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicFileChooserUI;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Utilities;
+import org.openide.windows.WindowManager;
 
 class LoadSnapshotAction extends AbstractAction {
     
@@ -89,10 +91,19 @@ class LoadSnapshotAction extends AbstractAction {
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileFilter fileFilter : fileFilters) chooser.addChoosableFileFilter(fileFilter);
         chooser.setFileFilter(fileFilters.get(0));
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
-            lastFile = selectedFile.getAbsolutePath();
-            categories.get(fileFilters.indexOf(chooser.getFileFilter())).openSnapshot(selectedFile);
+            if (selectedFile == null || !selectedFile.exists()) {
+                NetBeansProfiler.getDefaultNB().displayError("Selected file does not exist.");
+            } else {
+                FileFilter fileFilter = chooser.getFileFilter();
+                if (fileFilter.accept(selectedFile)) {
+                    lastFile = selectedFile.getAbsolutePath();
+                    categories.get(fileFilters.indexOf(fileFilter)).openSnapshot(selectedFile);
+                } else {
+                    NetBeansProfiler.getDefaultNB().displayError("Selected file does not match snapshot type.");
+                }
+            }
         }
     }
     

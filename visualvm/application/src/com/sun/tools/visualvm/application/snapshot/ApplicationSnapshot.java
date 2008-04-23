@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.RequestProcessor;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -66,7 +67,7 @@ public final class ApplicationSnapshot extends Snapshot {
         chooser.setSelectedFile(new File(getFile().getName()));
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(getCategory().getFileFilter());
-        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             final File file = chooser.getSelectedFile();
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {

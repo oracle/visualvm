@@ -45,6 +45,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -107,7 +108,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
       chooser.setSelectedFile(getSnapshotFile());
       chooser.setAcceptAllFileFilterUsed(false);
       chooser.setFileFilter(ApplicationSnapshotsSupport.getInstance().getCategory().getFileFilter());
-      if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) snapshotFileField.setText(chooser.getSelectedFile().getAbsolutePath());
+      if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) snapshotFileField.setText(chooser.getSelectedFile().getAbsolutePath());
   }
   
   private void initComponents() {

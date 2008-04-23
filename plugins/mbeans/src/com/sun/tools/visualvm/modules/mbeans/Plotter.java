@@ -33,16 +33,15 @@ import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.lang.reflect.Array;
-import java.text.*;
 import java.util.*;
 
 import javax.accessibility.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
 import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 
+import org.openide.windows.WindowManager;
 import static com.sun.tools.visualvm.modules.mbeans.Formatter.*;
 import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
 import static com.sun.tools.visualvm.modules.mbeans.Utilities.*;
@@ -280,7 +279,7 @@ class Plotter extends JComponent
         if (saveFC == null) {
             saveFC = new SaveDataFileChooser();
         }
-        int ret = saveFC.showSaveDialog(this);
+        int ret = saveFC.showSaveDialog(WindowManager.getDefault().getMainWindow());
         if (ret == JFileChooser.APPROVE_OPTION) {
             saveDataToFile(saveFC.getSelectedFile());
         }
