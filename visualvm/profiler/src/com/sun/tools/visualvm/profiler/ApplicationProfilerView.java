@@ -350,9 +350,27 @@ class ApplicationProfilerView extends DataSourceView {
                 lastInstrValue = instrValue;
             } else if (memorySettingsSupport.getSettings().getProfilingType() == currentProfilingType) {
                 int instrValue = TargetAppRunner.getDefault().getProfilingSessionStatus().getNInstrClasses();
-                if (lastInstrValue != instrValue)
-                    statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_classes"), new Object[] { instrValue })); // NOI18N
+                if (lastInstrValue != instrValue) {
+                    int allocEvery = currentSettings.getAllocTrackEvery();
+                    switch (allocEvery) {
+                        case 1:
+                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
+                            "MSG_profiling_running_classes_1"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            break;
+                        case 2:
+                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
+                            "MSG_profiling_running_classes_2"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            break;
+                        case 3:
+                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
+                            "MSG_profiling_running_classes_3"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            break;
+                        default:
+                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
+                            "MSG_profiling_running_classes_N"), new Object[] { instrValue, allocEvery })); // NOI18N
+                    }
+                }
+                    
                 lastInstrValue = instrValue;
             }
         }

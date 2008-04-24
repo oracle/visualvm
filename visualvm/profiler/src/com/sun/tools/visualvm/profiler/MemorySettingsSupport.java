@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.profiler;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -38,8 +39,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.openide.util.NbBundle;
 
 /**
@@ -58,14 +62,16 @@ public class MemorySettingsSupport {
     
     public static final String PROP_MODE = PROP_PREFIX + "mode"; // NOI18N
     public static final String PROP_STACKTRACES = PROP_PREFIX + "stacktraces"; // NOI18N
-    public static final String PROP_RUNGC = PROP_PREFIX + "rungc"; // NOI18N
+    public static final String PROP_TRACK_EVERY = PROP_PREFIX + "track_every"; // NOI18N
     
     private JPanel panel;
     private JRadioButton allocRadioButton;
     private JRadioButton livenessRadioButton;
     private JCheckBox stackTracesCheckBox;
-    private JCheckBox runGCCheckBox;
     private JButton resetDefaultsButton;
+    private JLabel trackEveryLabel1;
+    private JLabel trackEveryLabel2;
+    private JSpinner trackEverySpinner;
     
     private Application application;
     
@@ -85,8 +91,10 @@ public class MemorySettingsSupport {
         allocRadioButton.setEnabled(enabled);
         livenessRadioButton.setEnabled(enabled);
         stackTracesCheckBox.setEnabled(enabled);
-        runGCCheckBox.setEnabled(enabled);
         resetDefaultsButton.setEnabled(enabled);
+        trackEveryLabel1.setEnabled(enabled);
+        trackEveryLabel2.setEnabled(enabled);
+        trackEverySpinner.setEnabled(enabled);
     }
     
     public ProfilingSettings getSettings() {
@@ -96,8 +104,7 @@ public class MemorySettingsSupport {
             ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) :
             ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
         settings.setAllocStackTraceLimit(stackTracesCheckBox.isSelected() ? -1 : 0);
-        settings.setRunGCOnGetResultsInMemoryProfiling(runGCCheckBox.isSelected());
-        settings.setAllocTrackEvery(1);
+        settings.setAllocTrackEvery(((Integer) trackEverySpinner.getValue()).intValue());
         
         return settings;
     }
@@ -110,7 +117,7 @@ public class MemorySettingsSupport {
         storage.setCustomProperty(PROP_MODE, Integer.toString(allocRadioButton.isSelected() ?
             ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS : ProfilingSettings.PROFILE_MEMORY_LIVENESS));
         storage.setCustomProperty(PROP_STACKTRACES, Integer.toString(stackTracesCheckBox.isSelected() ? -1 : 0));
-        storage.setCustomProperty(PROP_RUNGC, Boolean.toString(runGCCheckBox.isSelected()));
+        storage.setCustomProperty(PROP_TRACK_EVERY, Integer.toString((Integer) trackEverySpinner.getValue()));
     }
     
     
@@ -131,17 +138,17 @@ public class MemorySettingsSupport {
             stackTracesCheckBox.setSelected(stackTracesInt != 0);
         } catch (Exception e) {}
         
-        String runGC = storage.getCustomProperty(PROP_RUNGC);
-        if (runGC != null) try {
-            boolean runGCBool = Boolean.parseBoolean(runGC);
-            runGCCheckBox.setSelected(runGCBool);
+        String trackEveryObj = storage.getCustomProperty(PROP_TRACK_EVERY);
+        if (trackEveryObj != null) try {
+            int trackEveryObjInt = Integer.parseInt(trackEveryObj);
+            trackEverySpinner.setValue(trackEveryObjInt);
         } catch (Exception e) {}
     }
     
     private void setDefaults() {
         livenessRadioButton.setSelected(true);
         stackTracesCheckBox.setSelected(false);
-        runGCCheckBox.setSelected(true);
+        trackEverySpinner.setValue(new Integer(10));
     }
     
     private JPanel getPanel() {
@@ -189,29 +196,82 @@ public class MemorySettingsSupport {
         constraints.insets = new Insets(0, 10, 10, 10);
         panelImpl.add(livenessRadioButton, constraints);
         
-        stackTracesCheckBox = new JCheckBox(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Record_Stacktraces")); // NOI18N
-        stackTracesCheckBox.setOpaque(false);
-        stackTracesCheckBox.setBorder(referenceLabel.getBorder());
+        // trackEveryContainer - definition
+        JPanel trackEveryContainer = new JPanel(new GridBagLayout());
+
+        // trackEveryLabel1
+        trackEveryLabel1 = new JLabel("Track every");
+//        org.openide.awt.Mnemonics.setLocalizedText(trackEveryLabel1, TRACK_EVERY_LABEL_TEXT);
+//        trackEveryLabel1.setToolTipText(STP_TRACKEVERY_TOOLTIP);
+        trackEveryLabel1.setOpaque(false);
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 0, 0, 5);
+        trackEveryContainer.add(trackEveryLabel1, constraints);
+
+        // trackEverySpinner
+        trackEverySpinner = new JExtendedSpinner(new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1)) {
+                public Dimension getPreferredSize() {
+                    return new Dimension(55, super.getPreferredSize().height);
+                }
+
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
+        trackEveryLabel1.setLabelFor(trackEverySpinner);
+//        trackEverySpinner.setToolTipText(STP_TRACKEVERY_TOOLTIP);
+//        trackEverySpinner.addChangeListener(getSettingsChangeListener());
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 0, 0, 0);
+        trackEveryContainer.add(trackEverySpinner, constraints);
+
+        // trackEveryLabel2
+        trackEveryLabel2 = new JLabel("object allocations");
+//        JLabel trackEveryLabel2 = new JLabel(ALLOC_LABEL_TEXT);
+//        trackEveryLabel2.setToolTipText(STP_TRACKEVERY_TOOLTIP);
+        trackEveryLabel2.setOpaque(false);
+        constraints = new GridBagConstraints();
+        constraints.gridx = 2;
+        constraints.gridy = 0;
+        constraints.weightx = 1;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 5, 0, 0);
+        trackEveryContainer.add(trackEveryLabel2, constraints);
+
+        // trackEveryContainer - customization
+        trackEveryContainer.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 2;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(10, 10, 10, 10);
-        panelImpl.add(stackTracesCheckBox, constraints);
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(5, 10, 10, 10);
+        panelImpl.add(trackEveryContainer, constraints);
         
-        runGCCheckBox = new JCheckBox(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Run_GC")); // NOI18N
-        runGCCheckBox.setOpaque(false);
-        runGCCheckBox.setBorder(referenceLabel.getBorder());
+        stackTracesCheckBox = new JCheckBox(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Record_Stacktraces")); // NOI18N
+        stackTracesCheckBox.setOpaque(false);
+        stackTracesCheckBox.setBorder(referenceLabel.getBorder());
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 3;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(0, 10, 10, 10);
-        panelImpl.add(runGCCheckBox, constraints);
+        constraints.insets = new Insets(5, 10, 10, 10);
+        panelImpl.add(stackTracesCheckBox, constraints);
         
         JPanel filler = new JPanel(null);
         filler.setOpaque(false);
