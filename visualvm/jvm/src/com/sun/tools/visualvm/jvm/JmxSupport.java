@@ -44,11 +44,13 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.swing.Timer;
@@ -60,6 +62,7 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 public class JmxSupport implements DataRemovedListener {
+    private final static Logger LOGGER = Logger.getLogger(JmxSupport.class.getName());
     private static final String HOTSPOT_DIAGNOSTIC_MXBEAN_NAME =
             "com.sun.management:type=HotSpotDiagnostic";    // NOI18N
     private static final String PERM_GEN = "Perm Gen";  // NOI18N
@@ -250,8 +253,12 @@ public class JmxSupport implements DataRemovedListener {
                 public void actionPerformed(ActionEvent e) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
-                            jvm.notifyListeners(data);
+                            try {
+                                MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
+                                jvm.notifyListeners(data);
+                            } catch (UndeclaredThrowableException e) {
+                                LOGGER.throwing(JmxSupport.class.getName(), "MonitoredDataImpl<init>", e); // NOI18N
+                            }
                         }
                     });
                 }
