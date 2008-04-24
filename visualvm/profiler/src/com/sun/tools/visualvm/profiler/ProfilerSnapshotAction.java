@@ -95,7 +95,10 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
                     File snapshotFile = snapshot.getFile();
                     if (profiledApplication != null && snapshotFile.getCanonicalPath().contains(NB_PROFILER_SNAPSHOTS_STORAGE)) {
                         File newSnapshotFile = Utils.getUniqueFile(profiledApplication.getStorage().getDirectory(), snapshotFile.getName());
-                        snapshotFile.renameTo(newSnapshotFile);
+                        if (!snapshotFile.renameTo(newSnapshotFile)) {
+                            Utils.copyFile(snapshotFile, newSnapshotFile);
+                            snapshotFile.deleteOnExit();
+                        }
                         snapshot.setFile(newSnapshotFile);
                         ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
                         openNextSnapshot = true;
