@@ -265,8 +265,11 @@ public class GlassFishOverviewPlugin extends DataSourceViewPlugin {
     public DetailsView createView(int position) {
         if (model == null) return null;
         if (position == DataViewComponent.TOP_RIGHT) {
-            return new DataViewComponent.DetailsView("Application Server", null, 0,
-                        new ScrollableContainer(new GlassfishOverviewPanel(AMXUtil.getDomainRoot(model), model)), null);
+            DomainRoot root = AMXUtil.getDomainRoot(model);
+            if (root != null) {
+                return new DataViewComponent.DetailsView("Application Server", null, 0,
+                        new ScrollableContainer(new GlassfishOverviewPanel(root, model)), null);
+            }
         }
         return null;
     }
