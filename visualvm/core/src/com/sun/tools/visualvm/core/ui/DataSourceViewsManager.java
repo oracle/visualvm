@@ -42,6 +42,9 @@ import java.util.Set;
  * @author Jiri Sedlacek
  */
 public final class DataSourceViewsManager {
+    
+    private static final String APP_OVERVIEW_CLASS_workaround =
+            "com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider"; // NOI18N
 
     private static DataSourceViewsManager sharedInstance;
 
@@ -82,6 +85,10 @@ public final class DataSourceViewsManager {
     public boolean canSaveViewsFor(DataSource dataSource, Class<? extends Snapshot> snapshotClass) {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
+        // Workaround for #109 to not block synchronous actions updating in EDT
+        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+            if (APP_OVERVIEW_CLASS_workaround.equals(compatibleProvider.getClass().getName())) return true;
+        // --------------------------------------------------------------------
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource) && compatibleProvider.supportsSaveViewFor(dataSource, snapshotClass))
                 return true;
@@ -98,6 +105,10 @@ public final class DataSourceViewsManager {
     boolean hasViewsFor(DataSource dataSource) {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
+        // Workaround for #109 to not block synchronous actions updating in EDT
+        for (DataSourceViewProvider compatibleProvider : compatibleProviders)
+            if (APP_OVERVIEW_CLASS_workaround.equals(compatibleProvider.getClass().getName())) return true;
+        // --------------------------------------------------------------------
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource)) return true;
         return false;
