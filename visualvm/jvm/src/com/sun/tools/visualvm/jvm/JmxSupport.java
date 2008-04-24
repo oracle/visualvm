@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
@@ -88,8 +89,9 @@ public class JmxSupport implements DataRemovedListener {
     synchronized JvmMXBeans getJvmMXBeans() {
         if (mxbeans == null) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-            mxbeans = jmxModel == null ? null :
-                JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+            if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+                mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+            }
         }
         return mxbeans;
     }
@@ -142,15 +144,12 @@ public class JmxSupport implements DataRemovedListener {
     }
     
     String takeThreadDump() {
-        JvmMXBeans jmx = getJvmMXBeans();
-        RuntimeMXBean runtimeMXBean;
-        ThreadMXBean threadMXBean;
-        
+        JvmMXBeans jmx = getJvmMXBeans();        
         if (jmx == null) {
             return null;
         }
-        runtimeMXBean = getRuntime();
-        threadMXBean = jmx.getThreadMXBean();
+        RuntimeMXBean runtimeMXBean = getRuntime();
+        ThreadMXBean threadMXBean = jmx.getThreadMXBean();
         if (runtimeMXBean == null || threadMXBean == null) {
             return null;
         }
@@ -246,18 +245,20 @@ public class JmxSupport implements DataRemovedListener {
     void initTimer() {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
         final JvmMXBeans jmx = getJvmMXBeans();
-        timer = new Timer(interval, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        MonitoredData data = new MonitoredDataImpl(jvm,JmxSupport.this,jmx);
-                        jvm.notifyListeners(data);
-                    }
-                });
-            }
-        });
-        timer.setCoalesce(true);
-        timer.start();
+        if (jmx != null) {
+            timer = new Timer(interval, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
+                            jvm.notifyListeners(data);
+                        }
+                    });
+                }
+            });
+            timer.setCoalesce(true);
+            timer.start();
+        }
     }
     
     void disableTimer() {

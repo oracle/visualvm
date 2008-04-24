@@ -34,10 +34,14 @@ import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -279,6 +283,15 @@ class JmxApplicationProvider {
             });
             return;
         }
+        model.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getNewValue() == ConnectionState.CONNECTED) {
+                    application.setStateImpl(Stateful.STATE_AVAILABLE);
+                } else {
+                    application.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                }
+            }
+        });
         // precompute JVM
         application.jvm = JvmFactory.getJVMFor(application);
         // If everything succeeded, add datasource to application tree

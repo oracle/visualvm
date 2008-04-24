@@ -36,6 +36,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
@@ -88,7 +89,7 @@ class ApplicationMonitorView extends DataSourceView {
         jvm = JvmFactory.getJVMFor(application);
         memoryMXBean = null;
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel != null) {
+        if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
             JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
             if (mxbeans != null) memoryMXBean = mxbeans.getMemoryMXBean();
         }

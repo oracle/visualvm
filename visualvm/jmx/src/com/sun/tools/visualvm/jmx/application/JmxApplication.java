@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
@@ -65,6 +66,10 @@ public final class JmxApplication extends Application {
         this.storage = storage;
     }
 
+    void setStateImpl(int newState) {
+        setState(newState);
+    }
+
     public JMXServiceURL getJMXServiceURL() {
         return url;
     }
@@ -85,14 +90,16 @@ public final class JmxApplication extends Application {
     public int getPid() {
         if (pid == UNKNOWN_PID) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
-            if (jmxModel != null) {
+            if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-                RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
-                if (rt != null) {
-                    String name = rt.getName();
-                    if (name != null && name.indexOf("@") != -1) {
-                        name = name.substring(0, name.indexOf("@"));
-                        pid = Integer.parseInt(name);
+                if (mxbeans != null) {
+                    RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
+                    if (rt != null) {
+                        String name = rt.getName();
+                        if (name != null && name.indexOf("@") != -1) {
+                            name = name.substring(0, name.indexOf("@"));
+                            pid = Integer.parseInt(name);
+                        }
                     }
                 }
             }
