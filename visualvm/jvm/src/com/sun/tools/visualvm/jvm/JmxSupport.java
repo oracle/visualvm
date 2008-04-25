@@ -147,26 +147,49 @@ public class JmxSupport implements DataRemovedListener {
     }
     
     String takeThreadDump() {
-        JvmMXBeans jmx = getJvmMXBeans();        
-        if (jmx == null) {
-            return null;
-        }
-        RuntimeMXBean runtimeMXBean = getRuntime();
-        ThreadMXBean threadMXBean = jmx.getThreadMXBean();
-        if (runtimeMXBean == null || threadMXBean == null) {
-            return null;
-        }
-        StringBuffer sb = new StringBuffer(4096);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
-        sb.append(df.format(new Date()) + "\n");
-        sb.append("Full thread dump " + jvm.getVmName() +   // NOI18N
-                " (" + jvm.getVmVersion() + " " +   // NOI18N
-                jvm.getVmInfo() + "):\n");  // NOI18N
-        if (jvm.is15()) {
-            long[] threadIds = threadMXBean.getAllThreadIds();
-            for (long threadId : threadIds) {
-                ThreadInfo thread = threadMXBean.getThreadInfo(threadId, Integer.MAX_VALUE);
-                if (thread != null) {
+        try {
+            JvmMXBeans jmx = getJvmMXBeans();
+            if (jmx == null) {
+                return null;
+            }
+            RuntimeMXBean runtimeMXBean = getRuntime();
+            ThreadMXBean threadMXBean = jmx.getThreadMXBean();
+            if (runtimeMXBean == null || threadMXBean == null) {
+                return null;
+            }
+            StringBuffer sb = new StringBuffer(4096);
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
+            sb.append(df.format(new Date()) + "\n");
+            sb.append("Full thread dump " + jvm.getVmName() + // NOI18N
+                    " (" + jvm.getVmVersion() + " " + // NOI18N
+                    jvm.getVmInfo() + "):\n");  // NOI18N
+            if (jvm.is15()) {
+                long[] threadIds = threadMXBean.getAllThreadIds();
+                for (long threadId : threadIds) {
+                    ThreadInfo thread = threadMXBean.getThreadInfo(threadId, Integer.MAX_VALUE);
+                    if (thread != null) {
+                        sb.append("\n\"" + thread.getThreadName() + // NOI18N
+                                "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
+                        sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
+                        if (thread.getLockName() != null) {
+                            sb.append(" on " + thread.getLockName());   // NOI18N
+                            if (thread.getLockOwnerName() != null) {
+                                sb.append(" owned by: " + thread.getLockOwnerName());   // NOI18N
+                            }
+                        }
+                        sb.append("\n");
+                        for (StackTraceElement st : thread.getStackTrace()) {
+                            sb.append("        at " + st.toString() + "\n");    // NOI18N
+                        }
+                    }
+                }
+            } else {
+                ThreadInfo[] threads = threadMXBean.dumpAllThreads(true, true);
+                for (ThreadInfo thread : threads) {
+                    MonitorInfo[] monitors = null;
+                    if (threadMXBean.isObjectMonitorUsageSupported()) {
+                        monitors = thread.getLockedMonitors();
+                    }
                     sb.append("\n\"" + thread.getThreadName() + // NOI18N
                             "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
                     sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
@@ -177,54 +200,36 @@ public class JmxSupport implements DataRemovedListener {
                         }
                     }
                     sb.append("\n");
+                    int index = 0;
                     for (StackTraceElement st : thread.getStackTrace()) {
-                        sb.append("        at " + st.toString() + "\n");    // NOI18N
+                        sb.append("\tat " + st.toString() + "\n");  // NOI18N
+                        if (monitors != null) {
+                            for (MonitorInfo mi : monitors) {
+                                if (mi.getLockedStackDepth() == index) {
+                                    sb.append("\t- locked " + mi.toString() + "\n");    // NOI18N
+                                }
+                            }
+                        }
+                        index++;
                     }
-                }
-            }
-        } else {
-            ThreadInfo[] threads = threadMXBean.dumpAllThreads(true, true);
-            for (ThreadInfo thread : threads) {
-                MonitorInfo[] monitors = null;
-                if (threadMXBean.isObjectMonitorUsageSupported()) {
-                    monitors = thread.getLockedMonitors();
-                }
-                sb.append("\n\"" + thread.getThreadName() + // NOI18N
-                        "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
-                sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-                if (thread.getLockName() != null) {
-                    sb.append(" on " + thread.getLockName());   // NOI18N
-                    if (thread.getLockOwnerName() != null) {
-                        sb.append(" owned by: " + thread.getLockOwnerName());   // NOI18N
-                    }
-                }
-                sb.append("\n");
-                int index = 0;
-                for (StackTraceElement st : thread.getStackTrace()) {
-                    sb.append("\tat " + st.toString() + "\n");  // NOI18N
-                    if (monitors != null) {
-                        for (MonitorInfo mi : monitors) {
-                            if (mi.getLockedStackDepth() == index) {
-                                sb.append("\t- locked " + mi.toString() + "\n");    // NOI18N
+                    if (threadMXBean.isSynchronizerUsageSupported()) {
+                        sb.append("\n   Locked ownable synchronizers:");    // NOI18N
+                        LockInfo[] synchronizers = thread.getLockedSynchronizers();
+                        if (synchronizers == null || synchronizers.length == 0) {
+                            sb.append("\n\t- None\n");  // NOI18N
+                        } else {
+                            for (LockInfo li : synchronizers) {
+                                sb.append("\n\t- locked " + li.toString() + "\n");  // NOI18N
                             }
                         }
                     }
-                    index++;
-                }
-                if (threadMXBean.isSynchronizerUsageSupported()) {
-                    sb.append("\n   Locked ownable synchronizers:");    // NOI18N
-                    LockInfo[] synchronizers = thread.getLockedSynchronizers();
-                    if (synchronizers == null || synchronizers.length == 0) {
-                        sb.append("\n\t- None\n");  // NOI18N
-                    } else {
-                        for (LockInfo li : synchronizers) {
-                            sb.append("\n\t- locked " + li.toString() + "\n");  // NOI18N
-                        }
-                    }
                 }
             }
+            return sb.toString();
+        } catch (Exception e) {
+            LOGGER.throwing(JmxSupport.class.getName(), "takeThreadDump", e); // NOI18N
+            return null;
         }
-        return sb.toString();
     }
     
     MemoryPoolMXBean getPermGenPool() {
