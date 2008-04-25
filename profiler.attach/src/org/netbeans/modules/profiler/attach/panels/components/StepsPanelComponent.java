@@ -54,7 +54,7 @@ import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
  * @author  Jaroslav Bachorik
  */
 public class StepsPanelComponent extends javax.swing.JPanel {
-  private final ResourceBundle messages = ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/components/StepsPanelComponent"); // NOI18N
+  private final ResourceBundle messages = ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/components/Bundle"); // NOI18N
   private final String STEP = messages.getString("STEP"); // NOI18N
   private final String WARNINGS = messages.getString("WARNINGS"); // NOI18N
   private final String NOTES = messages.getString("NOTES"); // NOI18N
