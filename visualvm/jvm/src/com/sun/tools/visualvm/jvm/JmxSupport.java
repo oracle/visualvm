@@ -76,19 +76,21 @@ public class JmxSupport implements DataRemovedListener {
     private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
-    
-    JmxSupport(Application app,JVMImpl vm) {
+
+    JmxSupport(Application app, JVMImpl vm) {
         jvm = vm;
         application = app;
         app.notifyWhenRemoved(this);
     }
-    
+
     RuntimeMXBean getRuntime() {
         JvmMXBeans jmx = getJvmMXBeans();
-        if (jmx != null) return jmx.getRuntimeMXBean();
+        if (jmx != null) {
+            return jmx.getRuntimeMXBean();
+        }
         return null;
     }
-    
+
     synchronized JvmMXBeans getJvmMXBeans() {
         if (mxbeans == null) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
@@ -98,30 +100,40 @@ public class JmxSupport implements DataRemovedListener {
         }
         return mxbeans;
     }
-    
+
     Properties getSystemProperties() {
-        RuntimeMXBean runtime = getRuntime();
-        if (runtime != null) {
-            Properties prop = new Properties();
-            prop.putAll(runtime.getSystemProperties());
-            return prop;
-        }
-        return null;
-    }
-    
-    String getJvmArgs() {
-        RuntimeMXBean runtime = getRuntime();
-        if (runtime != null) {
-            StringBuilder buf = new StringBuilder();
-            List<String> args = runtime.getInputArguments();
-            for (String arg : args) {
-                buf.append(arg).append(' ');
+        try {
+            RuntimeMXBean runtime = getRuntime();
+            if (runtime != null) {
+                Properties prop = new Properties();
+                prop.putAll(runtime.getSystemProperties());
+                return prop;
             }
-            return buf.toString();
+            return null;
+        } catch (Exception e) {
+            LOGGER.throwing(JmxSupport.class.getName(), "getSystemProperties", e); // NOI18N
+            return null;
         }
-        return null;
     }
-    
+
+    String getJvmArgs() {
+        try {
+            RuntimeMXBean runtime = getRuntime();
+            if (runtime != null) {
+                StringBuilder buf = new StringBuilder();
+                List<String> args = runtime.getInputArguments();
+                for (String arg : args) {
+                    buf.append(arg).append(' ');
+                }
+                return buf.toString();
+            }
+            return null;
+        } catch (Exception e) {
+            LOGGER.throwing(JmxSupport.class.getName(), "getJvmArgs", e); // NOI18N
+            return null;
+        }
+    }
+
     HotSpotDiagnosticMXBean getHotSpotDiagnostic() {
         synchronized (hotspotDiagnosticLock) {
             if (hotspotDiagnosticInitialized) {
@@ -138,14 +150,14 @@ public class JmxSupport implements DataRemovedListener {
                             "Couldn't find HotSpotDiagnosticMXBean: " + // NOI18N
                             e.getLocalizedMessage());
                 } catch (IllegalArgumentException ex) {
-                    ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL,ex);
-                } 
+                    ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
+                }
             }
             hotspotDiagnosticInitialized = true;
             return hotspotDiagnosticMXBean;
         }
     }
-    
+
     String takeThreadDump() {
         try {
             JvmMXBeans jmx = getJvmMXBeans();
@@ -231,25 +243,30 @@ public class JmxSupport implements DataRemovedListener {
             return null;
         }
     }
-    
+
     MemoryPoolMXBean getPermGenPool() {
-        if (permGenPool == null) {
-            JvmMXBeans jmx = getJvmMXBeans();
-            if (jmx != null) {
-                Collection<MemoryPoolMXBean> pools = jmx.getMemoryPoolMXBeans();
-                for (MemoryPoolMXBean pool : pools) {
-                    if (pool.getType().equals(MemoryType.NON_HEAP) &&
-                            (PERM_GEN.equals(pool.getName()) ||
-                            PS_PERM_GEN.equals(pool.getName()))) {
-                        permGenPool = pool;
-                        break;
+        try {
+            if (permGenPool == null) {
+                JvmMXBeans jmx = getJvmMXBeans();
+                if (jmx != null) {
+                    Collection<MemoryPoolMXBean> pools = jmx.getMemoryPoolMXBeans();
+                    for (MemoryPoolMXBean pool : pools) {
+                        if (pool.getType().equals(MemoryType.NON_HEAP) &&
+                                (PERM_GEN.equals(pool.getName()) ||
+                                PS_PERM_GEN.equals(pool.getName()))) {
+                            permGenPool = pool;
+                            break;
+                        }
                     }
                 }
             }
+            return permGenPool;
+        } catch (Exception e) {
+            LOGGER.throwing(JmxSupport.class.getName(), "getPermGenPool", e); // NOI18N
+            return null;
         }
-        return permGenPool;
     }
-    
+
     void initTimer() {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
         final JvmMXBeans jmx = getJvmMXBeans();
@@ -272,15 +289,14 @@ public class JmxSupport implements DataRemovedListener {
             timer.start();
         }
     }
-    
+
     void disableTimer() {
         if (timer != null) {
             timer.stop();
         }
     }
-    
+
     public void dataRemoved(Object dataSource) {
         disableTimer();
     }
-    
 }
