@@ -49,50 +49,6 @@ public class Install extends ModuleInstall {
         
         // Initialize snapshots
         SnapshotsSupport.getInstance();
-        
-//        org.openide.windows.WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-//            public void run() {
-//                RequestProcessor.getDefault().post(new Runnable() {
-//                    public void run() { init(); }
-//                });
-//            }
-//        });
-    }
-    
-    private void init() {
-        
-//        // Initialize hosts
-//        HostsSupport.getInstance();
-//        
-//        // Initialize applications
-//        ApplicationsSupport.getInstance();
-//
-//        // Initialize core dumps
-//        CoreDumpSupport.register();
-//        
-//        // Initialize explorer
-//        ExplorerSupport.sharedInstance();
-//        
-//        // Initialize snapshots
-//        SnapshotsSupport.getInstance();
-//        
-//        // Initialize views
-//        OverviewViewSupport.getInstance();
-//        MonitorViewSupport.getInstance();
-//        ThreadsViewSupport.getInstance();
-//        
-//        // Initialize profiler
-//        ProfilerSupport.getInstance();
-//        
-//        // Initialize thread dumps
-//        ThreadDumpSupport.getInstance();
-// 
-//        // Initialize heap dumps
-//        HeapDumpSupport.getInstance();
-//        
-//        // Initialize Application snapshots support
-//        ApplicationSnapshotsSupport.getInstance();
-
     }
     
     private void cleanupPreviousSession() {
