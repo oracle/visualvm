@@ -37,6 +37,8 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.InetAddress;
@@ -46,11 +48,23 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -217,6 +231,9 @@ public class HostProvider {
                 }
             });
 
+            Set<File> unresolvedHostsF = new HashSet();
+            Set<String> unresolvedHostsS = new HashSet();
+            
             Set<HostImpl> hosts = new HashSet();
             for (File file : files) {
                 Storage storage = new Storage(file.getParentFile(), file.getName());
@@ -226,12 +243,16 @@ public class HostProvider {
                 try {
                     persistedHost = new HostImpl(hostName, storage);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error loading persisted host", e);    // NOI18N
+                    LOGGER.throwing(HostProvider.class.getName(), "initPersistedHosts", e);    // NOI18N
+                    unresolvedHostsF.add(file);
+                    unresolvedHostsS.add(hostName);
                 }
 
                 if (persistedHost != null) hosts.add(persistedHost);
             }
-
+            
+            if (!unresolvedHostsF.isEmpty()) notifyUnresolvedHosts(unresolvedHostsF, unresolvedHostsS);
+            
             RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);     
         }
         
@@ -241,6 +262,27 @@ public class HostProvider {
                 initializingHosts = false;
             }
         });
+    }
+    
+    private static void notifyUnresolvedHosts(final Set<File> unresolvedHostsF, final Set<String> unresolvedHostsS) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
+                messagePanel.add(new JLabel(NbBundle.getMessage(HostProvider.class, "MSG_Unresolved_Hosts")), BorderLayout.NORTH); // NOI18N
+                JList list = new JList(unresolvedHostsS.toArray());
+                list.setVisibleRowCount(4);
+                messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
+                NotifyDescriptor dd = new NotifyDescriptor(
+                        messagePanel, NbBundle.getMessage(HostProvider.class, "Title_Unresolved_Hosts"), // NOI18N
+                        NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
+                        null, NotifyDescriptor.YES_OPTION);
+                if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.NO_OPTION)
+                    for (File file : unresolvedHostsF) Utils.delete(file, true);
+                
+                unresolvedHostsF.clear();
+                unresolvedHostsS.clear();
+            }
+        }, 1000);
     }
     
     
