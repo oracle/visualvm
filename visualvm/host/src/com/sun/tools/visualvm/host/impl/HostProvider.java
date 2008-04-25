@@ -170,7 +170,7 @@ public class HostProvider {
     
     public Host createLocalHost() {
         try {
-            return new Host("localhost", InetAddress.getLocalHost()) {};    // NOI18N
+            return new Host("localhost") {};    // NOI18N
         } catch (UnknownHostException e) {
             LOGGER.severe("Critical failure: cannot resolve localhost");    // NOI18N
             return null;
