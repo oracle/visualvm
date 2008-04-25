@@ -102,7 +102,7 @@ public class AboutDialogPanel extends JPanel {
                     try {
                         DesktopUtils.browse(url.toURI());
                     } catch (Exception e) {
-                        LOGGER.throwing(AboutDialogPanel.class.getName(), "initComponents", e);
+                        LOGGER.throwing(AboutDialogPanel.class.getName(), "initComponents", e); // NOI18N
                     }
                 }
             }

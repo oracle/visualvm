@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -92,7 +93,7 @@ public class AboutDialogControls extends JPanel {
         buildIDLabel.setFont(buildIDLabel.getFont().deriveFont(Font.BOLD));
         buildIDLabel.setEnabled(false);
         
-        detailsButton = new JButton("Details");
+        detailsButton = new JButton(NbBundle.getMessage(AboutDialogControls.class, "LBL_Details")); // NOI18N
         detailsButton.setDefaultCapable(false);
         detailsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -100,7 +101,7 @@ public class AboutDialogControls extends JPanel {
             }
         });
         
-        logfileButton = new JButton("Logfile");
+        logfileButton = new JButton(NbBundle.getMessage(AboutDialogControls.class, "LBL_Logfile")); // NOI18N
         logfileButton.setDefaultCapable(false);
         logfileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +109,7 @@ public class AboutDialogControls extends JPanel {
             }
         });
         
-        closeButton = new JButton("Close");
+        closeButton = new JButton(NbBundle.getMessage(AboutDialogControls.class, "LBL_Close")); // NOI18N
         closeButton.setDefaultCapable(true);
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -131,7 +132,7 @@ public class AboutDialogControls extends JPanel {
     }
     
     private void showDetails() {
-        TextBrowser.getInstance().setCaption("Details");
+        TextBrowser.getInstance().setCaption(NbBundle.getMessage(AboutDialogControls.class, "LBL_Details"));    // NOI18N
         TextBrowser.getInstance().setPreferredBrowserSize(new Dimension(450, 250));
         TextBrowser.getInstance().showHTMLText(AboutDialog.getInstance().getDetails());
     }
@@ -145,24 +146,30 @@ public class AboutDialogControls extends JPanel {
         
                 try {
                     if (!logfile.exists() || !logfile.isFile() || !logfile.canRead()) {
-                        JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(), "Cannot open the logfile " + logfile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(), 
+                                NbBundle.getMessage(AboutDialogControls.class, "LBL_Cannot_open_the_logfile", logfile.getAbsolutePath()),   // NOI18N
+                                NbBundle.getMessage(AboutDialogControls.class, "LBL_Error"),    // NOI18N
+                                JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
-                    TextBrowser.getInstance().setCaption("Logfile Viewer (" + logfile.getAbsolutePath() + ")");
+                    TextBrowser.getInstance().setCaption(NbBundle.getMessage(AboutDialogControls.class, "LBL_Logfile_Viewer_", logfile.getAbsolutePath())); // NOI18N
                     if (DesktopUtils.isOpenAvailable()) {
                         try {
                             DesktopUtils.open(logfile);
                         } catch (Exception ex) {
                             showLogfileInBrowser(logfile);
-                            LOGGER.throwing(AboutDialogControls.class.getName(), "showLogFile", ex);
+                            LOGGER.throwing(AboutDialogControls.class.getName(), "showLogFile", ex);    // NOI18N
                         }
                     } else {
                         showLogfileInBrowser(logfile);
                     }
                 } catch (Exception e) {
-                    LOGGER.throwing(AboutDialogControls.class.getName(), "showLogFile", e);
-                    JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(), "Cannot open the logfile " + logfile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+                    LOGGER.throwing(AboutDialogControls.class.getName(), "showLogFile", e); // NOI18N
+                    JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(), 
+                            NbBundle.getMessage(AboutDialogControls.class, "LBL_Cannot_open_the_logfile", logfile.getAbsolutePath()),   // NOI18N
+                            NbBundle.getMessage(AboutDialogControls.class, "LBL_Error"),    // NOI18N
+                            JOptionPane.ERROR_MESSAGE);
                 } finally {
                     logfileButton.setEnabled(true);
                 }

@@ -50,12 +50,12 @@ import org.openide.windows.WindowManager;
 public final class AboutAction extends AbstractAction {
     private final static Logger LOGGER = Logger.getLogger(AboutAction.class.getName());
     
-    private String versionString = "Dev"; // Use "Dev" for development builds
+    private String versionString = "Dev"; // Use "Dev" for development builds   // NOI18N
 
 
     public AboutAction() {
         putValue(Action.NAME, NbBundle.getMessage(AboutAction.class, "CTL_AboutAction")); // NOI18N
-        putValue("noIconInMenu", Boolean.TRUE); //NOI18N
+        putValue("noIconInMenu", Boolean.TRUE); // NOI18N
     }
     
     public void actionPerformed(final ActionEvent e) {
@@ -70,10 +70,10 @@ public final class AboutAction extends AbstractAction {
                 URL imageURL = getClass().getResource("/com/sun/tools/visualvm/modules/appui/about/image.gif"); // NOI18N
                 Image splashImage = Toolkit.getDefaultToolkit().createImage(imageURL);
                 aboutDialog = AboutDialog.createInstance(WindowManager.getDefault().getMainWindow(), splashImage);
-                aboutDialog.setCaption("About VisualVM");
-                aboutDialog.setBuildID("Version: " + versionString + " (Build " + getBuildNumber() + ")");
-                aboutDialog.setMessage("<b>VisualVM</b> has been licensed under the GNU General Public License (GPL) Version 2 with Classpath Exception. " + "Visit https://visualvm.dev.java.net for more information. Built on NetBeans Platform.");
-                aboutDialog.setHTMLMessage("<b>VisualVM</b> has been licensed under the GNU General Public License (GPL) Version 2 with Classpath Exception. " + "Visit <a href=\"https://visualvm.dev.java.net\">https://visualvm.dev.java.net</a> for more information. Built on <a href=\"http://platform.netbeans.org\">NetBeans Platform</a>.");
+                aboutDialog.setCaption(NbBundle.getMessage(AboutAction.class, "LBL_About_VisualVM"));   // NOI18N
+                aboutDialog.setBuildID(NbBundle.getMessage(AboutAction.class, "LBL_Version_Build", new Object[] {versionString,getBuildNumber()}));
+                aboutDialog.setMessage(NbBundle.getMessage(AboutAction.class, "MSG_License") + NbBundle.getMessage(AboutAction.class, "MSG_License1"));
+                aboutDialog.setHTMLMessage(NbBundle.getMessage(AboutAction.class, "MSG_Html_License") + NbBundle.getMessage(AboutAction.class, "MSG_Html_License1"));
                 aboutDialog.setDetails(getDetails());
                 aboutDialog.setLogfile(getLogfile());
             } catch (Exception e) {
@@ -153,30 +153,30 @@ public final class AboutAction extends AbstractAction {
         String osName = systemProperties.getProperty("os.name", "&lt;not available&gt;"); // NOI18N
         String osVersion = systemProperties.getProperty("os.version", ""); // NOI18N
         String patchLevel = systemProperties.getProperty("sun.os.patch.level", ""); // NOI18N
-        String osArch = systemProperties.getProperty("os.arch", "&lt;not available&gt;");
-        String sunArch = systemProperties.getProperty("sun.arch.data.model", "?") + "bit";
+        String osArch = systemProperties.getProperty("os.arch", "&lt;not available&gt;");   // NOI18N
+        String sunArch = systemProperties.getProperty("sun.arch.data.model", "?") + "bit";  // NOI18N
         return osName + " (" + osVersion + ") " + ("unknown".equals(patchLevel) ? "" : patchLevel) + ", " + osArch + " " + sunArch; // NOI18N
     }
     
     private static String getJavaInfo() {
         Properties systemProperties = System.getProperties();
-        String javaVersion = systemProperties.getProperty("java.version", "unknown");
-        String vmName = systemProperties.getProperty("java.vm.name", "&lt;not available&gt;");
-        String vmVerison = systemProperties.getProperty("java.vm.version", "");
-        String vmInfo = systemProperties.getProperty("java.vm.info", "");
+        String javaVersion = systemProperties.getProperty("java.version", "unknown");   // NOI18N
+        String vmName = systemProperties.getProperty("java.vm.name", "&lt;not available&gt;");  // NOI18N
+        String vmVerison = systemProperties.getProperty("java.vm.version", ""); // NOI18N
+        String vmInfo = systemProperties.getProperty("java.vm.info", "");   // NOI18N
         return javaVersion + "; " + vmName + " (" + vmVerison + ", " + vmInfo + ")";
     }
     
     private static String getEnvironment() {
         String branding = NbBundle.getBranding();
-        String encoding = System.getProperty("file.encoding", "unknown");
+        String encoding = System.getProperty("file.encoding", "unknown");   // NOI18N
         String locale = Locale.getDefault().toString() + (branding == null ? "" : (" (" + branding + ")")); // NOI18N
         return encoding + "; " + locale;
     }
     
     private static String getIDEInstallValue() {
-        String nbhome = System.getProperty("netbeans.home");
-        String nbdirs = System.getProperty("netbeans.dirs");
+        String nbhome = System.getProperty("netbeans.home");    // NOI18N
+        String nbdirs = System.getProperty("netbeans.dirs");    // NOI18N
         
         Enumeration<Object> more;
         if (nbdirs != null) {
@@ -200,7 +200,7 @@ public final class AboutAction extends AbstractAction {
                 // new file
                 sb.append (prefix);
                 sb.append(f.getAbsolutePath());
-                prefix = "\n";
+                prefix = "\n";  // NOI18N
             }
         }
         

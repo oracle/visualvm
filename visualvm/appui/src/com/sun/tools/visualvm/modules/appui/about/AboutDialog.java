@@ -38,6 +38,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -153,7 +154,7 @@ public class AboutDialog {
     }
     
     private void initComponents() {
-        dialog = new JDialog(parentFrame, "About", true);
+        dialog = new JDialog(parentFrame, NbBundle.getMessage(AboutDialog.class, "LBL_About"), true);   // NOI18N
         dialog.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) { cleanup(); }
         });
