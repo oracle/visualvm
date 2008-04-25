@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -214,6 +215,7 @@ public final class CachedMBeanServerConnectionFactory {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     flush();
+                    connectionPinger();
                     notifyListeners();
                 }
             });
@@ -222,6 +224,21 @@ public final class CachedMBeanServerConnectionFactory {
         void notifyListeners() {
             for (MBeanCacheListener listener : listenerList) {
                 listener.flushed();
+            }
+        }
+
+        private void connectionPinger() {
+            try {
+                conn.getDefaultDomain();
+            } catch (Exception e) {
+                timer.stop();
+                listenerList.clear();
+                cachedValues.clear();
+                cachedNames.clear();
+                Collection<Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>> values = snapshots.values();
+                for (Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> value : values) {
+                    value.remove(conn);
+                }
             }
         }
 
