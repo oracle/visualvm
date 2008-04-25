@@ -50,11 +50,11 @@ import javax.swing.UIManager;
  */
 final class DataSourceCaption<X extends DataSource> extends JComponent implements PropertyChangeListener, DataRemovedListener<DataSource> {
     
-    private static final boolean ANIMATE = Boolean.getBoolean("com.sun.tools.visualvm.core.ui.DataSourceCaption.animate");
-    private static final int ANIMATION_RATE = Integer.getInteger("com.sun.tools.visualvm.core.ui.DataSourceCaption.animationRate", 80);
+    private static final boolean ANIMATE = Boolean.getBoolean("com.sun.tools.visualvm.core.ui.DataSourceCaption.animate");  // NOI18N
+    private static final int ANIMATION_RATE = Integer.getInteger("com.sun.tools.visualvm.core.ui.DataSourceCaption.animationRate", 80); // NOI18N
     
-    private static final String APPLICATION_PID_PREFIX = "(pid";
-    private static final String APPLICATION_PID_SUFFIX = ")";
+    private static final String APPLICATION_PID_PREFIX = "(pid";    // NOI18N
+    private static final String APPLICATION_PID_SUFFIX = ")";   // NOI18N
     
     private DataSource dataSource;
     private DataSourceDescriptor<X> dataSourceDescriptor;
@@ -131,21 +131,21 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
                 if (busyIconTimer == null) createTimer();
                 busyIconTimer.start();
             } else {
-                presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon4.png")));
+                presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
             }
         } else {
             if (busyIconTimer != null) busyIconTimer.stop(); // Stop previous animation if still running
-            presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/idle-icon.png")));
+            presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/idle-icon.png")));    // NOI18N
         }
     }
     
     private void updateCaption() {
         // TODO: mask all html-specific characters
-        name = name.replace(">", "&gt;");
-        name = name.replace("<", "&lt;");
+        name = name.replace(">", "&gt;");   // NOI18N
+        name = name.replace("<", "&lt;");   // NOI18N
         
-        Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : UIManager.getColor("Label.disabledForeground");
-        String textColorString = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
+        Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : UIManager.getColor("Label.disabledForeground");    // NOI18N
+        String textColorString = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; // NOI18N
         
         if (name.contains(APPLICATION_PID_PREFIX) && name.contains(APPLICATION_PID_SUFFIX)) {
             // Hack to customize default Application displayname containing "(pid XXX)"
@@ -154,9 +154,9 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
             String captionBase = name.substring(0, startPid).trim();
             String captionPid = name.substring(startPid).trim();
             
-            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + captionBase + "</b> " + captionPid + "</nobr></body></html>");
+            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + captionBase + "</b> " + captionPid + "</nobr></body></html>");  // NOI18N
         } else {
-            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + name + "</b></nobr></body></html>");
+            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + name + "</b></nobr></body></html>");    // NOI18N
         }
     }
     
@@ -169,12 +169,12 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     private void createTimer() {
         final Icon[] busyIcons = new Icon[15];
 
-        for (int i = 0; i < busyIcons.length; i++) busyIcons[i] = new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon" + i + ".png"));
+        for (int i = 0; i < busyIcons.length; i++) busyIcons[i] = new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon" + i + ".png"));    // NOI18N
         busyIconTimer = new Timer(ANIMATION_RATE, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!ANIMATE) {
                     if (busyIconTimer != null) busyIconTimer.stop(); // Stop animation
-                    presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon4.png")));
+                    presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
                 } else {
                     busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
                     if (!DataSourceCaption.this.isShowing()) return;

@@ -44,9 +44,9 @@ public abstract class DataSource {
     /**
      * Named property for DataSource visibility.
      */
-    public static final String PROPERTY_VISIBLE = "prop_visible";
+    public static final String PROPERTY_VISIBLE = "prop_visible";   // NOI18N
     
-    public static final RequestProcessor EVENT_QUEUE = new RequestProcessor("DataSource Event Queue");
+    public static final RequestProcessor EVENT_QUEUE = new RequestProcessor("DataSource Event Queue");  // NOI18N
     
     /**
      * Virtual root of DataSource tree.
@@ -87,7 +87,7 @@ public abstract class DataSource {
     }
     
     public final synchronized void setVisible(boolean newVisible) {
-        if (this == DataSource.ROOT && !newVisible) throw new IllegalArgumentException("DataSourceRoot cannot be hidden");
+        if (this == DataSource.ROOT && !newVisible) throw new IllegalArgumentException("DataSourceRoot cannot be hidden");  // NOI18N
         boolean oldVisible = visible;
         visible = newVisible;
         getChangeSupport().firePropertyChange(PROPERTY_VISIBLE, oldVisible, newVisible);
@@ -104,7 +104,7 @@ public abstract class DataSource {
     public final synchronized Storage getStorage() {
         if (storage == null) {
             storage = createStorage();
-            if (storage == null) throw new NullPointerException("Storage cannot be null");
+            if (storage == null) throw new NullPointerException("Storage cannot be null");  // NOI18N
         }
         return storage;
     }
@@ -137,7 +137,7 @@ public abstract class DataSource {
     
     // Notifies the listener that the DataSource has been removed from the tree
     public final void notifyWhenRemoved(DataRemovedListener listener) {
-        if (listener == null) throw new IllegalArgumentException("Listener cannot be null");
+        if (listener == null) throw new IllegalArgumentException("Listener cannot be null");    // NOI18N
         if (isRemoved()) listener.dataRemoved(this);
         else getRemovedListeners().add(new ComparableWeakReference(listener));
     }
@@ -161,7 +161,7 @@ public abstract class DataSource {
     
     
     final void addImpl(DataSource owner) {
-        if (isRemoved) throw new UnsupportedOperationException("DataSource can be added only once");
+        if (isRemoved) throw new UnsupportedOperationException("DataSource can be added only once");    // NOI18N
         this.owner = owner;
     }
     

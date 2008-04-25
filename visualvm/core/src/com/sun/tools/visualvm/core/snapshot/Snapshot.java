@@ -41,7 +41,7 @@ public abstract class Snapshot extends DataSource {
     /**
      * Named property for snapshot file.
      */
-    public static final String PROPERTY_FILE = "prop_file";
+    public static final String PROPERTY_FILE = "prop_file"; // NOI18N
     
     private File file;
     private final SnapshotCategory category;
@@ -108,7 +108,7 @@ public abstract class Snapshot extends DataSource {
     }
     
     public void saveAs() {
-        throw new UnsupportedOperationException("Save as not supported");
+        throw new UnsupportedOperationException("Save as not supported");   // NOI18N
     }
     
     public boolean supportsDelete() {

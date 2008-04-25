@@ -34,6 +34,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
@@ -45,7 +46,7 @@ import org.openide.windows.WindowManager;
  */
 public final class SnapshotsSupport {
     
-    private static final Image SNAPSHOT_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);
+    private static final Image SNAPSHOT_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     
     private static SnapshotsSupport instance;
 
@@ -75,7 +76,7 @@ public final class SnapshotsSupport {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {
-                        pHandle = ProgressHandleFactory.createHandle("Saving " + DataSourceDescriptorFactory.getDescriptor(snapshot).getName() + "...");
+                        pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(SnapshotsSupport.class, "LBL_Saving",DataSourceDescriptorFactory.getDescriptor(snapshot).getName()));  // NOI18N
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         Utils.copyFile(file, copy);

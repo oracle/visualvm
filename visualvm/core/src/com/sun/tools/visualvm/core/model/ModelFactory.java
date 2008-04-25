@@ -114,7 +114,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         Lock wlock = providersLock.writeLock();
         wlock.lock();
         try {
-            LOGGER.finer("Registering " + newProvider.getClass().getName());
+            LOGGER.finer("Registering " + newProvider.getClass().getName());    // NOI18N
             boolean added = providers.add(newProvider);
             if (added) {
                 clearCache();
@@ -131,7 +131,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         Lock wlock = providersLock.writeLock();
         wlock.lock();
         try {
-            LOGGER.finer("Unregistering " + oldProvider.getClass().getName());
+            LOGGER.finer("Unregistering " + oldProvider.getClass().getName());  // NOI18N
             boolean removed = providers.remove(oldProvider);
             if (removed) {
                 clearCache();
@@ -212,7 +212,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         
         public String toString() {
             DataSource ds = weakReference.get();
-            return "DataSourceKey for "+System.identityHashCode(this)+" for "+ds==null?"NULL":ds.toString();
+            return "DataSourceKey for "+System.identityHashCode(this)+" for "+ds==null?"NULL":ds.toString();    // NOI18N
         }
     }
 }

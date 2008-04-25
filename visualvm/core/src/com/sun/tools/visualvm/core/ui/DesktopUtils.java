@@ -38,7 +38,7 @@ import java.net.URI;
  */
 public final class DesktopUtils {
 
-    private static final Object allowDesktopOpen = System.getProperty("com.sun.tools.visualvm.core.ui.DesktopUtils.allowDesktopOpen");
+    private static final Object allowDesktopOpen = System.getProperty("com.sun.tools.visualvm.core.ui.DesktopUtils.allowDesktopOpen");  // NOI18N
 
     private static boolean desktopSupported;
     private static boolean desktopSupportedInitialized = false;

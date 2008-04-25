@@ -51,11 +51,11 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
         
         String fileName = file.getName();
         SnapshotCategory category = snapshot.getCategory();
-        String name = "[" + category.getPrefix() + "] " + fileName;
+        String name = "[" + category.getPrefix() + "] " + fileName; // NOI18N
         
         if (category.isSnapshot(file)) {
             String timeStamp = category.getTimeStamp(fileName);
-            if (timeStamp != null) name = "[" + category.getPrefix() + "] " + timeStamp;
+            if (timeStamp != null) name = "[" + category.getPrefix() + "] " + timeStamp;    // NOI18N
         }
         
         return name;

@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import java.awt.Image;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -54,10 +55,10 @@ public final class SnapshotsContainer extends DataSource {
     
     
     private static class SnapshotsContainerDescriptor extends DataSourceDescriptor {
-            private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);
+            private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshots.png", true); // NOI18N
 
             SnapshotsContainerDescriptor() {
-                super(SnapshotsContainer.sharedInstance(), "Snapshots", null, NODE_ICON, 30, EXPAND_ON_FIRST_CHILD);
+                super(SnapshotsContainer.sharedInstance(), NbBundle.getMessage(SnapshotsContainer.class, "LBL_Snapshots"), null, NODE_ICON, 30, EXPAND_ON_FIRST_CHILD); // NOI18N
             }
 
         }

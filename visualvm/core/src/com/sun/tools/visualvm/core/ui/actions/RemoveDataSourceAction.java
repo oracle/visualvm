@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.awt.event.ActionEvent;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -72,7 +73,7 @@ class RemoveDataSourceAction extends MultiDataSourceAction<DataSource> {
     
     private RemoveDataSourceAction() {
         super(DataSource.class);
-        putValue(NAME, "Remove");
-        putValue(SHORT_DESCRIPTION, "Remove");
+        putValue(NAME, NbBundle.getMessage(RemoveDataSourceAction.class, "LBL_Remove"));    // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(RemoveDataSourceAction.class, "LBL_Remove"));   // NOI18N
     }
 }

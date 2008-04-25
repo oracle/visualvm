@@ -53,7 +53,7 @@ import org.openide.util.RequestProcessor;
  */
 class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
-    private static final RequestProcessor queue = new RequestProcessor("Explorer Builder Processor");
+    private static final RequestProcessor queue = new RequestProcessor("Explorer Builder Processor");   // NOI18N
     
     private static ExplorerModelBuilder instance;
     

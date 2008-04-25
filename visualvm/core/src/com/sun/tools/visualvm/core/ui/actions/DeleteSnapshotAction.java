@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import java.awt.event.ActionEvent;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -61,8 +62,8 @@ class DeleteSnapshotAction extends MultiDataSourceAction<Snapshot> {
     
     private DeleteSnapshotAction() {
         super(Snapshot.class);
-        putValue(NAME, "Delete");
-        putValue(SHORT_DESCRIPTION, "Delete");
+        putValue(NAME, NbBundle.getMessage(DeleteSnapshotAction.class, "LBL_Delete"));  // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(DeleteSnapshotAction.class, "LBL_Delete")); // NOI18N
 //        putValue(SMALL_ICON, new ImageIcon(ICON_16));
 //        putValue("iconBase", new ImageIcon(ICON_24));
     }

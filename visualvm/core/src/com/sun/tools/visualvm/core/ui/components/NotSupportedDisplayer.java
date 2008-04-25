@@ -29,6 +29,7 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -36,13 +37,13 @@ import javax.swing.SwingConstants;
  */
 public final class NotSupportedDisplayer extends JPanel {
 
-    public static final String APPLICATION = "application";
-    public static final String JVM = "JVM";
-    public static final String HOST = "host";
-    public static final String OS = "OS";
+    public static final String APPLICATION = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_application");   // NOI18N
+    public static final String JVM = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_JVM");   // NOI18N
+    public static final String HOST = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_host"); // NOI18N
+    public static final String OS = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_OS"); // NOI18N
 
     public NotSupportedDisplayer(String object) {
-        JLabel notSupportedLabel = new JLabel("Not supported for this " + object + ".", SwingConstants.CENTER);
+        JLabel notSupportedLabel = new JLabel(NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_Not_supported", object), SwingConstants.CENTER);    // NOI18N
         notSupportedLabel.setEnabled(false);
 
         setLayout(new BorderLayout());

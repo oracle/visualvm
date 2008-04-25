@@ -43,12 +43,12 @@ import java.util.logging.Logger;
  */
 public final class Storage {
     
-    private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";
-    private static final String PERSISTENT_STORAGE_DIRNAME = "repository";
+    private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";  // NOI18N
+    private static final String PERSISTENT_STORAGE_DIRNAME = "repository";  // NOI18N
     
     private static final Logger LOGGER = Logger.getLogger(Storage.class.getName());
     
-    public static final String DEFAULT_PROPERTIES_EXT = ".properties";
+    public static final String DEFAULT_PROPERTIES_EXT = ".properties";  // NOI18N
     
     private static final Object temporaryStorageDirectoryLock = new Object();
     // @GuardedBy temporaryStorageDirectory
@@ -74,8 +74,8 @@ public final class Storage {
     }
     
     public Storage(File directory, String propertiesFile) {
-        if (directory == null) throw new NullPointerException("Directory cannot be null");
-        if (directory.isFile()) throw new IllegalArgumentException("Not a valid directory: " + directory);
+        if (directory == null) throw new NullPointerException("Directory cannot be null");  // NOI18N
+        if (directory.isFile()) throw new IllegalArgumentException("Not a valid directory: " + directory);  // NOI18N
         this.directory = directory;
         this.propertiesFile = propertiesFile != null ? new File(directory, propertiesFile) : null;
     }
@@ -86,7 +86,7 @@ public final class Storage {
     }
     
     public synchronized File getDirectory() {
-        if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);
+        if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);    // NOI18N
         return directory;
     }
     
@@ -112,8 +112,8 @@ public final class Storage {
     }
     
     public synchronized void saveCustomPropertiesTo(File file) {
-        if (file == null) throw new NullPointerException("File cannot be null");
-        if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);
+        if (file == null) throw new NullPointerException("File cannot be null");    // NOI18N
+        if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);    // NOI18N
         
         Properties prop = getCustomProperties();
         if (!prop.isEmpty()) storeProperties(prop, file);
@@ -133,7 +133,7 @@ public final class Storage {
     public static String getTemporaryStorageDirectoryString() {
         synchronized(temporaryStorageDirectoryStringLock) {
             if (temporaryStorageDirectoryString == null)
-                temporaryStorageDirectoryString = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + File.separator + TEMPORARY_STORAGE_DIRNAME;
+                temporaryStorageDirectoryString = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + File.separator + TEMPORARY_STORAGE_DIRNAME;    // NOI18N
             return temporaryStorageDirectoryString;
         }
     }
@@ -151,11 +151,11 @@ public final class Storage {
                 String temporaryStorageString = getTemporaryStorageDirectoryString();
                 temporaryStorageDirectory = new File(temporaryStorageString);
                 if (temporaryStorageDirectory.exists() && temporaryStorageDirectory.isFile())
-                    throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");
+                    throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString + ", file in the way");   // NOI18N
                 if (temporaryStorageDirectory.exists() && (!temporaryStorageDirectory.canRead() || !temporaryStorageDirectory.canWrite()))
-                    throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");
+                    throw new IllegalStateException("Cannot access temporary storage directory " + temporaryStorageString + ", read&write permission required");    // NOI18N
                 if (!Utils.prepareDirectory(temporaryStorageDirectory))
-                    throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString);
+                    throw new IllegalStateException("Cannot create temporary storage directory " + temporaryStorageString); // NOI18N
             }
             return temporaryStorageDirectory;
         }
@@ -169,7 +169,7 @@ public final class Storage {
     public static String getPersistentStorageDirectoryString() {
         synchronized(persistentStorageDirectoryStringLock) {
             if (persistentStorageDirectoryString == null)
-                persistentStorageDirectoryString = new File(System.getProperty("netbeans.user")).getAbsolutePath() + File.separator + PERSISTENT_STORAGE_DIRNAME;
+                persistentStorageDirectoryString = new File(System.getProperty("netbeans.user")).getAbsolutePath() + File.separator + PERSISTENT_STORAGE_DIRNAME;   // NOI18N
             return persistentStorageDirectoryString;
         }
     }
@@ -185,11 +185,11 @@ public final class Storage {
                 String persistentStorageString = getPersistentStorageDirectoryString();
                 persistentStorageDirectory = new File(persistentStorageString);
                 if (persistentStorageDirectory.exists() && persistentStorageDirectory.isFile())
-                    throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way");
+                    throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString + ", file in the way"); // NOI18N
                 if (persistentStorageDirectory.exists() && (!persistentStorageDirectory.canRead() || !persistentStorageDirectory.canWrite()))
-                    throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");
+                    throw new IllegalStateException("Cannot access persistent storage directory " + persistentStorageString + ", read&write permission required");  // NOI18N
                 if (!Utils.prepareDirectory(persistentStorageDirectory))
-                    throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);
+                    throw new IllegalStateException("Cannot create persistent storage directory " + persistentStorageString);   // NOI18N
             }
             return persistentStorageDirectory;
         }
@@ -223,14 +223,14 @@ public final class Storage {
             properties.loadFromXML(bis);
             return properties;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error loading properties", e);
+            LOGGER.log(Level.SEVERE, "Error loading properties", e);    // NOI18N
             return null;
         } finally {
             try {
                 if (bis != null) bis.close();
                 if (is != null) is.close();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Problem closing input stream", e);
+                LOGGER.log(Level.SEVERE, "Problem closing input stream", e);    // NOI18N
             }
         }
     }
@@ -243,13 +243,13 @@ public final class Storage {
             bos = new BufferedOutputStream(os);
             properties.storeToXML(os, null);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error storing properties", e);
+            LOGGER.log(Level.SEVERE, "Error storing properties", e);    // NOI18N
         } finally {
             try {
                 if (bos != null) bos.close();
                 if (os != null) os.close();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Problem closing output stream", e);
+                LOGGER.log(Level.SEVERE, "Problem closing output stream", e);   // NOI18N
             }
         }
     }

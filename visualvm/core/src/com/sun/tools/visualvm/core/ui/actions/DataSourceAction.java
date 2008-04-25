@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,7 +54,7 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
     protected abstract void updateState(Set<X> selectedDataSources);
 
     protected void notifyCannotPerform() {
-        NetBeansProfiler.getDefaultNB().displayError("Cannot perform action in this context");
+        NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(DataSourceAction.class, "MSG_Cannot_perform_action_in_this_context")); // NOI18N
     }
     
     protected void initialize() {

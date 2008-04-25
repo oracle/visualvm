@@ -59,9 +59,9 @@ public abstract class DataSourceView implements Positionable {
      * @param isClosable true if the user is allowed to close the view, false otherwise.
      */
     public DataSourceView(DataSource dataSource, String name, Image icon, int preferredPosition, boolean isClosable) {
-        if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null");
-        if (name == null) throw new IllegalArgumentException("Name cannot be null");
-        if (icon == null) throw new IllegalArgumentException("Icon cannot be null");
+        if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null");    // NOI18N
+        if (name == null) throw new IllegalArgumentException("Name cannot be null");    // NOI18N
+        if (icon == null) throw new IllegalArgumentException("Icon cannot be null");    // NOI18N
 
         this.dataSource = dataSource;
         this.name = name;
@@ -153,7 +153,7 @@ public abstract class DataSourceView implements Positionable {
     DataViewComponent getView() {
         if (component == null) {
             component = createComponent();
-            if (component == null) throw new NullPointerException("Null view component from " + this);
+            if (component == null) throw new NullPointerException("Null view component from " + this);  // NOI18N
             controller.processCreatedComponent(this, component);
         }
         return component;

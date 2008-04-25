@@ -65,7 +65,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
                 }
             });
         } catch (Exception e) {
-            LOGGER.severe("Failed to create window for " + dataSource);
+            LOGGER.severe("Failed to create window for " + dataSource); // NOI18N
         }
     }
     
@@ -96,20 +96,20 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     public void selectView(DataSourceView view) {
         if (viewsCount > 1) {
             int viewIndex = indexOf(view);
-            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
+            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);   // NOI18N
             else tabbedContainer.setSelectedIndex(viewIndex);
         }
     }
     
     public void removeView(final DataSourceView view) {
         if (viewsCount == 1) {
-            if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
+            if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this); // NOI18N
             remove(singleViewContainer);
             singleViewContainer.getCaption().finish();
             singleViewContainer = null;
         } else {
             int viewIndex = indexOf(view);
-            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);
+            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);   // NOI18N
             else tabbedContainer.removeTabAt(viewIndex);
             
             if (viewsCount == 2) {
@@ -174,7 +174,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() { setIcon((Image)evt.getNewValue()); }
             });
-        } else if ("close".equals(propertyName)) {
+        } else if (DataSourceWindowTabbedPane.PROP_CLOSE.equals(propertyName)) {
             removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.ViewContainer)evt.getNewValue()));
         }
     }
@@ -194,7 +194,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
 
         // tabbedContainer
         tabbedContainer = new DataSourceWindowTabbedPane();
-        tabbedContainer.addPropertyChangeListener("close", this);
+        tabbedContainer.addPropertyChangeListener(DataSourceWindowTabbedPane.PROP_CLOSE, this);
         add(tabbedContainer, BorderLayout.CENTER);
     }
     

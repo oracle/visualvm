@@ -39,15 +39,15 @@ class GeneralOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/options.png"));
+        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/options.png"));  // NOI18N
     }
 
     public String getCategoryName() {
-        return NbBundle.getMessage(GeneralOptionsCategory.class, "OptionsCategory_Name_Core");
+        return NbBundle.getMessage(GeneralOptionsCategory.class, "OptionsCategory_Name_Core");  // NOI18N
     }
 
     public String getTitle() {
-        return NbBundle.getMessage(GeneralOptionsCategory.class, "OptionsCategory_Title_Core");
+        return NbBundle.getMessage(GeneralOptionsCategory.class, "OptionsCategory_Title_Core"); // NOI18N
     }
 
     public OptionsPanelController create() {

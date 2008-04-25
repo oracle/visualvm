@@ -51,8 +51,8 @@ import org.openide.loaders.DataObject;
 final class ExplorerContextMenuFactory {
 
     private static final Logger LOGGER = Logger.getLogger(ExplorerContextMenuFactory.class.getName());
-    private static final String SELECTION_ACTIONS_FILE = "VisualVM/ExplorerPopupSelection";
-    private static final String NOSELECTION_ACTIONS_FILE = "VisualVM/ExplorerPopupNoSelection";
+    private static final String SELECTION_ACTIONS_FILE = "VisualVM/ExplorerPopupSelection"; // NOI18N
+    private static final String NOSELECTION_ACTIONS_FILE = "VisualVM/ExplorerPopupNoSelection"; // NOI18N
 
     private static ExplorerContextMenuFactory sharedInstance;
 
@@ -148,21 +148,21 @@ final class ExplorerContextMenuFactory {
                 FileObject fobj = menuItemDO.getPrimaryFile();
                 
                 if (fobj.isFolder()) {
-                    LOGGER.log(Level.WARNING, "Nested menus not supported for Applications context menu: " + fobj, fobj);
+                    LOGGER.log(Level.WARNING, "Nested menus not supported for Applications context menu: " + fobj, fobj);   // NOI18N
                 } else {
                     InstanceCookie menuItemCookie = (InstanceCookie)menuItemDO.getCookie(InstanceCookie.class);
                     try {
                         Object menuItem = menuItemCookie.instanceCreate();
                         
                         boolean isDefaultAction = false;
-                        Object isDefaultActionObj = fobj.getAttribute("default");
+                        Object isDefaultActionObj = fobj.getAttribute("default");   // NOI18N
                         if (isDefaultActionObj != null) try {
                             isDefaultAction = (Boolean)isDefaultActionObj;
                             if (!allowDefaultActions && isDefaultAction)
-                                LOGGER.log(Level.WARNING, "Default actions not supported for " + actionsFO.getPath() + ": " + menuItem, menuItem);
+                                LOGGER.log(Level.WARNING, "Default actions not supported for " + actionsFO.getPath() + ": " + menuItem, menuItem);  // NOI18N
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Cannot determine whether context menu action is default: " + isDefaultActionObj, isDefaultActionObj);
-        }
+                            LOGGER.log(Level.WARNING, "Cannot determine whether context menu action is default: " + isDefaultActionObj, isDefaultActionObj);    // NOI18N
+                        }
         
                         List<Action> actionsList = isDefaultAction ? defaultActions : actions;
         
@@ -171,15 +171,15 @@ final class ExplorerContextMenuFactory {
                             if (action.isEnabled()) actionsList.add(action);
                         } else if (menuItem instanceof JSeparator) {
                             if (isDefaultAction) {
-                                LOGGER.log(Level.WARNING, "Separator cannot be added to default actions " + menuItem, menuItem);
+                                LOGGER.log(Level.WARNING, "Separator cannot be added to default actions " + menuItem, menuItem);    // NOI18N
                             } else {
                                 actionsList.add(null);
-        }
+                            }
                         } else {
-                            LOGGER.log(Level.WARNING, "Unsupported context menu item: " + menuItem, menuItem);
+                            LOGGER.log(Level.WARNING, "Unsupported context menu item: " + menuItem, menuItem);  // NOI18N
                         }
                     } catch (Exception ex) {
-                        LOGGER.log(Level.SEVERE, "Unable to resolve context menu action: " + menuItemDO, menuItemDO);
+                        LOGGER.log(Level.SEVERE, "Unable to resolve context menu action: " + menuItemDO, menuItemDO);   // NOI18N
                     }
                 }
             }
@@ -224,7 +224,5 @@ final class ExplorerContextMenuFactory {
             setIcon(null);
             setToolTipText(null);
         }
-        
-                          }
-        
-    }
+    }    
+}

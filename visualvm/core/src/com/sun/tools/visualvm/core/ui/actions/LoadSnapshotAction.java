@@ -39,12 +39,13 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicFileChooserUI;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 class LoadSnapshotAction extends AbstractAction {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/loadSnapshot.png";
+    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/loadSnapshot.png";    // NOI18N
     private static final Image ICON =  Utilities.loadImage(ICON_PATH);
     
     private String lastFile = null;
@@ -86,7 +87,7 @@ class LoadSnapshotAction extends AbstractAction {
                 ui.setFileName(file == null ? "" : file.getName());
             }            
         };
-        chooser.setDialogTitle("Load");
+        chooser.setDialogTitle(NbBundle.getMessage(LoadSnapshotAction.class, "LBL_Load"));  // NOI18N
         if (lastFile != null) chooser.setSelectedFile(new File(lastFile));
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileFilter fileFilter : fileFilters) chooser.addChoosableFileFilter(fileFilter);
@@ -94,14 +95,14 @@ class LoadSnapshotAction extends AbstractAction {
         if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
             if (selectedFile == null || !selectedFile.exists()) {
-                NetBeansProfiler.getDefaultNB().displayError("Selected file does not exist.");
+                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(LoadSnapshotAction.class, "MSG_Selected_file_does_not_exist"));    // NOI18N
             } else {
                 FileFilter fileFilter = chooser.getFileFilter();
                 if (fileFilter.accept(selectedFile)) {
                     lastFile = selectedFile.getAbsolutePath();
                     categories.get(fileFilters.indexOf(fileFilter)).openSnapshot(selectedFile);
                 } else {
-                    NetBeansProfiler.getDefaultNB().displayError("Selected file does not match snapshot type.");
+                    NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(LoadSnapshotAction.class, "MSG_Selected_file_does_not_match_snapshot_type"));  // NOI18N
                 }
             }
         }
@@ -117,9 +118,9 @@ class LoadSnapshotAction extends AbstractAction {
     
     
     private LoadSnapshotAction() {
-        putValue(NAME, "Load...");
-        putValue(SHORT_DESCRIPTION, "Load Snapshot");
+        putValue(NAME, NbBundle.getMessage(LoadSnapshotAction.class, "LBL_Load1")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(LoadSnapshotAction.class, "LBL_Load_Snapshot"));    // NOI18N
         putValue(SMALL_ICON, new ImageIcon(ICON));
-        putValue("iconBase", ICON_PATH);
+        putValue("iconBase", ICON_PATH);    // NOI18N
     }
 }

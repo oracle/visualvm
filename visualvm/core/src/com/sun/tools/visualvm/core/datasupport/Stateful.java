@@ -36,7 +36,7 @@ public interface Stateful {
     /**
      * Named property for state.
      */
-    public static final String PROPERTY_STATE = "prop_state";
+    public static final String PROPERTY_STATE = "prop_state";   // NOI18N
     
     /**
      * State cannot be determined.

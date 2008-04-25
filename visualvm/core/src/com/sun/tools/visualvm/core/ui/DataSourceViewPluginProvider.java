@@ -73,7 +73,7 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
             DataSourceViewPlugin plugin = getCachedPlugin(dataSource);
             if (plugin == null) {
                 plugin = createPlugin(dataSource);
-                if (plugin == null) throw new NullPointerException("DataSourceViewPluginProvider provides null plugin: " + this);
+                if (plugin == null) throw new NullPointerException("DataSourceViewPluginProvider provides null plugin: " + this);   // NOI18N
                 plugin.setController(this);
                 pluginsCache.put(dataSource, plugin);
             }

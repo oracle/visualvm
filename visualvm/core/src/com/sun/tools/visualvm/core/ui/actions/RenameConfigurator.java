@@ -42,6 +42,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -54,7 +55,7 @@ class RenameConfigurator extends JPanel {
     RenameConfigurator hc = getDefault();
     hc.setupDefineName(dataSource);
     
-    final DialogDescriptor dd = new DialogDescriptor(hc, "Rename", true, new Object[] {
+    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(RenameConfigurator.class, "LBL_Rename"), true, new Object[] {  // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
     final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
@@ -98,7 +99,7 @@ class RenameConfigurator extends JPanel {
     GridBagConstraints constraints;
     
     // nameLabel
-    nameLabel = new JLabel("New Name:");
+    nameLabel = new JLabel(NbBundle.getMessage(RenameConfigurator.class, "LBL_New_Name"));  // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -139,7 +140,7 @@ class RenameConfigurator extends JPanel {
     add(spacer, constraints);
     
     // okButton
-    okButton = new JButton("OK");
+    okButton = new JButton(NbBundle.getMessage(RenameConfigurator.class, "LBL_OK"));    // NOI18N
   }
   
   private JLabel nameLabel;

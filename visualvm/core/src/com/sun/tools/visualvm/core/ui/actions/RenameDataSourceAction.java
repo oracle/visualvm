@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui.actions;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.awt.event.ActionEvent;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -56,8 +57,8 @@ class RenameDataSourceAction extends SingleDataSourceAction<DataSource> {
     
     private RenameDataSourceAction() {
         super(DataSource.class);
-        putValue(NAME, "Rename...");
-        putValue(SHORT_DESCRIPTION, "Rename");
+        putValue(NAME, NbBundle.getMessage(RenameDataSourceAction.class, "LBL_Rename1"));   // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(RenameDataSourceAction.class, "LBL_Rename"));   // NOI18N
     }
     
 }

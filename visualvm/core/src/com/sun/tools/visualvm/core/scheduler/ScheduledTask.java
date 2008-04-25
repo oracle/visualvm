@@ -34,7 +34,7 @@ public interface ScheduledTask {
     /**
      * Property-change support
      */
-    public static final String INTERVAL_PROPERTY = "Task.Interval";
+    public static final String INTERVAL_PROPERTY = "Task.Interval"; // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

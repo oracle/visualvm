@@ -61,7 +61,7 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
             DataSourceView view = getCachedView(dataSource);
             if (view == null) {
                 view = createView(dataSource);
-                if (view == null) throw new NullPointerException("DataSourceViewProvider provides null view: " + this);
+                if (view == null) throw new NullPointerException("DataSourceViewProvider provides null view: " + this); // NOI18N
                 view.setController(this);
                 viewsCache.put(dataSource, view);
             }

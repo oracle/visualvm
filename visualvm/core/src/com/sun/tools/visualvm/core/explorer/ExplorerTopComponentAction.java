@@ -56,7 +56,7 @@ class ExplorerTopComponentAction extends AbstractAction {
     
     
     private ExplorerTopComponentAction() {
-        super(NbBundle.getMessage(ExplorerTopComponentAction.class, "CTL_ExplorerTopComponentAction"));
+        super(NbBundle.getMessage(ExplorerTopComponentAction.class, "CTL_ExplorerTopComponentAction")); // NOI18N
         putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(ExplorerTopComponent.ICON_PATH, true)));
     }
   

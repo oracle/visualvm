@@ -32,7 +32,7 @@ import org.netbeans.modules.profiler.ProfilerIDESettings;
 
 final class GeneralOptionsPanel extends javax.swing.JPanel {
 
-    final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");
+    final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");   // NOI18N
     private final GeneralOptionsPanelController controller;
 
     transient private final ChangeListener changeListener = new ChangeListener() {

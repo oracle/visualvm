@@ -40,7 +40,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public abstract class SnapshotCategory<X extends Snapshot> implements Positionable {
     
-    private static final String PREFIX_DIVIDER = "-";
+    private static final String PREFIX_DIVIDER = "-";   // NOI18N
     
     /**
      * Category won't be displayed in UI.
@@ -103,7 +103,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     public void openSnapshot(File file) {
-        throw new UnsupportedOperationException("Open snapshot not supported");
+        throw new UnsupportedOperationException("Open snapshot not supported"); // NOI18N
     }
     
     
@@ -187,7 +187,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
             }
             public String getDescription() {
                 String suff = getSuffix();
-                return getName() + (suff != null ? " (*" + suff + ")" : "");
+                return getName() + (suff != null ? " (*" + suff + ")" : "");    // NOI18N
             }
         };
     }

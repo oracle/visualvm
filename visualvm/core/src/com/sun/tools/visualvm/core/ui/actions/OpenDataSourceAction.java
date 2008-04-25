@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -62,8 +63,8 @@ class OpenDataSourceAction extends MultiDataSourceAction<DataSource> {
     
     private OpenDataSourceAction() {
         super(DataSource.class);
-        putValue(NAME, "Open");
-        putValue(SHORT_DESCRIPTION, "Open");
+        putValue(NAME, NbBundle.getMessage(OpenDataSourceAction.class, "LBL_Open"));    // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(OpenDataSourceAction.class, "LBL_Open"));   // NOI18N
     }
     
 }

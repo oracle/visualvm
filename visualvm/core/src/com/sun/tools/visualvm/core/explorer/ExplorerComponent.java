@@ -134,7 +134,7 @@ class ExplorerComponent extends JPanel {
 //        // NOTE: At least on GTK this returns -1
 //        int rowHeight = UIManager.getInt("Tree.rowHeight");
 //        if (rowHeight != -1) return rowHeight + 2; else 
-        return new JLabel("XXX").getPreferredSize().height + 4;
+        return new JLabel("XXX").getPreferredSize().height + 4; // NOI18N
     }
     
     
@@ -145,7 +145,7 @@ class ExplorerComponent extends JPanel {
     private void performDefaultAction() {
         Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         Action defaultAction = getDefaultAction(selectedDataSources);
-        if (defaultAction != null) defaultAction.actionPerformed(new ActionEvent(selectedDataSources, 0, "Default Action"));
+        if (defaultAction != null) defaultAction.actionPerformed(new ActionEvent(selectedDataSources, 0, "Default Action"));    // NOI18N
     }
     
     private void displayContextMenu(int x, int y) {

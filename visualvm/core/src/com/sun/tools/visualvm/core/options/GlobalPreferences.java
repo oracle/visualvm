@@ -47,13 +47,13 @@ import org.openide.util.NbPreferences;
  * @author Jaroslav Bachorik
  */
 public final class GlobalPreferences implements PreferenceChangeListener {
-    private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");
+    private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");   // NOI18N
 
-    private static final String INT_KEY_MONHOST_POLL = "MonitoredHostPoll";
-    private static final String INT_KEY_THREADS_POLL = "ThreadsPoll";
-    private static final String INT_KEY_MONDATA_POLL = "MonitoredDataPoll";
-    private static final String INT_KEY_MONHOST_CACHE = "MonitoredHostCache";
-    private static final String INT_KEY_MONDATA_CACHE = "MonitoredDataCache";
+    private static final String INT_KEY_MONHOST_POLL = "MonitoredHostPoll"; // NOI18N
+    private static final String INT_KEY_THREADS_POLL = "ThreadsPoll";   // NOI18N
+    private static final String INT_KEY_MONDATA_POLL = "MonitoredDataPoll"; // NOI18N
+    private static final String INT_KEY_MONHOST_CACHE = "MonitoredHostCache";   // NOI18N
+    private static final String INT_KEY_MONDATA_CACHE = "MonitoredDataCache";   // NOI18N
     
     private final static int MONHOST_POLL_DEFAULT = 3;
     private final static int THREADS_POLL_DEFAULT = 1;
@@ -166,7 +166,7 @@ public final class GlobalPreferences implements PreferenceChangeListener {
             prefs.sync();
             return true;
         } catch (BackingStoreException ex) {
-            LOGGER.log(Level.SEVERE, "Error saving preferences", ex);
+            LOGGER.log(Level.SEVERE, "Error saving preferences", ex);   // NOI18N
         }
         return false;
     }

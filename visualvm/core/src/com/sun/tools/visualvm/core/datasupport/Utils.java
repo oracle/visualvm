@@ -58,7 +58,7 @@ import org.openide.util.Utilities;
  */
 public final class Utils {
     
-    public static final RequestProcessor FILE_QUEUE = new RequestProcessor("File Queue");
+    public static final RequestProcessor FILE_QUEUE = new RequestProcessor("File Queue");   // NOI18N
     
     private static final int COPY_PACKET_SIZE = 16384;
     private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
@@ -190,8 +190,8 @@ public final class Utils {
     }
     
     public static boolean copyFile(File file, File copy) {
-        if (file == null || copy == null) throw new NullPointerException("File cannot be null");
-        if (!file.isFile() || copy.isDirectory()) throw new IllegalArgumentException("Not a valid file");        
+        if (file == null || copy == null) throw new NullPointerException("File cannot be null");    // NOI18N
+        if (!file.isFile() || copy.isDirectory()) throw new IllegalArgumentException("Not a valid file");   // NOI18N       
         
         FileInputStream fis = null;
         FileOutputStream fos = null;
@@ -205,11 +205,11 @@ public final class Utils {
             while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
             return true;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error copying file", e);
+            LOGGER.log(Level.SEVERE, "Error copying file", e);  // NOI18N
             return false;
         } finally {
-            try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing target stream", e); }
-            try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing source stream", e); }
+            try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing target stream", e); } // NOI18N
+            try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing source stream", e); } // NOI18N
         }
     }
     
@@ -224,7 +224,7 @@ public final class Utils {
      */
     public static boolean delete(File file, boolean deleteOnExit) {
         
-        if (file == null) throw new NullPointerException("File cannot be null");
+        if (file == null) throw new NullPointerException("File cannot be null");    // NOI18N
         if (!file.exists()) return true;
         
         if (file.isDirectory()) {
@@ -265,16 +265,16 @@ public final class Utils {
                         while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) zos.write(packet, 0, bytes);
                     } finally {
                         if (zos != null) zos.closeEntry();
-                        try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive entry stream", e); }
+                        try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive entry stream", e); }  // NOI18N
                     }
                 } else {
                     // TODO: process directory
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error creating archive", e);
+            LOGGER.log(Level.SEVERE, "Error creating archive", e);  // NOI18N
         } finally {
-            try { if (zos != null) zos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive stream", e); }
+            try { if (zos != null) zos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive stream", e); }    // NOI18N
         }
     }
     
@@ -300,15 +300,15 @@ public final class Utils {
                     byte[] packet = new byte[COPY_PACKET_SIZE];
                     while ((bytes = is.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
                 } finally {
-                    try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing extracted file stream", e); }
-                    try { if (is != null) is.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing zipentry stream", e); }
+                    try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing extracted file stream", e); } // NOI18N
+                    try { if (is != null) is.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing zipentry stream", e); } // NOI18N
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error extracting archive", e);
+            LOGGER.log(Level.SEVERE, "Error extracting archive", e);    // NOI18N
             return null;
         } finally {
-            try { if (zipFile != null) zipFile.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive", e); }
+            try { if (zipFile != null) zipFile.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive", e); }   // NOI18N
         }
         
         return directory;

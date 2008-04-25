@@ -148,8 +148,7 @@ class Base64 {
         int sLen = s.length();
         int numGroups = sLen/4;
         if (4*numGroups != sLen)
-            throw new IllegalArgumentException(
-                "String length must be a multiple of four.");
+            throw new IllegalArgumentException("String length must be a multiple of four.");    // NOI18N   
         int missingBytesInLastGroup = 0;
         int numFullGroups = numGroups;
         if (sLen != 0) {
@@ -200,7 +199,7 @@ class Base64 {
     private static int base64toInt(char c, byte[] alphaToInt) {
         int result = alphaToInt[c];
         if (result < 0)
-            throw new IllegalArgumentException("Illegal character " + c);
+            throw new IllegalArgumentException("Illegal character " + c);   // NOI18N
         return result;
     }
 
@@ -249,12 +248,12 @@ class Base64 {
                 String s = byteArrayToBase64(arr);
                 byte [] b = base64ToByteArray(s);
                 if (!java.util.Arrays.equals(arr, b))
-                    System.out.println("Dismal failure!");
+                    System.out.println("Dismal failure!");  // NOI18N
 
                 s = byteArrayToAltBase64(arr);
                 b = altBase64ToByteArray(s);
                 if (!java.util.Arrays.equals(arr, b))
-                    System.out.println("Alternate dismal failure!");
+                    System.out.println("Alternate dismal failure!");    // NOI18N
             }
         }
     }

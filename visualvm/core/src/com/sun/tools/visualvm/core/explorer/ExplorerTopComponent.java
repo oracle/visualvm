@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.explorer;
 import java.awt.BorderLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -40,18 +41,18 @@ import org.openide.windows.WindowManager;
 // Top component for DataSources explorer
 final class ExplorerTopComponent extends TopComponent {
 
-    private static final String PREFERRED_ID = "ExplorerTopComponent";
+    private static final String PREFERRED_ID = "ExplorerTopComponent";  // NOI18N
     private static final Logger LOGGER = Logger.getLogger(ExplorerTopComponent.class.getName());
     
-    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/explorer.png";
+    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/explorer.png";    // NOI18N
 
     private static ExplorerTopComponent instance;
 
 
     private ExplorerTopComponent() {
         initComponents();
-        setName("Applications");
-        setToolTipText("Applications");
+        setName(NbBundle.getMessage(ExplorerTopComponent.class, "LBL_Applications"));   // NOI18N
+        setToolTipText(NbBundle.getMessage(ExplorerTopComponent.class, "LBL_Applications"));    // NOI18N
         setIcon(Utilities.loadImage(ICON_PATH, true));
 
         setFocusable(true);
@@ -83,7 +84,7 @@ final class ExplorerTopComponent extends TopComponent {
         if (explorerTopComponent instanceof ExplorerTopComponent) return (ExplorerTopComponent)explorerTopComponent;
     
         if (LOGGER.isLoggable(Level.WARNING)) {
-            LOGGER.warning("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior.");
+            LOGGER.warning("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior.");   // NOI18N
         }
         return getInstance();
     }

@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -48,7 +49,7 @@ import org.openide.util.RequestProcessor;
  */
 public final class DataSourceWindowManager {
     
-    private static final RequestProcessor processor = new RequestProcessor("DataSourceWindowManager Processor");
+    private static final RequestProcessor processor = new RequestProcessor("DataSourceWindowManager Processor");    // NOI18N
     private static final Logger LOGGER = Logger.getLogger(DataSourceWindowManager.class.getName());
     
     private static DataSourceWindowManager sharedInstance;
@@ -137,8 +138,8 @@ public final class DataSourceWindowManager {
         final boolean wasOpened = window != null;
         
         final ProgressHandle pHandle = !wasOpened ?
-            ProgressHandleFactory.createHandle("Opening " +
-            DataSourceDescriptorFactory.getDescriptor(dataSource).getName() + "...") : null;
+            ProgressHandleFactory.createHandle(NbBundle.getMessage(DataSourceWindowManager.class, "LBL_Opening",    // NOI18N
+            DataSourceDescriptorFactory.getDescriptor(dataSource).getName())) : null;
         
         try {
 
@@ -171,7 +172,7 @@ public final class DataSourceWindowManager {
                         if (windowF.containsView(viewToSelectF)) windowF.selectView(viewToSelectF);
                         else {
                             if (LOGGER.isLoggable(Level.WARNING)) {
-                                LOGGER.warning("Tried to select not opened view " + viewToSelectF);
+                                LOGGER.warning("Tried to select not opened view " + viewToSelectF); // NOI18N
                             }
                         }
                     }
@@ -227,7 +228,7 @@ public final class DataSourceWindowManager {
                 }
             });
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize views for " + window.getDataSource(), e);
+            LOGGER.log(Level.SEVERE, "Failed to initialize views for " + window.getDataSource(), e);    // NOI18N
         }
 
         // Blocking notification that the view has been added
@@ -245,7 +246,7 @@ public final class DataSourceWindowManager {
             views.remove(view);
             if (views.isEmpty()) openedViews.remove(dataSource);
         } else if (LOGGER.isLoggable(Level.WARNING)) {
-            LOGGER.warning("Tried to unregister not opened view " + view);
+            LOGGER.warning("Tried to unregister not opened view " + view);  // NOI18N
         }
     }
     

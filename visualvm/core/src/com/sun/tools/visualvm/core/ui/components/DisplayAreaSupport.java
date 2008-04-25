@@ -68,7 +68,7 @@ class DisplayAreaSupport {
     static final Color BACKGROUND_COLOR_HIGHLIGHT = new Color(235, 235, 235);
     
     static final Color COLOR_NONE = new Color(0, 0, 0, 0);
-    static final Color TABS_SEPARATOR = new Color(UIManager.getColor("Label.foreground").getRGB());
+    static final Color TABS_SEPARATOR = new Color(UIManager.getColor("Label.foreground").getRGB()); // NOI18N
     
     static final int TABBUTTON_MARGIN_TOP = 3;
     static final int TABBUTTON_MARGIN_LEFT = 8;

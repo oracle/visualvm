@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 
@@ -37,7 +38,7 @@ import org.openide.util.Utilities;
  */
 class SaveSnapshotAsAction extends SingleDataSourceAction<Snapshot> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png";
+    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png";    // NOI18N
     private static final Image ICON = Utilities.loadImage(ICON_PATH);
     
     private static SaveSnapshotAsAction instance;
@@ -60,9 +61,9 @@ class SaveSnapshotAsAction extends SingleDataSourceAction<Snapshot> {
     
     private SaveSnapshotAsAction() {
         super(Snapshot.class);
-        putValue(NAME, "Save As...");
-        putValue(SHORT_DESCRIPTION, "Save Snapshot As");
+        putValue(NAME, NbBundle.getMessage(SaveSnapshotAsAction.class, "LBL_Save_As")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(SaveSnapshotAsAction.class, "LBL_Save_Snapshot_As"));   // NOI18N
         putValue(SMALL_ICON, new ImageIcon(ICON));
-        putValue("iconBase", ICON_PATH);
+        putValue("iconBase", ICON_PATH);    // NOI18N
     }
 }

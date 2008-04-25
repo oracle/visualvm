@@ -39,15 +39,15 @@ import java.beans.PropertyChangeSupport;
  */
 public abstract class DataSourceDescriptor<X extends DataSource> extends Model implements Positionable {
     
-    public static final String PROPERTY_ICON = "prop_icon";
+    public static final String PROPERTY_ICON = "prop_icon"; // NOI18N
     
-    public static final String PROPERTY_NAME = "prop_name";
+    public static final String PROPERTY_NAME = "prop_name"; // NOI18N
     
-    public static final String PROPERTY_DESCRIPTION = "prop_description";
+    public static final String PROPERTY_DESCRIPTION = "prop_description";   // NOI18N
     
-    public static final String PROPERTY_PREFERRED_POSITION = "prop_preferred_position";
+    public static final String PROPERTY_PREFERRED_POSITION = "prop_preferred_position"; // NOI18N
     
-    public static final String PROPERTY_EXPANSION_POLICY = "prop_expansion_policy";
+    public static final String PROPERTY_EXPANSION_POLICY = "prop_expansion_policy"; // NOI18N
     
     public static final int EXPAND_NEVER = 0;
     
@@ -96,8 +96,8 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     }
     
     public void setName(String newName) {
-        if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor");
-        if (newName == null) throw new IllegalArgumentException("Name cannot be null");
+        if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor"); // NOI18N
+        if (newName == null) throw new IllegalArgumentException("Name cannot be null"); // NOI18N
         String oldName = name;
         name = newName;
         getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });

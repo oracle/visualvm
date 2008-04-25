@@ -136,7 +136,7 @@ public class Scheduler implements PropertyChangeListener {
                         public void run() {
                             try {
                                 if (LOGGER.isLoggable(Level.FINEST)) {
-                                    LOGGER.finest("Notifying scheduled tasks at interval " + interval);
+                                    LOGGER.finest("Notifying scheduled tasks at interval " + interval); // NOI18N
                                 }
 
                                 long timeStamp = System.currentTimeMillis();
@@ -145,7 +145,7 @@ public class Scheduler implements PropertyChangeListener {
                                 synchronized (interval2recevier) {
                                     myReceivers = new HashSet<WeakReference<DefaultScheduledTask>>(interval2recevier.get(interval));
                                     if (LOGGER.isLoggable(Level.FINEST)) {
-                                        LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);
+                                        LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);    // NOI18N
                                     }
                                 }
 
@@ -160,11 +160,11 @@ public class Scheduler implements PropertyChangeListener {
                                     }
                                 }
                                 if (LOGGER.isLoggable(Level.FINEST)) {
-                                    LOGGER.finest("Finished");
+                                    LOGGER.finest("Finished");  // NOI18N
                                 }
                             } catch (Exception e) {
                                 if (LOGGER.isLoggable(Level.WARNING)) {
-                                    LOGGER.log(Level.WARNING, "Exception in scheduler", e);
+                                    LOGGER.log(Level.WARNING, "Exception in scheduler", e); // NOI18N
                                 }
                             }
                         }
