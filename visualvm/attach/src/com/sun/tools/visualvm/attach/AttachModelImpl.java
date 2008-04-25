@@ -41,8 +41,8 @@ import sun.tools.attach.HotSpotVirtualMachine;
 public class AttachModelImpl extends AttachModel {
     String pid;
     HotSpotVirtualMachine vm;
-    private static final String LIVE_OBJECTS_OPTION = "-live";
-    private static final String ALL_OBJECTS_OPTION = "-all";
+    private static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
+    private static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
     
     
     AttachModelImpl(Application app) {
@@ -74,7 +74,7 @@ public class AttachModelImpl extends AttachModel {
     
     public synchronized String takeThreadDump() {
         try {
-            InputStream in = getVirtualMachine().remoteDataDump("-l");
+            InputStream in = getVirtualMachine().remoteDataDump("-l");  // NOI18N
             return readToEOF(in);
         } catch (IOException ex) {
             ErrorManager.getDefault().notify(ErrorManager.USER,ex);
@@ -123,7 +123,7 @@ public class AttachModelImpl extends AttachModel {
         do {
             n = in.read(b);
             if (n > 0) {
-                String s = new String(b, 0, n, "UTF-8");
+                String s = new String(b, 0, n, "UTF-8");    // NOI18N
                 
                 buffer.append(s);
             }
