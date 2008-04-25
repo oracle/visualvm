@@ -69,6 +69,8 @@ public class HostProvider {
     
     private static final String PROPERTY_HOSTNAME = "prop_hostname";    // NOI18N
     
+    private static InetAddress localhostAddress2;
+    
     private boolean initializingHosts = true;
     private Semaphore initializingHostsSemaphore = new Semaphore(1);
 
@@ -164,6 +166,7 @@ public class HostProvider {
             if (knownHost.getInetAddress().equals(inetAddress)) return knownHost;
         
         if (inetAddress.equals(Host.LOCALHOST.getInetAddress())) return Host.LOCALHOST;
+        if (inetAddress.equals(localhostAddress2)) return Host.LOCALHOST;
         
         return null;
     }
@@ -187,6 +190,9 @@ public class HostProvider {
     }
     
     private void initLocalHost() {
+        try {
+            localhostAddress2 = InetAddress.getLocalHost();
+        } catch (java.net.UnknownHostException e) {}
         Host localhost = Host.LOCALHOST;
         if (localhost != null) DataSource.ROOT.getRepository().addDataSource(localhost);
     }
