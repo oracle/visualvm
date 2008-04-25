@@ -37,7 +37,7 @@ import com.sun.tools.visualvm.application.jvm.JvmFactory;
 public class JavaPluginApplicationTypeFactory
         extends AbstractModelProvider<ApplicationType, Application> {
 
-    private static final String JAVA_PLUGIN = "-Djavaplugin.version=";
+    private static final String JAVA_PLUGIN = "-Djavaplugin.version=";  // NOI18N
 
     @Override
     public ApplicationType createModelFor(Application application) {

@@ -36,7 +36,7 @@ public class NetBeans3xApplicationType extends MainClassApplicationType {
 
 
   NetBeans3xApplicationType(Application app,Jvm jvm) {
-    super(app,"NetBeans 3.x","com/sun/tools/visualvm/application/resources/application.png");
+    super(app,"NetBeans 3.x","com/sun/tools/visualvm/application/resources/application.png");   // NOI18N
   }
 
 }

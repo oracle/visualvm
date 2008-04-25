@@ -45,6 +45,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 /**
@@ -58,7 +59,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
     ApplicationSnapshotConfigurator hc = getDefault();
     hc.setupDefineCoreDump();
     
-    final DialogDescriptor dd = new DialogDescriptor(hc, "Add Application Snapshot", true, new Object[] {
+    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Add_Application_Snapshot"), true, new Object[] {   // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
     final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
@@ -104,7 +105,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
 
   private void chooseSnapshot() {
       JFileChooser chooser = new JFileChooser();
-      chooser.setDialogTitle("Select Application Snapshot");
+      chooser.setDialogTitle(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Select_Application_Snapshot"));     // NOI18N
       chooser.setSelectedFile(getSnapshotFile());
       chooser.setAcceptAllFileFilterUsed(false);
       chooser.setFileFilter(ApplicationSnapshotsSupport.getInstance().getCategory().getFileFilter());
@@ -116,7 +117,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
     GridBagConstraints constraints;
     
     // coreDumpFileLabel
-    coreDumpFileLabel = new JLabel("Snapshot file:");
+    coreDumpFileLabel = new JLabel(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Snapshot_file"));     // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -145,7 +146,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
     add(snapshotFileField, constraints);
     
     // snapshotFileButton
-    snapshotFileButton = new JButton("Browse...");
+    snapshotFileButton = new JButton(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Browse"));  // NOI18N
     snapshotFileButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             chooseSnapshot();
@@ -161,7 +162,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
     add(snapshotFileButton, constraints);         
     
     // deleteSourceCheckbox
-    deleteSourceCheckbox = new JCheckBox("Delete source file");
+    deleteSourceCheckbox = new JCheckBox(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Delete_source_file"));  // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;
@@ -184,7 +185,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
     add(spacer, constraints);
     
     // okButton
-    okButton = new JButton("OK");
+    okButton = new JButton(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_OK"));    // NOI18N
     
     // UI tweaks
     deleteSourceCheckbox.setBorder(coreDumpFileLabel.getBorder());

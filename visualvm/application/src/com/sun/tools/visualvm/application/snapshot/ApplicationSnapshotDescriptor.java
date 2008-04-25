@@ -8,7 +8,7 @@ import org.openide.util.Utilities;
 
 public class ApplicationSnapshotDescriptor extends SnapshotDescriptor<ApplicationSnapshot> {
 
-    private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);
+    private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);    // NOI18N
 
     
     public ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {

@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
 import java.util.Set;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 
@@ -53,11 +54,11 @@ public class NetBeansBasedApplicationType extends ApplicationType {
   }
 
   public String getName() {
-    return "NetBeans Platform application";
+    return "NetBeans Platform application"; // NOI18N
   }
 
   public String getVersion() {
-    return "<Unknown>";
+    return NbBundle.getMessage(NetBeansBasedApplicationType.class, "LBL_Unknown");  // NOI18N
   }
 
   public String getDescription() {
@@ -65,7 +66,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
   }
 
   public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/application/resources/application.png";
+    String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
     return Utilities.loadImage(iconPath, true);
   }
 }

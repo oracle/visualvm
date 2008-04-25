@@ -37,7 +37,7 @@ import com.sun.tools.visualvm.application.jvm.JvmFactory;
 public class JavaWebStartApplicationTypeFactory
         extends AbstractModelProvider<ApplicationType, Application> {
 
-    private static final String JWS = "-Djnlpx.home=";
+    private static final String JWS = "-Djnlpx.home=";  // NOI18N
 
     @Override
     public ApplicationType createModelFor(Application application) {

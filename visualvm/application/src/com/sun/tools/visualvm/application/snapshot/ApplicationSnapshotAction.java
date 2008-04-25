@@ -35,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.HashSet;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
     
 /**
@@ -95,7 +96,7 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     
     private ApplicationSnapshotAction() {
         super(Application.class);
-        putValue(NAME, "Application Snapshot");
-        putValue(SHORT_DESCRIPTION, "Application Snapshot");
+        putValue(NAME, NbBundle.getMessage(ApplicationSnapshotAction.class, "LBL_Application_Snapshot"));   // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ApplicationSnapshotAction.class, "LBL_Application_Snapshot"));  // NOI18N
     }
 }

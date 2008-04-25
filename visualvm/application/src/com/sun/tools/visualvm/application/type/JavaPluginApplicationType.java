@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.application.type;
 
 import java.awt.Image;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -41,7 +42,7 @@ public class JavaPluginApplicationType extends ApplicationType {
     }
 
     public String getName() {
-        return "Java Plug-in " + version;
+        return NbBundle.getMessage(JavaPluginApplicationType.class, "LBL_Java_Plug-in_ver", version);   // NOI18N
     }
 
     public String getVersion() {
@@ -49,11 +50,11 @@ public class JavaPluginApplicationType extends ApplicationType {
     }
 
     public String getDescription() {
-        return "Java Plug-in";
+        return NbBundle.getMessage(JavaPluginApplicationType.class, "LBL_Java_Plug-in");    // NOI18N
     }
 
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";
+        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
         return Utilities.loadImage(iconPath, true);
     }
 }

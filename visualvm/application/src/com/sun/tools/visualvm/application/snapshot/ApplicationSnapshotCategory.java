@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.application.snapshot;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -34,9 +35,9 @@ import java.io.File;
  */
 class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> {
     
-    private static final String NAME = "Application Snapshots";
-    private static final String PREFIX = "application";
-    private static final String SUFFIX = ".apps";
+    private static final String NAME = NbBundle.getMessage(ApplicationSnapshotCategory.class, "LBL_Application_Snapshots"); // NOI18N
+    private static final String PREFIX = "application"; // NOI18N
+    private static final String SUFFIX = ".apps";   // NOI18N
     
     public ApplicationSnapshotCategory() {
         super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);

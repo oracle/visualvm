@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 public abstract class Jvm extends Model {
     protected static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
     
-    public static final String PROPERTY_DUMP_OOME_ENABLED = "prop_oome";
+    public static final String PROPERTY_DUMP_OOME_ENABLED = "prop_oome";    // NOI18N
     
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     

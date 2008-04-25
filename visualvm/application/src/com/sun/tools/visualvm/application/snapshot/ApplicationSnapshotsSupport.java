@@ -42,7 +42,7 @@ public final class ApplicationSnapshotsSupport {
     
     private static ApplicationSnapshotsSupport instance;
     
-    private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";
+    private static final String SNAPSHOTS_STORAGE_DIRNAME = "snapshots";    // NOI18N
     
     private static File snapshotsStorageDirectory;
     private static String snapshotsStorageDirectoryString;
@@ -91,11 +91,11 @@ public final class ApplicationSnapshotsSupport {
             String snapshotsStorageString = getStorageDirectoryString();
             snapshotsStorageDirectory = new File(snapshotsStorageString);
             if (snapshotsStorageDirectory.exists() && snapshotsStorageDirectory.isFile())
-                throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString + ", file in the way");
+                throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString + ", file in the way");   // NOI18N
             if (snapshotsStorageDirectory.exists() && (!snapshotsStorageDirectory.canRead() || !snapshotsStorageDirectory.canWrite()))
-                throw new IllegalStateException("Cannot access snapshots storage directory " + snapshotsStorageString + ", read&write permission required");
+                throw new IllegalStateException("Cannot access snapshots storage directory " + snapshotsStorageString + ", read&write permission required");    // NOI18N
             if (!Utils.prepareDirectory(snapshotsStorageDirectory))
-                throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString);
+                throw new IllegalStateException("Cannot create snapshots storage directory " + snapshotsStorageString); // NOI18N
         }
         return snapshotsStorageDirectory;
     }

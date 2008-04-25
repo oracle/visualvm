@@ -52,7 +52,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
         // Provide generic displayname
         int pid = application.getPid();
         String id = Application.CURRENT_APPLICATION.getPid() == pid ||
-            pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")";
+        pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")"; // NOI18N
         return type.getName() + id;
     }
     

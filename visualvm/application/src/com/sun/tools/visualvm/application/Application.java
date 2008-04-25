@@ -62,8 +62,8 @@ public abstract class Application extends DataSource implements Stateful {
      * @param pid process ide of the application or UNKNOWN_PID if the process id is unknown.
      */
     public Application(Host host, String id) {
-        if (host == null) throw new IllegalArgumentException("Host cannot be null");
-        if (id == null && pid == UNKNOWN_PID) throw new IllegalArgumentException("Either id or pid must be provided for the application");
+        if (host == null) throw new IllegalArgumentException("Host cannot be null");    // NOI18N
+        if (id == null && pid == UNKNOWN_PID) throw new IllegalArgumentException("Either id or pid must be provided for the application");  // NOI18N
         this.host = host;
         this.id = id;
     }
@@ -114,7 +114,7 @@ public abstract class Application extends DataSource implements Stateful {
     
     @Override
     public String toString() {
-        return "Application [id: " + getId() + ", pid: " + getPid() + ", host: " + getHost().getHostName() + "]";
+        return "Application [id: " + getId() + ", pid: " + getPid() + ", host: " + getHost().getHostName() + "]";   // NOI18N
     }
     
     

@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -54,13 +55,13 @@ import org.openide.util.RequestProcessor;
  */
 class ApplicationSnapshotProvider {
     
-    private static final String SNAPSHOT_VERSION = "snapshot_version";
-    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    private static final String SNAPSHOT_VERSION = "snapshot_version";   // NOI18N
+    private static final String SNAPSHOT_VERSION_DIVIDER = ".";  // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";    // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";    // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
-    private static final String PROPERTIES_FILENAME = "application_snapshot" + Storage.DEFAULT_PROPERTIES_EXT;
+    private static final String PROPERTIES_FILENAME = "application_snapshot" + Storage.DEFAULT_PROPERTIES_EXT;   // NOI18N
     
     private static final Logger LOGGER = Logger.getLogger(ApplicationSnapshotProvider.class.getName());
     
@@ -82,7 +83,7 @@ class ApplicationSnapshotProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Saving snapshot of " + DataSourceDescriptorFactory.getDescriptor(application).getName() + "...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Saving_snapshot", DataSourceDescriptorFactory.getDescriptor(application).getName()));  // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     createSnapshotImpl(application, interactive);
@@ -104,14 +105,14 @@ class ApplicationSnapshotProvider {
         synchronized(ApplicationSnapshotProvider.this) {
             snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
             if (!Utils.prepareDirectory(snapshotDirectory))
-                throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);
+                throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);    // NOI18N
         }
         
         for (Snapshot snapshot : snapshots) {
             try {
                 snapshot.save(snapshotDirectory);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error saving snapshot to application snapshot", e);
+                LOGGER.log(Level.SEVERE, "Error saving snapshot to application snapshot", e);   // NOI18N
             }
         }
         
@@ -124,7 +125,7 @@ class ApplicationSnapshotProvider {
         String[] propValues = new String[] {
             CURRENT_SNAPSHOT_VERSION,
             applicationType.getName() + getDisplayNameSuffix(application),
-            Utils.imageToString(applicationType.getIcon(), "png")
+            Utils.imageToString(applicationType.getIcon(), "png")   // NOI18N
         };
         
         Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
@@ -139,11 +140,11 @@ class ApplicationSnapshotProvider {
     }
     
     private static String getDisplayNameSuffix(Application application) {
-        StringBuilder builder = new StringBuilder(" (");
+        StringBuilder builder = new StringBuilder(" (");    // NOI18N
         int pid = application.getPid();
-        if (pid != Application.UNKNOWN_PID) builder.append("pid " + pid + ", ");
+        if (pid != Application.UNKNOWN_PID) builder.append("pid " + pid + ", ");    // NOI18N
         builder.append(SnapshotsSupport.getInstance().getTimeStamp(System.currentTimeMillis()));
-        builder.append(")");
+        builder.append(")");    // NOI18N
         return builder.toString();
     }
     
@@ -155,7 +156,7 @@ class ApplicationSnapshotProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle("Adding " + archive.getName() + "...");
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Adding", archive.getName()));  // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     
@@ -168,7 +169,7 @@ class ApplicationSnapshotProvider {
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                NetBeansProfiler.getDefaultNB().displayError("<html><b>Adding snapshot " + archive.getName() + " failed.</b><br><br>Make sure the file is not broken.</html>");
+                                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Adding_snapshot_failed", archive.getName()));  // NOI18N
                             }
                         });
                     }

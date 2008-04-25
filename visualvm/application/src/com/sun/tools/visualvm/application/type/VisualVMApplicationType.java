@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 
@@ -42,11 +43,11 @@ public class VisualVMApplicationType extends ApplicationType {
   }
 
   public String getName() {
-    return "VisualVM";
+    return "VisualVM";  // NOI18N
   }
 
   public String getVersion() {
-    return "<Unknown>";
+    return NbBundle.getMessage(VisualVMApplicationType.class, "LBL_Unknown");   // NOI18N
   }
 
   public String getDescription() {
@@ -54,7 +55,7 @@ public class VisualVMApplicationType extends ApplicationType {
   }
 
   public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/application/resources/visualvm.png";
+    String iconPath = "com/sun/tools/visualvm/application/resources/visualvm.png";  // NOI18N
     return Utilities.loadImage(iconPath, true);
   }
 }

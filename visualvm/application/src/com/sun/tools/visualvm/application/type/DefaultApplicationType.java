@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import java.awt.Image;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 
@@ -56,7 +57,7 @@ public class DefaultApplicationType extends ApplicationType  {
             if (mainClassName != null && mainClassName.length() > 0) {
                 applicationName = mainClassName;
             } else {
-                applicationName = "<Unknown Application>";
+                applicationName = NbBundle.getMessage(DefaultApplicationType.class, "LBL_Unknown_Application"); // NOI18N
             }
             name = applicationName;
         }
@@ -64,7 +65,7 @@ public class DefaultApplicationType extends ApplicationType  {
     }
     
     public String getVersion() {
-        return "<Unknown Version>";
+        return NbBundle.getMessage(DefaultApplicationType.class, "LBL_Unknown_Version");    // NOI18N
     }
     
     public String getDescription() {
@@ -72,7 +73,7 @@ public class DefaultApplicationType extends ApplicationType  {
     }
     
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";
+        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
         return Utilities.loadImage(iconPath, true);
     }
 }

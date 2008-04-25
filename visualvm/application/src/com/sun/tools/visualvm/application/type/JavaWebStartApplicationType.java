@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.application.type;
 
 import java.awt.Image;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -41,7 +42,7 @@ public class JavaWebStartApplicationType extends ApplicationType {
     }
 
     public String getName() {
-        return "Java Web Start";
+        return NbBundle.getMessage(JavaWebStartApplicationType.class, "LBL_Java_Web_Start");    // NOI18N
     }
 
     public String getVersion() {
@@ -49,11 +50,11 @@ public class JavaWebStartApplicationType extends ApplicationType {
     }
 
     public String getDescription() {
-        return "Java Web Start";
+        return NbBundle.getMessage(JavaWebStartApplicationType.class, "LBL_Java_Web_Start");    // NOI18N
     }
 
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";
+        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
         return Utilities.loadImage(iconPath, true);
     }
 }

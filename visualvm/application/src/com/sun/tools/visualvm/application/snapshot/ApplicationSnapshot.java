@@ -34,6 +34,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
@@ -63,7 +64,7 @@ public final class ApplicationSnapshot extends Snapshot {
     
     public void saveAs() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Save Application Snapshot As");
+        chooser.setDialogTitle(NbBundle.getMessage(ApplicationSnapshot.class, "LBL_Save_Application_Snapshot_As")); // NOI18N
         chooser.setSelectedFile(new File(getFile().getName()));
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(getCategory().getFileFilter());
@@ -73,7 +74,7 @@ public final class ApplicationSnapshot extends Snapshot {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {
-                        pHandle = ProgressHandleFactory.createHandle("Saving " + DataSourceDescriptorFactory.getDescriptor(ApplicationSnapshot.this).getName() + "...");
+                        pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshot.class, "MSG_Saving", DataSourceDescriptorFactory.getDescriptor(ApplicationSnapshot.this).getName()));  // NOI18N
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         saveArchive(file);

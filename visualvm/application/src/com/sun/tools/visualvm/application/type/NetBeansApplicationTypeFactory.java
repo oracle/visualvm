@@ -42,21 +42,21 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
 
   private static final String NETBEANS_DIRS = "-Dnetbeans.dirs="; // NOI18N
   private static final String BRANDING_ID = "--branding "; // NOI18N
-  private static final String VISUALVM_ID = "visualvm";
-  private static final String MAIN_CLASS = "org.netbeans.Main";
-  private static final Pattern nbcluster_pattern = Pattern.compile("nb[0-9]+\\.[0-9]+");
+  private static final String VISUALVM_ID = "visualvm"; // NOI18N
+  private static final String MAIN_CLASS = "org.netbeans.Main"; // NOI18N
+  private static final Pattern nbcluster_pattern = Pattern.compile("nb[0-9]+\\.[0-9]+");    // NOI18N
 
   protected Set<String> computeClusters(Jvm jvm) {
     String args = jvm.getJvmArgs();
     int clusterIndex = args.indexOf(NETBEANS_DIRS);
-    String pathSeparator = jvm.getJavaHome().contains("\\")?";":":";
-    String separator = pathSeparator.equals(":")?"/":"\\";    
+    String pathSeparator = jvm.getJavaHome().contains("\\")?";":":";    // NOI18N
+    String separator = pathSeparator.equals(":")?"/":"\\";      // NOI18N
     Set<String> clusters = new HashSet();
     
     if (clusterIndex > -1) {
       String clustersString=args.substring(clusterIndex);
-      int endIndex = clustersString.indexOf(" -");
-      Scanner clusterScanner;
+      int endIndex = clustersString.indexOf(" -");  // NOI18N
+      Scanner clusterScanner;   
       if (endIndex > -1) {
         clustersString = clustersString.substring(0,endIndex);
       }
