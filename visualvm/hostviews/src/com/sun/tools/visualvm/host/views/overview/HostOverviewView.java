@@ -146,10 +146,10 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             HostOverview so = HostOverviewFactory.getSystemOverviewFor(host);
             StringBuilder data = new StringBuilder();
             String hostIp = NbBundle.getMessage(HostOverviewView.class, "LBL_Host_IP"); // NOI18N
-            data.append("<b>"+ hostIp + ":</b>"+ so.getHostAddress() + "<br>"); // NOI18N
+            data.append("<b>"+ hostIp + ":</b> "+ so.getHostAddress() + "<br>"); // NOI18N
             
             String hostname = NbBundle.getMessage(HostOverviewView.class, "LBL_Hostname");  // NOI18N
-            data.append("<b>"+ hostname + ":</b>" + so.getHostName() + "<br><br>"); // NOI18N
+            data.append("<b>"+ hostname + ":</b> " + so.getHostName() + "<br><br>"); // NOI18N
 
             String name = so.getName();
             String ver = so.getVersion();
