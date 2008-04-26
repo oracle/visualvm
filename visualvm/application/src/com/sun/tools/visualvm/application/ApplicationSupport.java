@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
+import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -59,7 +60,11 @@ final class ApplicationSupport {
     private void initCurrentApplication() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                Host.LOCALHOST.getRepository().addDataSource(Application.CURRENT_APPLICATION);
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        Host.LOCALHOST.getRepository().addDataSource(Application.CURRENT_APPLICATION);
+                    }
+                });
             }
         });
     }

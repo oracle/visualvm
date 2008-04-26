@@ -298,9 +298,13 @@ public class HostProvider {
     public void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                initLocalHost();
-                initUnknownHost();
-                initPersistedHosts();
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        initLocalHost();
+                        initUnknownHost();
+                        initPersistedHosts();
+                    }
+                });
             }
         });
     }

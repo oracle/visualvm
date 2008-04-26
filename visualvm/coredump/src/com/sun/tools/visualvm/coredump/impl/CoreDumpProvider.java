@@ -231,7 +231,11 @@ public class CoreDumpProvider {
         final CoreDumpProvider provider = new CoreDumpProvider();
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                provider.initPersistedCoreDumps();
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        provider.initPersistedCoreDumps();
+                    }
+                });
             }
         });
     }

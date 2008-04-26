@@ -415,7 +415,11 @@ class JmxApplicationProvider {
     public static void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                JmxApplicationProvider.sharedInstance().initPersistedApplications();
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        JmxApplicationProvider.sharedInstance().initPersistedApplications();
+                    }
+                });
             }
         });
     }
