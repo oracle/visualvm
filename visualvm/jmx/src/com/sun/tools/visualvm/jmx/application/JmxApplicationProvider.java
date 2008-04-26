@@ -180,7 +180,6 @@ class JmxApplicationProvider {
             String[] keys = new String[]{
                 SNAPSHOT_VERSION,
                 PROPERTY_CONNECTION_STRING,
-                PROPERTY_HOSTNAME,
                 PROPERTY_USERNAME,
                 PROPERTY_PASSWORD,
                 DataSourceDescriptor.PROPERTY_NAME
@@ -197,7 +196,6 @@ class JmxApplicationProvider {
             String[] values = new String[]{
                 CURRENT_SNAPSHOT_VERSION,
                 normalizedConnectionName,
-                hostName,
                 user,
                 Utils.encodePassword(passwd),
                 displayName
@@ -253,6 +251,7 @@ class JmxApplicationProvider {
             return;            
         }
         // Create the JmxApplication
+        storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
         final JmxApplication application =
                 new JmxApplication(host, serviceURL, username, password, saveCredentials, storage);
         // Check if the given JmxApplication has been already added to the application tree
