@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -38,7 +39,7 @@ import org.openide.util.Utilities;
  */
 class ApplicationOverviewView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/overview.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/overview.png"; // NOI18N
 
     private ApplicationOverviewModel model;
     
@@ -46,7 +47,7 @@ class ApplicationOverviewView extends DataSourceView {
     
 
     public ApplicationOverviewView(DataSource dataSource, ApplicationOverviewModel model) {
-        super(dataSource, "Overview", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10, false);
+        super(dataSource, NbBundle.getMessage(ApplicationOverviewView.class, "LBL_Overview"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10, false);  // NOI18N
         this.model = model;
     }
     
@@ -73,10 +74,10 @@ class ApplicationOverviewView extends DataSourceView {
         dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
         
         snapshotsView = new OverviewViewSupport.SnapshotsViewSupport(model.getSource());
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Saved data", true), DataViewComponent.TOP_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationOverviewView.class, "LBL_Saved_data"), true), DataViewComponent.TOP_LEFT);   // NOI18N
         dvc.addDetailsView(snapshotsView.getDetailsView(), DataViewComponent.TOP_LEFT);
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.TOP_RIGHT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationOverviewView.class, "LBL_Details"), true), DataViewComponent.TOP_RIGHT); // NOI18N
         dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(model.getJvmArgs()).getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(model.getSystemProperties()).getDetailsView(), DataViewComponent.TOP_RIGHT);
         

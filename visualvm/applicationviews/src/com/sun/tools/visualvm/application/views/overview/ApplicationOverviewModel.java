@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -45,28 +46,28 @@ import java.util.StringTokenizer;
  */
 final class ApplicationOverviewModel {
     
-    private static final String PROP_PREFIX = "ApplicationOverviewModel_";
+    private static final String PROP_PREFIX = "ApplicationOverviewModel_";  // NOI18N
     
-    static final String SNAPSHOT_VERSION = PROP_PREFIX + "version";
-    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
-    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";
+    static final String SNAPSHOT_VERSION = PROP_PREFIX + "version"; // NOI18N
+    private static final String SNAPSHOT_VERSION_DIVIDER = "."; // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
-    private static final String PROP_NOT_DEFINED = "<not defined>";
+    private static final String PROP_NOT_DEFINED = "<not defined>"; // NOI18N
     
-    public static final String PROP_BASIC_INFO_SUPPORTED = PROP_PREFIX + "basic_info_supported";
-    public static final String PROP_SYSTEM_PROPERTIES_SUPPORTED = PROP_PREFIX + "system_properties_supported";
-    public static final String PROP_PID = PROP_PREFIX + "pid";
-    public static final String PROP_HOST_NAME = PROP_PREFIX + "host_name";
-    public static final String PROP_MAIN_CLASS = PROP_PREFIX + "main_class";
-    public static final String PROP_MAIN_ARGS = PROP_PREFIX + "main_args";
-    public static final String PROP_VM_ID = PROP_PREFIX + "vm_id";
-    public static final String PROP_JAVA_HOME = PROP_PREFIX + "java_home";
-    public static final String PROP_JVM_FLAGS = PROP_PREFIX + "jvm_flags";
-    public static final String PROP_OOME_ENABLED = PROP_PREFIX + "oome_enabled";
-    public static final String PROP_JVM_ARGS = PROP_PREFIX + "jvm_args";
-    public static final String PROP_SYSTEM_PROPERTIES = PROP_PREFIX + "system.properties";
+    public static final String PROP_BASIC_INFO_SUPPORTED = PROP_PREFIX + "basic_info_supported";    // NOI18N
+    public static final String PROP_SYSTEM_PROPERTIES_SUPPORTED = PROP_PREFIX + "system_properties_supported";  // NOI18N
+    public static final String PROP_PID = PROP_PREFIX + "pid";  // NOI18N
+    public static final String PROP_HOST_NAME = PROP_PREFIX + "host_name";  // NOI18N
+    public static final String PROP_MAIN_CLASS = PROP_PREFIX + "main_class";    // NOI18N
+    public static final String PROP_MAIN_ARGS = PROP_PREFIX + "main_args";  // NOI18N
+    public static final String PROP_VM_ID = PROP_PREFIX + "vm_id";  // NOI18N
+    public static final String PROP_JAVA_HOME = PROP_PREFIX + "java_home";  // NOI18N
+    public static final String PROP_JVM_FLAGS = PROP_PREFIX + "jvm_flags";  // NOI18N
+    public static final String PROP_OOME_ENABLED = PROP_PREFIX + "oome_enabled";    // NOI18N
+    public static final String PROP_JVM_ARGS = PROP_PREFIX + "jvm_args";    // NOI18N
+    public static final String PROP_SYSTEM_PROPERTIES = PROP_PREFIX + "system.properties";  // NOI18N
     
     private boolean initialized;
     private DataSource source;
@@ -113,7 +114,7 @@ final class ApplicationOverviewModel {
     public String oomeEnabled() {
         if (basicInfoSupported() && source instanceof Application) {
             Jvm jvm = JvmFactory.getJVMFor((Application)source);
-            oomeEnabled = jvm.isDumpOnOOMEnabled() ? "enabled" : "disabled";
+            oomeEnabled = jvm.isDumpOnOOMEnabled() ? NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_enabled") : NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_disabled");  // NOI18N
         }
         return oomeEnabled;
     }
@@ -192,25 +193,25 @@ final class ApplicationOverviewModel {
         systemPropertiesSupported = jvm.isGetSystemPropertiesSupported();
 
         int pidInt = application.getPid();
-        pid = pidInt == Application.UNKNOWN_PID ? "<unknown>" : "" + pidInt;
+        pid = pidInt == Application.UNKNOWN_PID ? NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown") : "" + pidInt; // NOI18N
         
         hostName = application.getHost().getHostName();
         
         if (basicInfoSupported) {
             mainClass = jvm.getMainClass();
-            if (mainClass == null) mainClass = "<unknown>";
+            if (mainClass == null) mainClass = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
 
             mainArgs = jvm.getMainArgs();
-            if (mainArgs == null) mainArgs = "<none>";
+            if (mainArgs == null) mainArgs = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none");   // NOI18N
 
-            vmId = jvm.getVmName() + " (" + jvm.getVmVersion() + ", " + jvm.getVmInfo() + ")";
+            vmId = jvm.getVmName() + " (" + jvm.getVmVersion() + ", " + jvm.getVmInfo() + ")";  // NOI18N
 
             javaHome = jvm.getJavaHome();
 
             jvmFlags = jvm.getJvmFlags();
-            if (jvmFlags == null || jvmFlags.length() == 0) jvmFlags = "<none>";
+            if (jvmFlags == null || jvmFlags.length() == 0) jvmFlags = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none"); // NOI18N
 
-            oomeEnabled = jvm.isDumpOnOOMEnabled() ? "enabled" : "disabled";
+            oomeEnabled = jvm.isDumpOnOOMEnabled() ? NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_enabled") : NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_disabled");  // NOI18N
             String jvmArgss = jvm.getJvmArgs();
             if (jvmArgss != null) jvmArgs = formatJVMArgs(jvmArgss);
         }
@@ -223,24 +224,24 @@ final class ApplicationOverviewModel {
 
     
     private static String formatJVMArgs(String jvmargs) {
-        String mangledString = " ".concat(jvmargs).replace(" -", "\n");
-        StringTokenizer tok = new StringTokenizer(mangledString, "\n");
+        String mangledString = " ".concat(jvmargs).replace(" -", "\n"); // NOI18N
+        StringTokenizer tok = new StringTokenizer(mangledString, "\n"); // NOI18N
         StringBuffer text = new StringBuffer(100);
         while (tok.hasMoreTokens()) {
-            String arg = tok.nextToken().replace(" ", "&nbsp;");
+            String arg = tok.nextToken().replace(" ", "&nbsp;");    // NOI18N
             int equalsSign = arg.indexOf('=');
 
-            text.append("<b>");
-            text.append("-");
+            text.append("<b>"); // NOI18N
+            text.append("-");   // NOI18N
             if (equalsSign != -1) {
                 text.append(arg.substring(0, equalsSign));
-                text.append("</b>");
+                text.append("</b>");    // NOI18N
                 text.append(arg.substring(equalsSign));
             } else {
                 text.append(arg);
-                text.append("</b>");
+                text.append("</b>");    // NOI18N
             }
-            text.append("<br>");
+            text.append("<br>");    // NOI18N
         }
         return text.toString();
     }
@@ -256,16 +257,16 @@ final class ApplicationOverviewModel {
             String key = (String) keyIt.next();
             String val = properties.getProperty(key);
             
-            if ("line.separator".equals(key) && val != null) {
-                val = val.replace("\n", "\\n");
-                val = val.replace("\r", "\\r");
+            if ("line.separator".equals(key) && val != null) {  // NOI18N
+                val = val.replace("\n", "\\n"); // NOI18N
+                val = val.replace("\r", "\\r"); // NOI18N
             }
 
-            text.append("<b>");
+            text.append("<b>"); // NOI18N
             text.append(key);
-            text.append("</b>=");
+            text.append("</b>=");   // NOI18N
             text.append(val);
-            text.append("<br>");
+            text.append("<br>");    // NOI18N
         }
         return text.toString();
     }

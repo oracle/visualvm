@@ -64,7 +64,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
                     resp.fillInThreadData();
                     processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));
                 } catch (Exception ex) {
-                    LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex);
+                    LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex); // NOI18N
                 } finally {
                     refreshRunning = false;
                 }
@@ -156,7 +156,7 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
 
         boolean isSleeping(StackTraceElement element) {
             return Thread.class.getName().equals(element.getClassName()) &&
-                    "sleep".equals(element.getMethodName());
+                    "sleep".equals(element.getMethodName());    // NOI18N
         }
     }
 }

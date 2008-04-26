@@ -53,6 +53,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -61,14 +62,14 @@ import org.openide.util.Utilities;
  */
 class ApplicationThreadsView extends DataSourceView implements DataRemovedListener<Application> {
 
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";  // NOI18N
     private Jvm jvm;
     private JvmMXBeans mxbeans;
     private ThreadMXBeanDataManager threadsManager;
     private MBeanCacheListener listener;
 
     ApplicationThreadsView(Application application) {
-        super(application, "Threads", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);
+        super(application, NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
     }
 
     @Override
@@ -122,7 +123,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         final DataViewComponent dvc = new DataViewComponent(mvs.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
 
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Threads visualization", true), DataViewComponent.TOP_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads_visualization"), true), DataViewComponent.TOP_LEFT); // NOI18N
 
         final DetailsViewSupport detailsViewSupport = new DetailsViewSupport(threadsManager);
         final DataViewComponent.DetailsView detailsView = detailsViewSupport.getDetailsView();
@@ -145,13 +146,15 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private HTMLTextArea area;
         private JButton threadDumpButton;
+        private static final String LIVE_THRADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Live_threads");    // NOI18N
+        private static final String DAEMON_THREADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Daemon_threads");   // NOI18N
 
         MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
             initComponents(application, jvm, threadsManager);
         }
 
         DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Threads", null, this);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), null, this);  // NOI18N
         }
 
         public void dataRemoved(Application dataSource) {
@@ -172,7 +175,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
             add(area, BorderLayout.CENTER);
 
-            threadDumpButton = new JButton(new AbstractAction("Thread Dump") {
+            threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Thread_Dump")) {   // NOI18N
                 public void actionPerformed(ActionEvent e) {
                     ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                 }
@@ -210,8 +213,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                 protected void done() {
                     StringBuilder data = new StringBuilder();
 
-                    data.append("<b>Live threads:</b> " + threads[0] + "<br>");
-                    data.append("<b>Daemon threads:</b> " + threads[1] + "<br>");
+                    data.append("<b>"+LIVE_THRADS+":</b> " + threads[0] + "<br>");  // NOI18N
+                    data.append("<b>"+DAEMON_THREADS+":</b> " + threads[1] + "<br>");   // NOI18N
 
                     int selStart = area.getSelectionStart();
                     int selEnd = area.getSelectionEnd();
@@ -231,7 +234,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
 
         DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Timeline", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Timeline"), null, 10, this, null);  // NOI18N
         }
 
         private void initComponents(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
@@ -256,7 +259,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
 
         DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Details", null, 20, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Details"), null, 20, this, null);   // NOI18N
         }
 
         void showDetails(int[] indexes) {

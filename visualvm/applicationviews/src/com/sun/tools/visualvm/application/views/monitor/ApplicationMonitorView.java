@@ -62,6 +62,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
@@ -72,7 +73,7 @@ import org.openide.util.Utilities;
 class ApplicationMonitorView extends DataSourceView {
     private static final Logger LOGGER = Logger.getLogger(ApplicationMonitorView.class.getName());
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/monitor.png";
+    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/monitor.png";  // NOI18N
 
     private Jvm jvm;
     private MemoryMXBean memoryMXBean;
@@ -80,7 +81,7 @@ class ApplicationMonitorView extends DataSourceView {
     
 
     public ApplicationMonitorView(Application application) {
-        super(application, "Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);
+        super(application, NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Monitor"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);   // NOI18N
     }
     
     @Override
@@ -108,19 +109,19 @@ class ApplicationMonitorView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(false));
         
         final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Heap", true), DataViewComponent.TOP_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap"), true), DataViewComponent.TOP_LEFT);  // NOI18N
         dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(jvm);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("PermGen", true), DataViewComponent.TOP_RIGHT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
         dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
         final ClassesViewSupport classesViewSupport = new ClassesViewSupport(jvm);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Classes", true), DataViewComponent.BOTTOM_LEFT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Classes"), true), DataViewComponent.BOTTOM_LEFT);    // NOI18N
         dvc.addDetailsView(classesViewSupport.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
         
         final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(jvm);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Threads", true), DataViewComponent.BOTTOM_RIGHT);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Threads"), true), DataViewComponent.BOTTOM_RIGHT);   // NOI18N
         dvc.addDetailsView(threadsViewSupport.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
         
         monitoredDataListener = new MonitoredDataListener() {
@@ -135,7 +136,7 @@ class ApplicationMonitorView extends DataSourceView {
                             classesViewSupport.refresh(data, time);
                             threadsViewSupport.refresh(data, time);
                         } catch (Exception ex) {
-                            LOGGER.log(Level.INFO,"monitoredDataEvent",ex);
+                            LOGGER.log(Level.INFO,"monitoredDataEvent",ex); // NOI18N
                         }
                     }
                 });
@@ -167,7 +168,7 @@ class ApplicationMonitorView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Monitor", null, this);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Monitor"), null, this);  // NOI18N
         }
         
         public void refresh(MonitoredData data) {
@@ -198,12 +199,12 @@ class ApplicationMonitorView extends DataSourceView {
             
             add(area, BorderLayout.CENTER);
 
-            gcButton = new JButton(new AbstractAction("Perform GC") {
+            gcButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Perform_GC")) {    // NOI18N
                 public void actionPerformed(ActionEvent e) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             try { memoryMXBean.gc(); } catch (Exception e) { 
-                                LOGGER.throwing(ApplicationMonitorView.class.getName(), "initComponents", e);
+                                LOGGER.throwing(ApplicationMonitorView.class.getName(), "initComponents", e);   // NOI18N
                             }
                         };
                     });
@@ -211,7 +212,7 @@ class ApplicationMonitorView extends DataSourceView {
             });
             gcButton.setEnabled(memoryMXBean != null);
             
-            heapDumpButton = new JButton(new AbstractAction("Heap Dump") {
+            heapDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_Dump")) {   // NOI18N
                 public void actionPerformed(ActionEvent e) {
                     HeapDumpSupport.getInstance().takeHeapDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                 }
@@ -233,8 +234,9 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         private String getBasicTelemetry(MonitoredData data) {
-            if (data == null) return "<nobr><b>Uptime:</b></nobr>";
-            else return "<nobr><b>Uptime:</b> " + getTime(data.getUpTime()) + "</nobr>";
+            String uptimeLbl = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Uptime"); // NOI18N
+            if (data == null) return "<nobr><b>"+uptimeLbl+":</b></nobr>";  // NOI18N
+            else return "<nobr><b>"+uptimeLbl+":</b> " + getTime(data.getUpTime()) + "</nobr>"; // NOI18N
         }
         
         public static String getTime(long millis) {
@@ -268,15 +270,18 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel usedHeapLabel;
         private HTMLLabel maxHeapLabel;
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
-        
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String HEAP_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size"); // NOI18N
+        private static final String USED_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap"); // NOI18N
+        private static final String MAX_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_Heap");   // NOI18N
+
         public HeapViewSupport(Jvm jvm) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
             initComponents();
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Heap", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap"), null, 10, this, null);  // NOI18N
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -285,14 +290,14 @@ class ApplicationMonitorView extends DataSourceView {
                 long heapUsed = data.getGenUsed()[0];
                 long maxHeap = data.getGenMaxCapacity()[0];
                 heapMetricsChart.getModel().addItemValues(time, new long[] { heapCapacity, heapUsed });
-                heapSizeLabel.setText("<nobr><b>Heap size:</b> " + formatter.format(heapCapacity) + " </nobr>");
-                usedHeapLabel.setText("<nobr><b>Used heap:</b> " + formatter.format(heapUsed) + " </nobr>");
-                maxHeapLabel.setText("<nobr><b>Max heap:</b> " + formatter.format(maxHeap) + " </nobr>");
+                heapSizeLabel.setText("<nobr><b>"+HEAP_SIZE+":</b> " + formatter.format(heapCapacity) + " </nobr>");    // NOI18N
+                usedHeapLabel.setText("<nobr><b>"+USED_HEAP+":</b> " + formatter.format(heapUsed) + " </nobr>");    // NOI18N
+                maxHeapLabel.setText("<nobr><b>"+MAX_HEAP+":</b> " + formatter.format(maxHeap) + " </nobr>");   // NOI18N
               
                 heapMetricsChart.setToolTipText(
-                        "<html><nobr><b>Heap size:</b> " + formatter.format(heapCapacity) + " </nobr>" + "<br>" + 
-                        "<nobr><b>Used heap:</b> " + formatter.format(heapUsed) + " </nobr>" + "<br>" +
-                        "<nobr><b>Max heap:</b> " + formatter.format(maxHeap) + " </nobr></html>");
+                        "<html><nobr><b>"+HEAP_SIZE+":</b> " + formatter.format(heapCapacity) + " </nobr>" + "<br>" +   // NOI18N
+                        "<nobr><b>"+USED_HEAP+":</b> " + formatter.format(heapUsed) + " </nobr>" + "<br>" + // NOI18N
+                        "<nobr><b>"+MAX_HEAP+":</b> " + formatter.format(maxHeap) + " </nobr></html>"); // NOI18N
             }
         }
         
@@ -308,21 +313,21 @@ class ApplicationMonitorView extends DataSourceView {
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              heapSizeLabel.setText("<nobr><b>Heap size:</b></nobr>");
+              heapSizeLabel.setText("<nobr><b>"+HEAP_SIZE+":</b></nobr>");  // NOI18N
               heapSizeLabel.setOpaque(false);
               usedHeapLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              usedHeapLabel.setText("<nobr><b>Used heap:</b></nobr>");
+              usedHeapLabel.setText("<nobr><b>"+USED_HEAP+":</b></nobr>");  // NOI18N
               usedHeapLabel.setOpaque(false);
               maxHeapLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              maxHeapLabel.setText("<nobr><b>Live threads peak:</b></nobr>");
+              maxHeapLabel.setText("<nobr><b>"+MAX_HEAP+":</b></nobr>");    // NOI18N
               maxHeapLabel.setOpaque(false);
               final JPanel heapMetricsDataPanel = new JPanel(new GridLayout(2, 2));
               heapMetricsDataPanel.setOpaque(false);
@@ -380,7 +385,10 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel permUsedHeapLabel;
         private HTMLLabel permMaxHeapLabel;
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String PERM_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size");  // NOI18N
+        private static final String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
+        private static final String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
         
         public PermGenViewSupport(Jvm jvm) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
@@ -388,7 +396,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("PermGen", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen"), null, 10, this, null);   // NOI18N
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -397,14 +405,14 @@ class ApplicationMonitorView extends DataSourceView {
                 long permgenUsed = data.getGenUsed()[1];
                 long permgenMax = data.getGenMaxCapacity()[1];
                 permgenMetricsChart.getModel().addItemValues(time, new long[] { permgenCapacity, permgenUsed });
-                permHeapSizeLabel.setText("<nobr><b>PermGen size:</b> " + formatter.format(permgenCapacity) + " </nobr>");
-                permUsedHeapLabel.setText("<nobr><b>Used PermGen:</b> " + formatter.format(permgenUsed) + " </nobr>");
-                permMaxHeapLabel.setText("<nobr><b>Max PermGen size:</b> " + formatter.format(permgenMax) + " </nobr>");
+                permHeapSizeLabel.setText("<nobr><b>"+PERM_SIZE+":</b> " + formatter.format(permgenCapacity) + " </nobr>"); // NOI18N
+                permUsedHeapLabel.setText("<nobr><b>"+USED_PERM+":</b> " + formatter.format(permgenUsed) + " </nobr>"); // NOI18N
+                permMaxHeapLabel.setText("<nobr><b>"+MAX_PERM+":</b> " + formatter.format(permgenMax) + " </nobr>");    // NOI18N
               
                 permgenMetricsChart.setToolTipText(
-                        "<html><nobr><b>PermGen size:</b> " + formatter.format(permgenCapacity) + " </nobr>" + "<br>" + 
-                        "<nobr><b>Used PermGen:</b> " + formatter.format(permgenUsed) + " </nobr>" + "<br>" +
-                        "<nobr><b>Max PermGen size:</b> " + formatter.format(permgenMax) + " </nobr>");
+                        "<html><nobr><b>"+PERM_SIZE+":</b> " + formatter.format(permgenCapacity) + " </nobr>" + "<br>" +    // NOI18N
+                        "<nobr><b>"+USED_PERM+":</b> " + formatter.format(permgenUsed) + " </nobr>" + "<br>" +  // NOI18N
+                        "<nobr><b>"+MAX_PERM+":</b> " + formatter.format(permgenMax) + " </nobr>"); // NOI18N
             }
         }
         
@@ -420,21 +428,21 @@ class ApplicationMonitorView extends DataSourceView {
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              permHeapSizeLabel.setText("<nobr><b>PermGen size:</b></nobr>");
+              permHeapSizeLabel.setText("<nobr><b>"+PERM_SIZE+":</b></nobr>");  // NOI18N
               permHeapSizeLabel.setOpaque(false);
               permUsedHeapLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              permUsedHeapLabel.setText("<nobr><b>Used PermGen:</b></nobr>");
+              permUsedHeapLabel.setText("<nobr><b>"+USED_PERM+":</b></nobr>");  // NOI18N
               permUsedHeapLabel.setOpaque(false);
               permMaxHeapLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              permMaxHeapLabel.setText("<nobr><b>Max PermGen size:</b></nobr>");
+              permMaxHeapLabel.setText("<nobr><b>"+MAX_PERM+":</b></nobr>");    // NOI18N
               permMaxHeapLabel.setOpaque(false);
               final JPanel permgenMetricsDataPanel = new JPanel(new GridLayout(2, 2));
               permgenMetricsDataPanel.setOpaque(false);
@@ -492,7 +500,11 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel loadedSharedClassesLabel;
         private HTMLLabel unloadedClassesLabel;
         private HTMLLabel unloadedSharedClassesLabel;
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String TOTAL_LOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_loaded_classes");   // NOI18N
+        private static final String SHARED_LOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Shared_loaded_classes"); // NOI18N
+        private static final String TOTAL_UNLOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_unloaded_classes");   // NOI18N
+        private static final String SHARED_UNLOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Shared_unloaded_classes"); // NOI18N
         
         public ClassesViewSupport(Jvm jvm) {
             classMonitoringSupported = jvm.isClassMonitoringSupported();
@@ -500,7 +512,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Classes", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Classes"), null, 10, this, null);   // NOI18N
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -510,16 +522,16 @@ class ApplicationMonitorView extends DataSourceView {
                 long sharedClasses  = data.getSharedLoadedClasses() - sharedUnloaded;
                 long totalClasses   = data.getLoadedClasses() - data.getUnloadedClasses() + sharedClasses;
                 classesMetricsChart.getModel().addItemValues(time, new long[] { totalClasses, sharedClasses });
-                loadedClassesLabel.setText("<nobr><b>Total loaded classes:</b> " + totalClasses + " </nobr>");
-                loadedSharedClassesLabel.setText("<nobr><b>Shared loaded classes:</b> " + sharedClasses + " </nobr>");
-                unloadedClassesLabel.setText("<nobr><b>Total unloaded classes:</b> " + totalUnloaded + " </nobr>");
-                unloadedSharedClassesLabel.setText("<nobr><b>Shared unloaded classes:</b> " + sharedUnloaded + " </nobr>");
+                loadedClassesLabel.setText("<nobr><b>"+TOTAL_LOADED+":</b> " + totalClasses + " </nobr>");  // NOI18N
+                loadedSharedClassesLabel.setText("<nobr><b>"+SHARED_LOADED+":</b> " + sharedClasses + " </nobr>");  // NOI18N
+                unloadedClassesLabel.setText("<nobr><b>"+TOTAL_UNLOADED+":</b> " + totalUnloaded + " </nobr>"); // NOI18N
+                unloadedSharedClassesLabel.setText("<nobr><b>"+SHARED_UNLOADED+":</b> " + sharedUnloaded + " </nobr>"); // NOI18N
               
                 classesMetricsChart.setToolTipText(
-                        "<html><nobr><b>Total loaded classes:</b> " + totalClasses + " </nobr>" + "<br>" + 
-                        "<nobr><b>Shared loaded classes:</b> " + sharedClasses + " </nobr>" + "<br>" +
-                        "<nobr><b>Total unloaded classes:</b> " + totalUnloaded + " </nobr>" + "<br>" +
-                        "<nobr><b>Shared unloaded classes:</b> " + sharedUnloaded + " </nobr></html>");
+                        "<html><nobr><b>"+TOTAL_LOADED+":</b> " + totalClasses + " </nobr>" + "<br>" +  // NOI18N
+                        "<nobr><b>"+SHARED_LOADED+":</b> " + sharedClasses + " </nobr>" + "<br>" +  // NOI18N
+                        "<nobr><b>"+TOTAL_UNLOADED+":</b> " + totalUnloaded + " </nobr>" + "<br>" + // NOI18N
+                        "<nobr><b>"+SHARED_UNLOADED+":</b> " + sharedUnloaded + " </nobr></html>"); // NOI18N
             }
         }
         
@@ -535,28 +547,28 @@ class ApplicationMonitorView extends DataSourceView {
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              loadedClassesLabel.setText("<nobr><b>Total loaded classes:</b></nobr>");
+              loadedClassesLabel.setText("<nobr><b>"+TOTAL_LOADED+":</b></nobr>");  // NOI18N
               loadedClassesLabel.setOpaque(false);
               loadedSharedClassesLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              loadedSharedClassesLabel.setText("<nobr><b>Shared loaded classes:</b></nobr>");
+              loadedSharedClassesLabel.setText("<nobr><b>"+SHARED_LOADED+":</b></nobr>");   // NOI18N
               loadedSharedClassesLabel.setOpaque(false);
               unloadedClassesLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              unloadedClassesLabel.setText("<nobr><b>Total unloaded classes:</b></nobr>");
+              unloadedClassesLabel.setText("<nobr><b>"+TOTAL_UNLOADED+":</b></nobr>");  // NOI18N
               unloadedClassesLabel.setOpaque(false);
               unloadedSharedClassesLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              unloadedSharedClassesLabel.setText("<nobr><b>Shared unloaded classes:</b></nobr>");
+              unloadedSharedClassesLabel.setText("<nobr><b>"+SHARED_UNLOADED+":</b></nobr>");   // NOI18N
               unloadedSharedClassesLabel.setOpaque(false);
               final JPanel classesMetricsDataPanel = new JPanel(new GridLayout(2, 2));
               classesMetricsDataPanel.setOpaque(false);
@@ -615,7 +627,11 @@ class ApplicationMonitorView extends DataSourceView {
         private HTMLLabel daemonThreadsLabel;
         private HTMLLabel liveThreadsPeakLabel;
         private HTMLLabel startedThreadsLabel;
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height;
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String LIVE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Live_threads");   // NOI18N
+        private static final String DAEMON = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Daemon_threads");// NOI18N
+        private static final String PEAK = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Live_threads_peak");  // NOI18N
+        private static final String STARTED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Started_threads_total");   // NOI18N
         
         public ThreadsViewSupport(Jvm jvm) {
             threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
@@ -623,7 +639,7 @@ class ApplicationMonitorView extends DataSourceView {
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Threads", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Threads"), null, 10, this, null);   // NOI18N
         }
         
         public void refresh(MonitoredData data, long time) {
@@ -633,16 +649,16 @@ class ApplicationMonitorView extends DataSourceView {
                 long peakThreads    = data.getThreadsLivePeak();
                 long startedThreads = data.getThreadsStarted();
                 threadsMetricsChart.getModel().addItemValues(time, new long[] { totalThreads, daemonThreads });
-                liveThreadsLabel.setText("<nobr><b>Live threads:</b> " + totalThreads + " </nobr>");
-                daemonThreadsLabel.setText("<nobr><b>Daemon threads:</b> " + daemonThreads + " </nobr>");
-                liveThreadsPeakLabel.setText("<nobr><b>Live threads peak:</b> " + peakThreads + " </nobr>");
-                startedThreadsLabel.setText("<nobr><b>Started threads total:</b> " + startedThreads + " </nobr>");
+                liveThreadsLabel.setText("<nobr><b>"+LIVE+":</b> " + totalThreads + " </nobr>");    // NOI18N
+                daemonThreadsLabel.setText("<nobr><b>"+DAEMON+":</b> " + daemonThreads + " </nobr>");   // NOI18N
+                liveThreadsPeakLabel.setText("<nobr><b>"+PEAK+":</b> " + peakThreads + " </nobr>"); // NOI18N
+                startedThreadsLabel.setText("<nobr><b>"+STARTED+":</b> " + startedThreads + " </nobr>");    // NOI18N
               
                 threadsMetricsChart.setToolTipText(
-                        "<html><nobr><b>Live threads:</b> " + totalThreads + " </nobr>" + "<br>" + 
-                        "<nobr><b>Daemon threads:</b> " + daemonThreads + " </nobr>" + "<br>" +
-                        "<nobr><b>Live threads peak:</b> " + peakThreads + " </nobr>" + "<br>" +
-                        "<nobr><b>Started threads total:</b> " + startedThreads + " </nobr></html>");
+                        "<html><nobr><b>"+LIVE+":</b> " + totalThreads + " </nobr>" + "<br>" +  // NOI18N
+                        "<nobr><b>"+DAEMON+":</b> " + daemonThreads + " </nobr>" + "<br>" + // NOI18N
+                        "<nobr><b>"+PEAK+":</b> " + peakThreads + " </nobr>" + "<br>" + // NOI18N
+                        "<nobr><b>"+STARTED+":</b> " + startedThreads + " </nobr></html>"); // NOI18N
             }
         }
         
@@ -658,28 +674,28 @@ class ApplicationMonitorView extends DataSourceView {
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              liveThreadsLabel.setText("<nobr><b>Live threads:</b></nobr>");
+              liveThreadsLabel.setText("<nobr><b>"+LIVE+":</b></nobr>");    // NOI18N
               liveThreadsLabel.setOpaque(false);
               daemonThreadsLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              daemonThreadsLabel.setText("<nobr><b>Daemon threads:</b></nobr>");
+              daemonThreadsLabel.setText("<nobr><b>"+DAEMON+":</b></nobr>");    // NOI18N
               daemonThreadsLabel.setOpaque(false);
               liveThreadsPeakLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              liveThreadsPeakLabel.setText("<nobr><b>Live threads peak:</b></nobr>");
+              liveThreadsPeakLabel.setText("<nobr><b>"+PEAK+":</b></nobr>");    // NOI18N
               liveThreadsPeakLabel.setOpaque(false);
               startedThreadsLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              startedThreadsLabel.setText("<nobr><b>Started threads total:</b></nobr>");
+              startedThreadsLabel.setText("<nobr><b>"+STARTED+":</b></nobr>");  // NOI18N
               startedThreadsLabel.setOpaque(false);
               final JPanel threadsMetricsDataPanel = new JPanel(new GridLayout(2, 2));
               threadsMetricsDataPanel.setOpaque(false);

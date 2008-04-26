@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -120,7 +121,7 @@ class ChartsSupport {
   public static class ClassesMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"Total loaded classes", "Shared loaded classes"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Total_loaded_classes"), NbBundle.getMessage(ChartsSupport.class, "LBL_Shared_loaded_classes")}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );    // NOI18N
     }
 
     protected SynchronousXYChart createChart() {
@@ -156,7 +157,7 @@ class ChartsSupport {
   public static class ThreadsMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"Live threads", "Daemon threads"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Live_threads"), NbBundle.getMessage(ChartsSupport.class, "LBL_Daemon_threads")}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );   // NOI18N
     }
 
     protected SynchronousXYChart createChart() {
@@ -193,7 +194,7 @@ class ChartsSupport {
   public static class HeapMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"Heap size", "Used heap"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Heap_size"), NbBundle.getMessage(ChartsSupport.class, "LBL_Used_heap")}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );   // NOI18N
     }
 
     protected SynchronousXYChart createChart() {
@@ -231,7 +232,7 @@ class ChartsSupport {
   public static class PermGenMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {"PermGen size", "Used PermGen"}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} );
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_PermGen_size"), NbBundle.getMessage(ChartsSupport.class, "LBL_Used_PermGen")}, new Color[] { new Color(255, 127, 127),new Color(127, 63, 191)} ); // NOI18N
     }
 
     protected SynchronousXYChart createChart() {

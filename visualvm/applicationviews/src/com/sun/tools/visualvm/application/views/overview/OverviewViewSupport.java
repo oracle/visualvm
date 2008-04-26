@@ -46,6 +46,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
 /**
@@ -67,7 +68,7 @@ class OverviewViewSupport {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView("Overview", null, this);
+            return new DataViewComponent.MasterView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_Overview"), null, this);    // NOI18N
         }
         
         
@@ -75,7 +76,7 @@ class OverviewViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            final HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>");
+            final HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>"); // NOI18N
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             
             DataSource source = model.getSource();
@@ -85,7 +86,7 @@ class OverviewViewSupport {
                         if (Jvm.PROPERTY_DUMP_OOME_ENABLED.equals(evt.getPropertyName())) {
                             int selStart = area.getSelectionStart();
                             int selEnd   = area.getSelectionEnd();
-                            area.setText("<nobr>" + getGeneralProperties(model) + "</nobr>");
+                            area.setText("<nobr>" + getGeneralProperties(model) + "</nobr>");   // NOI18N
                             area.select(selStart, selEnd);
                         }
                     }
@@ -100,18 +101,26 @@ class OverviewViewSupport {
             StringBuilder data = new StringBuilder();
             
             // Application information
-            data.append("<b>PID:</b> " + model.getPid() + "<br>");
-            data.append("<b>Host:</b> " + model.getHostName() + "<br>");
+            String PID = NbBundle.getMessage(OverviewViewSupport.class, "LBL_PID"); // NOI18N
+            String HOST = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Host");   // NOI18N
+            data.append("<b>"+PID+":</b> " + model.getPid() + "<br>");  // NOI18N
+            data.append("<b>"+HOST+":</b> " + model.getHostName() + "<br>");    // NOI18N
             
             if (model.basicInfoSupported()) {
-                data.append("<b>Main class:</b> " + model.getMainClass() + "<br>");
-                data.append("<b>Arguments:</b> " + model.getMainArgs() + "<br>");
+                String MAIN_CLASS = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Main_class");   // NOI18N
+                String ARGS = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Arguments");  // NOI18N
+                String JVM = NbBundle.getMessage(OverviewViewSupport.class, "LBL_JVM"); // NOI18N
+                String JAVA_HOME = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Java_Home"); // NOI18N
+                String JVM_FLAGS = NbBundle.getMessage(OverviewViewSupport.class, "LBL_JVM_Flags"); // NOI18N
+                String HEAP_DUMP_OOME = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Heap_dump_on_OOME");    // NOI18N
+                data.append("<b>"+MAIN_CLASS+":</b> " + model.getMainClass() + "<br>"); // NOI18N
+                data.append("<b>"+ARGS+":</b> " + model.getMainArgs() + "<br>");    // NOI18N
                 
-                data.append("<br>");
-                data.append("<b>JVM:</b> " + model.getVmId() + "<br>");
-                data.append("<b>Java Home:</b> " + model.getJavaHome() + "<br>");
-                data.append("<b>JVM Flags:</b> " + model.getJvmFlags() + "<br><br>");
-                data.append("<b>Heap dump on OOME:</b> " + model.oomeEnabled() + "<br>");
+                data.append("<br>");    // NOI18N
+                data.append("<b>"+JVM+":</b> " + model.getVmId() + "<br>"); // NOI18N
+                data.append("<b>"+JAVA_HOME+":</b> " + model.getJavaHome() + "<br>");   // NOI18N
+                data.append("<b>"+JVM_FLAGS+":</b> " + model.getJvmFlags() + "<br><br>");   // NOI18N
+                data.append("<b>"+HEAP_DUMP_OOME+":</b> " + model.oomeEnabled() + "<br>");  // NOI18N
             }
             
             return data.toString();
@@ -135,7 +144,7 @@ class OverviewViewSupport {
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Saved data", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_Saved_data"), null, 10, this, null);   // NOI18N
         }
         
         private void initComponents() {
@@ -164,9 +173,9 @@ class OverviewViewSupport {
             
             List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
             for (SnapshotCategory category : snapshotCategories)
-                data.append("<b>" + category.getName() + ":</b> " + dataSource.getRepository().getDataSources(category.getType()).size() + "<br>");
+                data.append("<b>" + category.getName() + ":</b> " + dataSource.getRepository().getDataSources(category.getType()).size() + "<br>"); // NOI18N
             
-            area.setText("<nobr>" + data.toString() + "</nobr>");
+            area.setText("<nobr>" + data.toString() + "</nobr>");   // NOI18N
         }
         
     }
@@ -181,7 +190,7 @@ class OverviewViewSupport {
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("JVM arguments", null, 10, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_JVM_arguments"), null, 10, this, null);    // NOI18N
         }
         
         private void initComponents(String jvmargs) {
@@ -191,7 +200,7 @@ class OverviewViewSupport {
             JComponent contents;
             
             if (jvmargs != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + jvmargs + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + jvmargs + "</nobr>");   // NOI18N
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 contents = area;
@@ -214,7 +223,7 @@ class OverviewViewSupport {
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("System properties", null, 20, this, null);
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(OverviewViewSupport.class, "LBL_System_properties"), null, 20, this, null);    // NOI18N
         }
         
         private void initComponents(String properties) {
@@ -224,7 +233,7 @@ class OverviewViewSupport {
             JComponent contents;
             
             if (properties != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + properties + "</nobr>");
+                HTMLTextArea area = new HTMLTextArea("<nobr>" + properties + "</nobr>");    // NOI18N
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 contents = area;
