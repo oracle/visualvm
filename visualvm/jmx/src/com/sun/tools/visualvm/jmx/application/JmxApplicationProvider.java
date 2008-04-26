@@ -85,6 +85,9 @@ class JmxApplicationProvider {
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
     private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
     private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
+    
+    private static final String PROPERTIES_FILE = "jmxapplication" + Storage.DEFAULT_PROPERTIES_EXT;  // NOI18N
+    private static final String JMX_SUFFIX = ".jmx";  // NOI18N
 
     private static JmxApplicationProvider sharedInstance;
     
@@ -169,8 +172,10 @@ class JmxApplicationProvider {
             pHandle.setInitialDelay(0);
             pHandle.start();
             
-            Storage storage = new Storage(JmxApplicationsSupport.getStorageDirectory(),
-                    System.currentTimeMillis() + Storage.DEFAULT_PROPERTIES_EXT);
+            File storageDirectory = Utils.getUniqueFile(JmxApplicationsSupport.getStorageDirectory(),
+                    "" + System.currentTimeMillis(), JMX_SUFFIX);    // NOI18N
+            Utils.prepareDirectory(storageDirectory);
+            Storage storage = new Storage(storageDirectory, PROPERTIES_FILE);
 
             String[] keys = new String[]{
                 SNAPSHOT_VERSION,
@@ -356,18 +361,20 @@ class JmxApplicationProvider {
         File[] files = JmxApplicationsSupport.getStorageDirectory().listFiles(
                 new FilenameFilter() {
                     public boolean accept(File dir, String name) {
-                        return name.endsWith(Storage.DEFAULT_PROPERTIES_EXT);
+                        return name.endsWith(JMX_SUFFIX);
                     }
                 });
         
         for (File file : files) {
-            Storage storage = new Storage(file.getParentFile(), file.getName());
-            Set<Storage> storageSet = persistedApplications.get(storage.getCustomProperty(PROPERTY_HOSTNAME));
-            if (storageSet == null) {
-                storageSet = new HashSet<Storage>();
-                persistedApplications.put(storage.getCustomProperty(PROPERTY_HOSTNAME), storageSet);
+            if (file.isDirectory()) {
+                Storage storage = new Storage(file, PROPERTIES_FILE);
+                Set<Storage> storageSet = persistedApplications.get(storage.getCustomProperty(PROPERTY_HOSTNAME));
+                if (storageSet == null) {
+                    storageSet = new HashSet<Storage>();
+                    persistedApplications.put(storage.getCustomProperty(PROPERTY_HOSTNAME), storageSet);
+                }
+                storageSet.add(storage);
             }
-            storageSet.add(storage);
         }
         
         DataChangeListener<Host> dataChangeListener = new DataChangeListener<Host>() {
