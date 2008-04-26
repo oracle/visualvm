@@ -225,7 +225,8 @@ class JmxApplicationProvider {
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) serviceURL = getServiceURL(connectionName);
         if (serviceURL == null) {
-            storage.deleteCustomPropertiesStorage();
+            File appStorage = storage.getDirectory();
+            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
@@ -240,7 +241,8 @@ class JmxApplicationProvider {
         try {
             host = getHost(hostName, serviceURL);
         } catch (Exception e) {
-            storage.deleteCustomPropertiesStorage();
+            File appStorage = storage.getDirectory();
+            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(
@@ -256,7 +258,8 @@ class JmxApplicationProvider {
         // Check if the given JmxApplication has been already added to the application tree
         final Set<JmxApplication> jmxapps = host.getRepository().getDataSources(JmxApplication.class);
         if (jmxapps.contains(application)) {
-            storage.deleteCustomPropertiesStorage();
+            File appStorage = storage.getDirectory();
+            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             JmxApplication tempapp = null;
             for (JmxApplication jmxapp : jmxapps) {
                 if (jmxapp.equals(application)) {
@@ -279,7 +282,8 @@ class JmxApplicationProvider {
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null || model.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
-            storage.deleteCustomPropertiesStorage();
+            File appStorage = storage.getDirectory();
+            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().displayError(

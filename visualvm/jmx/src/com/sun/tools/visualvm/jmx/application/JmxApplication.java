@@ -28,12 +28,14 @@ package com.sun.tools.visualvm.jmx.application;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
+import java.io.File;
 import java.lang.management.RuntimeMXBean;
 import javax.management.remote.JMXServiceURL;
 
@@ -115,6 +117,11 @@ public final class JmxApplication extends Application {
     @Override
     protected Storage createStorage() {
         return storage;
+    }
+    
+    protected void remove() {
+        File appStorage = getStorage().getDirectory();
+        if (appStorage.isDirectory()) Utils.delete(appStorage, true);
     }
 
 }
