@@ -45,6 +45,9 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -124,25 +127,33 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     private void processAddedDisplayableDataSources(Set<DataSource> addedDisplayable) {
         final Set<ExplorerNode> addedNodes = new HashSet();
+        final ProgressHandle pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ExplorerModelBuilder.class, "LBL_Computing_description"));
         
-        for (DataSource dataSource : addedDisplayable) {
-            if (dataSource != DataSource.ROOT) {
-                final ExplorerNode node = new ExplorerNode(dataSource);
-                addedNodes.add(node);
-                DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-                PropertyChangeListener descriptorListener = new PropertyChangeListener() {
-                    public void propertyChange(final PropertyChangeEvent evt) {
-                        queue.post(new Runnable() {
-                            public void run() { updateNode(node, evt); }
-                        });
-                    }
-                };
-                descriptor.addPropertyChangeListener(descriptorListener);
-                descriptorListeners.put(descriptor, descriptorListener);
-                updateNode(node, descriptor);
+        pHandle.setInitialDelay(5000);
+        pHandle.start();
+        try {
+            for (DataSource dataSource : addedDisplayable) {
+                if (dataSource != DataSource.ROOT) {
+                    final ExplorerNode node = new ExplorerNode(dataSource);
+                    addedNodes.add(node);
+                    DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
+                    PropertyChangeListener descriptorListener = new PropertyChangeListener() {
+                        public void propertyChange(final PropertyChangeEvent evt) {
+                            queue.post(new Runnable() {
+                                public void run() { updateNode(node, evt); }
+                            });
+                        }
+                    };
+                    descriptor.addPropertyChangeListener(descriptorListener);
+                    descriptorListeners.put(descriptor, descriptorListener);
+                    updateNode(node, descriptor);
+                }
             }
+        } finally {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { pHandle.finish(); }
+            });
         }
-        
         try { SwingUtilities.invokeAndWait(new Runnable() {
             public void run() { addNodes(addedNodes); }
         }); } catch (Exception e) {}
