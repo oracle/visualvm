@@ -55,6 +55,7 @@ import org.openide.windows.WindowManager;
  */
 public class WelcomeComponent extends TopComponent {
     static final long serialVersionUID=6021472310161712674L;
+    private static final String PREFERRED_ID = "VisualVMWelcomeComponent";   //NOI18N
     private static WeakReference<WelcomeComponent> component =
                 new WeakReference<WelcomeComponent>(null); 
     private JComponent content;
@@ -70,7 +71,7 @@ public class WelcomeComponent extends TopComponent {
     }
     
     @Override protected String preferredID(){
-        return "VisualVMWelcomeComponent";    //NOI18N
+        return PREFERRED_ID;    //NOI18N
     }
     
     /**
@@ -96,7 +97,7 @@ public class WelcomeComponent extends TopComponent {
     public static WelcomeComponent findComp() {
         WelcomeComponent wc = component.get();
         if (wc == null) {
-            TopComponent tc = WindowManager.getDefault().findTopComponent("VisualVMWelcome"); // NOI18N
+            TopComponent tc = WindowManager.getDefault().findTopComponent(PREFERRED_ID); // NOI18N
             if (tc != null) {
                 if (tc instanceof WelcomeComponent) {
                     wc = (WelcomeComponent)tc;
