@@ -49,7 +49,7 @@ class ExplorerTopComponentAction extends AbstractAction {
     }
   
     public void actionPerformed(ActionEvent evt) {
-        ExplorerTopComponent win = ExplorerTopComponent.getInstance();
+        ExplorerTopComponent win = ExplorerTopComponent.getComp();
         win.open();
         win.requestActive();
     }

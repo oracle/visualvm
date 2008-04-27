@@ -4,5 +4,5 @@
   <module name="com.sun.tools.visualvm.core" spec="1.0"/>
   <instanceof class="org.openide.windows.TopComponent"/>
   <instanceof class="com.sun.tools.visualvm.core.explorer.ExplorerTopComponent"/>
-  <instance class="com.sun.tools.visualvm.core.explorer.ExplorerTopComponent" method="getInstance"/>
+  <instance class="com.sun.tools.visualvm.core.explorer.ExplorerTopComponent" method="createComp"/>
 </settings>
