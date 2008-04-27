@@ -55,7 +55,7 @@ import org.openide.windows.WindowManager;
  */
 public class WelcomeComponent extends TopComponent {
     static final long serialVersionUID=6021472310161712674L;
-    private static final String PREFERRED_ID = "VisualVMWelcomeComponent";   //NOI18N
+    private static final String PREFERRED_ID = "VisualVMWelcome";   //NOI18N
     private static WeakReference<WelcomeComponent> component =
                 new WeakReference<WelcomeComponent>(null); 
     private JComponent content;
@@ -91,8 +91,8 @@ public class WelcomeComponent extends TopComponent {
         
     /* Singleton accessor. As WelcomeComponent is persistent singleton this
      * accessor makes sure that WelcomeComponent is deserialized by window system.
-     * Uses known unique TopComponent ID "Welcome" to get WelcomeComponent instance
-     * from window system. "Welcome" is name of settings file defined in module layer.
+     * Uses known unique TopComponent ID "VisualVMWelcome" to get WelcomeComponent instance
+     * from window system. "VisualVMWelcome" is name of settings file defined in module layer.
      */
     public static WelcomeComponent findComp() {
         WelcomeComponent wc = component.get();
