@@ -81,14 +81,13 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     
     private void updateState(Jvm jvm) {
         oomeEnabled = jvm.isDumpOnOOMEnabled();
-        String actionName;
         if (oomeEnabled) {
-            actionName = NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Disable_Heap_Dump_on_OOME");  // NOI18N
+            putValue(NAME, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Disable_Heap_Dump_on_OOME"));  // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "DESCR_Disable_Heap_Dump_on_OOME"));  // NOI18N
         } else {
-            actionName = NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Enable_Heap_Dump_on_OOME");   // NOI18N
+            putValue(NAME, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Enable_Heap_Dump_on_OOME"));  // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "DESCR_Enable_Heap_Dump_on_OOME"));  // NOI18N
         }
-        putValue(NAME, actionName);
-        putValue(SHORT_DESCRIPTION,actionName);
     }
     
     protected void updateState(Set<Application> applications) {

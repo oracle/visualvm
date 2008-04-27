@@ -114,6 +114,6 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     private ProfilerSnapshotAction() {
         super(Application.class);
         putValue(NAME, NbBundle.getMessage(ProfilerSnapshotAction.class, "MSG_Profiler_Snapshot")); // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfilerSnapshotAction.class, "MSG_Profiler_Snapshot"));    // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfilerSnapshotAction.class, "DESCR_Profiler_Snapshot"));    // NOI18N
     }
 }

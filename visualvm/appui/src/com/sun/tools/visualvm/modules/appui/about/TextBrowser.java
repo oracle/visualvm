@@ -42,6 +42,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -123,7 +124,8 @@ public class TextBrowser {
         textDisplayer.setSelectionColor(htmlTextDisplayer.getSelectionColor());
         textDisplayer.setSelectedTextColor(htmlTextDisplayer.getSelectedTextColor());
         
-        closeButton = new JButton(NbBundle.getMessage(TextBrowser.class, "LBL_Close")); // NOI18N
+        closeButton = new JButton(); // NOI18N
+        Mnemonics.setLocalizedText(closeButton, NbBundle.getMessage(AboutDialogControls.class, "LBL_Close")); // NOI18N
         closeButton.setDefaultCapable(true);
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

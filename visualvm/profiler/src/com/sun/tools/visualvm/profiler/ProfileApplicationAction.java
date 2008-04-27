@@ -82,6 +82,6 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
     private ProfileApplicationAction() {
         super(Application.class);
         putValue(NAME, NbBundle.getMessage(ProfileApplicationAction.class, "MSG_Profile")); // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfileApplicationAction.class, "MSG_Profile"));    // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfileApplicationAction.class, "DESCR_Profile"));    // NOI18N
     }
 }

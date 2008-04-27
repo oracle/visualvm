@@ -45,6 +45,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
@@ -59,7 +60,7 @@ class ApplicationSnapshotConfigurator extends JPanel {
     ApplicationSnapshotConfigurator hc = getDefault();
     hc.setupDefineCoreDump();
     
-    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Add_Application_Snapshot"), true, new Object[] {   // NOI18N
+    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "Title_Add_Application_Snapshot"), true, new Object[] {   // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
     final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
@@ -116,8 +117,9 @@ class ApplicationSnapshotConfigurator extends JPanel {
     setLayout(new GridBagLayout());
     GridBagConstraints constraints;
     
-    // coreDumpFileLabel
-    coreDumpFileLabel = new JLabel(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Snapshot_file"));     // NOI18N
+    // snapshotFileLabel
+    snapshotFileLabel = new JLabel();
+    Mnemonics.setLocalizedText(snapshotFileLabel, NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Snapshot_file")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -125,10 +127,11 @@ class ApplicationSnapshotConfigurator extends JPanel {
     constraints.fill = GridBagConstraints.NONE;
     constraints.anchor = GridBagConstraints.EAST;
     constraints.insets = new Insets(15, 10, 0, 0);
-    add(coreDumpFileLabel, constraints);
+    add(snapshotFileLabel, constraints);
     
-    // coreDumpFileField
+    // snapshotFileField
     snapshotFileField = new JTextField();
+    snapshotFileLabel.setLabelFor(snapshotFileField);
     snapshotFileField.setPreferredSize(new Dimension(220, snapshotFileField.getPreferredSize().height));
     snapshotFileField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
@@ -146,7 +149,8 @@ class ApplicationSnapshotConfigurator extends JPanel {
     add(snapshotFileField, constraints);
     
     // snapshotFileButton
-    snapshotFileButton = new JButton(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Browse"));  // NOI18N
+    snapshotFileButton = new JButton();
+    Mnemonics.setLocalizedText(snapshotFileButton, NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Browse")); // NOI18N
     snapshotFileButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             chooseSnapshot();
@@ -162,7 +166,8 @@ class ApplicationSnapshotConfigurator extends JPanel {
     add(snapshotFileButton, constraints);         
     
     // deleteSourceCheckbox
-    deleteSourceCheckbox = new JCheckBox(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Delete_source_file"));  // NOI18N
+    deleteSourceCheckbox = new JCheckBox();
+    Mnemonics.setLocalizedText(deleteSourceCheckbox, NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_Delete_source_file")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;
@@ -188,10 +193,10 @@ class ApplicationSnapshotConfigurator extends JPanel {
     okButton = new JButton(NbBundle.getMessage(ApplicationSnapshotConfigurator.class, "LBL_OK"));    // NOI18N
     
     // UI tweaks
-    deleteSourceCheckbox.setBorder(coreDumpFileLabel.getBorder());
+    deleteSourceCheckbox.setBorder(snapshotFileLabel.getBorder());
   }
   
-  private JLabel coreDumpFileLabel;
+  private JLabel snapshotFileLabel;
   private JTextField snapshotFileField;
   private JButton snapshotFileButton;
   private JCheckBox deleteSourceCheckbox;

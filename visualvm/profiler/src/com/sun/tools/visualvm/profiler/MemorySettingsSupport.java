@@ -171,6 +171,7 @@ public class MemorySettingsSupport {
         GridBagConstraints constraints;
         
         allocRadioButton = new JRadioButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile_Allocations")); // NOI18N
+        allocRadioButton.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Allocations")); // NOI18N
         allocRadioButton.setOpaque(false);
         allocRadioButton.setBorder(referenceLabel.getBorder());
         modesRadioGroup.add(allocRadioButton);
@@ -184,6 +185,7 @@ public class MemorySettingsSupport {
         panelImpl.add(allocRadioButton, constraints);
         
         livenessRadioButton = new JRadioButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile_AllocationsGC")); // NOI18N
+        livenessRadioButton.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Allocations_GC")); // NOI18N
         livenessRadioButton.setOpaque(false);
         livenessRadioButton.setBorder(referenceLabel.getBorder());
         modesRadioGroup.add(livenessRadioButton);
@@ -200,9 +202,8 @@ public class MemorySettingsSupport {
         JPanel trackEveryContainer = new JPanel(new GridBagLayout());
 
         // trackEveryLabel1
-        trackEveryLabel1 = new JLabel("Track every");
-//        org.openide.awt.Mnemonics.setLocalizedText(trackEveryLabel1, TRACK_EVERY_LABEL_TEXT);
-//        trackEveryLabel1.setToolTipText(STP_TRACKEVERY_TOOLTIP);
+        trackEveryLabel1 = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Track_Every1")); // NOI18N
+        trackEveryLabel1.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Track_Every")); // NOI18N
         trackEveryLabel1.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -223,9 +224,8 @@ public class MemorySettingsSupport {
                     return getPreferredSize();
                 }
             };
+        trackEverySpinner.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Track_Every")); // NOI18N
         trackEveryLabel1.setLabelFor(trackEverySpinner);
-//        trackEverySpinner.setToolTipText(STP_TRACKEVERY_TOOLTIP);
-//        trackEverySpinner.addChangeListener(getSettingsChangeListener());
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
         constraints.gridy = 0;
@@ -236,9 +236,8 @@ public class MemorySettingsSupport {
         trackEveryContainer.add(trackEverySpinner, constraints);
 
         // trackEveryLabel2
-        trackEveryLabel2 = new JLabel("object allocations");
-//        JLabel trackEveryLabel2 = new JLabel(ALLOC_LABEL_TEXT);
-//        trackEveryLabel2.setToolTipText(STP_TRACKEVERY_TOOLTIP);
+        trackEveryLabel2 = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Track_Every2")); // NOI18N
+        trackEveryLabel2.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Track_Every")); // NOI18N
         trackEveryLabel2.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
@@ -262,6 +261,7 @@ public class MemorySettingsSupport {
         panelImpl.add(trackEveryContainer, constraints);
         
         stackTracesCheckBox = new JCheckBox(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Record_Stacktraces")); // NOI18N
+        stackTracesCheckBox.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Stack_Traces")); // NOI18N
         stackTracesCheckBox.setOpaque(false);
         stackTracesCheckBox.setBorder(referenceLabel.getBorder());
         constraints = new GridBagConstraints();

@@ -74,6 +74,6 @@ class RemoveDataSourceAction extends MultiDataSourceAction<DataSource> {
     private RemoveDataSourceAction() {
         super(DataSource.class);
         putValue(NAME, NbBundle.getMessage(RemoveDataSourceAction.class, "LBL_Remove"));    // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(RemoveDataSourceAction.class, "LBL_Remove"));   // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(RemoveDataSourceAction.class, "DESCR_Remove"));   // NOI18N
     }
 }

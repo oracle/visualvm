@@ -46,6 +46,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
@@ -164,7 +165,8 @@ class CoreDumpConfigurator extends JPanel {
     GridBagConstraints constraints;
     
     // coreDumpFileLabel
-    coreDumpFileLabel = new JLabel(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_VM_Coredump_file"));    // NOI18N
+    coreDumpFileLabel = new JLabel();
+    Mnemonics.setLocalizedText(coreDumpFileLabel, NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_VM_Coredump_file")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -176,6 +178,7 @@ class CoreDumpConfigurator extends JPanel {
     
     // coreDumpFileField
     coreDumpFileField = new JTextField();
+    coreDumpFileLabel.setLabelFor(coreDumpFileField);
     coreDumpFileField.setPreferredSize(new Dimension(220, coreDumpFileField.getPreferredSize().height));
     coreDumpFileField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
@@ -193,7 +196,8 @@ class CoreDumpConfigurator extends JPanel {
     add(coreDumpFileField, constraints);
     
     // coreDumpFileButton
-    coreDumpFileButton = new JButton(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Browse"));    // NOI18N
+    coreDumpFileButton = new JButton();
+    Mnemonics.setLocalizedText(coreDumpFileButton, NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Browse")); // NOI18N
     coreDumpFileButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             chooseCoreDump();
@@ -209,7 +213,8 @@ class CoreDumpConfigurator extends JPanel {
     add(coreDumpFileButton, constraints);    
     
     // javaHomeFileLabel
-    javaHomeFileLabel = new JLabel(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_JDK_home"));    // NOI18N
+    javaHomeFileLabel = new JLabel();
+    Mnemonics.setLocalizedText(javaHomeFileLabel, NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_JDK_home")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;
@@ -221,6 +226,7 @@ class CoreDumpConfigurator extends JPanel {
     
     // javaHomeFileField
     javaHomeFileField = new JTextField();
+    javaHomeFileLabel.setLabelFor(javaHomeFileField);
     javaHomeFileField.setPreferredSize(new Dimension(220, javaHomeFileField.getPreferredSize().height));
     javaHomeFileField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
@@ -237,7 +243,8 @@ class CoreDumpConfigurator extends JPanel {
     add(javaHomeFileField, constraints);
     
     // javaHomeFileButton
-    javaHomeFileButton = new JButton(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Browse"));    // NOI18N
+    javaHomeFileButton = new JButton();
+    Mnemonics.setLocalizedText(javaHomeFileButton, NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Browse1")); // NOI18N
     javaHomeFileButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             chooseJavaHome();
@@ -253,7 +260,8 @@ class CoreDumpConfigurator extends JPanel {
     add(javaHomeFileButton, constraints);        
     
     // displaynameCheckbox
-    displaynameCheckbox = new JCheckBox(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Display_name"));   // NOI18N
+    displaynameCheckbox = new JCheckBox();
+    Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Display_name")); // NOI18N
     displaynameCheckbox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) { update(); };
     });
@@ -284,7 +292,8 @@ class CoreDumpConfigurator extends JPanel {
     add(displaynameField, constraints);
     
     // deleteSourceCheckbox
-    deleteSourceCheckbox = new JCheckBox(NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Delete_source_file"));    // NOI18N
+    deleteSourceCheckbox = new JCheckBox();
+    Mnemonics.setLocalizedText(deleteSourceCheckbox, NbBundle.getMessage(CoreDumpConfigurator.class, "LBL_Delete_source_file")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 3;

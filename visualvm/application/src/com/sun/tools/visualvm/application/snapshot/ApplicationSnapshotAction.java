@@ -97,6 +97,6 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     private ApplicationSnapshotAction() {
         super(Application.class);
         putValue(NAME, NbBundle.getMessage(ApplicationSnapshotAction.class, "LBL_Application_Snapshot"));   // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ApplicationSnapshotAction.class, "LBL_Application_Snapshot"));  // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ApplicationSnapshotAction.class, "DESCR_Application_Snapshot"));  // NOI18N
     }
 }

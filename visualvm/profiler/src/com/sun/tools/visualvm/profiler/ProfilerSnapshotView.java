@@ -40,7 +40,6 @@ import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
 
 /**
  *
@@ -68,21 +67,21 @@ class ProfilerSnapshotView extends DataSourceView {
             IDEUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     try {
-                        Method method = srw.getClass().getDeclaredMethod("componentClosed");
+                        Method method = srw.getClass().getDeclaredMethod("componentClosed");   // NOI18N
                         if (method != null) {
                             method.setAccessible(true);
                             method.invoke(srw);
                         }
                     } catch (NoSuchMethodException noSuchMethodException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", noSuchMethodException);
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", noSuchMethodException);   // NOI18N
                     } catch (SecurityException securityException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", securityException);
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", securityException);   // NOI18N
                     } catch (IllegalAccessException illegalAccessException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalAccessException);
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalAccessException);   // NOI18N
                     } catch (IllegalArgumentException illegalArgumentException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalArgumentException);
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalArgumentException);   // NOI18N
                     } catch (InvocationTargetException invocationTargetException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", invocationTargetException);
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", invocationTargetException);   // NOI18N
                     }
                     srw = null;
                 }
@@ -107,7 +106,7 @@ class ProfilerSnapshotView extends DataSourceView {
         
         public DataViewComponent.MasterView getMasterView() {
             srw.setPreferredSize(new Dimension(1, 1));
-            return new DataViewComponent.MasterView(NbBundle.getMessage(ProfilerSnapshotView.class, "MSG_Profiler_Snapshot"), null, srw);   // NOI18N
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ProfilerSnapshotView.class, "DESCR_Profiler_Snapshot"), null, srw);   // NOI18N
         }
         
     }

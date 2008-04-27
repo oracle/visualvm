@@ -36,12 +36,14 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import org.openide.awt.Mnemonics;
 import org.openide.cookies.InstanceCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.Repository;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
+import org.openide.util.NbBundle;
 
 /**
  * Class responsible for building explorer context menu.
@@ -223,6 +225,8 @@ final class ExplorerContextMenuFactory {
             super(action);
             setIcon(null);
             setToolTipText(null);
+            String name = (String)action.getValue(Action.NAME);
+            if (name != null) Mnemonics.setLocalizedText(this, name); // NOI18N
         }
     }    
 }

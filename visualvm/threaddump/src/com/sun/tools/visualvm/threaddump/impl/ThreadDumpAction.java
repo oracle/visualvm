@@ -100,6 +100,6 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
     private ThreadDumpAction() {
         super(DataSource.class);
         putValue(NAME, NbBundle.getMessage(ThreadDumpAction.class, "MSG_Thread_Dump"));  // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ThreadDumpAction.class, "MSG_Thread_Dump"));     // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ThreadDumpAction.class, "LBL_Thread_Dump"));     // NOI18N
     }
 }

@@ -43,6 +43,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -121,7 +122,8 @@ class HostCustomizer extends JPanel {
     GridBagConstraints constraints;
     
     // hostnameLabel
-    hostnameLabel = new JLabel(NbBundle.getMessage(HostCustomizer.class, "LBL_Host_name")); // NOI18N
+    hostnameLabel = new JLabel();
+    Mnemonics.setLocalizedText(hostnameLabel, NbBundle.getMessage(HostCustomizer.class, "LBL_Host_name")); // NOI18N
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -133,6 +135,7 @@ class HostCustomizer extends JPanel {
     
     // hostnameField
     hostnameField = new JTextField();
+    hostnameLabel.setLabelFor(hostnameField);
     hostnameField.setPreferredSize(new Dimension(250, hostnameField.getPreferredSize().height));
     hostnameField.getDocument().addDocumentListener(new DocumentListener() {
       public void insertUpdate(DocumentEvent e)  { update(); }
@@ -149,7 +152,8 @@ class HostCustomizer extends JPanel {
     add(hostnameField, constraints);
     
     // displaynameCheckbox
-    displaynameCheckbox = new JCheckBox(NbBundle.getMessage(HostCustomizer.class, "LBL_Display_name")); // NOI18N
+    displaynameCheckbox = new JCheckBox();
+    Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(HostCustomizer.class, "LBL_Display_name")); // NOI18N
     displaynameCheckbox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) { update(); };
     });
@@ -193,7 +197,8 @@ class HostCustomizer extends JPanel {
     add(spacer, constraints);
     
     // okButton
-    okButton = new JButton(NbBundle.getMessage(HostCustomizer.class, "LBL_OK"));    // NOI18N
+    okButton = new JButton();
+    Mnemonics.setLocalizedText(okButton, NbBundle.getMessage(HostCustomizer.class, "LBL_OK")); // NOI18N
     
     // UI tweaks
     displaynameCheckbox.setBorder(hostnameLabel.getBorder());

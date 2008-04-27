@@ -155,7 +155,7 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="mhRefresh"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Monitored Host:"/>
+        <Property name="text" type="java.lang.String" value="Monitored &amp;Host:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="mhRefresh">
@@ -166,7 +166,7 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="thrdRefresh"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Threads:"/>
+        <Property name="text" type="java.lang.String" value="&amp;Threads:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="thrdRefresh">
@@ -177,7 +177,7 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="dataRefresh"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Monitored Data:"/>
+        <Property name="text" type="java.lang.String" value="Monitored &amp;Data:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="dataRefresh">
@@ -215,9 +215,9 @@
       <Properties>
         <Property name="displayedMnemonic" type="int" value="104"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="mhRefresh"/>
+          <ComponentRef name="mhRefresh1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Monitored Host:"/>
+        <Property name="text" type="java.lang.String" value="Monitored H&amp;ost:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="mhRefresh1">
@@ -238,9 +238,9 @@
       <Properties>
         <Property name="displayedMnemonic" type="int" value="109"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="dataRefresh"/>
+          <ComponentRef name="dataRefresh1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Monitored Data:"/>
+        <Property name="text" type="java.lang.String" value="Monitored D&amp;ata:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
@@ -252,7 +252,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="jButton1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Reset"/>
+        <Property name="text" type="java.lang.String" value="&amp;Reset"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>

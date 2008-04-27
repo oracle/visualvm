@@ -81,15 +81,15 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
 
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Monitored Host:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Monitored &Host:");
 
         jLabel2.setDisplayedMnemonic('t');
         jLabel2.setLabelFor(thrdRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Threads:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "&Threads:");
 
         jLabel3.setDisplayedMnemonic('m');
         jLabel3.setLabelFor(dataRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Monitored Data:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Monitored &Data:");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "Polling");
 
@@ -102,20 +102,20 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel9, "Charts Cache");
 
         jLabel10.setDisplayedMnemonic('h');
-        jLabel10.setLabelFor(mhRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "Monitored Host:");
+        jLabel10.setLabelFor(mhRefresh1);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "Monitored H&ost:");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel11, "min.");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel12, "min.");
 
         jLabel13.setDisplayedMnemonic('m');
-        jLabel13.setLabelFor(dataRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "Monitored Data:");
+        jLabel13.setLabelFor(dataRefresh1);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "Monitored D&ata:");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Profiler");
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, "Reset");
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, "&Reset");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);

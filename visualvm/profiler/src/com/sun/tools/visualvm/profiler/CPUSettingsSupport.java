@@ -297,6 +297,7 @@ public class CPUSettingsSupport {
         GridBagConstraints constraints;
         
         rootClassesLabel = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Root_Classes")); // NOI18N
+        rootClassesLabel.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Root_Classes")); // NOI18N
         rootClassesLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -308,6 +309,7 @@ public class CPUSettingsSupport {
         panelImpl.add(rootClassesLabel, constraints);
         
         rootsArea = createTextArea(3);
+        rootsArea.getTextArea().setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Root_Classes")); // NOI18N
         rootsArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkRootValidity(); }
             public void removeUpdate(DocumentEvent e) { checkRootValidity(); }
@@ -325,6 +327,7 @@ public class CPUSettingsSupport {
         panelImpl.add(rootsArea, constraints);
         
         runnablesCheckBox = new JCheckBox(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile_Runnables")); // NOI18N
+        runnablesCheckBox.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_New_Runnables")); // NOI18N
         runnablesCheckBox.setOpaque(false);
         runnablesCheckBox.setBorder(rootClassesLabel.getBorder());
         constraints = new GridBagConstraints();
@@ -337,6 +340,7 @@ public class CPUSettingsSupport {
         panelImpl.add(runnablesCheckBox, constraints);
         
         inclFilterRadioButton = new JRadioButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile_Incl")); // NOI18N
+        inclFilterRadioButton.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Inclusive_Filter")); // NOI18N
         inclFilterRadioButton.setOpaque(false);
         inclFilterRadioButton.setBorder(rootClassesLabel.getBorder());
         filterRadiosGroup.add(inclFilterRadioButton);
@@ -350,6 +354,7 @@ public class CPUSettingsSupport {
         panelImpl.add(inclFilterRadioButton, constraints);
         
         exclFilterRadioButton = new JRadioButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile_Excl")); // NOI18N
+        exclFilterRadioButton.setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Exclusive_Filter")); // NOI18N
         exclFilterRadioButton.setOpaque(false);
         exclFilterRadioButton.setBorder(rootClassesLabel.getBorder());
         filterRadiosGroup.add(exclFilterRadioButton);
@@ -363,6 +368,7 @@ public class CPUSettingsSupport {
         panelImpl.add(exclFilterRadioButton, constraints);
         
         filtersArea = createTextArea(2);
+        filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(ApplicationProfilerView.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
         filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkFilterValidity(); }
             public void removeUpdate(DocumentEvent e) { checkFilterValidity(); }

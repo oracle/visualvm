@@ -63,7 +63,7 @@ class DeleteSnapshotAction extends MultiDataSourceAction<Snapshot> {
     private DeleteSnapshotAction() {
         super(Snapshot.class);
         putValue(NAME, NbBundle.getMessage(DeleteSnapshotAction.class, "LBL_Delete"));  // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(DeleteSnapshotAction.class, "LBL_Delete")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(DeleteSnapshotAction.class, "LBL_Delete_Snapshot")); // NOI18N
 //        putValue(SMALL_ICON, new ImageIcon(ICON_16));
 //        putValue("iconBase", new ImageIcon(ICON_24));
     }

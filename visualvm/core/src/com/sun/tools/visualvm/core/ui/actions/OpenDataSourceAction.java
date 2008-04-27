@@ -64,7 +64,7 @@ class OpenDataSourceAction extends MultiDataSourceAction<DataSource> {
     private OpenDataSourceAction() {
         super(DataSource.class);
         putValue(NAME, NbBundle.getMessage(OpenDataSourceAction.class, "LBL_Open"));    // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(OpenDataSourceAction.class, "LBL_Open"));   // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(OpenDataSourceAction.class, "DESCR_Open"));   // NOI18N
     }
     
 }

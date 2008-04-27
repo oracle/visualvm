@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -93,7 +94,9 @@ public class AboutDialogControls extends JPanel {
         buildIDLabel.setFont(buildIDLabel.getFont().deriveFont(Font.BOLD));
         buildIDLabel.setEnabled(false);
         
-        detailsButton = new JButton(NbBundle.getMessage(AboutDialogControls.class, "LBL_Details")); // NOI18N
+        detailsButton = new JButton();
+        Mnemonics.setLocalizedText(detailsButton, NbBundle.getMessage(AboutDialogControls.class, "LBL_Details")); // NOI18N
+        detailsButton.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(AboutDialogControls.class, "DESCR_Details"));
         detailsButton.setDefaultCapable(false);
         detailsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -101,7 +104,9 @@ public class AboutDialogControls extends JPanel {
             }
         });
         
-        logfileButton = new JButton(NbBundle.getMessage(AboutDialogControls.class, "LBL_Logfile")); // NOI18N
+        logfileButton = new JButton();
+        Mnemonics.setLocalizedText(logfileButton, NbBundle.getMessage(AboutDialogControls.class, "LBL_Logfile")); // NOI18N
+        logfileButton.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(AboutDialogControls.class, "DESCR_Logfile"));
         logfileButton.setDefaultCapable(false);
         logfileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +114,8 @@ public class AboutDialogControls extends JPanel {
             }
         });
         
-        closeButton = new JButton(NbBundle.getMessage(AboutDialogControls.class, "LBL_Close")); // NOI18N
+        closeButton = new JButton();
+        Mnemonics.setLocalizedText(closeButton, NbBundle.getMessage(AboutDialogControls.class, "LBL_Close")); // NOI18N
         closeButton.setDefaultCapable(true);
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

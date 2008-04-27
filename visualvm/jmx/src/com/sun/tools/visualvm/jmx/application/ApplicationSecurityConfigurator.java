@@ -41,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -104,7 +105,8 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         GridBagConstraints constraints;
 
         // usernameLabel
-        usernameLabel = new JLabel(NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Username")); // NOI18N
+        usernameLabel = new JLabel(); // NOI18N
+        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Username")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -116,6 +118,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
 
         // usernameField
         usernameField = new JTextField();
+        usernameLabel.setLabelFor(usernameField);
         usernameField.setPreferredSize(
                 new Dimension(320, usernameField.getPreferredSize().height));
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
@@ -139,7 +142,8 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         add(usernameField, constraints);
 
         // passwordLabel
-        passwordLabel = new JLabel(NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Password")); // NOI18N
+        passwordLabel = new JLabel(); // NOI18N
+        Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Password")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -151,6 +155,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
 
         // passwordField
         passwordField = new JPasswordField();
+        passwordLabel.setLabelFor(passwordField);
         passwordField.setPreferredSize(
                 new Dimension(200, passwordField.getPreferredSize().height));
         passwordField.getDocument().addDocumentListener(new DocumentListener() {

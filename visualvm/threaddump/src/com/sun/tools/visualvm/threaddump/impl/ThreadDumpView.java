@@ -88,7 +88,7 @@ class ThreadDumpView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadDumpView.class, "MSG_Thread_Dump"), null, new ScrollableContainer(this));  // NOI18N
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadDumpView.class, "LBL_Thread_Dump"), null, new ScrollableContainer(this));  // NOI18N
         }
         
         

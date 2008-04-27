@@ -49,6 +49,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import sun.net.util.IPAddressUtil;
 
@@ -64,7 +65,7 @@ class JmxApplicationConfigurator extends JPanel {
         JmxApplicationConfigurator hc = getDefault();
         hc.setupDefineJmxConnection();
 
-        final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Add_JMX_Connection"),   // NOI18N
+        final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(JmxApplicationConfigurator.class, "Title_Add_JMX_Connection"),   // NOI18N
                 true, new Object[]{hc.okButton, DialogDescriptor.CANCEL_OPTION},
                 hc.okButton, 0, null, null);
         final Dialog d = ProfilerDialogs.createDialog(dd);
@@ -227,7 +228,8 @@ class JmxApplicationConfigurator extends JPanel {
         GridBagConstraints constraints;
 
         // connectionLabel
-        connectionLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Connection"));  // NOI18N
+        connectionLabel = new JLabel();
+        Mnemonics.setLocalizedText(connectionLabel, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Connection")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -239,6 +241,7 @@ class JmxApplicationConfigurator extends JPanel {
 
         // connectionField
         connectionField = new JTextField();
+        connectionLabel.setLabelFor(connectionField);
         connectionField.setPreferredSize(
                 new Dimension(250, connectionField.getPreferredSize().height));
         connectionField.getDocument().addDocumentListener(new DocumentListener() {
@@ -277,7 +280,8 @@ class JmxApplicationConfigurator extends JPanel {
         add(usageLabel, constraints);
 
         // displaynameCheckbox
-        displaynameCheckbox = new JCheckBox(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Display_name")); // NOI18N
+        displaynameCheckbox = new JCheckBox();
+        Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Display_name")); // NOI18N
         displaynameCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();
@@ -317,7 +321,8 @@ class JmxApplicationConfigurator extends JPanel {
         add(displaynameField, constraints);
 
         // securityCheckbox
-        securityCheckbox = new JCheckBox(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Use_security_credentials"));    // NOI18N
+        securityCheckbox = new JCheckBox();
+        Mnemonics.setLocalizedText(securityCheckbox, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Use_security_credentials")); // NOI18N
         securityCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();
@@ -333,7 +338,8 @@ class JmxApplicationConfigurator extends JPanel {
         add(securityCheckbox, constraints);
 
         // usernameLabel
-        usernameLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Username"));  // NOI18N
+        usernameLabel = new JLabel();
+        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Username")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
@@ -345,6 +351,7 @@ class JmxApplicationConfigurator extends JPanel {
 
         // usernameField
         usernameField = new JTextField();
+        usernameLabel.setLabelFor(usernameField);
         usernameField.setPreferredSize(
                 new Dimension(320, usernameField.getPreferredSize().height));
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
@@ -368,7 +375,8 @@ class JmxApplicationConfigurator extends JPanel {
         add(usernameField, constraints);
 
         // passwordLabel
-        passwordLabel = new JLabel(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Password"));  // NOI18N
+        passwordLabel = new JLabel();
+        Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Password")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 5;
@@ -380,6 +388,7 @@ class JmxApplicationConfigurator extends JPanel {
 
         // passwordField
         passwordField = new JPasswordField();
+        passwordLabel.setLabelFor(passwordField);
         passwordField.setPreferredSize(
                 new Dimension(200, passwordField.getPreferredSize().height));
         passwordField.getDocument().addDocumentListener(new DocumentListener() {
@@ -403,7 +412,8 @@ class JmxApplicationConfigurator extends JPanel {
         add(passwordField, constraints);
 
         // saveCheckbox
-        saveCheckbox = new JCheckBox(NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Save_security_credentials"));   // NOI18N
+        saveCheckbox = new JCheckBox();   // NOI18N
+        Mnemonics.setLocalizedText(saveCheckbox, NbBundle.getMessage(JmxApplicationConfigurator.class, "LBL_Save_security_credentials")); // NOI18N
         saveCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();

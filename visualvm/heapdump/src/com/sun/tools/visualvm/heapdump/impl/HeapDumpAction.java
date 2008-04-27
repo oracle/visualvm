@@ -98,7 +98,7 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
     
     private HeapDumpAction() {
         super(DataSource.class);
-        putValue(NAME, NbBundle.getMessage(HeapDumpAction.class, "LBL_Heap_Dump")); // NOI18N
+        putValue(NAME, NbBundle.getMessage(HeapDumpAction.class, "MSG_Heap_Dump")); // NOI18N
         putValue(SHORT_DESCRIPTION, NbBundle.getMessage(HeapDumpAction.class, "LBL_Heap_Dump"));    // NOI18N
             }
     }
