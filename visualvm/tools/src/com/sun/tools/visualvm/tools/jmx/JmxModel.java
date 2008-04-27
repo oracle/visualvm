@@ -41,7 +41,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  *
  * <pre>
  * JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
- * if (jmx == null || jmx.getConnectionState() == JmxModel.ConnectionState.DISCONNECTED) {
+ * if (jmx == null || jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
  *     // JMX connection not available...
  * } else {
  *     MBeanServerConnection mbsc = jmx.getMBeanServerConnection();
