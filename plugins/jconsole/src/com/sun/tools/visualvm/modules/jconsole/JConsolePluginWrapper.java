@@ -364,7 +364,7 @@ class JConsolePluginWrapper {
                     update();
                 }
             };
-            String timerName = "Timer-" + application.getId(); // NOI18N
+            String timerName = "JConsole Update Timer-[" + application.getId() + "]"; // NOI18N
             timer = new Timer(timerName, true);
             timer.schedule(timerTask, 0, updateInterval);
         }

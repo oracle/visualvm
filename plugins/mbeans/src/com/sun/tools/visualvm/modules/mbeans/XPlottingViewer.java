@@ -177,7 +177,7 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
                 }
             };
 
-        String timerName = "Timer-" + key;
+        String timerName = "MBeans Plotter Timer-[" + key + "]"; // NOI18N
         Timer timer = new Timer(timerName, true);
         timer.schedule(timerTask, 0, tab.getUpdateInterval());
         timerCache.put(key, timer);
