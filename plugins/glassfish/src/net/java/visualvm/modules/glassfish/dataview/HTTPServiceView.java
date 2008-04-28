@@ -14,6 +14,9 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import net.java.visualvm.modules.glassfish.ui.ConnectionQueuePanel;
@@ -26,6 +29,7 @@ import org.openide.util.Utilities;
 class HTTPServiceView extends DataSourceView {
 
     private static final String ICON_PATH = "net/java/visualvm/modules/glassfish/resources/logviewer_icon.png";
+    private static final Logger LOGGER = Logger.getLogger(HTTPServiceView.class.getName());
     private DataViewComponent dvc;
     private HTTPServiceMonitor monitor;
     private ScheduledTask queueRefreshTask;
@@ -119,8 +123,12 @@ class HTTPServiceView extends DataSourceView {
                     model.refresh(timeStamp);
                     model.notifyObservers();
                 } catch (Exception e) {
-                    Scheduler.sharedInstance().unschedule(queueRefreshTask);
-                    queueRefreshTask = null;
+                    if (!(e instanceof UndeclaredThrowableException)) {
+                        LOGGER.log(Level.INFO,"onSchedule",e);
+                    } else {
+                        Scheduler.sharedInstance().unschedule(queueRefreshTask);
+                        queueRefreshTask = null;
+                    }
                 }
             }
         }, Quantum.seconds(1));
@@ -189,8 +197,12 @@ class HTTPServiceView extends DataSourceView {
                 model.refresh(timeStamp);
                 model.notifyObservers();
                 } catch (Exception e) {
-                    Scheduler.sharedInstance().unschedule(cacheRefreshTask);
-                    cacheRefreshTask = null;
+                    if (!(e instanceof UndeclaredThrowableException)) {
+                        LOGGER.log(Level.INFO,"onSchedule",e);
+                    } else {
+                        Scheduler.sharedInstance().unschedule(cacheRefreshTask);
+                        cacheRefreshTask = null;
+                    }
                 }
             }
         }, Quantum.seconds(1));
@@ -265,8 +277,12 @@ class HTTPServiceView extends DataSourceView {
                 model.refresh(timeStamp);
                 model.notifyObservers();
                 } catch (Exception e) {
-                    Scheduler.sharedInstance().unschedule(kaRefreshTask);
-                    kaRefreshTask = null;
+                    if (!(e instanceof UndeclaredThrowableException)) {
+                        LOGGER.log(Level.INFO,"onSchedule",e);
+                    } else {
+                        Scheduler.sharedInstance().unschedule(kaRefreshTask);
+                        kaRefreshTask = null;
+                    }
                 }
             }
         }, Quantum.seconds(1));

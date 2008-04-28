@@ -30,10 +30,13 @@ import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.j2ee.statistics.CountStatistic;
 import javax.management.j2ee.statistics.Statistic;
 import javax.management.j2ee.statistics.Stats;
@@ -73,8 +76,12 @@ public abstract class AbstractStatsTableModel<PM, M extends MonitoringStats, S e
                     fireTableDataChanged();
                 }
                 } catch (Exception e) {
-                    Scheduler.sharedInstance().unschedule(refresh);
-                    refresh = null;
+                    if (!(e instanceof UndeclaredThrowableException)) {
+                        Logger.getLogger(AbstractStatsTableModel.class.getName()).log(Level.INFO,"onSchedule",e);
+                    } else {
+                        Scheduler.sharedInstance().unschedule(refresh);
+                        refresh = null;
+                    }
                 }
             }
         }, refreshInterval, true);

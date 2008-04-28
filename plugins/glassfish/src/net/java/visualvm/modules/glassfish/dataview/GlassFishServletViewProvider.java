@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.lang.reflect.UndeclaredThrowableException;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
@@ -128,8 +129,13 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
                     try {
                     refreshData(timeStamp);
                     } catch (Exception e) {
+                        if (!(e instanceof UndeclaredThrowableException)) {
+                        System.out.println("Error: "+e.getMessage());
+                        e.printStackTrace();
+                        } else {
                         Scheduler.sharedInstance().unschedule(refreshTask);
                         refreshTask = null;
+                        }
                     }
                 }
             }, Quantum.seconds(3));

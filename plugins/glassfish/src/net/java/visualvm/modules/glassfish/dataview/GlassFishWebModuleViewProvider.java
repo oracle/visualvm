@@ -25,6 +25,8 @@
 package net.java.visualvm.modules.glassfish.dataview;
 
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -208,8 +210,12 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
                     try {
                         refreshData(timeStamp);
                     } catch (Exception e) {
-                        Scheduler.sharedInstance().unschedule(refreshTask);
-                        refreshTask = null;
+                        if (!(e instanceof UndeclaredThrowableException)) {
+                            Logger.getLogger(GlassFishWebModuleViewProvider.class.getName()).log(Level.INFO,"onSchedule",e);
+                        } else {
+                            Scheduler.sharedInstance().unschedule(refreshTask);
+                            refreshTask = null;
+                        }
                     }
                 }
             }, Quantum.seconds(5));

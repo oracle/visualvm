@@ -9,6 +9,9 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import net.java.visualvm.modules.glassfish.ui.TransactionsPanel;
@@ -76,8 +79,12 @@ class TransactionServiceView extends DataSourceView {
                 model.refresh(timeStamp);
                 model.notifyObservers();
                 } catch (Exception e) {
-                    Scheduler.sharedInstance().unschedule(transRefreshTask);
-                    transRefreshTask = null;
+                    if (!(e instanceof UndeclaredThrowableException)) {
+                        Logger.getLogger(TransactionServiceView.class.getName()).log(Level.INFO,"onSchedule",e);
+                    } else {
+                        Scheduler.sharedInstance().unschedule(transRefreshTask);
+                        transRefreshTask = null;
+                    }
                 }
             }
         }, Quantum.seconds(1));
