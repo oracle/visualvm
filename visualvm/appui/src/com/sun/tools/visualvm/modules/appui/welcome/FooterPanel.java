@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.modules.appui.welcome;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 import java.awt.Image;
 import javax.swing.JPanel;
 import org.openide.util.Utilities;
@@ -40,7 +39,6 @@ class FooterPanel extends JPanel {
     private static final String BOTTOM_LEFT_RESOURCE =    "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottomleft.png";
     private static final String BOTTOM__RIGHT_RESOURCE =  "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottomright.png";
     private static final String BOTTOM__MIDDLE_RESOURCE = "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottommiddle.png";
-    private static final String BOTTOM__LOGO_RESOURCE =   "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottomlogo.png";
     
     
     public FooterPanel() {
@@ -57,13 +55,7 @@ class FooterPanel extends JPanel {
         setOpaque(false);
         add(new FixedImagePanel(bottomLeftImage), BorderLayout.WEST);
         add(new FixedImagePanel(bottomRightImage), BorderLayout.EAST);
-        
-        HorizontalImagePanel topMiddlePanel = new HorizontalImagePanel(bottomMiddleImage);
-        Logo logo = new Logo( BOTTOM__LOGO_RESOURCE, BundleSupport.getURL("SunLogo") );
-        topMiddlePanel.setLayout(new GridBagLayout());
-        topMiddlePanel.add(logo);
-        
-        add(topMiddlePanel, BorderLayout.CENTER);
+        add(new HorizontalImagePanel(bottomMiddleImage), BorderLayout.CENTER);
     }
 
 }
