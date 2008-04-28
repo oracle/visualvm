@@ -31,6 +31,8 @@ import com.sun.tools.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.ErrorManager;
 import sun.tools.attach.HotSpotVirtualMachine;
 
@@ -39,6 +41,7 @@ import sun.tools.attach.HotSpotVirtualMachine;
  * @author Tomas Hurka
  */
 public class AttachModelImpl extends AttachModel {
+    private static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
     String pid;
     HotSpotVirtualMachine vm;
     private static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
@@ -53,7 +56,7 @@ public class AttachModelImpl extends AttachModel {
         try {
             return getVirtualMachine().getSystemProperties();
         } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            LOGGER.log(Level.INFO,"getSystemProperties",ex);
         }
         return null;
     }
@@ -63,11 +66,11 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().dumpHeap(fileName,LIVE_OBJECTS_OPTION);
             String out = readToEOF(in);
             if (out.length()>0) {
-                ErrorManager.getDefault().log(ErrorManager.USER,out);
+                LOGGER.log(Level.INFO,"takeHeapDump",out);
             }
             return true;
         } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            LOGGER.log(Level.INFO,"takeHeapDump",ex);
         }
         return false;
     }
@@ -77,7 +80,7 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().remoteDataDump("-l");  // NOI18N
             return readToEOF(in);
         } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            LOGGER.log(Level.INFO,"takeThreadDump",ex);
         }
         return null;
     }
@@ -87,7 +90,7 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().printFlag(name);
             return readToEOF(in);
         } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            LOGGER.log(Level.INFO,"printFlag",ex);
         }
         return null;
     }
@@ -97,10 +100,10 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().setFlag(name,value);
             String out = readToEOF(in);
             if (out.length()>0) {
-                ErrorManager.getDefault().log(ErrorManager.USER,out);                
+                LOGGER.log(Level.INFO,"setFlag",out);
             }
         } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            LOGGER.log(Level.INFO,"setFlag",ex);
         }
     }
     
