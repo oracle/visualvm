@@ -5,7 +5,7 @@
         <file name="glassfish.instance">
             <attr name="instanceCreate" methodvalue="org.netbeans.modules.consumervisualvm.api.PluginInfo.create"/>
             <attr name="codeName" stringvalue="net.java.visualvm.modules.glassfish"/>
-            <attr name="pluginLayer" urlvalue="nbresloc:/org/netbeans/modules/consumerentrypoints/resources/glassfish.xml"/>
+            <attr name="delegateLayer" urlvalue="nbresloc:/org/netbeans/modules/consumerentrypoints/resources/glassfish.xml"/>
         </file>
     </folder>
 </filesystem>

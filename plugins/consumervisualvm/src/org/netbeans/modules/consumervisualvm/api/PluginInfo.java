@@ -64,7 +64,7 @@ public final class PluginInfo {
 
     static PluginInfo create (FileObject fo) {
         Object cnb = fo.getAttribute ("codeName"); // NOI18N
-        Object layer = fo.getAttribute ("pluginLayer"); // NOI18N
+        Object layer = fo.getAttribute ("delegateLayer"); // NOI18N
 
         return create ((String) cnb, (URL) layer);
     }
