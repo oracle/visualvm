@@ -138,7 +138,7 @@ public class AboutDialogControls extends JPanel {
     }
     
     private void showDetails() {
-        TextBrowser.getInstance().setCaption(NbBundle.getMessage(AboutDialogControls.class, "LBL_Details"));    // NOI18N
+        TextBrowser.getInstance().setCaption(NbBundle.getMessage(AboutDialogControls.class, "TITLE_Details"));    // NOI18N
         TextBrowser.getInstance().setPreferredBrowserSize(new Dimension(450, 250));
         TextBrowser.getInstance().showHTMLText(AboutDialog.getInstance().getDetails());
     }
