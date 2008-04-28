@@ -38,6 +38,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -66,6 +73,8 @@ import org.openide.util.Utilities;
 public class CPUSettingsSupport {
     
     private static final String PROP_PREFIX = "ProfilerCPUSettings_"; // NOI18N
+    private static final String JAR_SUFFIX = ".jar";  // NOI18N
+    private static final Logger LOGGER = Logger.getLogger(CPUSettingsSupport.class.getName());
     
     static final String SNAPSHOT_VERSION = PROP_PREFIX + "version"; // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = "."; // NOI18N
@@ -181,7 +190,33 @@ public class CPUSettingsSupport {
         defaultRootClasses = "";
         Jvm jvm = JvmFactory.getJVMFor(application);
         String mainClass = jvm.getMainClass();
-        if (mainClass == null || mainClass.trim().length() == 0 || mainClass.endsWith(".jar")) mainClass = ""; // NOI18N
+        if (mainClass == null || mainClass.trim().length() == 0) {
+            mainClass = ""; // NOI18N
+        } else if (mainClass.endsWith(JAR_SUFFIX)) {
+            // application is launched with -jar and uses relative path, try to find jar
+            mainClass = ""; // NOI18N
+            Properties sysProp = jvm.getSystemProperties();
+            if (sysProp != null) {
+                String userdir = sysProp.getProperty("user.dir");     // NOI18N
+                if (userdir != null) {
+                    String args = jvm.getCommandLine();
+                    int index = args.indexOf(JAR_SUFFIX);
+                    if (index != -1) {
+                        File jarFile = new File(userdir,args.substring(0,index+JAR_SUFFIX.length()));
+                        if (jarFile.exists()) {
+                            try {
+                                JarFile jf = new JarFile(jarFile);
+                                String mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+                                assert mainClassName!=null;
+                                mainClass = mainClassName.replace('\\', '/').replace('/', '.');
+                            } catch (IOException ex) {
+                                LOGGER.log(Level.INFO, "getMainClass", ex);   // NOI18N
+                            }
+                        }
+                    }
+                }
+            }
+        }
         int dotIndex = mainClass.lastIndexOf("."); // NOI18N
         if (dotIndex != -1) defaultRootClasses = mainClass.substring(0, dotIndex + 1) + "**"; // NOI18N
         
