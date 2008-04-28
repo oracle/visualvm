@@ -81,48 +81,48 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
 
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Monitored &Host:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Host")); // NOI18N
 
         jLabel2.setDisplayedMnemonic('t');
         jLabel2.setLabelFor(thrdRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "&Threads:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Threads")); // NOI18N
 
         jLabel3.setDisplayedMnemonic('m');
         jLabel3.setLabelFor(dataRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Monitored &Data:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Data")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "Polling");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Polling")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, "sec.");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Sec")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "sec.");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Sec")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel8, "sec.");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel8, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Sec")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, "Charts Cache");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Charts_Cache")); // NOI18N
 
         jLabel10.setDisplayedMnemonic('h');
         jLabel10.setLabelFor(mhRefresh1);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "Monitored H&ost:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Host2")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, "min.");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_min")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, "min.");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_min")); // NOI18N
 
         jLabel13.setDisplayedMnemonic('m');
         jLabel13.setLabelFor(dataRefresh1);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "Monitored D&ata:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Data2")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Profiler");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Profiler")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, "&Reset");
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "BTN_Reset")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel14, "Reset Do Not Show Again confirmations:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel14, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "MSG_Do_Not_Show_Again")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
