@@ -47,7 +47,7 @@ import javax.management.remote.JMXServiceURL;
  */
 public final class JmxApplication extends Application {
     
-    private int pid;
+    private int pid = UNKNOWN_PID;
     private final JMXServiceURL url;
     private final String username;
     private final String password;
@@ -60,7 +60,6 @@ public final class JmxApplication extends Application {
     public JmxApplication(Host host, JMXServiceURL url, String username,
             String password, boolean saveCredentials, Storage storage) {
         super(host, url.toString() + (username == null || username.isEmpty() ? "" : " (" + username + ")"));
-        pid = UNKNOWN_PID;
         this.url = url;
         this.username = username;
         this.password = password;
@@ -90,18 +89,19 @@ public final class JmxApplication extends Application {
 
     @Override
     public int getPid() {
-        if (pid == UNKNOWN_PID) {
-            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
-            if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-                if (mxbeans != null) {
-                    RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
-                    if (rt != null) {
-                        String name = rt.getName();
-                        if (name != null && name.indexOf("@") != -1) {
-                            name = name.substring(0, name.indexOf("@"));
-                            pid = Integer.parseInt(name);
-                        }
+        // Never cache PID as JMX applications are persistent and subsequent
+        // runs of the same application will keep the same JMXServiceURL but
+        // a different PID.
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
+        if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+            if (mxbeans != null) {
+                RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
+                if (rt != null) {
+                    String name = rt.getName();
+                    if (name != null && name.indexOf("@") != -1) {
+                        name = name.substring(0, name.indexOf("@"));
+                        pid = Integer.parseInt(name);
                     }
                 }
             }
