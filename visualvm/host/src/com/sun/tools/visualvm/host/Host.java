@@ -97,7 +97,7 @@ public abstract class Host extends DataSource implements Stateful {
         if (Host.UNKNOWN_HOST == this) return super.hashCode();
         InetAddress address = getInetAddress();
         if (this == LOCALHOST) return address.hashCode();
-        if (address.isAnyLocalAddress()) return LOCALHOST.hashCode();
+        if (address.isLoopbackAddress()) return LOCALHOST.hashCode();
         else return address.hashCode();
     }
 
@@ -107,8 +107,8 @@ public abstract class Host extends DataSource implements Stateful {
         Host host = (Host)obj;
         InetAddress thisAddress = getInetAddress();
         InetAddress otherAddress = host.getInetAddress();
-        if (thisAddress.isAnyLocalAddress() && otherAddress.isAnyLocalAddress()) return true;
-        else return thisAddress.equals(otherAddress);
+        if (thisAddress.isLoopbackAddress() && otherAddress.isLoopbackAddress()) return true;
+        return thisAddress.equals(otherAddress);
     }
 
     public String toString() {

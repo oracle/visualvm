@@ -175,6 +175,7 @@ public class HostProvider {
         
         if (inetAddress.equals(Host.LOCALHOST.getInetAddress())) return Host.LOCALHOST;
         if (inetAddress.equals(localhostAddress2)) return Host.LOCALHOST;
+        if (inetAddress.isLoopbackAddress()) return Host.LOCALHOST;
         
         return null;
     }
