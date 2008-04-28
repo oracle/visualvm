@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.modules.appui.welcome;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 import java.awt.Image;
 import javax.swing.JPanel;
 import org.openide.util.Utilities;
@@ -40,7 +39,6 @@ class CaptionPanel extends JPanel {
     private static final String TOP_LEFT_RESOURCE =   "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-topleft.png";
     private static final String TOP_RIGHT_RESOURCE =  "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-topright.png";
     private static final String TOP_MIDDLE_RESOURCE = "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-topmiddle.png";
-    private static final String TOP_LOGO_RESOURCE =   "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-toplogo.png";
     
     
     public CaptionPanel() {
@@ -49,21 +47,16 @@ class CaptionPanel extends JPanel {
     
     
     private void initComponents() {
+        setLayout(new BorderLayout());
+        setOpaque(false);
+        
         Image topLeftImage = Utilities.loadImage(TOP_LEFT_RESOURCE, true);
         Image topRightImage = Utilities.loadImage(TOP_RIGHT_RESOURCE, true);
         Image topMiddleImage = Utilities.loadImage(TOP_MIDDLE_RESOURCE, true);
-        Image topLogoImage = Utilities.loadImage(TOP_LOGO_RESOURCE, true);
         
-        setLayout(new BorderLayout());
-        setOpaque(false);
         add(new FixedImagePanel(topLeftImage), BorderLayout.WEST);
         add(new FixedImagePanel(topRightImage), BorderLayout.EAST);
-        
-        HorizontalImagePanel topMiddlePanel = new HorizontalImagePanel(topMiddleImage);
-        topMiddlePanel.setLayout(new GridBagLayout());
-        topMiddlePanel.add(new FixedImagePanel(topLogoImage));
-        
-        add(topMiddlePanel, BorderLayout.CENTER);
+        add(new HorizontalImagePanel(topMiddleImage), BorderLayout.CENTER);
     }
 
 }

@@ -43,6 +43,7 @@ package com.sun.tools.visualvm.modules.appui.welcome;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import org.openide.awt.StatusDisplayer;
 
 /**
  *
@@ -68,12 +69,12 @@ public class WebLink extends LinkButton {
     
     @Override
     protected void onMouseExited(MouseEvent e) {
-//        StatusDisplayer.getDefault().setStatusText( "" );
+        StatusDisplayer.getDefault().setStatusText( "" );
     }
 
     @Override
     protected void onMouseEntered(MouseEvent e) {
-//        StatusDisplayer.getDefault().setStatusText( url );
+        StatusDisplayer.getDefault().setStatusText( url );
     }
 }
 

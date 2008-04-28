@@ -60,9 +60,9 @@ class ContentsPanel extends JPanel implements Constants {
     }
     
     private void addLink( String resourceKey, boolean drawBottom, boolean drawRight ) {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque( false );
-        panel.add( new WebLink(resourceKey) );
+        panel.add( new WebLink(resourceKey), BorderLayout.CENTER );
         panel.setBorder( new MyBorder(drawBottom, drawRight) );
         add( panel );
     }
@@ -87,7 +87,7 @@ class ContentsPanel extends JPanel implements Constants {
         }
 
         public Insets getBorderInsets(Component c) {
-            return new Insets(5,5,5,5);
+            return new Insets(8,8,8,8);
         }
 
         public boolean isBorderOpaque() {

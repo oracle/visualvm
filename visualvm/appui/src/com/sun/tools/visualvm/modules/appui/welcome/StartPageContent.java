@@ -81,10 +81,6 @@ public class StartPageContent extends JPanel implements Constants {
         res.add(new ContentsPanel(), BorderLayout.CENTER);
         res.add(new FooterPanel(), BorderLayout.SOUTH);
         
-        int preferredHeight = res.getPreferredSize().height;
-        res.setMinimumSize(new Dimension(462, preferredHeight));
-        res.setPreferredSize(new Dimension(462, preferredHeight));
-        
         return res;
     }
 }
