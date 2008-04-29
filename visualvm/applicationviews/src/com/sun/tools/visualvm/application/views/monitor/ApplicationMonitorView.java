@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
@@ -49,6 +50,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.management.MemoryMXBean;
 import java.text.NumberFormat;
 import java.util.logging.Level;
@@ -150,7 +153,7 @@ class ApplicationMonitorView extends DataSourceView {
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application> {
+    private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application>, PropertyChangeListener {
         
         private Application application;
         private Jvm jvm;
@@ -186,7 +189,11 @@ class ApplicationMonitorView extends DataSourceView {
                 }
             });
         }
-        
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            dataRemoved(application);
+            application.removePropertyChangeListener(Stateful.PROPERTY_STATE, this);
+        }
         
         private void initComponents() {
             setLayout(new BorderLayout());
@@ -231,6 +238,7 @@ class ApplicationMonitorView extends DataSourceView {
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
             
             application.notifyWhenRemoved(this);
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
         }
 
         private String getBasicTelemetry(MonitoredData data) {

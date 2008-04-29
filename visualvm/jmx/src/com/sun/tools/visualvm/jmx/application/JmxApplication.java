@@ -27,7 +27,9 @@ package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -68,6 +70,10 @@ public final class JmxApplication extends Application {
     }
 
     void setStateImpl(int newState) {
+        if (newState != Stateful.STATE_AVAILABLE) {
+            pid = UNKNOWN_PID;
+            jvm = null;
+        }
         setState(newState);
     }
 
@@ -89,19 +95,18 @@ public final class JmxApplication extends Application {
 
     @Override
     public int getPid() {
-        // Never cache PID as JMX applications are persistent and subsequent
-        // runs of the same application will keep the same JMXServiceURL but
-        // a different PID.
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
-        if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-            if (mxbeans != null) {
-                RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
-                if (rt != null) {
-                    String name = rt.getName();
-                    if (name != null && name.indexOf("@") != -1) {
-                        name = name.substring(0, name.indexOf("@"));
-                        pid = Integer.parseInt(name);
+        if (pid == UNKNOWN_PID) {
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
+            if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                if (mxbeans != null) {
+                    RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
+                    if (rt != null) {
+                        String name = rt.getName();
+                        if (name != null && name.indexOf("@") != -1) {
+                            name = name.substring(0, name.indexOf("@"));
+                            pid = Integer.parseInt(name);
+                        }
                     }
                 }
             }
@@ -124,4 +129,8 @@ public final class JmxApplication extends Application {
         if (appStorage.isDirectory()) Utils.delete(appStorage, true);
     }
 
+    @Override
+    public String toString() {
+        return "JmxApplication [id: " + getId() + "]";   // NOI18N
+    }
 }

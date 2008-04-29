@@ -44,6 +44,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.text.MessageFormat;
 import javax.swing.BorderFactory;
@@ -119,7 +121,7 @@ class ApplicationProfilerView extends DataSourceView {
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements ProfilingStateListener, DataRemovedListener<Application>, ActionListener {
+    private static class MasterViewSupport extends JPanel implements ProfilingStateListener, DataRemovedListener<Application>, ActionListener, PropertyChangeListener {
         
         private Application application;
         private ProfilingResultsSupport profilingResultsView;
@@ -135,7 +137,7 @@ class ApplicationProfilerView extends DataSourceView {
         private boolean applicationTerminated = false;
     
         
-        public MasterViewSupport(Application application, ProfilingResultsSupport profilingResultsView,
+        public MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
                 CPUSettingsSupport cpuSettingsSupport, MemorySettingsSupport memorySettingsSupport) {
             this.application = application;
             this.profilingResultsView = profilingResultsView;
@@ -153,6 +155,7 @@ class ApplicationProfilerView extends DataSourceView {
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
             application.notifyWhenRemoved(this);
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
         }
         
         
@@ -176,7 +179,12 @@ class ApplicationProfilerView extends DataSourceView {
                 }
             });
         }
-        
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            dataRemoved(application);
+            application.removePropertyChangeListener(Stateful.PROPERTY_STATE, this);
+        }
+
         public void viewRemoved() {
             timer.stop();
             timer.removeActionListener(MasterViewSupport.this);
