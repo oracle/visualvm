@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
@@ -43,11 +44,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.ErrorManager;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -57,6 +59,8 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 public class HeapDumpProvider {
+    
+    private final static Logger LOGGER = Logger.getLogger(HeapDumpProvider.class.getName());
     
     public void createHeapDump(final Application application, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
@@ -77,13 +81,19 @@ public class HeapDumpProvider {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
-                        application.getRepository().addDataSource(heapDump);
-                        if (openView) SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
-                        });
+                        File file = jvm.takeHeapDump();
+                        if (file != null && file.isFile()) {
+                            final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
+                            application.getRepository().addDataSource(heapDump);
+                            if (openView) SwingUtilities.invokeLater(new Runnable() {
+                                public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
+                            });
+                        } else {
+                            notifyHeapDumpFailed(application);
+                        }
                     } catch (IOException ex) {
-                        ErrorManager.getDefault().notify(ex);
+                        LOGGER.log(Level.INFO, "createHeapDump-Application", ex); // NOI18N
+                        notifyHeapDumpFailed(application);
                     }
                 } finally {
                     final ProgressHandle pHandleF = pHandle;
@@ -114,9 +124,12 @@ public class HeapDumpProvider {
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                             });
+                        } else {
+                            notifyHeapDumpFailed(coreDump);
                         }
                     } catch (Exception ex) {
-                        ErrorManager.getDefault().notify(ex);
+                        LOGGER.log(Level.INFO, "createHeapDump-CoreDump", ex); // NOI18N
+                        notifyHeapDumpFailed(coreDump);
                     }
                 } finally {
                     final ProgressHandle pHandleF = pHandle;
@@ -155,6 +168,15 @@ public class HeapDumpProvider {
             for (File file : files) heapDumps.add(new HeapDumpImpl(file, application));
             application.getRepository().addDataSources(heapDumps);
         }
+    }
+    
+    private void notifyHeapDumpFailed(final DataSource dataSource) {
+        final String displayName = DataSourceDescriptorFactory.getDescriptor(dataSource).getName();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(HeapDumpProvider.class, "MSG_Cannot_take_heap_dump") + displayName);  // NOI18N
+            }
+        });
     }
     
     
