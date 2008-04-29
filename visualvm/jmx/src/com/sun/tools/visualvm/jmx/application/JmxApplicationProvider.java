@@ -281,6 +281,7 @@ class JmxApplicationProvider {
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
+            application.setStateImpl(Stateful.STATE_UNAVAILABLE);
             File appStorage = storage.getDirectory();
             if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             SwingUtilities.invokeLater(new Runnable() {
