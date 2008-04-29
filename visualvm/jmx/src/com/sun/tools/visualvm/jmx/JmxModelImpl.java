@@ -726,7 +726,8 @@ public class JmxModelImpl extends JmxModel {
 
         public void handleNotification(Notification n, Object hb) {
             if (n instanceof JMXConnectionNotification) {
-                if (JMXConnectionNotification.FAILED.equals(n.getType())) {
+                if (JMXConnectionNotification.FAILED.equals(n.getType()) ||
+                        JMXConnectionNotification.CLOSED.equals(n.getType())) {
                     markAsDead();
                 }
             }
