@@ -57,6 +57,7 @@ import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -171,7 +172,6 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         public void propertyChange(PropertyChangeEvent evt) {
             dataRemoved(application);
-            application.removePropertyChangeListener(Stateful.PROPERTY_STATE, this);
         }
 
         private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager) {
@@ -202,7 +202,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
 
             application.notifyWhenRemoved(this);
-            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this,application));
         }
 
         private void updateThreadsCounts(final ThreadMXBeanDataManager threadsManager) {

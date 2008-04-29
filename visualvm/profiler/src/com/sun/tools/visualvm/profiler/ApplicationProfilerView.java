@@ -70,6 +70,7 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -155,7 +156,7 @@ class ApplicationProfilerView extends DataSourceView {
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
             application.notifyWhenRemoved(this);
-            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this,application));
         }
         
         
@@ -182,7 +183,6 @@ class ApplicationProfilerView extends DataSourceView {
 
         public void propertyChange(PropertyChangeEvent evt) {
             dataRemoved(application);
-            application.removePropertyChangeListener(Stateful.PROPERTY_STATE, this);
         }
 
         public void viewRemoved() {

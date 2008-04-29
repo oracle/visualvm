@@ -68,6 +68,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -192,7 +193,6 @@ class ApplicationMonitorView extends DataSourceView {
 
         public void propertyChange(PropertyChangeEvent evt) {
             dataRemoved(application);
-            application.removePropertyChangeListener(Stateful.PROPERTY_STATE, this);
         }
         
         private void initComponents() {
@@ -237,8 +237,8 @@ class ApplicationMonitorView extends DataSourceView {
             
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
             
-            application.notifyWhenRemoved(this);
-            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
+            application.notifyWhenRemoved(this);            
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this,application));
         }
 
         private String getBasicTelemetry(MonitoredData data) {
