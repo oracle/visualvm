@@ -27,7 +27,9 @@ package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.Storage;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -47,7 +49,7 @@ import javax.management.remote.JMXServiceURL;
  */
 public final class JmxApplication extends Application {
     
-    private int pid;
+    private int pid = UNKNOWN_PID;
     private final JMXServiceURL url;
     private final String username;
     private final String password;
@@ -60,7 +62,6 @@ public final class JmxApplication extends Application {
     public JmxApplication(Host host, JMXServiceURL url, String username,
             String password, boolean saveCredentials, Storage storage) {
         super(host, url.toString() + (username == null || username.isEmpty() ? "" : " (" + username + ")"));
-        pid = UNKNOWN_PID;
         this.url = url;
         this.username = username;
         this.password = password;
@@ -69,6 +70,10 @@ public final class JmxApplication extends Application {
     }
 
     void setStateImpl(int newState) {
+        if (newState != Stateful.STATE_AVAILABLE) {
+            pid = UNKNOWN_PID;
+            jvm = null;
+        }
         setState(newState);
     }
 
@@ -124,4 +129,8 @@ public final class JmxApplication extends Application {
         if (appStorage.isDirectory()) Utils.delete(appStorage, true);
     }
 
+    @Override
+    public String toString() {
+        return "JmxApplication [id: " + getId() + "]";   // NOI18N
+    }
 }

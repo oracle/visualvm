@@ -43,6 +43,8 @@ import com.sun.tools.visualvm.tools.jmx.MBeanCacheListener;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -55,6 +57,7 @@ import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -142,15 +145,17 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     // --- General data --------------------------------------------------------
 
-    private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application> {
+    private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application>, PropertyChangeListener {
 
+        private Application application;
         private HTMLTextArea area;
         private JButton threadDumpButton;
         private static final String LIVE_THRADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Live_threads");    // NOI18N
         private static final String DAEMON_THREADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Daemon_threads");   // NOI18N
 
-        MasterViewSupport(Application application, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
-            initComponents(application, jvm, threadsManager);
+        MasterViewSupport(Application app, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
+            application = app;
+            initComponents(app, jvm, threadsManager);
         }
 
         DataViewComponent.MasterView getMasterView() {
@@ -163,6 +168,10 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                     threadDumpButton.setEnabled(false);
                 }
             });
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            dataRemoved(application);
         }
 
         private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager) {
@@ -193,6 +202,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
 
             application.notifyWhenRemoved(this);
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this,application));
         }
 
         private void updateThreadsCounts(final ThreadMXBeanDataManager threadsManager) {
