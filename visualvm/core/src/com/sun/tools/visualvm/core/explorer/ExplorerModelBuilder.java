@@ -127,10 +127,18 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     private void processAddedDisplayableDataSources(Set<DataSource> addedDisplayable) {
         final Set<ExplorerNode> addedNodes = new HashSet();
-        final ProgressHandle pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ExplorerModelBuilder.class, "LBL_Computing_description"));
+        final ProgressHandle[] pHandle = new ProgressHandle[1];
         
-        pHandle.setInitialDelay(5000);
-        pHandle.start();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                pHandle[0] = ProgressHandleFactory.createHandle(NbBundle.getMessage(ExplorerModelBuilder.class, "LBL_Computing_description"));
+
+                pHandle[0].setInitialDelay(5000);
+                pHandle[0].start();
+            }
+        });
+
         try {
             for (DataSource dataSource : addedDisplayable) {
                 if (dataSource != DataSource.ROOT) {
@@ -151,7 +159,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             }
         } finally {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() { pHandle.finish(); }
+                public void run() { pHandle[0].finish(); }
             });
         }
         try { SwingUtilities.invokeAndWait(new Runnable() {
