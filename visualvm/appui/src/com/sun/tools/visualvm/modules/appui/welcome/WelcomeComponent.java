@@ -94,7 +94,7 @@ public class WelcomeComponent extends TopComponent {
      * Uses known unique TopComponent ID "VisualVMWelcome" to get WelcomeComponent instance
      * from window system. "VisualVMWelcome" is name of settings file defined in module layer.
      */
-    public static WelcomeComponent findComp() {
+    public static synchronized WelcomeComponent findComp() {
         WelcomeComponent wc = component.get();
         if (wc == null) {
             TopComponent tc = WindowManager.getDefault().findTopComponent(PREFERRED_ID); // NOI18N
@@ -124,7 +124,7 @@ public class WelcomeComponent extends TopComponent {
     /* Singleton accessor reserved for window system ONLY. Used by window system to create
      * WelcomeComponent instance from settings file when method is given. Use <code>findComp</code>
      * to get correctly deserialized instance of WelcomeComponent. */
-    public static WelcomeComponent createComp() {
+    public static synchronized  WelcomeComponent createComp() {
         WelcomeComponent wc = component.get();
         if(wc == null) {
             wc = new WelcomeComponent();
