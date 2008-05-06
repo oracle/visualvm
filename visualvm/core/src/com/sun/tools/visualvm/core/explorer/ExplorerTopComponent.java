@@ -65,37 +65,28 @@ final class ExplorerTopComponent extends TopComponent {
     }
     
     
-    public static synchronized ExplorerTopComponent getComp() {
-        if (instance == null) {
-            TopComponent tc = WindowManager.getDefault().findTopComponent(PREFERRED_ID); // NOI18N
-            if (tc != null) {
-                if (tc instanceof ExplorerTopComponent) {
-                    instance = (ExplorerTopComponent)tc;
-                } else {
-                    if (LOGGER.isLoggable(Level.WARNING)) {
-                        //Incorrect settings file?
-                        String exception = new String
-                        ("Incorrect settings file. Unexpected class returned." // NOI18N
-                        + " Expected:" + ExplorerTopComponent.class.getName() // NOI18N
-                        + " Returned:" + tc.getClass().getName()); // NOI18N
-                        LOGGER.warning(exception);   // NOI18N
-                    }
-                    //Fallback to accessor reserved for window system.
-                    instance = ExplorerTopComponent.createComp();
-                }
-            } else {
-                //Component cannot be deserialized
-                //Fallback to accessor reserved for window system.
-                instance = ExplorerTopComponent.createComp();
-            }
-        }       
+    /**
+    * Gets default instance. Do not use directly: reserved for *.settings files only,
+    * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
+    * To obtain the singleton instance, use {@link findInstance}.
+    */
+    public static synchronized ExplorerTopComponent getInstance() {
+        if (instance == null) instance = new ExplorerTopComponent();
         return instance;
     }
     
-    public static synchronized ExplorerTopComponent createComp() {
-        if (instance == null)
-            instance = new ExplorerTopComponent();
-        return instance;
+    /**
+    * Obtain the ExplorerTopComponent instance. Never call {@link #getDefault} directly!
+    */
+    public static synchronized ExplorerTopComponent findInstance() {
+        TopComponent explorerTopComponent = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
+        if (explorerTopComponent == null) return getInstance();
+        if (explorerTopComponent instanceof ExplorerTopComponent) return (ExplorerTopComponent)explorerTopComponent;
+    
+        if (LOGGER.isLoggable(Level.WARNING)) {
+            LOGGER.warning("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior.");   // NOI18N
+    }
+        return getInstance();
     }
     
     private boolean needsDocking() {
