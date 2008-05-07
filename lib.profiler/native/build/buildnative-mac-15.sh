@@ -39,6 +39,7 @@ BuildForJDK()
         BuildForArch "x86_64"
 
 	lipo -create libprofilerinterface_ppc.jnilib libprofilerinterface_i386.jnilib \
+	libprofilerinterface_ppc64.jnilib libprofilerinterface_x86_64.jnilib \
 	-output ../../release/lib/deployed/$JDK_ID/mac/libprofilerinterface.jnilib
 
 	rm *.o *.jnilib
