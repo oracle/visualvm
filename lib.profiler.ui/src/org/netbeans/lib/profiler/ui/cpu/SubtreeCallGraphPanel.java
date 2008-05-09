@@ -115,8 +115,8 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private AbstractTreeTableModel abstractTreeTableModel;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
     private ExtendedTreeTableModel treeTableModel;
-    private ImageIcon leafIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/leaf.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/node.png")); // NOI18N
+    private ImageIcon leafIcon = new ImageIcon(SubtreeCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/leaf.png")); // NOI18N
+    private ImageIcon nodeIcon = new ImageIcon(SubtreeCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/node.png")); // NOI18N
     private int minNamesColumnWidth; // minimal width of classnames columns
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------

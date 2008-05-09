@@ -76,6 +76,14 @@ made subject to such option by the copyright holder.
                     </file>
           </folder>
       </folder>
+      <folder name="x-fx">
+        <folder name="Actions">
+          <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance">
+            <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSinglePopup"/>
+              <attr name="position" intvalue="660"/>
+                    </file>
+          </folder>
+      </folder>
     </folder>
   </folder>
 

@@ -47,13 +47,13 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsDisplayer;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.filesystems.FileObject;
 import java.util.Properties;
 import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
 /**
@@ -107,7 +107,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
         public void setContext(Project project, FileObject profiledFile, boolean isAttach, boolean isModify,
                                boolean enableOverride) {
             this.project = project;
-            ptp = ProjectUtilities.getProjectTypeProfiler(project);
+            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
             this.profiledFile = profiledFile;
             this.enableOverride = enableOverride;
             this.isAttach = isAttach;
@@ -337,7 +337,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
         public void setContext(Project project, FileObject profiledFile, boolean isAttach, boolean isModify,
                                boolean enableOverride) {
             this.project = project;
-            ptp = ProjectUtilities.getProjectTypeProfiler(project);
+            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
             this.profiledFile = profiledFile;
             this.enableOverride = enableOverride;
             this.isAttach = isAttach;
@@ -522,7 +522,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
         public void setContext(Project project, FileObject profiledFile, boolean isAttach, boolean isModify,
                                boolean enableOverride) {
             this.project = project;
-            ptp = ProjectUtilities.getProjectTypeProfiler(project);
+            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
             this.profiledFile = profiledFile;
             this.enableOverride = enableOverride;
             this.isAttach = isAttach;

@@ -56,8 +56,6 @@ import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
-import org.netbeans.modules.profiler.utils.SourceUtils;
 import org.netbeans.spi.project.ui.support.MainProjectSensitiveActions;
 import org.netbeans.spi.project.ui.support.ProjectActionPerformer;
 import org.openide.ErrorManager;
@@ -73,6 +71,8 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
@@ -129,11 +129,11 @@ public final class AntActions {
                     }
 
                     // Check if project type is supported, eventually return null
-                    return ProjectUtilities.isProjectTypeSupported(project);
+                    return isProjectTypeSupported(project);
                 }
 
                 public void perform(final Project project) {
-                    if (ProjectUtilities.isProjectTypeSupported(project)) {
+                    if (isProjectTypeSupported(project)) {
                         doProfileProject(project, null, false);
                     } else {
                         NetBeansProfiler.getDefaultNB().displayError(UNSUPPORTED_PROJECT_TYPE_MSG);
@@ -167,7 +167,7 @@ public final class AntActions {
                         return false;
                     }
 
-                    return ProjectUtilities.isProjectTypeSupported(project);
+                    return isProjectTypeSupported(project);
                 }
 
                 public void perform(final Project project, final Lookup context) {
@@ -196,7 +196,7 @@ public final class AntActions {
                         return false;
                     }
 
-                    return ProjectUtilities.isProjectTypeSupported(project);
+                    return isProjectTypeSupported(project);
                 }
 
                 public void perform(final Project project, final Lookup context) {
@@ -232,7 +232,7 @@ public final class AntActions {
                     }
 
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                         if (ptp == null) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
@@ -282,7 +282,7 @@ public final class AntActions {
                     }
 
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                         if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
@@ -301,7 +301,7 @@ public final class AntActions {
                         throw new IllegalStateException();
                     }
 
-                    if (!ProjectUtilities.getProjectTypeProfiler(project).isFileObjectSupported(project, fos[0])) {
+                    if (!org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project).isFileObjectSupported(project, fos[0])) {
                         throw new IllegalStateException();
                     }
 
@@ -343,7 +343,7 @@ public final class AntActions {
                     }
 
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                         return (ptp.isFileObjectSupported(project, fo));
                     } else {
@@ -364,7 +364,7 @@ public final class AntActions {
                         throw new IllegalStateException(FILE_TEST_NOT_FOUND_MSG);
                     }
 
-                    if (!ProjectUtilities.getProjectTypeProfiler(project).isFileObjectSupported(project, fo)) {
+                    if (!org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project).isFileObjectSupported(project, fo)) {
                         throw new IllegalStateException();
                     }
 
@@ -389,13 +389,13 @@ public final class AntActions {
                         return false;
                     }
 
-                    final ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                     return ptp.supportsUnintegrate(project);
                 }
 
                 public void perform(final Project project, final Lookup context) {
-                    final ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                     try {
                         ptp.unintegrateProfiler(project);
@@ -487,7 +487,7 @@ public final class AntActions {
                             return;
                         }
 
-                        final ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                         if (!ptp.isProfilingSupported(project)) {
                             // Branch A: not supported project with profile action in the action provider
@@ -722,5 +722,15 @@ public final class AntActions {
         }
 
         return platform;
+    }
+    
+    private static boolean isProjectTypeSupported(final Project project) {
+        ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+
+        if (ptp.isProfilingSupported(project)) {
+            return true;
+        }
+
+        return ProjectUtilities.hasAction(project, "profile"); //NOI18N
     }
 }

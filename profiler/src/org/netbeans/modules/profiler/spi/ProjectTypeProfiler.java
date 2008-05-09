@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.marker.Marker;
 import org.netbeans.lib.profiler.results.cpu.marking.HierarchicalMark;
 import org.netbeans.modules.profiler.ui.stp.DefaultSettingsConfigurator;
 import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.filesystems.FileObject;
 import java.util.Collections;
 import java.util.HashSet;
@@ -58,6 +57,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.swing.JComponent;
+import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
 /**
@@ -195,7 +195,7 @@ public interface ProjectTypeProfiler {
         }
 
         public float getProfilingOverhead(ProfilingSettings settings) {
-            return ProjectUtilities.getProfilingOverhead(settings);
+            return 0F;
         }
     };
 

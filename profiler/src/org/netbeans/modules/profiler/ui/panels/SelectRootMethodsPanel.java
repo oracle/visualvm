@@ -46,8 +46,8 @@ import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilder;
-import org.netbeans.modules.profiler.selector.api.ui.RootSelectorTree;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
+import org.netbeans.modules.profiler.selector.ui.SelectionTreeView;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
@@ -66,22 +66,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import java.util.concurrent.CountDownLatch;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
+import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
 
 
 /**
@@ -114,7 +116,7 @@ public class SelectRootMethodsPanel extends JPanel {
     private Project currentProject;
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
     private RootSelectorTree advancedLogicalPackageTree;
-    private Set<ClientUtils.SourceCodeSelection> currentSelectionSet = new HashSet<ClientUtils.SourceCodeSelection>();
+
     private volatile boolean changingBuilderList = false;
     private boolean globalMode;
 
@@ -142,32 +144,44 @@ public class SelectRootMethodsPanel extends JPanel {
         advancedLogicalPackageTree.reset();
 
         setGlobalMode(project == null);
-        refreshBuilderList();
-        updateSelector(new Runnable() {
-                public void run() {
-                    advancedLogicalPackageTree.setup(relevantProjects(), currentSelection);
-                }
-            });
 
-        final DialogDescriptor dd = new DialogDescriptor(this,
-                                                         NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_Title"), // NOI18N
-                                                         true, new Object[] { okButton, DialogDescriptor.CANCEL_OPTION },
-                                                         okButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
+        PropertyChangeListener pcl = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshBuilderList();
+            }
+        };
 
-        Object[] additionalOptions = getAdditionalOptions();
+        try {
+            advancedLogicalPackageTree.addPropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
 
-        if ((additionalOptions != null) && (additionalOptions.length > 0)) {
-            dd.setAdditionalOptions(additionalOptions);
+            updateSelector(new Runnable() {
+                    public void run() {
+                        advancedLogicalPackageTree.setup(relevantProjects(), currentSelection);
+                    }
+                });
+
+            final DialogDescriptor dd = new DialogDescriptor(this,
+                                                             NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_Title"), // NOI18N
+                                                             true, new Object[] { okButton, DialogDescriptor.CANCEL_OPTION },
+                                                             okButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
+
+            Object[] additionalOptions = getAdditionalOptions();
+
+            if ((additionalOptions != null) && (additionalOptions.length > 0)) {
+                dd.setAdditionalOptions(additionalOptions);
+            }
+
+            final Dialog d = ProfilerDialogs.createDialog(dd);
+            d.pack(); // To properly layout HTML hint area
+            d.setVisible(true);
+
+            //    ClientUtils.SourceCodeSelection[] rootMethods = this.currentSelectionSet.toArray(new ClientUtils.SourceCodeSelection[this.currentSelectionSet.size()]);
+            this.currentProject = null;
+
+            return dd.getValue().equals(okButton) ? advancedLogicalPackageTree.getSelection() : null;
+        } finally {
+            advancedLogicalPackageTree.removePropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
         }
-
-        final Dialog d = ProfilerDialogs.createDialog(dd);
-        d.pack(); // To properly layout HTML hint area
-        d.setVisible(true);
-
-        //    ClientUtils.SourceCodeSelection[] rootMethods = this.currentSelectionSet.toArray(new ClientUtils.SourceCodeSelection[this.currentSelectionSet.size()]);
-        this.currentProject = null;
-
-        return dd.getValue().equals(okButton) ? advancedLogicalPackageTree.getSelection() : null;
 
         //    this.currentSelectionSet.clear();
         //    return rootMethods;
@@ -178,11 +192,39 @@ public class SelectRootMethodsPanel extends JPanel {
 
         okButton = new JButton(OK_BUTTON_TEXT);
 
-        advancedLogicalPackageTree = new RootSelectorTree() {
-                protected SelectionTreeBuilder getBuilder() {
-                    return (SelectionTreeBuilder) treeBuilderList.getSelectedItem();
+        //        advancedLogicalPackageTree = new RootSelectorTree() {
+        //                protected SelectionTreeBuilder getBuilder() {
+        //                    return (SelectionTreeBuilder) treeBuilderList.getSelectedItem();
+        //                }
+        //            };
+//        advancedLogicalPackageTree = new RootSelectorTree();
+                
+        advancedLogicalPackageTree = new RootSelectorTree(new ProgressDisplayer() {
+            ProfilerProgressDisplayer pd = null;
+            
+            public synchronized void showProgress(String message) {
+                pd = ProfilerProgressDisplayer.showProgress(message);
+            }
+
+            public synchronized void showProgress(String message, ProgressController controller) {
+                pd = ProfilerProgressDisplayer.showProgress(message, controller);
+            }
+
+            public synchronized void showProgress(String caption, String message, ProgressController controller) {
+                pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
+            }
+
+            public synchronized boolean isOpened() {
+                return pd != null;
+            }
+
+            public synchronized void close() {
+                if (pd != null) {
+                    pd.close();
+                    pd = null;
                 }
-            };
+            }
+        });
 
         advancedShowAllProjectsCheckBox = new JCheckBox();
         treeBuilderList = new JComboBox();
@@ -195,7 +237,9 @@ public class SelectRootMethodsPanel extends JPanel {
                     if ((currentProject != null) && (e.getStateChange() == ItemEvent.SELECTED)) {
                         rp.post(new Runnable() {
                                 public void run() {
-                                    updateSelectorProjects();
+                                    advancedLogicalPackageTree.setSelectionTreeView((SelectionTreeView) e.getItem());
+
+                                    //                                    updateSelectorProjects();
                                 }
                             });
                     }
@@ -295,34 +339,26 @@ public class SelectRootMethodsPanel extends JPanel {
     }
 
     private void refreshBuilderList() {
+        List<SelectionTreeView> treeViews = advancedLogicalPackageTree.getSelectionTreeViewList();
+        List<SelectionTreeView> usedTreeViews = new ArrayList<SelectionTreeView>();
+
+        for (SelectionTreeView view : treeViews) {
+            if (view.isEnabled()) {
+                if (view.isPreferred()) {
+                    usedTreeViews.add(0, view);
+                } else {
+                    usedTreeViews.add(view);
+                }
+            }
+        }
+
         try {
             changingBuilderList = true;
 
-            Vector<SelectionTreeBuilder> treeBuilders = new Vector<SelectionTreeBuilder>();
-            int preferredIndex = 0;
-            int counter = 0;
+            treeBuilderList.setModel(new DefaultComboBoxModel(usedTreeViews.toArray(new SelectionTreeView[usedTreeViews.size()])));
 
-            Collection<?extends SelectionTreeBuilder> allBuilders = Lookup.getDefault().lookupAll(SelectionTreeBuilder.class);
-            int[] refCounter = new int[allBuilders.size()];
-
-            if (advancedShowAllProjectsCheckBox.isSelected()) {
-                treeBuilders.addAll(allBuilders);
-            } else {
-                for (SelectionTreeBuilder builder : allBuilders) {
-                    if (builder.supports(currentProject)) {
-                        if (builder.isPreferred(currentProject)) {
-                            preferredIndex = counter;
-                        }
-
-                        treeBuilders.add(builder);
-                        counter++;
-                    }
-                }
-            }
-
-            treeBuilderList.setModel(new DefaultComboBoxModel(treeBuilders));
-
-            treeBuilderList.setSelectedIndex(preferredIndex);
+            treeBuilderList.setSelectedIndex(0);
+            advancedLogicalPackageTree.setSelectionTreeView((SelectionTreeView)treeBuilderList.getItemAt(0));
         } finally {
             changingBuilderList = false;
         }

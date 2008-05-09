@@ -46,7 +46,6 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.ClassesListControllerUI;
-import org.netbeans.modules.profiler.utils.SourceUtils;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**

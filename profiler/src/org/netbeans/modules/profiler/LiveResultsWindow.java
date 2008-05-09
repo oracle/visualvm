@@ -75,7 +75,6 @@ import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.stats.drilldown.hierarchical.DrillDown;
 import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -1094,7 +1093,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
             case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED: {
                 Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
-                ProjectTypeProfiler ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                 List additionalStats = new ArrayList();
 

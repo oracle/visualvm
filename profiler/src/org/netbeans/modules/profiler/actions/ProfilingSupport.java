@@ -49,16 +49,13 @@ import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
 import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
-import org.netbeans.modules.profiler.ui.wizards.AttachWizard;
-import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.openide.NotifyDescriptor;
-import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import java.awt.*;
 import java.io.IOException;
 import java.text.MessageFormat;
+import org.netbeans.modules.profiler.attach.AttachWizard;
 
 
 /**
@@ -228,7 +225,7 @@ public final class ProfilingSupport {
                         ProjectTypeProfiler ptp = null;
 
                         if (project != null) {
-                            ptp = ProjectUtilities.getProjectTypeProfiler(project);
+                            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                         }
 
                         if (ptp != null) {
@@ -275,20 +272,22 @@ public final class ProfilingSupport {
                         ProfilerLogger.log(">>> Attach settings: " + as); // NOI18N
 
                         if (as == null) {
-                            AttachWizard attachWizard = new AttachWizard();
-                            attachWizard.init(as); // as == null resets previous attach wizard settings
-
-                            final WizardDescriptor wd = attachWizard.getWizardDescriptor();
-                            final Dialog d = ProfilerDialogs.createDialog(wd);
-                            d.setVisible(true);
-
-                            if (wd.getValue() != WizardDescriptor.FINISH_OPTION) {
-                                return; // cancelled by the user
-                            }
-
-                            attachWizard.finish(); // wizard correctly finished
-
-                            as = attachWizard.getAttachSettings();
+//                            AttachWizard attachWizard = new AttachWizard();
+//                            return attachWizard.init(); // as == null resets previous attach wizard settings
+//
+//                            final WizardDescriptor wd = attachWizard.getWizardDescriptor();
+//                            final Dialog d = ProfilerDialogs.createDialog(wd);
+//                            d.setVisible(true);
+//
+//                            if (wd.getValue() != WizardDescriptor.FINISH_OPTION) {
+//                                return; // cancelled by the user
+//                            }
+//
+//                            attachWizard.finish(); // wizard correctly finished
+//
+//                            as = attachWizard.getAttachSettings();
+                            as = AttachWizard.getDefault().configure(as);
+                            if (as == null) return; // cancelled by the user
                             NetBeansProfiler.saveAttachSettings(project, as);
                         }
 

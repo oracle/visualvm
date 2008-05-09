@@ -49,6 +49,7 @@ import org.openide.util.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**

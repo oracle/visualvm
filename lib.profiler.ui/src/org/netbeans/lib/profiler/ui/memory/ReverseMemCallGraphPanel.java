@@ -113,8 +113,8 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     protected int minNamesColumnWidth; // minimal width of classnames columns
     CustomBarCellRenderer customBarCellRenderer;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
-    private ImageIcon leafIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(getClass().getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
+    private ImageIcon leafIcon = new ImageIcon(ReverseMemCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
+    private ImageIcon nodeIcon = new ImageIcon(ReverseMemCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

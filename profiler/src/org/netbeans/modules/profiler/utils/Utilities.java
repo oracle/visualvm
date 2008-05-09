@@ -53,6 +53,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
