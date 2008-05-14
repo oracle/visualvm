@@ -128,7 +128,7 @@ public class SaModelImpl extends SaModel {
                     jvmFlags = args.getJVMFlags();
                     jvmArgs = args.getJVMArgs();
                     commandLine = args.getJavaCommand();
-                    sysProp = agent.getVM().getSystemProperties();
+                    sysProp = (Properties)agent.getVM().getSystemProperties().clone();
                 }
             } finally {
                 agent.detach();
