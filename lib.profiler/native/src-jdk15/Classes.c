@@ -100,7 +100,7 @@ JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Clas
     class_status = malloc(classCount);
     for (i = 0; i < classCount; i++) {
         (*_jvmti)->GetClassStatus(_jvmti, classes[i], &classStatus);
-        if ((classStatus & JVMTI_CLASS_STATUS_PREPARED) != 0) {
+        if ((classStatus & JVMTI_CLASS_STATUS_PREPARED) != 0 && (classStatus & JVMTI_CLASS_STATUS_ERROR) == 0) {	
             class_status[i] = 1;
             n_linked_classes++;
         } else {
