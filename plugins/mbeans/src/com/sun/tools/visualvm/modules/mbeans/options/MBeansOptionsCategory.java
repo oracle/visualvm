@@ -39,7 +39,7 @@ import org.openide.util.Utilities;
 public final class MBeansOptionsCategory extends OptionsCategory {
 
     public Icon getIcon() {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans.png"));
+        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans32.png"));
     }
 
     public String getCategoryName() {
