@@ -43,11 +43,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -128,16 +130,15 @@ class JConsolePluginWrapper {
                         ServiceLoader.load(JConsolePlugin.class, pluginCL);
                 // Validate all plugins
                 for (JConsolePlugin p : plugins) {
-                    LOGGER.finer("Plugin " + p.getClass() + " loaded."); // NOI18N
+                    LOGGER.finer("JConsole plugin " + p.getClass().getName() + " loaded."); // NOI18N
                 }
                 pluginService = plugins;
             } catch (ServiceConfigurationError e) {
                 // Error occurs during initialization of plugin
-
-                LOGGER.finer("Warning: Fail to load plugin: " + e.getMessage()); // NOI18N
+                LOGGER.warning("Fail to load JConsole plugin: " + e.getMessage()); // NOI18N
                 LOGGER.throwing(JConsolePluginWrapper.class.getName(), "initPluginService", e); // NOI18N
             } catch (MalformedURLException e) {
-                LOGGER.finer("Warning: Invalid plugin path: " + e.getMessage()); // NOI18N
+                LOGGER.warning("Invalid JConsole plugin path: " + e.getMessage()); // NOI18N
                 LOGGER.throwing(JConsolePluginWrapper.class.getName(), "initPluginService", e); // NOI18N
             }
         }
@@ -322,9 +323,8 @@ class JConsolePluginWrapper {
         void disconnect() {
             // Disconnect
             proxyClient.disconnect();
-            for (JConsolePlugin p : plugins.keySet()) {
-                p.dispose();
-            }
+            // Dispose JConsole plugins
+            disposePlugins(plugins.keySet());
             // Cancel pending update tasks
             //
             if (timer != null) {
@@ -405,13 +405,36 @@ class JConsolePluginWrapper {
         private void createPluginTabs() {
             // Add plugin tabs if not done
             if (!pluginTabsAdded) {
+                Set<JConsolePlugin> failedPlugins = new HashSet<JConsolePlugin>();
                 for (JConsolePlugin p : plugins.keySet()) {
-                    Map<String, JPanel> tabs = p.getTabs();
-                    for (Map.Entry<String, JPanel> e : tabs.entrySet()) {
-                        addTab(e.getKey(), e.getValue());
+                    try {
+                        Map<String, JPanel> tabs = p.getTabs();
+                        for (Map.Entry<String, JPanel> e : tabs.entrySet()) {
+                            addTab(e.getKey(), e.getValue());
+                        }
+                    } catch (Throwable t) {
+                        // Error occurs during plugin tab creation.
+                        failedPlugins.add(p);
+                        LOGGER.warning("JConsole plugin " + p.getClass().getName() + " removed: Failed to create JConsole plugin tabs."); // NOI18N
+                        LOGGER.throwing(VMPanel.class.getName(), "createPluginTabs", t); // NOI18N
                     }
                 }
+                // Remove plugins that failed to return the plugin tabs
+                for (JConsolePlugin p : failedPlugins) {
+                    plugins.remove(p);
+                }
+                disposePlugins(failedPlugins);
                 pluginTabsAdded = true;
+            }
+        }
+
+        private void disposePlugins(Set<JConsolePlugin> pluginSet) {
+            for (JConsolePlugin p : pluginSet) {
+                try {
+                    p.dispose();
+                } catch (Throwable t) {
+                    // Best effort, ignore if plugin fails to cleanup itself.
+                }
             }
         }
     }
