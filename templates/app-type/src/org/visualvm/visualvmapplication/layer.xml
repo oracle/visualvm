@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Templates">
+        <folder name="NetBeansModuleDevelopment">
+            <file name="visualVMApplication">
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmapplication/search.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.visualvm.visualvmapplication.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.visualvm.visualvmapplication.NewProjectIterator.createIterator"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/visualvm/visualvmapplication/visualVMView.html"/>
+            </file>
+        </folder>
+        <folder name="NetBeansModuleDevelopment-files"> <!-- XXX later could be made visible (just need localized labels) -->
+            <attr name="position" intvalue="0"/>
+            <attr name="simple" boolvalue="false"/>
+            <file name="templateInstaller.java" url="templateInstaller.javx"/>
+            <file name="templateViewProvider.java" url="templateViewProvider.javx"/>
+            <file name="templateView.java" url="templateView.javx"/>
+        </folder>
+    </folder>
+</filesystem>

@@ -1,0 +1,46 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import com.sun.tools.visualvm.core.datasource.${DISPLAYNAME};
+import com.sun.tools.visualvm.core.ui.DataSourceView;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class ${TEMPLATENAME}ViewProvider implements DataSourceViewsProvider<${DISPLAYNAME}> {
+
+    private Map<${DISPLAYNAME}, DataSourceView> viewsCache = new HashMap();
+
+    @Override
+    public boolean supportsViewsFor(${DISPLAYNAME} My${DISPLAYNAME}) {
+        //Always shown:
+        return true;
+    }
+
+    @Override
+    public synchronized Set getViews(final ${DISPLAYNAME} My${DISPLAYNAME}) {
+        
+        DataSourceView view = viewsCache.get(My${DISPLAYNAME});
+        
+        if (view == null) {
+            view = new ${TEMPLATENAME}View(My${DISPLAYNAME}) {
+                @Override
+                public void removed() {
+                    super.removed();
+                    viewsCache.remove(My${DISPLAYNAME});
+                }
+            };
+            viewsCache.put(My${DISPLAYNAME}, view);
+        }
+        
+        return Collections.singleton(view);
+    }
+
+}
+

@@ -1,0 +1,23 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import org.openide.modules.ModuleInstall;
+
+public class ${TEMPLATENAME}Installer extends ModuleInstall {
+
+    @Override
+    public void restored() {
+        ${TEMPLATENAME}ViewProvider.initialize();
+    }
+
+    @Override
+    public void uninstalled() {
+        ${TEMPLATENAME}ViewProvider.unregister();
+    }
+    
+}
+

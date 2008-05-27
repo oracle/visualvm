@@ -1,0 +1,28 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import com.sun.tools.visualvm.core.datasource.${DISPLAYNAME};
+import com.sun.tools.visualvm.core.ui.DataSourceViewsProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowFactory;
+import org.openide.modules.ModuleInstall;
+
+public class ${TEMPLATENAME}Installer extends ModuleInstall {
+
+    private static DataSourceViewsProvider<${DISPLAYNAME}> instance =  new ${TEMPLATENAME}ViewProvider();
+
+    @Override
+    public void restored() {
+        DataSourceWindowFactory.sharedInstance().addViewProvider(instance, ${DISPLAYNAME}.class);
+    }
+
+    @Override
+    public void uninstalled() {
+        DataSourceWindowFactory.sharedInstance().removeViewProvider(instance);
+    }
+    
+}
+
