@@ -45,13 +45,6 @@ public class HelloWorldViewProvider extends DataSourceViewProvider<Application> 
         return new HelloWorldView(application);
     }
 
-    public boolean supportsSaveViewsFor(Application arg0) {
-        return false;
-    }
-
-    public void saveViews(Application arg0, Application arg1) {
-    }
-
     static void initialize() {
         DataSourceViewsManager.sharedInstance().addViewProvider(instance, Application.class);
     }
