@@ -38,11 +38,11 @@ import org.openide.util.Utilities;
 public final class JConsoleOptionsCategory extends OptionsCategory {
 
     public String getCategoryName() {
-        return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Name_JConsole");
+        return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Name_JConsole"); // NOI18N
     }
 
     public String getTitle() {
-        return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Title_JConsole");
+        return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Title_JConsole"); // NOI18N
     }
 
     public Icon getIcon() {

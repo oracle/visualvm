@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -43,7 +44,7 @@ class JConsoleView extends DataSourceView {
     private JConsolePluginWrapper wrapper;
 
     public JConsoleView(Application application) {
-        super(application, "JConsole Plugins", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
+        super(application, NbBundle.getMessage(JConsoleView.class, "JConsole_Plugins"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false); // NOI18N
         this.application = application;
     }
 
@@ -55,7 +56,7 @@ class JConsoleView extends DataSourceView {
     protected DataViewComponent createComponent() {
         wrapper = new JConsolePluginWrapper(application);
         return new DataViewComponent(
-                new DataViewComponent.MasterView("JConsole Plugins", null, wrapper.getView()),
+                new DataViewComponent.MasterView(NbBundle.getMessage(JConsoleView.class, "JConsole_Plugins"), null, wrapper.getView()), //NOI18N
                 new DataViewComponent.MasterViewConfiguration(true));
     }
 }

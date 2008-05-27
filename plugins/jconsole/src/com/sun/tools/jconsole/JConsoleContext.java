@@ -47,7 +47,7 @@ public interface JConsoleContext {
     /**
      * The {@link ConnectionState ConnectionState} bound property name.
      */
-    public static String CONNECTION_STATE_PROPERTY = "connectionState";
+    public static String CONNECTION_STATE_PROPERTY = "connectionState"; // NOI18N
 
     /**
      * Values for the {@linkplain #CONNECTION_STATE_PROPERTY
