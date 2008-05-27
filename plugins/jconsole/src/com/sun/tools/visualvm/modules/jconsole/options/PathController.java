@@ -59,7 +59,7 @@ public class PathController implements ActionListener, ListSelectionListener, Li
     private ListDataListener lstnr;
 
     public PathController(JList l, JLabel label, JButton add, JFileChooser chooser, JButton remove, JButton up, JButton down, ListDataListener lstnr) {
-        this(l, label, createModel(""), add, chooser, remove, up, down, lstnr);
+        this(l, label, createModel(""), add, chooser, remove, up, down, lstnr); // NOI18N
     }
 
     public PathController(JList l, JLabel label, String items, JButton add, JFileChooser chooser, JButton remove, JButton up, JButton down, ListDataListener lstnr) {

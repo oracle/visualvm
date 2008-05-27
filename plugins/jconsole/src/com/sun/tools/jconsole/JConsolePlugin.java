@@ -198,7 +198,7 @@ public abstract class JConsolePlugin {
      */
     public final void addContextPropertyChangeListener(PropertyChangeListener listener) {
         if (listener == null) {
-            throw new NullPointerException("listener is null");
+            throw new NullPointerException("listener is null"); // NOI18N
         }
 
         if (context == null) {
@@ -231,7 +231,7 @@ public abstract class JConsolePlugin {
      */
     public final void removeContextPropertyChangeListener(PropertyChangeListener listener) {
         if (listener == null) {
-            throw new NullPointerException("listener is null");
+            throw new NullPointerException("listener is null"); // NOI18N
         }
 
         if (context == null) {

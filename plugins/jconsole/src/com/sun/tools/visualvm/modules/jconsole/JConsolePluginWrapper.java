@@ -73,7 +73,7 @@ class JConsolePluginWrapper {
     JConsolePluginWrapper(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel == null || jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "JMX_Not_Available"));
+            JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "JMX_Not_Available")); // NOI18N
             textArea.setEditable(false);
             jconsoleView = textArea;
         } else {
@@ -83,11 +83,11 @@ class JConsolePluginWrapper {
                 vmPanel.connect();
                 JPanel panel = new JPanel(new BorderLayout());
                 panel.setBackground(Color.WHITE);
-                panel.add(new JLabel(" "), BorderLayout.NORTH);
+                panel.add(new JLabel(" "), BorderLayout.NORTH); // NOI18N
                 panel.add(vmPanel, BorderLayout.CENTER);
                 jconsoleView = panel;
             } else {
-                JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "PluginPath_Not_Available"));
+                JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "PluginPath_Not_Available")); // NOI18N
                 textArea.setEditable(false);
                 jconsoleView = textArea;
             }
