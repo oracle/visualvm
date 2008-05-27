@@ -2,7 +2,6 @@ package org.visualvm.visualvmaction;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.apisupport.project.CreatedModifiedFiles;
@@ -10,7 +9,6 @@ import org.netbeans.modules.apisupport.project.spi.NbModuleProvider;
 import org.netbeans.modules.apisupport.project.ui.wizard.BasicWizardIterator;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
-import org.openide.util.NbBundle;
 
 final class NewProjectIterator extends BasicWizardIterator {
 
@@ -28,9 +26,6 @@ final class NewProjectIterator extends BasicWizardIterator {
         "com.sun.tools.visualvm.host" // NOI18N
 
     };
-
-    private NewProjectIterator() { /* Use factory method. */ }
-    ;
 
     public static NewProjectIterator createIterator() {
         return new NewProjectIterator();
@@ -145,7 +140,7 @@ final class NewProjectIterator extends BasicWizardIterator {
         fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
 
         //Layer entry:
-        fileChanges.add(fileChanges.createLayerEntry("VisualVM/" + "ExplorerPopupSelection" + "/PaletteFactory.instance", //NOI18N
+        fileChanges.add(fileChanges.createLayerEntry("VisualVM/" + "ExplorerPopupSelection/" + packageName.replace(".", "-") + "-" + name + "Action.instance", //NOI18N
                     null,
                     null,
                     "",
@@ -153,13 +148,8 @@ final class NewProjectIterator extends BasicWizardIterator {
         
         //Layer attr:
         fileChanges.add(fileChanges.createLayerAttribute(
-                "VisualVM/" + "ExplorerPopupSelection" + "/PaletteFactory.instance",
-                "instanceCreate", "org.netbeans.modules.autoupdate.featureondemand.api.FeatureInfo.create"));
-
-        //Layer attr:
-        fileChanges.add(fileChanges.createLayerAttribute(
-                "VisualVM/" + "ExplorerPopupSelection" + "/PaletteFactory.instance",
-                "instanceCreate", "org.netbeans.modules.autoupdate.featureondemand.api.FeatureInfo.create"));
+                "VisualVM/" + "ExplorerPopupSelection/" + packageName.replace(".", "-") + "-" + name + "Action.instance",
+                "position", 3000));
 
 
         model.setCreatedModifiedFiles(fileChanges);
