@@ -24,7 +24,7 @@ public class HelloWorldViewPlugin extends DataSourceViewPlugin {
         switch (location) {
             case DataViewComponent.TOP_RIGHT:
                 JPanel panel = new JPanel();
-                return new DataViewComponent.DetailsView("User Interface", null, 30,
+                return new DataViewComponent.DetailsView("I'm plugged in from outside!", null, 30,
                         new ScrollableContainer(panel), null);
             default:
                 return null;
