@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.visualvm.demodescriptorprovider
+OpenIDE-Module-Install: org/visualvm/demodescriptorprovider/Installer.class
+OpenIDE-Module-Layer: org/visualvm/demodescriptorprovider/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/visualvm/demodescriptorprovider/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
