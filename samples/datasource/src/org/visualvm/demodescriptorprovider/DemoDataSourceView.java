@@ -23,7 +23,7 @@ class DemoDataSourceView extends DataSourceView {
     private static final String IMAGE_PATH = "" +
             "org/visualvm/demodescriptorprovider/icon.png"; // NOI18N
 
-    public DemoDataSourceView(DemoAbstractDataSource ds) {
+    public DemoDataSourceView(DemoDataSource ds) {
         super(ds, "Memory Monitor", new ImageIcon(
                 Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, true);
     }

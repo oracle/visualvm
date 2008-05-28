@@ -5,7 +5,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
-public class DemoDataSourceDescriptor extends DataSourceDescriptor<DemoAbstractDataSource> {
+public class DemoDataSourceDescriptor extends DataSourceDescriptor<DemoDataSource> {
 
     private static final Image NODE_ICON =
             Utilities.loadImage(
@@ -13,7 +13,7 @@ public class DemoDataSourceDescriptor extends DataSourceDescriptor<DemoAbstractD
             true);
 
    
-    public DemoDataSourceDescriptor(DemoAbstractDataSource application) {
+    public DemoDataSourceDescriptor(DemoDataSource application) {
         super(application,
                 "System Monitors",
                 "Descriptor for System Monitors container",

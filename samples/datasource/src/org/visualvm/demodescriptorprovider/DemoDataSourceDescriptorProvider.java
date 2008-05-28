@@ -20,8 +20,8 @@ public class DemoDataSourceDescriptorProvider extends AbstractModelProvider<Data
     }
 
     public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (ds instanceof DemoAbstractDataSource) {
-            return new DemoDataSourceDescriptor((DemoAbstractDataSource) ds);
+        if (ds instanceof DemoDataSource) {
+            return new DemoDataSourceDescriptor((DemoDataSource) ds);
         }
         return null;
     }

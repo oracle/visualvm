@@ -6,6 +6,7 @@
 package org.visualvm.demodescriptorprovider;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 
 /**
  *
@@ -16,10 +17,11 @@ public class DemoDefaultDataSourceProvider {
     static void register() {
         DemoDefaultDataSourceProvider support = new DemoDefaultDataSourceProvider();
         support.initContainer();
+        DataSourceRepository.sharedInstance().getDataSources(DemoDataSource.class);
     }
 
     private void initContainer() {
-        DemoAbstractDataSource container = DemoAbstractDataSource.sharedInstance();
+        DemoDataSource container = DemoDataSource.sharedInstance();
         DataSource.ROOT.getRepository().addDataSource(container);
     }
     

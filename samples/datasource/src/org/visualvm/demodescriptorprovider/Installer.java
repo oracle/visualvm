@@ -3,12 +3,18 @@ package org.visualvm.demodescriptorprovider;
 import org.openide.modules.ModuleInstall;
 
 public class Installer extends ModuleInstall {
-    
-    DemoAbstractDataSource ds = new DemoAbstractDataSource();
+
+    DemoDataSource ds = new DemoDataSource();
 
     @Override
     public void restored() {
         DemoDefaultDataSourceProvider.register();
         DemoSupport.getInstance();
+        DemoDataSourceViewProvider.initialize();
+    }
+
+    @Override
+    public void uninstalled() {
+        DemoDataSourceViewProvider.unregister();
     }
 }
