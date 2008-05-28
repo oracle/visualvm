@@ -18,27 +18,27 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblName" pref="101" max="32767" attributes="0"/>
+                      <Component id="lblName" pref="120" max="32767" attributes="0"/>
                       <EmptySpace min="54" pref="54" max="54" attributes="0"/>
                   </Group>
-                  <Component id="lblProjectName" pref="155" max="32767" attributes="0"/>
-                  <Component id="lblPackageName" pref="155" max="32767" attributes="0"/>
-                  <Component id="createdFiles" pref="155" max="32767" attributes="0"/>
-                  <Component id="modifiedFiles" pref="155" max="32767" attributes="0"/>
+                  <Component id="lblProjectName" pref="174" max="32767" attributes="0"/>
+                  <Component id="lblPackageName" pref="174" max="32767" attributes="0"/>
+                  <Component id="createdFiles" pref="174" max="32767" attributes="0"/>
+                  <Component id="modifiedFiles" pref="174" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="txtName" alignment="0" pref="300" max="32767" attributes="0"/>
-                  <Component id="comCategory" alignment="0" pref="300" max="32767" attributes="0"/>
-                  <Component id="txtProjectName" alignment="0" pref="300" max="32767" attributes="0"/>
-                  <Component id="comPackageName" alignment="0" pref="300" max="32767" attributes="0"/>
-                  <Component id="createdFilesValue" alignment="0" pref="300" max="32767" attributes="0"/>
-                  <Component id="modifiedFilesValue" alignment="0" pref="300" max="32767" attributes="0"/>
+                  <Component id="txtName" alignment="0" pref="318" max="32767" attributes="0"/>
+                  <Component id="comCategory" alignment="0" pref="318" max="32767" attributes="0"/>
+                  <Component id="txtProjectName" alignment="0" pref="318" max="32767" attributes="0"/>
+                  <Component id="comPackageName" alignment="0" pref="318" max="32767" attributes="0"/>
+                  <Component id="createdFilesValue" alignment="0" pref="318" max="32767" attributes="0"/>
+                  <Component id="modifiedFilesValue" alignment="0" pref="318" max="32767" attributes="0"/>
               </Group>
           </Group>
           <Component id="filler" min="-2" pref="400" max="-2" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="lblDisplayName" max="32767" attributes="0"/>
+              <Component id="lblDisplayName" pref="181" max="32767" attributes="0"/>
               <EmptySpace min="323" pref="323" max="323" attributes="0"/>
           </Group>
       </Group>
@@ -71,12 +71,12 @@
               <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="createdFiles" min="-2" max="-2" attributes="0"/>
-                  <Component id="createdFilesValue" pref="15" max="32767" attributes="0"/>
+                  <Component id="createdFilesValue" pref="20" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="modifiedFiles" min="-2" max="-2" attributes="0"/>
-                  <Component id="modifiedFilesValue" pref="15" max="32767" attributes="0"/>
+                  <Component id="modifiedFilesValue" pref="20" max="32767" attributes="0"/>
               </Group>
               <Component id="filler" min="-2" pref="92" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
@@ -91,7 +91,7 @@
           <ComponentRef name="txtName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/visualvm/visualvmview/Bundle.properties" key="LBL_Name_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/visualvm/visualvmapplication/Bundle.properties" key="LBL_Name_1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -103,7 +103,7 @@
           <ComponentRef name="comCategory"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/visualvm/visualvmview/Bundle.properties" key="LBL_DisplayName_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/visualvm/visualvmapplication/Bundle.properties" key="LBL_DisplayName_1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -113,7 +113,7 @@
           <ComponentRef name="txtProjectName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/visualvm/visualvmview/Bundle.properties" key="LBL_ProjectName_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/visualvm/visualvmapplication/Bundle.properties" key="LBL_ProjectName_1_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -131,7 +131,7 @@
           <ComponentRef name="comPackageName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/visualvm/visualvmview/Bundle.properties" key="LBL_PackageName_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/visualvm/visualvmapplication/Bundle.properties" key="LBL_PackageName_1_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -152,7 +152,7 @@
           <ComponentRef name="createdFilesValue"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/visualvm/visualvmview/Bundle.properties" key="LBL_CreatedFiles_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/visualvm/visualvmapplication/Bundle.properties" key="LBL_CreatedFiles_1_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -162,7 +162,7 @@
           <ComponentRef name="modifiedFilesValue"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/visualvm/visualvmview/Bundle.properties" key="LBL_ModifiedFiles_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/visualvm/visualvmapplication/Bundle.properties" key="LBL_ModifiedFiles_1_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -191,14 +191,8 @@
       <Properties>
         <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="7">
-            <StringItem index="0" value="Application"/>
-            <StringItem index="1" value="CoreDump"/>
-            <StringItem index="2" value="DataSource"/>
-            <StringItem index="3" value="HeapDump"/>
-            <StringItem index="4" value="Host"/>
-            <StringItem index="5" value="Snapshot"/>
-            <StringItem index="6" value="ThreadDump"/>
+          <StringArray count="1">
+            <StringItem index="0" value="com.toy.anagrams.ui.Anagrams"/>
           </StringArray>
         </Property>
       </Properties>

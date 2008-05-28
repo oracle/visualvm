@@ -13,12 +13,11 @@ import org.openide.filesystems.FileObject;
 
 final class NewProjectIterator extends BasicWizardIterator {
 
-    static final String OPENIDE_MODULE_INSTALL = "OpenIDE-Module-Install"; // NOI18N
-
     private NewProjectIterator.DataModel data;
+    
     public static final String[] MODULES = {
         "org.openide.util", // NOI18N
-        "org.openide.modules", // NOI18N
+        "com.sun.tools.visualvm.application", // NOI18N
         "com.sun.tools.visualvm.core" // NOI18N
     };
 
@@ -128,34 +127,20 @@ final class NewProjectIterator extends BasicWizardIterator {
         for (int i = 0; i < MODULES.length; i++) {
             fileChanges.add(fileChanges.addModuleDependency(MODULES[i]));
         }
-
-        // Generate Installer class:
-        String iteratorName = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,
-                name, "Installer.java"); //NOI18N
-
-        FileObject template = CreatedModifiedFiles.getTemplate("templateInstaller.java");//NOI18N
-
-        fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
-
-        // Add manifest attribute:
-        Map<String, String> attribs = new HashMap<String, String>();
-        attribs.put(OPENIDE_MODULE_INSTALL, packageName.replace('.', '/') + '/' + name + "Installer.class"); // NOI18N
-
-        fileChanges.add(fileChanges.manifestModification(null, attribs));
-
+        
         // Generate view provider class:
-        iteratorName = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,
-                name, "ViewProvider.java"); //NOI18N
+        String iteratorName  = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,
+                name, "ApplicationTypeProvider.java"); //NOI18N
 
-        template = CreatedModifiedFiles.getTemplate("templateViewProvider.java");//NOI18N
+        FileObject template = CreatedModifiedFiles.getTemplate("templateApplicationTypeProvider.java");//NOI18N
 
         fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
 
         // Generate view class:
         iteratorName = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,
-                name, "View.java"); //NOI18N
+                name, "ApplicationType.java"); //NOI18N
 
-        template = CreatedModifiedFiles.getTemplate("templateView.java");//NOI18N
+        template = CreatedModifiedFiles.getTemplate("templateApplicationType.java");//NOI18N
 
         fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
 

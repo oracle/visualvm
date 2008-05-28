@@ -14,9 +14,8 @@
         <folder name="NetBeansModuleDevelopment-files"> <!-- XXX later could be made visible (just need localized labels) -->
             <attr name="position" intvalue="0"/>
             <attr name="simple" boolvalue="false"/>
-            <file name="templateInstaller.java" url="templateInstaller.javx"/>
-            <file name="templateViewProvider.java" url="templateViewProvider.javx"/>
-            <file name="templateView.java" url="templateView.javx"/>
+            <file name="templateApplicationTypeProvider.java" url="templateApplicationTypeProvider.javx"/>
+            <file name="templateApplicationType.java" url="templateApplicationType.javx"/>
         </folder>
     </folder>
 </filesystem>

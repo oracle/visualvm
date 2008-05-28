@@ -174,26 +174,27 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
         comCategory = new javax.swing.JComboBox();
 
         lblName.setLabelFor(txtName);
-        org.openide.awt.Mnemonics.setLocalizedText(lblName, "null");
+        org.openide.awt.Mnemonics.setLocalizedText(lblName, org.openide.util.NbBundle.getMessage(NameAndLocationPanel.class, "LBL_Name_1_1")); // NOI18N
 
         lblDisplayName.setLabelFor(comCategory);
-        org.openide.awt.Mnemonics.setLocalizedText(lblDisplayName, "null");
+        org.openide.awt.Mnemonics.setLocalizedText(lblDisplayName, org.openide.util.NbBundle.getMessage(NameAndLocationPanel.class, "LBL_DisplayName_1_1")); // NOI18N
 
         lblProjectName.setLabelFor(txtProjectName);
-        org.openide.awt.Mnemonics.setLocalizedText(lblProjectName, "null");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/visualvm/visualvmapplication/Bundle"); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblProjectName, bundle.getString("LBL_ProjectName_1_1")); // NOI18N
 
         txtProjectName.setEditable(false);
 
         lblPackageName.setLabelFor(comPackageName);
-        org.openide.awt.Mnemonics.setLocalizedText(lblPackageName, "null");
+        org.openide.awt.Mnemonics.setLocalizedText(lblPackageName, bundle.getString("LBL_PackageName_1_1")); // NOI18N
 
         comPackageName.setEditable(true);
 
         createdFiles.setLabelFor(createdFilesValue);
-        org.openide.awt.Mnemonics.setLocalizedText(createdFiles, "null");
+        org.openide.awt.Mnemonics.setLocalizedText(createdFiles, bundle.getString("LBL_CreatedFiles_1_1")); // NOI18N
 
         modifiedFiles.setLabelFor(modifiedFilesValue);
-        org.openide.awt.Mnemonics.setLocalizedText(modifiedFiles, "null");
+        org.openide.awt.Mnemonics.setLocalizedText(modifiedFiles, bundle.getString("LBL_ModifiedFiles_1_1")); // NOI18N
 
         createdFilesValue.setColumns(20);
         createdFilesValue.setRows(5);
@@ -205,7 +206,7 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
         modifiedFilesValue.setBorder(null);
 
         comCategory.setEditable(true);
-        comCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Application", "CoreDump", "DataSource", "HeapDump", "Host", "Snapshot", "ThreadDump" }));
+        comCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "com.toy.anagrams.ui.Anagrams" }));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -214,23 +215,23 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(lblName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
+                        .add(lblName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                         .add(54, 54, 54))
-                    .add(lblProjectName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-                    .add(lblPackageName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-                    .add(createdFiles, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-                    .add(modifiedFiles, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
+                    .add(lblProjectName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                    .add(lblPackageName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                    .add(createdFiles, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                    .add(modifiedFiles, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))
                 .add(12, 12, 12)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(txtName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .add(comCategory, 0, 300, Short.MAX_VALUE)
-                    .add(txtProjectName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .add(comPackageName, 0, 300, Short.MAX_VALUE)
-                    .add(createdFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .add(modifiedFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)))
+                    .add(txtName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                    .add(comCategory, 0, 318, Short.MAX_VALUE)
+                    .add(txtProjectName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                    .add(comPackageName, 0, 318, Short.MAX_VALUE)
+                    .add(createdFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                    .add(modifiedFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)))
             .add(filler, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
             .add(layout.createSequentialGroup()
-                .add(lblDisplayName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(lblDisplayName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
                 .add(323, 323, 323))
         );
         layout.setVerticalGroup(
@@ -256,11 +257,11 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
                 .add(36, 36, 36)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(createdFiles)
-                    .add(createdFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 15, Short.MAX_VALUE))
+                    .add(createdFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE))
                 .add(6, 6, 6)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(modifiedFiles)
-                    .add(modifiedFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 15, Short.MAX_VALUE))
+                    .add(modifiedFilesValue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE))
                 .add(filler, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 92, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(20, 20, 20))
         );
