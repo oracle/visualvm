@@ -4,7 +4,6 @@
  */
 package org.visualvm.demodescriptorprovider;
 
-import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
