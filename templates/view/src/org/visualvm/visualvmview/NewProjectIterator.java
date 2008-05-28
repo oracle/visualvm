@@ -13,12 +13,9 @@ import org.openide.filesystems.FileObject;
 
 final class NewProjectIterator extends BasicWizardIterator {
 
-    static final String OPENIDE_MODULE_INSTALL = "OpenIDE-Module-Install"; // NOI18N
-
     private NewProjectIterator.DataModel data;
     public static final String[] MODULES = {
         "org.openide.util", // NOI18N
-        "org.openide.modules", // NOI18N
         "com.sun.tools.visualvm.core", // NOI18N
         "com.sun.tools.visualvm.application", // NOI18N
         "com.sun.tools.visualvm.coredump", // NOI18N
@@ -134,19 +131,13 @@ final class NewProjectIterator extends BasicWizardIterator {
             fileChanges.add(fileChanges.addModuleDependency(MODULES[i]));
         }
 
-        // Generate Installer class:
+        // Generate Support class:
         String iteratorName = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,
-                name, "Installer.java"); //NOI18N
+                name, "ViewSupport.java"); //NOI18N
 
-        FileObject template = CreatedModifiedFiles.getTemplate("templateInstaller.java");//NOI18N
+        FileObject template = CreatedModifiedFiles.getTemplate("templateViewSupport.java");//NOI18N
 
         fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
-
-        // Add manifest attribute:
-        Map<String, String> attribs = new HashMap<String, String>();
-        attribs.put(OPENIDE_MODULE_INSTALL, packageName.replace('.', '/') + '/' + name + "Installer.class"); // NOI18N
-
-        fileChanges.add(fileChanges.manifestModification(null, attribs));
 
         // Generate view provider class:
         iteratorName = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,

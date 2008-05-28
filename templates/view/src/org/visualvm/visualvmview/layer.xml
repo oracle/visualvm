@@ -21,7 +21,7 @@
         <folder name="NetBeansModuleDevelopment-files"> <!-- XXX later could be made visible (just need localized labels) -->
             <attr name="position" intvalue="0"/>
             <attr name="simple" boolvalue="false"/>
-            <file name="templateInstaller.java" url="templatevisualVMViewInstaller.javx"/>
+            <file name="templateViewSupport.java" url="templatevisualVMViewSupport.javx"/>
             <file name="templateViewProvider.java" url="templatevisualVMViewViewProvider.javx"/>
             <file name="templateView.java" url="templatevisualVMViewView.javx"/>
         </folder>

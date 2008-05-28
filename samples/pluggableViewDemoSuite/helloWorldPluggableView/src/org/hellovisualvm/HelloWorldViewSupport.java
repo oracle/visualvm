@@ -30,10 +30,6 @@ public class HelloWorldViewSupport {
         return helloWorldPluggableView;
     }
 
-    HelloWorldViewProvider getApplicationThreadsPluggableView() {
-        return helloWorldPluggableView;
-    }
-
     public HelloWorldViewSupport() {
         DataSourceViewsManager.sharedInstance().addViewProvider(helloWorldPluggableView, Application.class);
     }
