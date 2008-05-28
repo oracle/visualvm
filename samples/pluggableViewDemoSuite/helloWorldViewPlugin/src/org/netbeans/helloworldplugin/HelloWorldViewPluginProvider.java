@@ -8,7 +8,7 @@ import org.hellovisualvm.HelloWorldViewSupport;
 class HelloWorldViewPluginProvider extends DataSourceViewPluginProvider<Application> {
 
     protected DataSourceViewPlugin createPlugin(Application application) {
-        return new HelloWorldOverview(application);
+        return new HelloWorldViewPlugin(application);
     }
 
     protected boolean supportsPluginFor(Application application) {

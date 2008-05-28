@@ -14,9 +14,9 @@ import javax.swing.JPanel;
  *
  * @author geertjan
  */
-public class HelloWorldOverview extends DataSourceViewPlugin {
+public class HelloWorldViewPlugin extends DataSourceViewPlugin {
 
-    HelloWorldOverview(Application application) {
+    HelloWorldViewPlugin(Application application) {
         super(application);
     }
 
