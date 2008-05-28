@@ -31,10 +31,10 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
     private static final String PROJECT_TEMPLATES_DIR = "Templates/Project"; // NOI18N
     private static final String DEFAULT_CATEGORY_PATH = PROJECT_TEMPLATES_DIR + "/Other"; // NOI18N
     
-    private NewProjectIterator.DataModel data;
+    private NewActionIterator.DataModel data;
     
     /** Creates new NameAndLocationPanel */
-    NameAndLocationPanel(WizardDescriptor setting, NewProjectIterator.DataModel data) {
+    NameAndLocationPanel(WizardDescriptor setting, NewActionIterator.DataModel data) {
         super(setting);
         this.data = data;
         initComponents();
@@ -74,7 +74,7 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
         data.setPackageName(comPackageName.getEditor().getItem().toString());
         data.setName(txtName.getText().trim());
         data.setCategory(comCategory.getEditor().getItem().toString());
-        NewProjectIterator.generateFileChanges(data);
+        NewActionIterator.generateFileChanges(data);
         CreatedModifiedFiles fls = data.getCreatedModifiedFiles();
         createdFilesValue.setText(generateText(fls.getCreatedPaths()));
         modifiedFilesValue.setText(generateText(fls.getModifiedPaths()));
@@ -129,7 +129,7 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
             return false;
         }
         ModuleEntry[] entries = platform.getModules();
-        Collection<String> modules = new HashSet<String>(Arrays.asList(NewProjectIterator.MODULES));
+        Collection<String> modules = new HashSet<String>(Arrays.asList(NewActionIterator.MODULES));
         
         for (int i = 0; i < entries.length; i++) {
             modules.remove(entries[i].getCodeNameBase());

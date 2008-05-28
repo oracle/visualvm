@@ -10,11 +10,11 @@ import org.netbeans.modules.apisupport.project.ui.wizard.BasicWizardIterator;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 
-final class NewProjectIterator extends BasicWizardIterator {
+final class NewActionIterator extends BasicWizardIterator {
 
     static final String OPENIDE_MODULE_INSTALL = "OpenIDE-Module-Install"; // NOI18N
 
-    private NewProjectIterator.DataModel data;
+    private NewActionIterator.DataModel data;
     public static final String[] MODULES = {
         "org.openide.util", // NOI18N
         "org.openide.modules", // NOI18N
@@ -27,8 +27,8 @@ final class NewProjectIterator extends BasicWizardIterator {
 
     };
 
-    public static NewProjectIterator createIterator() {
-        return new NewProjectIterator();
+    public static NewActionIterator createIterator() {
+        return new NewActionIterator();
     }
 
     public Set instantiate() throws IOException {
@@ -38,7 +38,7 @@ final class NewProjectIterator extends BasicWizardIterator {
     }
 
     protected BasicWizardIterator.Panel[] createPanels(WizardDescriptor wiz) {
-        data = new NewProjectIterator.DataModel(wiz);
+        data = new NewActionIterator.DataModel(wiz);
         return new BasicWizardIterator.Panel[]{
                     new NameAndLocationPanel(wiz, data)
                 };

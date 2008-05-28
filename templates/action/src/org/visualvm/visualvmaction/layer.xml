@@ -6,7 +6,7 @@
             <file name="visualVMAction">
                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmaction/search.png"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.visualvm.visualvmaction.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="org.visualvm.visualvmaction.NewProjectIterator.createIterator"/>
+                <attr name="instantiatingIterator" methodvalue="org.visualvm.visualvmaction.NewActionIterator.createIterator"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateWizardURL" urlvalue="nbresloc:/org/visualvm/visualvmaction/visualVMAction.html"/>
             </file>
