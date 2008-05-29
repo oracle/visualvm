@@ -6,15 +6,12 @@ package org.visualvm.demodescriptorprovider;
 
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 
 /**
  *
  * @author geertjan
  */
 public class DemoDataSourceViewProvider extends DataSourceViewProvider<DemoDataSource> {
-
-    private static DemoDataSourceViewProvider INSTANCE = new DemoDataSourceViewProvider();
 
     @Override
     protected boolean supportsViewFor(DemoDataSource ds) {
@@ -29,11 +26,4 @@ public class DemoDataSourceViewProvider extends DataSourceViewProvider<DemoDataS
         return new DemoDataSourceView(ds);
     }
 
-    static void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(INSTANCE, DemoDataSource.class);
-    }
-
-    static void unregister() {
-        DataSourceViewsManager.sharedInstance().removeViewProvider(INSTANCE);
-    }
 }
