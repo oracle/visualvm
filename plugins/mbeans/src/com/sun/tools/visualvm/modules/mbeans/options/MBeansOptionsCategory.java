@@ -39,15 +39,15 @@ import org.openide.util.Utilities;
 public final class MBeansOptionsCategory extends OptionsCategory {
 
     public Icon getIcon() {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans32.png"));
+        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans32.png")); // NOI18N
     }
 
     public String getCategoryName() {
-        return NbBundle.getMessage(MBeansOptionsCategory.class, "OptionsCategory_Name_MBeans");
+        return NbBundle.getMessage(MBeansOptionsCategory.class, "OptionsCategory_Name_MBeans"); // NOI18N
     }
 
     public String getTitle() {
-        return NbBundle.getMessage(MBeansOptionsCategory.class, "OptionsCategory_Title_MBeans");
+        return NbBundle.getMessage(MBeansOptionsCategory.class, "OptionsCategory_Title_MBeans"); // NOI18N
     }
 
     public OptionsPanelController create() {

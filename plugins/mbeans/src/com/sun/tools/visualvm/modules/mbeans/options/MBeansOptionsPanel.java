@@ -35,7 +35,7 @@ import javax.swing.event.ChangeListener;
  */
 final class MBeansOptionsPanel extends javax.swing.JPanel {
 
-    final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.modules.mbeans.options");
+    final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.modules.mbeans.options"); // NOI18N
     private final MBeansOptionsPanelController controller;
 
     private final ChangeListener changeListener = new ChangeListener() {
@@ -68,20 +68,20 @@ final class MBeansOptionsPanel extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         orderedKeyPropertyList = new javax.swing.JTextField();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Polling");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MBeansOptionsPanel.class, "LBL_Polling")); // NOI18N
 
         jLabel2.setDisplayedMnemonic('P');
         jLabel2.setLabelFor(plottersRefresh);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Plotters:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(MBeansOptionsPanel.class, "LBL_Plotters")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "sec.");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(MBeansOptionsPanel.class, "LBL_Sec")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, "MBeans Tree");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(MBeansOptionsPanel.class, "LBL_MBeans_Tree")); // NOI18N
 
         jLabel5.setDisplayedMnemonic('O');
         jLabel5.setLabelFor(orderedKeyPropertyList);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "Ordered Key Property List:");
-        jLabel5.setToolTipText("Comma-separated list of keys");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(MBeansOptionsPanel.class, "LBL_Ordered_Key_Property_List")); // NOI18N
+        jLabel5.setToolTipText(org.openide.util.NbBundle.getMessage(MBeansOptionsPanel.class, "MSG_Comma-separated_list_of_keys")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -93,7 +93,7 @@ final class MBeansOptionsPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE))
+                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(jLabel2)
                         .add(18, 18, 18)
@@ -107,7 +107,7 @@ final class MBeansOptionsPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)))
+                        .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
