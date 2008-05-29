@@ -86,25 +86,25 @@ public class HostView extends DataSourceView {
             //Put the first application top left:
             if (count == 1) {
 
-                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(appName), DataViewComponent.TOP_LEFT);
+                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(app, appName), DataViewComponent.TOP_LEFT);
 
 //            //Put the second application top right:
             } else if (count == 2) {
-                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(appName), DataViewComponent.TOP_RIGHT);
+                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(app, appName), DataViewComponent.TOP_RIGHT);
 
 //
 //            //Put the third application bottom left:    
             } else if (count == 3) {
-                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(appName), DataViewComponent.BOTTOM_LEFT);
+                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(app, appName), DataViewComponent.BOTTOM_LEFT);
 
             //Put the fourth application bottom right:        
             } else if (count == 4) {
-                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(appName), DataViewComponent.BOTTOM_RIGHT);
+                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(app, appName), DataViewComponent.BOTTOM_RIGHT);
 
             //Put all other applications bottom right, 
             //which creates tabs within the bottom right tab    
             } else {
-                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(appName), DataViewComponent.BOTTOM_RIGHT);
+                dvc.addDetailsView(new SystemPropertiesViewSupport(jvmProperties).getDetailsView(app, appName), DataViewComponent.BOTTOM_RIGHT);
             }
 
         }
