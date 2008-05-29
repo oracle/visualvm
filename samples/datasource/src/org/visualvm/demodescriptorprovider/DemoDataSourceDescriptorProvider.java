@@ -1,17 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.visualvm.demodescriptorprovider;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 
-/**
- *
- * @author geertjan
- */
 public class DemoDataSourceDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor, DataSource> {
 
     DemoDataSourceDescriptorProvider() {

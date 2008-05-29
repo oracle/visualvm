@@ -1,6 +1,5 @@
 package org.visualvm.demodescriptorprovider;
 
-import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;

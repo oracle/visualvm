@@ -1,16 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.visualvm.demodescriptorprovider;
 
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 
-/**
- *
- * @author geertjan
- */
 public class DemoDataSourceViewProvider extends DataSourceViewProvider<DemoDataSource> {
 
     @Override
