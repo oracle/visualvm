@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.nb.hostcompare;
 
 import com.sun.tools.visualvm.application.Application;

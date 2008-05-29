@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.nb.hostcompare;
 
 import com.sun.tools.visualvm.application.Application;
@@ -19,7 +16,6 @@ import javax.swing.JEditorPane;
 import org.openide.util.Utilities;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import javax.swing.JPanel;
 
 public class HostView extends DataSourceView {
 
