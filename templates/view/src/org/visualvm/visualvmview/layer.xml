@@ -11,7 +11,7 @@
     <folder name="Templates">
         <folder name="NetBeansModuleDevelopment">
             <file name="visualVMView">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmview/search.png"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmview/vvm.png"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.visualvm.visualvmview.Bundle"/>
                 <attr name="instantiatingIterator" methodvalue="org.visualvm.visualvmview.NewProjectIterator.createIterator"/>
                 <attr name="template" boolvalue="true"/>

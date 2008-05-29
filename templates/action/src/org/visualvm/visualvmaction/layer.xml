@@ -4,7 +4,7 @@
     <folder name="Templates">
         <folder name="NetBeansModuleDevelopment">
             <file name="visualVMAction">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmaction/search.png"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmaction/vvm.png"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.visualvm.visualvmaction.Bundle"/>
                 <attr name="instantiatingIterator" methodvalue="org.visualvm.visualvmaction.NewActionIterator.createIterator"/>
                 <attr name="template" boolvalue="true"/>

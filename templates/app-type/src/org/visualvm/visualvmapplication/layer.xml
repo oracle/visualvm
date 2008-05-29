@@ -4,11 +4,11 @@
     <folder name="Templates">
         <folder name="NetBeansModuleDevelopment">
             <file name="visualVMApplication">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmapplication/search.png"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/visualvm/visualvmapplication/vvm.png"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.visualvm.visualvmapplication.Bundle"/>
                 <attr name="instantiatingIterator" methodvalue="org.visualvm.visualvmapplication.NewProjectIterator.createIterator"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/visualvm/visualvmapplication/visualVMView.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/visualvm/visualvmapplication/visualVMAppType.html"/>
             </file>
         </folder>
         <folder name="NetBeansModuleDevelopment-files"> <!-- XXX later could be made visible (just need localized labels) -->
