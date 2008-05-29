@@ -47,13 +47,13 @@ import org.openide.util.NbPreferences;
  * @author Luis-Miguel Alventosa
  */
 public class GlobalPreferences implements PreferenceChangeListener {
-    private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.modules.mbeans.options");
+    private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.modules.mbeans.options"); // NOI18N
 
-    private static final String INT_KEY_PLOTTERS_POLL = "PlottersPoll";    
+    private static final String INT_KEY_PLOTTERS_POLL = "PlottersPoll"; // NOI18N
     private static final int PLOTTERS_POLL_DEFAULT = 4;
 
-    private static final String STRING_KEY_ORDERED_KEY_PROPERTY_LIST = "OrderedKeyPropertyList";
-    private static final String ORDERED_KEY_PROPERTY_LIST_DEFAULT = "";
+    private static final String STRING_KEY_ORDERED_KEY_PROPERTY_LIST = "OrderedKeyPropertyList"; // NOI18N
+    private static final String ORDERED_KEY_PROPERTY_LIST_DEFAULT = ""; // NOI18N
 
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
     private final Preferences prefs;
@@ -128,7 +128,7 @@ public class GlobalPreferences implements PreferenceChangeListener {
             prefs.sync();
             return true;
         } catch (BackingStoreException ex) {
-            LOGGER.log(Level.SEVERE, "Error saving preferences", ex);
+            LOGGER.log(Level.SEVERE, "Error saving preferences", ex); // NOI18N
         }
         return false;
     }
