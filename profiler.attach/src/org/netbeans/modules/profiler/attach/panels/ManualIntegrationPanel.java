@@ -37,9 +37,9 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.attach.panels;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,8 +48,8 @@ import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
-
 
 /**
  *
@@ -57,15 +57,11 @@ import org.openide.util.HelpCtx;
  */
 public class ManualIntegrationPanel extends AttachWizardPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-
     /* default */ class Model {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
-
         private TargetPlatformEnum jvm = null;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
         public String getApplication() {
             return getContext().getAttachSettings().getServerType();
         }
@@ -99,9 +95,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
                 for (Iterator it = TargetPlatformEnum.iterator(); it.hasNext();) {
                     TargetPlatformEnum jvm = (TargetPlatformEnum) it.next();
 
-                    if (settings.isDirect() || settings.isRemote()
-                            || (settings.isDynamic16()
-                                   && (jvm.equals(TargetPlatformEnum.JDK6) || jvm.equals(TargetPlatformEnum.JDK7)))) {
+                    if (settings.isDirect() || settings.isRemote() || (settings.isDynamic16() && (jvm.equals(TargetPlatformEnum.JDK6) || jvm.equals(TargetPlatformEnum.JDK7)))) {
                         if (getContext().getIntegrationProvider().supportsJVM(jvm)) {
                             supportedJvms.add(jvm);
                         }
@@ -111,26 +105,24 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
 
             return supportedJvms;
         }
-    }
 
+        public String exportRemotePack(String path) throws IOException {
+           return getContext().getIntegrationProvider().exportRemotePack(getContext().getAttachSettings(), path);
+        }
+    }    
+    
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
     private static final String HELP_CTX_KEY = "ManualIntegrationPanel.HelpCtx"; // NOI18N
-    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);    //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private ManualIntegrationPanelUI panel = null;
     private Model model = null;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public ManualIntegrationPanel() {
         this.model = new Model();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public HelpCtx getHelp() {
         return HELP_CTX;
     }
