@@ -96,7 +96,7 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="org.netbeans.modules.profiler.ui.wizards.panels.components.ResizableHintPanel" name="hintPanel">
+    <Component class="org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel" name="hintPanel">
       <Properties>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[500, 100]"/>
