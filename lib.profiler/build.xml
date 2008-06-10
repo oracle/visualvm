@@ -88,6 +88,13 @@ made subject to such option by the copyright holder.
 
     <target name="release" depends="projectized-common.release">
         <fixcrlf eol="crlf" srcdir="${cluster}/lib/deployed" includes="**/*.map"/>
+        <mkdir dir="${cluster}/remote-pack-defs"/>
+        <copy todir="${cluster}/remote-pack-defs">
+            <fileset dir="remote-packs" excludes="**/build/**"/>
+        </copy>
+        <!--
+        <replace dir="${cluster}/remote-pack-defs" file="build.xml" token="&lt;import file=&quot;../../nbbuild/templates/projectized.xml&quot;/&gt;" value="&lt;import file=&quot;../../../nbbuild/templates/projectized.xml&quot;/&gt;"/>
+        -->
     </target>
 
     <target name="netbeans-extra">
