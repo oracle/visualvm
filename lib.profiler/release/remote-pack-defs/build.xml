@@ -42,7 +42,7 @@ made subject to such option by the copyright holder.
 -->
 
 
-<project name="remote-packs" default="profiler-server-all" basedir=".">
+<project name="remote-packs" basedir="." default="profiler-server-all">
   <!--
   <import file="../../../nbbuild/templates/projectized.xml"/>
   -->
