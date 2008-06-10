@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,26 +25,49 @@
 
 package com.sun.tools.visualvm.modules.extensions;
 
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import java.lang.management.RuntimeMXBean;
 
 /**
  * Support additional JVMs.
  *
  * @author Luis-Miguel Alventosa
  */
-public class ExtendedJvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatModel, Application> {
-    public JvmJvmstatModel createModelFor(Application app) {
+public class ExtendedJvmProvider extends AbstractModelProvider<Jvm, Application> {
+
+    public Jvm createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
+        ExtendedJVMImpl jvm = null;
         if (jvmstat != null) {
             String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
             if (vmVersion != null && vmVersion.startsWith("13.0")) { // NOI18N
-                return new ExtendedJvmJvmstatModel(app, jvmstat);
+                jvm = new ExtendedJVMImpl(app, jvmstat);
+            }
+        } else {
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
+            if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
+                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                if (mxbeans != null) {
+                    RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
+                    if (runtime != null && runtime.getVmVersion().startsWith("13.0")) { // NOI18N
+                        jvm = new ExtendedJVMImpl(app);
+                    }
+                }
             }
         }
-        return null;
+        return jvm;
+    }
+
+    @Override
+    public int priority() {
+        return 3; // one more than JvmProvider
     }
 }

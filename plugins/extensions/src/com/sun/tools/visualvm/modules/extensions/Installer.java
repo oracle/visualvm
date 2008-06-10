@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.extensions;
 
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
 
@@ -35,6 +36,7 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     @Override
     public void restored() {
+        JvmFactory.getDefault().registerProvider(new ExtendedJvmProvider());
         JvmJvmstatModelFactory.getDefault().registerProvider(new ExtendedJvmJvmstatModelProvider());
     }
 }
