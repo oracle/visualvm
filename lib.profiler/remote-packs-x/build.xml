@@ -43,13 +43,12 @@ made subject to such option by the copyright holder.
 
 
 <project name="remote-packs" default="profiler-server-all" basedir=".">
-  <!--
   <import file="../../nbbuild/templates/projectized.xml"/>
-  -->
   
   <property name="lib.dir" value="${cluster}/lib"/>
   <property name="dest.dir" value="./build"/>
   <property name="build.dir" value="${dest.dir}/nb-profiler-server"/>
+  <property name="profiler.cluster" value="../release"/>
   
   <!-- ** Targets for remote-packs zips. These zips are used to facilitate remote profiling -->
 
@@ -186,8 +185,8 @@ made subject to such option by the copyright holder.
     </copy>	 
     <mkdir dir="${build.dir}/lib/deployed/jdk${jdk-version}"/>
     <copy todir="${build.dir}/lib/deployed/jdk${jdk-version}/${os-long-version}">	 
-       <fileset dir="${lib.dir}/deployed/jdk${jdk-version}/${os-long-version}" />	 
-    </copy>	 
+       <fileset dir="${profiler.cluster}/lib/deployed/jdk${jdk-version}/${os-long-version}" />	 
+    </copy>
   </target>
 
   <target name="profiler-server-zip-unix">
@@ -206,8 +205,6 @@ made subject to such option by the copyright holder.
   </target>
 
   <target name="profiler-server-zip-windows">
-    <echo>${build.dir}</echo>
-    <echo>${dest.dir}</echo>
     <fixcrlf srcdir="${build.dir}/bin" includes="*.bat" eol="dos" />
     <copy tofile="${build.dir}/README.txt" file="README.txt" />
     <fixcrlf srcdir="${build.dir}" includes="README.txt" eol="dos" />

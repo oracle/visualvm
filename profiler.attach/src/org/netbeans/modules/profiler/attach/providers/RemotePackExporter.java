@@ -49,7 +49,6 @@ import org.apache.tools.ant.module.spi.AntEvent;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
-import org.openide.execution.ExecutorTask;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
