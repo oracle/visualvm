@@ -38,5 +38,6 @@ public class Installer extends ModuleInstall {
     public void restored() {
         JvmFactory.getDefault().registerProvider(new ExtendedJvmProvider());
         JvmJvmstatModelFactory.getDefault().registerProvider(new ExtendedJvmJvmstatModelProvider());
+        JvmJvmstatModelFactory.getDefault().registerProvider(new SapJvmJvmstatModelProvider());
     }
 }
