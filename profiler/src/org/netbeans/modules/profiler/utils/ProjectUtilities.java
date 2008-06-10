@@ -60,7 +60,6 @@ import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.spi.project.ActionProvider;
-import org.netbeans.spi.project.AuxiliaryConfiguration;
 import org.netbeans.spi.project.SubprojectProvider;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
@@ -304,7 +303,7 @@ public final class ProjectUtilities {
     }
 
     public static boolean isProfilerIntegrated(Project project) {
-        Element e = project.getLookup().lookup(AuxiliaryConfiguration.class)
+        Element e = ProjectUtils.getAuxiliaryConfiguration(project)
                            .getConfigurationFragment("data", ProjectUtilities.PROFILER_NAME_SPACE, false); // NOI18N
 
         return e != null;
@@ -1014,7 +1013,7 @@ public final class ProjectUtilities {
         }
 
         // Remove data element from private/private.xml
-        project.getLookup().lookup(AuxiliaryConfiguration.class).removeConfigurationFragment("data", PROFILER_NAME_SPACE, false); // NOI18N
+        ProjectUtils.getAuxiliaryConfiguration(project).removeConfigurationFragment("data", PROFILER_NAME_SPACE, false); // NOI18N
 
         try {
             ProjectManager.getDefault().saveProject(project);
