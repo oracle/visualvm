@@ -36,7 +36,6 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.profiler.attach.providers;
 
 import java.io.File;
@@ -47,7 +46,10 @@ import java.util.Properties;
 import org.apache.tools.ant.module.api.AntProjectCookie;
 import org.apache.tools.ant.module.api.AntTargetExecutor;
 import org.apache.tools.ant.module.spi.AntEvent;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
+import org.openide.execution.ExecutorTask;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
@@ -57,56 +59,67 @@ import org.openide.modules.InstalledFileLocator;
  *
  * @author Jaroslav Bachorik
  */
-class RemotePackExporter {
-private static final class Singleton {
-            private static final RemotePackExporter INSTANCE = new RemotePackExporter();
-        }
-        
-        private static final Map<String, String> scriptMapper = new HashMap<String, String>() {
-            {
-                put(IntegrationUtils.PLATFORM_LINUX_AMD64_OS, "linuxamd64"); //NOI18N
-                put(IntegrationUtils.PLATFORM_LINUX_OS, "linux"); //NOI18N
-                put(IntegrationUtils.PLATFORM_MAC_OS, "mac"); //NOI18N
-                put(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS, "solamd64"); //NOI18N
-                put(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS, "solx86"); //NOI18N
-                put(IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS, "solsparc"); //NOI18N
-                put(IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS, "solsparcv9"); //NOI18N
-                put(IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS, "winamd64"); //NOI18N
-                put(IntegrationUtils.PLATFORM_WINDOWS_OS, "win"); //NOI18N
-            }
-        };
+public class RemotePackExporter {
 
-        private AntProjectCookie cookie;
+    private static final class Singleton {
 
-        public static final RemotePackExporter getInstance() {
-            return Singleton.INSTANCE;
+        private static final RemotePackExporter INSTANCE = new RemotePackExporter();
+    }
+    private static final Map<String, String> scriptMapper = new HashMap<String, String>() {
+
+        {
+            put(IntegrationUtils.PLATFORM_LINUX_AMD64_OS, "linuxamd64"); //NOI18N
+            put(IntegrationUtils.PLATFORM_LINUX_OS, "linux"); //NOI18N
+            put(IntegrationUtils.PLATFORM_MAC_OS, "mac"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS, "solamd64"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS, "solx86"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS, "solsparc"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS, "solsparcv9"); //NOI18N
+            put(IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS, "winamd64"); //NOI18N
+            put(IntegrationUtils.PLATFORM_WINDOWS_OS, "win"); //NOI18N
         }
-        
-        private RemotePackExporter() throws ExceptionInInitializerError {
-            try {
-                File antFile = InstalledFileLocator.getDefault().locate("remote-pack-defs/build.xml", "org-netbeans-lib-profiler", false); //NOI18N
-                cookie = DataObject.find(FileUtil.toFileObject(antFile)).getCookie(AntProjectCookie.class);
-            } catch (DataObjectNotFoundException ex) {
-                throw new ExceptionInInitializerError(ex);
-            }
+    };
+    private AntProjectCookie cookie;
+
+    public static final RemotePackExporter getInstance() {
+        return Singleton.INSTANCE;
+    }
+
+    private RemotePackExporter() throws ExceptionInInitializerError {
+        try {
+            File antFile = InstalledFileLocator.getDefault().locate("remote-pack-defs/build.xml", "org-netbeans-lib-profiler", false); //NOI18N
+            cookie = DataObject.find(FileUtil.toFileObject(antFile)).getCookie(AntProjectCookie.class);
+        } catch (DataObjectNotFoundException ex) {
+            throw new ExceptionInInitializerError(ex);
         }
-        
-        public String export(String exportPath, String hostOS) throws IOException {
+    }
+
+    public String export(final String exportPath, final String hostOS) throws IOException {
+        String packPath = getRemotePackPath(exportPath, hostOS);
+        ProgressHandle ph = ProgressHandleFactory.createHandle("Generating Remote Pack to " + packPath);
+        ph.setInitialDelay(500);
+        ph.start();
+        try {
             AntTargetExecutor.Env env = new AntTargetExecutor.Env();
             env.setVerbosity(AntEvent.LOG_VERBOSE);
             Properties antProperties = new Properties();
             antProperties.setProperty("lib.dir", "../lib");
-            
+
             antProperties.setProperty("dest.dir", exportPath != null ? exportPath : System.getProperty("java.io.tmpdir")); //NOI18N
             env.setProperties(antProperties);
             AntTargetExecutor ate = AntTargetExecutor.createTargetExecutor(env);
-            
-            ate.execute(cookie, new String[]{"profiler-server-" + scriptMapper.get(hostOS) + "-15"});
-            
-            return "profiler-server-" + scriptMapper.get(hostOS) + ".zip";
+            ate.execute(cookie, new String[]{"profiler-server-" + scriptMapper.get(hostOS) + "-15"}).result();            
+        } finally {
+            ph.finish();
         }
-        
-        public void export(String hostOS) throws IOException {
-            export(null, hostOS);
-        }
+        return packPath;
+    }
+
+    public String getRemotePackPath(String exportPath, String hostOS) {
+        return exportPath + File.separator + "profiler-server-" + scriptMapper.get(hostOS) + ".zip";
+    }
+
+    public void export(String hostOS) throws IOException {
+        export(null, hostOS);
+    }
 }

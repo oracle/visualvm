@@ -156,8 +156,6 @@ public interface IntegrationProvider {
 
     public void run(AttachSettings settings) throws RunException;
     
-    public String exportRemotePack(AttachSettings settings, String exportPath) throws IOException;
-
     public boolean supportsAutomation();
 
     public boolean supportsDirect();

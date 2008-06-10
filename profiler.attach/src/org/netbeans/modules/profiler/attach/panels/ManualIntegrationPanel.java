@@ -43,12 +43,14 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.modules.profiler.attach.providers.RemotePackExporter;
 import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
-import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
 /**
@@ -56,11 +58,12 @@ import org.openide.util.HelpCtx;
  * @author Jaroslav Bachorik
  */
 public class ManualIntegrationPanel extends AttachWizardPanel {
+    AtomicBoolean exportRunning = new AtomicBoolean(false);
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
     /* default */ class Model {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
-        private TargetPlatformEnum jvm = null;
-
+        private TargetPlatformEnum jvm = null;        
         //~ Methods --------------------------------------------------------------------------------------------------------------
         public String getApplication() {
             return getContext().getAttachSettings().getServerType();
@@ -74,6 +77,10 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
             return getContext().getIntegrationProvider().getModificationHints(getContext().getAttachSettings());
         }
 
+        public boolean isRemote() {
+            return getContext().getAttachSettings().isRemote();
+        }
+        
         public void setJvm(TargetPlatformEnum jvm) {
             this.jvm = jvm;
 
@@ -107,7 +114,21 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
         }
 
         public String exportRemotePack(String path) throws IOException {
-           return getContext().getIntegrationProvider().exportRemotePack(getContext().getAttachSettings(), path);
+            if (exportRunning.compareAndSet(false, true)) {
+                try {
+                    publishUpdate(new ChangeEvent(this));
+                    return RemotePackExporter.getInstance().export(path, getContext().getAttachSettings().getHostOS());
+                } finally {
+                    exportRunning.compareAndSet(true, false);
+                    publishUpdate(new ChangeEvent(exportRunning));
+                }
+            } else {
+                throw new IOException();
+            }
+        }
+        
+        public String getRemotePackPath(String exportPath) {
+            return RemotePackExporter.getInstance().getRemotePackPath(exportPath, getContext().getAttachSettings().getHostOS());
         }
     }    
     
@@ -128,7 +149,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
     }
 
     public boolean isValid() {
-        return true;
+        return !exportRunning.get();
     }
 
     public boolean canBack(AttachWizardContext context) {
@@ -136,7 +157,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
     }
 
     public boolean canFinish(AttachWizardContext context) {
-        return false;
+        return isValid();
     }
 
     public boolean canNext(AttachWizardContext context) {

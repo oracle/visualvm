@@ -37,6 +37,7 @@
                   <Component id="stepsPanel" alignment="0" pref="472" max="32767" attributes="0"/>
                   <Component id="label" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="comboJvms" alignment="0" pref="472" max="32767" attributes="1"/>
+                  <Component id="generateRemotePack" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -50,8 +51,10 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="comboJvms" min="-2" pref="24" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
-              <Component id="stepsPanel" pref="311" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="stepsPanel" pref="276" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="generateRemotePack" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -108,6 +111,16 @@
           <ResourceString bundle="" key="TargetJVMWizardPanelUI_SelectJvmString" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="generateRemotePack">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/profiler/attach/panels/Bundle.properties" key="ManualIntegrationPanelUI.generateRemotePack.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateRemotePackActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
