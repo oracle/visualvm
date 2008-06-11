@@ -55,10 +55,10 @@ class OperationEntry extends JPanel {
      */
     private String preProcessSignature(String signature) {
         int index;
-        if ((index=signature.indexOf(" throws"))>0) {
+        if ((index=signature.indexOf(" throws"))>0) { // NOI18N
             signature = signature.substring(0,index);
         }
-        while ((index = signature.indexOf("java.lang."))>0) {
+        while ((index = signature.indexOf("java.lang."))>0) { // NOI18N
             signature = signature.substring(0,index)+
                 signature.substring(index+10,signature.length());
         }
@@ -70,7 +70,7 @@ class OperationEntry extends JPanel {
                           XMBeanOperations xoperations) {
         try {
             MBeanParameterInfo params[] = operation.getSignature();
-            add(new JLabel("(",JLabel.CENTER));
+            add(new JLabel("(",JLabel.CENTER)); // NOI18N
             inputs = new XTextField[params.length];
             for (int i = 0; i < params.length; i++) {
                 if(params[i].getName() != null) {
@@ -104,13 +104,13 @@ class OperationEntry extends JPanel {
                 inputs[i].setHorizontalAlignment(SwingConstants.CENTER);
 
                 if (i < params.length-1)
-                    add(new JLabel(",",JLabel.CENTER));
+                    add(new JLabel(",",JLabel.CENTER)); // NOI18N
             }
-            add(new JLabel(")",JLabel.CENTER));
+            add(new JLabel(")",JLabel.CENTER)); // NOI18N
             validate();
             doLayout();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error setting Operation panel: ", e);
+            LOGGER.log(Level.SEVERE, "Error setting Operation panel: ", e); // NOI18N
         }
     }
 

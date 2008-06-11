@@ -97,10 +97,10 @@ class XDataViewer {
     public static String getActionLabel(int type) {
         if(type == ARRAY ||
            type == OPEN)
-            return Resources.getText("visualize");
+            return Resources.getText("LBL_visualize"); // NOI18N
         if(type == NUMERIC)
-            return Resources.getText("plot");
-        return Resources.getText("expand");
+            return Resources.getText("LBL_plot"); // NOI18N
+        return Resources.getText("LBL_expand"); // NOI18N
     }
 
     public Component createOperationViewer(Object value,

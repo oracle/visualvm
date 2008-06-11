@@ -54,22 +54,22 @@ class Plotter extends JComponent
     }
 
     static final String[] rangeNames = {
-        Resources.getText(" 1 min"),
-        Resources.getText(" 5 min"),
-        Resources.getText("10 min"),
-        Resources.getText("30 min"),
-        Resources.getText(" 1 hour"),
-        Resources.getText(" 2 hours"),
-        Resources.getText(" 3 hours"),
-        Resources.getText(" 6 hours"),
-        Resources.getText("12 hours"),
-        Resources.getText(" 1 day"),
-        Resources.getText(" 7 days"),
-        Resources.getText(" 1 month"),
-        Resources.getText(" 3 months"),
-        Resources.getText(" 6 months"),
-        Resources.getText(" 1 year"),
-        Resources.getText("All")
+        Resources.getText("LBL_1_min"), // NOI18N
+        Resources.getText("LBL_5_min"), // NOI18N
+        Resources.getText("LBL_10_min"), // NOI18N
+        Resources.getText("LBL_30_min"), // NOI18N
+        Resources.getText("LBL_1_hour"), // NOI18N
+        Resources.getText("LBL_2_hours"), // NOI18N
+        Resources.getText("LBL_3_hours"), // NOI18N
+        Resources.getText("LBL_6_hours"), // NOI18N
+        Resources.getText("LBL_12_hours"), // NOI18N
+        Resources.getText("LBL_1_day"), // NOI18N
+        Resources.getText("LBL_7_days"), // NOI18N
+        Resources.getText("LBL_1_month"), // NOI18N
+        Resources.getText("LBL_3_months"), // NOI18N
+        Resources.getText("LBL_6_months"), // NOI18N
+        Resources.getText("LBL_1_year"), // NOI18N
+        Resources.getText("LBL_All") // NOI18N
     };
 
     static final int[] rangeValues = {
@@ -223,7 +223,7 @@ class Plotter extends JComponent
             int oldValue = viewRange;
             viewRange = minutes;
             /* Do not i18n this string */
-            firePropertyChange("viewRange", oldValue, viewRange);
+            firePropertyChange("viewRange", oldValue, viewRange); // NOI18N
             if (popupMenu != null) {
                 for (int i = 0; i < menuRBs.length; i++) {
                     if (rangeValues[i] == viewRange) {
@@ -239,9 +239,9 @@ class Plotter extends JComponent
     @Override
     public JPopupMenu getComponentPopupMenu() {
         if (popupMenu == null) {
-            popupMenu = new JPopupMenu(Resources.getText("Chart:"));
-            timeRangeMenu = new JMenu(Resources.getText("Plotter.timeRangeMenu"));
-            timeRangeMenu.setMnemonic(getMnemonicInt("Plotter.timeRangeMenu"));
+            popupMenu = new JPopupMenu(Resources.getText("LBL_Chart") + ":"); // NOI18N
+            timeRangeMenu = new JMenu(Resources.getText("LBL_Plotter.timeRangeMenu")); // NOI18N
+            timeRangeMenu.setMnemonic(getMnemonicInt("LBL_Plotter.timeRangeMenu")); // NOI18N
             popupMenu.add(timeRangeMenu);
             menuRBs = new JRadioButtonMenuItem[rangeNames.length];
             ButtonGroup rbGroup = new ButtonGroup();
@@ -257,8 +257,8 @@ class Plotter extends JComponent
 
             popupMenu.addSeparator();
 
-            saveAsMI = new JMenuItem(getText("Plotter.saveAsMenuItem"));
-            saveAsMI.setMnemonic(getMnemonicInt("Plotter.saveAsMenuItem"));
+            saveAsMI = new JMenuItem(getText("LBL_Plotter.saveAsMenuItem")); // NOI18N
+            saveAsMI.setMnemonic(getMnemonicInt("LBL_Plotter.saveAsMenuItem")); // NOI18N
             saveAsMI.addActionListener(this);
             popupMenu.add(saveAsMI);
         }
@@ -290,9 +290,9 @@ class Plotter extends JComponent
             PrintStream out = new PrintStream(new FileOutputStream(file));
 
             // Print header line
-            out.print("Time");
+            out.print("Time"); // NOI18N
             for (Sequence seq : seqs) {
-                out.print(","+seq.name);
+                out.print(","+seq.name); // NOI18N
             }
             out.println();
 
@@ -300,9 +300,9 @@ class Plotter extends JComponent
             if (seqs.size() > 0 && seqs.get(0).size > 0) {
                 for (int i = 0; i < seqs.get(0).size; i++) {
                     double excelTime = toExcelTime(times.time(i));
-                    out.print(String.format(Locale.ENGLISH, "%.6f", excelTime));
+                    out.print(String.format(Locale.ENGLISH, "%.6f", excelTime)); // NOI18N
                     for (Sequence seq : seqs) {
-                        out.print("," + getFormattedValue(seq.value(i), false));
+                        out.print("," + getFormattedValue(seq.value(i), false)); // NOI18N
                     }
                     out.println();
                 }
@@ -310,7 +310,7 @@ class Plotter extends JComponent
 
             out.close();
             JOptionPane.showMessageDialog(this,
-                                          getText("FileChooser.savedFile",
+                                          getText("LBL_FileChooser.savedFile", // NOI18N
                                                   file.getAbsolutePath(),
                                                   file.length()));
         } catch (IOException ex) {
@@ -320,9 +320,9 @@ class Plotter extends JComponent
                 msg = msg.substring(path.length()).trim();
             }
             JOptionPane.showMessageDialog(this,
-                                          getText("FileChooser.saveFailed.message",
+                                          getText("LBL_FileChooser.saveFailed.message", // NOI18N
                                                   path, msg),
-                                          getText("FileChooser.saveFailed.title"),
+                                          getText("LBL_FileChooser.saveFailed.title"), // NOI18N
                                           JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -433,19 +433,19 @@ class Plotter extends JComponent
         g.drawLine(x,   y,   x,   y+h);
 
         int n = 5;
-        if ((""+vMax).startsWith("2")) {
+        if ((""+vMax).startsWith("2")) { // NOI18N
             n = 4;
-        } else if ((""+vMax).startsWith("3")) {
+        } else if ((""+vMax).startsWith("3")) { // NOI18N
             n = 6;
-        } else if ((""+vMax).startsWith("4")) {
+        } else if ((""+vMax).startsWith("4")) { // NOI18N
             n = 4;
-        } else if ((""+vMax).startsWith("6")) {
+        } else if ((""+vMax).startsWith("6")) { // NOI18N
             n = 6;
-        } else if ((""+vMax).startsWith("7")) {
+        } else if ((""+vMax).startsWith("7")) { // NOI18N
             n = 7;
-        } else if ((""+vMax).startsWith("8")) {
+        } else if ((""+vMax).startsWith("8")) { // NOI18N
             n = 8;
-        } else if ((""+vMax).startsWith("9")) {
+        } else if ((""+vMax).startsWith("9")) { // NOI18N
             n = 3;
         }
 
@@ -473,13 +473,13 @@ class Plotter extends JComponent
             boolean removedDecimalPoint = false;
             do {
                 for (String str : tickStrings) {
-                    if (!(str.endsWith("0") || str.endsWith("."))) {
+                    if (!(str.endsWith("0") || str.endsWith("."))) { // NOI18N
                         trimLast = false;
                         break;
                     }
                 }
                 if (trimLast) {
-                    if (tickStrings[0].endsWith(".")) {
+                    if (tickStrings[0].endsWith(".")) { // NOI18N
                         removedDecimalPoint = true;
                     }
                     for (int i = 0; i < n; i++) {
@@ -498,7 +498,7 @@ class Plotter extends JComponent
             g.drawLine(x-2, y, x+2, y);
             String s = tickStrings[i];
             if (unit == Unit.PERCENT) {
-                s += "%";
+                s += "%"; // NOI18N
             }
             int sx = x-6-fm.stringWidth(s);
             if (y < lastY-13) {
@@ -665,7 +665,7 @@ class Plotter extends JComponent
                     }
                     String curValue = getFormattedValue(v, true);
                     if (unit == Unit.PERCENT) {
-                        curValue += "%";
+                        curValue += "%"; // NOI18N
                     }
                     int valWidth = fm.stringWidth(curValue);
                     String legend = seq.name;
@@ -775,15 +775,15 @@ class Plotter extends JComponent
 
     private String getFormattedValue(long v, boolean groupDigits) {
         String str;
-        String fmt = "%";
+        String fmt = "%"; // NOI18N
         if (groupDigits) {
-            fmt += ",";
+            fmt += ","; // NOI18N
         }
         if (decimals > 0) {
-            fmt += "." + decimals + "f";
+            fmt += "." + decimals + "f"; // NOI18N
             str = String.format(fmt, v / decimalsMultiplier);
         } else {
-            fmt += "d";
+            fmt += "d"; // NOI18N
             str = String.format(fmt, v);
         }
         return str;
@@ -982,7 +982,7 @@ class Plotter extends JComponent
 
     private static class SaveDataFileChooser extends JFileChooser {
         SaveDataFileChooser() {
-            setFileFilter(new FileNameExtensionFilter("CSV file", "csv"));
+            setFileFilter(new FileNameExtensionFilter("CSV file", "csv")); // NOI18N
         }
 
         @Override
@@ -996,25 +996,25 @@ class Plotter extends JComponent
 
                     boolean goodExt = false;
                     for (String ext : extensions) {
-                        if (file.getName().toLowerCase().endsWith("." + ext.toLowerCase())) {
+                        if (file.getName().toLowerCase().endsWith("." + ext.toLowerCase())) { // NOI18N
                             goodExt = true;
                             break;
                         }
                     }
                     if (!goodExt) {
                         file = new File(file.getParent(),
-                                        file.getName() + "." + extensions[0]);
+                                        file.getName() + "." + extensions[0]); // NOI18N
                     }
                 }
 
                 if (file.exists()) {
-                    String okStr = getText("FileChooser.fileExists.okOption");
-                    String cancelStr = getText("FileChooser.fileExists.cancelOption");
+                    String okStr = getText("LBL_FileChooser.fileExists.okOption"); // NOI18N
+                    String cancelStr = getText("LBL_FileChooser.fileExists.cancelOption"); // NOI18N
                     int ret =
                         JOptionPane.showOptionDialog(this,
-                                                     getText("FileChooser.fileExists.message",
+                                                     getText("LBL_FileChooser.fileExists.message", // NOI18N
                                                              file.getName()),
-                                                     getText("FileChooser.fileExists.title"),
+                                                     getText("LBL_FileChooser.fileExists.title"), // NOI18N
                                                      JOptionPane.OK_CANCEL_OPTION,
                                                      JOptionPane.WARNING_MESSAGE,
                                                      null,
@@ -1040,7 +1040,7 @@ class Plotter extends JComponent
 
     protected class AccessiblePlotter extends AccessibleJComponent {
         protected AccessiblePlotter() {
-            setAccessibleName(getText("Plotter.accessibleName"));
+            setAccessibleName(getText("LBL_Plotter.accessibleName")); // NOI18N
         }
 
         @Override
@@ -1048,28 +1048,28 @@ class Plotter extends JComponent
             String name = super.getAccessibleName();
 
             if (seqs.size() > 0 && seqs.get(0).size > 0) {
-                String keyValueList = "";
+                String keyValueList = ""; // NOI18N
                 for (Sequence seq : seqs) {
                     if (seq.isPlotted) {
-                        String value = "null";
+                        String value = "null"; // NOI18N
                         if (seq.size > 0) {
                             if (unit == Unit.BYTES) {
-                                value = getText("Size Bytes", seq.value(seq.size - 1));
+                                value = getText("LBL_SizeBytes", seq.value(seq.size - 1)); // NOI18N
                             } else {
                                 value =
                                     getFormattedValue(seq.value(seq.size - 1), false) +
-                                    ((unit == Unit.PERCENT) ? "%" : "");
+                                    ((unit == Unit.PERCENT) ? "%" : ""); // NOI18N
                             }
                         }
                         // Assume format string ends with newline
                         keyValueList +=
-                            getText("Plotter.accessibleName.keyAndValue",
+                            getText("LBL_Plotter.accessibleName.keyAndValue", // NOI18N
                                     seq.key, value);
                     }
                 }
-                name += "\n" + keyValueList + ".";
+                name += "\n" + keyValueList + "."; // NOI18N
             } else {
-                name += "\n" + getText("Plotter.accessibleName.noData");
+                name += "\n" + getText("LBL_Plotter.accessibleName.noData"); // NOI18N
             }
             return name;
         }

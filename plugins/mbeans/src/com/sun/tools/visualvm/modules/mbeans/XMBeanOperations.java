@@ -41,7 +41,7 @@ class XMBeanOperations extends JPanel implements ActionListener {
     private final static Logger LOGGER = Logger.getLogger(XMBeanOperations.class.getName());
     
     public final static String OPERATION_INVOCATION_EVENT =
-            "jam.xoperations.invoke.result";
+            "jam.xoperations.invoke.result"; // NOI18N
     private java.util.List<NotificationListener> notificationListenersList;
     
     private Hashtable<JButton, OperationEntry> operationEntryTable;
@@ -94,14 +94,14 @@ class XMBeanOperations extends JPanel implements ActionListener {
             innerPanelRight = new JPanel(new FlowLayout(FlowLayout.LEFT));
             String returnType = operations[i].getReturnType();
             if (returnType == null) {
-                methodLabel = new JLabel("null", JLabel.RIGHT);
+                methodLabel = new JLabel("null", JLabel.RIGHT); // NOI18N
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     LOGGER.warning(
-                            "The operation's return type " +
-                            "shouldn't be \"null\". Check how the " +
-                            "MBeanOperationInfo for the \"" +
-                            operations[i].getName() + "\" operation has " +
-                            "been defined in the MBean's implementation code.");
+                            "The operation's return type " + // NOI18N
+                            "shouldn't be \"null\". Check how the " + // NOI18N
+                            "MBeanOperationInfo for the \"" + // NOI18N
+                            operations[i].getName() + "\" operation has " + // NOI18N
+                            "been defined in the MBean's implementation code."); // NOI18N
                 }
             } else {
                 methodLabel = new JLabel(
@@ -111,7 +111,7 @@ class XMBeanOperations extends JPanel implements ActionListener {
             if (methodLabel.getText().length()>20) {
                 methodLabel.setText(methodLabel.getText().
                         substring(methodLabel.getText().
-                        lastIndexOf(".")+1,
+                        lastIndexOf(".")+1, // NOI18N
                         methodLabel.getText().length()));
             }
             
@@ -131,7 +131,7 @@ class XMBeanOperations extends JPanel implements ActionListener {
             operationEntryTable.put(methodButton, paramEntry);
             innerPanelRight.add(methodButton);
             if(signature.length==0)
-                innerPanelRight.add(new JLabel("( )",JLabel.CENTER));
+                innerPanelRight.add(new JLabel("( )",JLabel.CENTER)); // NOI18N
             else
                 innerPanelRight.add(paramEntry);
             
@@ -177,18 +177,18 @@ class XMBeanOperations extends JPanel implements ActionListener {
                     else
                         new ThreadDialog(
                                 button,
-                                Resources.getText("Method successfully invoked"),
-                                Resources.getText("Info"),
+                                Resources.getText("LBL_MethodSuccessfullyInvoked"), // NOI18N
+                                Resources.getText("LBL_Info"), // NOI18N
                                 JOptionPane.INFORMATION_MESSAGE).run();
                 } catch (Throwable t) {
                     t = Utils.getActualException(t);
-                    LOGGER.throwing(XMBeanOperations.class.getName(), "performInvokeRequest", t);
+                    LOGGER.throwing(XMBeanOperations.class.getName(), "performInvokeRequest", t); // NOI18N
                     
                     new ThreadDialog(
                             button,
-                            Resources.getText("Problem invoking") + " " +
-                            button.getText() + " : " + t.toString(),
-                            Resources.getText("Error"),
+                            Resources.getText("LBL_ProblemInvoking") + " " + // NOI18N
+                            button.getText() + " : " + t.toString(), // NOI18N
+                            Resources.getText("LBL_Error"), // NOI18N
                             JOptionPane.ERROR_MESSAGE).run();
                 }
             }

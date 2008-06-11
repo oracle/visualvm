@@ -59,47 +59,47 @@ class XArrayDataViewer {
                 }
             }
             JEditorPane arrayEditor = new JEditorPane();
-            arrayEditor.setContentType("text/html");
+            arrayEditor.setContentType("text/html"); // NOI18N
             arrayEditor.setEditable(false);
             Color evenRowColor = arrayEditor.getBackground();
             int red = evenRowColor.getRed();
             int green = evenRowColor.getGreen();
             int blue = evenRowColor.getBlue();
             String evenRowColorStr =
-                    "rgb(" + red + "," + green + "," + blue + ")";
+                    "rgb(" + red + "," + green + "," + blue + ")"; // NOI18N
             Color oddRowColor = new Color(
                     red < 20 ? red + 20 : red - 20,
                     green < 20 ? green + 20 : green - 20,
                     blue < 20 ? blue + 20 : blue - 20);
             String oddRowColorStr =
-                    "rgb(" + oddRowColor.getRed() + "," +
-                    oddRowColor.getGreen() + "," +
-                    oddRowColor.getBlue() + ")";
+                    "rgb(" + oddRowColor.getRed() + "," + // NOI18N
+                    oddRowColor.getGreen() + "," + // NOI18N
+                    oddRowColor.getBlue() + ")"; // NOI18N
             Color foreground = arrayEditor.getForeground();
-            String textColor = String.format("%06x",
+            String textColor = String.format("%06x", // NOI18N
                                              foreground.getRGB() & 0xFFFFFF);
             StringBuilder sb = new StringBuilder();
-            sb.append("<html><body text=#"+textColor+"><table width=\"100%\">");
+            sb.append("<html><body text=#"+textColor+"><table width=\"100%\">"); // NOI18N
             for (int i = 0; i < arr.length; i++) {
                 if (i % 2 == 0) {
-                    sb.append("<tr style=\"background-color: " +
-                            evenRowColorStr + "\"><td><pre>" +
+                    sb.append("<tr style=\"background-color: " + // NOI18N
+                            evenRowColorStr + "\"><td><pre>" + // NOI18N
                             (arr[i] == null ?
                                 arr[i] : htmlize(arr[i].toString())) +
-                            "</pre></td></tr>");
+                            "</pre></td></tr>"); // NOI18N
                 } else {
-                    sb.append("<tr style=\"background-color: " +
-                            oddRowColorStr + "\"><td><pre>" +
+                    sb.append("<tr style=\"background-color: " + // NOI18N
+                            oddRowColorStr + "\"><td><pre>" + // NOI18N
                             (arr[i] == null ?
                                 arr[i] : htmlize(arr[i].toString())) +
-                            "</pre></td></tr>");
+                            "</pre></td></tr>"); // NOI18N
                 }
             }
             if (arr.length == 0) {
-                sb.append("<tr style=\"background-color: " +
-                        evenRowColorStr + "\"><td></td></tr>");
+                sb.append("<tr style=\"background-color: " + // NOI18N
+                        evenRowColorStr + "\"><td></td></tr>"); // NOI18N
             }
-            sb.append("</table></body></html>");
+            sb.append("</table></body></html>"); // NOI18N
             arrayEditor.setText(sb.toString());
             JScrollPane scrollp = new JScrollPane(arrayEditor);
             comp = scrollp;
@@ -108,6 +108,6 @@ class XArrayDataViewer {
     }
 
     private static String htmlize(String value) {
-        return value.replace("&", "&amp;").replace("<", "&lt;");
+        return value.replace("&", "&amp;").replace("<", "&lt;"); // NOI18N
     }
 }

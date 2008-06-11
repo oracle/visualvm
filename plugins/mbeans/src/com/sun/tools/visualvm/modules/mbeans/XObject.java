@@ -45,7 +45,7 @@ class XObject extends JLabel {
     private static boolean useHashCodeRepresentation = true;
     private final static Logger LOGGER = Logger.getLogger(XObject.class.getName());
     
-    public final static XObject NULL_OBJECT = new XObject("null");
+    public final static XObject NULL_OBJECT = new XObject("null"); // NOI18N
     
     public XObject (Object object, Icon icon) {
         this(object);
@@ -65,7 +65,7 @@ class XObject extends JLabel {
             }
         }
         catch (Throwable t) {
-            LOGGER.log(Level.SEVERE, "Error comparing XObjects", t);
+            LOGGER.log(Level.SEVERE, "Error comparing XObjects", t); // NOI18N
         }
         return false;
     }
@@ -110,13 +110,13 @@ class XObject extends JLabel {
             }
             if (text != null) {
                 if (useHashCodeRepresentation && (this != NULL_OBJECT)) {
-                    text = text + "     ("+object.hashCode()+")";
+                    text = text + "     ("+object.hashCode()+")"; // NOI18N
                 }
                 setText(text);
             }
         }
         catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error setting XObject object", e);
+            LOGGER.log(Level.SEVERE, "Error setting XObject object", e); // NOI18N
         }
     }
 }

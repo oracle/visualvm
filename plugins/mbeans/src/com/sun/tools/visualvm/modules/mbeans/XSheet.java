@@ -117,28 +117,28 @@ class XSheet extends JPanel
         topPanelMetadata = new JPanel();
         topPanelMetadata.setLayout(new BorderLayout());
         // create the refresh button
-        String refreshButtonKey = "MBeansTab.refreshAttributesButton";
+        String refreshButtonKey = "LBL_MBeansTab.refreshAttributesButton"; // NOI18N
         refreshButton = new JButton(getText(refreshButtonKey));
         refreshButton.setMnemonic(getMnemonicInt(refreshButtonKey));
-        refreshButton.setToolTipText(getText(refreshButtonKey + ".toolTip"));
+        refreshButton.setToolTipText(getText(refreshButtonKey + ".toolTip")); // NOI18N
         refreshButton.addActionListener(this);
         // create the clear button
-        String clearButtonKey = "MBeansTab.clearNotificationsButton";
+        String clearButtonKey = "LBL_MBeansTab.clearNotificationsButton"; // NOI18N
         clearButton = new JButton(getText(clearButtonKey));
         clearButton.setMnemonic(getMnemonicInt(clearButtonKey));
-        clearButton.setToolTipText(getText(clearButtonKey + ".toolTip"));
+        clearButton.setToolTipText(getText(clearButtonKey + ".toolTip")); // NOI18N
         clearButton.addActionListener(this);
         // create the subscribe button
-        String subscribeButtonKey = "MBeansTab.subscribeNotificationsButton";
+        String subscribeButtonKey = "LBL_MBeansTab.subscribeNotificationsButton"; // NOI18N
         subscribeButton = new JButton(getText(subscribeButtonKey));
         subscribeButton.setMnemonic(getMnemonicInt(subscribeButtonKey));
-        subscribeButton.setToolTipText(getText(subscribeButtonKey + ".toolTip"));
+        subscribeButton.setToolTipText(getText(subscribeButtonKey + ".toolTip")); // NOI18N
         subscribeButton.addActionListener(this);
         // create the unsubscribe button
-        String unsubscribeButtonKey = "MBeansTab.unsubscribeNotificationsButton";
+        String unsubscribeButtonKey = "LBL_MBeansTab.unsubscribeNotificationsButton"; // NOI18N
         unsubscribeButton = new JButton(getText(unsubscribeButtonKey));
         unsubscribeButton.setMnemonic(getMnemonicInt(unsubscribeButtonKey));
-        unsubscribeButton.setToolTipText(getText(unsubscribeButtonKey + ".toolTip"));
+        unsubscribeButton.setToolTipText(getText(unsubscribeButtonKey + ".toolTip")); // NOI18N
         unsubscribeButton.addActionListener(this);
         // create XMBeanAttributes container
         mbeanAttributes = new XMBeanAttributes(mbeansTab);
@@ -234,11 +234,11 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Couldn't get MBeanInfo for MBean [" +
-                            mbean.getObjectName() + "]", t);
+                    LOGGER.log(Level.SEVERE, "Couldn't get MBeanInfo for MBean [" + // NOI18N
+                            mbean.getObjectName() + "]", t); // NOI18N
 
                     showErrorDialog(t.toString(),
-                            Resources.getText("Problem displaying MBean"));
+                            Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
                 }
             }
         };
@@ -268,7 +268,7 @@ class XSheet extends JPanel
                     topPanelAttributes.removeAll();
                     JPanel borderPanel = new JPanel(new BorderLayout());
                     borderPanel.setBorder(BorderFactory.createTitledBorder(
-                            Resources.getText("Attribute values")));
+                            Resources.getText("LBL_AttributeValues"))); // NOI18N
                     borderPanel.add(new JScrollPane(mbeanAttributes));
                     JPanel mainPanelAttributes = new JPanel();
                     mainPanelAttributes.setLayout(new BorderLayout());
@@ -284,12 +284,12 @@ class XSheet extends JPanel
                     repaint();
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " +
-                            "attributes for MBean [" +
-                            mbean.getObjectName() + "]", t);
+                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
+                            "attributes for MBean [" + // NOI18N
+                            mbean.getObjectName() + "]", t); // NOI18N
 
                     showErrorDialog(t.toString(),
-                            Resources.getText("Problem displaying MBean"));
+                            Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
                 }
             }
         };
@@ -320,7 +320,7 @@ class XSheet extends JPanel
                         topPanelOperations.removeAll();
                         JPanel borderPanel = new JPanel(new BorderLayout());
                         borderPanel.setBorder(BorderFactory.createTitledBorder(
-                                Resources.getText("Operation invocation")));
+                                Resources.getText("LBL_OperationInvocation"))); // NOI18N
                         borderPanel.add(new JScrollPane(mbeanOperations));
                         JPanel mainPanelOperations = new JPanel();
                         mainPanelOperations.setLayout(new BorderLayout());
@@ -333,11 +333,11 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " +
-                            "operations for MBean [" +
-                            mbean.getObjectName() + "]", t);
+                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
+                            "operations for MBean [" + // NOI18N
+                            mbean.getObjectName() + "]", t); // NOI18N
                     showErrorDialog(t.toString(),
-                            Resources.getText("Problem displaying MBean"));
+                            Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
                 }
             }
         };
@@ -368,7 +368,7 @@ class XSheet extends JPanel
                         topPanelNotifications.removeAll();
                         JPanel borderPanel = new JPanel(new BorderLayout());
                         borderPanel.setBorder(BorderFactory.createTitledBorder(
-                                Resources.getText("Notification buffer")));
+                                Resources.getText("LBL_NotificationBuffer"))); // NOI18N
                         borderPanel.add(new JScrollPane(mbeanNotifications));
                         JPanel mainPanelNotifications = new JPanel();
                         mainPanelNotifications.setLayout(new BorderLayout());
@@ -389,11 +389,11 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " +
-                            "notifications for MBean [" +
-                            mbean.getObjectName() + "]", t);
+                    LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
+                            "notifications for MBean [" + // NOI18N
+                            mbean.getObjectName() + "]", t); // NOI18N
                     showErrorDialog(t.toString(),
-                            Resources.getText("Problem displaying MBean"));
+                            Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
                 }
             }
         };
@@ -442,10 +442,10 @@ class XSheet extends JPanel
                     validate();
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Problem adding listener", t);
+                    LOGGER.log(Level.SEVERE, "Problem adding listener", t); // NOI18N
 
                     showErrorDialog(t.getMessage(),
-                            Resources.getText("Problem adding listener"));
+                            Resources.getText("LBL_ProblemAddingListener")); // NOI18N
                 }
             }
         }.execute();
@@ -469,9 +469,9 @@ class XSheet extends JPanel
                     }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Problem removing listener", t);
+                    LOGGER.log(Level.SEVERE, "Problem removing listener", t); // NOI18N
                     showErrorDialog(t.getMessage(),
-                            Resources.getText("Problem removing listener"));
+                            Resources.getText("LBL_ProblemRemovingListener")); // NOI18N
                 }
             }
         }.execute();
@@ -500,7 +500,7 @@ class XSheet extends JPanel
     // Call on EDT
     private void updateReceivedNotifications(
             DefaultMutableTreeNode emitter, long received) {
-        String text = Resources.getText("Notifications") + "[" + received + "]";
+        String text = Resources.getText("LBL_Notifications") + "[" + received + "]"; // NOI18N
         updateNotificationsNodeLabel(emitter, text);
     }
     
@@ -510,7 +510,7 @@ class XSheet extends JPanel
     // Call on EDT
     private void clearNotifications() {
         updateNotificationsNodeLabel(currentNode,
-                Resources.getText("Notifications"));
+                Resources.getText("LBL_Notifications")); // NOI18N
     }
     
     /**
@@ -519,7 +519,7 @@ class XSheet extends JPanel
     // Call on EDT
     private void clearNotifications0() {
         updateNotificationsNodeLabel(currentNode,
-                Resources.getText("Notifications") + "[0]");
+                Resources.getText("LBL_Notifications") + "[0]"); // NOI18N
     }
     
     /**
@@ -597,7 +597,7 @@ class XSheet extends JPanel
         if (e.getType().equals(XMBeanOperations.OPERATION_INVOCATION_EVENT)) {
             final Object message;
             if (handback == null) {
-                JTextArea textArea = new JTextArea("null");
+                JTextArea textArea = new JTextArea("null"); // NOI18N
                 textArea.setEditable(false);
                 textArea.setEnabled(true);
                 textArea.setRows(textArea.getLineCount());
@@ -630,7 +630,7 @@ class XSheet extends JPanel
             new ThreadDialog(
                     (Component) e.getSource(),
                     message,
-                    Resources.getText("Operation return value"),
+                    Resources.getText("LBL_OperationReturnValue"), // NOI18N
                     JOptionPane.INFORMATION_MESSAGE).run();
         }
         // Got notification

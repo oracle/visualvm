@@ -53,7 +53,7 @@ class BorderedComponent extends JPanel implements ActionListener {
 
     private static Image getImage(String name) {
         Toolkit tk = Toolkit.getDefaultToolkit();
-        name = "resources/" + name + ".png";
+        name = "resources/" + name + ".png"; // NOI18N
         return tk.getImage(BorderedComponent.class.getResource(name));
     }
 
@@ -85,13 +85,8 @@ class BorderedComponent extends JPanel implements ActionListener {
                 border = new LabeledBorder(borderLabel);
                 textLabel.setForeground(border.getTitleColor());
 
-//                if (IS_WIN) {
-                    collapseIcon = new ImageIcon(getImage("collapse-winlf"));
-                    expandIcon = new ImageIcon(getImage("expand-winlf"));
-//                } else {
-//                    collapseIcon = new ArrowIcon(SOUTH, textLabel);
-//                    expandIcon = new ArrowIcon(EAST, textLabel);
-//                }
+                collapseIcon = new ArrowIcon(SOUTH, textLabel);
+                expandIcon = new ArrowIcon(EAST, textLabel);
 
                 moreOrLessButton = new JButton(collapseIcon);
                 moreOrLessButton.setContentAreaFilled(false);
@@ -99,7 +94,7 @@ class BorderedComponent extends JPanel implements ActionListener {
                 moreOrLessButton.setMargin(new Insets(0, 0, 0, 0));
                 moreOrLessButton.addActionListener(this);
                 String toolTip =
-                    getText("BorderedComponent.moreOrLessButton.toolTip");
+                    getText("LBL_BorderedComponent.moreOrLessButton.toolTip"); // NOI18N
                 moreOrLessButton.setToolTipText(toolTip);
                 borderLabel.add(moreOrLessButton);
                 borderLabel.setSize(borderLabel.getPreferredSize());
@@ -135,7 +130,7 @@ class BorderedComponent extends JPanel implements ActionListener {
     public void setValueLabel(String str) {
         this.valueLabelStr = str;
         if (label != null) {
-            label.setText(Resources.getText("Current value",valueLabelStr));
+            label.setText(Resources.getText("LBL_CurrentValue",valueLabelStr)); // NOI18N
         }
     }
 
@@ -150,7 +145,7 @@ class BorderedComponent extends JPanel implements ActionListener {
             remove(comp);
             if (valueLabelStr != null) {
                 if (label == null) {
-                    label = new JLabel(Resources.getText("Current value",
+                    label = new JLabel(Resources.getText("LBL_CurrentValue", // NOI18N
                                                          valueLabelStr));
                 }
                 add(label);
@@ -534,7 +529,7 @@ class BorderedComponent extends JPanel implements ActionListener {
             comp.addFocusListener(this);
 
             // This is the best guess for a L&F specific color
-            focusColor = UIManager.getColor("TabbedPane.focus");
+            focusColor = UIManager.getColor("TabbedPane.focus"); // NOI18N
         }
 
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {

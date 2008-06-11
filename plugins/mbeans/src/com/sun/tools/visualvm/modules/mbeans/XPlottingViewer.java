@@ -103,7 +103,7 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
                                           MBeansTab tab) {
         Component comp = null;
         if(isViewableValue(value)) {
-            String key = String.valueOf(tab.hashCode()) + " " + String.valueOf(mbean.hashCode()) + " " + mbean.getObjectName().getCanonicalName() + attributeName;
+            String key = String.valueOf(tab.hashCode()) + " " + String.valueOf(mbean.hashCode()) + " " + mbean.getObjectName().getCanonicalName() + attributeName; // NOI18N
             XPlottingViewer plotter = plotterCache.get(key);
             if(plotter == null) {
                 plotter = new XPlottingViewer(key,
@@ -189,7 +189,7 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
         //setLayout(new GridLayout(2,0));
         GridBagLayout gbl = new GridBagLayout();
         setLayout(gbl);
-        plotButton = new JButton(Resources.getText("Discard chart"));
+        plotButton = new JButton(Resources.getText("LBL_DiscardChart")); // NOI18N
         plotButton.addActionListener(this);
         plotButton.setEnabled(true);
 

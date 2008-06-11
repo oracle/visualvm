@@ -59,12 +59,12 @@ class MBeansTab extends JPanel implements
     private CachedMBeanServerConnection cachedMBSC;
     
     public static String getTabName() {
-        return Resources.getText("MBeans");
+        return Resources.getText("LBL_MBeans"); // NOI18N
     }
     
     public synchronized void workerAdd(Runnable job) {
         if (worker == null) {
-            worker = new Worker(getTabName() + "-" + application.getPid());
+            worker = new Worker(getTabName() + "-" + application.getPid()); // NOI18N
             worker.start();
         }
         worker.add(job);
@@ -139,9 +139,9 @@ class MBeansTab extends JPanel implements
                     // Should never happen because the MBeanServerDelegate
                     // is always present in any standard MBeanServer
                     //
-                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
+                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e); // NOI18N
                 } catch (IOException e) {
-                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
+                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e); // NOI18N
                     return null;
                 }
                 // Retrieve MBeans from MBeanServer
@@ -150,7 +150,7 @@ class MBeansTab extends JPanel implements
                 try {
                     mbeans = getMBeanServerConnection().queryNames(null,null);
                 } catch (IOException e) {
-                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e);
+                    LOGGER.throwing(MBeansTab.class.getName(), "buildMBeanServerView", e); // NOI18N
                     return null;
                 }
                 return mbeans;
@@ -174,7 +174,7 @@ class MBeansTab extends JPanel implements
                     tree.setVisible(true);
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
-                    LOGGER.log(Level.SEVERE, "Problem at MBean tree construction", t);
+                    LOGGER.log(Level.SEVERE, "Problem at MBean tree construction", t); // NOI18N
                 }
             }
         }.execute();

@@ -44,20 +44,20 @@ class VariableGridLayout extends GridLayout {
     }
 
     public void setFillRow(JComponent c, boolean b) {
-        c.putClientProperty("VariableGridLayout.fillRow", b);
+        c.putClientProperty("VariableGridLayout.fillRow", b); // NOI18N
     }
 
     public void setFillColumn(JComponent c, boolean b) {
-        c.putClientProperty("VariableGridLayout.fillColumn", b);
+        c.putClientProperty("VariableGridLayout.fillColumn", b); // NOI18N
     }
 
     public boolean getFillRow(JComponent c) {
-        Boolean b = (Boolean)c.getClientProperty("VariableGridLayout.fillRow");
+        Boolean b = (Boolean)c.getClientProperty("VariableGridLayout.fillRow"); // NOI18N
         return (b != null) ? b : fillRows;
     }
 
     public boolean getFillColumn(JComponent c) {
-        Boolean b = (Boolean)c.getClientProperty("VariableGridLayout.fillColumn");
+        Boolean b = (Boolean)c.getClientProperty("VariableGridLayout.fillColumn"); // NOI18N
         return (b != null) ? b : fillColumns;
     }
 

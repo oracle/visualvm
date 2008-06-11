@@ -118,7 +118,7 @@ class XTextField extends JPanel
         }
         else {
             //null String value for the moment
-            textField.setText("");
+            textField.setText(""); // NOI18N
         }
         textField.setToolTipText(null);
         if (fieldEditable) {
@@ -176,10 +176,10 @@ class XTextField extends JPanel
             return new JMenuItem(xobject.getText());
         }
         else if (valueType == CURRENT_VALUE) {
-            return new JMenuItem("> "+xobject.getText());
+            return new JMenuItem("> "+xobject.getText()); // NOI18N
         }
         else if (valueType == NULL_VALUE) {
-            return new JMenuItem("null");
+            return new JMenuItem("null"); // NOI18N
         }
         else {
             return null;

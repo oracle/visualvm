@@ -84,7 +84,7 @@ class Utils {
         // compute primitives/primitiveMap/primitiveToWrapper
         for (Class<?> c : primitiveWrappers) {
             try {
-                Field f = c.getField("TYPE");
+                Field f = c.getField("TYPE"); // NOI18N
                 Class<?> p = (Class<?>) f.get(null);
                 primitives.add(p);
                 primitiveMap.put(p.getName(), p);
@@ -135,10 +135,10 @@ class Utils {
      */
     public static boolean isUniformCollection(Collection<?> c, Class<?> e) {
         if (e == null) {
-            throw new IllegalArgumentException("Null reference type");
+            throw new IllegalArgumentException("Null reference type"); // NOI18N
         }
         if (c == null) {
-            throw new IllegalArgumentException("Null collection");
+            throw new IllegalArgumentException("Null collection"); // NOI18N
         }
         if (c.isEmpty()) {
             return false;
@@ -211,10 +211,10 @@ class Utils {
      */
     public static String getArrayClassName(String name) {
         String className = null;
-        if (name.startsWith("[")) {
-            int index = name.lastIndexOf("[");
+        if (name.startsWith("[")) { // NOI18N
+            int index = name.lastIndexOf("["); // NOI18N
             className = name.substring(index, name.length());
-            if (className.startsWith("[L")) {
+            if (className.startsWith("[L")) { // NOI18N
                 className = className.substring(2, className.length() - 1);
             } else {
                 try {
@@ -223,7 +223,7 @@ class Utils {
                 } catch (ClassNotFoundException e) {
                     // Should not happen
                     throw new IllegalArgumentException(
-                            "Bad class name " + name, e);
+                            "Bad class name " + name, e); // NOI18N
                 }
             }
         }
@@ -241,10 +241,10 @@ class Utils {
     public static String getReadableClassName(String name) {
         String className = getArrayClassName(name);
         if (className == null) return name;
-        int index = name.lastIndexOf("[");
+        int index = name.lastIndexOf("["); // NOI18N
         StringBuilder brackets = new StringBuilder(className);
         for (int i = 0; i <= index; i++) {
-            brackets.append("[]");
+            brackets.append("[]"); // NOI18N
         }
         return brackets.toString();
     }
@@ -265,10 +265,10 @@ class Utils {
     public static String getDefaultValue(String type) {
         if (numericalTypes.contains(type) ||
                 extraNumericalTypes.contains(type)) {
-            return "0";
+            return "0"; // NOI18N
         }
         if (booleanTypes.contains(type)) {
-            return "true";
+            return "true"; // NOI18N
         }
         type = getReadableClassName(type);
         int i = type.lastIndexOf('.');
@@ -303,13 +303,13 @@ class Utils {
     private static Number createNumberFromStringValue(String value)
     throws NumberFormatException {
         final String suffix = value.substring(value.length() - 1);
-        if ("L".equalsIgnoreCase(suffix)) {
+        if ("L".equalsIgnoreCase(suffix)) { // NOI18N
             return Long.valueOf(value.substring(0, value.length() - 1));
         }
-        if ("F".equalsIgnoreCase(suffix)) {
+        if ("F".equalsIgnoreCase(suffix)) { // NOI18N
             return Float.valueOf(value.substring(0, value.length() - 1));
         }
-        if ("D".equalsIgnoreCase(suffix)) {
+        if ("D".equalsIgnoreCase(suffix)) { // NOI18N
             return Double.valueOf(value.substring(0, value.length() - 1));
         }
         try {
@@ -327,8 +327,8 @@ class Utils {
         } catch (NumberFormatException e2) {
             // OK: Ignore exception...
         }
-        throw new NumberFormatException("Cannot convert string value '" +
-                value + "' into a numerical value");
+        throw new NumberFormatException("Cannot convert string value '" + // NOI18N
+                value + "' into a numerical value"); // NOI18N
     }
     
     /**
@@ -352,7 +352,7 @@ class Utils {
             result = new Character(value.charAt(0));
         } else if (Number.class.isAssignableFrom(Utils.getClass(type))) {
             result = createNumberFromStringValue(value);
-        } else if (value == null || value.toString().equals("null")) {
+        } else if (value == null || value.toString().equals("null")) { // NOI18N
             // hack for null value
             result = null;
         } else {
