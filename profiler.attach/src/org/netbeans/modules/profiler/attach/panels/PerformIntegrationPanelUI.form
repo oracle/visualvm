@@ -64,7 +64,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonPerformActionPerformed"/>
       </Events>
     </Component>
-    <Component class="org.netbeans.modules.profiler.ui.wizards.panels.components.StepsPanelComponent" name="integrationSteps">
+    <Component class="org.netbeans.modules.profiler.attach.panels.components.StepsPanelComponent" name="integrationSteps">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">

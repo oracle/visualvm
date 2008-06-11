@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.attach.providers;
 
+import java.io.IOException;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.wizard.WizardContext;
@@ -111,6 +112,10 @@ public interface WizardIntegrationProvider extends IntegrationProvider {
         }
 
         public void run(AttachSettings attachSettings) {
+        }
+
+        public String exportRemotePack(AttachSettings settings, String exportPath) throws IOException {
+            throw new IOException();
         }
 
         public boolean supportsAutomation() {
