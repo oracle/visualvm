@@ -55,8 +55,8 @@ class XMBeanAttributes extends XTable {
     private static final Logger LOGGER = Logger.getLogger(XMBeanAttributes.class.getName());
     
     private final static String[] columnNames =
-    {Resources.getText("Name"),
-     Resources.getText("Value")};
+    {Resources.getText("LBL_Name"), // NOI18N
+     Resources.getText("LBL_Value")}; // NOI18N
 
     private XMBean mbean;
     private MBeanInfo mbeanInfo;
@@ -221,7 +221,7 @@ class XMBeanAttributes extends XTable {
 
     public boolean isColumnEditable(int column) {
         if (column < getColumnCount()) {
-            return getColumnName(column).equals(Resources.getText("Value"));
+            return getColumnName(column).equals(Resources.getText("LBL_Value")); // NOI18N
         }
         else {
             return false;
@@ -266,8 +266,8 @@ class XMBeanAttributes extends XTable {
             if (value != null) {
                 tip = value.toString();
                 if(isAttributeViewable(row, VALUE_COLUMN))
-                    tip = Resources.getText("Double click to expand/collapse")+
-                        ". " + tip;
+                    tip = Resources.getText("LBL_DoubleClickToExpandCollapse")+ // NOI18N
+                        ". " + tip; // NOI18N
             }
 
             return tip;
@@ -602,7 +602,7 @@ class XMBeanAttributes extends XTable {
         for (int i = 0; i < attributesInfo.length; i++) {
             rowData[0] = (attributesInfo[i].getName());
             if (unavailableAttributes.containsKey(rowData[0])) {
-                rowData[1] = Resources.getText("Unavailable");
+                rowData[1] = Resources.getText("LBL_Unavailable"); // NOI18N
             } else if (viewableAttributes.containsKey(rowData[0])) {
                 rowData[1] = viewableAttributes.get(rowData[0]);
                 if (!attributesInfo[i].isWritable() ||
@@ -819,7 +819,7 @@ class XMBeanAttributes extends XTable {
                 String name =
                     Utils.getArrayClassName(value.getClass().getName());
                 int length = Array.getLength(value);
-                return name + "[" + length +"]";
+                return name + "[" + length +"]"; // NOI18N
             }
 
             if(value instanceof CompositeData ||
@@ -871,12 +871,12 @@ class XMBeanAttributes extends XTable {
                                 mbean.setAttribute(attribute);
                             } catch (Throwable ex) {
                                 ex = Utils.getActualException(ex);
-                                LOGGER.throwing(XMBeanAttributes.class.getName(), "tableChanged", ex);
+                                LOGGER.throwing(XMBeanAttributes.class.getName(), "tableChanged", ex); // NOI18N
                                 
                                 String message = (ex.getMessage() != null) ? ex.getMessage() : ex.toString();
                                 EventQueue.invokeLater(new ThreadDialog(component,
-                                                                        message+"\n",
-                                                                        Resources.getText("Problem setting attribute"),
+                                                                        message+"\n", // NOI18N
+                                                                        Resources.getText("LBL_ProblemSettingAttribute"), // NOI18N
                                                                         JOptionPane.ERROR_MESSAGE));
                             }
                             refreshAttributes();

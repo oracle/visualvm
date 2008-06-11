@@ -39,7 +39,7 @@ import static java.lang.Math.*;
  */
 class Utilities {
     private static final String windowsLaF =
-        "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        "com.sun.java.swing.plaf.windows.WindowsLookAndFeel"; // NOI18N
 
     public static void updateTransparency(JComponent comp) {
         LookAndFeel laf = UIManager.getLookAndFeel();

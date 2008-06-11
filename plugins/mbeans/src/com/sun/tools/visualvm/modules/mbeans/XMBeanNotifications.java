@@ -50,13 +50,13 @@ import javax.management.openmbean.TabularData;
 class XMBeanNotifications extends JTable implements NotificationListener {
     
     private final static String[] columnNames =  {
-        Resources.getText("TimeStamp"),
-        Resources.getText("Type"),
-        Resources.getText("UserData"),
-        Resources.getText("SeqNum"),
-        Resources.getText("Message"),
-        Resources.getText("Event"),
-        Resources.getText("Source")};
+        Resources.getText("LBL_TimeStamp"), // NOI18N
+        Resources.getText("LBL_Type"), // NOI18N
+        Resources.getText("LBL_UserData"), // NOI18N
+        Resources.getText("LBL_SeqNum"), // NOI18N
+        Resources.getText("LBL_Message"), // NOI18N
+        Resources.getText("LBL_Event"), // NOI18N
+        Resources.getText("LBL_Source")}; // NOI18N
     
     private final static Logger LOGGER = Logger.getLogger(XMBeanNotifications.class.getName());
     
@@ -65,14 +65,14 @@ class XMBeanNotifications extends JTable implements NotificationListener {
     private volatile boolean subscribed;
     private XMBeanNotificationsListener currentListener;
     public final static String NOTIFICATION_RECEIVED_EVENT =
-            "jconsole.xnotification.received";
+            "jconsole.xnotification.received"; // NOI18N
     private List<NotificationListener> notificationListenersList;
     private volatile boolean enabled;
     private Font normalFont, boldFont;
     private int rowMinHeight = -1;
     private TableCellEditor userDataEditor = new UserDataCellEditor();
     private NotifMouseListener mouseListener = new NotifMouseListener();
-    private SimpleDateFormat timeFormater = new SimpleDateFormat("HH:mm:ss:SSS");
+    private SimpleDateFormat timeFormater = new SimpleDateFormat("HH:mm:ss:SSS"); // NOI18N
     private static TableCellEditor editor =
             new Utils.ReadOnlyTableCellEditor(new JTextField());
     
@@ -180,8 +180,8 @@ class XMBeanNotifications extends JTable implements NotificationListener {
         }
         
         if (cell != null)
-            toolTip = Resources.getText("Double click to expand/collapse") +
-                    ". " + cell.toString();
+            toolTip = Resources.getText("LBL_DoubleClickToExpandCollapse") + // NOI18N
+                    ". " + cell.toString(); // NOI18N
         else {
             Object val =
                     ((DefaultTableModel) getModel()).getValueAt(row, column);
@@ -237,7 +237,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                         MBeanServerDelegate.DELEGATE_NAME, this, null, null);
                 subscribed = true;
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error adding listener for delegate", e);
+                LOGGER.log(Level.SEVERE, "Error adding listener for delegate", e); // NOI18N
             }
         }
         XMBeanNotificationsListener listener =
@@ -262,12 +262,12 @@ class XMBeanNotifications extends JTable implements NotificationListener {
             if (notif instanceof MBeanServerNotification) {
                 ObjectName mbean =
                         ((MBeanServerNotification) notif).getMBeanName();
-                if (notif.getType().indexOf("JMX.mbean.unregistered") >= 0) {
+                if (notif.getType().indexOf("JMX.mbean.unregistered") >= 0) { // NOI18N
                     unregister(mbean);
                 }
             }
         } catch(Exception e) {
-            LOGGER.log(Level.SEVERE, "Error unregistering notification", e);
+            LOGGER.log(Level.SEVERE, "Error unregistering notification", e); // NOI18N
         }
     }
     
@@ -442,7 +442,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                 String name =
                         Utils.getArrayClassName(userData.getClass().getName());
                 int length = Array.getLength(userData);
-                return name + "[" + length +"]";
+                return name + "[" + length +"]"; // NOI18N
             }
             
             if (userData instanceof CompositeData ||
@@ -597,7 +597,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                 mbean.getMBeanServerConnection().removeNotificationListener(
                         mbean.getObjectName(), this, null, null);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error removing listener", e);
+                LOGGER.log(Level.SEVERE, "Error removing listener", e); // NOI18N
             }
             unregistered = true;
         }
@@ -614,7 +614,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                         mbean.getObjectName(), this, null, null);
                 unregistered = false;
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error adding listener", e);
+                LOGGER.log(Level.SEVERE, "Error adding listener", e); // NOI18N
             }
         }
         
@@ -652,7 +652,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                                     XMBeanNotificationsListener.this,
                                     mbean, node, rowData, received);
                         } catch (Exception e) {
-                            LOGGER.log(Level.SEVERE, "Error handling notification", e);
+                            LOGGER.log(Level.SEVERE, "Error handling notification", e); // NOI18N
                         }
                     }
                 }

@@ -46,8 +46,8 @@ class XMBeanInfo extends JPanel {
     private final int VALUE_COLUMN = 1;
     
     private final String[] columnNames = {
-        Resources.getText("Name"),
-        Resources.getText("Value")
+        Resources.getText("LBL_Name"), // NOI18N
+        Resources.getText("LBL_Value") // NOI18N
     };
     
     private JTable infoTable = new JTable();
@@ -88,7 +88,7 @@ class XMBeanInfo extends JPanel {
                     table, value, isSelected, hasFocus, row, column);
             if (value instanceof TableRowDivider) {
                 JLabel label = new JLabel(
-                        "<html><b>" + value.toString() + "</b></html>");
+                        "<html><b>" + value.toString() + "</b></html>"); // NOI18N
                 label.setBackground(ensureContrast(
                         ((TableRowDivider) value).tableRowDividerColor,
                         label.getForeground()));
@@ -115,7 +115,7 @@ class XMBeanInfo extends JPanel {
                     table, value, isSelected, row, column);
             if (value instanceof TableRowDivider) {
                 JLabel label = new JLabel(
-                        "<html><b>" + value.toString() + "</b></html>");
+                        "<html><b>" + value.toString() + "</b></html>"); // NOI18N
                 label.setBackground(ensureContrast(
                         ((TableRowDivider) value).tableRowDividerColor,
                         label.getForeground()));
@@ -128,7 +128,7 @@ class XMBeanInfo extends JPanel {
     
     public XMBeanInfo() {
         super(new BorderLayout());
-        setBorder(BorderFactory.createTitledBorder(Resources.getText("MBeanInfo")));
+        setBorder(BorderFactory.createTitledBorder(Resources.getText("LBL_MBeanInfo"))); // NOI18N
         infoTable.setModel(new ReadOnlyDefaultTableModel());
         infoTable.setRowSelectionAllowed(false);
         infoTable.setColumnSelectionAllowed(false);
@@ -160,8 +160,8 @@ class XMBeanInfo extends JPanel {
             DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
             Object rowData[] = new Object[2];
             rowData[0] = new TableRowDivider(
-                    text + " " + Resources.getText("Descriptor") + ":", lightYellow);
-            rowData[1] = new TableRowDivider("", lightYellow);
+                    text + " " + Resources.getText("LBL_Descriptor") + ":", lightYellow); // NOI18N
+            rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
             tableModel.addRow(rowData);
             for (String fieldName : desc.getFieldNames()) {
                 rowData[0] = fieldName;
@@ -195,23 +195,23 @@ class XMBeanInfo extends JPanel {
     
     // Call on EDT
     private void addMBeanInfo(XMBean mbean, MBeanInfo mbeanInfo) {
-        String border = Resources.getText("MBeanInfo");
-        String text = Resources.getText("Info");
+        String border = Resources.getText("LBL_MBeanInfo"); // NOI18N
+        String text = Resources.getText("LBL_Info"); // NOI18N
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
         rowData[0] = new TableRowDivider(border, lightSalmon);
-        rowData[1] = new TableRowDivider("", lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = new TableRowDivider(text + ":", lightYellow);
-        rowData[1] = new TableRowDivider("", lightYellow);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow); // NOI18N
+        rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("ObjectName");
+        rowData[0] = Resources.getText("LBL_ObjectName"); // NOI18N
         rowData[1] = mbean.getObjectName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("ClassName");
+        rowData[0] = Resources.getText("LBL_ClassName"); // NOI18N
         rowData[1] = mbeanInfo.getClassName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Description");
+        rowData[0] = Resources.getText("LBL_Description"); // NOI18N
         rowData[1] = mbeanInfo.getDescription();
         tableModel.addRow(rowData);
         addDescriptor(mbeanInfo.getDescriptor(), text);
@@ -220,13 +220,13 @@ class XMBeanInfo extends JPanel {
         int i = 0;
         for (MBeanConstructorInfo mbci : mbeanInfo.getConstructors()) {
             addMBeanConstructorInfo(mbci,
-                    Resources.getText("Constructor") + "-" + i);
+                    Resources.getText("LBL_Constructor") + "-" + i); // NOI18N
             // MBeanParameterInfo
             //
             int j = 0;
             for (MBeanParameterInfo mbpi : mbci.getSignature()) {
                 addMBeanParameterInfo(mbpi,
-                        Resources.getText("Parameter") + "-" + i + "-" + j);
+                        Resources.getText("LBL_Parameter") + "-" + i + "-" + j); // NOI18N
                 j++;
             }
             i++;
@@ -236,32 +236,32 @@ class XMBeanInfo extends JPanel {
     
     // Call on EDT
     private void addMBeanAttributeInfo(MBeanAttributeInfo mbai) {
-        String border = Resources.getText("MBeanAttributeInfo");
-        String text = Resources.getText("Attribute");
+        String border = Resources.getText("LBL_MBeanAttributeInfo"); // NOI18N
+        String text = Resources.getText("LBL_Attribute"); // NOI18N
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
         rowData[0] = new TableRowDivider(border, lightSalmon);
-        rowData[1] = new TableRowDivider("", lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = new TableRowDivider(text + ":", lightYellow);
-        rowData[1] = new TableRowDivider("", lightYellow);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow); // NOI18N
+        rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Name");
+        rowData[0] = Resources.getText("LBL_Name"); // NOI18N
         rowData[1] = mbai.getName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Description");
+        rowData[0] = Resources.getText("LBL_Description"); // NOI18N
         rowData[1] = mbai.getDescription();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Readable");
+        rowData[0] = Resources.getText("LBL_Readable"); // NOI18N
         rowData[1] = mbai.isReadable();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Writable");
+        rowData[0] = Resources.getText("LBL_Writable"); // NOI18N
         rowData[1] = mbai.isWritable();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Is");
+        rowData[0] = Resources.getText("LBL_Is"); // NOI18N
         rowData[1] = mbai.isIs();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Type");
+        rowData[0] = Resources.getText("LBL_Type"); // NOI18N
         rowData[1] = mbai.getType();
         tableModel.addRow(rowData);
         addDescriptor(mbai.getDescriptor(), text);
@@ -270,39 +270,39 @@ class XMBeanInfo extends JPanel {
     
     // Call on EDT
     private void addMBeanOperationInfo(MBeanOperationInfo mboi) {
-        String border = Resources.getText("MBeanOperationInfo");
-        String text = Resources.getText("Operation");
+        String border = Resources.getText("LBL_MBeanOperationInfo"); // NOI18N
+        String text = Resources.getText("LBL_Operation"); // NOI18N
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
         rowData[0] = new TableRowDivider(border, lightSalmon);
-        rowData[1] = new TableRowDivider("", lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = new TableRowDivider(text + ":", lightYellow);
-        rowData[1] = new TableRowDivider("", lightYellow);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow); // NOI18N
+        rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Name");
+        rowData[0] = Resources.getText("LBL_Name"); // NOI18N
         rowData[1] = mboi.getName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Description");
+        rowData[0] = Resources.getText("LBL_Description"); // NOI18N
         rowData[1] = mboi.getDescription();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Impact");
+        rowData[0] = Resources.getText("LBL_Impact"); // NOI18N
         switch (mboi.getImpact()) {
             case MBeanOperationInfo.INFO:
-                rowData[1] = Resources.getText("INFO");
+                rowData[1] = Resources.getText("LBL_INFO"); // NOI18N
                 break;
             case MBeanOperationInfo.ACTION:
-                rowData[1] = Resources.getText("ACTION");
+                rowData[1] = Resources.getText("LBL_ACTION"); // NOI18N
                 break;
             case MBeanOperationInfo.ACTION_INFO:
-                rowData[1] = Resources.getText("ACTION_INFO");
+                rowData[1] = Resources.getText("LBL_ACTION_INFO"); // NOI18N
                 break;
             case MBeanOperationInfo.UNKNOWN:
-                rowData[1] = Resources.getText("UNKNOWN");
+                rowData[1] = Resources.getText("LBL_UNKNOWN"); // NOI18N
                 break;
         }
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("ReturnType");
+        rowData[0] = Resources.getText("LBL_ReturnType"); // NOI18N
         rowData[1] = mboi.getReturnType();
         tableModel.addRow(rowData);
         addDescriptor(mboi.getDescriptor(), text);
@@ -311,30 +311,30 @@ class XMBeanInfo extends JPanel {
         int i = 0;
         for (MBeanParameterInfo mbpi : mboi.getSignature()) {
             addMBeanParameterInfo(mbpi,
-                    Resources.getText("Parameter") + "-" + i++);
+                    Resources.getText("LBL_Parameter") + "-" + i++); // NOI18N
         }
         tableModel.newDataAvailable(new TableModelEvent(tableModel));
     }
     
     // Call on EDT
     private void addMBeanNotificationInfo(MBeanNotificationInfo mbni) {
-        String border = Resources.getText("MBeanNotificationInfo") + ":";
-        String text = Resources.getText("Notification");
+        String border = Resources.getText("LBL_MBeanNotificationInfo") + ":"; // NOI18N
+        String text = Resources.getText("LBL_Notification"); // NOI18N
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
         rowData[0] = new TableRowDivider(border, lightSalmon);
-        rowData[1] = new TableRowDivider("", lightSalmon);
+        rowData[1] = new TableRowDivider("", lightSalmon); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = new TableRowDivider(text + ":", lightYellow);
-        rowData[1] = new TableRowDivider("", lightYellow);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow); // NOI18N
+        rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Name");
+        rowData[0] = Resources.getText("LBL_Name"); // NOI18N
         rowData[1] = mbni.getName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Description");
+        rowData[0] = Resources.getText("LBL_Description"); // NOI18N
         rowData[1] = mbni.getDescription();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("NotifTypes");
+        rowData[0] = Resources.getText("LBL_NotifTypes"); // NOI18N
         rowData[1] = Arrays.toString(mbni.getNotifTypes());
         tableModel.addRow(rowData);
         addDescriptor(mbni.getDescriptor(), text);
@@ -345,13 +345,13 @@ class XMBeanInfo extends JPanel {
     private void addMBeanConstructorInfo(MBeanConstructorInfo mbci, String text) {
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text + ":", lightYellow);
-        rowData[1] = new TableRowDivider("", lightYellow);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow); // NOI18N
+        rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Name");
+        rowData[0] = Resources.getText("LBL_Name"); // NOI18N
         rowData[1] = mbci.getName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Description");
+        rowData[0] = Resources.getText("LBL_Description"); // NOI18N
         rowData[1] = mbci.getDescription();
         tableModel.addRow(rowData);
         addDescriptor(mbci.getDescriptor(), text);
@@ -362,16 +362,16 @@ class XMBeanInfo extends JPanel {
     private void addMBeanParameterInfo(MBeanParameterInfo mbpi, String text) {
         DefaultTableModel tableModel = (DefaultTableModel) infoTable.getModel();
         Object rowData[] = new Object[2];
-        rowData[0] = new TableRowDivider(text + ":", lightYellow);
-        rowData[1] = new TableRowDivider("", lightYellow);
+        rowData[0] = new TableRowDivider(text + ":", lightYellow); // NOI18N
+        rowData[1] = new TableRowDivider("", lightYellow); // NOI18N
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Name");
+        rowData[0] = Resources.getText("LBL_Name"); // NOI18N
         rowData[1] = mbpi.getName();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Description");
+        rowData[0] = Resources.getText("LBL_Description"); // NOI18N
         rowData[1] = mbpi.getDescription();
         tableModel.addRow(rowData);
-        rowData[0] = Resources.getText("Type");
+        rowData[0] = Resources.getText("LBL_Type"); // NOI18N
         rowData[1] = mbpi.getType();
         tableModel.addRow(rowData);
         addDescriptor(mbpi.getDescriptor(), text);

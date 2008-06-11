@@ -26,10 +26,10 @@
 package com.sun.tools.visualvm.modules.mbeans;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -46,7 +46,7 @@ class MBeansView extends DataSourceView {
     private Application application;
     
     public MBeansView(Application application) {
-        super(application, "MBeans", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false);
+        super(application, Resources.getText("LBL_MBeans"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false); // NOI18N
         this.application = application;
     }
 
@@ -54,12 +54,10 @@ class MBeansView extends DataSourceView {
         DataViewComponent dvc = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         if (jmx == null || jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            JTextArea textArea = new JTextArea("\n\nData not available in " +
-                    "this tab because JMX connection to the JMX agent couldn't " +
-                    "be established.");
+            JTextArea textArea = new JTextArea("\n\n" + Resources.getText("LBL_ConnectionNotEstablished")); // NOI18N
             textArea.setEditable(false);
             dvc = new DataViewComponent(
-                new DataViewComponent.MasterView("MBeans Browser", null, textArea),
+                new DataViewComponent.MasterView(Resources.getText("LBL_MBeansBrowser"), null, textArea), // NOI18N
                 new DataViewComponent.MasterViewConfiguration(true));
         } else {           
             // MBeansTab
@@ -81,19 +79,19 @@ class MBeansView extends DataSourceView {
             // MBeansMetadataView
             MBeansMetadataView mbeansMetadataView = new MBeansMetadataView(mbeansTab);
 
-            DataViewComponent.MasterView monitoringMasterView = new DataViewComponent.MasterView("MBeans Browser", null, new JLabel(" "));
+            DataViewComponent.MasterView monitoringMasterView = new DataViewComponent.MasterView(Resources.getText("LBL_MBeansBrowser"), null, new JLabel(" ")); // NOI18N
             DataViewComponent.MasterViewConfiguration monitoringMasterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
             dvc = new DataViewComponent(monitoringMasterView, monitoringMasterConfiguration);
         
             dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.33, 0, -1, -1, -1, -1));
-            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("MBeans", false), DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("MBeans", null, 10, mbeansTreeView, null), DataViewComponent.TOP_LEFT);
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(Resources.getText("LBL_MBeans"), false), DataViewComponent.TOP_LEFT); // NOI18N
+            dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_MBeans"), null, 10, mbeansTreeView, null), DataViewComponent.TOP_LEFT); // NOI18N
             
-            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", false), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Attributes", null, 10, mbeansAttributesView, null), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Operations", null, 20, mbeansOperationsView, null), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Notifications", null, 30, mbeansNotificationsView, null), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Metadata", null, 40, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT);
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(Resources.getText("LBL_Details"), false), DataViewComponent.TOP_RIGHT); // NOI18N
+            dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_Attributes"), null, 10, mbeansAttributesView, null), DataViewComponent.TOP_RIGHT); // NOI18N
+            dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_Operations"), null, 20, mbeansOperationsView, null), DataViewComponent.TOP_RIGHT); // NOI18N
+            dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_Notifications"), null, 30, mbeansNotificationsView, null), DataViewComponent.TOP_RIGHT); // NOI18N
+            dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_Metadata"), null, 40, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT); // NOI18N
 
             mbeansTab.setView(dvc);
         }

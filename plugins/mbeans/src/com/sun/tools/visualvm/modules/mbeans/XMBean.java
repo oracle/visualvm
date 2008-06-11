@@ -46,7 +46,7 @@ class XMBean {
     public XMBean(ObjectName objectName, MBeansTab mbeansTab) {
         this.mbeansTab = mbeansTab;
         this.objectName = objectName;
-        text = objectName.getKeyProperty("name");
+        text = objectName.getKeyProperty("name"); // NOI18N
         if (text == null)
             text = objectName.getDomain();
         if (MBeanServerDelegate.DELEGATE_NAME.equals(objectName)) {
@@ -70,10 +70,10 @@ class XMBean {
                 try {
                     broadcaster = getMBeanServerConnection().isInstanceOf(
                             getObjectName(),
-                            "javax.management.NotificationBroadcaster");
+                            "javax.management.NotificationBroadcaster"); // NOI18N
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Couldn't check if MBean [" +
-                            objectName + "] is a notification broadcaster", e);
+                    LOGGER.log(Level.SEVERE, "Couldn't check if MBean [" + // NOI18N
+                            objectName + "] is a notification broadcaster", e); // NOI18N
                     return false;
                 }
             }

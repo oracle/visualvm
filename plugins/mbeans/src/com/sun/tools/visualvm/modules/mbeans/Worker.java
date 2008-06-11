@@ -32,7 +32,7 @@ class Worker extends Thread {
     private boolean stopped = false;
 
     public Worker(String name) {
-        super("Worker-"+name);
+        super("Worker-"+name); // NOI18N
 
         setPriority(NORM_PRIORITY - 1);
     }

@@ -41,7 +41,7 @@ class XTree extends JTree {
             new HashMap<String, DefaultMutableTreeNode>();
 
     public XTree(MBeansTab mbeansTab) {
-        super(new DefaultMutableTreeNode("MBeanTreeRootNode"));
+        super(new DefaultMutableTreeNode("MBeanTreeRootNode")); // NOI18N
         this.mbeansTab = mbeansTab;
         setRootVisible(false);
         setShowsRootHandles(true);
@@ -248,7 +248,7 @@ class XTree extends JTree {
             } else {
                 // Create new intermediate node
                 //
-                if ("domain".equals(token.getTokenType())) {
+                if ("domain".equals(token.getTokenType())) { // NOI18N
                     parentNode = createDomainNode(dn, token);
                     DefaultMutableTreeNode root =
                             (DefaultMutableTreeNode) getModel().getRoot();
@@ -350,10 +350,10 @@ class XTree extends JTree {
             orderedKeyPropertyList = new ArrayList<String>();
             String keyPropertyList = GlobalPreferences.sharedInstance().getOrderedKeyPropertyList();
             if (keyPropertyList.isEmpty()) {
-                orderedKeyPropertyList.add("type");
-                orderedKeyPropertyList.add("j2eeType");
+                orderedKeyPropertyList.add("type"); // NOI18N
+                orderedKeyPropertyList.add("j2eeType"); // NOI18N
             } else {
-                String[] tokens = keyPropertyList.split(",");
+                String[] tokens = keyPropertyList.split(","); // NOI18N
                 for (String token : tokens) {
                     orderedKeyPropertyList.add(token);
                 }
@@ -370,16 +370,16 @@ class XTree extends JTree {
     private static Map<String, String> extractKeyValuePairs(
             String props, ObjectName mbean) {
         Map<String, String> map = new LinkedHashMap<String, String>();
-        int eq = props.indexOf("=");
+        int eq = props.indexOf("="); // NOI18N
         while (eq != -1) {
             String key = props.substring(0, eq);
             String value = mbean.getKeyProperty(key);
             map.put(key, value);
             props = props.substring(key.length() + 1 + value.length());
-            if (props.startsWith(",")) {
+            if (props.startsWith(",")) { // NOI18N
                 props = props.substring(1);
             }
-            eq = props.indexOf("=");
+            eq = props.indexOf("="); // NOI18N
         }
         return map;
     }
@@ -403,13 +403,13 @@ class XTree extends JTree {
         // key order defined by the "orderedKeyPropertyList"
         for (String key : orderedKeyPropertyList) {
             if (map.containsKey(key)) {
-                sb.append(key + "=" + map.get(key) + ",");
+                sb.append(key + "=" + map.get(key) + ","); // NOI18N
                 map.remove(key);
             }
         }
         // Add the remaining key/value pairs to the buffer
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            sb.append(entry.getKey() + "=" + entry.getValue() + ",");
+            sb.append(entry.getKey() + "=" + entry.getValue() + ","); // NOI18N
         }
         String orderedKeyPropertyListString = sb.toString();
         orderedKeyPropertyListString = orderedKeyPropertyListString.substring(
@@ -432,14 +432,14 @@ class XTree extends JTree {
     }
 
     private static boolean getTreeViewValue() {
-        String tv = System.getProperty("treeView");
-        return ((tv == null) ? true : !(tv.equals("false")));
+        String tv = System.getProperty("treeView"); // NOI18N
+        return ((tv == null) ? true : !(tv.equals("false"))); // NOI18N
     }
 
     //
     // MBean key-value preferences
     //
-    private boolean keyValueView = Boolean.getBoolean("keyValueView");
+    private boolean keyValueView = Boolean.getBoolean("keyValueView"); // NOI18N
 
     private boolean isKeyValueView() {
         return keyValueView;
@@ -475,15 +475,15 @@ class XTree extends JTree {
                 Map<String, String> map =
                         extractKeyValuePairs(keyPropertyList, mbean);
                 for (Map.Entry<String, String> entry : map.entrySet()) {
-                    tokens.add(new Token("key", entry.getKey() + "=" + entry.getValue()));
+                    tokens.add(new Token("key", entry.getKey() + "=" + entry.getValue())); // NOI18N
                 }
             } else {
                 // Flat view
-                tokens.add(new Token("key", "properties=" + keyPropertyList));
+                tokens.add(new Token("key", "properties=" + keyPropertyList)); // NOI18N
             }
 
             // Add the domain as the first token in the Dn
-            tokens.add(0, new Token("domain", "domain=" + domain));
+            tokens.add(0, new Token("domain", "domain=" + domain)); // NOI18N
 
             // Reverse the Dn (from leaf to root)
             Collections.reverse(tokens);
@@ -528,14 +528,14 @@ class XTree extends JTree {
             final StringBuilder hdn = new StringBuilder();
             for (int i = 0; i < tokens.size(); i++) {
                 hdn.append(tokens.get(i).getTokenValue());
-                hdn.append(",");
+                hdn.append(","); // NOI18N
             }
             hashDn = hdn.substring(0, hdn.length() - 1);
         }
 
         @Override
         public String toString() {
-            return domain + ":" + keyPropertyList;
+            return domain + ":" + keyPropertyList; // NOI18N
         }
 
         public int compareTo(Dn dn) {
@@ -573,7 +573,7 @@ class XTree extends JTree {
         }
 
         private void buildKeyValue() {
-            int index = tokenValue.indexOf("=");
+            int index = tokenValue.indexOf("="); // NOI18N
             if (index < 0) {
                 key = tokenValue;
                 value = tokenValue;

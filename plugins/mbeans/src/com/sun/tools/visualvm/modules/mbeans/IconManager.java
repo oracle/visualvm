@@ -33,14 +33,14 @@ import org.openide.util.Utilities;
 class IconManager {
 
     public static Icon MBEAN =
-            getSmallIcon(getImage("mbean.gif"));
+            getSmallIcon(getImage("mbean.gif")); // NOI18N
     public static Icon MBEANSERVERDELEGATE =
-            getSmallIcon(getImage("mbeanserverdelegate.gif"));
+            getSmallIcon(getImage("mbeanserverdelegate.gif")); // NOI18N
     public static Icon DEFAULT_XOBJECT =
-            getSmallIcon(getImage("xobject.gif"));
+            getSmallIcon(getImage("xobject.gif")); // NOI18N
 
     private static ImageIcon getImage(String img) {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/" + img, true));
+        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/" + img, true)); // NOI18N
     }
 
     private static ImageIcon getSmallIcon(ImageIcon icon) {
