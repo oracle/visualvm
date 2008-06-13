@@ -40,9 +40,10 @@
 
 package org.netbeans.modules.profiler.attach.spi;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import java.util.List;
-import java.util.Vector;
 
 
 /**
@@ -64,9 +65,9 @@ public interface IntegrationProvider {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public IntegrationHints() {
-            steps = new Vector(10);
-            hints = new Vector(10);
-            warnings = new Vector(10);
+            steps = new ArrayList(10);
+            hints = new ArrayList(10);
+            warnings = new ArrayList(10);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -126,7 +127,7 @@ public interface IntegrationProvider {
         }
 
         private List copyLock(List source) {
-            List immutable = new Vector();
+            List immutable = new ArrayList();
             immutable.addAll(source);
 
             return immutable;
@@ -154,7 +155,7 @@ public interface IntegrationProvider {
     public void modify(AttachSettings settings) throws ModificationException;
 
     public void run(AttachSettings settings) throws RunException;
-
+    
     public boolean supportsAutomation();
 
     public boolean supportsDirect();
