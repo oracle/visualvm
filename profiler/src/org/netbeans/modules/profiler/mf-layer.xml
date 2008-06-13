@@ -85,6 +85,15 @@ made subject to such option by the copyright holder.
           </folder>
       </folder>
     </folder>
+    <folder name="content">
+        <folder name="unknown">
+            <folder name="Factories">
+                <file name="org-netbeans-modules-profiler-SnapshotDataLoader.instance">
+                    <attr name="position" intvalue="98312"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
   </folder>
 
   <folder name="Menu">
