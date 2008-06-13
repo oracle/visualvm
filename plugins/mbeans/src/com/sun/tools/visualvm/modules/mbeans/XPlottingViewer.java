@@ -25,35 +25,39 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import java.util.Timer;
-
-import javax.management.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.logging.Logger;
+import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.Timer;
 
 @SuppressWarnings("serial")
 class XPlottingViewer extends PlotterPanel implements ActionListener {
+
+    private final static Logger LOGGER = Logger.getLogger(XPlottingViewer.class.getName());
+
     // TODO: Make number of decimal places customizable
     private static final int PLOTTER_DECIMALS = 4;
 
     private JButton plotButton;
     // The plotter cache holds Plotter instances for the various attributes
     private static HashMap<String, XPlottingViewer> plotterCache =
-        new HashMap<String, XPlottingViewer>();
-     private static HashMap<String, Timer> timerCache =
-         new HashMap<String, Timer>();
-    private JPanel bordered;
-    private Number value;
+            new HashMap<String, XPlottingViewer>();
+    private static HashMap<String, Timer> timerCache =
+            new HashMap<String, Timer>();
     private MBeansTab tab;
     private XMBean mbean;
     private String attributeName;
     private String key;
     private JTable table;
+
     private XPlottingViewer(String key,
                             XMBean mbean,
                             String attributeName,
@@ -61,14 +65,12 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
                             JTable table,
                             MBeansTab tab) {
         super(null);
-
         this.tab = tab;
         this.key = key;
         this.mbean = mbean;
         this.table = table;
-        this.attributeName = attributeName;
-        Plotter plotter = createPlotter(mbean, attributeName, key, table);
-        setupDisplay(plotter);
+        this.attributeName = attributeName;        
+        setupDisplay(createPlotter(mbean, attributeName, key, table));
     }
 
     static void dispose(MBeansTab tab) {
@@ -85,7 +87,7 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
             String key = (String) it.next();
             if(key.startsWith(String.valueOf(tab.hashCode()))) {
                 Timer t = timerCache.get(key);
-                t.cancel();
+                t.stop();
                 it.remove();
             }
         }
@@ -95,50 +97,38 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
         return (value instanceof Number);
     }
 
-    //Fired by dbl click
-    public  static Component loadPlotting(XMBean mbean,
-                                          String attributeName,
-                                          Object value,
-                                          JTable table,
-                                          MBeansTab tab) {
+    // Fired by dbl click
+    public static Component loadPlotting(
+            XMBean mbean, String attributeName, Object value, JTable table, MBeansTab tab) {
         Component comp = null;
-        if(isViewableValue(value)) {
-            String key = String.valueOf(tab.hashCode()) + " " + String.valueOf(mbean.hashCode()) + " " + mbean.getObjectName().getCanonicalName() + attributeName; // NOI18N
-            XPlottingViewer plotter = plotterCache.get(key);
-            if(plotter == null) {
-                plotter = new XPlottingViewer(key,
-                                              mbean,
-                                              attributeName,
-                                              value,
-                                              table,
-                                              tab);
-                plotterCache.put(key, plotter);
+        if (isViewableValue(value)) {
+            String key = String.valueOf(tab.hashCode()) + " " + // NOI18N
+                    String.valueOf(mbean.hashCode()) + " " + // NOI18N
+                    mbean.getObjectName().getCanonicalName() + attributeName;
+            XPlottingViewer p = plotterCache.get(key);
+            if (p == null) {
+                p = new XPlottingViewer(key, mbean, attributeName, value, table, tab);
+                plotterCache.put(key, p);
             }
-
-            comp = plotter;
+            comp = p;
         }
         return comp;
     }
 
-    /*public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        setBackground(g.getColor());
-        plotter.paintComponent(g);
-        }*/
     @Override
     public void actionPerformed(ActionEvent evt) {
         plotterCache.remove(key);
         Timer t = timerCache.remove(key);
-        t.cancel();
+        t.stop();
         ((XMBeanAttributes) table).collapse(attributeName, this);
     }
 
-    //Create plotter instance
+    // Create plotter instance
     public Plotter createPlotter(final XMBean xmbean,
                                  final String attributeName,
                                  String key,
                                  JTable table) {
-        final Plotter plotter = new XPlotter(table, Plotter.Unit.NONE) {
+        final Plotter p = new XPlotter(table, Plotter.Unit.NONE) {
             Dimension prefSize = new Dimension(400, 170);
             @Override
             public Dimension getPreferredSize() {
@@ -150,42 +140,44 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
             }
         };
 
-        plotter.createSequence(attributeName, attributeName, null, true);
+        p.createSequence(attributeName, attributeName, null, true);
 
-        TimerTask timerTask = new TimerTask() {
-                public void run() {
-                    tab.workerAdd(new Runnable() {
-                            public void run() {
-                                try {
-                                    Number n =
-                                        (Number) xmbean.getMBeanServerConnection().getAttribute(xmbean.getObjectName(), attributeName);
-                                    long v;
-                                    if (n instanceof Float || n instanceof Double) {
-                                        plotter.setDecimals(PLOTTER_DECIMALS);
-                                        double d = (n instanceof Float) ? (Float)n : (Double)n;
-                                        v = Math.round(d * Math.pow(10.0, PLOTTER_DECIMALS));
-                                    } else {
-                                        v = n.longValue();
-                                    }
-                                    plotter.addValues(System.currentTimeMillis(), v);
-                                } catch (Exception ex) {
-                                    // Should have a trace logged with proper
-                                    // trace mecchanism
-                                }
-                            }
-                        });
-                }
-            };
-
-        String timerName = "MBeans Plotter Timer-[" + key + "]"; // NOI18N
-        Timer timer = new Timer(timerName, true);
-        timer.schedule(timerTask, 0, tab.getUpdateInterval());
+        Timer timer = new Timer(tab.getUpdateInterval(), new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                intervalElapsed(p);
+            }
+        });
+        timer.setCoalesce(true);
+        timer.setInitialDelay(0);
+        timer.start();
         timerCache.put(key, timer);
-        return plotter;
+        return p;
     }
 
-    //Create Plotter display
-    private void setupDisplay(Plotter plotter) {
+    void intervalElapsed(final Plotter p) {
+        tab.getRequestProcessor().post(new Runnable() {
+            public void run() {
+                try {
+                    Number n = (Number) mbean.getCachedMBeanServerConnection().getAttribute(
+                            mbean.getObjectName(), attributeName);
+                    long v;
+                    if (n instanceof Float || n instanceof Double) {
+                        p.setDecimals(PLOTTER_DECIMALS);
+                        double d = (n instanceof Float) ? (Float) n : (Double) n;
+                        v = Math.round(d * Math.pow(10.0, PLOTTER_DECIMALS));
+                    } else {
+                        v = n.longValue();
+                    }
+                    p.addValues(System.currentTimeMillis(), v);
+                } catch (Exception e) {
+                    LOGGER.throwing(XPlottingViewer.class.getName(), "intervalElapsed", e); // NOI18N
+                }
+            }
+        });
+    }
+
+    // Create Plotter display
+    private void setupDisplay(Plotter p) {
         //setLayout(new GridLayout(2,0));
         GridBagLayout gbl = new GridBagLayout();
         setLayout(gbl);
@@ -206,21 +198,10 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
         plotterConstraints.gridx = 0;
         plotterConstraints.gridy = 1;
         plotterConstraints.weightx = 1;
-        //plotterConstraints.gridwidth = (int) plotter.getPreferredSize().getWidth();
-        //plotterConstraints.gridheight =  (int) plotter.getPreferredSize().getHeight();
         plotterConstraints.fill = GridBagConstraints.VERTICAL;
-        gbl.setConstraints(plotter, plotterConstraints);
+        gbl.setConstraints(p, plotterConstraints);
 
-
-        //bordered = new JPanel();
-        //bordered.setPreferredSize(new Dimension(400, 250));
-        //bordered.add(plotButton);
-        //bordered.add(plotter);
-
-        //add(bordered);
-
-        setPlotter(plotter);
+        setPlotter(p);
         repaint();
     }
-
 }

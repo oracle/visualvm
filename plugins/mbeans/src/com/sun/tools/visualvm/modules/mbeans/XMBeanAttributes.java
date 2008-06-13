@@ -30,13 +30,11 @@ import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import javax.swing.tree.*;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.*;
 import java.awt.Dimension;
 import java.util.*;
-import java.io.*;
 
 import java.lang.reflect.Array;
 
@@ -851,7 +849,7 @@ class XMBeanAttributes extends XTable {
             final TableModel model = (TableModel)e.getSource();
             // only post changes to the draggable column
             if (isColumnEditable(e.getColumn())) {
-                mbeansTab.workerAdd(new Runnable() {
+                mbeansTab.getRequestProcessor().post(new Runnable() {
                         public void run() {
                             try {
                                 Object tableValue =
