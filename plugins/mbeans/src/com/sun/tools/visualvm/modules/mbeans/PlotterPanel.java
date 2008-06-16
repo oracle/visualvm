@@ -33,7 +33,7 @@ import javax.swing.*;
 
 @SuppressWarnings("serial")
 class PlotterPanel extends BorderedComponent {
-    Plotter plotter;
+    private Plotter plotter;
 
     public PlotterPanel(String labelStr, Plotter.Unit unit, boolean collapsible) {
         super(labelStr, new Plotter(unit), collapsible);

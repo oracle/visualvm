@@ -96,9 +96,11 @@ class XSheet extends JPanel
     }
     
     public void dispose() {
+        clearNotifications();
         clear();
         XDataViewer.dispose(mbeansTab);
         mbeanNotifications.dispose();
+        displayEmptyNode();
     }
     
     private void setupScreen() {
@@ -223,6 +225,7 @@ class XSheet extends JPanel
                         mbeanInfo.loadMBeanInfo(mbean, mbi);
                         invalidate();
                         topPanelMetadata.removeAll();
+                        mbeansTab.getButtonAt(3).setEnabled(true);
                         JPanel mainPanelMetadata = new JPanel();
                         mainPanelMetadata.setLayout(new BorderLayout());
                         mainPanelMetadata.add(mbeanInfo, BorderLayout.CENTER);
@@ -242,7 +245,7 @@ class XSheet extends JPanel
                 }
             }
         };
-        sw.execute();
+        mbeansTab.getRequestProcessor().post(sw);
     }
 
     // Call on EDT
@@ -252,36 +255,40 @@ class XSheet extends JPanel
             return;
         }
         mbean = (XMBean) uo.getData();
-        SwingWorker<Void,Void> sw = new SwingWorker<Void,Void>() {
+        SwingWorker<MBeanInfo,Void> sw = new SwingWorker<MBeanInfo,Void>() {
             @Override
-            public Void doInBackground() throws InstanceNotFoundException,
+            public MBeanInfo doInBackground() throws InstanceNotFoundException,
                     IntrospectionException, ReflectionException, IOException {
-                mbeanAttributes.loadAttributes(mbean, mbean.getMBeanInfo());
-                return null;
+                MBeanInfo mbi = mbean.getMBeanInfo();
+                mbeanAttributes.loadAttributes(mbean, mbi);
+                return mbi;
             }
             @Override
             protected void done() {
                 try {
-                    get();
-                    if (!isSelectedNode(node, currentNode)) return;
-                    invalidate();
-                    topPanelAttributes.removeAll();
-                    JPanel borderPanel = new JPanel(new BorderLayout());
-                    borderPanel.setBorder(BorderFactory.createTitledBorder(
-                            Resources.getText("LBL_AttributeValues"))); // NOI18N
-                    borderPanel.add(new JScrollPane(mbeanAttributes));
-                    JPanel mainPanelAttributes = new JPanel();
-                    mainPanelAttributes.setLayout(new BorderLayout());
-                    mainPanelAttributes.add(borderPanel, BorderLayout.CENTER);
-                    topPanelAttributes.add(mainPanelAttributes, BorderLayout.CENTER);
-                    // add the refresh button to the south panel
-                    JPanel southPanelAttributes = new JPanel();
-                    southPanelAttributes.add(refreshButton, BorderLayout.SOUTH);
-                    southPanelAttributes.setVisible(true);
-                    refreshButton.setEnabled(true);
-                    topPanelAttributes.add(southPanelAttributes, BorderLayout.SOUTH);
-                    validate();
-                    repaint();
+                    MBeanInfo mbi = get();
+                    if (mbi != null && mbi.getAttributes() != null && mbi.getAttributes().length > 0) {
+                        if (!isSelectedNode(node, currentNode)) return;
+                        invalidate();
+                        topPanelAttributes.removeAll();
+                        mbeansTab.getButtonAt(0).setEnabled(true);
+                        JPanel borderPanel = new JPanel(new BorderLayout());
+                        borderPanel.setBorder(BorderFactory.createTitledBorder(
+                                Resources.getText("LBL_AttributeValues"))); // NOI18N
+                        borderPanel.add(new JScrollPane(mbeanAttributes));
+                        JPanel mainPanelAttributes = new JPanel();
+                        mainPanelAttributes.setLayout(new BorderLayout());
+                        mainPanelAttributes.add(borderPanel, BorderLayout.CENTER);
+                        topPanelAttributes.add(mainPanelAttributes, BorderLayout.CENTER);
+                        // add the refresh button to the south panel
+                        JPanel southPanelAttributes = new JPanel();
+                        southPanelAttributes.add(refreshButton, BorderLayout.SOUTH);
+                        southPanelAttributes.setVisible(true);
+                        refreshButton.setEnabled(true);
+                        topPanelAttributes.add(southPanelAttributes, BorderLayout.SOUTH);
+                        validate();
+                        repaint();
+                    }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
                     LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
@@ -293,7 +300,7 @@ class XSheet extends JPanel
                 }
             }
         };
-        sw.execute();
+        mbeansTab.getRequestProcessor().post(sw);
     }
     
     // Call on EDT
@@ -313,11 +320,12 @@ class XSheet extends JPanel
             protected void done() {
                 try {
                     MBeanInfo mbi = get();
-                    if (mbi != null) {
+                    if (mbi != null && mbi.getOperations() != null && mbi.getOperations().length > 0) {
                         if (!isSelectedNode(node, currentNode)) return;
                         mbeanOperations.loadOperations(mbean, mbi);
                         invalidate();
                         topPanelOperations.removeAll();
+                        mbeansTab.getButtonAt(1).setEnabled(true);
                         JPanel borderPanel = new JPanel(new BorderLayout());
                         borderPanel.setBorder(BorderFactory.createTitledBorder(
                                 Resources.getText("LBL_OperationInvocation"))); // NOI18N
@@ -341,7 +349,7 @@ class XSheet extends JPanel
                 }
             }
         };
-        sw.execute();
+        mbeansTab.getRequestProcessor().post(sw);
     }
     
     // Call on EDT
@@ -366,6 +374,7 @@ class XSheet extends JPanel
                         updateNotifications();
                         invalidate();
                         topPanelNotifications.removeAll();
+                        mbeansTab.getButtonAt(2).setEnabled(true);
                         JPanel borderPanel = new JPanel(new BorderLayout());
                         borderPanel.setBorder(BorderFactory.createTitledBorder(
                                 Resources.getText("LBL_NotificationBuffer"))); // NOI18N
@@ -397,7 +406,7 @@ class XSheet extends JPanel
                 }
             }
         };
-        sw.execute();
+        mbeansTab.getRequestProcessor().post(sw);
     }
     
     // Call on EDT
@@ -419,6 +428,10 @@ class XSheet extends JPanel
         topPanelMetadata.removeAll();
         topPanelMetadata.validate();
         topPanelMetadata.repaint();
+        mbeansTab.getButtonAt(0).setEnabled(false);
+        mbeansTab.getButtonAt(1).setEnabled(false);
+        mbeansTab.getButtonAt(2).setEnabled(false);
+        mbeansTab.getButtonAt(3).setEnabled(false);
         validate();
         repaint();
     }
@@ -427,7 +440,7 @@ class XSheet extends JPanel
      * Subscribe button action.
      */
     private void registerListener() {
-        new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> sw = new SwingWorker<Void, Void>() {
             @Override
             public Void doInBackground()
             throws InstanceNotFoundException, IOException {
@@ -448,14 +461,15 @@ class XSheet extends JPanel
                             Resources.getText("LBL_ProblemAddingListener")); // NOI18N
                 }
             }
-        }.execute();
+        };
+        mbeansTab.getRequestProcessor().post(sw);
     }
     
     /**
      * Unsubscribe button action.
      */
     private void unregisterListener() {
-        new SwingWorker<Boolean, Void>() {
+        SwingWorker<Boolean, Void> sw = new SwingWorker<Boolean, Void>() {
             @Override
             public Boolean doInBackground() {
                 return mbeanNotifications.unregisterListener(currentNode);
@@ -474,7 +488,8 @@ class XSheet extends JPanel
                             Resources.getText("LBL_ProblemRemovingListener")); // NOI18N
                 }
             }
-        }.execute();
+        };
+        mbeansTab.getRequestProcessor().post(sw);
     }
     
     /**
@@ -535,17 +550,7 @@ class XSheet extends JPanel
             return;
         }
         invalidate();
-        JComponent containerPanel = (JComponent) mbeansTab.getView().getComponent(0);
-        JComponent detailsPanel = (JComponent) containerPanel.getComponent(1);
-        JSplitPane detailsVerticalSplitter = (JSplitPane) detailsPanel.getComponent(0);
-        JComponent detailsTopPanel = (JComponent) detailsVerticalSplitter.getLeftComponent();
-        JSplitPane detailsTopHorizontalSplitter = (JSplitPane) detailsTopPanel.getComponent(0);
-        JComponent detailsTopRightArea = (JComponent) detailsTopHorizontalSplitter.getRightComponent();
-        JComponent captionArea = (JComponent) detailsTopRightArea.getComponent(0);
-        JComponent tabsContainer = (JComponent) captionArea.getComponent(0);
-        JComponent tabButtonContainer = (JComponent) tabsContainer.getComponent(2);
-        JButton tabButton = (JButton) tabButtonContainer.getComponent(0);
-        tabButton.setText(label);
+        mbeansTab.getButtonAt(2).setText(label);
         validate();
         repaint();
     }
@@ -651,13 +656,14 @@ class XSheet extends JPanel
             JButton button = (JButton) e.getSource();
             // Refresh button
             if (button == refreshButton) {
-                new SwingWorker<Void, Void>() {
+                SwingWorker<Void, Void> sw = new SwingWorker<Void, Void>() {
                     @Override
                     public Void doInBackground() {
                         refreshAttributes();
                         return null;
                     }
-                }.execute();
+                };
+                mbeansTab.getRequestProcessor().post(sw);
                 return;
             }
             // Clear button

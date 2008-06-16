@@ -34,6 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -44,10 +45,18 @@ class MBeansView extends DataSourceView {
 
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans.png"; // NOI18N
     private Application application;
+    private MBeansTab mbeansTab;
     
     public MBeansView(Application application) {
         super(application, Resources.getText("LBL_MBeans"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false); // NOI18N
         this.application = application;
+    }
+
+    @Override
+    protected void removed() {
+        if (mbeansTab != null) {
+            mbeansTab.dispose();
+        }
     }
 
     protected DataViewComponent createComponent() {
@@ -61,8 +70,8 @@ class MBeansView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(true));
         } else {           
             // MBeansTab
-            MBeansTab mbeansTab = new MBeansTab(application);
-            jmx.addPropertyChangeListener(mbeansTab);
+            mbeansTab = new MBeansTab(application);
+            jmx.addPropertyChangeListener(WeakListeners.propertyChange(mbeansTab, jmx));
 
             // MBeansTreeView
             MBeansTreeView mbeansTreeView = new MBeansTreeView(mbeansTab);
@@ -84,6 +93,7 @@ class MBeansView extends DataSourceView {
             dvc = new DataViewComponent(monitoringMasterView, monitoringMasterConfiguration);
         
             dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.33, 0, -1, -1, -1, -1));
+
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(Resources.getText("LBL_MBeans"), false), DataViewComponent.TOP_LEFT); // NOI18N
             dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_MBeans"), null, 10, mbeansTreeView, null), DataViewComponent.TOP_LEFT); // NOI18N
             
@@ -94,6 +104,10 @@ class MBeansView extends DataSourceView {
             dvc.addDetailsView(new DataViewComponent.DetailsView(Resources.getText("LBL_Metadata"), null, 40, mbeansMetadataView, null), DataViewComponent.TOP_RIGHT); // NOI18N
 
             mbeansTab.setView(dvc);
+            mbeansTab.getButtonAt(0).setEnabled(false); // Disable "Attributes"
+            mbeansTab.getButtonAt(1).setEnabled(false); // Disable "Operations"
+            mbeansTab.getButtonAt(2).setEnabled(false); // Disable "Notifications"
+            mbeansTab.getButtonAt(3).setEnabled(false); // Disable "Metadata"
         }
         return dvc;
     }

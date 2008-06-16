@@ -158,7 +158,7 @@ class XMBeanOperations extends JPanel implements ActionListener {
     
     void performInvokeRequest(final JButton button) {
         final OperationEntry entryIf = operationEntryTable.get(button);
-        new SwingWorker<Object, Void>() {
+        SwingWorker<Object, Void> sw = new SwingWorker<Object, Void>() {
             @Override
             public Object doInBackground() throws Exception {
                 return mbean.invoke(button.getText(),
@@ -192,7 +192,8 @@ class XMBeanOperations extends JPanel implements ActionListener {
                             JOptionPane.ERROR_MESSAGE).run();
                 }
             }
-        }.execute();
+        };
+        mbeansTab.getRequestProcessor().post(sw);
     }
     
     public void addOperationsListener(NotificationListener nl) {

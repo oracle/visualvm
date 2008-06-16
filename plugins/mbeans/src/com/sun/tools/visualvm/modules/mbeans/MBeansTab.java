@@ -44,36 +44,33 @@ import javax.management.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
+import org.openide.util.RequestProcessor;
 
 class MBeansTab extends JPanel implements
         NotificationListener, PropertyChangeListener,
         TreeSelectionListener, TreeWillExpandListener {
-    private final static Logger LOGGER = Logger.getLogger(MBeansTab.class.getName());
-    
+    private static final Logger LOGGER = Logger.getLogger(MBeansTab.class.getName());
+    private static final RequestProcessor worker = new RequestProcessor("MBeansTab Processor"); // NOI18N
+
     private Application application;
     private DataViewComponent view;
     private XTree tree;
     private XSheet sheet;
     private XDataViewer viewer;
-    private Worker worker;
     private CachedMBeanServerConnection cachedMBSC;
     
     public static String getTabName() {
         return Resources.getText("LBL_MBeans"); // NOI18N
     }
     
-    public synchronized void workerAdd(Runnable job) {
-        if (worker == null) {
-            worker = new Worker(getTabName() + "-" + application.getPid()); // NOI18N
-            worker.start();
-        }
-        worker.add(job);
-    }
-    
     public MBeansTab(Application application) {
         this.application = application;
         addPropertyChangeListener(this);
         setupTab();
+    }
+    
+    public RequestProcessor getRequestProcessor() {
+        return worker;
     }
     
     public XDataViewer getDataViewer() {
@@ -112,10 +109,23 @@ class MBeansTab extends JPanel implements
         this.view = view;
     }
 
+    public JButton getButtonAt(int position) {
+        JComponent containerPanel = (JComponent) view.getComponent(0);
+        JComponent detailsPanel = (JComponent) containerPanel.getComponent(1);
+        JSplitPane detailsVerticalSplitter = (JSplitPane) detailsPanel.getComponent(0);
+        JComponent detailsTopPanel = (JComponent) detailsVerticalSplitter.getLeftComponent();
+        JSplitPane detailsTopHorizontalSplitter = (JSplitPane) detailsTopPanel.getComponent(0);
+        JComponent detailsTopRightArea = (JComponent) detailsTopHorizontalSplitter.getRightComponent();
+        JComponent captionArea = (JComponent) detailsTopRightArea.getComponent(0);
+        JComponent tabsContainer = (JComponent) captionArea.getComponent(0);
+        JComponent tabButtonContainer = (JComponent) tabsContainer.getComponent(position);
+        return (JButton) tabButtonContainer.getComponent(0);
+    }
+    
     public void dispose() {
-        if (worker != null) {
-            worker.stopWorker();
-        }
+        removePropertyChangeListener(this);
+        tree.removeTreeSelectionListener(this);
+        tree.removeTreeWillExpandListener(this);
         sheet.dispose();
     }
     
@@ -124,7 +134,7 @@ class MBeansTab extends JPanel implements
     }
     
     public void buildMBeanServerView() {
-        new SwingWorker<Set<ObjectName>, Void>() {
+        SwingWorker<Set<ObjectName>, Void> sw = new SwingWorker<Set<ObjectName>, Void>() {
             @Override
             public Set<ObjectName> doInBackground() {
                 // Register listener for MBean registration/unregistration
@@ -177,7 +187,8 @@ class MBeansTab extends JPanel implements
                     LOGGER.log(Level.SEVERE, "Problem at MBean tree construction", t); // NOI18N
                 }
             }
-        }.execute();
+        };
+        worker.post(sw);
     }
     
     public MBeanServerConnection getMBeanServerConnection() {
@@ -253,7 +264,7 @@ class MBeansTab extends JPanel implements
                     buildMBeanServerView();
                     break;
                 case DISCONNECTED:
-                    sheet.dispose();
+                    dispose();
                     break;
             }
         }
