@@ -35,6 +35,8 @@ import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -50,8 +52,6 @@ import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.swing.JComponent;
@@ -60,8 +60,10 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 import javax.swing.event.SwingPropertyChangeSupport;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 class JConsolePluginWrapper {
 
@@ -328,7 +330,7 @@ class JConsolePluginWrapper {
             // Cancel pending update tasks
             //
             if (timer != null) {
-                timer.cancel();
+                timer.stop();
             }
             // Stop listening to connection state events
             //
@@ -357,16 +359,20 @@ class JConsolePluginWrapper {
 
         private void startUpdateTimer() {
             if (timer != null) {
-                timer.cancel();
+                timer.stop();
             }
-            TimerTask timerTask = new TimerTask() {
-                public void run() {
-                    update();
+            timer = new Timer(updateInterval, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            update();
+                        }
+                    });
                 }
-            };
-            String timerName = "JConsole Update Timer-[" + application.getId() + "]"; // NOI18N
-            timer = new Timer(timerName, true);
-            timer.schedule(timerTask, 0, updateInterval);
+            });
+            timer.setCoalesce(true);
+            timer.setInitialDelay(0);
+            timer.start();
         }
 
         // Note: This method is called on a TimerTask thread. Any GUI manipulation
@@ -394,7 +400,7 @@ class JConsolePluginWrapper {
                         if (sw == null || sw.getState() == SwingWorker.StateValue.PENDING) {
                             plugins.put(p, sw);
                             if (sw != null) {
-                                sw.execute();
+                                RequestProcessor.getDefault().post(sw);
                             }
                         }
                     }
