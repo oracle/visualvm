@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.marking;
 
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import java.util.HashMap;
 import java.util.Map;

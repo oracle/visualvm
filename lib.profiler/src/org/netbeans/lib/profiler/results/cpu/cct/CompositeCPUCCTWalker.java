@@ -40,7 +40,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct;
 
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
@@ -163,7 +163,7 @@ public class CompositeCPUCCTWalker extends CPUCCTWalker {
         }
     }
 
-    public void visit(CategoryCPUCCTNode node) {
+    public void visit(MarkedCPUCCTNode node) {
         for (Iterator iter = visitors.iterator(); iter.hasNext();) {
             CPUCCTVisitor visitor = (CPUCCTVisitor) iter.next();
 

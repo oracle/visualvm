@@ -40,6 +40,8 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.util.Collection;
+import java.util.Iterator;
 import org.netbeans.lib.profiler.ContextAware;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
@@ -50,6 +52,9 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 
 //import org.netbeans.lib.profiler.results.cpu.cct.NodeMarker;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
+import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.openide.util.Lookup;
 
 
 /**
@@ -111,9 +116,18 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
             if (ThreadInfo.beginTrans(false, true)) {
                 try {
                     CompositeCPUCCTWalker walker = new CompositeCPUCCTWalker();
-                    walker.add(0, client.getMarkFilter());
-                    walker.add(1, flattener);
-                    walker.add(2, client.getTimeCollector());
+                    int index = 0;
+                    CCTResultsFilter filter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
+                    
+                    if (filter != null) {
+                        walker.add(index++, filter);
+                    }
+                    walker.add(index++, flattener);
+                    
+                    TimeCollector tc = (TimeCollector)Lookup.getDefault().lookup(TimeCollector.class);
+                    if (tc != null) {
+                        walker.add(index++ , tc);
+                    }
 
                     walker.walk(appNode);
 

@@ -43,12 +43,11 @@ package org.netbeans.modules.profiler.ui.stats;
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTVisitorAdapter;
 import org.netbeans.lib.profiler.results.cpu.cct.CompositeCPUCCTWalker;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
-import org.netbeans.lib.profiler.ui.cpu.statistics.TimingData;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -57,11 +56,9 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -147,7 +144,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
             usedMark = Mark.DEFAULT;
         }
 
-        public void visit(CategoryCPUCCTNode node) {
+        public void visit(MarkedCPUCCTNode node) {
             if (time0 > 0L) {
                 // fill the timing data structures
                 Long markTime = markMap.get(usedMark);
@@ -186,7 +183,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
             lastCalls = node.getNCalls();
         }
 
-        public void visitPost(CategoryCPUCCTNode node) {
+        public void visitPost(MarkedCPUCCTNode node) {
             if (time0 > 0L) {
                 // fill the timing data structures
                 Long markTime = markMap.get(usedMark);
@@ -346,7 +343,9 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
                                 JPanel panel = new JPanel(new BorderLayout());
                                 panel.setOpaque(false);
 
-                                JLabel data = new JLabel(cat.mark.description + " (" + StringUtils.floatPerCentToString(percent)
+//                                JLabel data = new JLabel(cat.mark.description + " (" + StringUtils.floatPerCentToString(percent)
+//                                                         + "%)"); // NOI18N
+                                JLabel data = new JLabel("***" + " (" + StringUtils.floatPerCentToString(percent)
                                                          + "%)"); // NOI18N
                                 data.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 7, 0, 0),
                                                                                   data.getBorder()));

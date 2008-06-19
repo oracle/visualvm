@@ -341,14 +341,11 @@ public class ProfilerClient implements CommonConstants {
     private static final String CONNECT_VM_MSG = messages.getString("ProfilerClient_ConnectVmMsg"); // NOI18N
     private static final String TARGET_JVM_ERROR_MSG = messages.getString("ProfilerClient_TargetJvmErrorMsg"); // NOI18N
     private static final String UNSUPPORTED_JVM_MSG = messages.getString("ProfilerClient_UnsupportedJvmMsg"); // NOI18N
-                                                                                                              // -----
-    private static final String a = "AAQ";
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AppStatusHandler.ServerCommandHandler serverCommandHandler;
     private AppStatusHandler appStatusHandler;
-    private CCTResultsFilter markFilter;
     private CPUCCTProvider cpuCctProvider;
     private Command execInSeparateThreadCmd;
     private FlatProfileProvider flatProvider;
@@ -569,10 +566,6 @@ public class ProfilerClient implements CommonConstants {
         return resp;
     }
 
-    public CCTResultsFilter getMarkFilter() {
-        return markFilter;
-    }
-
     public MemoryCCTProvider getMemoryCCTProvider() {
         return memCctProvider;
     }
@@ -699,10 +692,6 @@ public class ProfilerClient implements CommonConstants {
 
     public ProfilingSessionStatus getStatus() {
         return status;
-    }
-
-    public TimeCollector getTimeCollector() {
-        return timeCollector;
     }
 
     public synchronized boolean cpuResultsExist() throws ClientUtils.TargetAppOrVMTerminated {
@@ -1015,16 +1004,8 @@ public class ProfilerClient implements CommonConstants {
         flatProvider = provider;
     }
 
-    public void registerMarkFilter(CCTResultsFilter filter) {
-        markFilter = filter;
-    }
-
     public void registerMemoryCCTProvider(MemoryCCTProvider provider) {
         memCctProvider = provider;
-    }
-
-    public void registerTimeCollector(TimeCollector collector) {
-        timeCollector = collector;
     }
 
     public void removeAllInstrumentation(boolean cleanupClient)

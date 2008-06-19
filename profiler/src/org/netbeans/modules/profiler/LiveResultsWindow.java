@@ -64,7 +64,7 @@ import org.netbeans.lib.profiler.ui.cpu.CodeRegionLivePanel;
 import org.netbeans.lib.profiler.ui.cpu.FlatProfilePanel;
 import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfilePanel;
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModuleContainer;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.DrillDownListener;
+import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownListener;
 import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 import org.netbeans.lib.profiler.ui.memory.LiveAllocResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
@@ -72,7 +72,7 @@ import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.stats.drilldown.hierarchical.DrillDown;
+import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDown;
 import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
@@ -1045,9 +1045,10 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
                     if (group != null) {
                         group.close();
                     }
-
                     drillDownGroupOpened = false;
                     DrillDownWindow.getDefault().getPresenter().setEnabled(false);
+                    
+                    Lookup.getDefault().lookup(DrillDown.class).deconfigure();
                 }
             });
     }
@@ -1097,10 +1098,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
                 List additionalStats = new ArrayList();
 
-                dd = new DrillDown(runner.getProfilerClient(), ptp.getMarkHierarchyRoot());
-
-                runner.getProfilerClient().getMarkFilter().removeAllEvaluators();
-                runner.getProfilerClient().getMarkFilter().addEvaluator(dd);
+                dd = Lookup.getDefault().lookup(DrillDown.class);
+                dd.configure(project.getLookup(), runner.getProfilerClient());
 
                 StatisticalModuleContainer container = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
                 additionalStats.addAll(container.getAllModules());
@@ -1207,9 +1206,9 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     }
 
     private void updateDrillDown() {
-        if (dd != null) {
-            dd.refresh(); // TODO race condition by cleaning the dd variable!
-        }
+//        if (dd != null) {
+//            dd.refresh(); // TODO race condition by cleaning the dd variable!
+//        }
 
         if (LOGGER.isLoggable(Level.FINE) && (currentDisplayComponent != null)) {
             LOGGER.fine("updating drilldown: " + currentDisplayComponent.getClass().getName()); // NOI18N
