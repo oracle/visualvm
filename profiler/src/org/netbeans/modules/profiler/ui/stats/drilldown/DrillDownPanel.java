@@ -38,10 +38,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu.statistics.drilldown;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.ui.charts.PieChart;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.cpu.StatisticsPanel;
@@ -51,6 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import org.netbeans.modules.profiler.categories.Category;
 
 
 /**
@@ -70,16 +71,16 @@ public class DrillDownPanel extends StatisticalModule {
     };
 
     private HTMLTextArea crumbNav;
-    private IDrillDown ddModel;
+    private DrillDown ddModel;
     private PieChart pieChart;
     private ProjectPieChartModel pieModel = null;
     private StatisticsPanel panel = null;
-    private int lastNavigableCategory;
+    private String lastNavigableCategoryId = null;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of DrillDownPanel */
-    public DrillDownPanel(IDrillDown model) {
+    public DrillDownPanel(DrillDown model) {
         ddModel = model;
         ddModel.addListener(listener);
         initComponents();
@@ -125,8 +126,7 @@ public class DrillDownPanel extends StatisticalModule {
                             return;
                         }
 
-                        int catIndex = Integer.parseInt(query.substring(index + 1));
-                        ddModel.drillup((Mark) ddModel.getDrillDownPath().get(catIndex));
+                        ddModel.drillup(query.substring(index + 1));
                     }
                 });
             updateCrumbNav();
@@ -162,25 +162,22 @@ public class DrillDownPanel extends StatisticalModule {
     }
 
     private void navigateOneLevelBack() {
-        if (lastNavigableCategory != -1) {
-            ddModel.drillup((Mark) ddModel.getDrillDownPath().get(lastNavigableCategory));
+        if (lastNavigableCategoryId != null) {
+            ddModel.drillup(lastNavigableCategoryId);
         }
     }
 
     private synchronized void updateCrumbNav() {
         StringBuilder sb = new StringBuilder();
-        int counter = 0;
-        lastNavigableCategory = -1;
+        lastNavigableCategoryId = null;
 
-        for (Iterator it = ddModel.getDrillDownPath().iterator(); it.hasNext(); counter++) {
-            final Mark mark = (Mark) it.next();
-
-            if (it.hasNext()) {
-                sb.append("<a href=\"http://localhost/category?id=").append(counter).append("\">").append(mark.description)
+        for (Category category : ddModel.getDrillDownPath()) {
+            if (!category.getSubcategories().isEmpty()) {
+                sb.append("<a href=\"http://localhost/category?id=").append(category.getId()).append("\">").append(category.getLabel())
                   .append("</a>").append("/"); // NOI18N
-                lastNavigableCategory = counter;
+                lastNavigableCategoryId = category.getId();
             } else {
-                sb.append(mark.description);
+                sb.append(category.getLabel());
             }
 
             crumbNav.setText(sb.toString());

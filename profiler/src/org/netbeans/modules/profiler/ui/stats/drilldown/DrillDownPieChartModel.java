@@ -38,13 +38,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu.statistics.drilldown;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.ui.charts.AbstractPieChartModel;
 import java.awt.Color;
 import java.util.Iterator;
 import java.util.List;
+import org.netbeans.modules.profiler.categories.Category;
 
 
 /**
@@ -62,7 +63,7 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected IDrillDown drillDown;
+    protected DrillDown drillDown;
     private Object itemMapLock = new Object();
     private int[] itemMap = null;
     private int itemCount = 0;
@@ -70,13 +71,13 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of DrillDownPieChartModel */
-    public DrillDownPieChartModel(IDrillDown model) {
+    public DrillDownPieChartModel(DrillDown model) {
         setDrillDown(model);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void setDrillDown(IDrillDown model) {
+    public void setDrillDown(DrillDown model) {
         if (drillDown != null) {
             drillDown.removeListener(this);
         }
@@ -107,7 +108,7 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
             return ""; // illegal index // NOI18N
         }
 
-        return ((Mark) drillDown.getSubmarks().get(getMappedIndex(index))).description;
+        return drillDown.getSubCategories().get(getMappedIndex(index)).getLabel();
     }
 
     public void dataChanged() {
@@ -131,11 +132,11 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
             return; // illegal index
         }
 
-        if (drillDown.getSubmarks().isEmpty()) {
+        if (drillDown.getSubCategories().isEmpty()) {
             return;
         }
 
-        drillDown.drilldown((Mark) drillDown.getSubmarks().get(getMappedIndex(index)));
+        drillDown.drilldown(drillDown.getSubCategories().get(getMappedIndex(index)).getId());
     }
 
     public void drillup() {
@@ -147,7 +148,7 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
             return; // illegal index
         }
 
-        drillDown.drillup((Mark) drillDown.getSubmarks().get(getMappedIndex(index)));
+        drillDown.drillup(drillDown.getSubCategories().get(getMappedIndex(index)).getId());
     }
 
     @Override
@@ -171,33 +172,16 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
         synchronized (itemMapLock) {
             int counter = 0;
             int mapCounter = 0;
-            int[] map = new int[drillDown.getSubmarks().size()];
+            int[] map = new int[drillDown.getSubCategories().size()];
 
-            for (Iterator it = drillDown.getSubmarks().iterator(); it.hasNext(); counter++) {
-                Mark mark = (Mark) it.next();
-
-                if (drillDown.getMarkTime(mark, false) > 0) {
+            for (Category category : drillDown.getSubCategories()) {
+                if (drillDown.getCategoryTime(category, false) > 0) {
                     map[mapCounter++] = counter;
                 }
             }
 
             itemCount = (mapCounter > 0) ? mapCounter : 0;
             itemMap = map;
-
-            //      if (itemCount > 0) {
-            //        int surplus = 0;
-            //        if (drillDown.getCurrentTime(true) > 0) {
-            //          surplus = 1;
-            //        }
-            //        itemMap = new int[itemCount + surplus];
-            //        System.arraycopy(map, 0, itemMap, 0, itemCount);
-            //        if (surplus > 0) {
-            //          itemMap[itemCount + surplus - 1] = -1;
-            //        }
-            //        itemCount += surplus;
-            //      } else {
-            //        itemMap = new int[0];
-            //      }
         }
     }
 }

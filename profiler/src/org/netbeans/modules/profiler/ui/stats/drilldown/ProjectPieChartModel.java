@@ -38,11 +38,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu.statistics.drilldown;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -54,7 +55,7 @@ public class ProjectPieChartModel extends DrillDownPieChartModel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.Bundle"); // NOI18N
+    private static final ResourceBundle messages = NbBundle.getBundle(ProjectPieChartModel.class.getName());
     private static final String SELF_BADGE_TEXT = messages.getString("ProjectPieChartModel_SelfBadgeText"); // NOI18N
                                                                                                             // -----
 
@@ -63,7 +64,7 @@ public class ProjectPieChartModel extends DrillDownPieChartModel {
     /**
      * Creates a new instance of ProjectPieChartModel
      */
-    public ProjectPieChartModel(IDrillDown model) {
+    public ProjectPieChartModel(DrillDown model) {
         super(model);
     }
 
@@ -89,7 +90,7 @@ public class ProjectPieChartModel extends DrillDownPieChartModel {
         //    long netSelfTime = drillDown.getCurrentTime(true);
         long allTimeCalc = 0;
 
-        for (int i = 0; i < drillDown.getSubmarks().size(); i++) {
+        for (int i = 0; i < drillDown.getSubCategories().size(); i++) {
             allTimeCalc += getItemValueAt(i);
         }
 
@@ -107,38 +108,38 @@ public class ProjectPieChartModel extends DrillDownPieChartModel {
     }
 
     public boolean isSelectable(int index) {
-        if (drillDown.getSubmarks().size() <= index) {
+        if (drillDown.getSubCategories().size() <= index) {
             return false;
         }
 
         if (index != -1) {
-            return drillDown.canDrilldown((Mark) drillDown.getSubmarks().get(index));
+            return drillDown.canDrilldown(drillDown.getSubCategories().get(index));
         }
 
         return false;
     }
 
     private String getItemNameAt(int index) {
-        if (drillDown.getSubmarks().size() <= index) {
+        if (drillDown.getSubCategories().size() <= index) {
             return ""; // NOI18N
         }
 
-        if (((index == -1) || drillDown.isCurrent((Mark) drillDown.getSubmarks().get(index))) && !drillDown.isInSelf()) {
-            return MessageFormat.format(SELF_BADGE_TEXT, new Object[] { ((Mark) drillDown.getCurrentMark()).description });
+        if (((index == -1) || drillDown.isCurrent(drillDown.getSubCategories().get(index))) && !drillDown.isInSelf()) {
+            return MessageFormat.format(SELF_BADGE_TEXT, new Object[] { (drillDown.getCurrentCategory()).getLabel() });
         } else {
-            return ((Mark) drillDown.getSubmarks().get(index)).description;
+            return drillDown.getCurrentCategory().getLabel();
         }
     }
 
     private double getItemValueAt(int index) {
-        if (drillDown.getSubmarks().size() <= index) {
+        if (drillDown.getSubCategories().size() <= index) {
             return 0d;
         }
 
-        if (((index == -1) || drillDown.isCurrent((Mark) drillDown.getSubmarks().get(index))) && !drillDown.isInSelf()) {
+        if (((index == -1) || drillDown.isCurrent(drillDown.getSubCategories().get(index))) && !drillDown.isInSelf()) {
             return (double) drillDown.getCurrentTime(true);
         } else {
-            return (double) drillDown.getMarkTime((Mark) drillDown.getSubmarks().get(index), false);
+            return (double) drillDown.getCategoryTime(drillDown.getSubCategories().get(index), false);
         }
     }
 }
