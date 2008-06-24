@@ -448,11 +448,10 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
       panelDetails.setVisible(true);
       hintPanel.setVisible(true);
     }
-    String platform = IntegrationUtils.getLocalJavaPlatform();
     boolean remote = target.supportsRemoteProfiling() && model.isRemote();
     boolean local = (target.supportsLocalProfiling() && model.isLocal()) || !target.supportsRemoteProfiling();
     boolean directEnabled = target.supportsDirectAttach();
-    boolean dynamicEnabled16 = target.supportsDynamicAttach() && model.isLocal() && (platform.equals(IntegrationUtils.PLATFORM_JAVA_60) || platform.equals(IntegrationUtils.PLATFORM_JAVA_70));
+    boolean dynamicEnabled16 = target.supportsDynamicAttach() && model.isLocal() && isDynamicAttachSupported();
     boolean direct = ((directEnabled && model.isDirectAttach()) || (!dynamicEnabled16 && model.isDynamicAttach16()));
     boolean dynamic16 = (dynamicEnabled16 && model.isDynamicAttach16() && model.isLocal());
 //
@@ -506,5 +505,15 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
     else
       return new ForceSelectionComboBoxModel(model.getTargetGroup().getTargets());
   }
+
+    private boolean isDynamicAttachSupported() {
+        try {
+            Class.forName("sun.jvmstat.monitor.MonitoredHost");
+            Class.forName("com.sun.tools.attach.VirtualMachine");
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+        return true;
+    }
   
 }

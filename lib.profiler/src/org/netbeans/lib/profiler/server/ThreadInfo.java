@@ -312,7 +312,6 @@ public class ThreadInfo {
                 }
 
                 ti.initialized = false;
-                ti.resetInternalState();
             }
         }
     }
