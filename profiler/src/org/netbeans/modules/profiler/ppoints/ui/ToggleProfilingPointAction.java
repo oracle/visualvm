@@ -246,10 +246,14 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
-
-        initChooser();
-
-        Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
+        
+        // #129155, probably causes deadlock when not initialized from EDT
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            public void run() {
+                initChooser();
+                Toolkit.getDefaultToolkit().addAWTEventListener(ToggleProfilingPointAction.this, AWTEvent.KEY_EVENT_MASK);
+            }
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
