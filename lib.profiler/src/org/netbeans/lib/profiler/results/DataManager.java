@@ -56,7 +56,7 @@ import java.util.concurrent.Executors;
 public abstract class DataManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Executor eventDispatcher = Executors.newCachedThreadPool();
+    private static Executor eventDispatcher = Executors.newCachedThreadPool();
     private final Set listeners = new HashSet();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
