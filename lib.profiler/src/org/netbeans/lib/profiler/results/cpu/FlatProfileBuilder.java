@@ -40,8 +40,6 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
-import java.util.Collection;
-import java.util.Iterator;
 import org.netbeans.lib.profiler.ContextAware;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;

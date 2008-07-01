@@ -36,7 +36,6 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.profiler.categories;
 
 import java.util.Collections;
@@ -44,8 +43,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.WeakHashMap;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.marker.Mark;
+import org.netbeans.lib.profiler.marker.Marker;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import org.netbeans.modules.profiler.utilities.Visitable;
 import org.netbeans.modules.profiler.utilities.Visitor;
@@ -54,49 +56,77 @@ import org.netbeans.modules.profiler.utilities.Visitor;
  *
  * @author Jaroslav Bachorik
  */
-public class Categorization {
+public class Categorization implements Marker {
+
     private CategoryBuilder builder;
     private Project project;
     private Map<Category, Set<Mark>> inheritedMarkMap;
-    
+    private Map<Mark, Category> reverseMap;
+
     public Categorization(Project project, CategoryBuilder builder) {
         this.builder = builder;
         this.project = project;
         this.inheritedMarkMap = null;
     }
-    
+
     private synchronized Map<Category, Set<Mark>> getInheritedMap() {
-        if (inheritedMarkMap == null) {
-            inheritedMarkMap = new HashMap<Category, Set<Mark>>();
-            initInheritedMap(getRoot());
+        if (inheritedMarkMap == null && reverseMap == null) {
+            initInternals();
         }
-        
+
         return inheritedMarkMap;
     }
     
-    private void initInheritedMap(Category category) {
-        Set<Mark> marks = inheritedMarkMap.get(category);
+    private synchronized Map<Mark, Category> getReverseMap() {
+        if (inheritedMarkMap == null && reverseMap == null) {
+            initInternals();
+        }
+        return reverseMap;
+    }
+    
+    private void initInternals() {
+        inheritedMarkMap = new HashMap<Category, Set<Mark>>();
+        reverseMap = new WeakHashMap<Mark, Category>();
+        
+        Stack<Category> path = new Stack<Category>();
+        path.add(getRoot());
+        initInternals(path);
+    }
+
+    private void initInternals(Stack<Category> path) {
+        Category currentCategory = path.peek();
+        reverseMap.put(currentCategory.getAssignedMark(), currentCategory);
+        
+        for (Category category : path) {
+            Set<Mark> marks = inheritedMarkMap.get(category);
             if (marks == null) {
                 marks = new HashSet<Mark>();
                 inheritedMarkMap.put(category, marks);
             }
-            marks.add(category.getAssignedMark());
-
-            for(Category child : category.getSubcategories()) {
-                initInheritedMap(child);
-            }
+            marks.add(currentCategory.getAssignedMark());
+        }
+        for (Category child : currentCategory.getSubcategories()) {
+            path.push(child);
+            initInternals(path);
+            path.pop();
+        }
     }
     
     public Category getRoot() {
         return builder.getRootCategory();
     }
+
+    public Category getCategoryForMark(Mark mark) {
+        return getReverseMap().get(mark);
+    }
+    
     
     public Set<Mark> getAllMarks(Category category) {
         Set<Mark> marks = getInheritedMap().get(category);
         return marks != null ? Collections.unmodifiableSet(marks) : Collections.EMPTY_SET;
     }
-    
-    public MarkMapping[] getMarkMappings() {
+
+    public MarkMapping[] getMappings() {
         MarkerProcessor mp = new MarkerProcessor(project);
         getRoot().accept(new Visitor<Visitable<Category>, Void, CategoryDefinitionProcessor>() {
 
@@ -107,4 +137,21 @@ public class Categorization {
         }, mp);
         return mp.getMappings();
     }
+
+    public Mark[] getMarks() {
+        return getAllMarks(getRoot()).toArray(new Mark[0]);
+    }
+    
+//    private Category getCategoryForMark(Mark mark, Category rootCategory) {
+//        if (rootCategory.getAssignedMark().equals(mark)) return rootCategory;
+//        
+//        for(Category subCat : rootCategory.getSubcategories()) {
+//            Category found = getCategoryForMark(mark, subCat);
+//            if (found != null) {
+//                return found;
+//            }
+//        }
+//        
+//        return null;
+//    }
 }

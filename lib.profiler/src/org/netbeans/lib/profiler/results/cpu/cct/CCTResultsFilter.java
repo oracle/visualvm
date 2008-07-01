@@ -40,10 +40,13 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct;
 
+import java.util.Collection;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
 import org.netbeans.lib.profiler.marker.Mark;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,6 +65,10 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
 
         boolean evaluate(Mark mark);
     }
+    
+    public static interface EvaluatorProvider {
+        Set/*<Evaluator>*/ getEvaluators();
+    }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -69,23 +76,37 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private Set /*<Evaluator>*/ evaluators = null;
     private Stack passFlagStack;
     private boolean passingFilter;
-    private Lookup.Result evaluators;
-    
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of CategoryFilter */
     public CCTResultsFilter() {
+        evaluators = new HashSet /*<Evaluator>*/();
         passFlagStack = new Stack();
-        evaluators = Lookup.getDefault().lookupResult(CCTResultsFilter.Evaluator.class);
         doReset();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public synchronized boolean passesFilter() {
         return passingFilter;
+    }
+
+    public void beforeWalk() {
+        super.beforeWalk();
+        evaluators.clear();
+        
+        Collection providers = Lookup.getDefault().lookupAll(EvaluatorProvider.class);
+        for(Iterator iter = providers.iterator();iter.hasNext();) {
+            evaluators.addAll(((EvaluatorProvider)iter.next()).getEvaluators());
+        }
+    }
+
+    public void afterWalk() {
+        evaluators.clear();
+        super.afterWalk();
     }
 
     public void reset() {
@@ -97,7 +118,7 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
         passFlagStack.push(Boolean.valueOf(passingFilter));
         passingFilter = true;
 
-        for (Iterator iter = evaluators.allInstances().iterator(); iter.hasNext();) {
+        for (Iterator iter = evaluators.iterator(); iter.hasNext();) {
             Evaluator evaluator = (Evaluator) iter.next();
             passingFilter &= evaluator.evaluate(Mark.DEFAULT);
         }
@@ -114,7 +135,7 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
         passFlagStack.push(Boolean.valueOf(passingFilter));
         passingFilter = true;
 
-        for (Iterator iter = evaluators.allInstances().iterator(); iter.hasNext();) {
+        for (Iterator iter = evaluators.iterator(); iter.hasNext();) {
             Evaluator evaluator = (Evaluator) iter.next();
             passingFilter &= evaluator.evaluate(node.getMark());
         }

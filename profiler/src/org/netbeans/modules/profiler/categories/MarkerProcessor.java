@@ -39,6 +39,10 @@
 
 package org.netbeans.modules.profiler.categories;
 
+import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
+import org.netbeans.modules.profiler.categories.definitions.SubtypeCategoryDefinition;
+import org.netbeans.modules.profiler.categories.definitions.SingleTypeCategoryDefinition;
+import org.netbeans.modules.profiler.categories.definitions.CustomCategoryDefinition;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,28 +95,28 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
     
     @Override
     public void process(SubtypeCategoryDefinition def) {
-        if (def.excludes == null && def.includes == null) {
-            addInterfaceMarker(mMarker, def.typeName, def.getAssignedMark());
+        if (def.getExcludes() == null && def.getIncludes() == null) {
+            addInterfaceMarker(mMarker, def.getTypeName(), def.getAssignedMark());
         } else {
-            if (def.excludes != null) {
-                addInterfaceMarker(mMarker, def.typeName, def.excludes, false, def.getAssignedMark());
+            if (def.getExcludes() != null) {
+                addInterfaceMarker(mMarker, def.getTypeName(), def.getExcludes(), false, def.getAssignedMark());
             }
-            if (def.includes != null) {
-                addInterfaceMarker(mMarker, def.typeName, def.includes, true, def.getAssignedMark());
+            if (def.getIncludes() != null) {
+                addInterfaceMarker(mMarker, def.getTypeName(), def.getIncludes(), true, def.getAssignedMark());
             }
         }
     }
 
     @Override
     public void process(SingleTypeCategoryDefinition def) {
-        if (def.excludes == null && def.includes == null) {
-            cMarker.addClassMark(def.typeName, def.getAssignedMark());
+        if (def.getExcludes() == null && def.getIncludes() == null) {
+            cMarker.addClassMark(def.getTypeName(), def.getAssignedMark());
         } else {
-            if (def.excludes != null) {
-                addTypeMarker(mMarker, def.typeName, def.excludes, false, def.getAssignedMark());
+            if (def.getExcludes() != null) {
+                addTypeMarker(mMarker, def.getTypeName(), def.getExcludes(), false, def.getAssignedMark());
             }
-            if (def.includes != null) {
-                addTypeMarker(mMarker, def.typeName, def.includes, true, def.getAssignedMark());
+            if (def.getIncludes() != null) {
+                addTypeMarker(mMarker, def.getTypeName(), def.getIncludes(), true, def.getAssignedMark());
             }
         }
     }
@@ -122,6 +126,11 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
         cmMarker.addMarker(def.getCustomMarker());
     }
 
+    @Override
+    public void process(PackageCategoryDefinition def) {
+        pMarker.addPackageMark(def.getPackageName(), def.getAssignedMark());
+    }
+    
     public MarkMapping[] getMappings() {
         List<MarkMapping> mappings = new ArrayList<MarkMapping>();
         mappings.addAll(Arrays.asList(mMarker.getMappings()));

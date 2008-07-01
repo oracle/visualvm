@@ -37,24 +37,38 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.categories;
+package org.netbeans.modules.profiler.categories.definitions;
+
+import org.netbeans.modules.profiler.categories.*;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class SingleTypeCategoryDefinition  extends TypeCategoryDefinition {
+public abstract class TypeCategoryDefinition extends CategoryDefinition {
+    protected String typeName;
+    protected String[] includes, excludes;
 
-    public SingleTypeCategoryDefinition(Category category, String typeName, String[] includes, String[] excludes) {
-        super(category, typeName, includes, excludes);
+    public TypeCategoryDefinition(Category category, String typeName) {
+        this(category, typeName, null, null);
     }
 
-    public SingleTypeCategoryDefinition(Category category, String typeName) {
-        super(category, typeName);
+    public TypeCategoryDefinition(Category category, String typeName, String[] includes, String[] excludes) {
+        super(category);
+        this.typeName = typeName;
+        this.includes = includes;
+        this.excludes = excludes;
     }
-    
-    public void processWith(CategoryDefinitionProcessor processor) {
-        processor.process(this);
-        // process other cases
+
+    public String[] getExcludes() {
+        return excludes;
+    }
+
+    public String[] getIncludes() {
+        return includes;
+    }
+
+    public String getTypeName() {
+        return typeName;
     }
 }

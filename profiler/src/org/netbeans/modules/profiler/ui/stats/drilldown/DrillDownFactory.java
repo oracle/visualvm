@@ -37,27 +37,52 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.categories;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
-import org.netbeans.modules.profiler.categories.definitions.SubtypeCategoryDefinition;
-import org.netbeans.modules.profiler.categories.definitions.SingleTypeCategoryDefinition;
-import org.netbeans.modules.profiler.categories.definitions.CustomCategoryDefinition;
-import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.marker.Mark;
+import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
+import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter.Evaluator;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class CategoryDefinitionProcessor {
-    public void process(CategoryDefinition def) {
-        throw new UnsupportedOperationException("Must specify a concrete org.netbeans.modules.profiler.categories.CategoryDefinition implementation");
+public class DrillDownFactory implements CCTResultsFilter.EvaluatorProvider {
+    private class WeakEvaluator extends WeakReference<CCTResultsFilter.Evaluator> implements Evaluator {
+        public WeakEvaluator(Evaluator referent, ReferenceQueue<? super Evaluator> q) {
+            super(referent, q);
+        }
+
+        public WeakEvaluator(Evaluator referent) {
+            super(referent);
+        }
+
+        public boolean evaluate(Mark mark) {
+            Evaluator eval = get();
+            return eval != null ? eval.evaluate(mark) : true;
+        }
     }
+    final private Set<WeakEvaluator> drillDownEvaluators = Collections.synchronizedSet(new HashSet<WeakEvaluator>());
     
-    public abstract void process(SubtypeCategoryDefinition def);
-    
-    public abstract void process(SingleTypeCategoryDefinition def);
-    
-    public abstract void process(CustomCategoryDefinition def);
-    
-    public abstract void process(PackageCategoryDefinition def);
+    public DrillDown createDrillDown(Project project, ProfilerClient client) {
+        DrillDown dd = new DrillDown(project.getLookup(), client);
+        drillDownEvaluators.add(new WeakEvaluator(dd));
+        return dd;
+    }
+
+    /**
+     * A set of provided evaluators
+     * @return Returns a synchronized set - thus each access to the set must be guarded by the instance
+     */
+    public Set getEvaluators() {
+        
+        return drillDownEvaluators;
+    }
 }

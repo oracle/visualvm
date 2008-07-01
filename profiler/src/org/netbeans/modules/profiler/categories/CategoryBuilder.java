@@ -39,8 +39,12 @@
 
 package org.netbeans.modules.profiler.categories;
 
+import org.netbeans.modules.profiler.categories.definitions.SubtypeCategoryDefinition;
+import org.netbeans.modules.profiler.categories.definitions.SingleTypeCategoryDefinition;
 import java.util.Enumeration;
 import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.marker.Mark;
+import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.Repository;
@@ -51,13 +55,14 @@ import org.openide.util.NbBundle;
  * @author Jaroslav Bachorik
  */
 public class CategoryBuilder  {
-    private static final String CATEGORY_ATTRIB_CUSTOM = "custom";
-    private static final String CATEGORY_ATTRIB_EXCLUDES = "excludes";
-    private static final String CATEGORY_ATTRIB_INCLUDES = "includes";
-    private static final String CATEGORY_ATTRIB_INSTANCENAME = "instanceClass";
-    private static final String CATEGORY_ATTRIB_PREFIX = "~";
-    private static final String CATEGORY_ATTRIB_SUBTYPES = "subtypes";
-    private static final String CATEGORY_ATTRIB_TYPE = "type";
+    private static final String CATEGORY_ATTRIB_CUSTOM = "custom"; // NOI18N
+    private static final String CATEGORY_ATTRIB_EXCLUDES = "excludes"; // NOI18N
+    private static final String CATEGORY_ATTRIB_INCLUDES = "includes"; // NOI18N
+    private static final String CATEGORY_ATTRIB_INSTANCENAME = "instanceClass"; // NOI18N
+    private static final String CATEGORY_ATTRIB_PREFIX = "~"; // NOI18N
+    private static final String CATEGORY_ATTRIB_SUBTYPES = "subtypes"; // NOI18N
+    private static final String CATEGORY_ATTRIB_TYPE = "type"; // NOI18N
+    private static final String CATEGORY_ATTRIB_PACKAGE = "package"; // NOI18N
     
     private String defPath;
     private CategoryContainer rootCategory = null;
@@ -68,10 +73,10 @@ public class CategoryBuilder  {
     
     public synchronized Category getRootCategory() {
         if (rootCategory == null) {
-            rootCategory = new CategoryContainer("ROOT", "Root category");
+            rootCategory = new CategoryContainer("ROOT", NbBundle.getMessage(CategoryBuilder.class, "ROOT_CATEGORY_NAME"), Mark.DEFAULT); // NOI18N
 
             FileSystem fs = Repository.getDefault().getDefaultFileSystem();
-            FileObject aoi = fs.findResource("Profiler/" + defPath + "/AreaOfInterest"); //NOI18N
+            FileObject aoi = fs.findResource("Profiler/" + defPath + "/AreasOfInterest"); //NOI18N
             if (aoi != null) {
                 Enumeration<? extends FileObject> folders = aoi.getFolders(false);
                 while (folders.hasMoreElements()) {
@@ -96,30 +101,36 @@ public class CategoryBuilder  {
             String nodeName = subNode.getName();
             if (nodeName.startsWith(CATEGORY_ATTRIB_PREFIX)) {
                 if (nodeName.endsWith(CATEGORY_ATTRIB_SUBTYPES)) {
-                    Enumeration<? extends FileObject> marks = subNode.getData(false);
-                    while (marks.hasMoreElements()) {
-                        FileObject category = marks.nextElement();
-                        String excludes = (String)category.getAttribute(CATEGORY_ATTRIB_EXCLUDES);
-                        String includes = (String)category.getAttribute(CATEGORY_ATTRIB_INCLUDES);
-                        String includesArr[] = includes != null ? includes.split(",") : null;
-                        String excludesArr[] = excludes != null ? excludes.split(",") : null;
+                    Enumeration<? extends FileObject> definitions = subNode.getData(false);
+                    while (definitions.hasMoreElements()) {
+                        FileObject typeDef = definitions.nextElement();
+                        String excludes = (String)typeDef.getAttribute(CATEGORY_ATTRIB_EXCLUDES);
+                        String includes = (String)typeDef.getAttribute(CATEGORY_ATTRIB_INCLUDES);
+                        String includesArr[] = includes != null ? includes.split(",") : null; // NOI18N
+                        String excludesArr[] = excludes != null ? excludes.split(",") : null; // NOI18N
                         
-                        newCategory.getDefinitions().add(new SubtypeCategoryDefinition(newCategory, category.getNameExt(), includesArr, excludesArr));
+                        newCategory.getDefinitions().add(new SubtypeCategoryDefinition(newCategory, typeDef.getNameExt(), includesArr, excludesArr));
                     }
                 } else if (nodeName.endsWith(CATEGORY_ATTRIB_TYPE)) {
-                    Enumeration<? extends FileObject> marks = subNode.getData(false);
-                    while (marks.hasMoreElements()) {
-                        FileObject mark = marks.nextElement();
+                    Enumeration<? extends FileObject> definitions = subNode.getData(false);
+                    while (definitions.hasMoreElements()) {
+                        FileObject typeDef = definitions.nextElement();
 
-                        String excludes = (String)mark.getAttribute(CATEGORY_ATTRIB_EXCLUDES);
-                        String includes = (String)mark.getAttribute(CATEGORY_ATTRIB_INCLUDES);
-                        String includesArr[] = includes != null ? includes.split(",") : null;
-                        String excludesArr[] = excludes != null ? excludes.split(",") : null;
+                        String excludes = (String)typeDef.getAttribute(CATEGORY_ATTRIB_EXCLUDES);
+                        String includes = (String)typeDef.getAttribute(CATEGORY_ATTRIB_INCLUDES);
+                        String includesArr[] = includes != null ? includes.split(",") : null; // NOI18N
+                        String excludesArr[] = excludes != null ? excludes.split(",") : null; // NOI18N
                         
-                        newCategory.getDefinitions().add(new SingleTypeCategoryDefinition(newCategory, mark.getNameExt(), includesArr, excludesArr));
+                        newCategory.getDefinitions().add(new SingleTypeCategoryDefinition(newCategory, typeDef.getNameExt(), includesArr, excludesArr));
                     }
                 } else if (nodeName.endsWith(CATEGORY_ATTRIB_CUSTOM)) {
                     System.out.println(subNode.getAttribute(CATEGORY_ATTRIB_INSTANCENAME));
+                } else if (nodeName.endsWith(CATEGORY_ATTRIB_PACKAGE)) {
+                    Enumeration<? extends FileObject> definitions = subNode.getData(false);
+                    while (definitions.hasMoreElements()) {
+                        FileObject packageDef = definitions.nextElement();
+                        newCategory.getDefinitions().add(new PackageCategoryDefinition(newCategory, packageDef.getNameExt()));
+                    }
                 }
             } else {
                 processCategories(newCategory, subNode);

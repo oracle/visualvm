@@ -41,13 +41,11 @@
 package org.netbeans.modules.profiler.ui.stats.drilldown;
 
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.ui.charts.PieChart;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.cpu.StatisticsPanel;
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
 import java.awt.BorderLayout;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -171,10 +169,14 @@ public class DrillDownPanel extends StatisticalModule {
         StringBuilder sb = new StringBuilder();
         lastNavigableCategoryId = null;
 
+        int counter = ddModel.getDrillDownPath().size() - 1;
         for (Category category : ddModel.getDrillDownPath()) {
-            if (!category.getSubcategories().isEmpty()) {
+            if (sb.length() > 0) {
+                sb.append("/");
+            }
+            if (counter-- > 0) {
                 sb.append("<a href=\"http://localhost/category?id=").append(category.getId()).append("\">").append(category.getLabel())
-                  .append("</a>").append("/"); // NOI18N
+                  .append("</a>"); // NOI18N
                 lastNavigableCategoryId = category.getId();
             } else {
                 sb.append(category.getLabel());

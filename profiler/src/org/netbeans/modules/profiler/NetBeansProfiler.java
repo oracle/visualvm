@@ -68,8 +68,6 @@ import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
-import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
@@ -490,7 +488,6 @@ public final class NetBeansProfiler extends Profiler {
     private final ProfilerIDESettings ideSettings = ProfilerIDESettings.getInstance();
     private final ProfilingMonitor monitor = new ProfilingMonitor();
     private final TargetAppRunner targetAppRunner;
-    private CCTResultsFilter mFilter = new CCTResultsFilter();
     private DefinedFilterSets definedFilterSets;
     private FileObject profiledSingleFile;
 
@@ -505,7 +502,6 @@ public final class NetBeansProfiler extends Profiler {
     private String rerunTarget;
     private StringBuilder logMsgs = new StringBuilder();
     private ThreadsDataManager threadsManager;
-    private TimeCollector collector = new TimeCollector();
     private VMTelemetryDataManager vmTelemetryManager;
     private VMTelemetryXYChartModel memoryXYChartModel;
     private VMTelemetryXYChartModel survivingGenerationsXYChartModel;
@@ -2089,7 +2085,10 @@ public final class NetBeansProfiler extends Profiler {
 
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
-            mFilter.reset(); // clean up the filter before reusing it
+            CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
+            if (filter != null) {
+                filter.reset(); // clean up the filter before reusing it
+            }
 
             // init context aware instances
             Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);

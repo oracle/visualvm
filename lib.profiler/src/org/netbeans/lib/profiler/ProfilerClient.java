@@ -59,8 +59,6 @@ import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
-import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.results.memory.*;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
@@ -69,7 +67,6 @@ import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.text.MessageFormat;
@@ -371,7 +368,6 @@ public class ProfilerClient implements CommonConstants {
 
     //--------------------- Connection management --------------------
     private Socket clientSocket;
-    private TimeCollector timeCollector;
     private WireIO wireIO;
 
     /**

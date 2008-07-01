@@ -114,6 +114,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
 
 
 /**
@@ -1015,25 +1016,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.addSeparator();
         toolBar.add(new SaveViewAction(this));
 
-        /*    toolBar.addSeparator();
-        
-                                                                                 valueSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0) {
-                                                                                   public Dimension getMaximumSize() {
-                                                                                     return new Dimension(100, super.getMaximumSize().height);
-                                                                                   }
-                                                                                 };
-                                                                                 toolBar.add(valueSlider);
-                                                                                 valueFilterComponent = valueSlider;
-        
-                                                                                 valueSlider.addChangeListener(new ChangeListener() {
-        
-                                                                                   public void stateChanged(ChangeEvent e) {
-                                                                                     // make cubic curve instead of linear
-                                                                                     double val = (double) valueSlider.getValue() / 10f;
-                                                                                     val = val * val;
-                                                                                     if (currentDisplay != null) currentDisplay.updateValueFilter(val);
-                                                                                   }
-                                                                                 }); */
         return toolBar;
     }
 
@@ -1047,8 +1029,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
                     }
                     drillDownGroupOpened = false;
                     DrillDownWindow.getDefault().getPresenter().setEnabled(false);
-                    
-                    Lookup.getDefault().lookup(DrillDown.class).deconfigure();
                 }
             });
     }
@@ -1094,12 +1074,11 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
             case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED: {
                 Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
-                ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+//                ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
                 List additionalStats = new ArrayList();
 
-                dd = Lookup.getDefault().lookup(DrillDown.class);
-                dd.configure(project.getLookup(), runner.getProfilerClient());
+                dd = Lookup.getDefault().lookup(DrillDownFactory.class).createDrillDown(project, runner.getProfilerClient());
 
                 StatisticalModuleContainer container = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
                 additionalStats.addAll(container.getAllModules());
@@ -1206,9 +1185,9 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     }
 
     private void updateDrillDown() {
-//        if (dd != null) {
-//            dd.refresh(); // TODO race condition by cleaning the dd variable!
-//        }
+        if (dd != null) {
+            dd.refresh(); // TODO race condition by cleaning the dd variable!
+        }
 
         if (LOGGER.isLoggable(Level.FINE) && (currentDisplayComponent != null)) {
             LOGGER.fine("updating drilldown: " + currentDisplayComponent.getClass().getName()); // NOI18N

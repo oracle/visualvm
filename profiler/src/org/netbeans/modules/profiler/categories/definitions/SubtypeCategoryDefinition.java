@@ -37,27 +37,26 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.categories;
+package org.netbeans.modules.profiler.categories.definitions;
 
-import org.netbeans.modules.profiler.categories.definitions.SubtypeCategoryDefinition;
-import org.netbeans.modules.profiler.categories.definitions.SingleTypeCategoryDefinition;
-import org.netbeans.modules.profiler.categories.definitions.CustomCategoryDefinition;
-import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
+import org.netbeans.modules.profiler.categories.*;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class CategoryDefinitionProcessor {
-    public void process(CategoryDefinition def) {
-        throw new UnsupportedOperationException("Must specify a concrete org.netbeans.modules.profiler.categories.CategoryDefinition implementation");
+public class SubtypeCategoryDefinition extends TypeCategoryDefinition {
+
+    public SubtypeCategoryDefinition(Category category, String typeName, String[] includes, String[] excludes) {
+        super(category, typeName, includes, excludes);
     }
-    
-    public abstract void process(SubtypeCategoryDefinition def);
-    
-    public abstract void process(SingleTypeCategoryDefinition def);
-    
-    public abstract void process(CustomCategoryDefinition def);
-    
-    public abstract void process(PackageCategoryDefinition def);
+
+    public SubtypeCategoryDefinition(Category category, String typeName) {
+        super(category, typeName);
+    }
+
+    public void processWith(CategoryDefinitionProcessor processor) {
+        processor.process(this);
+    }
+
 }

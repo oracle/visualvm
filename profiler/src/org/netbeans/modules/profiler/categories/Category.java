@@ -69,7 +69,7 @@ public abstract class Category implements Visitable<Category> {
         }
     };
     
-    private Category(String id, String label, Mark mark) {
+    public Category(String id, String label, Mark mark) {
         this.id = id;
         this.label = label;
         this.definitions = new HashSet<CategoryDefinition>();

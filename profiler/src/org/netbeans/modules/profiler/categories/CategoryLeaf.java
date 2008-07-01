@@ -41,6 +41,7 @@ package org.netbeans.modules.profiler.categories;
 
 import java.util.Collections;
 import java.util.Set;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.modules.profiler.utilities.Visitable;
 import org.netbeans.modules.profiler.utilities.Visitor;
 
@@ -49,6 +50,11 @@ import org.netbeans.modules.profiler.utilities.Visitor;
  * @author Jaroslav Bachorik
  */
 public class CategoryLeaf extends Category {
+
+    public CategoryLeaf(String id, String label, Mark mark) {
+        super(id, label, mark);
+    }
+    
     public CategoryLeaf(String name, String label) {
         super(name, label);
     }

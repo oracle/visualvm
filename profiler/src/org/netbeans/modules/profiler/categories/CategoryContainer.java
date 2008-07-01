@@ -53,6 +53,10 @@ import org.netbeans.modules.profiler.utilities.Visitor;
  */
 public class CategoryContainer extends Category implements Iterable<Category> {
     private Set<Category> contained = new HashSet<Category>();
+
+    public CategoryContainer(String id, String label, Mark mark) {
+        super(id, label, mark);
+    }
     
     public CategoryContainer(String name, String label) {
         super(name, label);

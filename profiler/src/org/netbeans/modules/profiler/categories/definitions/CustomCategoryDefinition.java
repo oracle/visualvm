@@ -37,24 +37,28 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.categories;
+package org.netbeans.modules.profiler.categories.definitions;
+
+import org.netbeans.modules.profiler.categories.*;
+import org.netbeans.lib.profiler.marker.Marker;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class SubtypeCategoryDefinition extends TypeCategoryDefinition {
+public class CustomCategoryDefinition extends CategoryDefinition {
+    private Marker customMarker;
 
-    public SubtypeCategoryDefinition(Category category, String typeName, String[] includes, String[] excludes) {
-        super(category, typeName, includes, excludes);
+    public CustomCategoryDefinition(Category category, Marker customMarker) {
+        super(category);
+        this.customMarker = customMarker;
     }
-
-    public SubtypeCategoryDefinition(Category category, String typeName) {
-        super(category, typeName);
-    }
-
+    
     public void processWith(CategoryDefinitionProcessor processor) {
         processor.process(this);
     }
 
+    public Marker getCustomMarker() {
+        return customMarker;
+    }
 }

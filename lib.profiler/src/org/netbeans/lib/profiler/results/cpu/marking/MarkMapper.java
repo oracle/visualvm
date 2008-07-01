@@ -59,10 +59,6 @@ public class MarkMapper implements MarkingEngine.StateObserver {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Creates a new instance of CategoryMapper */
-    MarkMapper() {
-    }
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Mark getMark(int methodId, ProfilingSessionStatus status) {
