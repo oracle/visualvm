@@ -207,12 +207,8 @@ public class ClassFileCache {
             }
 
             if (classPath != null) {
-                zip = classPath.getZipFileForName(classFileLocation);
-            }
-
-            if (zip == null) {
                 try {
-                    zip = new ZipFile(classFileLocation);
+                    zip = classPath.getZipFileForName(classFileLocation);
                 } catch (ZipException e2) {
                     throw new IOException("Could not open archive " + classFileLocation); // NOI18N
                 }
