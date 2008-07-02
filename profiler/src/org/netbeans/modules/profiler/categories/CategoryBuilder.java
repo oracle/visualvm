@@ -108,7 +108,7 @@ public class CategoryBuilder {
             String nodeName = subNode.getName();
             if (nodeName.startsWith(CATEGORY_ATTRIB_PREFIX)) {
                 if (nodeName.endsWith(CATEGORY_ATTRIB_SUBTYPES)) {
-                    Enumeration<? extends FileObject> definitions = subNode.getData(false);
+                    Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                     while (definitions.hasMoreElements()) {
                         FileObject typeDef = definitions.nextElement();
                         String excludes = (String) typeDef.getAttribute(CATEGORY_ATTRIB_EXCLUDES);
@@ -129,7 +129,7 @@ public class CategoryBuilder {
                         newCategory.getDefinitions().add(new SubtypeCategoryDefinition(newCategory, typeDef.getNameExt(), includesArr, excludesArr));
                     }
                 } else if (nodeName.endsWith(CATEGORY_ATTRIB_TYPE)) {
-                    Enumeration<? extends FileObject> definitions = subNode.getData(false);
+                    Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                     while (definitions.hasMoreElements()) {
                         FileObject typeDef = definitions.nextElement();
 
@@ -181,7 +181,7 @@ public class CategoryBuilder {
                         }
                     }
                 } else if (nodeName.endsWith(CATEGORY_ATTRIB_PACKAGE)) {
-                    Enumeration<? extends FileObject> definitions = subNode.getData(false);
+                    Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                     while (definitions.hasMoreElements()) {
                         FileObject packageDef = definitions.nextElement();
                         newCategory.getDefinitions().add(new PackageCategoryDefinition(newCategory, packageDef.getNameExt()));
