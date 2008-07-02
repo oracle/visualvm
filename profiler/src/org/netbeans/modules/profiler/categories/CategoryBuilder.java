@@ -42,9 +42,10 @@ import java.lang.reflect.InvocationTargetException;
 import org.netbeans.modules.profiler.categories.definitions.SubtypeCategoryDefinition;
 import org.netbeans.modules.profiler.categories.definitions.SingleTypeCategoryDefinition;
 import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.marker.Marker;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.categories.definitions.CustomCategoryDefinition;
 import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
@@ -60,7 +61,8 @@ import org.openide.util.NbBundle;
  * @author Jaroslav Bachorik
  */
 public class CategoryBuilder {
-
+    private static final Logger LOGGER = Logger.getLogger(CategoryBuilder.class.getName());
+    
     private static final String CATEGORY_ATTRIB_CUSTOM = "custom"; // NOI18N
     private static final String CATEGORY_ATTRIB_EXCLUDES = "excludes"; // NOI18N
     private static final String CATEGORY_ATTRIB_INCLUDES = "includes"; // NOI18N
@@ -151,28 +153,31 @@ public class CategoryBuilder {
                 } else if (nodeName.endsWith(CATEGORY_ATTRIB_CUSTOM)) {
                     String instanceClass = (String) subNode.getAttribute(CATEGORY_ATTRIB_INSTANCENAME);
                     if (instanceClass != null) {
+                        Exception thrownException = null;
                         try {
                             ClassLoader cl = Lookup.getDefault().lookup(ClassLoader.class);
                             Class<CustomMarker> markerClz = (Class<CustomMarker>) cl.loadClass(instanceClass);
                             CustomMarker marker = markerClz.getConstructor(Project.class, Mark.class).newInstance(NetBeansProfiler.getDefaultNB().getProfiledProject(), newCategory.getAssignedMark());
                             if (marker != null) {
-                                System.out.println("Adding category: " + newCategory.getLabel() + " with assigned mark " + marker.getMark().getId());
                                 newCategory.getDefinitions().add(new CustomCategoryDefinition(newCategory, marker));
                             }
                         } catch (InstantiationException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
                         } catch (IllegalAccessException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
                         } catch (IllegalArgumentException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
                         } catch (InvocationTargetException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
                         } catch (NoSuchMethodException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
                         } catch (SecurityException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
                         } catch (ClassNotFoundException ex) {
-                            Exceptions.printStackTrace(ex);
+                            thrownException = ex;
+                        }
+                        if (thrownException != null)  {
+                            LOGGER.logp(Level.WARNING, CategoryBuilder.class.getName(), "processCategories", "Error while building profiling results categories", thrownException); // NOI18N
                         }
                     }
                 } else if (nodeName.endsWith(CATEGORY_ATTRIB_PACKAGE)) {
