@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,12 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -36,31 +31,58 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ * 
+ * Contributor(s):
+ * 
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.results.cpu.cct;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
-
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.marker.Mark;
+import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
+import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter.Evaluator;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface RuntimeCPUCCTNodeVisitor {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+public class DrillDownFactory implements CCTResultsFilter.EvaluatorProvider {
+    private class WeakEvaluator extends WeakReference<CCTResultsFilter.Evaluator> implements Evaluator {
+        public WeakEvaluator(Evaluator referent, ReferenceQueue<? super Evaluator> q) {
+            super(referent, q);
+        }
 
-    void visit(ServletRequestCPUCCTNode node);
+        public WeakEvaluator(Evaluator referent) {
+            super(referent);
+        }
 
-    void visit(ThreadCPUCCTNode node);
+        public boolean evaluate(Mark mark) {
+            Evaluator eval = get();
+            return eval != null ? eval.evaluate(mark) : true;
+        }
+    }
+    final private Set<WeakEvaluator> drillDownEvaluators = Collections.synchronizedSet(new HashSet<WeakEvaluator>());
+    
+    public DrillDown createDrillDown(Project project, ProfilerClient client) {
+        DrillDown dd = new DrillDown(project.getLookup(), client);
+        drillDownEvaluators.add(new WeakEvaluator(dd));
+        return dd;
+    }
 
-    void visit(MethodCPUCCTNode node);
-
-    void visit(SimpleCPUCCTNode node);
-
-    void visit(MarkedCPUCCTNode node);
+    /**
+     * A set of provided evaluators
+     * @return Returns a synchronized set - thus each access to the set must be guarded by the instance
+     */
+    public Set getEvaluators() {
+        
+        return drillDownEvaluators;
+    }
 }

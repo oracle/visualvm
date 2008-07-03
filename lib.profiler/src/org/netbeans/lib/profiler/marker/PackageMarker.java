@@ -41,11 +41,10 @@
 package org.netbeans.lib.profiler.marker;
 
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -69,17 +68,21 @@ public class PackageMarker implements Marker {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public MarkMapping[] getMarks() {
-        List marks = new ArrayList();
+    public MarkMapping[] getMappings() {
+        List mappings = new ArrayList();
 
         for (Iterator iter = markMap.keySet().iterator(); iter.hasNext();) {
             String packageName = (String) iter.next();
             ClientUtils.SourceCodeSelection markerMethod = new ClientUtils.SourceCodeSelection(packageName + ".*", "", ""); // NOI18N
             markerMethod.setMarkerMethod(true);
-            marks.add(new MarkMapping(markerMethod, (Mark) markMap.get(packageName)));
+            mappings.add(new MarkMapping(markerMethod, (Mark) markMap.get(packageName)));
         }
 
-        return (MarkMapping[]) marks.toArray(new MarkMapping[marks.size()]);
+        return (MarkMapping[]) mappings.toArray(new MarkMapping[mappings.size()]);
+    }
+    
+    public Mark[] getMarks() {
+        return (Mark[])new HashSet(markMap.values()).toArray(new Mark[0]);
     }
 
     public void addPackageMark(String packageName, Mark mark) {
