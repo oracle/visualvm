@@ -109,12 +109,12 @@ public abstract class AbstractWizard implements WizardDescriptor.Iterator, Chang
 
         getWizardDescriptor().setTitle(getTitle());
         getWizardDescriptor().setTitleFormat(new MessageFormat(getTitleFormat()));
-        getWizardDescriptor().putProperty("WizardPanel_autoWizardStyle", Boolean.valueOf(isAutoWizard())); // NOI18N
-                                                                                                           //    this.wizardDescriptor.putProperty("WizardPanel_helpDisplayed", Boolean.valueOf(isHelpDisplayed())); // NOI18N // Needs to be in default state to correctly display Help button
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, Boolean.valueOf(isAutoWizard())); // NOI18N
+                                                                                                           //    this.wizardDescriptor.putProperty(WizardDescriptor.PROP_HELP_DISPLAYED, Boolean.valueOf(isHelpDisplayed())); // NOI18N // Needs to be in default state to correctly display Help button
 
-        getWizardDescriptor().putProperty("WizardPanel_contentDisplayed", Boolean.valueOf(isContentDisplayed())); // NOI18N
-        getWizardDescriptor().putProperty("WizardPanel_contentNumbered", Boolean.valueOf(isNumbered())); // NOI18N
-        getWizardDescriptor().putProperty("WizardPanel_contentSelectedIndex", new Integer(0)); // NOI18N
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.valueOf(isContentDisplayed())); // NOI18N
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, Boolean.valueOf(isNumbered())); // NOI18N
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0)); // NOI18N
         getWizardDescriptor().putProperty(WizardContext.CONTEXT_PROPERTY_NAME, getContext());
 
         this.wizardModel.setFirst();
@@ -195,8 +195,8 @@ public abstract class AbstractWizard implements WizardDescriptor.Iterator, Chang
         TitleCollectingStepVisitor visitor = new TitleCollectingStepVisitor();
         wizardModel.accept(visitor, getContext(), 0);
 
-        wizardDescriptor.putProperty("WizardPanel_contentData", visitor.getTitleArray()); // NOI18N
-        wizardDescriptor.putProperty("WizardPanel_contentSelectedIndex", new Integer(visitor.getTitleIndex())); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_DATA, visitor.getTitleArray()); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(visitor.getTitleIndex())); // NOI18N
         wizardDescriptor.setTitle(wizardModel.getTitle());
     }
 }
