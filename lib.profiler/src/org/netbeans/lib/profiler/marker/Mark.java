@@ -38,10 +38,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu.marking;
-
-import java.util.Arrays;
-import java.util.Collection;
+package org.netbeans.lib.profiler.marker;
 
 
 /**
@@ -50,46 +47,39 @@ import java.util.Collection;
  */
 public class Mark implements Cloneable {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    public static final String DEFAULT_ID = "SELF"; // NOI18N
-    public static final Mark DEFAULT = new Mark(DEFAULT_ID, "Uncategorized", true); // NOI18N
+    
+    public static final short DEFAULT_ID = 0;
+    public static final Mark DEFAULT = new Mark(DEFAULT_ID); 
     public static final char ID_NONE = (char) 0;
 
+    private static short counter = 1;
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    public final String description;
-    public final String label;
-    public final boolean isDefault;
+    public final short id;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of Mark */
-    public Mark(final String label, final String description) {
-        this(label, description, false);
+    public Mark(short value) {
+        this.id = value;
+    }
+    
+    public Mark() {
+        this.id = counter++;
     }
 
-    protected Mark(final String label, final String description, final boolean isDefault) {
-        this.label = label.intern();
-        this.description = description;
-        this.isDefault = isDefault;
+    public boolean isDefault() {
+        return this.equals(DEFAULT);
     }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public Collection getLabels() {
-        return Arrays.asList(new String[] { label });
+    public short getId() {
+        return id;
     }
 
     public Object clone() {
-        return new Mark(label, description);
+        return new Mark(id);
     }
 
     public boolean equals(Object other) {
@@ -101,10 +91,12 @@ public class Mark implements Cloneable {
             return false;
         }
 
-        return label == ((Mark) other).label;
+        return id == ((Mark) other).id;
     }
 
     public int hashCode() {
-        return label.hashCode();
+        int hash = 5;
+        hash = 43 * hash + this.id;
+        return hash;
     }
 }
