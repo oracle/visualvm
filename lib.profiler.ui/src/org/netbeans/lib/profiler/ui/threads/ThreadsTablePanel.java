@@ -380,7 +380,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                     case 4:
                         return data.monitorTime == 0 ? "0.0 (0.0%)" : TimeLineUtils.getMillisValue2(data.monitorTime) + " (" + getPercentValue(data.monitorTime, data.totalTime) + "%)"; // NOI18N
                     case 5:
-                        return data.totalTime == 0 ? "0.0 (0.0%)" : TimeLineUtils.getMillisValue2(data.totalTime); // NOI18N
+                        return data.totalTime == 0 ? "0.0" : TimeLineUtils.getMillisValue2(data.totalTime); // NOI18N
                     default:
                         return null;
                 }
