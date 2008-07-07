@@ -48,8 +48,8 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -202,7 +202,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
 
         // set properties
-        buttonsToolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+        buttonsToolBar.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         buttonsToolBar.setFloatable(false);
         buttonsToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
 
@@ -242,13 +242,14 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         //add (scrollBar, BorderLayout.EAST);
         threadsSelectionCombo.addActionListener(this);
         manager.addDataListener(this);
-        addComponentListener(new ComponentAdapter() {
-                public void componentShown(ComponentEvent e) {
-                    // since the data were not processed when this component was not showing,
-                    // we need to do the updateState when the component becomes visible
-                    dataChanged();
+        
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) dataChanged();
                 }
-            });
+            }
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
