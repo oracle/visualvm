@@ -42,7 +42,7 @@ package org.netbeans.lib.profiler.results.cpu.cct;
 
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkBasedNodeVisitor;
 import java.util.HashMap;
 import java.util.Map;
