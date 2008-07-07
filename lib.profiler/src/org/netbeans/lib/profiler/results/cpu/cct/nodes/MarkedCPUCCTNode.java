@@ -43,20 +43,20 @@ package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitor;
 import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitorAdaptor;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class CategoryCPUCCTNode extends TimedCPUCCTNode {
+public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class Locator extends RuntimeCPUCCTNodeVisitorAdaptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private CategoryCPUCCTNode candidate = null;
+        private MarkedCPUCCTNode candidate = null;
         private Mark searchMark;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -66,19 +66,19 @@ public class CategoryCPUCCTNode extends TimedCPUCCTNode {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public static CategoryCPUCCTNode locate(Mark mark, RuntimeCPUCCTNode.Children nodes) {
+        public static MarkedCPUCCTNode locate(Mark mark, RuntimeCPUCCTNode.Children nodes) {
             Locator instance = new Locator();
 
             return instance.doLocate(mark, nodes);
         }
 
-        public void visit(CategoryCPUCCTNode node) {
+        public void visit(MarkedCPUCCTNode node) {
             if (node.getMark().equals(searchMark)) {
                 candidate = node;
             }
         }
 
-        private CategoryCPUCCTNode doLocate(Mark mark, RuntimeCPUCCTNode.Children nodes) {
+        private MarkedCPUCCTNode doLocate(Mark mark, RuntimeCPUCCTNode.Children nodes) {
             candidate = null;
             searchMark = mark;
             nodes.accept(this);
@@ -93,8 +93,8 @@ public class CategoryCPUCCTNode extends TimedCPUCCTNode {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Creates a new instance of CategoryCPUCCTNode */
-    public CategoryCPUCCTNode(CPUCCTNodeFactory factory, Mark mark, boolean collectingTwoTimeStamps) {
+    /** Creates a new instance of MarkedCPUCCTNode */
+    public MarkedCPUCCTNode(CPUCCTNodeFactory factory, Mark mark, boolean collectingTwoTimeStamps) {
         super(factory, collectingTwoTimeStamps);
         this.mark = mark;
     }
@@ -118,11 +118,11 @@ public class CategoryCPUCCTNode extends TimedCPUCCTNode {
             return false;
         }
 
-        if (!(otherNode instanceof CategoryCPUCCTNode)) {
+        if (!(otherNode instanceof MarkedCPUCCTNode)) {
             return false;
         }
 
-        return mark.equals(((CategoryCPUCCTNode) otherNode).getMark());
+        return mark.equals(((MarkedCPUCCTNode) otherNode).getMark());
     }
 
     public int hashCode() {
