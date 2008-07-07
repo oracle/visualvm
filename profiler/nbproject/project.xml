@@ -373,6 +373,7 @@ made subject to such option by the copyright holder.
             </module-dependencies>
             <friend-packages>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
@@ -380,26 +381,16 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
-                <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
-                <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
+                <package>org.netbeans.modules.profiler.categories</package>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
-                <package>org.netbeans.modules.profiler.selector.api</package>
-                <package>org.netbeans.modules.profiler.selector.api.nodes</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.ui</package>
                 <package>org.netbeans.modules.profiler.ui.stats</package>
                 <package>org.netbeans.modules.profiler.ui.stp</package>
-                <package>org.netbeans.modules.profiler.ui.wizards</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.framework</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.framework.screen</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.framework.steps</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.panels</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.panels.components</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.providers</package>
-                <package>org.netbeans.modules.profiler.ui.wizards.providers.scripted</package>
                 <package>org.netbeans.modules.profiler.utils</package>
             </friend-packages>
             <extra-compilation-unit>
