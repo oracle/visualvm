@@ -52,6 +52,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Lookup;
 
 
 /**
@@ -78,6 +79,8 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
     private long[] timePM1;
     private int nMethods;
 
+    private CCTResultsFilter currentFilter = null;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CCTFlattener(ProfilerClient client) {
@@ -145,6 +148,7 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
         timePM0 = timePM1 = null;
         invPM = invDiff = nCalleeInvocations = null;
         parentStack.clear();
+        currentFilter = null;
     }
 
     public void beforeWalk() {
@@ -157,6 +161,8 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
         nCalleeInvocations = new int[nMethods];
         parentStack.clear();
 
+        currentFilter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
+        
         synchronized (containerGuard) {
             container = null;
         }
@@ -178,8 +184,8 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
             }
         }
 
-        if (!filteredOut && (client.getMarkFilter() != null)) {
-            filteredOut = !client.getMarkFilter().passesFilter(); // finally use the mark filter
+        if (!filteredOut && (currentFilter != null)) {
+            filteredOut = !currentFilter.passesFilter(); // finally use the mark filter
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {

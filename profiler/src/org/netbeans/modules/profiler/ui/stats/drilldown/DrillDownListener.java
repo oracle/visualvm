@@ -38,100 +38,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu.statistics.drilldown;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
 import java.util.List;
 
 
 /**
- * This interface marks a generic drill-down functionality provider
+ *
  * @author Jaroslav Bachorik
  */
-public interface IDrillDown {
+public interface DrillDownListener {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Provides info whether the given mark is the current one
-     */
-    public boolean isCurrent(final Mark mark);
+    void dataChanged();
 
-    /**
-     * Indicates that the drilldown is parked in a special "self" category
-     */
-    public boolean isInSelf();
-
-    /**
-     * Returns the information whether the drilldown manager is validly setup
-     */
-    public boolean isValid();
-
-    /**
-     *Returns the current active category
-     * @return Returns the current active category
-     */
-    Mark getCurrentMark();
-
-    /**
-     * Returns the accumulated time for the current category
-     * @return Returns the accumulated time for the current category
-     */
-    long getCurrentTime(boolean net);
-
-    /**
-     * Returns the representation of the drill-down filter
-     * @return Returns the drill-down path
-     */
-    List getDrillDownPath();
-
-    /**
-     * Time getter for category
-     * @param category The category to retrieve the time for
-     * @return Returns the accumulated time per category
-     */
-    long getMarkTime(Mark category, boolean net);
-
-    /**
-     * Returns the current list of subcategories
-     * @return Returns the list of the current category's subcategories
-     */
-    List getSubmarks();
-
-    /**
-     * Returns the top level category
-     */
-    Mark getTopMark();
-
-    /**
-     * Returns the accumulated time for the top category
-     * @return Returns the accumulated time for the top category
-     */
-    long getTopTime(boolean net);
-
-    void addListener(DrillDownListener listener);
-
-    /**
-     * Indicates whehter the given mark can be used for drilldown
-     */
-    boolean canDrilldown(Mark mark);
-
-    /**
-     * Performs drill-down using the specified category
-     * @param category The category to use for drill down
-     */
-    void drilldown(Mark mark);
-
-    /**
-     * Drills-up one level
-     */
-    void drillup();
-
-    /**
-     * Drills-up to the specified category
-     */
-    void drillup(Mark mark);
-
-    void removeListener(DrillDownListener listener);
-
-    void reset();
+    void drillDownPathChanged(List newDrillDownPath);
 }
