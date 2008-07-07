@@ -41,9 +41,8 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.DrillDownListener;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.DrillDownPanel;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.IDrillDown;
+import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownListener;
+import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownPanel;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -58,6 +57,7 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
+import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDown;
 
 
 /**
@@ -143,7 +143,7 @@ public final class DrillDownWindow extends TopComponent {
         }
     }
 
-    public void setDrillDown(IDrillDown drillDown, List statModules) {
+    public void setDrillDown(DrillDown drillDown, List statModules) {
         if (ddPanel != null) {
             remove(ddPanel);
         }

@@ -38,13 +38,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu.statistics.drilldown;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
 import org.netbeans.lib.profiler.ui.charts.AbstractPieChartModel;
 import java.awt.Color;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import org.netbeans.modules.profiler.categories.Category;
 
 
 /**
@@ -53,7 +54,8 @@ import java.util.List;
  */
 public abstract class DrillDownPieChartModel extends AbstractPieChartModel implements DrillDownListener {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
+    final static protected Logger LOGGER = Logger.getLogger(DrillDownPieChartModel.class.getName());
+    
     private static Color[] COLORS = new Color[] {
                                         new Color(0x99ff99), new Color(0x99cc99), new Color(0x666633), new Color(0x336666),
                                         new Color(0x6699cc), new Color(0x9999cc), new Color(0xffccff), new Color(0xcc9999),
@@ -62,27 +64,31 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected IDrillDown drillDown;
+    protected DrillDown drillDown;
     private Object itemMapLock = new Object();
     private int[] itemMap = null;
     private int itemCount = 0;
-
+    // @GuardedBy itemMapLock
+    private List<Category> subCategories;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of DrillDownPieChartModel */
-    public DrillDownPieChartModel(IDrillDown model) {
+    public DrillDownPieChartModel(DrillDown model) {
         setDrillDown(model);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void setDrillDown(IDrillDown model) {
+    public void setDrillDown(DrillDown model) {
         if (drillDown != null) {
             drillDown.removeListener(this);
         }
 
         drillDown = model;
-        updateItemMap();
+        synchronized(itemMapLock) {
+            updateItemMap();
+        }
         drillDown.addListener(this);
     }
 
@@ -107,7 +113,13 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
             return ""; // illegal index // NOI18N
         }
 
-        return ((Mark) drillDown.getSubmarks().get(getMappedIndex(index))).description;
+        synchronized(itemMapLock) {
+            if (subCategories != null) {
+                return subCategories.get(getMappedIndex(index)).getLabel();
+            } else {
+                return "";
+            }
+        }
     }
 
     public void dataChanged() {
@@ -122,7 +134,7 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
         synchronized (itemMapLock) {
             updateItemMap();
         }
-
+        
         fireChartDataChanged();
     }
 
@@ -130,12 +142,18 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
         if ((index == -1) || (getMappedIndex(index) == -1)) {
             return; // illegal index
         }
-
-        if (drillDown.getSubmarks().isEmpty()) {
-            return;
+        
+        Category toDrill = null;
+        synchronized(itemMapLock) {
+            if (subCategories == null || subCategories.isEmpty()) {
+                return;
+            }
+            toDrill = subCategories.get(getMappedIndex(index));
         }
 
-        drillDown.drilldown((Mark) drillDown.getSubmarks().get(getMappedIndex(index)));
+        if (toDrill != null) {
+            drillDown.drilldown(toDrill.getId());
+        }
     }
 
     public void drillup() {
@@ -147,7 +165,15 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
             return; // illegal index
         }
 
-        drillDown.drillup((Mark) drillDown.getSubmarks().get(getMappedIndex(index)));
+        Category toDrill = null;
+        synchronized(itemMapLock) {
+            if (subCategories == null || subCategories.isEmpty()) {
+                return;
+            }
+            toDrill = subCategories.get(getMappedIndex(index));
+        }
+        
+        drillDown.drillup(toDrill.getId());
     }
 
     @Override
@@ -157,6 +183,25 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
         }
     }
 
+    protected List<Category> getSubCategories() {
+        List<Category> cats = new ArrayList<Category>();
+        synchronized(itemMapLock) {
+            if (subCategories != null) {
+                cats.addAll(subCategories);
+            }
+        }
+        return cats;
+    }
+    
+    protected Category getCategoryAt(int index) {
+        synchronized(itemMapLock) {
+            if (subCategories == null || subCategories.isEmpty()) {
+                return Category.DEFAULT;
+            }
+            return subCategories.get(getMappedIndex(index));
+        }
+    }
+    
     protected int getMappedIndex(int index) {
         synchronized (itemMapLock) {
             if ((index < 0) || (index >= itemMap.length)) {
@@ -169,35 +214,21 @@ public abstract class DrillDownPieChartModel extends AbstractPieChartModel imple
 
     private void updateItemMap() {
         synchronized (itemMapLock) {
+            subCategories = drillDown.getSubCategories();
+            if (subCategories == null || subCategories.isEmpty()) return;
             int counter = 0;
             int mapCounter = 0;
-            int[] map = new int[drillDown.getSubmarks().size()];
+            int[] map = new int[subCategories.size()];
 
-            for (Iterator it = drillDown.getSubmarks().iterator(); it.hasNext(); counter++) {
-                Mark mark = (Mark) it.next();
-
-                if (drillDown.getMarkTime(mark, false) > 0) {
+            for (Category category : subCategories) {
+                if (drillDown.getCategoryTime(category, false) > 0) {
                     map[mapCounter++] = counter;
                 }
+                counter++;
             }
 
             itemCount = (mapCounter > 0) ? mapCounter : 0;
             itemMap = map;
-
-            //      if (itemCount > 0) {
-            //        int surplus = 0;
-            //        if (drillDown.getCurrentTime(true) > 0) {
-            //          surplus = 1;
-            //        }
-            //        itemMap = new int[itemCount + surplus];
-            //        System.arraycopy(map, 0, itemMap, 0, itemCount);
-            //        if (surplus > 0) {
-            //          itemMap[itemCount + surplus - 1] = -1;
-            //        }
-            //        itemCount += surplus;
-            //      } else {
-            //        itemMap = new int[0];
-            //      }
         }
     }
 }
