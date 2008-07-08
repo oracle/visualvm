@@ -68,8 +68,6 @@ import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
-import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
@@ -139,8 +137,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.openide.execution.ExecutorTask;
@@ -492,7 +488,6 @@ public final class NetBeansProfiler extends Profiler {
     private final ProfilerIDESettings ideSettings = ProfilerIDESettings.getInstance();
     private final ProfilingMonitor monitor = new ProfilingMonitor();
     private final TargetAppRunner targetAppRunner;
-    private CCTResultsFilter mFilter = new CCTResultsFilter();
     private DefinedFilterSets definedFilterSets;
     private FileObject profiledSingleFile;
 
@@ -507,7 +502,6 @@ public final class NetBeansProfiler extends Profiler {
     private String rerunTarget;
     private StringBuilder logMsgs = new StringBuilder();
     private ThreadsDataManager threadsManager;
-    private TimeCollector collector = new TimeCollector();
     private VMTelemetryDataManager vmTelemetryManager;
     private VMTelemetryXYChartModel memoryXYChartModel;
     private VMTelemetryXYChartModel survivingGenerationsXYChartModel;
@@ -2090,11 +2084,11 @@ public final class NetBeansProfiler extends Profiler {
             }
 
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
-            MarkingEngine.getDefault().addStateObserver(collector);
 
-            mFilter.reset(); // clean up the filter before reusing it
-            client.registerMarkFilter(mFilter);
-            client.registerTimeCollector(collector);
+            CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
+            if (filter != null) {
+                filter.reset(); // clean up the filter before reusing it
+            }
 
             // init context aware instances
             Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
@@ -2106,10 +2100,17 @@ public final class NetBeansProfiler extends Profiler {
             boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
                                      || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
 
-            final MarkMapping[] marks = isMarksEnabled
-                                        ? org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project).getMethodMarker(project).getMarks()
-                                        : new MarkMapping[0];
-            MarkingEngine.configure(org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project).getMarkHierarchyRoot(), marks);
+            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+//            Marker marker = ptp.getProjectMarker(project);
+//            final MarkMapping[] marks = isMarksEnabled
+//                                        ? marker.getMarks()
+//                                        : new MarkMapping[0];
+            // TODO profilingSettings should go to the Project-Lookup
+            if (isMarksEnabled) {
+                MarkingEngine.configure(project.getLookup());
+            } else {
+                MarkingEngine.deconfigure();
+            }
 
             Collection listeners = null;
 
@@ -2246,11 +2247,8 @@ public final class NetBeansProfiler extends Profiler {
             // deconfigure the profiler client
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
             client.registerFlatProfileProvider(null);
-            client.registerMarkFilter(null);
-            client.registerTimeCollector(null);
             // deconfigure the marking engine
-            MarkingEngine.getDefault().removeStateObserver(collector);
-            MarkingEngine.configure(null, null);
+            MarkingEngine.deconfigure();
         }
     }
 

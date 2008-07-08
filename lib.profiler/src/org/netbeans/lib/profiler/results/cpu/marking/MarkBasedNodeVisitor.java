@@ -40,9 +40,10 @@
 
 package org.netbeans.lib.profiler.results.cpu.marking;
 
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTVisitorAdapter;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import java.util.Stack;
 
 
@@ -50,7 +51,7 @@ import java.util.Stack;
  *
  * @author Jaroslav Bachorik
  */
-public class MarkBasedNodeVisitor extends CPUCCTVisitorAdapter implements MarkingEngine.StateObserver {
+public abstract class MarkBasedNodeVisitor extends CPUCCTVisitorAdapter implements MarkingEngine.StateObserver {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     volatile boolean resetFlag = false;
@@ -103,12 +104,12 @@ public class MarkBasedNodeVisitor extends CPUCCTVisitorAdapter implements Markin
         reset();
     }
 
-    public void visit(final CategoryCPUCCTNode node) {
+    public void visit(final MarkedCPUCCTNode node) {
         parentMark = (Mark) (markStack.isEmpty() ? null : markStack.peek());
         markStack.push(node.getMark());
     }
 
-    public void visitPost(final CategoryCPUCCTNode node) {
+    public void visitPost(final MarkedCPUCCTNode node) {
         markStack.pop();
         parentMark = (Mark) (markStack.isEmpty() ? null : markStack.peek());
     }

@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.marker;
 
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,16 +73,27 @@ public class CompositeMarker implements Marker {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public MarkMapping[] getMarks() {
+    public MarkMapping[] getMappings() {
         Set markerMethods = new HashSet();
 
         for (Iterator iter = delegates.iterator(); iter.hasNext();) {
             Marker delegate = (Marker) iter.next();
-            MarkMapping[] mMethods = delegate.getMarks();
+            MarkMapping[] mMethods = delegate.getMappings();
             markerMethods.addAll(Arrays.asList(mMethods));
         }
 
         return (MarkMapping[]) markerMethods.toArray(new MarkMapping[markerMethods.size()]);
+    }
+
+    public Mark[] getMarks() {
+        Set allMarks = new HashSet();
+
+        for (Iterator iter = delegates.iterator(); iter.hasNext();) {
+            Marker delegate = (Marker) iter.next();
+            Mark[] marks = delegate.getMarks();
+            allMarks.addAll(Arrays.asList(marks));
+        }
+        return (Mark[]) allMarks.toArray(new Mark[allMarks.size()]);
     }
 
     public void addMarker(Marker marker) {
