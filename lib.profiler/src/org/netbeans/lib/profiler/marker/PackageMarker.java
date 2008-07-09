@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -56,7 +58,7 @@ import java.util.Map;
  */
 public class PackageMarker implements Marker {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    private static Logger LOGGER = Logger.getLogger(PackageMarker.class.getName());
     private Map markMap;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -89,15 +91,23 @@ public class PackageMarker implements Marker {
         if (packageName.length() == 0) {
             packageName = "default"; // NOI18N
         }
-
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Marking package " + packageName + " with " + mark.getId());
+        }
         markMap.put(packageName, mark);
     }
 
     public void removePackageMark(String packageName) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking package " + packageName);
+        }
         markMap.remove(packageName);
     }
 
     public void resetPackageMarks() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking all packages");
+        }
         markMap.clear();
     }
 }
