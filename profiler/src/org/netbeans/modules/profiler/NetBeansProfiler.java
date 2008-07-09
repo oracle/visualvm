@@ -136,6 +136,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
+import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
@@ -1628,7 +1629,7 @@ public final class NetBeansProfiler extends Profiler {
         setupDispatcher(profilingSettings);
 
         ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
-        profilingSettings.setInstrumentationMarkerMethods(marks);
+//        profilingSettings.setInstrumentationMarkerMethods(marks);
 
         retValue = super.prepareInstrumentation(profilingSettings);
 
@@ -2107,7 +2108,8 @@ public final class NetBeansProfiler extends Profiler {
 //                                        : new MarkMapping[0];
             // TODO profilingSettings should go to the Project-Lookup
             if (isMarksEnabled) {
-                MarkingEngine.configure(project.getLookup());
+                Categorization ctg = project.getLookup().lookup(Categorization.class);
+                MarkingEngine.configure(ctg.getMappings());
             } else {
                 MarkingEngine.deconfigure();
             }
@@ -2270,7 +2272,7 @@ public final class NetBeansProfiler extends Profiler {
 
         return false;
     }
-    
+
     /**
      * Runs an target in Ant script with properties context.
      *
