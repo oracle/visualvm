@@ -1629,7 +1629,7 @@ public final class NetBeansProfiler extends Profiler {
         setupDispatcher(profilingSettings);
 
         ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
-//        profilingSettings.setInstrumentationMarkerMethods(marks);
+        profilingSettings.setInstrumentationMarkerMethods(marks);
 
         retValue = super.prepareInstrumentation(profilingSettings);
 
@@ -2109,6 +2109,7 @@ public final class NetBeansProfiler extends Profiler {
             // TODO profilingSettings should go to the Project-Lookup
             if (isMarksEnabled) {
                 Categorization ctg = project.getLookup().lookup(Categorization.class);
+                ctg.reset();
                 MarkingEngine.configure(ctg.getMappings());
             } else {
                 MarkingEngine.deconfigure();
@@ -2249,6 +2250,7 @@ public final class NetBeansProfiler extends Profiler {
             // deconfigure the profiler client
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
             client.registerFlatProfileProvider(null);
+
             // deconfigure the marking engine
             MarkingEngine.deconfigure();
         }

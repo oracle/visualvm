@@ -88,7 +88,9 @@ public class MarkingEngine {
      */
     private MarkingEngine() {
         observers = Lookup.getDefault().lookupResult(StateObserver.class);
+    }
 
+    private void reset() {
         synchronized (mapperGuard) {
             mapper = new MarkMapper();
         }
@@ -106,6 +108,7 @@ public class MarkingEngine {
 
     // configure the engine from a given {@linkplain Lookup}
     public static synchronized void configure(MarkMapping[] mappings) {
+        getDefault().reset();
         getDefault().setMarks(mappings != null ? mappings : Marker.DEFAULT.getMappings());
     }
 

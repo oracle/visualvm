@@ -76,6 +76,12 @@ public class Categorization implements Marker {
         this.inheritedMarkMap = null;
     }
 
+    public synchronized void reset() {
+        root = null;
+        inheritedMarkMap = null;
+        reverseMap = null;
+    }
+
     private synchronized Map<Category, Set<Mark>> getInheritedMap() {
         if (inheritedMarkMap == null && reverseMap == null) {
             initInternals();
@@ -152,16 +158,5 @@ public class Categorization implements Marker {
 
     public Mark[] getMarks() {
         return getAllMarks(getRoot()).toArray(new Mark[0]);
-    }//    private Category getCategoryForMark(Mark mark, Category rootCategory) {
-//        if (rootCategory.getAssignedMark().equals(mark)) return rootCategory;
-//        
-//        for(Category subCat : rootCategory.getSubcategories()) {
-//            Category found = getCategoryForMark(mark, subCat);
-//            if (found != null) {
-//                return found;
-//            }
-//        }
-//        
-//        return null;
-//    }
+    }
 }
