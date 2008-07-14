@@ -271,12 +271,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     List getReferences() {
-        HprofByteBuffer buffer = getHprofBuffer();
-        byte[] idArr = new byte[buffer.getIDSize()];
-
-        buffer.get(fileOffset + 1, idArr);
-
-        return getHprof().findReferencesFor(getJavaClassId(), idArr);
+        return getHprof().findReferencesFor(getJavaClassId());
     }
 
     int getStaticFieldOffset() {
