@@ -436,7 +436,7 @@ public class MiscUtils implements CommonConstants {
                 File f = files[i];
                 String fname = f.getName();
 
-                if (fname.startsWith("NBProfiler") && fname.endsWith(".map")) { // NOI18N
+                if (fname.startsWith("NBProfiler") && (fname.endsWith(".map") || fname.endsWith(".ref"))) { // NOI18N
                     f.delete();
                 }
             }
