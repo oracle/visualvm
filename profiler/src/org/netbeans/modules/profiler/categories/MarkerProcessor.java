@@ -128,7 +128,7 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
 
     @Override
     public void process(PackageCategoryDefinition def) {
-        pMarker.addPackageMark(def.getPackageName(), def.getAssignedMark());
+        pMarker.addPackageMark(def.getPackageName(), def.getAssignedMark(), def.isRecursive());
     }
     
     public MarkMapping[] getMappings() {
