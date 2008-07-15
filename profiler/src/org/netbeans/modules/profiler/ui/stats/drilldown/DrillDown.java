@@ -91,13 +91,16 @@ public class DrillDown implements CCTResultsFilter.Evaluator {
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     public DrillDown(Lookup lookup, final ProfilerClient client, final boolean secondTimeStamp) {
-        categorization = lookup.lookup(Categorization.class);
-
         this.secondTime = secondTimeStamp;
         this.client = client;
-        reset();
+        categorization = lookup.lookup(Categorization.class);
+        if (categorization == null) {
+            this.validFlag = false;
+        } else {
+            reset();
 
-        this.validFlag = !categorization.getRoot().getSubcategories().isEmpty();
+            this.validFlag = !categorization.getRoot().getSubcategories().isEmpty();
+        }
     }
 
     public DrillDown(Lookup lookup, final ProfilerClient client) {
@@ -223,10 +226,8 @@ public class DrillDown implements CCTResultsFilter.Evaluator {
     }
 
     public boolean evaluate(Mark categoryMark) {
-        if ((currentCategory == null || currentCategory.getAssignedMark() == Mark.DEFAULT)) {
-            if (currentCategory.getSubcategories().size() > 1) {
-                return true;
-            }
+        if ((currentCategory == null || (currentCategory.getAssignedMark() == Mark.DEFAULT && currentCategory.getSubcategories().size() > 1))) {
+            return true;
         }
 
         Boolean passed = currentCategory.accept(new Visitor<Visitable<Category>, Boolean, Mark>() {
