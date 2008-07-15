@@ -90,10 +90,10 @@ public class DrillDown implements CCTResultsFilter.Evaluator {
     final private List<Category> subCategories = new ArrayList<Category>();
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-    public DrillDown(Lookup lookup, final ProfilerClient client, final boolean secondTimeStamp) {
+    public DrillDown(Categorization cat, final ProfilerClient client, final boolean secondTimeStamp) {
         this.secondTime = secondTimeStamp;
         this.client = client;
-        categorization = lookup.lookup(Categorization.class);
+        categorization = cat;
         if (categorization == null) {
             this.validFlag = false;
         } else {
@@ -103,8 +103,8 @@ public class DrillDown implements CCTResultsFilter.Evaluator {
         }
     }
 
-    public DrillDown(Lookup lookup, final ProfilerClient client) {
-        this(lookup, client, false);
+    public DrillDown(Categorization cat, final ProfilerClient client) {
+        this(cat, client, false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
