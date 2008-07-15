@@ -114,6 +114,7 @@ public class MarkingEngine {
 
     public static synchronized void deconfigure() {
         getDefault().setMarks(Marker.DEFAULT.getMappings());
+        getDefault().reset();
     }
 
     public ClientUtils.SourceCodeSelection[] getMarkerMethods() {
