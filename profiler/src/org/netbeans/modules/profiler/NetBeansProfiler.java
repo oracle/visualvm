@@ -2108,9 +2108,9 @@ public final class NetBeansProfiler extends Profiler {
 
             if (isMarksEnabled) {
                 ctg.reset();
-                MarkingEngine.configure(ctg.getMappings());
+                MarkingEngine.getDefault().configure(ctg.getMappings());
             } else {
-                MarkingEngine.deconfigure();
+                MarkingEngine.getDefault().deconfigure();
             }
 
             Collection listeners = null;
@@ -2250,7 +2250,7 @@ public final class NetBeansProfiler extends Profiler {
             client.registerFlatProfileProvider(null);
 
             // deconfigure the marking engine
-            MarkingEngine.deconfigure();
+            MarkingEngine.getDefault().deconfigure();
         }
     }
 
