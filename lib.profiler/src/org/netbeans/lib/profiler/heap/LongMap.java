@@ -279,7 +279,7 @@ class LongMap {
 
     private long getID(long index) {
         if (ID_SIZE == 4) {
-            return dumpBuffer.getInt(index);
+            return ((long)dumpBuffer.getInt(index)) & 0xFFFFFFFFL;
         }
         return dumpBuffer.getLong(index);
     }
