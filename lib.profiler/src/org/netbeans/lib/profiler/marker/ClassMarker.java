@@ -50,6 +50,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -57,6 +59,7 @@ import java.util.Map;
  * @author Jaroslav Bachorik
  */
 public class ClassMarker implements Marker {
+    private static Logger LOGGER = Logger.getLogger(ClassMarker.class.getName());
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Map markMap;
@@ -89,14 +92,24 @@ public class ClassMarker implements Marker {
     }
 
     public void addClassMark(String className, Mark mark) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Marking class " + className + " with " + mark.getId());
+        }
+
         markMap.put(className, mark);
     }
 
     public void removeClassMark(String className) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking class " + className);
+        }
         markMap.remove(className);
     }
 
     public void resetClassMarks() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking all classes");
+        }
         markMap.clear();
     }
 }
