@@ -67,11 +67,9 @@ public class MarkingEngine {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final Object mapperGuard = new Object();
     private final Object markGuard = new Object();
 
-    // @GuardedBy mapperGuard
-    private MarkMapper mapper = null;
+    final private MarkMapper mapper;
 
     // @GuardedBy markGuard
     private String[] labels;
@@ -88,12 +86,7 @@ public class MarkingEngine {
      */
     private MarkingEngine() {
         observers = Lookup.getDefault().lookupResult(StateObserver.class);
-    }
-
-    private void reset() {
-        synchronized (mapperGuard) {
-            mapper = new MarkMapper();
-        }
+        mapper = new MarkMapper();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -106,14 +99,13 @@ public class MarkingEngine {
         return instance;
     }
 
-    // configure the engine from a given {@linkplain Lookup}
-    public static synchronized void configure(MarkMapping[] mappings) {
-        getDefault().reset();
-        getDefault().setMarks(mappings != null ? mappings : Marker.DEFAULT.getMappings());
+    // configure the engine for a given set of {@linkplain MarkMapping}
+    public synchronized void configure(MarkMapping[] mappings) {
+        setMarks(mappings != null ? mappings : Marker.DEFAULT.getMappings());
     }
 
-    public static synchronized void deconfigure() {
-        getDefault().setMarks(Marker.DEFAULT.getMappings());
+    public synchronized void deconfigure() {
+        setMarks(Marker.DEFAULT.getMappings());
     }
 
     public ClientUtils.SourceCodeSelection[] getMarkerMethods() {
