@@ -29,7 +29,9 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 
 /**
- *
+ * The AttachModelFactory class is a factory class for getting the
+ * {@link AttachModel} representation  for the {@link Application}.
+ * 
  * @author Tomas Hurka
  */
 public final class AttachModelFactory extends ModelFactory<AttachModel, Application> {
@@ -39,6 +41,10 @@ public final class AttachModelFactory extends ModelFactory<AttachModel, Applicat
     private AttachModelFactory() {
     }
 
+    /**
+     * Getter for the default version of the AttachModelFactory.
+     * @return instance of {@link AttachModelFactory}.
+     */
     public static synchronized AttachModelFactory getDefault() {
         if (attachFactory == null) {
             attachFactory = new AttachModelFactory();
@@ -46,6 +52,15 @@ public final class AttachModelFactory extends ModelFactory<AttachModel, Applicat
         return attachFactory;
     }
     
+    /**
+     * Factory method for obtaining {@link AttachModel} for {@link Application}. Note that there
+     * is only one instance of {@link AttachModel} for a concrete application. This {@link AttachModel}
+     * instance is cached. This methoc can return <CODE>null</CODE> if there is no AttachModel
+     * available
+     * @param app application
+     * @return {@link AttachModel} instance or <CODE>null</CODE> if there is no
+     * {@link AttachModel}
+     */
     public static AttachModel getAttachFor(Application app) {
         return getDefault().getModel(app);
     }

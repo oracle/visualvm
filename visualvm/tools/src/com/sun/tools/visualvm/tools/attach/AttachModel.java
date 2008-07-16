@@ -29,19 +29,58 @@ import com.sun.tools.visualvm.core.model.Model;
 import java.util.Properties;
 
 /**
- *
+ * This class uses Attach API (http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html)
+ * to obtatin various information from JVM. Note that
+ * Attach API is available in JDK 6 and up and only for local processes running as
+ * same user. See Attach API documentaion for mode details.
  * @author Tomas Hurka
  */
 public abstract class AttachModel extends Model {
 
+    /**
+     * Returns the current system properties in the target Application.
+     * 
+     * <p> This method returns the system properties in the target virtual
+     * machine. Properties whose key or value is not a <tt>String</tt> are 
+     * omitted. The method is approximately equivalent to the invocation of the
+     * method {@link java.lang.System#getProperties System.getProperties}
+     * in the target virtual machine except that properties with a key or
+     * value that is not a <tt>String</tt> are not included.
+     * @return The system properties of target Application
+     * @see java.lang.System#getProperties
+     */
     public abstract Properties getSystemProperties();
     
+    /**
+     * Takes heap dump of target Application.
+     * The heap is written to the <tt>fileName</tt> file in the same
+     * format as the hprof heap dump.
+     * @return returns <CODE>true</CODE> if operation was sucessfull.
+     * @param fileName {@link File} where heap dump will be stored.
+     */
     public abstract boolean takeHeapDump(String fileName);
     
+    /**
+     * Takes thread dump of target Application.
+     * @return Returns {@link String} of the thread dump from target Application.
+     */
     public abstract String takeThreadDump();
     
+    /**
+     * print VM option.
+     * Note that VM option is the one which starts with
+     * <CODE>-XX:</CODE>
+     * @param name name of VM option. For examle <CODE>HeapDumpOnOutOfMemoryError</CODE>
+     * @return Full text of VM option. For example <CODE>-XX:+HeapDumpOnOutOfMemoryError</CODE>
+     */
     public abstract String printFlag(String name);
     
+    /**
+     * Sets a VM option of the given name to the specified value. 
+     *
+     * @param name Name of a VM option 
+     * @param value New value of the VM option to be set 
+     */
     public abstract void setFlag(String name,String value);
     
 }
