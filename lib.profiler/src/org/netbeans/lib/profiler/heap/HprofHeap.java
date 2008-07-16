@@ -497,11 +497,11 @@ class HprofHeap implements Heap {
                         
                         if (outId != 0) {
                             LongMap.Entry entry = idToOffsetMap.get(outId);
-                            if (entry == null) {
+                            if (entry != null) {
+                                entry.addReference(instanceId);
+                            } else {
                                 //    System.err.println("instance entry:" + Long.toHexString(outId));
-                                continue;
                             }
-                            entry.addReference(instanceId);
                         }
                     }
                     inOff += field.getValueSize();
@@ -516,11 +516,11 @@ class HprofHeap implements Heap {
                     
                     if (outId == 0) continue;
                     LongMap.Entry entry = idToOffsetMap.get(outId);
-                    if (entry == null) {
+                    if (entry != null) {
+                        entry.addReference(instanceId);
+                    } else {
                         //    System.err.println("bad array entry:" + Long.toHexString(outId));
-                        continue;
                     }
-                    entry.addReference(instanceId);
                 }
             }
         }
