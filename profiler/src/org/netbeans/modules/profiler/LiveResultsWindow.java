@@ -1079,12 +1079,21 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
                 List additionalStats = new ArrayList();
 
                 dd = Lookup.getDefault().lookup(DrillDownFactory.class).createDrillDown(project, runner.getProfilerClient());
+                if (dd != null) {
+                    StatisticalModuleContainer container = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
+                    additionalStats.addAll(container.getAllModules());
 
-                StatisticalModuleContainer container = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-                additionalStats.addAll(container.getAllModules());
+
+                    DrillDownWindow.getDefault().setDrillDown(dd, additionalStats);
+                    showDrillDown();
+                } else {
+                    hideDrillDown();
+                }
 
                 final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler, additionalStats);
-                dd.addListener(new DrillDownListener() {
+
+                if (dd != null) {
+                    dd.addListener(new DrillDownListener() {
                         public void dataChanged() {
                         }
 
@@ -1092,8 +1101,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
                             cpuPanel.updateLiveResults();
                         }
                     });
-
-                DrillDownWindow.getDefault().setDrillDown(dd, additionalStats);
+                }
 
                 currentDisplayComponent = cpuPanel;
 
