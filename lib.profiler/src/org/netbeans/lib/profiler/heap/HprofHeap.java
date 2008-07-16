@@ -468,7 +468,7 @@ class HprofHeap implements Heap {
         return refs;
     }
 
-    void computeReferences() {
+    synchronized void computeReferences() {
         if (referencesComputed) {
             return;
         }
