@@ -232,7 +232,7 @@ public class DirectorySelector extends javax.swing.JPanel {
      */
     public void setHint(String hint) {
         this.labelHint.setText(hint);
-        if (hint == null || hint.isEmpty()) {
+        if (hint == null || hint.length() == 0) {
             this.hintScroller.setVisible(false);
         } else {
             this.hintScroller.setVisible(true);

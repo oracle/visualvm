@@ -148,7 +148,7 @@ public class ComboSelector extends javax.swing.JPanel implements ListDataListene
 
     public void setHint(String hint) {
         labelHint.setText(hint);
-        if (hint == null || hint.isEmpty()) {
+        if (hint == null || hint.length() == 0) {
             this.hintScroller.setVisible(false);
         } else {
             this.hintScroller.setVisible(true);
