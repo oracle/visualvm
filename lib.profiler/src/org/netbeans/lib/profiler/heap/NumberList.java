@@ -201,7 +201,7 @@ class NumberList {
     private long readNumber(byte[] block,int slot) {
         int offset = slot*numberSize;
         long el = 0;
-//        for (int i=0;i<NUMBERS_IN_BLOCK;i++) {
+//        for (int i=0;i<numberSize;i++) {
 //            el <<= 8;
 //            el |= ((int)block[offset+i]) & 0xFF;
 //        }    
