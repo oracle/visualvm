@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Help">
+            <file name="com-sun-tools-visualvm-modules-killapp-KillAction.instance"/>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Applications">
+            <attr name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.shadow/com-sun-tools-visualvm-modules-killapp-KillAction.shadow" boolvalue="true"/>
+            <file name="com-sun-tools-visualvm-modules-killapp-KillAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Help/com-sun-tools-visualvm-modules-killapp-KillAction.instance"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="VisualVM">
+        <folder name="ExplorerPopupSelection">
+            <file name="com-sun-tools-visualvm-modules-killapp-KillAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Application/com-sun-tools-visualvm-modules-killapp-KillAction.instance"/>
+                <attr name="position" intvalue="550"/>
+            </file>
+        </folder>
+    </folder>
+</filesystem>
