@@ -33,6 +33,7 @@ import java.io.IOException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -57,11 +58,16 @@ public final class KillAction extends SingleDataSourceAction<Application> {
             assert false:"strange os";  // NOI18N
             return;
         }
-        try {
-            Runtime.getRuntime().exec(command);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                try {
+                    Runtime.getRuntime().exec(command);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        });
     }
     
     protected boolean isEnabled(Application application) {
