@@ -2101,18 +2101,16 @@ public final class NetBeansProfiler extends Profiler {
             boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
                                      || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
 
-            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-//            Marker marker = ptp.getProjectMarker(project);
-//            final MarkMapping[] marks = isMarksEnabled
-//                                        ? marker.getMarks()
-//                                        : new MarkMapping[0];
-            // TODO profilingSettings should go to the Project-Lookup
+//            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+            Categorization ctg = project.getLookup().lookup(Categorization.class);
+
+            isMarksEnabled &= (ctg != null);
+
             if (isMarksEnabled) {
-                Categorization ctg = project.getLookup().lookup(Categorization.class);
                 ctg.reset();
-                MarkingEngine.configure(ctg.getMappings());
+                MarkingEngine.getDefault().configure(ctg.getMappings());
             } else {
-                MarkingEngine.deconfigure();
+                MarkingEngine.getDefault().deconfigure();
             }
 
             Collection listeners = null;
@@ -2252,7 +2250,7 @@ public final class NetBeansProfiler extends Profiler {
             client.registerFlatProfileProvider(null);
 
             // deconfigure the marking engine
-            MarkingEngine.deconfigure();
+            MarkingEngine.getDefault().deconfigure();
         }
     }
 
