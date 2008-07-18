@@ -80,10 +80,10 @@ public class MonitoredDataImpl extends MonitoredData {
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
     MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
     MemoryUsage perm = jmxSupport.getPermGenPool().getUsage();
-    loadedClasses = classBean.getLoadedClassCount();
+    unloadedClasses = classBean.getUnloadedClassCount();
+    loadedClasses = classBean.getLoadedClassCount() + unloadedClasses;
     sharedLoadedClasses = 0;
     sharedUnloadedClasses = 0;
-    unloadedClasses = classBean.getUnloadedClassCount();
     threadsDaemon = threadBean.getDaemonThreadCount();
     threadsLive = threadBean.getThreadCount();
     threadsLivePeak = threadBean.getPeakThreadCount();
