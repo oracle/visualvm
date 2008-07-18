@@ -136,6 +136,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
+import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
@@ -2100,16 +2101,16 @@ public final class NetBeansProfiler extends Profiler {
             boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
                                      || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
 
-            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-//            Marker marker = ptp.getProjectMarker(project);
-//            final MarkMapping[] marks = isMarksEnabled
-//                                        ? marker.getMarks()
-//                                        : new MarkMapping[0];
-            // TODO profilingSettings should go to the Project-Lookup
+//            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+            Categorization ctg = project.getLookup().lookup(Categorization.class);
+
+            isMarksEnabled &= (ctg != null);
+
             if (isMarksEnabled) {
-                MarkingEngine.configure(project.getLookup());
+                ctg.reset();
+                MarkingEngine.getDefault().configure(ctg.getMappings());
             } else {
-                MarkingEngine.deconfigure();
+                MarkingEngine.getDefault().deconfigure();
             }
 
             Collection listeners = null;
@@ -2247,8 +2248,9 @@ public final class NetBeansProfiler extends Profiler {
             // deconfigure the profiler client
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
             client.registerFlatProfileProvider(null);
+
             // deconfigure the marking engine
-            MarkingEngine.deconfigure();
+            MarkingEngine.getDefault().deconfigure();
         }
     }
 
@@ -2270,7 +2272,7 @@ public final class NetBeansProfiler extends Profiler {
 
         return false;
     }
-    
+
     /**
      * Runs an target in Ant script with properties context.
      *
