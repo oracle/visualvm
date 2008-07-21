@@ -416,6 +416,9 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     public void eventDispatched(AWTEvent ev) {
       MouseEvent e = (MouseEvent) ev;
       
+      // Fix for TrayIcon
+      if (!(e.getSource() instanceof Component)) return;
+      
       Component c = (Component) e.getSource();
       while (c != null && !(c instanceof DataSourceWindowTabbedPane))
         c = c.getParent();
