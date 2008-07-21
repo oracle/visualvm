@@ -216,6 +216,9 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         } else if (Utils.isMemorySettings(type)) {
             typeString = " (" + MEMORY_STRING + ")"; // NOI18N
         }
+        
+        // Remove mnemonics wildcard
+        typeString = typeString.replace("&", "");
 
         //    final DialogDescriptor dd = new DialogDescriptor(ncc, "New Custom Configuration" + typeString);
         final DialogDescriptor dd = new DialogDescriptor(ncc, NEW_CONFIG_DIALOG_CAPTION + typeString, true,
