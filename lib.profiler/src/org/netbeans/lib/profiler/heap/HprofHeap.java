@@ -115,6 +115,7 @@ class HprofHeap implements Heap {
     private TagBounds[] heapTagBounds;
     private TagBounds[] tagBounds = new TagBounds[0xff];
     private boolean instancesCountComputed;
+    private boolean referencesComputed;
     private int idMapSize;
     private int segment;
 
@@ -186,7 +187,6 @@ class HprofHeap implements Heap {
         ClassDump classDump;
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
-        int instanceIdOffset = 0;
         int classIdOffset = 0;
         LongMap.Entry entry = idToOffsetMap.get(instanceID);
 
@@ -202,13 +202,10 @@ class HprofHeap implements Heap {
         int tag = readDumpTag(offset);
 
         if (tag == INSTANCE_DUMP) {
-            instanceIdOffset = 1;
             classIdOffset = idSize + 4;
         } else if (tag == OBJECT_ARRAY_DUMP) {
-            instanceIdOffset = 1;
             classIdOffset = idSize + 4 + 4;
         } else if (tag == PRIMITIVE_ARRAY_DUMP) {
-            instanceIdOffset = 1;
             classIdOffset = idSize + 4 + 4;
         }
 
@@ -409,13 +406,20 @@ class HprofHeap implements Heap {
         return;
     }
 
-    List findReferencesFor(long instanceId, byte[] idArray) {
+    List findReferencesFor(long instanceId) {
+        assert instanceId != 0L : "InstanceID is null";
+        computeReferences();
+        
         List refs = new ArrayList();
+        List refIds = idToOffsetMap.get(instanceId).getReferences();
+        Iterator refIdsIt = refIds.iterator();
+        int idSize = dumpBuffer.getIDSize();
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
-        final int idSize = dumpBuffer.getIDSize();
-        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
-
-        while (offset[0] < allInstanceDumpBounds.endOffset) {
+        long[] offset = new long[1];
+        
+        while (refIdsIt.hasNext()) {
+            long foundInstanceId = ((Long)refIdsIt.next()).longValue();
+            offset[0] = idToOffsetMap.get(foundInstanceId).getOffset();
             int classIdOffset = 0;
             int instanceIdOffset = 0;
             long start = offset[0];
@@ -423,28 +427,22 @@ class HprofHeap implements Heap {
 
             if (tag == INSTANCE_DUMP) {
                 classIdOffset = idSize + 4;
-
                 int size = dumpBuffer.getInt(start + 1 + idSize + 4 + idSize);
                 byte[] fields = new byte[size];
-
                 dumpBuffer.get(start + 1 + idSize + 4 + idSize + 4, fields);
+                long classId = dumpBuffer.getID(start + 1 + idSize + 4);
+                ClassDump classDump = classDumpBounds.getClassDumpByID(classId);
+                InstanceDump instance = new InstanceDump(classDump, start);
+                Iterator fieldIt = instance.getFieldValues().iterator();
 
-                if (contains(idArray, fields)) {
-                    long classId = dumpBuffer.getID(start + 1 + idSize + 4);
-                    ClassDump classDump = classDumpBounds.getClassDumpByID(classId);
-                    long foundInstanceId = dumpBuffer.getID(start + 1);
-                    InstanceDump instance = new InstanceDump(classDump, start);
-                    Iterator fieldIt = instance.getFieldValues().iterator();
+                while (fieldIt.hasNext()) {
+                    Object field = fieldIt.next();
 
-                    while (fieldIt.hasNext()) {
-                        Object field = fieldIt.next();
+                    if (field instanceof HprofInstanceObjectValue) {
+                        HprofInstanceObjectValue objectValue = (HprofInstanceObjectValue) field;
 
-                        if (field instanceof HprofInstanceObjectValue) {
-                            HprofInstanceObjectValue objectValue = (HprofInstanceObjectValue) field;
-
-                            if (objectValue.getInstanceId() == instanceId) {
-                                refs.add(objectValue);
-                            }
+                        if (objectValue.getInstanceId() == instanceId) {
+                            refs.add(objectValue);
                         }
                     }
                 }
@@ -461,14 +459,99 @@ class HprofHeap implements Heap {
                         refs.add(new HprofArrayValue(classDump, start, i));
                     }
                 }
+            } else if (tag == CLASS_DUMP) {
+                ClassDump cls = classDumpBounds.getClassDumpByID(foundInstanceId);
+                cls.findStaticReferencesFor(instanceId, refs);
             }
         }
-
-        refs.addAll(classDumpBounds.findStaticReferencesFor(instanceId));
 
         return refs;
     }
 
+    synchronized void computeReferences() {
+        if (referencesComputed) {
+            return;
+        }
+
+        ClassDumpSegment classDumpBounds = getClassDumpSegment();
+        int idSize = dumpBuffer.getIDSize();
+        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+        Map classIdToClassMap = classDumpBounds.getClassIdToClassMap();
+
+        while (offset[0] < allInstanceDumpBounds.endOffset) {
+            long start = offset[0];
+            int tag = readDumpTag(offset);
+
+            if (tag == INSTANCE_DUMP) {
+                long classId = dumpBuffer.getID(start+1+idSize+4);
+                ClassDump classDump = (ClassDump) classIdToClassMap.get(new Long(classId));
+                long instanceId = dumpBuffer.getID(start+1);
+                long inOff = start+1+idSize+4+idSize+4;
+                List fields = classDump.getAllInstanceFields();
+                Iterator fit = fields.iterator();
+                
+                while(fit.hasNext()) {
+                    HprofField field = (HprofField) fit.next();
+                    if (field.getVauleType() == HprofHeap.OBJECT) {
+                        long outId = dumpBuffer.getID(inOff);
+                        
+                        if (outId != 0) {
+                            LongMap.Entry entry = idToOffsetMap.get(outId);
+                            if (entry != null) {
+                                entry.addReference(instanceId);
+                            } else {
+                                //    System.err.println("instance entry:" + Long.toHexString(outId));
+                            }
+                        }
+                    }
+                    inOff += field.getValueSize();
+                }
+            } else if (tag == OBJECT_ARRAY_DUMP) {
+                long instanceId = dumpBuffer.getID(start+1);
+                int elements = dumpBuffer.getInt(start+1+idSize+4);
+                long position = start+1+idSize+4+4+idSize;
+                
+                for(int i=0;i<elements;i++,position+=idSize) {
+                    long outId = dumpBuffer.getID(position);
+                    
+                    if (outId == 0) continue;
+                    LongMap.Entry entry = idToOffsetMap.get(outId);
+                    if (entry != null) {
+                        entry.addReference(instanceId);
+                    } else {
+                        //    System.err.println("bad array entry:" + Long.toHexString(outId));
+                    }
+                }
+            }
+        }
+        
+        Iterator classesIt = getClassDumpSegment().createClassCollection().iterator();
+        
+        while (classesIt.hasNext()) {
+            ClassDump classDump = (ClassDump)classesIt.next();
+            List fields = classDump.getStaticFieldValues();
+            Iterator fit = fields.iterator();
+            
+            while(fit.hasNext()) {
+                Object field = fit.next();
+                if (field instanceof HprofFieldObjectValue) {
+                    long outId = ((HprofFieldObjectValue)field).getInstanceID();
+
+                    if (outId != 0) {
+                        LongMap.Entry entry = idToOffsetMap.get(outId);
+                        if (entry == null) {
+                            //    System.err.println("instance entry:" + Long.toHexString(outId));
+                            continue;
+                        }
+                        entry.addReference(classDump.getJavaClassId());
+                    }
+                }
+            }
+        }
+        referencesComputed = true;
+        return;
+    }
+    
     int readDumpTag(long[] offset) {
         long position = offset[0];
         int dumpTag = dumpBuffer.get(position++);
