@@ -48,7 +48,7 @@ made subject to such option by the copyright holder.
   -->
   
   <property name="lib.dir" value="${cluster}/lib"/>
-  <property name="dest.dir" value="./build"/>
+  <property name="dest.dir" value="../../build"/>
   <property name="build.dir" value="${dest.dir}/nb-profiler-server"/>
   <property name="profiler.cluster" value=".."/>
   
@@ -83,9 +83,11 @@ made subject to such option by the copyright holder.
  </target>
 
   <target name="profiler-server-mac-15">
-    <antcall target="profiler-server-15">
+    <property name="jdk-version" value="15"/>
+    <antcall target="profiler-server-unix">
       <param name="os-version" value="mac"/>
       <param name="os-long-version" value="mac"/>
+      <param name="calibrate-suffix" value="-mac-${jdk-version}"/>
     </antcall>
   </target>
 
