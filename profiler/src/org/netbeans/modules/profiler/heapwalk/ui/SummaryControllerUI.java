@@ -242,18 +242,21 @@ public class SummaryControllerUI extends JPanel {
                 nclassloaders += jc.getInstancesCount();
             }
         }
-
+        NumberFormat numberFormat = (NumberFormat)NumberFormat.getInstance().clone();
+        numberFormat.setMaximumFractionDigits(1);
+        
         String filename = "&nbsp;&nbsp;&nbsp;&nbsp;"
                           + MessageFormat.format(FILE_ITEM_STRING,
                                                  new Object[] {
-                                                     (((file != null) && file.exists()) ? file.getAbsolutePath() : NOT_AVAILABLE_MSG)
+                                                     file != null && file.exists() ? file.getAbsolutePath() : NOT_AVAILABLE_MSG
                                                  }); // NOI18N
 
         String filesize = "&nbsp;&nbsp;&nbsp;&nbsp;"
                           + MessageFormat.format(FILE_SIZE_ITEM_STRING,
                                                  new Object[] {
-                                                     (((file != null) && file.exists()) ? ((file.length() / (1024 * 1024))
-                                                                                        + " MB") : NOT_AVAILABLE_MSG)
+                                                     file != null && file.exists() ? 
+                                                         numberFormat.format(file.length()/(1024 * 1024.0)) + " MB" :
+                                                         NOT_AVAILABLE_MSG
                                                  }); // NOI18N
 
         String dateTaken = "&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -261,25 +264,25 @@ public class SummaryControllerUI extends JPanel {
 
         String liveBytes = "&nbsp;&nbsp;&nbsp;&nbsp;"
                            + MessageFormat.format(TOTAL_BYTES_ITEM_STRING,
-                                                  new Object[] { NumberFormat.getInstance().format(hsummary.getTotalLiveBytes()) }); // NOI18N
+                                                  new Object[] { numberFormat.format(hsummary.getTotalLiveBytes()) }); // NOI18N
 
         String liveClasses = "&nbsp;&nbsp;&nbsp;&nbsp;"
                              + MessageFormat.format(TOTAL_CLASSES_ITEM_STRING,
-                                                    new Object[] { NumberFormat.getInstance().format(heap.getAllClasses().size()) }); // NOI18N
+                                                    new Object[] { numberFormat.format(heap.getAllClasses().size()) }); // NOI18N
 
         String liveInstances = "&nbsp;&nbsp;&nbsp;&nbsp;"
                                + MessageFormat.format(TOTAL_INSTANCES_ITEM_STRING,
                                                       new Object[] {
-                                                          NumberFormat.getInstance().format(hsummary.getTotalLiveInstances())
+                                                          numberFormat.format(hsummary.getTotalLiveInstances())
                                                       }); // NOI18N
 
         String classloaders = "&nbsp;&nbsp;&nbsp;&nbsp;"
                               + MessageFormat.format(CLASSLOADERS_ITEM_STRING,
-                                                     new Object[] { NumberFormat.getInstance().format(nclassloaders) }); // NOI18N
+                                                     new Object[] { numberFormat.format(nclassloaders) }); // NOI18N
 
         String gcroots = "&nbsp;&nbsp;&nbsp;&nbsp;"
                          + MessageFormat.format(GCROOTS_ITEM_STRING,
-                                                new Object[] { NumberFormat.getInstance().format(heap.getGCRoots().size()) }); // NOI18N
+                                                new Object[] { numberFormat.format(heap.getGCRoots().size()) }); // NOI18N
 
         return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;"
                + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes
