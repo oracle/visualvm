@@ -55,7 +55,7 @@ public final class AttachModelFactory extends ModelFactory<AttachModel, Applicat
     /**
      * Factory method for obtaining {@link AttachModel} for {@link Application}. Note that there
      * is only one instance of {@link AttachModel} for a concrete application. This {@link AttachModel}
-     * instance is cached. This methoc can return <CODE>null</CODE> if there is no AttachModel
+     * instance is cached. This method can return <CODE>null</CODE> if there is no AttachModel
      * available
      * @param app application
      * @return {@link AttachModel} instance or <CODE>null</CODE> if there is no
