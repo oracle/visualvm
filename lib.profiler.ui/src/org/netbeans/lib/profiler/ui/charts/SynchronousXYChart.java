@@ -1497,7 +1497,7 @@ public class SynchronousXYChart extends JComponent implements ComponentListener,
     }
 
     private void checkChartMargins() {
-        if (checkLeftChartMargin() || checkRightChartMargin()) {
+        if (offScreenGraphics == null || checkLeftChartMargin() || checkRightChartMargin()) {
             updateOffScreenImageSize();
         }
     }
