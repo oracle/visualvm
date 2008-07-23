@@ -2102,7 +2102,7 @@ public final class NetBeansProfiler extends Profiler {
                                      || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
 
 //            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-            Categorization ctg = project.getLookup().lookup(Categorization.class);
+            Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
 
             isMarksEnabled &= (ctg != null);
 
