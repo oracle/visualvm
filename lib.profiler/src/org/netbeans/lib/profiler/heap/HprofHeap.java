@@ -111,7 +111,7 @@ class HprofHeap implements Heap {
     private ComputedSummary computedSummary;
     private Map gcRoots;
     private TagBounds allInstanceDumpBounds;
-    private TagBounds headDumpSegment;
+    private TagBounds heapDumpSegment;
     private TagBounds[] heapTagBounds;
     private TagBounds[] tagBounds = new TagBounds[0xff];
     private boolean instancesCountComputed;
@@ -125,9 +125,9 @@ class HprofHeap implements Heap {
         dumpBuffer = HprofByteBuffer.createHprofByteBuffer(dumpFile);
         segment = seg;
         fillTagBounds(dumpBuffer.getHeaderSize());
-        headDumpSegment = computeHeapDumpStart();
+        heapDumpSegment = computeHeapDumpStart();
 
-        if (headDumpSegment != null) {
+        if (heapDumpSegment != null) {
             fillHeapTagBounds();
         }
 
@@ -140,7 +140,7 @@ class HprofHeap implements Heap {
     public List /*<JavaClass>*/ getAllClasses() {
         ClassDumpSegment classDumpBounds;
 
-        if (headDumpSegment == null) {
+        if (heapDumpSegment == null) {
             return Collections.EMPTY_LIST;
         }
 
@@ -164,6 +164,9 @@ class HprofHeap implements Heap {
     }
 
     public Collection getGCRoots() {
+        if (heapDumpSegment == null) {
+            return Collections.EMPTY_LIST;
+        }
         if (gcRoots == null) {
             gcRoots = computeGCRootsFor(heapTagBounds[ROOT_UNKNOWN]);
             gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_GLOBAL]));
@@ -234,6 +237,9 @@ class HprofHeap implements Heap {
     }
 
     public JavaClass getJavaClassByName(String fqn) {
+        if (heapDumpSegment == null) {
+            return null;
+        }
         return getClassDumpSegment().getJavaClassByName(fqn);
     }
 
@@ -253,9 +259,12 @@ class HprofHeap implements Heap {
 
     public Properties getSystemProperties() {
         JavaClass systemClass = getJavaClassByName("java.lang.System"); // NOI18N
-        Instance props = (Instance) systemClass.getValueOfStaticField("props"); //NOI18N
+        if (systemClass != null) {
+            Instance props = (Instance) systemClass.getValueOfStaticField("props"); //NOI18N
 
-        return HprofProxy.getProperties(props);
+            return HprofProxy.getProperties(props);
+        }
+        return null;
     }
 
     ClassDumpSegment getClassDumpSegment() {
@@ -468,7 +477,7 @@ class HprofHeap implements Heap {
         return refs;
     }
 
-    void computeReferences() {
+    synchronized void computeReferences() {
         if (referencesComputed) {
             return;
         }
@@ -497,11 +506,11 @@ class HprofHeap implements Heap {
                         
                         if (outId != 0) {
                             LongMap.Entry entry = idToOffsetMap.get(outId);
-                            if (entry == null) {
+                            if (entry != null) {
+                                entry.addReference(instanceId);
+                            } else {
                                 //    System.err.println("instance entry:" + Long.toHexString(outId));
-                                continue;
                             }
-                            entry.addReference(instanceId);
                         }
                     }
                     inOff += field.getValueSize();
@@ -516,11 +525,11 @@ class HprofHeap implements Heap {
                     
                     if (outId == 0) continue;
                     LongMap.Entry entry = idToOffsetMap.get(outId);
-                    if (entry == null) {
+                    if (entry != null) {
+                        entry.addReference(instanceId);
+                    } else {
                         //    System.err.println("bad array entry:" + Long.toHexString(outId));
-                        continue;
                     }
-                    entry.addReference(instanceId);
                 }
             }
         }
@@ -908,9 +917,9 @@ class HprofHeap implements Heap {
 
         heapTagBounds = new TagBounds[0x100];
 
-        long[] offset = new long[] { headDumpSegment.startOffset + 1 + 4 + 4 };
+        long[] offset = new long[] { heapDumpSegment.startOffset + 1 + 4 + 4 };
 
-        while (offset[0] < headDumpSegment.endOffset) {
+        while (offset[0] < heapDumpSegment.endOffset) {
             long start = offset[0];
             int tag = readDumpTag(offset);
             TagBounds bounds = heapTagBounds[tag];
