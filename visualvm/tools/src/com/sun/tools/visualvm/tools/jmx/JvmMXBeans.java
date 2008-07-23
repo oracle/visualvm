@@ -46,52 +46,95 @@ import javax.management.ObjectName;
 public interface JvmMXBeans extends MBeanCacheOperations {
 
     /**
-     * Returns an MXBean proxy for the class loading system of the JVM.
+     * Returns the managed bean for the class loading system of 
+     * the Java virtual machine.
+     *
+     * @return a {@link ClassLoadingMXBean} object for 
+     * the Java virtual machine.
      */
     public ClassLoadingMXBean getClassLoadingMXBean();
 
     /**
-     * Returns an MXBean proxy for the compilation system of the JVM.
+     * Returns the managed bean for the compilation system of 
+     * the Java virtual machine.  This method returns <tt>null</tt>
+     * if the Java virtual machine has no compilation system.
+     *
+     * @return a {@link CompilationMXBean} object for the Java virtual 
+     *   machine or <tt>null</tt> if the Java virtual machine has 
+     *   no compilation system. 
      */
     public CompilationMXBean getCompilationMXBean();
 
     /**
-     * Returns an MXBean proxy for the logging system of the JVM.
+     * Returns <tt>LoggingMXBean</tt> for managing loggers. 
+     *
+     * @return a {@link LoggingMXBean} object for 
+     * the Java virtual machine.
      */
     public LoggingMXBean getLoggingMXBean();
 
     /**
-     * Returns a collection of MXBean proxies for the garbage collectors of the JVM.
+     * Returns a list of {@link GarbageCollectorMXBean} objects 
+     * in the Java virtual machine.
+     * The Java virtual machine may have one or more
+     * <tt>GarbageCollectorMXBean</tt> objects.
+     * It may add or remove <tt>GarbageCollectorMXBean</tt> 
+     * during execution.
+     *
+     * @return a list of <tt>GarbageCollectorMXBean</tt> objects.
      */
     public Collection<GarbageCollectorMXBean> getGarbageCollectorMXBeans();
 
     /**
-     * Returns a collection of MXBean proxies for the memory managers of the JVM.
+     * Returns a list of {@link MemoryManagerMXBean} objects 
+     * in the Java virtual machine. 
+     * The Java virtual machine can have one or more memory managers.
+     * It may add or remove memory managers during execution.
+     *
+     * @return a list of <tt>MemoryManagerMXBean</tt> objects.
      */
     public Collection<MemoryManagerMXBean> getMemoryManagerMXBeans();
 
     /**
-     * Returns an MXBean proxy for the memory system of the JVM.
+     * Returns the managed bean for the memory system of 
+     * the Java virtual machine.
+     *
+     * @return a {@link MemoryMXBean} object for the Java virtual machine.
      */
     public MemoryMXBean getMemoryMXBean();
 
     /**
-     * Returns a collection of MXBean proxies for the memory pools of the JVM.
+     * Returns a list of {@link MemoryPoolMXBean} objects in the 
+     * Java virtual machine.
+     * The Java virtual machine can have one or more memory pools.
+     * It may add or remove memory pools during execution.
+     *
+     * @return a list of <tt>MemoryPoolMXBean</tt> objects.
      */
     public Collection<MemoryPoolMXBean> getMemoryPoolMXBeans();
 
     /**
-     * Returns an MXBean proxy for the operating system of the JVM.
+     * Returns the managed bean for the operating system on which
+     * the Java virtual machine is running.
+     *
+     * @return an {@link OperatingSystemMXBean} object for 
+     * the Java virtual machine.
      */
     public OperatingSystemMXBean getOperatingSystemMXBean();
 
     /**
-     * Returns an MXBean proxy for the runtime system of the JVM.
+     * Returns the managed bean for the runtime system of 
+     * the Java virtual machine.
+     *
+     * @return a {@link RuntimeMXBean} object for the Java virtual machine.
      */
     public RuntimeMXBean getRuntimeMXBean();
 
     /**
-     * Returns an MXBean proxy for the thread system of the JVM.
+     * Returns the managed bean for the thread system of 
+     * the Java virtual machine.
+     *
+     * @return a {@link ThreadMXBean} object for the Java virtual machine.
      */
     public ThreadMXBean getThreadMXBean();
 
@@ -99,6 +142,11 @@ public interface JvmMXBeans extends MBeanCacheOperations {
      * Generic method that returns an MXBean proxy for the given platform
      * MXBean identified by its ObjectName and which implements the supplied
      * interface.
+     * @return a proxy for a platform MXBean interface of a 
+     * given MXBean
+     * @param objectName {@link ObjectName} which identifies MXBean
+     * @param interfaceClass the MXBean interface to be implemented
+     * by the proxy.
      */
     public <T> T getMXBean(ObjectName objectName, Class<T> interfaceClass);
 }
