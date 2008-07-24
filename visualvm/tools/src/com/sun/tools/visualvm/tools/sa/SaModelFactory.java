@@ -29,7 +29,9 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 
 /**
- *
+ * The SaModelFactory class is a factory class for getting the
+ * {@link SaModel} representation for the {@link Application}.
+ * 
  * @author Tomas Hurka
  */
 public final class SaModelFactory extends ModelFactory<SaModel, DataSource> {
@@ -39,6 +41,10 @@ public final class SaModelFactory extends ModelFactory<SaModel, DataSource> {
     private SaModelFactory() {
     }
 
+    /**
+     * Getter for the default version of the SaModelFactory.
+     * @return instance of {@link SaModelFactory}.
+     */
     public static synchronized SaModelFactory getDefault() {
         if (saAgentFactory == null) {
             saAgentFactory = new SaModelFactory();
@@ -46,6 +52,15 @@ public final class SaModelFactory extends ModelFactory<SaModel, DataSource> {
         return saAgentFactory;
     }
     
+    /**
+     * Factory method for obtaining {@link SaModel} for {@link Application}.
+     * Note that there is only one instance of {@link SaModel} for a concrete
+     * application.This {@link SaModel} instance is cached. This method can 
+     * return <CODE>null</CODE> if there is no AttachModel available
+     * @param app application
+     * @return {@link SaModel} instance or <CODE>null</CODE> if there is no
+     * {@link SaModel}
+     */
     public static SaModel getSAAgentFor(DataSource app) {
         return getDefault().getModel(app);
     }
