@@ -41,60 +41,60 @@ import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
 class XSheet extends JPanel
         implements ActionListener, NotificationListener {
     private final static Logger LOGGER = Logger.getLogger(XSheet.class.getName());
-    
+
     private JPanel topPanelAttributes;
     private JPanel topPanelOperations;
     private JPanel topPanelNotifications;
     private JPanel topPanelMetadata;
-    
+
     // Node being currently displayed
     private volatile DefaultMutableTreeNode currentNode;
-    
+
     // MBean being currently displayed
     private volatile XMBean mbean;
-    
+
     // XMBeanAttributes container
     private XMBeanAttributes mbeanAttributes;
-    
+
     // XMBeanOperations container
     private XMBeanOperations mbeanOperations;
-    
+
     // XMBeanNotifications container
     private XMBeanNotifications mbeanNotifications;
-    
+
     // XMBeanInfo container
     private XMBeanInfo mbeanInfo;
-    
+
     // Refresh JButton (mbean attributes case)
     private JButton refreshButton;
-    
+
     // Subscribe/Unsubscribe/Clear JButton (mbean notifications case)
     private JButton clearButton, subscribeButton, unsubscribeButton;
-    
+
     // Reference to MBeans tab
     private MBeansTab mbeansTab;
-    
+
     public XSheet(MBeansTab mbeansTab) {
         this.mbeansTab = mbeansTab;
         setupScreen();
     }
-    
+
     public JPanel getAttributes() {
         return topPanelAttributes;
     }
-    
+
     public JPanel getOperations() {
         return topPanelOperations;
     }
-    
+
     public JPanel getNotifications() {
         return topPanelNotifications;
     }
-    
+
     public JPanel getMetadata() {
         return topPanelMetadata;
     }
-    
+
     public void dispose() {
         clearNotifications();
         clear();
@@ -102,7 +102,7 @@ class XSheet extends JPanel
         mbeanNotifications.dispose();
         displayEmptyNode();
     }
-    
+
     private void setupScreen() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -153,16 +153,16 @@ class XSheet extends JPanel
         // create XMBeanInfo container
         mbeanInfo = new XMBeanInfo();
     }
-    
+
     private boolean isSelectedNode(DefaultMutableTreeNode n, DefaultMutableTreeNode cn) {
         return (cn == n);
     }
-    
+
     // Call on EDT
     private void showErrorDialog(Object message, String title) {
         new ThreadDialog(this, message, title, JOptionPane.ERROR_MESSAGE).run();
     }
-    
+
     public boolean isMBeanNode(DefaultMutableTreeNode node) {
         Object userObject = node.getUserObject();
         if (userObject instanceof XNodeInfo) {
@@ -171,7 +171,7 @@ class XSheet extends JPanel
         }
         return false;
     }
-    
+
     // Call on EDT
     public synchronized void displayNode(DefaultMutableTreeNode node) {
         clear();
@@ -202,7 +202,7 @@ class XSheet extends JPanel
             displayEmptyNode();
         }
     }
-    
+
     // Call on EDT
     private void displayMBeanMetadataNode(final DefaultMutableTreeNode node) {
         final XNodeInfo uo = (XNodeInfo) node.getUserObject();
@@ -255,18 +255,19 @@ class XSheet extends JPanel
             return;
         }
         mbean = (XMBean) uo.getData();
+        final XMBean xmb = mbean;
         SwingWorker<MBeanInfo,Void> sw = new SwingWorker<MBeanInfo,Void>() {
             @Override
             public MBeanInfo doInBackground() throws InstanceNotFoundException,
                     IntrospectionException, ReflectionException, IOException {
-                MBeanInfo mbi = mbean.getMBeanInfo();
-                mbeanAttributes.loadAttributes(mbean, mbi);
+                MBeanInfo mbi = xmb.getMBeanInfo();
                 return mbi;
             }
             @Override
             protected void done() {
                 try {
                     MBeanInfo mbi = get();
+                    mbeanAttributes.loadAttributes(xmb, mbi);
                     if (mbi != null && mbi.getAttributes() != null && mbi.getAttributes().length > 0) {
                         if (!isSelectedNode(node, currentNode)) return;
                         invalidate();
@@ -293,7 +294,7 @@ class XSheet extends JPanel
                     Throwable t = Utils.getActualException(e);
                     LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
                             "attributes for MBean [" + // NOI18N
-                            mbean.getObjectName() + "]", t); // NOI18N
+                            xmb.getObjectName() + "]", t); // NOI18N
 
                     showErrorDialog(t.toString(),
                             Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
@@ -302,7 +303,7 @@ class XSheet extends JPanel
         };
         mbeansTab.getRequestProcessor().post(sw);
     }
-    
+
     // Call on EDT
     private void displayMBeanOperationsNode(final DefaultMutableTreeNode node) {
         final XNodeInfo uo = (XNodeInfo) node.getUserObject();
@@ -351,7 +352,7 @@ class XSheet extends JPanel
         };
         mbeansTab.getRequestProcessor().post(sw);
     }
-    
+
     // Call on EDT
     private void displayMBeanNotificationsNode(final DefaultMutableTreeNode node) {
         final XNodeInfo uo = (XNodeInfo) node.getUserObject();
@@ -408,7 +409,7 @@ class XSheet extends JPanel
         };
         mbeansTab.getRequestProcessor().post(sw);
     }
-    
+
     // Call on EDT
     private void displayEmptyNode() {
         invalidate();
@@ -435,7 +436,7 @@ class XSheet extends JPanel
         validate();
         repaint();
     }
-    
+
     /**
      * Subscribe button action.
      */
@@ -464,7 +465,7 @@ class XSheet extends JPanel
         };
         mbeansTab.getRequestProcessor().post(sw);
     }
-    
+
     /**
      * Unsubscribe button action.
      */
@@ -491,14 +492,14 @@ class XSheet extends JPanel
         };
         mbeansTab.getRequestProcessor().post(sw);
     }
-    
+
     /**
      * Refresh button action.
      */
     private void refreshAttributes() {
         mbeanAttributes.refreshAttributes();
     }
-    
+
     // Call on EDT
     private void updateNotifications() {
         if (mbeanNotifications.isListenerRegistered(mbean)) {
@@ -508,7 +509,7 @@ class XSheet extends JPanel
             clearNotifications();
         }
     }
-    
+
     /**
      * Update notification node label in MBean tree: "Notifications[received]".
      */
@@ -518,7 +519,7 @@ class XSheet extends JPanel
         String text = Resources.getText("LBL_Notifications") + "[" + received + "]"; // NOI18N
         updateNotificationsNodeLabel(emitter, text);
     }
-    
+
     /**
      * Update notification node label in MBean tree: "Notifications".
      */
@@ -527,7 +528,7 @@ class XSheet extends JPanel
         updateNotificationsNodeLabel(currentNode,
                 Resources.getText("LBL_Notifications")); // NOI18N
     }
-    
+
     /**
      * Update notification node label in MBean tree: "Notifications[0]".
      */
@@ -536,7 +537,7 @@ class XSheet extends JPanel
         updateNotificationsNodeLabel(currentNode,
                 Resources.getText("LBL_Notifications") + "[0]"); // NOI18N
     }
-    
+
     /**
      * Update the label of the supplied MBean tree node.
      */
@@ -554,7 +555,7 @@ class XSheet extends JPanel
         validate();
         repaint();
     }
-    
+
     /**
      * Clear button action.
      */
@@ -577,7 +578,7 @@ class XSheet extends JPanel
             clearNotifications();
         }
     }
-    
+
     // Call on EDT
     private void clear() {
         mbeanAttributes.stopCellEditing();
@@ -591,7 +592,7 @@ class XSheet extends JPanel
         mbean = null;
         currentNode = null;
     }
-    
+
     /**
      * Notification listener: handles asynchronous reception
      * of MBean operation results and MBean notifications.
@@ -646,7 +647,7 @@ class XSheet extends JPanel
             updateReceivedNotifications(emitter, received.longValue());
         }
     }
-    
+
     /**
      * Action listener: handles actions in panel buttons
      */
@@ -656,14 +657,7 @@ class XSheet extends JPanel
             JButton button = (JButton) e.getSource();
             // Refresh button
             if (button == refreshButton) {
-                SwingWorker<Void, Void> sw = new SwingWorker<Void, Void>() {
-                    @Override
-                    public Void doInBackground() {
-                        refreshAttributes();
-                        return null;
-                    }
-                };
-                mbeansTab.getRequestProcessor().post(sw);
+                refreshAttributes();
                 return;
             }
             // Clear button
