@@ -78,14 +78,14 @@ public class ProfilerOptionsCategory extends AdvancedOption {
                                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 optionsComponent.setBorder(BorderFactory.createEmptyBorder());
                 optionsComponent.setViewportBorder(BorderFactory.createEmptyBorder());
-                if (UIUtils.isMetalLookAndFeel() || UIUtils.isWindowsLookAndFeel()) {
-                     // JTabbedPane (container) has other than Panel.background color on Metal, XP and probably Vista
-                    optionsComponent.getViewport().setBackground(settingsPanel.getBackground());
-                    optionsComponent.setBackground(settingsPanel.getBackground());
-                } else {
-                    // Must be transparent at least for Aqua and GTK
+                if (UIUtils.isGTKLookAndFeel()) {
+                    // Must be transparent for GTK
                     optionsComponent.getViewport().setOpaque(false);
                     optionsComponent.setOpaque(false);
+                } else {
+                    // JTabbedPane (container) has other than Panel.background color on Metal, Windows, Aqua
+                    optionsComponent.getViewport().setBackground(settingsPanel.getBackground());
+                    optionsComponent.setBackground(settingsPanel.getBackground());
                 }
             }
 
