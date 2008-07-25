@@ -563,6 +563,15 @@ public class JmxModelImpl extends JmxModel {
                 if (e.toString().contains("com.sun.enterprise.security.LoginException")) {  // NOI18N
                     throw new SecurityException("Authentication failed! Invalid username or password"); // NOI18N
                 }
+                if (LOGGER.isLoggable(Level.INFO))  {
+                    // Try to provide info on the target
+                    //    Use PID when attach was used to connect,
+                    //    Use JMXServiceURL otherwise...
+                    final String param = 
+                            (lvm != null)?String.valueOf(lvm.vmid())
+                            :((jmxUrl != null)?jmxUrl.toString():"");
+                    LOGGER.log(Level.INFO,"connect("+param+")", e);
+                }
             }
         }
 
