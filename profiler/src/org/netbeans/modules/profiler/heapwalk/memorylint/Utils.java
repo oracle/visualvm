@@ -343,8 +343,8 @@ public class Utils {
     }
 
     public static String printClass(MemoryLint context, String cls) {
-        if (cls.startsWith("<<")) { // NOI18N
-            cls = cls.substring("<<".length()); // NOI18N
+        if (cls.startsWith("<< ")) { // NOI18N
+            cls = cls.substring("<< ".length()); // NOI18N
         }
 
         if ("unknown".equals(cls)) { // NOI18N
