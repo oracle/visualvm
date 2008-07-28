@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.openide.filesystems.FileObject;
 
 
 /**
@@ -61,45 +60,53 @@ import org.openide.filesystems.FileObject;
 class GestureSubmitter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final Logger UILOGGER = Logger.getLogger("org.netbeans.ui.profiler"); // NOI18N
+    private static final Logger USG_LOGGER = Logger.getLogger("org.netbeans.ui.metrics.profiler"); // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    static void logModify(Project profiledProject, FileObject profiledClass, ProfilingSettings settings) {
+    static void logConfig(ProfilingSettings settings) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillParamsForProfiling(settings, paramList);
 
-        logStartup(profiledProject, profiledClass, "MODIFY", paramList); // NOI18N
+        logUsage("CONFIG", paramList); // NOI18N
     }
 
-    static void logProfileApp(Project profiledProject, ProfilingSettings settings, SessionSettings session) {
+    static void logProfileApp(Project profiledProject, SessionSettings session) {
         List<Object> paramList = new ArrayList<Object>();
 
-        fillParamsForProfiling(settings, paramList);
+        fillProjectParam(profiledProject, paramList);
         fillParamsForSession(session, paramList);
 
-        logStartup(profiledProject, null, "PROFILE_APP", paramList); // NOI18N
+        logUsage("PROFILE_APP", paramList); // NOI18N
     }
 
-    static void logProfileClass(FileObject profiledClass, ProfilingSettings settings, SessionSettings session) {
+    static void logProfileClass(Project profiledProject, SessionSettings session) {
         List<Object> paramList = new ArrayList<Object>();
 
-        fillParamsForProfiling(settings, paramList);
+        fillProjectParam(profiledProject, paramList);
         fillParamsForSession(session, paramList);
 
-        logStartup(null, profiledClass, "PROFILE_CLASS", paramList); // NOI18N
+        logUsage("PROFILE_CLASS", paramList); // NOI18N
     }
 
-    static void logAttach(Project profiledProject, ProfilingSettings settings, AttachSettings attach) {
+    static void logAttach(Project profiledProject, AttachSettings attach) {
         List<Object> paramList = new ArrayList<Object>();
 
-        fillParamsForProfiling(settings, paramList);
+        fillProjectParam(profiledProject, paramList);
         fillParamsForAttach(attach, paramList);
 
-        logStartup(profiledProject, null, "ATTACH", paramList); // NOI18N
+        logUsage("ATTACH", paramList); // NOI18N
     }
 
+    private static void fillProjectParam(Project profiledProject, List<Object> paramList) {
+        String param = ""; // NOI18N
+        if (profiledProject != null) {
+            param = profiledProject.getClass().getName();
+        }
+        paramList.add(0, param);
+    }
+    
     private static void fillParamsForAttach(AttachSettings as, List<Object> paramList) {
         paramList.add("OS_" + as.getHostOS());
         paramList.add(as.isDirect() ? "ATTACH_DIRECT" : "ATTACH_DYNAMIC"); // NOI18N
@@ -161,22 +168,13 @@ class GestureSubmitter {
         paramList.add("JAVA_" + ss.getJavaVersionString()); // NOI18N
     }
 
-    private static void logStartup(Project profiledProject, FileObject profiledClass, String startType, List<Object> params) {
-        LogRecord record = new LogRecord(Level.CONFIG, "UI_PROFILER_" + startType); // NOI18N
+    private static void logUsage(String startType, List<Object> params) {
+        LogRecord record = new LogRecord(Level.INFO, "USG_PROFILER_" + startType); // NOI18N
         record.setResourceBundle(NbBundle.getBundle(NetBeansProfiler.class));
         record.setResourceBundleName(NetBeansProfiler.class.getPackage().getName() + ".Bundle"); // NOI18N
-        record.setLoggerName(UILOGGER.getName());
-
-        if (profiledProject != null) {
-            params.add(0, profiledProject.getClass().getName());
-        } else {
-            if (profiledClass != null) {
-                params.add(0, profiledClass.getName());
-            }
-        }
-
+        record.setLoggerName(USG_LOGGER.getName());
         record.setParameters(params.toArray(new Object[params.size()]));
 
-        UILOGGER.log(record);
+        USG_LOGGER.log(record);
     }
 }
