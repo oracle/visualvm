@@ -48,12 +48,8 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
-import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
-import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.ui.ManualMethodSelect;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utilities.trees.TreeDecimator;
-import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -65,6 +61,7 @@ import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 
 
 /**
@@ -96,6 +93,8 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                                                                                        "RootMethodsPanel_AddManuallyButtonAccessDescr"); //NOI18N
     private static final String REMOVE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
                                                                                  "RootMethodsPanel_RemoveButtonAccessDescr"); //NOI18N
+    private static final String INCORRECT_MANUAL_ROOT_MSG = NbBundle.getMessage(RootMethodsPanel.class,
+                                                                                 "RootMethodsPanel_IncorrectManualRootMsg"); //NOI18N
                                                                                                                               // -----
     private static RootMethodsPanel defaultInstance;
     private static MethodNameFormatterFactory formatterFactory = MethodNameFormatterFactory.getDefault(new DefaultMethodNameFormatter(DefaultMethodNameFormatter.VERBOSITY_FULLCLASSMETHOD));
@@ -156,14 +155,19 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                 });
         } else if (e.getSource() == addManualButton) {
             final ClientUtils.SourceCodeSelection scs = ManualMethodSelect.selectMethod();
-
+            
             if (scs != null) {
-                if (!selectedRoots.contains(scs)) {
-                    selectedRoots.add(scs);
+                String newItem = null;
+                try {
+                    newItem = formatterFactory.getFormatter().formatMethodName(scs).toFormatted();
+                    if (!selectedRoots.contains(scs)) {
+                        selectedRoots.add(scs);
 
-                    String newItem = formatterFactory.getFormatter().formatMethodName(scs).toFormatted();
-                    rootsListModel.addElement(newItem);
-                    rootsList.setSelectedValue(newItem, true);
+                        rootsListModel.addElement(newItem);
+                        rootsList.setSelectedValue(newItem, true);
+                    }
+                } catch (Exception ex) {
+                    NetBeansProfiler.getDefaultNB().displayError(INCORRECT_MANUAL_ROOT_MSG);
                 }
             }
         } else if (e.getSource() == removeButton) {
