@@ -2,5 +2,4 @@
 read global
 ${l10n-module}/release/config/Services/filtersets-default.xml
 ${l10n-module}/release/config/Services/filters-default.xml
-exclude ${l10n-module}/src/org/netbeans/modules/profiler/nb-log-file.url
 
