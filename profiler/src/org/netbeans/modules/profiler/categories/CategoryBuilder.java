@@ -86,7 +86,7 @@ public class CategoryBuilder {
             FileSystem fs = Repository.getDefault().getDefaultFileSystem();
             FileObject aoi = fs.findResource("Projects/" + projectType + "/NBProfiler/Categories"); //NOI18N
             if (aoi != null) {
-                Enumeration<? extends FileObject> folders = aoi.getFolders(false);
+                Enumeration<? extends FileObject> folders = aoi.getChildren(false);
                 while (folders.hasMoreElements()) {
                     FileObject folder = folders.nextElement();
                     processCategories(rootCategory, folder);
@@ -108,7 +108,7 @@ public class CategoryBuilder {
                 LOGGER.severe("Can not process " + node.getPath()); // NOI18N
                 LOGGER.throwing(CategoryBuilder.class.getName(), "processCategories", e); // NOI18N
             }
-        } else {
+        } else if (node.isFolder()) {
             String bundleName = (String) node.getAttribute("SystemFileSystem.localizingBundle"); // NOI18N
             String label = bundleName != null ? NbBundle.getBundle(bundleName).getString(node.getPath()) : node.getName();
 
