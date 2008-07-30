@@ -71,7 +71,7 @@ public class CategoryBuilder {
     private static final String CATEGORY_ATTRIB_SUBTYPES = "subtypes"; // NOI18N
     private static final String CATEGORY_ATTRIB_TYPE = "type"; // NOI18N
     private static final String CATEGORY_ATTRIB_PACKAGE = "package"; // NOI18N
-    private static final String CATEGORY_ATTRIBG_REF = "ref";
+    private static final String SHADOW_SUFFIX = "shadow";
     private String projectType;
     private CategoryContainer rootCategory = null;
 
@@ -86,7 +86,7 @@ public class CategoryBuilder {
             FileSystem fs = Repository.getDefault().getDefaultFileSystem();
             FileObject aoi = fs.findResource("Projects/" + projectType + "/NBProfiler/Categories"); //NOI18N
             if (aoi != null) {
-                Enumeration<? extends FileObject> folders = aoi.getFolders(false);
+                Enumeration<? extends FileObject> folders = aoi.getChildren(false);
                 while (folders.hasMoreElements()) {
                     FileObject folder = folders.nextElement();
                     processCategories(rootCategory, folder);
@@ -97,18 +97,18 @@ public class CategoryBuilder {
     }
 
     private void processCategories(CategoryContainer container, FileObject node) {
-        String reference = (String) node.getAttribute("link");
-        if (reference != null) {
+        if (SHADOW_SUFFIX.equals(node.getExt())) {
+            String reference = (String) node.getAttribute("originalFile");
             try {
                 FileObject refNode = node.getFileSystem().findResource(reference);
                 if (refNode != null) {
                     processCategories(container, refNode);
                 }
             } catch (FileStateInvalidException e) {
-                LOGGER.severe("Can not process " + node.getPath());
-                LOGGER.throwing(CategoryBuilder.class.getName(), "processCategories", e);
+                LOGGER.severe("Can not process " + node.getPath()); // NOI18N
+                LOGGER.throwing(CategoryBuilder.class.getName(), "processCategories", e); // NOI18N
             }
-        } else {
+        } else if (node.isFolder()) {
             String bundleName = (String) node.getAttribute("SystemFileSystem.localizingBundle"); // NOI18N
             String label = bundleName != null ? NbBundle.getBundle(bundleName).getString(node.getPath()) : node.getName();
 
@@ -197,7 +197,7 @@ public class CategoryBuilder {
                         Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                         while (definitions.hasMoreElements()) {
                             FileObject packageDef = definitions.nextElement();
-                            Boolean recursive = (Boolean) packageDef.getAttribute("recursive");
+                            Boolean recursive = (Boolean) packageDef.getAttribute("recursive"); // NOI18N
                             newCategory.getDefinitions().add(new PackageCategoryDefinition(newCategory, packageDef.getNameExt(), recursive != null ? recursive.booleanValue() : true));
                         }
                     }
