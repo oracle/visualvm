@@ -136,6 +136,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
+import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
@@ -855,7 +856,8 @@ public final class NetBeansProfiler extends Profiler {
                     printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
                     flushDebugMsgs();
 
-                    GestureSubmitter.logAttach(getProfiledProject(), profilingSettings, attachSettings);
+                    GestureSubmitter.logAttach(getProfiledProject(), attachSettings);
+                    GestureSubmitter.logConfig(profilingSettings);
 
                     changeStateTo(PROFILING_STARTED);
 
@@ -1079,7 +1081,8 @@ public final class NetBeansProfiler extends Profiler {
                     printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
                     flushDebugMsgs();
 
-                    GestureSubmitter.logProfileApp(getProfiledProject(), profilingSettings, sessionSettings); // NOI18N
+                    GestureSubmitter.logProfileApp(getProfiledProject(), sessionSettings);
+                    GestureSubmitter.logConfig(profilingSettings);
 
                     changeStateTo(PROFILING_STARTED);
 
@@ -1305,7 +1308,7 @@ public final class NetBeansProfiler extends Profiler {
         printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
         flushDebugMsgs();
 
-        GestureSubmitter.logModify(getProfiledProject(), getProfiledSingleFile(), profilingSettings);
+        GestureSubmitter.logConfig(profilingSettings);
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
@@ -1440,7 +1443,9 @@ public final class NetBeansProfiler extends Profiler {
         printDebugMsg("Instrumentation filter:\n" + sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
         flushDebugMsgs();
 
-        GestureSubmitter.logProfileClass(getProfiledSingleFile(), profilingSettings, sessionSettings); // NOI18N
+        Project owningProject = FileOwnerQuery.getOwner(getProfiledSingleFile());
+        GestureSubmitter.logProfileClass(owningProject, sessionSettings);
+        GestureSubmitter.logConfig(profilingSettings);
 
         changeStateTo(PROFILING_STARTED);
 
