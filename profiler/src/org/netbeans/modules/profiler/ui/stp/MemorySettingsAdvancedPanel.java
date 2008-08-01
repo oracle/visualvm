@@ -53,7 +53,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.net.URL;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -67,6 +66,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -437,7 +437,7 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
         sampledTimingContainer.add(definedDepthRadio, constraints);
 
         // defineDepthSpinner
-        defineDepthSpinner = new JExtendedSpinner() {
+        defineDepthSpinner = new JExtendedSpinner(new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1)) {
                 public Dimension getPreferredSize() {
                     return new Dimension(55, Utils.getDefaultSpinnerHeight());
                 }

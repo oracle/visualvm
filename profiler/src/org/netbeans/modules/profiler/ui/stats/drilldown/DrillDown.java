@@ -37,132 +37,129 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
-package org.netbeans.modules.profiler.ui.stats.drilldown.hierarchical;
+package org.netbeans.modules.profiler.ui.stats.drilldown;
 
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.HierarchicalMark;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.DrillDownListener;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.IDrillDown;
+import org.netbeans.lib.profiler.marker.Mark;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
+import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.netbeans.modules.profiler.categories.Categorization;
+import org.netbeans.modules.profiler.categories.Category;
+import org.netbeans.modules.profiler.categories.CategoryLeaf;
+import org.netbeans.modules.profiler.utilities.Visitable;
+import org.netbeans.modules.profiler.utilities.Visitor;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class DrillDown implements IDrillDown, CCTResultsFilter.Evaluator {
+public class DrillDown implements CCTResultsFilter.Evaluator {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
     private static class TimeTouple {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
-
-        public static final TimeTouple ZERO = new TimeTouple(0, 0);
-
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
+        public static final TimeTouple ZERO = new TimeTouple(0, 0);        //~ Instance fields ------------------------------------------------------------------------------------------------------
         final long time0;
         final long time1;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
-
         public TimeTouple(final long time0, final long time1) {
             this.time0 = time0;
             this.time1 = time1;
         }
-    }
-
+    }    
+    
+    private static final String SELF_CATEGORY_ID = "SELF_CATEGORY";
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private final List ddPath = new ArrayList(5);
-    private final Map netTimeMap = new HashMap();
-    private final Map timeMap = new HashMap();
+    private final List<Category> ddPath = new ArrayList<Category>(5);
     private final ProfilerClient client;
     private final Set listeners = Collections.synchronizedSet(new HashSet());
     private final boolean secondTime;
     private final boolean validFlag;
-    private HierarchicalMark currentMark;
-    private HierarchicalMark root;
-    private boolean isSelf = false;
-
+    private Category currentCategory;
+    private Categorization categorization;
+    
+    final private List<Category> subCategories = new ArrayList<Category>();
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public DrillDown(final ProfilerClient client, final HierarchicalMark markRoot, final boolean secondTimeStamp) {
-        this.root = markRoot;
+    public DrillDown(Categorization cat, final ProfilerClient client, final boolean secondTimeStamp) {
         this.secondTime = secondTimeStamp;
         this.client = client;
-        reset();
+        categorization = cat;
+        if (categorization == null) {
+            this.validFlag = false;
+        } else {
+            reset();
 
-        this.validFlag = !markRoot.getChildren().isEmpty();
+            this.validFlag = !categorization.getRoot().getSubcategories().isEmpty();
+        }
     }
 
-    public DrillDown(final ProfilerClient client, final HierarchicalMark markRoot) {
-        this(client, markRoot, false);
+    public DrillDown(Categorization cat, final ProfilerClient client) {
+        this(cat, client, false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isCurrent(final Mark mark) {
-        return getCurrentMark().equals(mark);
+    public boolean isCurrent(final Category category) {
+        return currentCategory.equals(category);
     }
 
-    public Mark getCurrentMark() {
-        return (currentMark != null) ? currentMark : Mark.DEFAULT;
+    public Category getCurrentCategory() {
+        return (currentCategory != null) ? currentCategory : null;
     }
 
     public long getCurrentTime(final boolean net) {
-        return getMarkTime(currentMark, net);
+        return getCategoryTime(currentCategory, net);
     }
 
-    public List getDrillDownPath() {
-        List rslt = new ArrayList(ddPath);
-
-        if (isSelf) {
-            rslt.add(new Mark("SELF", "Self")); // NOI18N
-        }
+    public List<Category> getDrillDownPath() {
+        List<Category> rslt = new ArrayList(ddPath);
 
         return rslt;
     }
 
-    public boolean isInSelf() {
-        return isSelf;
-    }
-
-    public long getMarkTime(final Mark mark, final boolean net) {
-        TimeTouple time = (TimeTouple) (net ? netTimeMap : timeMap).get(mark);
-
-        return (time != null) ? (secondTime ? time.time1 : time.time0) : 0;
-    }
-
-    public List getSubmarks() {
-        if (isSelf) {
-            return Arrays.asList(new HierarchicalMark[] { currentMark });
-        } else {
-            List rslt = new ArrayList(currentMark.getChildren());
-            rslt.add(currentMark);
-
-            return rslt;
+    public long getCategoryTime(final Category category, final boolean net) {
+        TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
+        TimeTouple time = null;
+        try {
+            tc.beginTrans(false);
+            if (net || category.getId().equals(SELF_CATEGORY_ID)) {
+                time = new TimeTouple(tc.getNetTime0(category.getAssignedMark()), tc.getNetTime1(category.getAssignedMark()));
+            } else {
+                long time0 = 0L;
+                long time1 = 0L;
+                for (Mark mark : categorization.getAllMarks(category)) {
+                    time0 += tc.getNetTime0(mark);
+                    time1 += tc.getNetTime1(mark);
+                }
+                time = new TimeTouple(time0, time1);
+            }
+            return (time != null) ? (secondTime ? time.time1 : time.time0) : 0;
+        } finally {
+            tc.endTrans();
         }
     }
 
-    public Mark getTopMark() {
-        return root;
+    public List<Category> getSubCategories() {
+        synchronized(subCategories) {
+            return new ArrayList<Category>(subCategories);
+        }
+    }
+
+    public Category getTopCategory() {
+        return categorization.getRoot();
     }
 
     public long getTopTime(final boolean net) {
-        return getMarkTime(root, net);
+        return getCategoryTime(getTopCategory(), net);
     }
 
     public boolean isValid() {
@@ -173,48 +170,25 @@ public class DrillDown implements IDrillDown, CCTResultsFilter.Evaluator {
         listeners.add(drillDownListener);
     }
 
-    public boolean canDrilldown(Mark mark) {
-        if (mark == null) {
+    public boolean canDrilldown(Category category) {
+        if (getCurrentCategory().getId().equals(SELF_CATEGORY_ID)) {
             return false;
+        } else {
+            return getSubCategories().size() > 1;
         }
-
-        if (isSelf) {
-            return false;
-        }
-
-        if (isCurrent(mark)) { // special "SELF" category
-
-            if (mark instanceof HierarchicalMark) {
-                return ((HierarchicalMark) mark).getChildren().size() > 1;
-            }
-        }
-
-        return true;
     }
 
-    public void drilldown(Mark mark) {
-        if (!canDrilldown(mark)) {
-            return;
-        }
-
-        if (mark.equals(currentMark)) {
-            isSelf = true;
-            fireDrillDownChange();
-        } else {
-            isSelf = false;
-
-            for (Iterator iter = currentMark.getChildren().iterator(); iter.hasNext();) {
-                HierarchicalMark child = (HierarchicalMark) iter.next();
-
-                if (child.equals(mark)) {
-                    if (canDrilldown(mark)) {
-                        currentMark = child;
-                        ddPath.add(currentMark);
-                        fireDrillDownChange();
-                    }
-
-                    break;
+    public void drilldown(String catId) {
+        for (Category category : subCategories) {
+            if (category.getId().equals(catId)) {
+                if (canDrilldown(category)) {
+                    currentCategory = category;
+                    ddPath.add(currentCategory);
+                    updateSubCategories();
+                    fireDrillDownChange();
                 }
+
+                break;
             }
         }
     }
@@ -225,56 +199,74 @@ public class DrillDown implements IDrillDown, CCTResultsFilter.Evaluator {
         }
 
         ddPath.remove(ddPath.size() - 1);
-        currentMark = (HierarchicalMark) ddPath.get(ddPath.size() - 1);
+        currentCategory = ddPath.get(ddPath.size() - 1);
+        updateSubCategories();
         fireDrillDownChange();
     }
 
-    public void drillup(Mark mark) {
-        if (!ddPath.contains(mark)) {
-            return;
-        }
-
-        isSelf = false;
-
-        for (int i = ddPath.size() - 1; i >= 0; i--) {
-            if (ddPath.get(i).equals(mark)) {
-                currentMark = (HierarchicalMark) ddPath.get(i);
-                fireDrillDownChange();
-
-                break;
+    public void drillup(String catId) {
+//        isSelf = false;
+        boolean found = false;
+        Collection<Category> toRemove = new ArrayList<Category>();
+        for (Category catInPath : ddPath) {
+            if (!found) {
+                if (catInPath.getId().equals(catId)) {
+                    currentCategory = catInPath;
+                    found = true;
+                }
+            } else {
+                toRemove.add(catInPath);
             }
-
-            ddPath.remove(ddPath.size() - 1);
+        }
+        if (found) {
+            ddPath.removeAll(toRemove);
+            updateSubCategories();
+            fireDrillDownChange();
         }
     }
 
     public boolean evaluate(Mark categoryMark) {
-        if ((currentMark == null) || (currentMark.isRoot() && !isSelf)) {
+        if ((currentCategory == null || (currentCategory.getAssignedMark() == Mark.DEFAULT && currentCategory.getSubcategories().size() > 1))) {
             return true;
         }
 
-        if (currentMark.isDefault && categoryMark.isDefault) {
-            return true;
-        }
+        Boolean passed = currentCategory.accept(new Visitor<Visitable<Category>, Boolean, Mark>() {
 
-        return isSelf ? categoryMark.equals(currentMark) : categoryMark.getLabels().contains(currentMark.getLabel());
+            public Boolean visit(Visitable<Category> visitable, Mark parameter) {
+                if (visitable.getValue().getAssignedMark().equals(parameter)) {
+                    return Boolean.TRUE;
+                }
+
+                return null;
+            }
+        }, categoryMark);
+        return passed != null ? passed.booleanValue() : false;
     }
 
     public void refresh() {
-        if (client.getTimeCollector() == null) {
-            return;
-        }
-
-        clearTimeMaps();
-
-        client.getTimeCollector().beginTrans(false);
-
-        try {
-            getTime(root);
-        } finally {
-            client.getTimeCollector().endTrans();
-        }
-
+//        TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
+//        if (tc == null) {
+//            return;
+//        }
+//
+//        clearTimeMaps();
+//
+//
+//
+//        tc.beginTrans(false);
+//
+//        categorization.getRoot().accept(new Visitor<Visitable<Category>, Void, Stack<Category>>() {
+//
+//            public Void visit(Visitable<Category> visitable, Stack<Category> stack) {
+//            }
+//        }, new Stack<Category>());
+//
+//        try {
+//            getTime(root);
+//        } finally {
+//            client.getTimeCollector().endTrans();
+//        }
+//
         fireDataChange();
     }
 
@@ -284,44 +276,10 @@ public class DrillDown implements IDrillDown, CCTResultsFilter.Evaluator {
 
     public void reset() {
         ddPath.clear();
-        ddPath.add(root);
-        currentMark = root;
-        isSelf = false;
+        ddPath.add(categorization.getRoot());
+        currentCategory = categorization.getRoot();
+        updateSubCategories();
         fireDrillDownChange();
-    }
-
-    private TimeTouple getTime(HierarchicalMark mark) {
-        int markId = MarkingEngine.getDefault().getMarkId(mark);
-
-        if (markId == -1) {
-            netTimeMap.put(mark, TimeTouple.ZERO);
-            timeMap.put(mark, TimeTouple.ZERO);
-
-            return TimeTouple.ZERO;
-        }
-
-        long tmpTime0 = client.getTimeCollector().getNetTime0(mark);
-        long tmpTime1 = client.getTimeCollector().getNetTime1(mark);
-        long netTime0 = tmpTime0;
-        long netTime1 = tmpTime1;
-
-        for (Iterator iter = mark.getChildren().iterator(); iter.hasNext();) {
-            TimeTouple subtime = getTime((HierarchicalMark) iter.next());
-            tmpTime0 += subtime.time0;
-            tmpTime1 += subtime.time1;
-        }
-
-        TimeTouple netTime = new TimeTouple(netTime0, netTime1);
-        TimeTouple accTime = new TimeTouple(tmpTime0, tmpTime1);
-        netTimeMap.put(mark, netTime);
-        timeMap.put(mark, accTime);
-
-        return accTime;
-    }
-
-    private void clearTimeMaps() {
-        netTimeMap.clear();
-        timeMap.clear();
     }
 
     private void fireDataChange() {
@@ -337,6 +295,18 @@ public class DrillDown implements IDrillDown, CCTResultsFilter.Evaluator {
 
         for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
             ((DrillDownListener) iter.next()).drillDownPathChanged(getDrillDownPath());
+        }
+    }
+    
+    private void updateSubCategories() {
+        synchronized(subCategories) {
+            subCategories.clear();
+            subCategories.addAll(currentCategory.getSubcategories());
+            if (currentCategory.getId().equals(SELF_CATEGORY_ID) || currentCategory.getAssignedMark().equals(Mark.DEFAULT)) {
+                subCategories.add(new CategoryLeaf(SELF_CATEGORY_ID, getCurrentCategory().getLabel(), getCurrentCategory().getAssignedMark()));
+            } else {
+                subCategories.add(new CategoryLeaf(SELF_CATEGORY_ID, getCurrentCategory().getLabel() + "(Self)", getCurrentCategory().getAssignedMark())); // NOI18N
+            }
         }
     }
 }

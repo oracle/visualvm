@@ -54,10 +54,12 @@ class HprofFieldObjectValue extends HprofFieldValue implements ObjectFieldValue 
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public Instance getInstance() {
+    long getInstanceID() {
         HprofByteBuffer dumpBuffer = classDump.getHprofBuffer();
-        long instanceID = dumpBuffer.getID(fileOffset + classDump.classDumpSegment.fieldValueOffset);
-
-        return classDump.getHprof().getInstanceByID(instanceID);
+        return dumpBuffer.getID(fileOffset + classDump.classDumpSegment.fieldValueOffset);
+    }
+    
+    public Instance getInstance() {
+        return classDump.getHprof().getInstanceByID(getInstanceID());
     }
 }

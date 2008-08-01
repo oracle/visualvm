@@ -88,13 +88,19 @@ made subject to such option by the copyright holder.
 
     <target name="release" depends="projectized-common.release">
         <fixcrlf eol="crlf" srcdir="${cluster}/lib/deployed" includes="**/*.map"/>
+        <chmod perm="ugo+x">
+          <fileset dir="${cluster}/lib/deployed">
+          <include name="**/hpux*/lib*.sl"/>
+        </fileset>
+    </chmod>
+
     </target>
 
     <target name="netbeans-extra">
-       <ant dir="remote-packs" target="profiler-server-all"/>
+       <ant dir="release/remote-pack-defs" target="profiler-server-all"/>
     </target>
 
-    <target name="clean" depends="init,projectized-common.clean">
+    <target name="clean" depends="projectized-common.clean">
        <delete dir="remote-packs/build"/>
     </target>
 

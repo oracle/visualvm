@@ -176,7 +176,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
             }
         }
 
-        if (!normallyFilteredOut) {
+        if (!normallyFilteredOut || clazz.getAllMethodsMarkers() || clazz.getAllMethodsRoots()) {
             checkAndMarkAllMethodsForInstrumentation(clazz);
         }
 

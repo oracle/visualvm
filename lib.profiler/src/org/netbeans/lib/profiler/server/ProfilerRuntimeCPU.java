@@ -553,7 +553,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         }
 
         byte[] evBuf = ti.evBuf;
-
+        if (!ti.isInitialized()) return;    // Reset collectors performed when we were already executing instrumentation code 
         evBuf[curPos++] = eventType;
         evBuf[curPos++] = (byte) ((methodId >> 8) & 0xFF);
         evBuf[curPos++] = (byte) ((methodId) & 0xFF);

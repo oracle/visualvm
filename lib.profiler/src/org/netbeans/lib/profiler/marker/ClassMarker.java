@@ -41,10 +41,8 @@
 package org.netbeans.lib.profiler.marker;
 
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +50,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -60,6 +59,7 @@ import java.util.Set;
  * @author Jaroslav Bachorik
  */
 public class ClassMarker implements Marker {
+    private static Logger LOGGER = Logger.getLogger(ClassMarker.class.getName());
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Map markMap;
@@ -73,29 +73,43 @@ public class ClassMarker implements Marker {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public MarkMapping[] getMarks() {
-        List marks = new ArrayList();
+    public MarkMapping[] getMappings() {
+        List mappings = new ArrayList();
 
         for (Iterator iter = markMap.keySet().iterator(); iter.hasNext();) {
             String className = (String) iter.next();
             ClientUtils.SourceCodeSelection markerMethod = new ClientUtils.SourceCodeSelection(className, Wildcards.ALLWILDCARD,
                                                                                                ""); // NOI18N
             markerMethod.setMarkerMethod(true);
-            marks.add(new MarkMapping(markerMethod, (Mark) markMap.get(className)));
+            mappings.add(new MarkMapping(markerMethod, (Mark) markMap.get(className)));
         }
 
-        return (MarkMapping[]) marks.toArray(new MarkMapping[marks.size()]);
+        return (MarkMapping[]) mappings.toArray(new MarkMapping[mappings.size()]);
+    }
+
+    public Mark[] getMarks() {
+        return (Mark[])new HashSet(markMap.values()).toArray(new Mark[0]);
     }
 
     public void addClassMark(String className, Mark mark) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Marking class " + className + " with " + mark.getId());
+        }
+
         markMap.put(className, mark);
     }
 
     public void removeClassMark(String className) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking class " + className);
+        }
         markMap.remove(className);
     }
 
     public void resetClassMarks() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking all classes");
+        }
         markMap.clear();
     }
 }

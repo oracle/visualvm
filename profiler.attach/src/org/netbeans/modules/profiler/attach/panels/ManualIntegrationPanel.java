@@ -37,35 +37,34 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.attach.panels;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.modules.profiler.attach.providers.RemotePackExporter;
 import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
 import org.openide.util.HelpCtx;
-
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class ManualIntegrationPanel extends AttachWizardPanel {
+    AtomicBoolean exportRunning = new AtomicBoolean(false);
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-
     /* default */ class Model {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private TargetPlatformEnum jvm = null;
-
+        private TargetPlatformEnum jvm = null;        
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
         public String getApplication() {
             return getContext().getAttachSettings().getServerType();
         }
@@ -78,6 +77,10 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
             return getContext().getIntegrationProvider().getModificationHints(getContext().getAttachSettings());
         }
 
+        public boolean isRemote() {
+            return getContext().getAttachSettings().isRemote();
+        }
+        
         public void setJvm(TargetPlatformEnum jvm) {
             this.jvm = jvm;
 
@@ -99,9 +102,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
                 for (Iterator it = TargetPlatformEnum.iterator(); it.hasNext();) {
                     TargetPlatformEnum jvm = (TargetPlatformEnum) it.next();
 
-                    if (settings.isDirect() || settings.isRemote()
-                            || (settings.isDynamic16()
-                                   && (jvm.equals(TargetPlatformEnum.JDK6) || jvm.equals(TargetPlatformEnum.JDK7)))) {
+                    if (settings.isDirect() || settings.isRemote() || (settings.isDynamic16() && (jvm.equals(TargetPlatformEnum.JDK6) || jvm.equals(TargetPlatformEnum.JDK7)))) {
                         if (getContext().getIntegrationProvider().supportsJVM(jvm)) {
                             supportedJvms.add(jvm);
                         }
@@ -111,32 +112,44 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
 
             return supportedJvms;
         }
-    }
 
+        public String exportRemotePack(String path) throws IOException {
+            if (exportRunning.compareAndSet(false, true)) {
+                try {
+                    publishUpdate(new ChangeEvent(this));
+                    return RemotePackExporter.getInstance().export(path, getContext().getAttachSettings().getHostOS());
+                } finally {
+                    exportRunning.compareAndSet(true, false);
+                    publishUpdate(new ChangeEvent(exportRunning));
+                }
+            } else {
+                throw new IOException();
+            }
+        }
+        
+        public String getRemotePackPath(String exportPath) {
+            return RemotePackExporter.getInstance().getRemotePackPath(exportPath, getContext().getAttachSettings().getHostOS());
+        }
+    }    
+    
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
     private static final String HELP_CTX_KEY = "ManualIntegrationPanel.HelpCtx"; // NOI18N
-    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);    //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private ManualIntegrationPanelUI panel = null;
     private Model model = null;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public ManualIntegrationPanel() {
         this.model = new Model();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public HelpCtx getHelp() {
         return HELP_CTX;
     }
 
     public boolean isValid() {
-        return true;
+        return !exportRunning.get();
     }
 
     public boolean canBack(AttachWizardContext context) {
@@ -144,7 +157,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
     }
 
     public boolean canFinish(AttachWizardContext context) {
-        return false;
+        return isValid();
     }
 
     public boolean canNext(AttachWizardContext context) {

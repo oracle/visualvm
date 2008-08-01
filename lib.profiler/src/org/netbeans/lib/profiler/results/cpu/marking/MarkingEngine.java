@@ -40,12 +40,12 @@
 
 package org.netbeans.lib.profiler.results.cpu.marking;
 
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.netbeans.lib.profiler.marker.Marker;
+import org.openide.util.Lookup;
 
 
 /**
@@ -67,22 +67,17 @@ public class MarkingEngine {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final Object mapperGuard = new Object();
     private final Object markGuard = new Object();
-    private Mark defaultMark = null;
 
-    // @GuardedBy mapperGuard
-    private MarkMapper mapper = null;
-    private Set observers;
+    final private MarkMapper mapper;
 
     // @GuardedBy markGuard
     private String[] labels;
 
-    // @GuardedBy markGuard  
-    private Mark[] markBackMap;
-
     // @GuardedBy markGuard
     private MarkMapping[] marks;
+
+    private Lookup.Result observers;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -90,16 +85,8 @@ public class MarkingEngine {
      * Creates a new instance of MarkingEngine
      */
     private MarkingEngine() {
-        observers = new HashSet();
-
-        //    synchronized(filterGuard) {
-        //      filter = new MarkFilter();
-        //      CPUStatsCollector.getDefault().addListener(filter);
-        //    }
-        synchronized (mapperGuard) {
-            mapper = new MarkMapper();
-            this.addStateObserver(mapper);
-        }
+        observers = Lookup.getDefault().lookupResult(StateObserver.class);
+        mapper = new MarkMapper();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -112,59 +99,13 @@ public class MarkingEngine {
         return instance;
     }
 
-    public static synchronized void configure(Mark rootMark, MarkMapping[] marks) {
-        getDefault().defaultMark = rootMark;
-        getDefault().setMarks(marks);
+    // configure the engine for a given set of {@linkplain MarkMapping}
+    public synchronized void configure(MarkMapping[] mappings) {
+        setMarks(mappings != null ? mappings : Marker.DEFAULT.getMappings());
     }
 
-    public String getLabelForId(char markId) {
-        synchronized (markGuard) {
-            if (marks == null) {
-                return null;
-            }
-
-            if (((int) markId > 0) && ((int) markId <= labels.length)) {
-                return labels[(int) markId - 1];
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public Mark getMarkForId(char markId) {
-        synchronized (markGuard) {
-            if (marks == null) {
-                return null;
-            }
-
-            if (((int) markId > 0) && ((int) markId <= labels.length)) {
-                return markBackMap[(int) markId - 1];
-            } else {
-                return (defaultMark != null) ? defaultMark : Mark.DEFAULT;
-            }
-        }
-    }
-
-    public int getMarkId(Mark mark) {
-        synchronized (markGuard) {
-            if (mark.isDefault) {
-                return 0;
-            }
-
-            for (int i = 0; i < labels.length; i++) {
-                if (labels[i].equals(mark.label)) {
-                    return (char) (i + 1);
-                }
-            }
-
-            return -1;
-        }
-    }
-
-    public MarkMapper getMarker() {
-        synchronized (mapperGuard) {
-            return mapper;
-        }
+    public synchronized void deconfigure() {
+        setMarks(Marker.DEFAULT.getMappings());
     }
 
     public ClientUtils.SourceCodeSelection[] getMarkerMethods() {
@@ -189,12 +130,10 @@ public class MarkingEngine {
         }
     }
 
-    public void addStateObserver(StateObserver observer) {
-        observers.add(observer);
-    }
-
-    public void removeStateObserver(StateObserver observer) {
-        observers.remove(observer);
+    public Mark markMethod(int methodId, ProfilingSessionStatus status) {
+        synchronized(mapper) {
+            return mapper.getMark(methodId, status);
+        }
     }
 
     Mark mark(int methodId, ProfilingSessionStatus status) {
@@ -220,9 +159,6 @@ public class MarkingEngine {
             for (int i = 0; i < marks.length; i++) {
                 if (methodSig.startsWith(marks[i].markSig)) {
                     return marks[i].mark;
-
-                    //          int supposedMark = getMarkId(marks[i].mark);
-                    //          return (char)(supposedMark >= 0 ? supposedMark : 0);
                 }
             }
 
@@ -238,38 +174,14 @@ public class MarkingEngine {
                           && (((this.marks == null) && (marks != null)) || ((this.marks != null) && (marks == null))
                              || !this.marks.equals(marks));
             this.marks = marks;
-
-            if (marks != null) {
-                Set labelSet = new LinkedHashSet();
-
-                for (int i = 0; i < marks.length; i++) {
-                    labelSet.addAll(marks[i].mark.getLabels());
-                }
-
-                labels = new String[labelSet.size()];
-                labels = (String[]) labelSet.toArray(labels);
-
-                markBackMap = new Mark[labels.length];
-
-                for (int i = 0; i < labels.length; i++) {
-                    for (int j = 0; j < marks.length; j++) {
-                        if (marks[j].mark.getLabel().equals(labels[i])) {
-                            markBackMap[i] = marks[j].mark;
-
-                            break;
-                        }
-                    }
-                }
-            }
         }
-
         if (stateChange) {
             fireStateChanged();
         }
     }
 
     private void fireStateChanged() {
-        for (Iterator iter = observers.iterator(); iter.hasNext();) {
+        for (Iterator iter = observers.allInstances().iterator(); iter.hasNext();) {
             ((StateObserver) iter.next()).stateChanged(this);
         }
     }

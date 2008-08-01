@@ -110,7 +110,8 @@ class NearestGCRoot {
         referenceClasses.add(softRef);
         referenceClasses.addAll(softRef.getSubClasses());
         referentFiled = computeReferentFiled();
-
+        heap.computeReferences(); // make sure references are computed first
+        
         try {
             createBuffers();
             fillZeroLevel();

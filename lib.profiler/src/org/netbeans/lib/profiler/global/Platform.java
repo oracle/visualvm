@@ -196,6 +196,8 @@ public class Platform implements CommonConstants {
             libSuffix = ".dll"; // Windows // NOI18N
         } else if (isMac()) {
             libSuffix = ".jnilib"; // Mac // NOI18N
+        } else if (isHpux()) {
+            libSuffix = ".sl"; // HP-UX // NOI18N
         } else {
             libSuffix = ".so"; // UNIXes // NOI18N
         }
@@ -203,9 +205,18 @@ public class Platform implements CommonConstants {
         String libSubPath = "/"; // NOI18N
 
         if (!fullPathToLibSpecified) {
-            String libSubDir = isWindows() ? "windows" : (isMac() ? // NOI18N
-            "mac" : (isLinux() ? // NOI18N
-            "linux" : "solaris")); // NOI18N
+            String libSubDir;
+            if (isWindows()) {
+               libSubDir = "windows"; // NOI18N
+            } else if (isMac()) {
+               libSubDir = "mac";
+            } else if (isLinux()) {
+               libSubDir = "linux"; // NOI18N
+            } else if (isHpux()) {
+               libSubDir = "hpux"; // NOI18N
+            } else {
+               libSubDir = "solaris"; // NOI18N
+            }
             String procArch = null;
 
             if (is64bitArch) {
@@ -213,6 +224,8 @@ public class Platform implements CommonConstants {
                     procArch = "amd64"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparcv9"; // NOI18N
+                } else if (isHpux()) {
+                    procArch = System.getProperty("os.arch").toLowerCase(); // NOI18N
                 }
             } else { // 32bit
 
@@ -220,6 +233,8 @@ public class Platform implements CommonConstants {
                     procArch = "i386"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparc"; // NOI18N
+                } else if (isHpux()) {
+                    procArch = System.getProperty("os.arch").toLowerCase(); // NOI18N
                 }
             }
 
@@ -344,7 +359,11 @@ public class Platform implements CommonConstants {
     public static boolean isMac() {
         return (getOperatingSystem() == OS_MAC);
     }
-
+    
+    public static boolean isHpux() {
+        return (getOperatingSystem() == OS_HP);
+    }
+    
     /**
      * Get the operating system on which we are is running.
      * Returns one of the <code>OS_*</code> constants (such as {@link #OS_WINNT})

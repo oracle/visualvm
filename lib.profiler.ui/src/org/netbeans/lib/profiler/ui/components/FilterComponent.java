@@ -48,6 +48,7 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -746,7 +747,7 @@ public class FilterComponent extends JPanel {
 
     //--- Private implementation -----
     private void initComponents() {
-        Border textFieldBorder;
+        Border componentBorder;
         Color textFieldBackground;
 
         ActionListener setClearButtonsActionListner = new SetClearButtonsActionListener();
@@ -772,7 +773,8 @@ public class FilterComponent extends JPanel {
         }
 
         filterStringCombo.setEditable(true);
-        textFieldBorder = filterStringCombo.getBorder();
+        componentBorder = UIUtils.isGTKLookAndFeel() ? BorderFactory.createBevelBorder(BevelBorder.LOWERED) :
+            filterStringCombo.getBorder();
         filterStringCombo.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 0));
         filterStringCombo.setMaximumRowCount(7);
         filterStringCombo.addActionListener(new FilterStringComboActionListener());
@@ -856,7 +858,7 @@ public class FilterComponent extends JPanel {
         filterTypePopup.setBackground(UIUtils.getProfilerResultsBackground());
 
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createCompoundBorder(textFieldBorder, BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+        setBorder(BorderFactory.createCompoundBorder(componentBorder, BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         setBackground(textFieldBackground);
 
         add(filterTypeButton, BorderLayout.WEST);

@@ -43,12 +43,11 @@ package org.netbeans.modules.profiler.ui.stats;
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTVisitorAdapter;
 import org.netbeans.lib.profiler.results.cpu.cct.CompositeCPUCCTWalker;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
-import org.netbeans.lib.profiler.ui.cpu.statistics.TimingData;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -57,11 +56,9 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -70,6 +67,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import org.netbeans.api.project.Project;
+import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.categories.Categorization;
+import org.netbeans.modules.profiler.categories.Category;
+import org.netbeans.modules.profiler.utilities.Visitable;
+import org.netbeans.modules.profiler.utilities.Visitor;
 
 
 /**
@@ -134,12 +137,14 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
             return new HashMap<Mark, Long>(markMap);
         }
 
+        @Override
         public void afterWalk() {
             //      markStack.pop();
             //      updateTimeForMark(Mark.DEFAULT);
             refreshData();
         }
 
+        @Override
         public void beforeWalk() {
             markStack.clear();
             markMap.clear();
@@ -147,7 +152,8 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
             usedMark = Mark.DEFAULT;
         }
 
-        public void visit(CategoryCPUCCTNode node) {
+        @Override
+        public void visit(MarkedCPUCCTNode node) {
             if (time0 > 0L) {
                 // fill the timing data structures
                 Long markTime = markMap.get(usedMark);
@@ -174,6 +180,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
             usedMark = node.getMark();
         }
 
+        @Override
         public void visit(MethodCPUCCTNode node) {
             if (node.getMethodId() != getSelectedMethodId()) {
                 return;
@@ -186,7 +193,8 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
             lastCalls = node.getNCalls();
         }
 
-        public void visitPost(CategoryCPUCCTNode node) {
+        @Override
+        public void visitPost(MarkedCPUCCTNode node) {
             if (time0 > 0L) {
                 // fill the timing data structures
                 Long markTime = markMap.get(usedMark);
@@ -234,7 +242,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
     private JLabel noMethods = new JLabel(NO_METHOD_LABEL_TEXT);
     private Model model;
     private RuntimeCPUCCTNode lastAppNode;
-
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of ForwardCategoryDistributionPanel */
@@ -247,6 +255,11 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    private Project getProject() {
+        return NetBeansProfiler.getDefaultNB().getProfiledProject();
+    }
+
+    @Override
     public void setSelectedMethodId(int methodId) {
         int lastSelectedId = getSelectedMethodId();
         super.setSelectedMethodId(methodId);
@@ -329,24 +342,40 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
 
                 final long fullTime = (parentTime > shownTime) ? parentTime : shownTime;
 
-                //        long restTime = fullTime - shownTime;
-                //        if (restTime > 0) {
-                //          shownCats.add(new MarkTime(dd.getCurrentMark(), restTime));
-                //        }
                 Collections.sort(shownCats, MarkTime.COMPARATOR);
 
                 uiUpdater = new Runnable() {
                         public void run() {
+                            final Categorization categorization = getProject().getLookup().lookup(Categorization.class);
+                            
                             removeAll();
 
-                            for (MarkTime cat : shownCats) {
+                            for (final MarkTime cat : shownCats) {
                                 float ratio = (float) cat.time / (float) fullTime;
                                 float percent = 100f * ratio;
 
                                 JPanel panel = new JPanel(new BorderLayout());
                                 panel.setOpaque(false);
 
-                                JLabel data = new JLabel(cat.mark.description + " (" + StringUtils.floatPerCentToString(percent)
+                                Category displayedCat = categorization.getCategoryForMark(cat.mark);
+                                StringBuilder labelBuilder = new StringBuilder();
+                                if (displayedCat != null) {
+                                    categorization.getRoot().accept(new Visitor<Visitable<Category>, Void, StringBuilder>() {
+
+                                        public Void visit(Visitable<Category> visitable, StringBuilder parameter) {
+                                            if (categorization.getAllMarks(visitable.getValue()).contains(cat.mark)) {
+                                                if (parameter.length() > 0) {
+                                                    parameter.append("/");
+                                                }
+                                                parameter.append(visitable.getValue().getLabel());
+                                            }
+                                            return null;
+                                        }
+                                    }, labelBuilder);
+                                } else {
+                                    labelBuilder.append("Not categorized");
+                                }
+                                JLabel data = new JLabel(labelBuilder.toString() + " (" + StringUtils.floatPerCentToString(percent)
                                                          + "%)"); // NOI18N
                                 data.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 7, 0, 0),
                                                                                   data.getBorder()));

@@ -40,7 +40,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct;
 
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
@@ -62,5 +62,5 @@ public interface RuntimeCPUCCTNodeVisitor {
 
     void visit(SimpleCPUCCTNode node);
 
-    void visit(CategoryCPUCCTNode node);
+    void visit(MarkedCPUCCTNode node);
 }

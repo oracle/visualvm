@@ -56,7 +56,6 @@ import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
 import org.netbeans.modules.profiler.attach.AttachWizard;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
 /**
@@ -287,7 +286,9 @@ public final class ProfilingSupport {
 //                            attachWizard.finish(); // wizard correctly finished
 //
 //                            as = attachWizard.getAttachSettings();
-                            NetBeansProfiler.saveAttachSettings(project, AttachWizard.getDefault().configure(as));
+                            as = AttachWizard.getDefault().configure(as);
+                            if (as == null) return; // cancelled by the user
+                            NetBeansProfiler.saveAttachSettings(project, as);
                         }
 
                         if (!as.isRemote() && as.isDynamic16()) {

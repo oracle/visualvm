@@ -41,7 +41,7 @@
 package org.netbeans.lib.profiler.results.cpu.cct;
 
 import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitor;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
@@ -74,7 +74,7 @@ public abstract class CPUCCTWalker implements RuntimeCPUCCTNodeVisitor {
         walkTree(node);
     }
 
-    public void visit(CategoryCPUCCTNode node) {
+    public void visit(MarkedCPUCCTNode node) {
         walkTree(node);
     }
 

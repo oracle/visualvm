@@ -44,16 +44,14 @@ import org.netbeans.lib.profiler.ContextAware;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTVisitorAdapter;
 import org.netbeans.lib.profiler.results.cpu.cct.CompositeCPUCCTWalker;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
-import org.netbeans.lib.profiler.ui.cpu.statistics.drilldown.IDrillDown;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,9 +114,9 @@ public class MergedCategoryTrackerPanel extends StatisticalModule implements Con
             }
         }
 
-        public void visitPost(CategoryCPUCCTNode node) {
+        public void visitPost(MarkedCPUCCTNode node) {
             if (inCalculation) {
-                categories.add(node.getMark().getDescription());
+                categories.add("***"); //node.getMark().getDescription());
             }
         }
 
@@ -148,7 +146,7 @@ public class MergedCategoryTrackerPanel extends StatisticalModule implements Con
     private CompositeCPUCCTWalker treeWalker;
     private JLabel noData = new JLabel(NO_DATA_LABEL_TEXT);
     private JLabel noMethods = new JLabel(NO_METHOD_LABEL_TEXT);
-    private Map<Integer, List<CategoryCPUCCTNode>> pathMap = new HashMap<Integer, List<CategoryCPUCCTNode>>();
+    private Map<Integer, List<MarkedCPUCCTNode>> pathMap = new HashMap<Integer, List<MarkedCPUCCTNode>>();
     private MergedCategoryTrackerModel model;
     private RuntimeCPUCCTNode lastAppNode = null;
 

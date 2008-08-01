@@ -339,7 +339,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             memoryPanel.setFindString(findString);
-            reversePanel.setFindString(findString);
+            if (reversePanel != null) reversePanel.setFindString(findString);
 
             if (!memoryPanel.findFirst()) {
                 NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
@@ -370,7 +370,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
                 }
 
                 memoryPanel.setFindString(findString);
-                reversePanel.setFindString(findString);
+                if (reversePanel != null) reversePanel.setFindString(findString);
             }
 
             if (!memoryPanel.findNext()) {
@@ -404,7 +404,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
                 }
 
                 memoryPanel.setFindString(findString);
-                reversePanel.setFindString(findString);
+                if (reversePanel != null) reversePanel.setFindString(findString);
             }
 
             if (!memoryPanel.findPrevious()) {

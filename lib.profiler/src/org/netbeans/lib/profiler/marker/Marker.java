@@ -42,7 +42,6 @@ package org.netbeans.lib.profiler.marker;
 
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 
-
 /**
  *
  * @author Jaroslav Bachorik
@@ -51,13 +50,18 @@ public interface Marker {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     public static final Marker DEFAULT = new Marker() {
-        public MarkMapping[] getMarks() {
+        public MarkMapping[] getMappings() {
             return new MarkMapping[0];
         }
+
+        public Mark[] getMarks() {
+            return new Mark[] { Mark.DEFAULT};
+        }  
     };
 
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    MarkMapping[] getMarks();
+    MarkMapping[] getMappings();
+    Mark[] getMarks();
 }

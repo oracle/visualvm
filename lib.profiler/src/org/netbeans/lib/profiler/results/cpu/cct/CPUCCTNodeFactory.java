@@ -40,11 +40,11 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct;
 
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.CategoryCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 
 
 /**
@@ -65,8 +65,8 @@ public class CPUCCTNodeFactory {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public CategoryCPUCCTNode createCategory(Mark mark) {
-        return new CategoryCPUCCTNode(this, mark, twoStamps);
+    public MarkedCPUCCTNode createCategory(Mark mark) {
+        return new MarkedCPUCCTNode(this, mark, twoStamps);
     }
 
     public MethodCPUCCTNode createMethodNode(int methodId) {

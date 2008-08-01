@@ -432,12 +432,15 @@ public class MiscUtils implements CommonConstants {
             File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
             File[] files = tempDir.listFiles();
 
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                String fname = f.getName();
+            // check that tempDir exists
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    String fname = f.getName();
 
-                if (fname.startsWith("NBProfiler") && fname.endsWith(".map")) { // NOI18N
-                    f.delete();
+                    if (fname.startsWith("NBProfiler") && (fname.endsWith(".map") || fname.endsWith(".ref"))) { // NOI18N
+                        f.delete();
+                    }
                 }
             }
         }

@@ -55,12 +55,11 @@ import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
 
 
 /** An IDE TopComponent to display profiling results.
@@ -80,10 +79,14 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     private static final String THREADS_WINDOW_NAME = NbBundle.getMessage(ThreadsWindow.class, "ThreadsWindow_ThreadsWindowName"); // NOI18N
     private static final String THREADS_TIMELINE_TAB_NAME = NbBundle.getMessage(ThreadsWindow.class,
                                                                                 "ThreadsWindow_ThreadsTimelineTabName"); // NOI18N
+    private static final String THREADS_TABLE_TAB_NAME = NbBundle.getMessage(ThreadsWindow.class,
+                                                                                "ThreadsWindow_ThreadsTableTabName"); // NOI18N
     private static final String THREADS_DETAILS_TAB_NAME = NbBundle.getMessage(ThreadsWindow.class,
                                                                                "ThreadsWindow_ThreadsDetailsTabName"); // NOI18N
     private static final String THREADS_TIMELINE_TAB_DESCR = NbBundle.getMessage(ThreadsWindow.class,
                                                                                  "ThreadsWindow_ThreadsTimelineTabDescr"); // NOI18N
+    private static final String THREADS_TABLE_TAB_DESCR = NbBundle.getMessage(ThreadsWindow.class,
+                                                                                 "ThreadsWindow_ThreadsTableTabDescr"); // NOI18N
     private static final String THREADS_DETAILS_TAB_DESCR = NbBundle.getMessage(ThreadsWindow.class,
                                                                                 "ThreadsWindow_ThreadsDetailsTabDescr"); // NOI18N
     private static final String THREADS_ACCESS_DESCR = NbBundle.getMessage(ThreadsWindow.class, "ThreadsWindow_ThreadsAccessDescr"); // NOI18N
@@ -98,6 +101,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     private final JPanel threadsTimelinePanelContainer;
     private final JTabbedPane tabs;
     private final ThreadsPanel threadsPanel;
+    private final ThreadsTablePanel threadsTablePanel;
     private Component lastFocusOwner;
     private JPanel threadsDetailsPanelContainer;
     private ThreadsDetailsPanel threadsDetailsPanel;
@@ -141,6 +145,15 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
 
         threadsPanel.addThreadsMonitoringActionListener(this);
         threadsPanel.addSaveViewAction(new SaveViewAction(this));
+        
+        threadsTablePanel = new ThreadsTablePanel(Profiler.getDefault().getThreadsManager(),
+                new ThreadsTablePanel.ThreadsDetailsCallback() {
+                public void showDetails(final int[] indexes) {
+                    threadsDetailsPanel.showDetails(indexes);
+                    tabs.setSelectedComponent(threadsDetailsPanelContainer);
+                }
+            }, tvmSupportsSleepingState);
+        threadsTablePanel.addSaveViewAction(new SaveViewAction(this));
 
         threadsDetailsPanel = new ThreadsDetailsPanel(Profiler.getDefault().getThreadsManager(), tvmSupportsSleepingState);
         threadsDetailsPanelContainer = new JPanel() {
@@ -153,6 +166,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         threadsDetailsPanel.addSaveViewAction(new SaveViewAction(this));
 
         tabs.addTab(THREADS_TIMELINE_TAB_NAME, null, threadsTimelinePanelContainer, THREADS_TIMELINE_TAB_DESCR);
+        tabs.addTab(THREADS_TABLE_TAB_NAME, null, threadsTablePanel, THREADS_TABLE_TAB_DESCR);
         tabs.addTab(THREADS_DETAILS_TAB_NAME, null, threadsDetailsPanelContainer, THREADS_DETAILS_TAB_DESCR);
 
         profilingStateChanged(Profiler.getDefault().getProfilingState());
@@ -220,6 +234,8 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
         if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
             return threadsPanel.getCurrentViewScreenshot(onlyVisibleArea);
+        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+            return threadsTablePanel.getCurrentViewScreenshot(onlyVisibleArea);
         } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
             return threadsDetailsPanel.getCurrentViewScreenshot(onlyVisibleArea);
         }
@@ -230,6 +246,8 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     public String getViewName() {
         if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
             return "threads-timeline"; // NOI18N
+        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+            return "threads-table"; // NOI18N
         } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
             return "threads-details"; // NOI18N
         }
@@ -252,6 +270,8 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     public boolean fitsVisibleArea() {
         if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
             return threadsPanel.fitsVisibleArea();
+        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+            return threadsTablePanel.fitsVisibleArea();
         } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
             return threadsDetailsPanel.fitsVisibleArea();
         }
@@ -263,6 +283,8 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     public boolean hasView() {
         if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
             return threadsPanel.hasView();
+        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+            return threadsTablePanel.hasView();
         } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
             return threadsDetailsPanel.hasView();
         }
@@ -298,10 +320,12 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
             threadsPanel.threadsMonitoringEnabled();
             tabs.setEnabledAt(1, true);
+            tabs.setEnabledAt(2, true);
         } else {
             threadsPanel.threadsMonitoringDisabled();
             tabs.setSelectedIndex(0);
             tabs.setEnabledAt(1, false);
+            tabs.setEnabledAt(2, false);
         }
     }
 

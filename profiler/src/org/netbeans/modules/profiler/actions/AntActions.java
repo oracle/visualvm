@@ -631,44 +631,50 @@ public final class AntActions {
                                 );
                                 activateOOMProtection(gps, props, project);
                             } else {
-                                throw new IllegalArgumentException("Unsoported JDK " + javaVersion); // NOI18N
+                                throw new IllegalArgumentException("Unsupported JDK " + javaVersion); // NOI18N
+                            }
+                            
+                            if (!ptp.startProfilingSession(project, profiledClassFile, isTest, props)) { // Used for Maven - ProjectTypeProfiler itself controls starting profiling session
+                                
+                                // 8. determine the build script and target to run
+                                final FileObject buildScriptFO = ptp.getProjectBuildScript(project);
+
+                                if (buildScriptFO == null) {
+                                    Profiler.getDefault()
+                                            .displayError(MessageFormat.format(FAILED_DETERMINE_PROJECT_BUILDSCRIPT_MSG,
+                                                                               new Object[] {
+                                                                                   ProjectUtils.getInformation(project).getName()
+                                                                               }));
+
+                                    return;
+                                }
+
+                                // determine which type fo target shoudl be called, and request its name
+                                int type;
+
+                                if (isTest) {
+                                    type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE_TEST
+                                                                       : ProjectTypeProfiler.TARGET_PROFILE_TEST_SINGLE;
+                                } else {
+                                    type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE
+                                                                       : ProjectTypeProfiler.TARGET_PROFILE_SINGLE;
+                                }
+
+                                final String profileTarget = ptp.getProfilerTargetName(project, buildScriptFO, type, profiledClassFile);
+
+                                if (profileTarget == null) {
+                                    return; // already notified the user or user's choice
+                                }
+
+                                // 9. final ability of the ProjectTypeProfiler to influence the properties passed to Ant
+                                ptp.configurePropertiesForProfiling(props, project, profiledClassFile);
+
+                                // 10. Run the target
+                                NetBeansProfiler.getDefaultNB().runTarget(buildScriptFO, profileTarget, props);
+                                
                             }
 
-                            // 8. determine the build script and target to run
-                            final FileObject buildScriptFO = ptp.getProjectBuildScript(project);
-
-                            if (buildScriptFO == null) {
-                                Profiler.getDefault()
-                                        .displayError(MessageFormat.format(FAILED_DETERMINE_PROJECT_BUILDSCRIPT_MSG,
-                                                                           new Object[] {
-                                                                               ProjectUtils.getInformation(project).getName()
-                                                                           }));
-
-                                return;
-                            }
-
-                            // determine which type fo target shoudl be called, and request its name
-                            int type;
-
-                            if (isTest) {
-                                type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE_TEST
-                                                                   : ProjectTypeProfiler.TARGET_PROFILE_TEST_SINGLE;
-                            } else {
-                                type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE
-                                                                   : ProjectTypeProfiler.TARGET_PROFILE_SINGLE;
-                            }
-
-                            final String profileTarget = ptp.getProfilerTargetName(project, buildScriptFO, type, profiledClassFile);
-
-                            if (profileTarget == null) {
-                                return; // already notified the user or user's choice
-                            }
-
-                            // 9. final ability of the ProjectTypeProfiler to influence the properties passed to Ant
-                            ptp.configurePropertiesForProfiling(props, project, profiledClassFile);
-
-                            // 10. Run the target
-                            NetBeansProfiler.getDefaultNB().runTarget(buildScriptFO, profileTarget, props);
+                            
                         }
                     } finally {
                         ProfilingSupport.getDefault().setProfilingActionInvoked(false);

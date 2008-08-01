@@ -40,7 +40,7 @@
 
 package org.netbeans.lib.profiler.utils.formatting;
 
-import org.netbeans.lib.profiler.results.cpu.marking.Mark;
+import org.netbeans.lib.profiler.marker.Mark;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,7 +97,7 @@ public class MethodNameFormatterFactory {
     }
 
     public synchronized MethodNameFormatter getFormatter(Mark mark) {
-        if ((mark == null) || mark.isDefault) {
+        if ((mark == null) || mark.isDefault()) {
             return defaultFormatter;
         }
 

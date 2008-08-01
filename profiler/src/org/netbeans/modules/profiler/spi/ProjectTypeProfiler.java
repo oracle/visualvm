@@ -47,7 +47,6 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.marker.Marker;
-import org.netbeans.lib.profiler.results.cpu.marking.HierarchicalMark;
 import org.netbeans.modules.profiler.ui.stp.DefaultSettingsConfigurator;
 import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
 import org.openide.filesystems.FileObject;
@@ -123,10 +122,6 @@ public interface ProjectTypeProfiler {
             return EMPTY_SELECTION;
         }
 
-        public Marker getMethodMarker(Project project) {
-            return Marker.DEFAULT;
-        }
-
         public List<SimpleFilter> getPredefinedInstrumentationFilters(Project project) {
             return Collections.emptyList();
         }
@@ -134,6 +129,10 @@ public interface ProjectTypeProfiler {
         public SimpleFilter computePredefinedInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
                                                                    String[][] projectPackagesDescr) {
             return null;
+        }
+        
+        public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties) {
+            return false;
         }
 
         public String getProfilerTargetName(Project project, FileObject buildScript, int type, FileObject profiledClassFile) {
@@ -188,10 +187,6 @@ public interface ProjectTypeProfiler {
         }
 
         public void unintegrateProfiler(Project project) {
-        }
-
-        public HierarchicalMark getMarkHierarchyRoot() {
-            return HierarchicalMark.DEFAULT;
         }
 
         public float getProfilingOverhead(ProfilingSettings settings) {
@@ -261,10 +256,6 @@ public interface ProjectTypeProfiler {
      * @return true if the specified FileObject can be profiled, false otherwise.
      */
     boolean isFileObjectSupported(Project project, FileObject fo);
-
-    HierarchicalMark getMarkHierarchyRoot();
-
-    Marker getMethodMarker(Project project);
 
     // Returns list of instrumentation filters defined by the ProjectTypeProfiler (related to concrete project type)
     // These filters are typically just placeholders useds for Instr. filter combo, real filter is computed in computePredefinedInstrumentationFilter
@@ -376,6 +367,18 @@ public interface ProjectTypeProfiler {
     boolean supportsSettingsOverride();
 
     boolean supportsUnintegrate(Project project);
+    
+    /**
+     * Returns true when the ProjectTypeProfiler itself is able to start the profiling session and doesn't rely on the underlying (Ant-based) framework.
+     * Currently used for Maven support.
+     * 
+     * @param project Project to be profiled
+     * @param profiledClassFile File to be profiled or null if profiling entire Project
+     * @param isTest True if profiledClassFile is test
+     * @param properties Properties containing settings for the upcoming profiling session
+     * @return true when the ProjectTypeProfiler is able to start the profiling session.
+     */
+    public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties);
 
     void unintegrateProfiler(Project project);
 }

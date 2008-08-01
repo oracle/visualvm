@@ -250,6 +250,10 @@ public class ClassesListControllerUI extends JTitledPanel {
                                                                              "ClassesListControllerUI_FilteringProgressText"); // NOI18N
     private static final String RESULT_NOT_AVAILABLE_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                                   "ClassesListControllerUI_ResultNotAvailableString"); // NOI18N
+    private static final String CLASSES_TABLE_ACCESS_NAME = NbBundle.getMessage(ClassesListControllerUI.class,
+                                                                             "ClassesListControllerUI_ClassesTableAccessName"); // NOI18N
+    private static final String CLASSES_TABLE_ACCESS_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
+                                                                                  "ClassesListControllerUI_ClassesTableAccessDescr"); // NOI18N
                                                                                                                                        // -----
     private static ImageIcon ICON_CLASSES = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png")); // NOI18N
     private static String filterValue = ""; // NOI18N
@@ -650,6 +654,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         classesListTableModel.setTable(classesListTable);
         classesListTableModel.setInitialSorting(sortingColumn, sortingOrder);
         classesListTable.getColumnModel().getColumn(0).setMinWidth(150);
+        classesListTable.getAccessibleContext().setAccessibleName(CLASSES_TABLE_ACCESS_NAME);
+        classesListTable.getAccessibleContext().setAccessibleDescription(CLASSES_TABLE_ACCESS_DESCR);
         classesListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                         .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
         classesListTable.getActionMap().put("DEFAULT_ACTION",

@@ -132,6 +132,37 @@ public class TimeLineUtils {
 
         return sHours + sMinutes + sSeconds + sMillis;
     }
+    
+    public static String getMillisValue2(long mark) {
+        // Hours
+        long hours = mark / 3600000;
+        String sHours = ((hours == 0) ? "" : ("" + hours + ":")); // NOI18N
+        mark = mark % 3600000;
+
+        // Minutes
+        long minutes = mark / 60000;
+        String sMinutes = hours == 0 && minutes == 0 ? "" : (((hours > 0) && (minutes < 10)) ? ("0" + minutes) : ("" + minutes)) + ":"; // NOI18N
+        mark = mark % 60000;
+
+        // Seconds
+        long seconds = mark / 1000;
+        String sSeconds = ((seconds < 10 && sMinutes.length() > 0) ? ("0" + seconds) : ("" + seconds)) + "."; // NOI18N
+        mark = mark % 1000;
+
+        // Milliseconds
+        long millis = mark;
+        String sMillis = "" + millis; // NOI18N
+
+        if (millis < 10) {
+            sMillis = "0" + sMillis; // NOI18N
+        }
+
+        if (millis < 100) {
+            sMillis = "0" + sMillis; // NOI18N
+        }
+
+        return sHours + sMinutes + sSeconds + sMillis;
+    }
 
     public static String getMinutesValue(long mark) {
         // Hours

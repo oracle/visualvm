@@ -3,7 +3,4 @@ OpenIDE-Module: org.netbeans.modules.profiler/1
 OpenIDE-Module-Layer: org/netbeans/modules/profiler/mf-layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/Bundle.properties
 OpenIDE-Module-Install: org/netbeans/modules/profiler/ProfilerModule.class
-OpenIDE-Module-Specification-Version: 1.7
-
-Name: org/netbeans/modules/profiler/SnapshotDataLoader.class
-OpenIDE-Module-Class: Loader
+OpenIDE-Module-Specification-Version: 1.8

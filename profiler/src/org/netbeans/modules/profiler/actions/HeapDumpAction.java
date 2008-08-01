@@ -349,7 +349,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
             String fileName = TAKEN_HEAPDUMP_PREFIX + System.currentTimeMillis();
             FileObject folder = (targetFolder == null)
                                 ? IDEUtils.getProjectSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
-                                : FileUtil.toFileObject(new File(targetFolder));
+                                : FileUtil.toFileObject(FileUtil.normalizeFile(new File(targetFolder)));
 
             return FileUtil.toFile(folder).getAbsolutePath() + File.separator
                    + FileUtil.findFreeFileName(folder, fileName, ResultsManager.HEAPDUMP_EXTENSION) + "."

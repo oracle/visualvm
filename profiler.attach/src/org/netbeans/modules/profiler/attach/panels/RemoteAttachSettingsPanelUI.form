@@ -160,7 +160,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="org.netbeans.modules.profiler.ui.wizards.panels.components.ResizableHintPanel" name="hintPanel">
+    <Component class="org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel" name="hintPanel">
       <Properties>
         <Property name="hint" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="org/netbeans/modules/profiler/ui/wizards/panels/Bundle.properties" key="TargetSettingsWizardPanelUI_RemotePacksHelpString" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>

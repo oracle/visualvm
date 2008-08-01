@@ -72,7 +72,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkAutomationActionPerformed"/>
       </Events>
     </Component>
-    <Component class="org.netbeans.modules.profiler.ui.wizards.panels.components.StepsPanelComponent" name="additionalSteps">
+    <Component class="org.netbeans.modules.profiler.attach.panels.components.StepsPanelComponent" name="additionalSteps">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">

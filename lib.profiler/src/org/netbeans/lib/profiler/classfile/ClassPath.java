@@ -53,6 +53,7 @@ import java.util.zip.ZipFile;
  * file with a specified fully qualified name.
  *
  * @author Misha Dmitirev
+ * @author Tomas Hurka
  */
 public class ClassPath {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -110,15 +111,15 @@ public class ClassPath {
         }
     }
 
-    private static class Zip extends PathEntry {
+    private class Zip extends PathEntry {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private ZipFile zip;
+        private String zipFilePath;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        Zip(ZipFile z) {
-            zip = z;
+        Zip(String path) {
+            zipFilePath = path;
             threshHits = 50 + (int) (20 * Math.random());
         }
 
@@ -127,23 +128,27 @@ public class ClassPath {
         String getLocationForClassFile(String fileName) {
             if (entries != null) {
                 if (entries.contains(fileName)) {
-                    return zip.getName();
+                    return zipFilePath;
                 } else {
                     return null;
                 }
             } else {
                 if (++hits >= threshHits) {
                     entries = new HashSet();
-                    MiscUtils.getAllClassesInJar(zip.getName(), false, entries);
-
-                    Enumeration e = zip.entries();
-
+                    MiscUtils.getAllClassesInJar(zipFilePath, false, entries);
                     return getLocationForClassFile(fileName);
                 } else {
+                    ZipFile zip;
+                    try {
+                        zip = getZipFileForName(zipFilePath);
+                    } catch (IOException ex) {
+                        System.err.println("Warning: CLASSPATH component " + zipFilePath + ": " + ex); // NOI18N
+                        return null;
+                    }
                     ZipEntry entry = zip.getEntry(fileName);
 
                     if (entry != null) {
-                        return zip.getName();
+                        return zipFilePath;
                     } else {
                         return null;
                     }
@@ -151,10 +156,31 @@ public class ClassPath {
             }
         }
     }
+    
+    private static class JarLRUCache extends LinkedHashMap {
+        private static final int MAX_CAPACITY = 100;
+        
+        private JarLRUCache() {  
+            super(10, 0.75f, true); 
+        }
+        
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            if (size()>MAX_CAPACITY) {
+                try {
+                    ((ZipFile)eldest.getValue()).close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+                return true;
+            }
+            return false;
+        }
+
+    }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Hashtable zipFileNameToFile;
+    private JarLRUCache zipFileNameToFile;
     private PathEntry[] paths;
     private boolean isCP; // True for a class path, false for a source path
 
@@ -162,29 +188,21 @@ public class ClassPath {
 
     public ClassPath(String classPath, boolean isCP) {
         this.isCP = isCP;
-
-        ArrayList vec = new ArrayList();
-        zipFileNameToFile = new Hashtable();
+        List vec = new ArrayList();
+        zipFileNameToFile = new JarLRUCache();
 
         for (StringTokenizer tok = new StringTokenizer(classPath, File.pathSeparator); tok.hasMoreTokens();) {
             String path = tok.nextToken();
 
             if (!path.equals("")) { // NOI18N
-
                 File file = new File(path);
 
-                try {
-                    if (file.exists()) {
-                        if (file.isDirectory()) {
-                            vec.add(new Dir(file));
-                        } else {
-                            ZipFile zipFile = new ZipFile(file);
-                            vec.add(new Zip(zipFile));
-                            zipFileNameToFile.put(path, zipFile);
-                        }
+                if (file.exists()) {
+                    if (file.isDirectory()) {
+                        vec.add(new Dir(file));
+                    } else {
+                        vec.add(new Zip(file.getPath()));
                     }
-                } catch (IOException e) {
-                    System.err.println("Warning: CLASSPATH component " + file + ": " + e); // NOI18N
                 }
             }
         }
@@ -230,8 +248,13 @@ public class ClassPath {
     }
 
     /** This is used to avoid repetitive creation of ZipFiles in the code that reads files from JARs given just the name of the latter */
-    public ZipFile getZipFileForName(String zipFileName) {
-        return (ZipFile) zipFileNameToFile.get(zipFileName);
+    public ZipFile getZipFileForName(String zipFileName) throws IOException {
+        ZipFile zip = (ZipFile) zipFileNameToFile.get(zipFileName);
+        if (zip == null) {
+            zip = new ZipFile(zipFileName);
+            zipFileNameToFile.put(zipFileName,zip);
+        }
+        return zip;
     }
 
     public void close() {
@@ -251,7 +274,7 @@ public class ClassPath {
         StringBuffer buf = new StringBuffer();
 
         for (int i = 0; i < paths.length; i++) {
-            buf.append((paths[i] instanceof Dir) ? ((Dir) paths[i]).dir.getAbsolutePath() : ((Zip) paths[i]).zip.getName());
+            buf.append((paths[i] instanceof Dir) ? ((Dir) paths[i]).dir.getAbsolutePath() : ((Zip) paths[i]).zipFilePath);
             buf.append(File.pathSeparatorChar);
         }
 

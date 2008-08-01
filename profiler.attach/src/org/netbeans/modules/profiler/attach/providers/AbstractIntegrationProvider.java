@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.attach.providers;
 
 import org.netbeans.lib.profiler.common.AttachSettings;
@@ -46,40 +45,34 @@ import org.openide.util.NbBundle;
 import java.text.MessageFormat;
 import org.netbeans.modules.profiler.attach.wizard.steps.WizardStep;
 
-
 /**
  *
  * @author Jaroslav Bachorik
  */
 public abstract class AbstractIntegrationProvider implements WizardIntegrationProvider {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     protected final String EXPORT_SETENV_MSG = NbBundle.getMessage(AbstractIntegrationProvider.class, "ExportSetenvMessage"); // NOI18N
     protected final String REDUCE_OVERHEAD_MSG = NbBundle.getMessage(AbstractIntegrationProvider.class, "ReduceOverheadMessage"); // NOI18N
     protected final String REMOTE_ABSOLUTE_PATH_HINT = MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class,
-                                                                                                "RemoteAbsolutePathHint"), // NOI18N
-                                                                            new Object[] {
-                                                                                "&lt;"
-                                                                                + NbBundle.getMessage(AbstractIntegrationProvider.class,
-                                                                                                      "RemoteString") + "&gt;"
-                                                                            } // NOI18N
-    );
+            "RemoteAbsolutePathHint"), // NOI18N
+            new Object[]{
+                "&lt;" + NbBundle.getMessage(AbstractIntegrationProvider.class,
+                "RemoteString") + "&gt;"
+            } // NOI18N
+            );
     protected final String SPACES_IN_PATH_WARNING_MSG = NbBundle.getMessage(AbstractIntegrationProvider.class,
-                                                                            "SpacesInPathWarningMsg"); // NOI18N
+            "SpacesInPathWarningMsg"); // NOI18N
     protected WizardStep attachedWizard;
-    private final String HTML_REMOTE_STRING = "&lt;" + NbBundle.getMessage(AbstractIntegrationProvider.class, "RemoteString")
-                                              + "&gt;"; // NOI18N
+    private final String HTML_REMOTE_STRING = "&lt;" + NbBundle.getMessage(AbstractIntegrationProvider.class, "RemoteString") + "&gt;"; // NOI18N
     private final String WORK_DIR_MESSAGE = NbBundle.getMessage(AbstractIntegrationProvider.class, "WorkDirMessage"); // NOI18N
     private String targetJava = ""; // NOI18N
     private String targetJavaHomePath = ""; // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public AbstractIntegrationProvider() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public WizardStep getAttachedWizard() {
         return this.attachedWizard;
     }
@@ -158,11 +151,11 @@ public abstract class AbstractIntegrationProvider implements WizardIntegrationPr
 
     protected final String getManualRemoteStep1(final String targetOS) {
         return MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class, "ManualRemoteStep1Message"),
-                                    new Object[] { "JDK 5.0/6.0", targetOS, HTML_REMOTE_STRING }); //NOI18N
+                new Object[]{"JDK 5.0/6.0", targetOS, HTML_REMOTE_STRING}); //NOI18N
     }
 
     protected final String getManualRemoteStep2(final String targetOS) {
         return MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class, "ManualRemoteStep2Message"),
-                                    new Object[] { IntegrationUtils.getRemoteCalibrateCommandString(targetOS) }); // NOI18N
+                new Object[]{IntegrationUtils.getRemoteCalibrateCommandString(targetOS)}); // NOI18N
     }
 }

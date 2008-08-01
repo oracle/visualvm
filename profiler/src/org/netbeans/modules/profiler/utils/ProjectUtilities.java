@@ -60,7 +60,6 @@ import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.spi.project.ActionProvider;
-import org.netbeans.spi.project.AuxiliaryConfiguration;
 import org.netbeans.spi.project.SubprojectProvider;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
@@ -79,9 +78,11 @@ import org.openide.util.NbBundle;
 import org.w3c.dom.Element;
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -304,7 +305,7 @@ public final class ProjectUtilities {
     }
 
     public static boolean isProfilerIntegrated(Project project) {
-        Element e = project.getLookup().lookup(AuxiliaryConfiguration.class)
+        Element e = ProjectUtils.getAuxiliaryConfiguration(project)
                            .getConfigurationFragment("data", ProjectUtilities.PROFILER_NAME_SPACE, false); // NOI18N
 
         return e != null;
@@ -350,40 +351,73 @@ public final class ProjectUtilities {
     }
 
     public static String getProjectBuildScript(final Project project) {
-        final FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
-        RandomAccessFile file = null;
-        byte[] data = null;
+        final FileObject buildFile = findBuildFile(project);
+        if (buildFile == null) {
+            return null;
+        }
 
         try {
-            file = new RandomAccessFile(FileUtil.toFile(buildFile), "r");
-            data = new byte[(int) buildFile.getSize()];
-            file.readFully(data);
-        } catch (FileNotFoundException e2) {
-            ProfilerLogger.log(e2);
+            BufferedReader br = new BufferedReader(new InputStreamReader(buildFile.getInputStream()));
 
-            return null;
-        } catch (IOException e2) {
-            ProfilerLogger.log(e2);
-
-            return null;
-        } finally {
-            if (file != null) {
-                try {
-                    file.close();
-                } catch (IOException e2) {
-                    ProfilerLogger.log(e2);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            do {
+                line = br.readLine();
+                if (line != null) {
+                    sb.append(line);
                 }
+            } while (line != null);
+            return sb.toString();
+        } catch (IOException e) {
+
+        }
+        return null;
+
+//        RandomAccessFile file = null;
+//        byte[] data = null;
+//
+//        try {
+//            file = new RandomAccessFile(FileUtil.toFile(buildFile), "r");
+//            data = new byte[(int) buildFile.getSize()];
+//            file.readFully(data);
+//        } catch (FileNotFoundException e2) {
+//            ProfilerLogger.log(e2);
+//
+//            return null;
+//        } catch (IOException e2) {
+//            ProfilerLogger.log(e2);
+//
+//            return null;
+//        } finally {
+//            if (file != null) {
+//                try {
+//                    file.close();
+//                } catch (IOException e2) {
+//                    ProfilerLogger.log(e2);
+//                }
+//            }
+//        }
+//
+//        try {
+//            return new String(data, "UTF-8" //NOI18N
+//            ); // According to Issue 65557, build.xml uses UTF-8, not default encoding!
+//        } catch (UnsupportedEncodingException ex) {
+//            ErrorManager.getDefault().notify(ErrorManager.ERROR, ex);
+//
+//            return null;
+//        }
+    }
+
+    public static FileObject findBuildFile(final Project project) {
+        FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+        if (buildFile == null) {
+            Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
+            String buildFileName = props.getProperty("buildfile"); // NOI18N
+            if (buildFileName != null) {
+                buildFile = project.getProjectDirectory().getFileObject(buildFileName);
             }
         }
-
-        try {
-            return new String(data, "UTF-8" //NOI18N
-            ); // According to Issue 65557, build.xml uses UTF-8, not default encoding!
-        } catch (UnsupportedEncodingException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, ex);
-
-            return null;
-        }
+        return buildFile;
     }
 
     public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
@@ -604,10 +638,10 @@ public final class ProjectUtilities {
     }
 
     public static boolean backupBuildScript(final Project project) {
-        final FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+        final FileObject buildFile = findBuildFile(project);
         final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
-        if (buildBackupFile != null) {
+        if (buildFile != null && buildBackupFile != null) {
             try {
                 buildBackupFile.delete();
             } catch (IOException e) {
@@ -967,10 +1001,10 @@ public final class ProjectUtilities {
         FileLock buildBackup2FileLock = null;
 
         try {
-            final FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+            final FileObject buildFile = findBuildFile(project); //NOI18N
             final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
-            if ((buildBackupFile != null) && buildBackupFile.isValid()) {
+            if (buildFile != null && (buildBackupFile != null && buildBackupFile.isValid())) {
                 try {
                     buildBackupFileLock = buildBackupFile.lock();
 
@@ -1014,7 +1048,7 @@ public final class ProjectUtilities {
         }
 
         // Remove data element from private/private.xml
-        project.getLookup().lookup(AuxiliaryConfiguration.class).removeConfigurationFragment("data", PROFILER_NAME_SPACE, false); // NOI18N
+        ProjectUtils.getAuxiliaryConfiguration(project).removeConfigurationFragment("data", PROFILER_NAME_SPACE, false); // NOI18N
 
         try {
             ProjectManager.getDefault().saveProject(project);

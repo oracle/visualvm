@@ -541,14 +541,15 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
                         }
                     }
                 }
+                
             });
-        addComponentListener(new ComponentAdapter() {
-                public void componentShown(ComponentEvent e) {
-                    // since the data were not processed when this component was not showing,
-                    // we need to do the updateState when the component becomes visible
-                    dataChanged();
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) dataChanged();
                 }
-            });
+            }
+        });
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(table.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));

@@ -42,8 +42,10 @@ package org.netbeans.modules.profiler.attach.wizard;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.profiler.attach.wizard.steps.WizardStep;
@@ -57,22 +59,24 @@ import org.openide.WizardDescriptor;
 public abstract class AbstractWizard implements WizardDescriptor.Iterator, ChangeListener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Collection listeners = null;
-    private WizardDescriptor wizardDescriptor = null;
+    private Set<ChangeListener> listeners = null;
+    volatile private WizardDescriptor wizardDescriptor = null;
     private WizardStep wizardModel = null;
     private boolean initialized = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public AbstractWizard() {
-        this.listeners = new LinkedList(); // MUST be the first statement in the sequence; WizardDescriptor depends on it
-        this.wizardDescriptor = new WizardDescriptor(this);
+        this.listeners = new HashSet<ChangeListener>(); // MUST be the first statement in the sequence; WizardDescriptor depends on it
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     public WizardDescriptor getWizardDescriptor() {
-        this.init();
-
+        if (wizardDescriptor == null) {
+            wizardDescriptor = new WizardDescriptor(this);
+            this.init();
+        }
+            
         return wizardDescriptor;
     }
 
@@ -103,15 +107,15 @@ public abstract class AbstractWizard implements WizardDescriptor.Iterator, Chang
 
         prepareWizardModel();
 
-        this.wizardDescriptor.setTitle(getTitle());
-        this.wizardDescriptor.setTitleFormat(new MessageFormat(getTitleFormat()));
-        this.wizardDescriptor.putProperty("WizardPanel_autoWizardStyle", Boolean.valueOf(isAutoWizard())); // NOI18N
-                                                                                                           //    this.wizardDescriptor.putProperty("WizardPanel_helpDisplayed", Boolean.valueOf(isHelpDisplayed())); // NOI18N // Needs to be in default state to correctly display Help button
+        getWizardDescriptor().setTitle(getTitle());
+        getWizardDescriptor().setTitleFormat(new MessageFormat(getTitleFormat()));
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, Boolean.valueOf(isAutoWizard())); // NOI18N
+                                                                                                           //    this.wizardDescriptor.putProperty(WizardDescriptor.PROP_HELP_DISPLAYED, Boolean.valueOf(isHelpDisplayed())); // NOI18N // Needs to be in default state to correctly display Help button
 
-        this.wizardDescriptor.putProperty("WizardPanel_contentDisplayed", Boolean.valueOf(isContentDisplayed())); // NOI18N
-        this.wizardDescriptor.putProperty("WizardPanel_contentNumbered", Boolean.valueOf(isNumbered())); // NOI18N
-        this.wizardDescriptor.putProperty("WizardPanel_contentSelectedIndex", new Integer(0)); // NOI18N
-        this.wizardDescriptor.putProperty(WizardContext.CONTEXT_PROPERTY_NAME, getContext());
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.valueOf(isContentDisplayed())); // NOI18N
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, Boolean.valueOf(isNumbered())); // NOI18N
+        getWizardDescriptor().putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0)); // NOI18N
+        getWizardDescriptor().putProperty(WizardContext.CONTEXT_PROPERTY_NAME, getContext());
 
         this.wizardModel.setFirst();
 
@@ -150,8 +154,10 @@ public abstract class AbstractWizard implements WizardDescriptor.Iterator, Chang
         }
     }
 
-    protected final synchronized void invalidate() {
+    public synchronized void invalidate() {
         this.initialized = false;
+        listeners.clear();
+        wizardDescriptor = null;
     }
 
     protected abstract boolean isAutoWizard();
@@ -172,7 +178,7 @@ public abstract class AbstractWizard implements WizardDescriptor.Iterator, Chang
     protected abstract String getTitleFormat();
 
     protected abstract void onUpdateWizardSteps();
-
+    
     private void prepareWizardModel() {
         if (this.wizardModel != null) {
             this.wizardModel.removeChangeListener(this);
@@ -189,8 +195,8 @@ public abstract class AbstractWizard implements WizardDescriptor.Iterator, Chang
         TitleCollectingStepVisitor visitor = new TitleCollectingStepVisitor();
         wizardModel.accept(visitor, getContext(), 0);
 
-        wizardDescriptor.putProperty("WizardPanel_contentData", visitor.getTitleArray()); // NOI18N
-        wizardDescriptor.putProperty("WizardPanel_contentSelectedIndex", new Integer(visitor.getTitleIndex())); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_DATA, visitor.getTitleArray()); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(visitor.getTitleIndex())); // NOI18N
         wizardDescriptor.setTitle(wizardModel.getTitle());
     }
 }
