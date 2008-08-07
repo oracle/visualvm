@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.host.model;
 
 import com.sun.management.OperatingSystemMXBean;
+import com.sun.tools.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -75,7 +76,7 @@ class LocalHostOverview extends HostOverview  {
     try {
       return InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException ex) {
-      return NbBundle.getMessage(LocalHostOverview.class, "LBL_Unknown");   // NOI18N
+      return NbBundle.getMessage(Host.class, "LBL_Unknown");   // NOI18N
     }
   }
   
