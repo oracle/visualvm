@@ -53,11 +53,13 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
             // JVM 1.6
             else if (vmVersion.startsWith("1.6.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
             else if (vmVersion.startsWith("10.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
+            else if (vmVersion.startsWith("11.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
             
             // JVM 1.7
             else if (vmVersion.startsWith("1.7.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("11.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
             else if (vmVersion.startsWith("12.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
+            else if (vmVersion.startsWith("13.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
+            else if (vmVersion.startsWith("14.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N // Sun HotSpot Express
             if (model != null) {
                 return model;
             }
