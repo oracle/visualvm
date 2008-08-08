@@ -48,6 +48,7 @@ import org.openide.util.NbBundle;
 public final class ProfilerSupport {
     private static final boolean FORCE_PROFILING_SUPPORTED = Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");   // NOI18N
     private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";    // NOI18N
+    private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N
     private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
     private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";  // NOI18N
     
@@ -95,9 +96,9 @@ public final class ProfilerSupport {
         String vmName = jvm.getVmName();
         String vmVendor = jvm.getVmVendor();
         
-        // VM has to be a HotSpot VM by Sun Microsystems Inc. or Apple Inc.
-        return vmName != null && vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) && vmVendor != null
-                && (vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX));
+        // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or Apple Inc.
+        return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) && 
+               vmVendor != null && (vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX));
     }
     
     ProfilerSnapshotProvider getSnapshotsProvider() {
