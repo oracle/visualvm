@@ -4,4 +4,4 @@ OpenIDE-Module: com.sun.tools.visualvm.modules.appui
 OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/appui/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/appui/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
-
+OpenIDE-Module-Install: com/sun/tools/visualvm/modules/appui/Install.class
