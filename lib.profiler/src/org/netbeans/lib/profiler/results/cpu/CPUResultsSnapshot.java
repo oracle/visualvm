@@ -94,22 +94,22 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Map threadIdMap;
-    private CPUCCTContainer[] allThreadsMergedCCTContainers; // [method|class|package aggregation level] -> CPUCCTContainer Per-view representation of all threads merged CCT containers
+    protected Map threadIdMap;
+    protected CPUCCTContainer[] allThreadsMergedCCTContainers; // [method|class|package aggregation level] -> CPUCCTContainer Per-view representation of all threads merged CCT containers
 
     // <class name>,<method name>,<method signature> triplets corresponding to methodIds in the profiling results
     // The 0th entry is reserved for a special "Threads" node
     // instrMethodClasses consists of 3 arrays, each per different "view"
-    private String[][] instrMethodClassesViews;
-    private String[] instrMethodNames;
-    private String[] instrMethodSignatures;
-    private PrestimeCPUCCTNode[] rootNode; // Per-view root nodes
-    private CPUCCTContainer[][] threadCCTContainers; // [method|class|package aggregation level][0-nThreads] -> CPUCCTContainer
-    private boolean collectingTwoTimeStamps;
-    private boolean sortNodesOrder;
+    protected String[][] instrMethodClassesViews;
+    protected String[] instrMethodNames;
+    protected String[] instrMethodSignatures;
+    protected PrestimeCPUCCTNode[] rootNode; // Per-view root nodes
+    protected CPUCCTContainer[][] threadCCTContainers; // [method|class|package aggregation level][0-nThreads] -> CPUCCTContainer
+    protected boolean collectingTwoTimeStamps;
+    protected boolean sortNodesOrder;
 
     // Number of instrumented methods - may be smaller than the size of the above arrays
-    private int nInstrMethods;
+    protected int nInstrMethods;
 
     // Remembered sorting parameters for CCT nodes
     private int sortNodesBy;
@@ -365,7 +365,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         return (cId != null) ? cId.intValue() : 0;
     }
 
-    private PrestimeCPUCCTNode createRootNodeForAllThreads(int view) {
+    protected PrestimeCPUCCTNode createRootNodeForAllThreads(int view) {
         CPUCCTContainer[] ccts = threadCCTContainers[view];
         int len = ccts.length;
         PrestimeCPUCCTNode[] threadNodes = new PrestimeCPUCCTNode[len];
