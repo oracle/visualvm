@@ -55,7 +55,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
             Application app = (Application) ds;
             if (Host.LOCALHOST.equals(app.getHost())) {
                 JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
-                File jdkHome = new File(jvmstat.getJavaHome());
+                File jdkHome = getJdkHome(jvmstat);
                 File saJar = getSaJar(jdkHome);
 
                 if (saJar == null) {
@@ -89,14 +89,18 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
         }
         return null;
     }
+
+    private File getJdkHome(final JvmJvmstatModel jvmstat) {
+        File jdkHome = new File(jvmstat.getJavaHome());
+        if ("jre".equals(jdkHome.getName())) {
+           jdkHome = jdkHome.getParentFile(); 
+        }
+        return jdkHome;
+    }
     
     static File getSaJar(File jdkHome) {
         File saJar = new File(jdkHome,SA_JAR);
         try {
-            if (saJar.exists()) {
-                return saJar.getCanonicalFile();
-            }
-            saJar = new File(new File(jdkHome, ".."), SA_JAR);
             if (saJar.exists()) {
                 return saJar.getCanonicalFile();
             }
