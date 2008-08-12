@@ -83,6 +83,8 @@ class ApplicationProfilerView extends DataSourceView {
     private MasterViewSupport masterViewSupport;
     private CPUSettingsSupport cpuSettingsSupport;
     private MemorySettingsSupport memorySettingsSupport;
+    
+    private boolean classSharingBreaksProfiling;
 
     
     public ApplicationProfilerView(Application application) {
@@ -95,7 +97,7 @@ class ApplicationProfilerView extends DataSourceView {
     protected DataViewComponent createComponent() {
         Application application = (Application)getDataSource();
         ProfilingResultsSupport profilingResultsSupport = new ProfilingResultsSupport();
-        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettingsSupport, memorySettingsSupport);
+        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettingsSupport, memorySettingsSupport, classSharingBreaksProfiling);
         
         DataViewComponent dvc = new DataViewComponent(
                 masterViewSupport.getMasterView(),
@@ -113,6 +115,10 @@ class ApplicationProfilerView extends DataSourceView {
         memorySettingsSupport = null;
         
         return dvc;
+    }
+    
+    protected void willBeAdded() {
+        classSharingBreaksProfiling = ProfilerSupport.getInstance().classSharingBreaksProfiling((Application)getDataSource());
     }
     
     protected void removed() {
@@ -136,14 +142,17 @@ class ApplicationProfilerView extends DataSourceView {
 
         private boolean internalChange = false;
         private boolean applicationTerminated = false;
+        
+        private boolean classSharingBreaksProfiling;
     
         
         public MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
-                CPUSettingsSupport cpuSettingsSupport, MemorySettingsSupport memorySettingsSupport) {
+                CPUSettingsSupport cpuSettingsSupport, MemorySettingsSupport memorySettingsSupport, boolean classSharingBreaksProfiling) {
             this.application = application;
             this.profilingResultsView = profilingResultsView;
             this.cpuSettingsSupport = cpuSettingsSupport;
             this.memorySettingsSupport = memorySettingsSupport;
+            this.classSharingBreaksProfiling = classSharingBreaksProfiling;
             
             initComponents();
             initSettings();
@@ -450,10 +459,6 @@ class ApplicationProfilerView extends DataSourceView {
               GridBagConstraints constraints;
 
               // classShareWarningLabel
-              Jvm jvm = JvmFactory.getJVMFor(application);
-              String vmInfo = jvm.getVmInfo();
-              String vmVersion = jvm.getVmVersion();
-              boolean classSharingBreaksProfiling = vmInfo.contains("sharing") && !vmVersion.equals("10.0-b23");    // NOI18N
               classShareWarningArea = new HTMLTextArea() {
                   protected void showURL(URL url) { 
                       try { DesktopUtils.browse(url.toURI()); } catch (Exception e) {}
@@ -465,7 +470,7 @@ class ApplicationProfilerView extends DataSourceView {
               classShareWarningArea.setBorder(BorderFactory.createLineBorder(new java.awt.Color(180, 180, 180)));
               classShareWarningArea.setBorder(BorderFactory.createCompoundBorder(classShareWarningArea.getBorder(),
                       BorderFactory.createMatteBorder(5, 5, 5, 5, classShareWarningArea.getBackground())));
-              classShareWarningArea.setVisible(classSharingBreaksProfiling); // NOI18N
+              classShareWarningArea.setVisible(classSharingBreaksProfiling);
               if (classSharingBreaksProfiling) {
                   String link;
                   if (DesktopUtils.isBrowseAvailable()) {

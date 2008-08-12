@@ -36,6 +36,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
 import java.io.File;
+import java.util.Properties;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
@@ -51,6 +52,9 @@ public final class ProfilerSupport {
     private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N
     private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
     private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";  // NOI18N
+    
+    private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
+    private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -99,6 +103,65 @@ public final class ProfilerSupport {
         // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or Apple Inc.
         return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) && 
                vmVendor != null && (vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX));
+    }
+    
+    boolean classSharingBreaksProfiling(Application application) {
+        Jvm jvm = JvmFactory.getJVMFor(application);
+        Properties properties = jvm.getSystemProperties();
+        if (properties == null) return true;
+        
+        String javaRTVersion = properties.getProperty("java.runtime.version"); // NOI18N
+        if (javaRTVersion == null) return true;
+        
+        int updateNumber = getUpdateNumber(javaRTVersion);
+        int buildNumber = getBuildNumber(javaRTVersion);
+        String vmName = jvm.getVmName();
+        
+        // Sun JDK & derived JDKs ----------------------------------------------
+        if (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX)) {
+            // JDK 6.0 is OK from Update 6 except of Update 10 Build 23 and lower
+            if (javaRTVersion.startsWith(JAVA_RT_16_PREFIX)) {
+                if (updateNumber == 10) {
+                    if (buildNumber >= 24) return false;
+                } else if (updateNumber >= 6) return false;
+            // JDK 7.0 is OK from Build 26
+            } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
+                if (buildNumber >= 26) return false;
+            }
+        // OpenJDK -------------------------------------------------------------
+        } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
+            // OpenJDK 6 is OK from Build 11
+            if (javaRTVersion.startsWith(JAVA_RT_16_PREFIX)) {
+                if (buildNumber >= 11) return false;
+            // OpenJDK 7 is assumed to be OK from Build 26 (not tested)
+            } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
+                if (buildNumber >= 26) return false;
+            }
+        }
+        
+        String vmInfo = jvm.getVmInfo();
+        return vmInfo.contains("sharing"); // NOI18N
+    }
+    
+    private static int getUpdateNumber(String javaRTVersion) {
+        int underscoreIndex = javaRTVersion.indexOf("_"); // NOI18N
+        if (underscoreIndex == -1) return 0; // Assumes no update, may be incorrect for unexpected javaRTVersion format
+        
+        try {
+            String updateNumberString = javaRTVersion.substring(underscoreIndex + "_".length(), javaRTVersion.indexOf("-")); // NOI18N
+            return Integer.parseInt(updateNumberString);
+        } catch (Exception e) {}
+        
+        return -1;
+    }
+    
+    private static int getBuildNumber(String javaRTVersion) {
+        try {
+            String buildNumberString = javaRTVersion.substring(javaRTVersion.indexOf("-b") + "-b".length()); // NOI18N
+            return Integer.parseInt(buildNumberString);
+        } catch (Exception e) {}
+        
+        return -1;
     }
     
     ProfilerSnapshotProvider getSnapshotsProvider() {
