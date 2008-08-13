@@ -374,6 +374,7 @@ made subject to such option by the copyright holder.
             <friend-packages>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.wtk.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
