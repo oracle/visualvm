@@ -31,7 +31,9 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -54,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Exceptions;
 
@@ -76,15 +79,42 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   
   DataSourceWindowTabbedPane() {
     addChangeListener( new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-        reset();
-      }
+        public void stateChanged(ChangeEvent e) {
+            reset();
+        }
     });
     CloseButtonListener.install();
-    
-    setFocusable(true);
-    setBorder(javax.swing.BorderFactory.createEmptyBorder());
-    setFocusCycleRoot(false);
+    //Bugfix #28263: Disable focus.
+    setFocusable(false);
+    setFocusCycleRoot(true);
+    setFocusTraversalPolicy(new CBTPPolicy());
+  }
+  
+  private Component sel() {
+      Component c = getSelectedComponent();
+      return c == null ? this : c;
+  }
+
+  private class CBTPPolicy extends FocusTraversalPolicy {
+      public Component getComponentAfter(Container aContainer, Component aComponent) {
+          return sel();
+      }
+
+      public Component getComponentBefore(Container aContainer, Component aComponent) {
+          return sel();
+      }
+
+      public Component getFirstComponent(Container aContainer) {
+          return sel();
+      }
+
+      public Component getLastComponent(Container aContainer) {
+          return sel();
+      }
+
+      public Component getDefaultComponent(Container aContainer) {
+          return sel();
+      }
   }
   
   
@@ -182,7 +212,10 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       if (b.x + b.width >= tabsz.width
         || b.y + b.height >= tabsz.height)
         return null;
-      
+      // bugfix #110654
+      if (b.width == 0 || b.height == 0) {
+        return null;
+      }
       if( (isWindowsVistaLaF() || isWindowsXPLaF() || isWindowsLaF()) && i == getSelectedIndex() ) {
         b.x -= 3;
         b.y -= 2;
@@ -195,7 +228,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
         else if( isAquaLaF() )
           b.x -= 3;
       }
-      return new Rectangle(b.x + b.width - 13,
+      return new Rectangle(b.x + b.width - (UIUtils.isGTKLookAndFeel() ? 14 : 13),
         b.y + b.height / 2 - 5,
         12,
         12);
@@ -310,7 +343,9 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     if (pressedCloseButtonIndex >= 0
       && pressedCloseButtonIndex < getTabCount()) {
       Rectangle r = getCloseButtonBoundsAt(pressedCloseButtonIndex);
-      repaint(r.x, r.y, r.width + 2, r.height + 2);
+      if (r != null) {
+        repaint(r.x, r.y, r.width + 2, r.height + 2);
+      }
       
       JComponent c = _getJComponentAt(pressedCloseButtonIndex);
       if( c != null )
@@ -322,7 +357,9 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     if (pressedCloseButtonIndex >= 0
       && pressedCloseButtonIndex < getTabCount()) {
       Rectangle r = getCloseButtonBoundsAt(pressedCloseButtonIndex);
-      repaint(r.x, r.y, r.width + 2, r.height + 2);
+      if (r != null) {
+        repaint(r.x, r.y, r.width + 2, r.height + 2);
+      }
       setMouseOverCloseButtonIndex(-1);
       setToolTipTextAt(pressedCloseButtonIndex, null);
     }
@@ -335,7 +372,9 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     if (mouseOverCloseButtonIndex >= 0
       && mouseOverCloseButtonIndex < getTabCount()) {
       Rectangle r = getCloseButtonBoundsAt(mouseOverCloseButtonIndex);
-      repaint(r.x, r.y, r.width + 2, r.height + 2);
+      if (r != null) {
+        repaint(r.x, r.y, r.width + 2, r.height + 2);
+      }
       JComponent c = _getJComponentAt(mouseOverCloseButtonIndex);
       if( c != null )
         setToolTipTextAt(mouseOverCloseButtonIndex, c.getToolTipText());
@@ -346,7 +385,9 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     if (mouseOverCloseButtonIndex >= 0
       && mouseOverCloseButtonIndex < getTabCount()) {
       Rectangle r = getCloseButtonBoundsAt(mouseOverCloseButtonIndex);
-      repaint(r.x, r.y, r.width + 2, r.height + 2);
+      if (r != null) {
+        repaint(r.x, r.y, r.width + 2, r.height + 2);
+      }
       setPressedCloseButtonIndex(-1);
       setToolTipTextAt(mouseOverCloseButtonIndex, null);
     }
@@ -397,6 +438,17 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     }
   }
   
+  protected void fireStateChanged() {
+        try {
+            super.fireStateChanged();
+        } catch( ArrayIndexOutOfBoundsException e ) {
+            if( Utilities.isMac() ) {
+                //#126651 - JTabbedPane is buggy on Mac OS
+            } else {
+                throw e;
+            }
+        }
+    }
   
   private static class CloseButtonListener implements AWTEventListener {
     private static boolean installed = false;
@@ -415,9 +467,10 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     
     public void eventDispatched(AWTEvent ev) {
       MouseEvent e = (MouseEvent) ev;
-      
-      // Fix for TrayIcon
-      if (!(e.getSource() instanceof Component)) return;
+      //#118828
+      if (! (ev.getSource() instanceof Component)) {
+        return;
+      }
       
       Component c = (Component) e.getSource();
       while (c != null && !(c instanceof DataSourceWindowTabbedPane))
