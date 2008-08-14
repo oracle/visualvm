@@ -123,10 +123,15 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private boolean draggedOut = false;
   
   public void addViewTab(DataSource dataSource, DataSourceView view) {
-    ViewContainer container = new ViewContainer(new DataSourceCaption(dataSource), view);
-    super.add(container);
-    setTitleAt(getComponentCount() - 1, view.getName() + (view.isClosable() ? "  " : ""));  // NOI18N
-    super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()));
+      ViewContainer container = new ViewContainer(new DataSourceCaption(dataSource), view);
+      super.add(container);
+      boolean notGTK = !UIUtils.isGTKLookAndFeel();
+      setTitleAt(getComponentCount() - 1, view.getName() + ((view.isClosable() && notGTK) ? "  " : ""));  // NOI18N
+      ImageIcon tabIcon = notGTK ? new ImageIcon(view.getImage()) :
+          new ImageIcon(view.getImage()) {
+              public int getIconWidth() { return super.getIconWidth() + 12; }
+          };
+      super.setIconAt(getComponentCount() - 1, tabIcon);
   }
   
   public void removeTabAt(int index) {
