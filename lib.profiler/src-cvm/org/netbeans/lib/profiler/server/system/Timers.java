@@ -38,61 +38,50 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.attach.providers;
-
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+package org.netbeans.lib.profiler.server.system;
 
 /**
+ * Provides methods for obtaining various high-resolution system times.
+ * A version for CVM 
  *
- * @author Jaroslav Bachorik
+ * @author  Misha Dmitriev
  */
-public class TargetPlatformEnum {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public class Timers {
+  
+  /** Should be called at earliest possible time */
+  public static void initialize() {
+    getThreadCPUTimeInNanos();
+  }
 
-    private static final String[] jvmNames = new String[] {
-                                                 IntegrationUtils.PLATFORM_JAVA_50, IntegrationUtils.PLATFORM_JAVA_60,
-                                                 IntegrationUtils.PLATFORM_JAVA_70, IntegrationUtils.PLATFORM_JAVA_CVM
-                                             };
-    public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
-    public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
-    public static final TargetPlatformEnum JDK7 = new TargetPlatformEnum(2);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(3);
+  
+  /** 
+   * "counts" instead of nanoseconds in this method are for compatibility with the previous
+   * versions of JFluid, that call a native method for system timer, which, in turn, returns
+   * the result in sub-microsecond "counts" on Windows.
+   */
+  public static native long getCurrentTimeInCounts();
+  
+  public static long getNoOfCountsInSecond() {
+    return 1000000000;
+  }
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+  
+  public static native long getThreadCPUTimeInNanos();
 
-    private int jvmIndex = 0;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    private TargetPlatformEnum(int index) {
-        this.jvmIndex = index;
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean equals(Object obj) {
-        if ((obj == null) || !(obj instanceof TargetPlatformEnum)) {
-            return false;
-        }
-
-        return ((TargetPlatformEnum) obj).jvmIndex == this.jvmIndex;
-    }
-
-    public static Iterator iterator() {
-        List jvmList = new ArrayList(4);
-        jvmList.add(JDK5);
-        jvmList.add(JDK6);
-        jvmList.add(JDK7);
-        jvmList.add(JDK_CVM);
-
-        return jvmList.listIterator();
-    }
-
-    public String toString() {
-        return jvmNames[this.jvmIndex];
-    }
+  /** 
+   * WORKS ONLY ON UNIX, calls nanosleep(). On Solaris, this is more precise than the built-in Thread.sleep() call
+   * implementation that, at least in JDK 1.4.2, goes to select(3C). On Linux, it should be more precise, but it
+   * turns out that nanosleep() in this OS, at least in version 7.3 that I tested, has a resolution of at least 20ms.
+   * This seems to be a known issue; hopefully they fix it in future.
+   */
+  public static native void osSleep(int ns);
+ 
+  
+  /** 
+   * This is relevant only on Solaris. By default, the resolution of the thread local CPU timer is 10 ms. If we enable
+   * micro state accounting, it enables significantly (but possibly at a price of some overhead). So I turn it on only
+   * when thread CPU timestamps are really collected.
+   */
+  public static native void enableMicrostateAccounting(boolean v);
 }

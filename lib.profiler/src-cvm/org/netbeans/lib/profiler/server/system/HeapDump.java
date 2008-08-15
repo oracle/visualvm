@@ -38,61 +38,30 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.attach.providers;
-
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+package org.netbeans.lib.profiler.server.system;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
-public class TargetPlatformEnum {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final String[] jvmNames = new String[] {
-                                                 IntegrationUtils.PLATFORM_JAVA_50, IntegrationUtils.PLATFORM_JAVA_60,
-                                                 IntegrationUtils.PLATFORM_JAVA_70, IntegrationUtils.PLATFORM_JAVA_CVM
-                                             };
-    public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
-    public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
-    public static final TargetPlatformEnum JDK7 = new TargetPlatformEnum(2);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(3);
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private int jvmIndex = 0;
+public class HeapDump {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    private TargetPlatformEnum(int index) {
-        this.jvmIndex = index;
+    private HeapDump() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public boolean equals(Object obj) {
-        if ((obj == null) || !(obj instanceof TargetPlatformEnum)) {
-            return false;
-        }
-
-        return ((TargetPlatformEnum) obj).jvmIndex == this.jvmIndex;
+    public static void initialize(boolean jdk15) {
     }
 
-    public static Iterator iterator() {
-        List jvmList = new ArrayList(4);
-        jvmList.add(JDK5);
-        jvmList.add(JDK6);
-        jvmList.add(JDK7);
-        jvmList.add(JDK_CVM);
-
-        return jvmList.listIterator();
+    public static String takeHeapDump(boolean jdk15, String outputFile) {
+        return takeHeapDumpCVM(outputFile);
     }
 
-    public String toString() {
-        return jvmNames[this.jvmIndex];
+
+    private static String takeHeapDumpCVM(String outputFile) {
+        return "Take heap dump is not available."; // NOI18N
     }
 }
