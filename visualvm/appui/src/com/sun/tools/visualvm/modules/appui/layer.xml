@@ -161,13 +161,13 @@
     </folder>
     <folder name="Windows2">
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
-        <!--folder name="Modes">
+        <folder name="Modes">
             <folder name="editor">
                 <file name="VisualVMWelcome.wstcref" url="welcome/resources/VisualVMWelcome.wstcref"/>
             </folder>
         </folder>
         <folder name="Components">
             <file name="VisualVMWelcome.settings" url="welcome/resources/VisualVMWelcome.settings"/>
-        </folder-->
+        </folder>
     </folder>
 </filesystem>
