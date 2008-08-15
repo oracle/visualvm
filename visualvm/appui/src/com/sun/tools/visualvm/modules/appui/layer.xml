@@ -97,9 +97,9 @@
             <file name="Separator1.instance_hidden"/>
             <file name="master-help.xml_hidden"/>
             <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
-            <!--file name="com-sun-tools-visualvm-modules-appui-welcome-ShowWelcomeAction.instance">
+            <file name="com-sun-tools-visualvm-modules-appui-welcome-ShowWelcomeAction.instance">
                 <attr name="position" intvalue="1100"/>
-            </file-->
+            </file>
             <file name="com-sun-tools-visualvm-modules-appui-AboutAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Help/com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
                 <attr name="position" intvalue="1200"/>
