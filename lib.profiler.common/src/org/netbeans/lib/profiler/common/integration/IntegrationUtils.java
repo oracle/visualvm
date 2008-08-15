@@ -403,13 +403,14 @@ public class IntegrationUtils {
         if ((getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).indexOf(' ') == -1)) {
             return getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber); //NOI18N
         }
-        if (!isWindowsPlatform(targetPlatform)) { // Profiler is installed in directory with space on Unix (Linux, Solaris, Mac OS X)
+        if (!isWindowsPlatform(targetPlatform)) { 
+            // Profiler is installed in directory with space on Unix (Linux, Solaris, Mac OS X)
             // create temporary link in /tmp directory and use it instead of directory with space
+            String libsDirPath = getLibsDir(targetPlatform, isRemote);
+            String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
             try {  
                 File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
                 String tmpPath = tmpFile.getAbsolutePath();
-                String libsDirPath = getLibsDir(targetPlatform, isRemote);
-                String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
                 tmpFile.delete();
                 Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
                 new File(tmpPath).deleteOnExit();
@@ -488,21 +489,6 @@ public class IntegrationUtils {
 
     public static String getSpacesInPathWarning() {
         return SPACES_IN_PATH_WARNING_MSG;
-    }
-
-    // Returns friendly name of the integration target type
-    public static String getTargetTypeName(String targetType, boolean startsUpperCase) {
-        if (targetType.equals(IntegrationProvider2.TARGET_TYPE_APPLICATION)) {
-            return (startsUpperCase ? APPLICATION_STRING : APPLICATION_STRING.toLowerCase());
-        } else if (targetType.equals(IntegrationProvider2.TARGET_TYPE_APPLET)) {
-            return (startsUpperCase ? APPLET_STRING : APPLET_STRING.toLowerCase());
-        } else if (targetType.equals(IntegrationProvider2.TARGET_TYPE_J2EEAPPLICATION)) {
-            return (startsUpperCase ? SERVER_STRING : SERVER_STRING.toLowerCase());
-        } else if (targetType.equals(IntegrationProvider2.TARGET_TYPE_DATABASE)) {
-            return (startsUpperCase ? DATABASE_STRING : DATABASE_STRING.toLowerCase());
-        }
-
-        return (startsUpperCase ? TARGET_STRING : TARGET_STRING.toLowerCase());
     }
 
     public static boolean isWindowsPlatform(String targetPlatform) {
