@@ -67,7 +67,7 @@ public final class AboutAction extends AbstractAction {
     private AboutDialog getAboutDialog() {
         if (aboutDialog == null) {
             try {
-                URL imageURL = getClass().getResource("/com/sun/tools/visualvm/modules/appui/about/image.gif"); // NOI18N
+                URL imageURL = getClass().getResource("/com/sun/tools/visualvm/modules/appui/about/image.png"); // NOI18N
                 Image splashImage = Toolkit.getDefaultToolkit().createImage(imageURL);
                 aboutDialog = AboutDialog.createInstance(WindowManager.getDefault().getMainWindow(), splashImage);
                 aboutDialog.setCaption(NbBundle.getMessage(AboutAction.class, "LBL_About_VisualVM"));   // NOI18N
