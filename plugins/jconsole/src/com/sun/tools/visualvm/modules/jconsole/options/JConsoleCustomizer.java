@@ -82,7 +82,7 @@ public class JConsoleCustomizer extends JPanel {
         }
 
         public String getDescription() {
-            return "JConsole " + type + " path (jar or dir)"; // NOI18N
+            return "JConsole " + type + " path (.jar or directory)"; // NOI18N
         }
     }
 
