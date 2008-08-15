@@ -225,7 +225,7 @@ public class Platform implements CommonConstants {
                 } else if (isSolarisSparc()) {
                     procArch = "sparcv9"; // NOI18N
                 } else if (isHpux()) {
-                    procArch = System.getProperty("os.arch").toLowerCase(); // NOI18N
+                    procArch = "pa_risc2.0w"; // NOI18N
                 }
             } else { // 32bit
 
@@ -234,7 +234,7 @@ public class Platform implements CommonConstants {
                 } else if (isSolarisSparc()) {
                     procArch = "sparc"; // NOI18N
                 } else if (isHpux()) {
-                    procArch = System.getProperty("os.arch").toLowerCase(); // NOI18N
+                    procArch = "pa_risc2.0"; // NOI18N
                 }
             }
 
