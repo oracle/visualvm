@@ -107,4 +107,15 @@ made subject to such option by the copyright holder.
         <!--CSH ID for select profiling task target dialog when profiling a freeform project -->
         <mapID target="FreeFormProjectTypeProfiler.AntTaskSelectPanel.HelpCtx" url="helppages/profile_freeform.html"/>
         
+        <!--CSH ID for set profiling points dialog -->
+        <mapID target="PPointsWizardPanel1UI.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="ResetResultsCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="StopwatchCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="TakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
+        <mapID target="TimedTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
+        <mapID target="TriggeredTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
+        <mapID target="StopwatchCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="LoadGeneratorCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        
+        
     </map>
