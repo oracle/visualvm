@@ -4,7 +4,8 @@
 *     Use is subject to license terms.
 -->
 <html>
-    <head>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <title>Taking a Snapshot</title>
         <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
     </head>
@@ -53,16 +54,26 @@
         <p>When you take a snapshot, the snapshot opens in the main editor window.
         You can then save the snapshot to your project.</p>
         
-
+        <a name="pp"></a>
         <p><b>To take a snapshot using a profiling point</b></p>
         <ol>
-            <li>Open the source file containing the method where you want to place the profiling point.</li>
-            <li>Right-click in the line of code containing the method and choose Insert Profiling Point.</li>
-            <li>Select Snapshot in the Profiling Point wizard and click Next.</li>
-            <li>Modify any of the profiling point properties and click Finish.</li>
+            <li>Open the source file containing the code where you want to place the profiling point.</li>
+            <li>Right-click in the line of code and choose Insert Profiling Point.</li>
+            <li>Select one of the snapshot options in the New Profiling Point wizard and click Next.</li>
+            <li>Modify any of the profiling point properties in the Customize Properties page of the wizard. 
+            Click Finish.</li>
         </ol>
-        <p>When you run the profiling session, the IDE takes a snapshot every time a thread enters the line 
-        of code containing the profiling point.</p>
+        <p>If you use a profiling point to take a snapshot, you can choose from the following snapshot options:</p>
+        <ul>
+            <li><b>Take Snapshot.</b> Choose this if you want the IDE to take a snapshot when an application thread
+            enters or leaves the specified line of code.</li>
+            <li><b>Timed Take Snapshot.</b> Choose this if you want the IDE to take a snapshot at a specific time and date.
+            You can also configure the IDE to take snapshots at a specified interval.</li>
+            <li><b>Triggered Take Snapshot.</b> Choose this if you want the IDE to take a snapshot when the specified
+            condition is met. You specify the conditon by choosing one of the available triggers. </li>
+        </ul>
+        <p>For each snapshot option you can choose to save the snapshot to your project or you can specify a location.
+        </p>
         
         <h3>Saving Snapshots</h3>
         <p>You can save a snapshot to your project or you can save the snapshot to a location on your local file system.
