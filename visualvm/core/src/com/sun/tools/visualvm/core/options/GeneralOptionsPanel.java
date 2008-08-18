@@ -83,13 +83,19 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel1.setLabelFor(mhRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Host")); // NOI18N
 
+        mhRefresh.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(3), Integer.valueOf(1), null, Integer.valueOf(1)));
+
         jLabel2.setDisplayedMnemonic('t');
         jLabel2.setLabelFor(thrdRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Threads")); // NOI18N
 
+        thrdRefresh.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+
         jLabel3.setDisplayedMnemonic('m');
         jLabel3.setLabelFor(dataRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Data")); // NOI18N
+
+        dataRefresh.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Polling")); // NOI18N
 
@@ -105,9 +111,13 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel10.setLabelFor(mhRefresh1);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel10, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Host2")); // NOI18N
 
+        mhRefresh1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(60), Integer.valueOf(1), null, Integer.valueOf(1)));
+
         org.openide.awt.Mnemonics.setLocalizedText(jLabel11, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_min")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel12, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_min")); // NOI18N
+
+        dataRefresh1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(60), Integer.valueOf(1), null, Integer.valueOf(1)));
 
         jLabel13.setDisplayedMnemonic('m');
         jLabel13.setLabelFor(dataRefresh1);
@@ -182,7 +192,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                         .addContainerGap())
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(jLabel14)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 27, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 29, Short.MAX_VALUE)
                         .add(jButton1)
                         .addContainerGap())))
         );
