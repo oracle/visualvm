@@ -32,12 +32,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
+import org.openide.windows.WindowManager;
 
 /**
  * Class for accessing the explorer tree.
@@ -91,7 +91,7 @@ public final class ExplorerSupport {
     
     public void selectDataSources(final Set<DataSource> dataSources) {
         if (dataSources.isEmpty()) return;
-        SwingUtilities.invokeLater(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 List<TreePath> selectedPaths = new ArrayList();
                 for (DataSource dataSource : dataSources) {
@@ -107,12 +107,14 @@ public final class ExplorerSupport {
      * Clears selection of explorer tree.
      */
     public void clearSelection() {
-        SwingUtilities.invokeLater(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() { mainTree.clearSelection(); } 
         });
     }
     
     public Set<DataSource> getSelectedDataSources() {
+        if (mainTree == null) return Collections.EMPTY_SET;
+        
         TreePath[] selectedPaths = mainTree.getSelectionPaths();
         if (selectedPaths == null) return Collections.EMPTY_SET;
         
@@ -152,7 +154,7 @@ public final class ExplorerSupport {
     
     void expandNode(final ExplorerNode node) {
         if (node == null) return;
-        SwingUtilities.invokeLater(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() { 
                 TreePath path = getPath(node);
                 // For some reason expanding the path doesn't always work for a single invocation,
@@ -174,7 +176,7 @@ public final class ExplorerSupport {
     
     void collapseNode(final ExplorerNode node) {
         if (node == null) return;
-        SwingUtilities.invokeLater(new Runnable() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() { mainTree.collapsePath(getPath(node)); } 
         });
     }
@@ -204,9 +206,13 @@ public final class ExplorerSupport {
             
     
     private ExplorerSupport() {
-        mainTree = ExplorerComponent.instance().getTree();
-        mainTree.addTreeSelectionListener(new ExplorerTreeSelectionListener());
-        mainTree.addTreeExpansionListener(new ExplorerTreeExpansionListener());
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            public void run() {
+                mainTree = ExplorerComponent.instance().getTree();
+                mainTree.addTreeSelectionListener(new ExplorerTreeSelectionListener());
+                mainTree.addTreeExpansionListener(new ExplorerTreeExpansionListener());
+            }
+        });
     }
     
     
