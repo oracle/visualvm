@@ -415,21 +415,25 @@ public class IntegrationUtils {
             // create temporary link in /tmp directory and use it instead of directory with space
             String libsDirPath = getLibsDir(targetPlatform, isRemote);
             String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
-            try {  
-                File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
-                String tmpPath = tmpFile.getAbsolutePath();
-                tmpFile.delete();
-                Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
-                new File(tmpPath).deleteOnExit();
-                return args.replace(libsDirPath,tmpPath);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            return fixLibsDirPath(libsDirPath, args);
         }
 
         return "-agentpath:" + "\"" + getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
                + getDirectorySeparator(targetPlatform) + getProfilerAgentLibraryFile(targetPlatform) + "=" //NOI18N
                + "\\\"" + getLibsDir(targetPlatform, isRemote) + "\\\"\"" + "," + portNumber; //NOI18N
+    }
+
+    public static String fixLibsDirPath(final String libsDirPath, final String args) {
+        try {  
+            File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
+            String tmpPath = tmpFile.getAbsolutePath();
+            tmpFile.delete();
+            Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
+            new File(tmpPath).deleteOnExit();
+            return args.replace(libsDirPath,tmpPath);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     // Returns extra command line arguments without additional quotes required when attaching on startup
