@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.systray;
 
 import java.awt.CheckboxMenuItem;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -35,6 +36,7 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -45,7 +47,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.openide.DialogDisplayer;
 import org.openide.LifecycleManager;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
@@ -153,7 +157,7 @@ class SysTray {
             public void mouseClicked(final MouseEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (e.getClickCount() == 2)
+                        if (trayPopup.isEnabled() && e.getClickCount() == 2)
                             toggleWindowVisibility();
                     }
                 });
@@ -268,10 +272,22 @@ class SysTray {
     }
     
     private void toggleWindowVisibility() {
-        if (mainWindow.isVisible()) hideWindow(); else showWindow();
+        if (mainWindow.isVisible()) hideWindow(); // May not hide window when modal dialog(s) in the way
+        else showWindow();
     }
     
     private void hideWindow() {
+        Window[] windows = mainWindow.getOwnedWindows();
+        for (Window window : windows) {
+            if (window.isVisible() && window instanceof Dialog)
+                if (((Dialog)window).isModal()) {
+                    trayPopup.setEnabled(false);
+                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("<html><b>Modal dialog in the way.</b><br><br>Please close all modal dialogs before hiding VisualVM.</html>", NotifyDescriptor.WARNING_MESSAGE));
+                    trayPopup.setEnabled(true);
+                    return;
+                }
+        }
+        
         mainWindow.setVisible(false);
         if (showHideItem != null) showHideItem.setLabel("Show");
     }
@@ -291,7 +307,7 @@ class SysTray {
     private void toggleHideWhenMinimized() {
         hideWhenMinimized = hideMinimizedItem.getState();
         if (hideWhenMinimized && (mainWindow.getExtendedState() & Frame.ICONIFIED) != 0)
-            hideWindow();
+            hideWindow(); // May not hide window when modal dialog(s) in the way
         SysTrayPreferences.getInstance().setHideWhenMinimized(hideWhenMinimized);
     }
     
@@ -316,8 +332,8 @@ class SysTray {
         public void windowStateChanged(WindowEvent e) {
             int windowState = e.getNewState();
             if ((windowState & Frame.ICONIFIED) != 0) {
-                if (hideWhenMinimized || hideTrayIcon) hideWindow();
-                if (hideTrayIcon && trayIcon == null) showTrayIcon();
+                if (hideWhenMinimized || hideTrayIcon) hideWindow(); // May not hide window when modal dialog(s) in the way
+                if (!mainWindow.isVisible() && hideTrayIcon && trayIcon == null) showTrayIcon();
             } else {
                 lastWindowState = windowState;
                 if (hideTrayIcon && trayIcon != null) hideTrayIcon();
