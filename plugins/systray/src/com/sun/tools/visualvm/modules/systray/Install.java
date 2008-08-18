@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.systray;
 
 import org.openide.modules.ModuleInstall;
+import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 /**
@@ -36,6 +37,9 @@ import org.openide.windows.WindowManager;
 public class Install extends ModuleInstall {
 
     public void restored() {
+        // SysTray isn't supported for Mac
+        if (Utilities.isMac()) return;
+        
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 SysTray.getInstance().initialize();
@@ -44,6 +48,9 @@ public class Install extends ModuleInstall {
     }
     
     public void uninstalled() {
+        // SysTray isn't supported for Mac
+        if (Utilities.isMac()) return;
+        
         SysTray.getInstance().uninitialize();
     }
     
