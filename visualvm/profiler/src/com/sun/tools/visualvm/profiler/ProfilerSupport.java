@@ -58,6 +58,8 @@ public final class ProfilerSupport {
     
     private static ProfilerSupport instance;
     
+    private boolean isInitialized;
+    
     private Application profiledApplication;
     private ProfilerSnapshotCategory category;
     private ApplicationProfilerViewProvider profilerViewProvider;
@@ -74,6 +76,10 @@ public final class ProfilerSupport {
         return category;
     }
     
+    
+    boolean isInitialized() {
+        return isInitialized;
+    }
     
     boolean supportsProfiling(Application application) {
         // Remote profiling is not supported
@@ -247,29 +253,39 @@ public final class ProfilerSupport {
         NetBeansProfiler.getDefaultNB().displayInfoAndWait(NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
 
         // Perform calibration
-        boolean result = NetBeansProfiler.getDefaultNB().runConfiguredCalibration();
+        boolean result = false;
+        try {
+            result = NetBeansProfiler.getDefaultNB().runConfiguredCalibration();
+        } catch (Exception e) {
+            System.err.println("Failed to calibrate profiler:"); // NOI18N
+            e.printStackTrace();
+        }
 
         return result;
     }
     
     
     private ProfilerSupport() {
-        DataSourceDescriptorFactory.getDefault().registerProvider(new ProfilerSnapshotDescriptorProvider());
-        profilerViewProvider = new ApplicationProfilerViewProvider();
-        profilerViewProvider.initialize();
+        isInitialized = NetBeansProfiler.isInitialized() && checkCalibration();
         
-        new ProfilerSnapshotViewProvider().initialize();
+        if (isInitialized) {
         
-        category = new ProfilerSnapshotCategory();
-        RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
+            DataSourceDescriptorFactory.getDefault().registerProvider(new ProfilerSnapshotDescriptorProvider());
+            profilerViewProvider = new ApplicationProfilerViewProvider();
+            profilerViewProvider.initialize();
+
+            new ProfilerSnapshotViewProvider().initialize();
+
+            category = new ProfilerSnapshotCategory();
+            RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
+
+            profilerSnapshotsProvider = new ProfilerSnapshotProvider();
+            profilerSnapshotsProvider.initialize();
+
+            ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
+            ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
         
-        profilerSnapshotsProvider = new ProfilerSnapshotProvider();
-        profilerSnapshotsProvider.initialize();
-        
-        checkCalibration();
-        
-        ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
-        ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
+        }
     }
 
 }

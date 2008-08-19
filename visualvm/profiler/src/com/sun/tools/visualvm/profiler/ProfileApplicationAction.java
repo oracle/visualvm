@@ -78,6 +78,14 @@ class ProfileApplicationAction extends SingleDataSourceAction<Application> {
         super.updateState(applications);
     }
     
+    protected void initialize() {
+        if (ProfilerSupport.getInstance().isInitialized()) {
+            super.initialize();
+        } else {
+            setEnabled(false);
+        }
+    }
+    
     
     private ProfileApplicationAction() {
         super(Application.class);

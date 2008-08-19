@@ -72,42 +72,46 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     
     protected boolean isEnabled(Application application) {
         return ProfilerSupport.getInstance().getProfiledApplication() == application && originalAction.isEnabled();
-            }
+    }
     
     protected void initialize() {
-        super.initialize();
-    
-        originalAction.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (SystemAction.PROP_ENABLED.equals(evt.getPropertyName()))
-                    ProfilerSnapshotAction.this.updateState(ActionUtils.getSelectedDataSources(Application.class));
-            }
-        });
-        
-        ResultsManager.getDefault().addSnapshotsListener(new SnapshotsListener() {
-            public void snapshotLoaded(LoadedSnapshot snapshot) {}
-            public void snapshotRemoved(LoadedSnapshot snapshot) {}
-            public void snapshotTaken(LoadedSnapshot snapshot) {}
-            
-            public void snapshotSaved(LoadedSnapshot snapshot) {
-                try {
-                    Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
-                    File snapshotFile = snapshot.getFile();
-                    if (profiledApplication != null && snapshotFile.getCanonicalPath().contains(NB_PROFILER_SNAPSHOTS_STORAGE)) {
-                        File newSnapshotFile = Utils.getUniqueFile(profiledApplication.getStorage().getDirectory(), snapshotFile.getName());
-                        if (!snapshotFile.renameTo(newSnapshotFile)) {
-                            Utils.copyFile(snapshotFile, newSnapshotFile);
-                            snapshotFile.deleteOnExit();
-                        }
-                        snapshot.setFile(newSnapshotFile);
-                        ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
-                        openNextSnapshot = true;
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e);
+        if (ProfilerSupport.getInstance().isInitialized()) {
+            super.initialize();
+
+            originalAction.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (SystemAction.PROP_ENABLED.equals(evt.getPropertyName()))
+                        ProfilerSnapshotAction.this.updateState(ActionUtils.getSelectedDataSources(Application.class));
                 }
-            }
-        });
+            });
+
+            ResultsManager.getDefault().addSnapshotsListener(new SnapshotsListener() {
+                public void snapshotLoaded(LoadedSnapshot snapshot) {}
+                public void snapshotRemoved(LoadedSnapshot snapshot) {}
+                public void snapshotTaken(LoadedSnapshot snapshot) {}
+
+                public void snapshotSaved(LoadedSnapshot snapshot) {
+                    try {
+                        Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
+                        File snapshotFile = snapshot.getFile();
+                        if (profiledApplication != null && snapshotFile.getCanonicalPath().contains(NB_PROFILER_SNAPSHOTS_STORAGE)) {
+                            File newSnapshotFile = Utils.getUniqueFile(profiledApplication.getStorage().getDirectory(), snapshotFile.getName());
+                            if (!snapshotFile.renameTo(newSnapshotFile)) {
+                                Utils.copyFile(snapshotFile, newSnapshotFile);
+                                snapshotFile.deleteOnExit();
+                            }
+                            snapshot.setFile(newSnapshotFile);
+                            ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
+                            openNextSnapshot = true;
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e);
+                    }
+                }
+            });
+        } else {
+            setEnabled(false);
+        }
     }
     
     
