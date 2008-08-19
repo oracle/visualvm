@@ -73,6 +73,13 @@ public class DrillDownFactory implements CCTResultsFilter.EvaluatorProvider {
     final private Set<WeakEvaluator> drillDownEvaluators = Collections.synchronizedSet(new HashSet<WeakEvaluator>());
     
     public DrillDown createDrillDown(Project project, ProfilerClient client) {
+        /*
+         * #143850 - drilldown fails when profiling a global attach
+         */
+        if (project == null) {
+            return null;
+        }
+        
         Categorization cat = project.getLookup().lookup(Categorization.class);
 
         if (cat != null) {

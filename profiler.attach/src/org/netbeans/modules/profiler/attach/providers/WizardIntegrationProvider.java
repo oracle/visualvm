@@ -134,7 +134,7 @@ public interface WizardIntegrationProvider extends IntegrationProvider {
             return false;
         }
 
-        public boolean supportsJVM(TargetPlatformEnum jvm) {
+        public boolean supportsJVM(TargetPlatformEnum jvm, AttachSettings attachSettings) {
             return false;
         }
 
@@ -163,7 +163,7 @@ public interface WizardIntegrationProvider extends IntegrationProvider {
 
     public boolean supportsDynamicPid();
 
-    public boolean supportsJVM(TargetPlatformEnum jvm);
+    public boolean supportsJVM(TargetPlatformEnum jvm, AttachSettings attachSettings);
 
     // </editor-fold>
 }
