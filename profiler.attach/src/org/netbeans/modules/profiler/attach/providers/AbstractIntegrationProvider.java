@@ -131,7 +131,10 @@ public abstract class AbstractIntegrationProvider implements WizardIntegrationPr
         return true;
     }
 
-    public boolean supportsJVM(TargetPlatformEnum jvm) {
+    public boolean supportsJVM(TargetPlatformEnum jvm, AttachSettings attachSettings) {
+        if (jvm.equals(TargetPlatformEnum.JDK_CVM)) {
+            return false;
+        }
         return true;
     }
 

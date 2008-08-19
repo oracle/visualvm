@@ -65,6 +65,7 @@ public class IntegrationUtils {
     public static final String PLATFORM_JAVA_50 = messages.getString("IntegrationUtils_PlatformJava50"); // NOI18N
     public static final String PLATFORM_JAVA_60 = messages.getString("IntegrationUtils_PlatformJava60"); // NOI18N
     public static final String PLATFORM_JAVA_70 = messages.getString("IntegrationUtils_PlatformJava70"); // NOI18N
+    public static final String PLATFORM_JAVA_CVM = messages.getString("IntegrationUtils_PlatformJavaCvm"); // NOI18N
     public static final String PLATFORM_WINDOWS_OS = messages.getString("IntegrationUtils_PlatformWindowsOs"); // NOI18N
     public static final String PLATFORM_WINDOWS_AMD64_OS = messages.getString("IntegrationUtils_PlatformWindowsAmd64Os"); // NOI18N
     public static final String PLATFORM_LINUX_OS = messages.getString("IntegrationUtils_PlatformLinuxOs"); // NOI18N
@@ -84,6 +85,7 @@ public class IntegrationUtils {
     private static final String JDK_50_NAME = messages.getString("IntegrationUtils_Jdk50Name"); // NOI18N
     private static final String JDK_60_NAME = messages.getString("IntegrationUtils_Jdk60Name"); // NOI18N
     private static final String JDK_70_NAME = messages.getString("IntegrationUtils_Jdk70Name"); // NOI18N
+    private static final String JDK_CVM_NAME = messages.getString("IntegrationUtils_JdkCvmName"); // NOI18N
     private static final String HTML_REMOTE_STRING = "&lt;" + messages.getString("IntegrationUtils_RemoteString") + "&gt;"; // NOI18N
     private static final String EXPORT_SETENV_MESSAGE = messages.getString("IntegrationUtils_ExportSetenvMessage"); // NOI18N
     private static final String REDUCE_OVERHEAD_MESSAGE = messages.getString("IntegrationUtils_ReduceOverheadMessage"); // NOI18N
@@ -240,8 +242,9 @@ public class IntegrationUtils {
             return PLATFORM_JAVA_60;
         } else if (javaVersionString.equals(CommonConstants.JDK_17_STRING)) {
             return PLATFORM_JAVA_70;
+        } else if (javaVersionString.equals(CommonConstants.JDK_CVM_STRING)) {
+            return PLATFORM_JAVA_CVM;
         }
-
         return null;
     }
 
@@ -253,6 +256,8 @@ public class IntegrationUtils {
             return JDK_60_NAME;
         } else if (javaPlatform.equals(PLATFORM_JAVA_70)) {
             return JDK_70_NAME;
+        } else if (javaPlatform.equals(PLATFORM_JAVA_CVM)) {
+            return JDK_CVM_NAME;
         }
 
         return javaPlatform;
@@ -266,6 +271,8 @@ public class IntegrationUtils {
             return "jdk16"; //NOI18N 
         } else if (javaPlatform.equals(PLATFORM_JAVA_70)) {
             return "jdk16"; //NOI18N // for JDK 7.0 we use the same as for 6.0 for now
+        } else if (javaPlatform.equals(PLATFORM_JAVA_CVM)) {
+            return "cvm";  // NOI18N
         }
 
         throw new IllegalArgumentException("Unsupported platform " + javaPlatform); // NOI18N
@@ -403,25 +410,30 @@ public class IntegrationUtils {
         if ((getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).indexOf(' ') == -1)) {
             return getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber); //NOI18N
         }
-        if (!isWindowsPlatform(targetPlatform)) { // Profiler is installed in directory with space on Unix (Linux, Solaris, Mac OS X)
+        if (!isWindowsPlatform(targetPlatform)) { 
+            // Profiler is installed in directory with space on Unix (Linux, Solaris, Mac OS X)
             // create temporary link in /tmp directory and use it instead of directory with space
-            try {  
-                File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
-                String tmpPath = tmpFile.getAbsolutePath();
-                String libsDirPath = getLibsDir(targetPlatform, isRemote);
-                String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
-                tmpFile.delete();
-                Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
-                new File(tmpPath).deleteOnExit();
-                return args.replace(libsDirPath,tmpPath);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            String libsDirPath = getLibsDir(targetPlatform, isRemote);
+            String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
+            return fixLibsDirPath(libsDirPath, args);
         }
 
         return "-agentpath:" + "\"" + getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
                + getDirectorySeparator(targetPlatform) + getProfilerAgentLibraryFile(targetPlatform) + "=" //NOI18N
                + "\\\"" + getLibsDir(targetPlatform, isRemote) + "\\\"\"" + "," + portNumber; //NOI18N
+    }
+
+    public static String fixLibsDirPath(final String libsDirPath, final String args) {
+        try {  
+            File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
+            String tmpPath = tmpFile.getAbsolutePath();
+            tmpFile.delete();
+            Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
+            new File(tmpPath).deleteOnExit();
+            return args.replace(libsDirPath,tmpPath);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     // Returns extra command line arguments without additional quotes required when attaching on startup
@@ -488,21 +500,6 @@ public class IntegrationUtils {
 
     public static String getSpacesInPathWarning() {
         return SPACES_IN_PATH_WARNING_MSG;
-    }
-
-    // Returns friendly name of the integration target type
-    public static String getTargetTypeName(String targetType, boolean startsUpperCase) {
-        if (targetType.equals(IntegrationProvider2.TARGET_TYPE_APPLICATION)) {
-            return (startsUpperCase ? APPLICATION_STRING : APPLICATION_STRING.toLowerCase());
-        } else if (targetType.equals(IntegrationProvider2.TARGET_TYPE_APPLET)) {
-            return (startsUpperCase ? APPLET_STRING : APPLET_STRING.toLowerCase());
-        } else if (targetType.equals(IntegrationProvider2.TARGET_TYPE_J2EEAPPLICATION)) {
-            return (startsUpperCase ? SERVER_STRING : SERVER_STRING.toLowerCase());
-        } else if (targetType.equals(IntegrationProvider2.TARGET_TYPE_DATABASE)) {
-            return (startsUpperCase ? DATABASE_STRING : DATABASE_STRING.toLowerCase());
-        }
-
-        return (startsUpperCase ? TARGET_STRING : TARGET_STRING.toLowerCase());
     }
 
     public static boolean isWindowsPlatform(String targetPlatform) {
