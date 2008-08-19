@@ -40,6 +40,7 @@
 package org.netbeans.modules.profiler.attach.panels;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,7 +95,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
         }
 
         public List getSupportedJvms() {
-            List supportedJvms = new LinkedList();
+            List<TargetPlatformEnum> supportedJvms = new ArrayList<TargetPlatformEnum>();
 
             if (getContext() != null) {
                 AttachSettings settings = getContext().getAttachSettings();
@@ -103,7 +104,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
                     TargetPlatformEnum jvm = (TargetPlatformEnum) it.next();
 
                     if (settings.isDirect() || settings.isRemote() || (settings.isDynamic16() && (jvm.equals(TargetPlatformEnum.JDK6) || jvm.equals(TargetPlatformEnum.JDK7)))) {
-                        if (getContext().getIntegrationProvider().supportsJVM(jvm)) {
+                        if (getContext().getIntegrationProvider().supportsJVM(jvm, settings)) {
                             supportedJvms.add(jvm);
                         }
                     }
@@ -117,7 +118,7 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
             if (exportRunning.compareAndSet(false, true)) {
                 try {
                     publishUpdate(new ChangeEvent(this));
-                    return RemotePackExporter.getInstance().export(path, getContext().getAttachSettings().getHostOS());
+                    return RemotePackExporter.getInstance().export(path, getContext().getAttachSettings().getHostOS(), getContext().getIntegrationProvider().getTargetJava());
                 } finally {
                     exportRunning.compareAndSet(true, false);
                     publishUpdate(new ChangeEvent(exportRunning));
