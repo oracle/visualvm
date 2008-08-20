@@ -1848,6 +1848,7 @@ public final class NetBeansProfiler extends Profiler {
     private void cleanupAfterProfiling() {
         stopLoadGenerator();
         teardownDispatcher();
+        MarkingEngine.getDefault().deconfigure();
         ClassRepository.cleanup();
     }
 
@@ -2103,20 +2104,20 @@ public final class NetBeansProfiler extends Profiler {
                 instance.setContext(client);
             }
 
-            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
-                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
-
-//            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-            Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
-
-            isMarksEnabled &= (ctg != null);
-
-            if (isMarksEnabled) {
-                ctg.reset();
-                MarkingEngine.getDefault().configure(ctg.getMappings());
-            } else {
-                MarkingEngine.getDefault().deconfigure();
-            }
+//            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
+//                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
+//
+////            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+//            Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
+//
+//            isMarksEnabled &= (ctg != null);
+//
+//            if (isMarksEnabled) {
+//                ctg.reset();
+//                MarkingEngine.getDefault().configure(ctg.getMappings());
+//            } else {
+//                MarkingEngine.getDefault().deconfigure();
+//            }
 
             Collection listeners = null;
 
@@ -2254,8 +2255,8 @@ public final class NetBeansProfiler extends Profiler {
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
             client.registerFlatProfileProvider(null);
 
-            // deconfigure the marking engine
-            MarkingEngine.getDefault().deconfigure();
+//            // deconfigure the marking engine
+//            MarkingEngine.getDefault().deconfigure();
         }
     }
 
