@@ -356,56 +356,39 @@ public final class ProjectUtilities {
             return null;
         }
 
+        RandomAccessFile file = null;
+        byte[] data = null;
+
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(buildFile.getInputStream()));
+            file = new RandomAccessFile(FileUtil.toFile(buildFile), "r");
+            data = new byte[(int) buildFile.getSize()];
+            file.readFully(data);
+        } catch (FileNotFoundException e2) {
+            ProfilerLogger.log(e2);
 
-            StringBuilder sb = new StringBuilder();
-            String line;
-            do {
-                line = br.readLine();
-                if (line != null) {
-                    sb.append(line);
+            return null;
+        } catch (IOException e2) {
+            ProfilerLogger.log(e2);
+
+            return null;
+        } finally {
+            if (file != null) {
+                try {
+                    file.close();
+                } catch (IOException e2) {
+                    ProfilerLogger.log(e2);
                 }
-            } while (line != null);
-            return sb.toString();
-        } catch (IOException e) {
-
+            }
         }
-        return null;
 
-//        RandomAccessFile file = null;
-//        byte[] data = null;
-//
-//        try {
-//            file = new RandomAccessFile(FileUtil.toFile(buildFile), "r");
-//            data = new byte[(int) buildFile.getSize()];
-//            file.readFully(data);
-//        } catch (FileNotFoundException e2) {
-//            ProfilerLogger.log(e2);
-//
-//            return null;
-//        } catch (IOException e2) {
-//            ProfilerLogger.log(e2);
-//
-//            return null;
-//        } finally {
-//            if (file != null) {
-//                try {
-//                    file.close();
-//                } catch (IOException e2) {
-//                    ProfilerLogger.log(e2);
-//                }
-//            }
-//        }
-//
-//        try {
-//            return new String(data, "UTF-8" //NOI18N
-//            ); // According to Issue 65557, build.xml uses UTF-8, not default encoding!
-//        } catch (UnsupportedEncodingException ex) {
-//            ErrorManager.getDefault().notify(ErrorManager.ERROR, ex);
-//
-//            return null;
-//        }
+        try {
+            return new String(data, "UTF-8" //NOI18N
+            ); // According to Issue 65557, build.xml uses UTF-8, not default encoding!
+        } catch (UnsupportedEncodingException ex) {
+            ErrorManager.getDefault().notify(ErrorManager.ERROR, ex);
+
+            return null;
+        }
     }
 
     public static FileObject findBuildFile(final Project project) {
