@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
+import java.util.Enumeration;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -49,7 +50,6 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -73,8 +73,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
-
 
 /**
  *
@@ -329,9 +327,13 @@ public class SummaryControllerUI extends JPanel {
 
     private String formatSystemProperties(Properties properties) {
         StringBuffer text = new StringBuffer(200);
-        List keys = new ArrayList(properties.keySet());
+        List keys = new ArrayList();
+        Enumeration en = properties.propertyNames();
         Iterator keyIt;
-
+        
+        while (en.hasMoreElements()) {
+            keys.add(en.nextElement());
+        }
         Collections.sort(keys);
         keyIt = keys.iterator();
 
