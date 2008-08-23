@@ -341,6 +341,11 @@ public class SummaryControllerUI extends JPanel {
             String key = (String) keyIt.next();
             String val = properties.getProperty(key);
 
+            if ("line.separator".equals(key) && val != null) {  // NOI18N
+                val = val.replace("\n", "\\n"); // NOI18N
+                val = val.replace("\r", "\\r"); // NOI18N
+            }
+
             text.append("<nobr>&nbsp;&nbsp;&nbsp;&nbsp;<b>"); // NOI18N
             text.append(key);
             text.append("</b>="); // NOI18N
