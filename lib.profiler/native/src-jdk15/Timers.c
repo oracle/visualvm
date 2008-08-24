@@ -69,6 +69,26 @@
 
 #include "common_functions.h"
 
+#ifdef CVM
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Method:    getCurrentTimeInCounts
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getCurrentTimeInCounts
+  (JNIEnv *env, jclass clz)
+{
+        jlong time;
+        jvmtiError res;
+
+        res = (*_jvmti)->GetTime(_jvmti,&time);
+        if (res != JVMTI_ERROR_NONE) fprintf(stderr, "Profiler Agent Error: GetTime failed with %d\n",res);
+        assert(res == JVMTI_ERROR_NONE);
+        return time;
+}
+
+#endif
+
 /*
  * Class:     org_netbeans_lib_profiler_server_system_Timers
  * Method:    getThreadCPUTimeInNanos
