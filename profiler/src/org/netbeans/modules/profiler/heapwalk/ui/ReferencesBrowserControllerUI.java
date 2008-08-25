@@ -630,8 +630,6 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         cornerPopup = new JPopupMenu();
 
-        JButton cornerButton = createHeaderPopupCornerButton(cornerPopup);
-
         JTreeTablePanel tablePanel = new JTreeTablePanel(fieldsListTable);
         tablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
 
