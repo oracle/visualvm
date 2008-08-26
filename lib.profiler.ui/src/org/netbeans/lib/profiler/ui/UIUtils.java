@@ -101,6 +101,12 @@ public final class UIUtils {
         // is current L&F some kind of GTKLookAndFeel?
         return UIManager.getLookAndFeel().getID().equals("GTK"); //NOI18N
     }
+    
+    /** Determines if current L&F is Nimbus */
+    public static boolean isNimbusLookAndFeel() {
+        // is current L&F Nimbus?
+        return UIManager.getLookAndFeel().getID().equals("Nimbus"); //NOI18N
+    }
 
     /** Determines if current L&F is MetalLookAndFeel */
     public static boolean isMetalLookAndFeel() {
