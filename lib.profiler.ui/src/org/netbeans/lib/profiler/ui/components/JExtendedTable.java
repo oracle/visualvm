@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -74,6 +75,8 @@ public class JExtendedTable extends JTable implements CellTipAware, MouseListene
 
     public JExtendedTable(TableModel model) {
         super(model);
+        
+        setBackground(UIUtils.getProfilerResultsBackground());
 
         cellTip = createCellTip();
         cellTip.setBorder(BorderFactory.createLineBorder(getGridColor()));

@@ -253,7 +253,7 @@ public final class UIUtils {
     
     public static Color getProfilerResultsBackground() {
         if (profilerResultsBackground == null) {
-            if (isGTKLookAndFeel()) {
+            if (isGTKLookAndFeel() || isNimbusLookAndFeel()) {
                 profilerResultsBackground = getGTKProfilerResultsBackground();
             } else {
                 profilerResultsBackground = getNonGTKProfilerResultsBackground();
