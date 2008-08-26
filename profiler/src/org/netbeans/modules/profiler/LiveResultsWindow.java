@@ -550,7 +550,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         cpuActionsHandler = new CPUActionsHandler();
 
         toolBar = createToolBar();
-        toolBar.setBorder(new EmptyBorder(5, 5, 0, 5));
 
         add(toolBar, BorderLayout.NORTH);
 
@@ -968,6 +967,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         toolBar.setFloatable(false);
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
+        toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        
         autoToggle = new JToggleButton(new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/autoRefresh.png") // NOI18N
         ));
         autoToggle.setSelected(true);
