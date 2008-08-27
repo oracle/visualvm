@@ -363,13 +363,13 @@ public class MiscUtils implements CommonConstants {
             return false;
         }
 
-        return isSupported15or16or17(jdkVersionString);
+        return isSupported15or16or17orCvm(jdkVersionString);
     }
 
     // This method is used for checking running JVM if supported.
     // jvmVersionString should be enough to decide that
     public static boolean isSupportedRunningJVMVersion(String jdkVersionString) {
-        return isSupported15or16or17(jdkVersionString);
+        return isSupported15or16or17orCvm(jdkVersionString);
     }
 
     public static void setVerbosePrint() {
@@ -543,24 +543,21 @@ public class MiscUtils implements CommonConstants {
         return (new Date()).toString();
     }
 
-    private static boolean isSupported15or16or17(String jdkVersionString) {
+    private static boolean isSupported15or16or17orCvm(String jdkVersionString) {
         if (jdkVersionString.startsWith("1.7")) { // NOI18N
-
             return true;
         } else if (jdkVersionString.startsWith("1.6")) { // NOI18N
-
             return true;
         } else if (jdkVersionString.startsWith("1.5")) { // NOI18N
-
-            if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01")
-                    || jdkVersionString.startsWith("1.5.0_02") || jdkVersionString.startsWith("1.5.0_03")) { // NOI18N
-
+            if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01") ||
+                jdkVersionString.startsWith("1.5.0_02") || jdkVersionString.startsWith("1.5.0_03")) { // NOI18N
                 return false;
             } else {
                 return true;
             }
-        } else {
-            return false;
+        } else if (jdkVersionString.startsWith("phoneme_advanced")) {
+            return true;
         }
+        return false;
     }
 }
