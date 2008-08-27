@@ -647,13 +647,13 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         projectsChooserComboContainer.add(projectsChooserCombo, BorderLayout.CENTER);
 
         // projectsChooserSeparator
-        projectsChooserSeparator = Utils.createHorizontalSeparator();
+        if (!UIUtils.isNimbus()) projectsChooserSeparator = Utils.createHorizontalSeparator();
 
         // projectsChooserPanel
         projectsChooserPanel = new JPanel(new BorderLayout());
         projectsChooserPanel.add(projectsChooserLabel, BorderLayout.WEST);
         projectsChooserPanel.add(projectsChooserComboContainer, BorderLayout.CENTER);
-        projectsChooserPanel.add(projectsChooserSeparator, BorderLayout.SOUTH);
+        if (projectsChooserSeparator != null) projectsChooserPanel.add(projectsChooserSeparator, BorderLayout.SOUTH);
 
         // taskChooser
         taskChooser = new TaskChooser();
