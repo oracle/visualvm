@@ -38,30 +38,30 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common.integration.exceptions;
-
+package org.netbeans.lib.profiler.server.system;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
-public class IntegrationException extends Exception {
+public class HeapDump {
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Creates a new instance of IntegrationException */
-    public IntegrationException() {
-        super();
+    private HeapDump() {
     }
 
-    public IntegrationException(String message) {
-        super(message);
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public static void initialize(boolean jdk15) {
     }
 
-    public IntegrationException(Throwable cause) {
-        super(cause);
+    public static String takeHeapDump(boolean jdk15, String outputFile) {
+        return takeHeapDumpCVM(outputFile);
     }
 
-    public IntegrationException(String message, Throwable cause) {
-        super(message, cause);
+
+    private static String takeHeapDumpCVM(String outputFile) {
+        return "Take heap dump is not available."; // NOI18N
     }
 }
