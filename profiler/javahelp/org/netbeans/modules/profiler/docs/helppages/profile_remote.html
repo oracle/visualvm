@@ -14,48 +14,45 @@
         <p><small><a href="#seealso">See Also</a></small></p> 
                 <p>You can profile an application that is running on a remote system such as a web server 
                 by attaching the profiler to the application.
-When you use this mode, the remote application starts after the profiler is attached. 
+                When you use this mode, the remote application starts after the profiler is attached. 
                 This mode enables you to obtain profiling data on the startup of the target JVM.</p>
-                <p>To profile an application on a remote system,  </p>
-                <ul class="note">
-                    <li>To attach profiler to an application on a remote system,
-                    you need to download and install the Profiler Remote Pack on the remote system. 
-                    The remote system needs to be 
-                    started on the Profiler Remote Pack and configured to support remote profiling.
-                    <p>You can download the Profiler Remote Pack from the Profiler web site:</p>
-                    <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
-                    <param name="content" value="http://profiler.netbeans.org">
-                    <param name="text" value="<html><u>http://profiler.netbeans.org</u></html>">
-                    <param name="textFontSize" value="medium">
-                    <param name="textColor" value="blue">
-                    </object></p>
-                    </li>
-                </ul>
-
+                
                 <p>You use the Attach Wizard to specify the attachment settings for your project.
                 In the Attach Wizard you specify the type of application and the remote location.
                 Based on the details that you provide, the Attach Wizard provides you with a set of instructions on how to 
                 configure the remote system to support profiling.</p>
+                
+                <p>To attach the profiling tool to a remote system you 
+                need to install a Remote Profiler Pack on the remote system.
+                The Remote Profiler Pack is an archive of libraries that enables the profiling tool 
+                to attach to the remote system.
+                You use the Attach Wizard to generate a Remote Profiler Pack that is appropriate
+                for the remote system and then 
+                configure the remote system to load the libraries on startup.
+                </p>
                  
                 <p>After configuring the remote system according to the instructions, you can attach the profiler to the remote location.
                 You only need to configure the attach mode once. The attachment settings are associated with that project. 
                 You can go through the Attach Wizard at any time to change any of the attachment settings.</p> 
                 
                 <p><b>To profile a remote application:</b></p>
-            <ol>
-                <li>Choose Profile &gt; Attach Profiler from the main menu.</li>
-                <li>Select the Project from the dropdown list at the top of the Select Profiling Task dialog box, if available.</li>
-                <li>In the bottom of the dialog box, click <b>define</b> to configure the attachment settings.</li>
-                <li>Select the type of application.</li>
-                <li>Select the server type, if necessary.</li>
-                <li>Select the Remote attach mode and click Next.</li>
-                <li>Complete the Attach wizard to specify the attachment settings according to the target application.</li>
-                <li>Click Finish to exit the Attach wizard.</li>
-                <li>Configure the target location and start the remote application according to the instructions provided in the Attach Wizard.
-                <p>When you start the remote application, the application will wait until the IDE is attached before starting.</p></li>
-                <li>Select a profiling task and any profiling options.</li>
-                <li>Click Attach.</li>
-            </ol>
+                <ol>
+                    <li>Choose Profile &gt; Attach Profiler from the main menu.</li>
+                    <li>Select the Project from the dropdown list at the top of the Select Profiling Task dialog box, if available.</li>
+                    <li>In the bottom of the dialog box, click <b>define</b> to configure the attachment settings.</li>
+                    <li>Select the type of application.</li>
+                    <li>Select the server type, if necessary.</li>
+                    <li>Select the Remote attach mode and click Next.</li>
+                    <li>Complete the Attach wizard to specify the attachment settings according to the target application.</li>
+                    <li>Click Finish to exit the Attach wizard.</li>
+                    <li>Configure the target location and start the remote application according to the instructions 
+                    provided in the Attach Wizard.
+                    You will need to install the generated Profiler Remote Pack on the remote system if not installed.
+                    <p>
+                    When you start the remote application, the application will wait until the IDE is attached before starting.</p></li>
+                    <li>Select a profiling task and any profiling options.</li>
+                    <li>Click Attach.</li>
+                </ol>
             
             <p>When you click Attach, the IDE will attach to the remote JVM and the application will start.
             You can view profiling data like you would for a local application.</p>
