@@ -127,7 +127,6 @@ public final class DataViewComponent extends JPanel {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) {
             if ("".equals(displayArea.getCaption())) displayArea.setCaption(detailsView.getTab().getName());
-            detailsPanel.setVisible(true);
             displayArea.addTab(detailsView.getTab());
             revalidate();
             repaint();
@@ -183,7 +182,7 @@ public final class DataViewComponent extends JPanel {
                     });
                 }
             };
-            mainVerticalSplitter.setResizeWeight(0);
+            mainVerticalSplitter.setDividerLocation(0.5d);
 
             contents = mainVerticalSplitter;
         } else {
@@ -275,7 +274,7 @@ public final class DataViewComponent extends JPanel {
         detailsTopHorizontalSplitter.setResizeWeight(0.5d);
         detailsTopHorizontalSplitter.setDividerLocation(0.5d);
         detailsTopPanel.add(detailsTopHorizontalSplitter, BorderLayout.CENTER);
-
+        
 
         // Bottom details area
 
@@ -321,7 +320,7 @@ public final class DataViewComponent extends JPanel {
         detailsBottomHorizontalSplitter.setResizeWeight(0.5d);
         detailsBottomHorizontalSplitter.setDividerLocation(0.5d);
         detailsBottomPanel.add(detailsBottomHorizontalSplitter, BorderLayout.CENTER);
-
+        
 
         // Details area
 
