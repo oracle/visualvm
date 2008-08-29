@@ -216,7 +216,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     private static SelectProfilingTask defaultInstance;
 
     // --- UI components declaration ---------------------------------------------
-    private static final Image BACKGROUND_IMAGE = Utilities.loadImage("org/netbeans/modules/profiler/ui/stp/resources/sptBar.png"); // NOI18N
+    private static final Image BACKGROUND_IMAGE = UIUtils.isNimbus() ? null : Utilities.loadImage("org/netbeans/modules/profiler/ui/stp/resources/sptBar.png"); // NOI18N
     private static final Icon MONITOR_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/monitoring.png")); // NOI18N
     private static final Icon CPU_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/cpu.png")); // NOI18N
     private static final Icon MEMORY_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/memory.png")); // NOI18N
@@ -228,7 +228,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     private AttachSettingsPanel attachSettingsPanel;
     private DialogDescriptor dd;
     private FileObject profiledFile;
-    private ImagePanel taskChooserPanel;
+    private JPanel taskChooserPanel;
     private JButton attachButton;
     private JButton cancelButton;
     private JButton modifyButton;
@@ -660,7 +660,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         taskChooser.addItemListener(this);
 
         // taskChooserPanel
-        taskChooserPanel = new ImagePanel(BACKGROUND_IMAGE, SwingConstants.BOTTOM);
+        taskChooserPanel = BACKGROUND_IMAGE != null ? new ImagePanel(BACKGROUND_IMAGE, SwingConstants.BOTTOM) : new JPanel(null);
         taskChooserPanel.setLayout(new BorderLayout());
         taskChooserPanel.add(taskChooser, BorderLayout.NORTH);
 
