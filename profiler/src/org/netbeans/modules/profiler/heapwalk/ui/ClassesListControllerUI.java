@@ -726,8 +726,6 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         cornerPopup = new JPopupMenu();
 
-        JButton cornerButton = createHeaderPopupCornerButton(cornerPopup);
-
         JExtendedTablePanel tablePanel = new JExtendedTablePanel(classesListTable);
         tablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
 
