@@ -54,7 +54,6 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -76,12 +75,8 @@ class JConsolePluginWrapper {
     JConsolePluginWrapper(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel == null || jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            JTextArea textArea = new JTextArea();
-            textArea.setBorder(BorderFactory.createEmptyBorder(25, 9, 9, 9));
+            JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "JMX_Not_Available")); // NOI18N
             textArea.setEditable(false);
-            textArea.setLineWrap(true);
-            textArea.setWrapStyleWord(true);
-            textArea.setText(NbBundle.getMessage(JConsolePluginWrapper.class, "JMX_Not_Available")); // NOI18N
             jconsoleView = textArea;
         } else {
             boolean availablePlugins = getPlugins().iterator().hasNext();
@@ -94,12 +89,8 @@ class JConsolePluginWrapper {
                 panel.add(vmPanel, BorderLayout.CENTER);
                 jconsoleView = panel;
             } else {
-                JTextArea textArea = new JTextArea();
-                textArea.setBorder(BorderFactory.createEmptyBorder(25, 9, 9, 9));
+                JTextArea textArea = new JTextArea(NbBundle.getMessage(JConsolePluginWrapper.class, "PluginPath_Not_Available")); // NOI18N
                 textArea.setEditable(false);
-                textArea.setLineWrap(true);
-                textArea.setWrapStyleWord(true);
-                textArea.setText(NbBundle.getMessage(JConsolePluginWrapper.class, "PluginPath_Not_Available")); // NOI18N
                 jconsoleView = textArea;
             }
         }

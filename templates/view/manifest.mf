@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.visualvm.visualvmview
-OpenIDE-Module-Layer: org/visualvm/visualvmview/layer.xml
-OpenIDE-Module-Localizing-Bundle: org/visualvm/visualvmview/Bundle.properties
-OpenIDE-Module-Requires: org.netbeans.api.javahelp.Help
-OpenIDE-Module-Specification-Version: 1.5
-
