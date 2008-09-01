@@ -87,6 +87,7 @@ import org.openide.windows.TopComponentGroup;
 import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -550,7 +551,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         cpuActionsHandler = new CPUActionsHandler();
 
         toolBar = createToolBar();
-        toolBar.setBorder(new EmptyBorder(5, 5, 0, 5));
 
         add(toolBar, BorderLayout.NORTH);
 
@@ -598,11 +598,22 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.add(graphTab.zoomOutButton);
         toolBar.add(graphTab.scaleToFitButton);
 
-        JPanel toolbarSpacer = new JPanel(new FlowLayout(0, 0, FlowLayout.LEADING));
+        JPanel toolbarSpacer = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
+            public Dimension getPreferredSize() {
+                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+                    int currentWidth = toolBar.getSize().width;
+                    int minimumWidth = toolBar.getMinimumSize().width;
+                    int extraWidth = currentWidth - minimumWidth;
+                    return new Dimension(Math.max(extraWidth, 0), 0);
+                } else {
+                    return super.getPreferredSize();
+                }
+            }
+        };
         toolbarSpacer.setOpaque(false);
 
         final DrillDownWindow drillDownWin = DrillDownWindow.getDefault();
-        drillDownWin.closeIfOpened();
+        DrillDownWindow.closeIfOpened();
         drillDownWin.getPresenter().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (drillDownWin.getPresenter().isSelected()) {
@@ -968,6 +979,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         toolBar.setFloatable(false);
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
+        toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        
         autoToggle = new JToggleButton(new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/autoRefresh.png") // NOI18N
         ));
         autoToggle.setSelected(true);
