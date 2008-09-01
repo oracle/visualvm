@@ -216,7 +216,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     private static SelectProfilingTask defaultInstance;
 
     // --- UI components declaration ---------------------------------------------
-    private static final Image BACKGROUND_IMAGE = Utilities.loadImage("org/netbeans/modules/profiler/ui/stp/resources/sptBar.png"); // NOI18N
+    private static final Image BACKGROUND_IMAGE = UIUtils.isNimbus() ? null : Utilities.loadImage("org/netbeans/modules/profiler/ui/stp/resources/sptBar.png"); // NOI18N
     private static final Icon MONITOR_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/monitoring.png")); // NOI18N
     private static final Icon CPU_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/cpu.png")); // NOI18N
     private static final Icon MEMORY_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/memory.png")); // NOI18N
@@ -228,7 +228,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     private AttachSettingsPanel attachSettingsPanel;
     private DialogDescriptor dd;
     private FileObject profiledFile;
-    private ImagePanel taskChooserPanel;
+    private JPanel taskChooserPanel;
     private JButton attachButton;
     private JButton cancelButton;
     private JButton modifyButton;
@@ -647,20 +647,20 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         projectsChooserComboContainer.add(projectsChooserCombo, BorderLayout.CENTER);
 
         // projectsChooserSeparator
-        projectsChooserSeparator = Utils.createHorizontalSeparator();
+        if (!UIUtils.isNimbus()) projectsChooserSeparator = Utils.createHorizontalSeparator();
 
         // projectsChooserPanel
         projectsChooserPanel = new JPanel(new BorderLayout());
         projectsChooserPanel.add(projectsChooserLabel, BorderLayout.WEST);
         projectsChooserPanel.add(projectsChooserComboContainer, BorderLayout.CENTER);
-        projectsChooserPanel.add(projectsChooserSeparator, BorderLayout.SOUTH);
+        if (projectsChooserSeparator != null) projectsChooserPanel.add(projectsChooserSeparator, BorderLayout.SOUTH);
 
         // taskChooser
         taskChooser = new TaskChooser();
         taskChooser.addItemListener(this);
 
         // taskChooserPanel
-        taskChooserPanel = new ImagePanel(BACKGROUND_IMAGE, SwingConstants.BOTTOM);
+        taskChooserPanel = BACKGROUND_IMAGE != null ? new ImagePanel(BACKGROUND_IMAGE, SwingConstants.BOTTOM) : new JPanel(null);
         taskChooserPanel.setLayout(new BorderLayout());
         taskChooserPanel.add(taskChooser, BorderLayout.NORTH);
 
@@ -698,10 +698,15 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         extraSettingsPanel.add(attachSettingsPanelContainer, BorderLayout.SOUTH);
 
         // runButton
-        runButton = new JButton(RUN_BUTTON_TEXT, RUN_ICON);
+        runButton = UIUtils.isNimbus() ? new JButton(RUN_BUTTON_TEXT) :
+                                         new JButton(RUN_BUTTON_TEXT, RUN_ICON);
 
         // attachButton
-        attachButton = new JButton(ATTACH_BUTTON_TEXT, ATTACH_ICON) {
+        attachButton = UIUtils.isNimbus() ? new JButton(ATTACH_BUTTON_TEXT) {
+                public Dimension getPreferredSize() {
+                    return new Dimension(super.getPreferredSize().width, runButton.getPreferredSize().height);
+                }
+            } : new JButton(ATTACH_BUTTON_TEXT, ATTACH_ICON) {
                 public Dimension getPreferredSize() {
                     return new Dimension(super.getPreferredSize().width, runButton.getPreferredSize().height);
                 }
