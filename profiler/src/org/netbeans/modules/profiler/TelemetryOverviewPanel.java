@@ -48,6 +48,8 @@ import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
 
 
 /** A panel with mini graphs intended to be displayed in the output area.
@@ -92,9 +94,12 @@ public final class TelemetryOverviewPanel extends TopComponent {
         getAccessibleContext().setAccessibleDescription(TELEMETRY_OVERVIEW_ACCESS_DESCR);
 
         graphsPanel = new MonitoringGraphsPanel();
-        graphsPanel.setPreferredSize(new Dimension(600, 200));
+        JScrollPane graphsPanelScroll = new JScrollPane(graphsPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        graphsPanelScroll.setBorder(BorderFactory.createEmptyBorder());
+        graphsPanelScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         setLayout(new BorderLayout());
-        add(graphsPanel, BorderLayout.CENTER);
+        add(graphsPanelScroll, BorderLayout.CENTER);
 
         setFocusable(true);
         setRequestFocusEnabled(true);
