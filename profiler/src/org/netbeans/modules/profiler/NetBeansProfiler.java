@@ -98,6 +98,7 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -1397,8 +1398,7 @@ public final class NetBeansProfiler extends Profiler {
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    GoToSourceHelper.openSource(project, className, methodName, className);
-//                    SourceUtils.openSource(project, className, methodName, methodSig);
+                    GoToSourceHelper.openSource(project, className, methodName, methodSig);
                 }
             });
     }
@@ -1590,12 +1590,20 @@ public final class NetBeansProfiler extends Profiler {
 
             lock = fo.lock();
 
-            final OutputStream fos = fo.getOutputStream(lock);
-            final BufferedOutputStream bos = new BufferedOutputStream(fos);
+            final BufferedOutputStream bos = new BufferedOutputStream(fo.getOutputStream(lock));
             final Properties globalProps = new Properties();
-            as.store(globalProps);
-            globalProps.storeToXML(bos, ""); //NOI18N
-            bos.close();
+            try {
+                as.store(globalProps);
+                globalProps.storeToXML(bos, ""); //NOI18N
+            } finally {
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException ex) {
+                        // ignore
+                    }
+                }
+            }
         } catch (Exception e) {
             ProfilerLogger.log(e);
             ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_ATTACH_SETTINGS_MESSAGE,
