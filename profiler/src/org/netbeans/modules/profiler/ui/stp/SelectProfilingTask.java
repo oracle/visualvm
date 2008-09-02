@@ -991,106 +991,111 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     }
 
     private void updateProject(final Project project) {
-        projectCleanup();
+        Runnable projectUpdater = new Runnable() {
+            public void run() {
+                projectCleanup();
 
-        this.project = project;
+                SelectProfilingTask.this.project = project;
 
-        if (project != null) {
-            projectPackages = new String[2][];
-            predefinedInstrFilterKeys = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project)
-                                                        .getPredefinedInstrumentationFilters(project);
-            predefinedInstrFilters = new SimpleFilter[predefinedInstrFilterKeys.size()];
-        } else {
-            projectPackages = null;
-            predefinedInstrFilters = null;
-            predefinedInstrFilterKeys = null;
-        }
-
-        if (projectsChooserPanel.isVisible() && (projectsChooserCombo.getSelectedItem() == SELECT_PROJECT_TO_ATTACH_STRING)) {
-            // Attach, no project selected
-            taskChooser.setEnabled(false);
-
-            // TODO: cleanup
-            contentsPanel.removeAll();
-            contentsPanel.add(getWelcomePanel(), BorderLayout.CENTER);
-            contentsPanel.doLayout();
-            contentsPanel.repaint();
-        } else {
-            configurator = Utils.getSettingsConfigurator(project);
-            configurator.setContext(project, profiledFile, isAttach, isModify, enableOverride);
-
-            JPanel customSettings = configurator.getCustomSettingsPanel();
-
-            if (customSettings != null) {
-                customSettingsPanelContainer.removeAll();
-                customSettingsPanelContainer.add(customSettings, BorderLayout.NORTH);
-                customSettingsPanelContainer.add(customSettingsPanelSeparator, BorderLayout.SOUTH);
-                customSettingsPanelContainer.setVisible(true);
-            } else {
-                customSettingsPanelContainer.removeAll();
-                customSettingsPanelContainer.setVisible(false);
-            }
-
-            // Project selected
-            taskChooser.setEnabled(true);
-
-            ProfilingSettings[] profilingSettings = new ProfilingSettings[0];
-            ProfilingSettings lastSelectedSettings = null;
-
-            ProfilingSettingsManager.ProfilingSettingsDescriptor profilingSettingsDescriptor = ProfilingSettingsManager.getDefault()
-                                                                                                                       .getProfilingSettings(project);
-            profilingSettings = profilingSettingsDescriptor.getProfilingSettings();
-            lastSelectedSettings = profilingSettingsDescriptor.getLastSelectedProfilingSettings();
-
-            ArrayList<ProfilingSettings> monitorSettings = new ArrayList();
-
-            //ArrayList<ProfilingSettings> analyzerSettings = new ArrayList();
-            ArrayList<ProfilingSettings> cpuSettings = new ArrayList();
-            ArrayList<ProfilingSettings> memorySettings = new ArrayList();
-
-            for (ProfilingSettings settings : profilingSettings) {
-                if (Utils.isMonitorSettings(settings)) {
-                    monitorSettings.add(settings);
+                if (project != null) {
+                    projectPackages = new String[2][];
+                    predefinedInstrFilterKeys = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project)
+                                                                .getPredefinedInstrumentationFilters(project);
+                    predefinedInstrFilters = new SimpleFilter[predefinedInstrFilterKeys.size()];
+                } else {
+                    projectPackages = null;
+                    predefinedInstrFilters = null;
+                    predefinedInstrFilterKeys = null;
                 }
-                //else if (Utils.isAnalyzerSettings(settings)) analyzerSettings.add(settings);
-                else if (Utils.isCPUSettings(settings)) {
-                    cpuSettings.add(settings);
-                } else if (Utils.isMemorySettings(settings)) {
-                    memorySettings.add(settings);
-                }
-            }
 
-            taskMonitor.setProfilingSettings(monitorSettings);
-            //taskAnalyzer.setProfilingSettings(analyzerSettings);
-            taskCPU.setProfilingSettings(cpuSettings);
-            taskMemory.setProfilingSettings(memorySettings);
+                if (projectsChooserPanel.isVisible() && (projectsChooserCombo.getSelectedItem() == SELECT_PROJECT_TO_ATTACH_STRING)) {
+                    // Attach, no project selected
+                    taskChooser.setEnabled(false);
 
-            // TODO: keep/change lastSelectedSettings to null if Welcome Screen is about to be displayed
-            if (lastSelectedSettings == null) {
-                // NOTE: If no lastSelectedSettings then CPU preset will be selected by default
-                //       Monitor preset would be more correct but this one looks better
-                for (ProfilingSettings cpuSettingsPreset : cpuSettings) {
-                    if (cpuSettingsPreset.isPreset()) {
-                        lastSelectedSettings = cpuSettingsPreset;
+                    // TODO: cleanup
+                    contentsPanel.removeAll();
+                    contentsPanel.add(getWelcomePanel(), BorderLayout.CENTER);
+                    contentsPanel.doLayout();
+                    contentsPanel.repaint();
+                } else {
+                    configurator = Utils.getSettingsConfigurator(project);
+                    configurator.setContext(project, profiledFile, isAttach, isModify, enableOverride);
+
+                    JPanel customSettings = configurator.getCustomSettingsPanel();
+
+                    if (customSettings != null) {
+                        customSettingsPanelContainer.removeAll();
+                        customSettingsPanelContainer.add(customSettings, BorderLayout.NORTH);
+                        customSettingsPanelContainer.add(customSettingsPanelSeparator, BorderLayout.SOUTH);
+                        customSettingsPanelContainer.setVisible(true);
+                    } else {
+                        customSettingsPanelContainer.removeAll();
+                        customSettingsPanelContainer.setVisible(false);
                     }
+
+                    // Project selected
+                    taskChooser.setEnabled(true);
+
+                    ProfilingSettings[] profilingSettings = new ProfilingSettings[0];
+                    ProfilingSettings lastSelectedSettings = null;
+
+                    ProfilingSettingsManager.ProfilingSettingsDescriptor profilingSettingsDescriptor = ProfilingSettingsManager.getDefault()
+                                                                                                                               .getProfilingSettings(project);
+                    profilingSettings = profilingSettingsDescriptor.getProfilingSettings();
+                    lastSelectedSettings = profilingSettingsDescriptor.getLastSelectedProfilingSettings();
+
+                    ArrayList<ProfilingSettings> monitorSettings = new ArrayList();
+
+                    //ArrayList<ProfilingSettings> analyzerSettings = new ArrayList();
+                    ArrayList<ProfilingSettings> cpuSettings = new ArrayList();
+                    ArrayList<ProfilingSettings> memorySettings = new ArrayList();
+
+                    for (ProfilingSettings settings : profilingSettings) {
+                        if (Utils.isMonitorSettings(settings)) {
+                            monitorSettings.add(settings);
+                        }
+                        //else if (Utils.isAnalyzerSettings(settings)) analyzerSettings.add(settings);
+                        else if (Utils.isCPUSettings(settings)) {
+                            cpuSettings.add(settings);
+                        } else if (Utils.isMemorySettings(settings)) {
+                            memorySettings.add(settings);
+                        }
+                    }
+
+                    taskMonitor.setProfilingSettings(monitorSettings);
+                    //taskAnalyzer.setProfilingSettings(analyzerSettings);
+                    taskCPU.setProfilingSettings(cpuSettings);
+                    taskMemory.setProfilingSettings(memorySettings);
+
+                    // TODO: keep/change lastSelectedSettings to null if Welcome Screen is about to be displayed
+                    if (lastSelectedSettings == null) {
+                        // NOTE: If no lastSelectedSettings then CPU preset will be selected by default
+                        //       Monitor preset would be more correct but this one looks better
+                        for (ProfilingSettings cpuSettingsPreset : cpuSettings) {
+                            if (cpuSettingsPreset.isPreset()) {
+                                lastSelectedSettings = cpuSettingsPreset;
+                            }
+                        }
+                    }
+
+                    // Expand appropriate task for lastSelectedSettings
+                    if (lastSelectedSettings != null) {
+                        TaskPresenter taskPresenter = getTaskPresenter(lastSelectedSettings);
+
+                        if (taskPresenter != null) {
+                            taskChooser.expandImmediately(taskPresenter);
+                        }
+                    }
+
+                    selectProfilingSettings(lastSelectedSettings);
+                }
+
+                if (attachSettingsPanelContainer.isVisible()) {
+                    attachSettingsPanel.setSettings(project, projectsChooserCombo.getSelectedItem() != SELECT_PROJECT_TO_ATTACH_STRING);
                 }
             }
-
-            // Expand appropriate task for lastSelectedSettings
-            if (lastSelectedSettings != null) {
-                TaskPresenter taskPresenter = getTaskPresenter(lastSelectedSettings);
-
-                if (taskPresenter != null) {
-                    taskChooser.expandImmediately(taskPresenter);
-                }
-            }
-
-            selectProfilingSettings(lastSelectedSettings);
-        }
-
-        if (attachSettingsPanelContainer.isVisible()) {
-            attachSettingsPanel.setSettings(project, projectsChooserCombo.getSelectedItem() != SELECT_PROJECT_TO_ATTACH_STRING);
-        }
+        };
+        IDEUtils.runInEventDispatchThread(projectUpdater);
     }
 
     private void updateProjectsCombo(Object projectToSelect) { // Actually may be also EXTERNAL_APPLICATION_STRING
