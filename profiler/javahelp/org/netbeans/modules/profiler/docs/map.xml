@@ -87,8 +87,11 @@ made subject to such option by the copyright holder.
         
         <mapID target="ThreadsWindow.HelpCtx" url="helppages/csh/view_threads.html"/>
         <mapID target="TelemetryWindow.HelpCtx" url="helppages/csh/view_telemetry.html"/>
+        <mapID target="TelemetryOverviewPanel.HelpCtx" url="helppages/csh/view_telemetryoverview.html"/>
         <mapID target="LiveResultsWindow.HelpCtx" url="helppages/results_liveresults.html"/>
         <mapID target="DrillDownWindow.HelpCtx" url="helppages/csh/view_drilldown.html"/>
+        <mapID target="ProfilingPointsWindow.HelpCtx" url="helppages/csh/view_profilingpoints.html"/>
+        <mapID target="ProfilerControlPanel.HelpCtx" url="helppages/csh/view_profiler.html"/>
         
         
         
