@@ -70,6 +70,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.BorderFactory;
@@ -87,6 +88,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.openide.util.Lookup;
 
 
 /**
@@ -598,7 +600,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
 
         if (isMarksEnabled) {
             ctg.reset();
-            MarkingEngine.getDefault().configure(ctg.getMappings());
+            MarkingEngine.getDefault().configure(ctg.getMappings(), Lookup.getDefault().lookupAll(MarkingEngine.StateObserver.class));
         } else {
             MarkingEngine.getDefault().deconfigure();
         }

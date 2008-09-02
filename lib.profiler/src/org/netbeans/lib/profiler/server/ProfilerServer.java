@@ -51,7 +51,6 @@ import org.netbeans.lib.profiler.server.system.Threads;
 import org.netbeans.lib.profiler.server.system.Timers;
 import org.netbeans.lib.profiler.wireprotocol.*;
 import java.io.*;
-import java.lang.InterruptedException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
