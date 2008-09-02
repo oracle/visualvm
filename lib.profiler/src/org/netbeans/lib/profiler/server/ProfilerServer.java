@@ -58,6 +58,7 @@ import java.lang.reflect.Modifier;
 import java.net.*;
 import java.text.MessageFormat;
 import java.util.*;
+import org.openide.util.Exceptions;
 
 
 /**
@@ -1550,7 +1551,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 sendSimpleResponseToClient(true, null);
                 closeConnection();
                 preemptExit = false;
-                System.exit(-1);
+                doExit();
 
                 break;
             case Command.SHUTDOWN_OK:
@@ -1654,6 +1655,32 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
                 break;
         }
+    }
+
+    private void doExit() {
+        // try to call LifecycleManager in NetBeans first
+        try {
+            Class lookupClz = Thread.currentThread().getContextClassLoader().loadClass("org.openide.util.Lookup"); // NOI18N
+            Method instMethod = lookupClz.getMethod("getDefault", new Class[0]); // NOI18N
+            Method lookupMethod = lookupClz.getMethod("lookup", new Class[]{Class.class}); // NOI18N
+
+            Object instance = instMethod.invoke(lookupClz, new Object[0]);
+            if (instance != null) {
+                ClassLoader clInstance = (ClassLoader)lookupMethod.invoke(instance, new Class[]{ClassLoader.class});
+                if (clInstance != null) {
+                    Class lcmInstanceClz = clInstance.loadClass("org.openide.LifecycleManager"); // NOI18N
+                    Method lcmInstMethod = lcmInstanceClz.getMethod("getDefault", new Class[0]); // NOI18N
+                    Method lcmExitMethod = lcmInstanceClz.getMethod("exit", new Class[0]); // NOI18N
+                    Object lcmInstance = lcmInstMethod.invoke(lcmInstanceClz, new Object[0]);
+                    lcmExitMethod.invoke(lcmInstance, new Object[0]);
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            // ignore
+        }
+        // fall through a general system exit
+        System.exit(-1);
     }
 
     private void handleIOExceptionOnSend(IOException ex) {
