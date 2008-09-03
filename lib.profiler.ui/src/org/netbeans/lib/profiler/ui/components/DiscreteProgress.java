@@ -45,10 +45,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 
 
 /**
@@ -64,19 +65,23 @@ public class DiscreteProgress extends JPanel {
     private int totalUnits = 10;
     private int unitHeight = 13;
     private int unitWidth = 10;
+    
+    private JProgressBar progressDelegate;
+    private DefaultBoundedRangeModel progressDelegateModel;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public DiscreteProgress() {
-        super(new BorderLayout());
-        setBorder(new ThinBevelBorder(BevelBorder.LOWERED));
-        setOpaque(false);
+        initComponents();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void setActiveUnits(int activeUnits) {
-        if (this.activeUnits != activeUnits) {
+        if (progressDelegateModel != null) {
+            this.activeUnits = activeUnits;
+            progressDelegateModel.setValue(activeUnits);
+        } else if (this.activeUnits != activeUnits) {
             this.activeUnits = activeUnits;
             repaint();
         }
@@ -120,13 +125,31 @@ public class DiscreteProgress extends JPanel {
     }
 
     public void paintComponent(Graphics g) {
-        Insets insets = getInsets();
-        int offsetX = insets.left;
-        int offsetY = insets.top;
+        if (progressDelegate == null) {
+            Insets insets = getInsets();
+            int offsetX = insets.left;
+            int offsetY = insets.top;
 
-        for (int i = 0; i < totalUnits; i++) {
-            g.setColor((i < activeUnits) ? enabledColor : disabledColor);
-            g.fillRect(offsetX + (i * unitWidth) + i, offsetY, unitWidth, unitHeight);
+            for (int i = 0; i < totalUnits; i++) {
+                g.setColor((i < activeUnits) ? enabledColor : disabledColor);
+                g.fillRect(offsetX + (i * unitWidth) + i, offsetY, unitWidth, unitHeight);
+            }
+        } else {
+            super.paintComponent(g);
         }
+    }
+    
+    
+    private void initComponents() {
+        setLayout(new BorderLayout());
+        
+//        if (UIUtils.isNimbus()) {
+            progressDelegateModel = new DefaultBoundedRangeModel(4, 1, 0, 10);
+            progressDelegate = new JProgressBar(progressDelegateModel);
+            add(progressDelegate, BorderLayout.CENTER);
+//        } else {
+//            setBorder(new ThinBevelBorder(BevelBorder.LOWERED));
+//            setOpaque(false);
+//        }
     }
 }
