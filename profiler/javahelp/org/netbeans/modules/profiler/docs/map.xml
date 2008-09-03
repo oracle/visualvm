@@ -119,6 +119,14 @@ made subject to such option by the copyright holder.
         <mapID target="TriggeredTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
         <mapID target="StopwatchCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
         <mapID target="LoadGeneratorCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
-        
+
+        <!--CSH ID for root methods dialogs -->
+        <mapID target="RootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
+        <mapID target="ProjectSelectRootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
+        <mapID target="ManualMethodSelect.HelpCtx" url="helppages/profile_rootmethod.html"/>
+
+        <!--CSH ID for active profiling points dialog -->
+        <mapID target="ProfilingPointsDisplayer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+
         
     </map>
