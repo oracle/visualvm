@@ -44,7 +44,6 @@ import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ContextAware;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -138,6 +137,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
+import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
@@ -2101,16 +2102,22 @@ public final class NetBeansProfiler extends Profiler {
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
             CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
+            filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
+
             if (filter != null) {
                 filter.reset(); // clean up the filter before reusing it
             }
 
             // init context aware instances
-            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
-
-            for (ContextAware instance : contextAwareInstances) {
-                instance.setContext(client);
-            }
+            FlatProfileBuilder fpb = Lookup.getDefault().lookup(FlatProfileBuilder.class);
+            TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
+            fpb.setContext(client, tc, filter);
+            
+//            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
+//
+//            for (ContextAware instance : contextAwareInstances) {
+//                instance.setContext(client);
+//            }
 
 //            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
 //                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
