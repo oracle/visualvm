@@ -244,29 +244,12 @@ public class JavaPlatformPanelComponent extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        labelHint = new javax.swing.JTextArea();
         comboJvm = new javax.swing.JComboBox();
         buttonManage = new javax.swing.JButton();
+        hintPanel = new org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/components/Bundle"); // NOI18N
         setBorder(javax.swing.BorderFactory.createTitledBorder(null, bundle.getString("SELECT_PLATFORM"), javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, UIManager.getFont("TitledBorder.font").deriveFont(Font.BOLD))); // NOI18N
-
-        labelHint.setBackground(javax.swing.UIManager.getDefaults().getColor("Panel.background"));
-        labelHint.setColumns(20);
-        labelHint.setEditable(false);
-        labelHint.setForeground(new java.awt.Color(204, 204, 0));
-        labelHint.setLineWrap(true);
-        labelHint.setRows(5);
-        labelHint.setText(bundle.getString("PLATFORMS_HINT")); // NOI18N
-        labelHint.setWrapStyleWord(true);
-        labelHint.setDisabledTextColor(new java.awt.Color(116, 122, 128));
-        labelHint.setEnabled(false);
-        labelHint.setFocusable(false);
-        labelHint.setMaximumSize(new java.awt.Dimension(800, 14));
-        labelHint.setPreferredSize(new java.awt.Dimension(400, 20));
-        labelHint.setRequestFocusEnabled(false);
-        labelHint.setSelectionColor(new java.awt.Color(230, 238, 246));
-        labelHint.setVerifyInputWhenFocusTarget(false);
 
         comboJvm.setModel(jvmModel);
         comboJvm.setMaximumSize(new java.awt.Dimension(400, 24));
@@ -283,15 +266,19 @@ public class JavaPlatformPanelComponent extends javax.swing.JPanel {
             }
         });
 
+        hintPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        hintPanel.setForeground(javax.swing.UIManager.getDefaults().getColor("TextField.inactiveForeground"));
+        hintPanel.setHint(org.openide.util.NbBundle.getMessage(JavaPlatformPanelComponent.class, "PLATFORMS_HINT")); // NOI18N
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, labelHint, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
                         .add(comboJvm, 0, 272, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(buttonManage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -305,11 +292,10 @@ public class JavaPlatformPanelComponent extends javax.swing.JPanel {
                     .add(comboJvm, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(buttonManage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(labelHint, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+                .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        labelHint.getAccessibleContext().setAccessibleName("null");
         comboJvm.getAccessibleContext().setAccessibleName("null");
         comboJvm.getAccessibleContext().setAccessibleDescription("null");
         buttonManage.getAccessibleContext().setAccessibleDescription("null");
@@ -329,7 +315,7 @@ public class JavaPlatformPanelComponent extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonManage;
     private javax.swing.JComboBox comboJvm;
-    private javax.swing.JTextArea labelHint;
+    private org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel hintPanel;
     // End of variables declaration//GEN-END:variables
   
   public String getTitle() {
@@ -340,24 +326,24 @@ public class JavaPlatformPanelComponent extends javax.swing.JPanel {
   }
   
   public String getHint() {
-    return labelHint.getText();
+    return hintPanel.getHint();
   }
   public void setHint(String hint) {
-    labelHint.setText(hint);
+    hintPanel.setHint(hint);
   }
   
   public Color getHintForeground() {
-    return labelHint.getDisabledTextColor();
+    return hintPanel.getForeground();
   }
   public void setHintForeground(Color color) {
-    labelHint.setDisabledTextColor(color);
+    hintPanel.setForeground(color);
   }
   
   public Color getHintBackground() {
-    return labelHint.getBackground();
+    return hintPanel.getBackground();
   }
   public void setHintBackground(Color bgcolor) {
-    labelHint.setBackground(bgcolor);
+    hintPanel.setBackground(bgcolor);
   }
   
   public TargetPlatform getSelectedPlatform() {
