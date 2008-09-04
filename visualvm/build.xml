@@ -95,8 +95,16 @@
                         <filename name="**/lib/nbexec*"/>
                     </not>
                     <selector refid="zip.platform.included.files"/>
+                    <not>
+                        <filename name="DISTRIBUTION.txt"/>
+                    </not>
+                    <not>
+                        <filename name="LICENSE.txt"/>
+                    </not>
                 </and>
             </zipfileset>
+
+            <zipfileset dir="startup/src/com/sun/tools/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
                         
             <!-- Yes, the doubled app.name is a bit ugly, but better than the alternative; cf. #66441: -->
             <zipfileset dir="${cluster}" prefix="${app.name}/${app.name}">
