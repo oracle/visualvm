@@ -31,14 +31,6 @@
             <code-name-base>com.sun.appserv.management</code-name-base>
             <suite-component/>
             <module-dependencies/>
-            <class-path-extension>
-                <runtime-relative-path>ext/amxapi.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/amxapi.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/javaee.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/javaee.jar</binary-origin>
-            </class-path-extension>
             <public-packages>
                 <package>com.sun.appserv.management</package>
                 <package>com.sun.appserv.management.base</package>
@@ -149,6 +141,14 @@
                 <package>javax.xml.ws.spi</package>
                 <package>javax.xml.ws.wsaddressing</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/amxapi.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/amxapi.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/javaee.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/javaee.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>
