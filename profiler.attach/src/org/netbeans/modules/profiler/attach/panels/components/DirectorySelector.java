@@ -95,8 +95,7 @@ public class DirectorySelector extends javax.swing.JPanel {
         browsePanel = new javax.swing.JPanel();
         textPath = new javax.swing.JTextField();
         buttonBrowse = new javax.swing.JButton();
-        hintScroller = new javax.swing.JScrollPane();
-        labelHint = new javax.swing.JTextPane();
+        hintPanel = new org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel();
 
         textPath.setText("null");
         textPath.getDocument().addDocumentListener(this.pathListener);
@@ -130,26 +129,23 @@ public class DirectorySelector extends javax.swing.JPanel {
         textPath.getAccessibleContext().setAccessibleDescription("null");
         buttonBrowse.getAccessibleContext().setAccessibleDescription("null");
 
-        hintScroller.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-        labelHint.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        labelHint.setContentType(org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.labelHint.contentType")); // NOI18N
-        labelHint.setForeground(javax.swing.UIManager.getDefaults().getColor("EditorPane.inactiveForeground"));
-        hintScroller.setViewportView(labelHint);
+        hintPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        hintPanel.setMinimumSize(new java.awt.Dimension(0, 0));
+        hintPanel.setPreferredSize(new java.awt.Dimension(0, 0));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(browsePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, hintScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+            .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(browsePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(hintScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE))
+                .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -174,8 +170,7 @@ public class DirectorySelector extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel browsePanel;
     private javax.swing.JButton buttonBrowse;
-    private javax.swing.JScrollPane hintScroller;
-    private javax.swing.JTextPane labelHint;
+    private org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel hintPanel;
     private javax.swing.JTextField textPath;
     // End of variables declaration//GEN-END:variables
     /**
@@ -223,7 +218,7 @@ public class DirectorySelector extends javax.swing.JPanel {
      * @return Value of property hint.
      */
     public String getHint() {
-        return this.labelHint.getText();
+        return hintPanel.getHint();
     }
 
     /**
@@ -231,30 +226,30 @@ public class DirectorySelector extends javax.swing.JPanel {
      * @param hint New value of property hint.
      */
     public void setHint(String hint) {
-        this.labelHint.setText(hint);
+        hintPanel.setHint(hint);
         if (hint == null || hint.length() == 0) {
-            this.hintScroller.setVisible(false);
+            hintPanel.setVisible(false);
         } else {
-            this.hintScroller.setVisible(true);
+            hintPanel.setVisible(true);
         }
         firePropertyChange(LAYOUT_CHANGED_PROPERTY, null, null);
     }
 
     public Color getHintForeground() {
-        return labelHint.getDisabledTextColor();
+        return hintPanel.getForeground();
 //    return labelHint.getForeground();
     }
 
     public void setHintForeground(Color color) {
-        labelHint.setDisabledTextColor(color);
+        hintPanel.setForeground(color);
 //    labelHint.setForeground(color);
     }
 
     public Color getHintBackground() {
-        return labelHint.getBackground();
+        return hintPanel.getBackground();
     }
 
     public void setHintBackground(Color bgcolor) {
-        labelHint.setBackground(bgcolor);
+        hintPanel.setBackground(bgcolor);
     }
 }
