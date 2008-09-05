@@ -117,7 +117,6 @@ made subject to such option by the copyright holder.
         <mapID target="TakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
         <mapID target="TimedTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
         <mapID target="TriggeredTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
-        <mapID target="StopwatchCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
         <mapID target="LoadGeneratorCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
 
         <!--CSH ID for root methods dialogs -->
