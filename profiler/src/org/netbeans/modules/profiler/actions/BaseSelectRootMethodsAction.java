@@ -55,28 +55,29 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.NodeAction;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.ui.panels.ClassSelectRootMethodsPanel;
+import org.openide.filesystems.FileObject;
 
 
 /**
- * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.
+ * Base class for actions providing functionality to select a profiling root
+ * method from the currently opened source file
  *
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
-public final class SelectRootMethodsAction extends NodeAction {
+abstract public class BaseSelectRootMethodsAction extends NodeAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
     // I18N String constants
-    private static final String NO_CLASS_FOUND_MSG = NbBundle.getMessage(SelectRootMethodsAction.class,
+    private static final String NO_CLASS_FOUND_MSG = NbBundle.getMessage(BaseSelectRootMethodsAction.class,
                                                                          "SelectRootMethodsAction_NoClassFoundMsg"); // NOI18N
                                                                                                                      // -----
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SelectRootMethodsAction() {
+    public BaseSelectRootMethodsAction() {
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
     }
 
@@ -87,7 +88,7 @@ public final class SelectRootMethodsAction extends NodeAction {
     }
 
     public String getName() {
-        return NbBundle.getMessage(SelectRootMethodsAction.class, "LBL_SelectRootMethodsAction"); //NOI18N
+        return NbBundle.getMessage(BaseSelectRootMethodsAction.class, "LBL_SelectRootMethodsAction"); //NOI18N
     }
 
     protected boolean asynchronous() {
@@ -115,32 +116,7 @@ public final class SelectRootMethodsAction extends NodeAction {
                 String className = null;
 
                 protected void doInBackground() {
-                    // Read current offset in editor
-                    int currentOffsetInEditor = SourceUtils.getCurrentOffsetInEditor();
-
-                    if (currentOffsetInEditor == -1) {
-                        return;
-                    }
-
-                    // Try to get class at cursor or type of field at cursor
-                    SourceUtils.ResolvedClass resolvedClass = SourceUtils.resolveClassAtPosition(dobj.getPrimaryFile(),
-                                                                                                 currentOffsetInEditor, true);
-
-                    if ((resolvedClass != null) && (resolvedClass.getJClass() != null)) {
-                        className = resolvedClass.getVMClassName();
-
-                        //      NetBeansProfiler.getDefaultNB().displayInfo("<html><br><b>Will open root method selector for class at cursor:</b><br><br><code>" + resolvedClass.getVMClassName() + "</code></html>");
-                    }
-
-                    if (className == null) {
-                        // Try to get method enclosing cursor position
-                        className = SourceUtils.getEnclosingClassName(dobj.getPrimaryFile(), currentOffsetInEditor);
-                    }
-
-                    if (className == null) {
-                        // Get toplevel class
-                        className = SourceUtils.getToplevelClassName(dobj.getPrimaryFile());
-                    }
+                    className = getFileClassName(dobj.getPrimaryFile());
                 }
 
                 protected void done() {
@@ -191,4 +167,6 @@ public final class SelectRootMethodsAction extends NodeAction {
                 }
             }.execute();
     }
+
+    abstract protected String getFileClassName(FileObject file);
 }
