@@ -101,6 +101,24 @@ public final class UIUtils {
         // is current L&F some kind of GTKLookAndFeel?
         return UIManager.getLookAndFeel().getID().equals("GTK"); //NOI18N
     }
+    
+    /** Determines if current L&F is Nimbus */
+    public static boolean isNimbusLookAndFeel() {
+        // is current L&F Nimbus?
+        return UIManager.getLookAndFeel().getID().equals("Nimbus"); //NOI18N
+    }
+    
+    /** Determines if current L&F is GTK using Nimbus theme */
+    public static boolean isNimbusGTKTheme() {
+        // is current L&F GTK using Nimbus theme?
+        return isGTKLookAndFeel() && "nimbus".equals(Toolkit.getDefaultToolkit().getDesktopProperty("gnome.Net/ThemeName")); //NOI18N
+    }
+    
+    /** Determines if current L&F is Nimbus or GTK with Nimbus theme*/
+    public static boolean isNimbus() {
+        // is current L&F Nimbus or GTK with Nimbus theme?
+        return isNimbusLookAndFeel() || isNimbusGTKTheme();
+    }
 
     /** Determines if current L&F is MetalLookAndFeel */
     public static boolean isMetalLookAndFeel() {
@@ -247,7 +265,7 @@ public final class UIUtils {
     
     public static Color getProfilerResultsBackground() {
         if (profilerResultsBackground == null) {
-            if (isGTKLookAndFeel()) {
+            if (isGTKLookAndFeel() || isNimbusLookAndFeel()) {
                 profilerResultsBackground = getGTKProfilerResultsBackground();
             } else {
                 profilerResultsBackground = getNonGTKProfilerResultsBackground();

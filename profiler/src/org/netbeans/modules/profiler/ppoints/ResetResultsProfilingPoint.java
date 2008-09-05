@@ -383,6 +383,8 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
         ResetResultsCustomizer customizer = (ResetResultsCustomizer) c;
         setName(customizer.getPPName());
         setLocation(customizer.getPPLocation());
+        
+        Utils.checkLocation(this);
     }
 
     void hit(RuntimeProfilingPoint.HitEvent hitEvent, int index) {
