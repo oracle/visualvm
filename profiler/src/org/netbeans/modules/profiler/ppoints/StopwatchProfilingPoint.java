@@ -516,6 +516,8 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
         setName(customizer.getPPName());
         setStartLocation(customizer.getPPStartLocation());
         setEndLocation(customizer.getPPEndLocation());
+        
+        Utils.checkLocation(this);
     }
 
     void hit(RuntimeProfilingPoint.HitEvent hitEvent, int index) {
