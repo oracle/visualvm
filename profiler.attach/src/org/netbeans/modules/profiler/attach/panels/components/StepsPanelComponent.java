@@ -84,9 +84,9 @@ public class StepsPanelComponent extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        label = new javax.swing.JTextArea();
         stepsScroller = new javax.swing.JScrollPane();
         areaSteps = new org.netbeans.lib.profiler.ui.components.HTMLTextArea();
-        label = new javax.swing.JLabel();
         labelHints = new org.netbeans.lib.profiler.ui.components.HTMLLabel();
 
         setMaximumSize(new java.awt.Dimension(800, 600));
@@ -95,17 +95,18 @@ public class StepsPanelComponent extends javax.swing.JPanel {
         setRequestFocusEnabled(false);
         setLayout(new java.awt.BorderLayout());
 
-        stepsScroller.setMaximumSize(new java.awt.Dimension(800, 600));
-        stepsScroller.setMinimumSize(new java.awt.Dimension(100, 100));
-        stepsScroller.setPreferredSize(new java.awt.Dimension(200, 100));
+        label.setEditable(false);
+        label.setLineWrap(true);
+        label.setText(org.openide.util.NbBundle.getMessage(StepsPanelComponent.class, "StepsPanelComponent.label.text")); // NOI18N
+        label.setWrapStyleWord(true);
+        label.setDisabledTextColor(javax.swing.UIManager.getDefaults().getColor("Label.foreground"));
+        label.setEnabled(false);
+        label.setOpaque(false);
+        add(label, java.awt.BorderLayout.NORTH);
+
         stepsScroller.setViewportView(areaSteps);
 
         add(stepsScroller, java.awt.BorderLayout.CENTER);
-
-        label.setLabelFor(areaSteps);
-        org.openide.awt.Mnemonics.setLocalizedText(label, org.openide.util.NbBundle.getMessage(StepsPanelComponent.class, "StepsPanelComponent.label.text")); // NOI18N
-        label.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        add(label, java.awt.BorderLayout.NORTH);
 
         labelHints.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
         labelHints.setText(org.openide.util.NbBundle.getMessage(StepsPanelComponent.class, "StepsPanelComponent.labelHints.text")); // NOI18N
@@ -122,7 +123,7 @@ public class StepsPanelComponent extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.netbeans.lib.profiler.ui.components.HTMLTextArea areaSteps;
-    private javax.swing.JLabel label;
+    private javax.swing.JTextArea label;
     private org.netbeans.lib.profiler.ui.components.HTMLLabel labelHints;
     private javax.swing.JScrollPane stepsScroller;
     // End of variables declaration//GEN-END:variables
@@ -139,7 +140,7 @@ public class StepsPanelComponent extends javax.swing.JPanel {
      * @param title New value of property title.
      */
     public void setTitle(String title) {
-        org.openide.awt.Mnemonics.setLocalizedText(label, title);
+        label.setText(title);
     }
     /**
      * Holds value of property steps.
