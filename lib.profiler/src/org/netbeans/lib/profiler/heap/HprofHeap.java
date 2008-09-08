@@ -153,7 +153,7 @@ class HprofHeap implements Heap {
         return classDumpBounds.createClassCollection();
     }
 
-    public GCRoot getGCRoot(Instance instance) {
+    public synchronized GCRoot getGCRoot(Instance instance) {
         Long instanceId = Long.valueOf(instance.getInstanceId());
 
         if (gcRoots == null) {
@@ -163,7 +163,7 @@ class HprofHeap implements Heap {
         return (GCRoot) gcRoots.get(instanceId);
     }
 
-    public Collection getGCRoots() {
+    public synchronized Collection getGCRoots() {
         if (heapDumpSegment == null) {
             return Collections.EMPTY_LIST;
         }
@@ -243,7 +243,7 @@ class HprofHeap implements Heap {
         return getClassDumpSegment().getJavaClassByName(fqn);
     }
 
-    public HeapSummary getSummary() {
+    public synchronized HeapSummary getSummary() {
         TagBounds summaryBound = tagBounds[HEAP_SUMMARY];
 
         if (summaryBound != null) {
@@ -363,7 +363,7 @@ class HprofHeap implements Heap {
         return instances;
     }
 
-    void computeInstances() {
+    synchronized void computeInstances() {
         if (instancesCountComputed) {
             return;
         }
