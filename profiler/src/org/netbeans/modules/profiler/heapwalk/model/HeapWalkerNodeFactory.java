@@ -182,6 +182,10 @@ public class HeapWalkerNodeFactory {
                 }
             };
     }
+    
+    public static boolean isNoFieldsNode(HeapWalkerNode node) {
+        return NO_FIELDS_STRING.equals(node.getName());
+    }
 
     public static HeapWalkerNode createNoItemsNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
@@ -201,6 +205,10 @@ public class HeapWalkerNodeFactory {
                     return null;
                 }
             };
+    }
+    
+    public static boolean isNoItemsNode(HeapWalkerNode node) {
+        return NO_ITEMS_STRING.equals(node.getName());
     }
 
     public static HeapWalkerNode createNoReferencesNode(HeapWalkerNode parent) {
@@ -222,6 +230,10 @@ public class HeapWalkerNodeFactory {
                 }
             };
     }
+    
+    public static boolean isNoReferencesNode(HeapWalkerNode node) {
+        return NO_REFERENCES_STRING.equals(node.getName());
+    }
 
     public static HeapWalkerNode createOOMNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
@@ -241,6 +253,10 @@ public class HeapWalkerNodeFactory {
                     return org.netbeans.modules.profiler.ui.Utils.ERROR_ICON;
                 }
             };
+    }
+    
+    public static boolean isOOMNode(HeapWalkerNode node) {
+        return OUT_OF_MEMORY_STRING.equals(node.getName());
     }
 
     public static HeapWalkerNode createObjectArrayItemNode(ObjectArrayNode array, int itemIndex, Instance instance) {
@@ -275,6 +291,10 @@ public class HeapWalkerNodeFactory {
                     return BrowserUtils.ICON_PROGRESS;
                 }
             };
+    }
+    
+    public static boolean isProgressNode(HeapWalkerNode node) {
+        return SEARCHING_STRING.equals(node.getName());
     }
 
     public static HeapWalkerNode createReferenceNode(Value value, HeapWalkerNode parent) {
@@ -356,5 +376,14 @@ public class HeapWalkerNodeFactory {
                     ;
                 };
         }
+    }
+    
+    public static boolean isMessageNode(HeapWalkerNode node) {
+        return isNoFieldsNode(node) ||
+               isNoItemsNode(node) ||
+               isNoReferencesNode(node) ||
+               isNoReferencesNode(node) ||
+               isOOMNode(node) ||
+               isProgressNode(node);
     }
 }
