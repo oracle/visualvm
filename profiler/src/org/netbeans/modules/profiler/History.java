@@ -104,7 +104,7 @@ public class History implements SynchronousXYChartModel, ActionsHandler, Profili
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static History getInstance() {
+    public static synchronized History getInstance() {
         if (instance == null) {
             instance = new History();
         }
