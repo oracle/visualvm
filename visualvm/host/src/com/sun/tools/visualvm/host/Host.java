@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 
 /**
  * Abstract implementation of Host.
+ * Each host is defined by a hostname/ip if resolvable or hostname/ip and InetAddress.
  *
  * @author Jiri Sedlacek
  */
@@ -42,6 +43,9 @@ public abstract class Host extends DataSource implements Stateful {
      */
     public static final Host LOCALHOST = HostsSupport.getInstance().createLocalHost();
     
+    /**
+     * Instance representing an unknown host (placeholder node in Applications window, hidden if not used).
+     */
     public static final Host UNKNOWN_HOST = HostsSupport.getInstance().createUnknownHost();
 
     private final String hostName;
@@ -74,10 +78,20 @@ public abstract class Host extends DataSource implements Stateful {
     }
     
     
+    /**
+     * Returns hostname of the host.
+     * 
+     * @return hostname of the host.
+     */
     public String getHostName() {
         return hostName;
     }
     
+    /**
+     * Returns InetAddress instance of the host.
+     * 
+     * @return InetAddress instance of the host.
+     */
     public final InetAddress getInetAddress() {
         return inetAddress;
     }

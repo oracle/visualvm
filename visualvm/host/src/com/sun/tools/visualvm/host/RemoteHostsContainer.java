@@ -34,6 +34,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
+ * Toplevel node Remote in Applications window.
  *
  * @author Jiri Sedlacek
  */
@@ -42,6 +43,11 @@ public class RemoteHostsContainer extends DataSource {
     private static RemoteHostsContainer sharedInstance;
     
     
+    /**
+     * Returns singleton instance of RemoteHostsContainer.
+     * 
+     * @return singleton instance of RemoteHostsContainer.
+     */
     public static synchronized RemoteHostsContainer sharedInstance() {
         if (sharedInstance == null) sharedInstance = new RemoteHostsContainer();
         return sharedInstance;
