@@ -34,6 +34,9 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
+ * Abstract implementation of CoreDump.
+ * Each coredump is defined by a coredump file and JDK_HOME directory of the JDK
+ * which was running the original application.
  *
  * @author Jiri Sedlacek
  * @author Tomas Hurka
@@ -43,10 +46,25 @@ public abstract class CoreDump extends Snapshot {
     private final File jdkHome;
     
     
+    /**
+     * Creates new instance of a coredump.
+     * 
+     * @param file coredump file.
+     * @param jdkHome JDK_HOME directory of the JDK which was running the original application.
+     * @throws java.io.IOException if file or jdkHome are invalid.
+     */
     public CoreDump(File file, File jdkHome) throws IOException {
         this(file, jdkHome, null);
     }
     
+    /**
+     * Creates new instance of a coredump.
+     * 
+     * @param file coredump file.
+     * @param jdkHome JDK_HOME directory of the JDK which was running the original application.
+     * @param master master DataSource for the coredump.
+     * @throws java.io.IOException if file or jdkHome are invalid.
+     */
     public CoreDump(File file, File jdkHome, DataSource master) throws IOException {
         super(file, CoreDumpSupport.getCategory(), master);
         
@@ -62,6 +80,11 @@ public abstract class CoreDump extends Snapshot {
         }
     }
     
+    /**
+     * Returns the Java executable of the JDK which was running the original application.
+     * 
+     * @return the Java executable of the JDK which was running the original application.
+     */
     public final String getExecutable() {
         String home = getJDKHome();
         
@@ -72,6 +95,11 @@ public abstract class CoreDump extends Snapshot {
         return exec;
     }
     
+    /**
+     * Returns JDK_HOME directory of the JDK which was running the original application.
+     * 
+     * @return JDK_HOME directory of the JDK which was running the original application.
+     */
     public final String getJDKHome() {
         return jdkHome.getAbsolutePath();
     }
