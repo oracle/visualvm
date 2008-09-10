@@ -35,6 +35,9 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 
 /**
+ * Support for built-in application views in VisualVM.
+ * Currently publishes Overview, Monitor and Threads subtabs for Application and
+ * Overview subtab for ApplicationSnapshot.
  *
  * @author Jiri Sedlacek
  */
@@ -48,24 +51,49 @@ public final class ApplicationViewsSupport {
     private ApplicationThreadsViewProvider threadsPluggableView = new ApplicationThreadsViewProvider();
     
     
+    /**
+     * Returns singleton instance of ApplicationViewsSupport.
+     * 
+     * @return singleton instance of ApplicationViewsSupport.
+     */
     public static synchronized ApplicationViewsSupport sharedInstance() {
         if (sharedInstance == null) sharedInstance = new ApplicationViewsSupport();
         return sharedInstance;
     }
     
     
+    /**
+     * Returns PluggableDataSourceViewProvider for Overview application subtab.
+     * 
+     * @return PluggableDataSourceViewProvider for Overview application subtab.
+     */
     public PluggableDataSourceViewProvider<Application> getOverviewView() {
         return overviewPluggableView;
     }
     
+    /**
+     * Returns PluggableDataSourceViewProvider for Overview application snapshot subtab.
+     * 
+     * @return PluggableDataSourceViewProvider for Overview application snapshot subtab.
+     */
     public PluggableDataSourceViewProvider<ApplicationSnapshot> getSnapshotOverviewView() {
         return applicationSnapshotOverviewView;
     }
     
+    /**
+     * Returns PluggableDataSourceViewProvider for Monitor application subtab.
+     * 
+     * @return PluggableDataSourceViewProvider for Monitor application subtab.
+     */
     public PluggableDataSourceViewProvider getMonitorView() {
         return monitorPluggableView;
     }
     
+    /**
+     * Returns PluggableDataSourceViewProvider for Threads application subtab.
+     * 
+     * @return PluggableDataSourceViewProvider for Threads application subtab.
+     */
     public PluggableDataSourceViewProvider getThreadsView() {
         return threadsPluggableView;
     }
