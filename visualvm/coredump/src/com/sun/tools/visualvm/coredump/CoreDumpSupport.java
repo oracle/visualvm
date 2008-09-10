@@ -136,7 +136,7 @@ public final class CoreDumpSupport {
     }
 
     
-    public static void register() {
+    static void register() {
         if (Utilities.isWindows()) return;
         
         DataSourceDescriptorFactory.getDefault().registerProvider(new CoreDumpDescriptorProvider());
