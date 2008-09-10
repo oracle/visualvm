@@ -92,7 +92,7 @@ public final class HostsSupport {
     }
     
     
-    public static String getStorageDirectoryString() {
+    static String getStorageDirectoryString() {
         synchronized(hostsStorageDirectoryStringLock) {
             if (hostsStorageDirectoryString == null)
                 hostsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + HOSTS_STORAGE_DIRNAME;
