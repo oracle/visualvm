@@ -33,7 +33,7 @@ import java.io.File;
 
 /**
  * Abstract implementation of Application.
- * Each application needs to provide the Host on which it's running and an unique identificator.
+ * Each application is defined by a Host on which it's running and an unique identificator.
  *
  * @author Jiri Sedlacek
  */

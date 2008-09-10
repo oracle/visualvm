@@ -16,7 +16,7 @@ public class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
     /**
      * Creates new instance of CoreDumpDescriptor.
      * 
-     * @param snapshot CoreDump for the descriptor.
+     * @param coreDump CoreDump for the descriptor.
      */
     public CoreDumpDescriptor(CoreDump coreDump) {
         super(coreDump, ICON);
