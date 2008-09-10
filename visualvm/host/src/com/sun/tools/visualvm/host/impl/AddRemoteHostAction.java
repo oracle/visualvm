@@ -74,7 +74,7 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
         if (hostDescriptor != null) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    HostsSupport.getInstance().getHostProvider().createHost(hostDescriptor, true);
+                    HostsSupport.getInstance().createHost(hostDescriptor.getHostName(), hostDescriptor.getDisplayName());
                 }
             });
         }

@@ -74,7 +74,18 @@ public final class HostsSupport {
      * @return new host from provided hostname or null if the hostname could not be resolved.
      */
     public Host createHost(String hostname) {
-        return getHostProvider().createHost(new HostProperties(hostname, hostname), true);
+        return hostProvider.createHost(new HostProperties(hostname, hostname), true);
+    }
+    
+    /**
+     * Creates new host from provided hostname and display name.
+     * 
+     * @param hostname hostname of the host to be created.
+     * @param displayname displayname of the host to be created.
+     * @return new host from provided hostname or null if the hostname could not be resolved.
+     */
+    public Host createHost(String hostname, String displayname) {
+        return hostProvider.createHost(new HostProperties(hostname, displayname), true);
     }
     
     /**
@@ -84,11 +95,7 @@ public final class HostsSupport {
      * @return already known Host instance with the same InetAddress or null.
      */
     public Host getHostByAddress(InetAddress inetAddress) {
-        return getHostProvider().getHostByAddress(inetAddress);
-    }
-
-    public HostProvider getHostProvider() {
-        return hostProvider;
+        return hostProvider.getHostByAddress(inetAddress);
     }
     
     
