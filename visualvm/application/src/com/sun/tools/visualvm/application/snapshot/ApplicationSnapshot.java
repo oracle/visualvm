@@ -39,6 +39,7 @@ import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
+ * Snapshot of an Application.
  *
  * @author Jiri Sedlacek
  */
@@ -47,6 +48,12 @@ public final class ApplicationSnapshot extends Snapshot {
     private Storage storage;
     
     
+    /**
+     * Creates new instance of an application snapshot.
+     * 
+     * @param directory directory for snapshot data
+     * @param storage Storage object for the snapshot.
+     */
     public ApplicationSnapshot(File directory, Storage storage) {
         super(directory, ApplicationSnapshotsSupport.getInstance().getCategory());
         this.storage = storage;
