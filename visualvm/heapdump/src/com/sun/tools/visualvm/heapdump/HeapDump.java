@@ -33,13 +33,14 @@ import org.openide.util.NbBundle;
 
 /**
  * Abstract implementation of HeapDump.
+ * Each coredump is defined by a heapdump file.
  *
  * @author Jiri Sedlacek
  */
 public abstract class HeapDump extends Snapshot {
     
     /**
-     * Creates new instance of AbstractHeapDump with the data stored in a file.
+     * Creates new instance of HeapDump with the data stored in a file.
      * 
      * @param file file where heap dump is saved.
      */
@@ -48,7 +49,7 @@ public abstract class HeapDump extends Snapshot {
     }
     
     /**
-     * Creates new instance of AbstractHeapDump with the data stored in a file and defined master.
+     * Creates new instance of HeapDump with the data stored in a file and defined master.
      * 
      * @param file file where heap dump is saved,
      * @param master DataSource in whose window the heap dump will be displayed.
