@@ -80,7 +80,7 @@ public class OpenProfilingPointsWindowAction extends SystemAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        ProfilingPointsWindow stc = ProfilingPointsWindow.getInstance();
+        ProfilingPointsWindow stc = ProfilingPointsWindow.getDefault();
         stc.open();
         stc.requestActive();
     }
