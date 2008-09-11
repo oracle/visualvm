@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -248,8 +249,13 @@ final class ApplicationOverviewModel {
 
     private static String formatSystemProperties(Properties properties) {
         StringBuffer text = new StringBuffer(200);
-        List keys = new ArrayList(properties.keySet());
+        List keys = new ArrayList();
+        Enumeration en = properties.propertyNames();
         Iterator keyIt;
+        
+        while (en.hasMoreElements()) {
+            keys.add(en.nextElement());
+        }
 
         Collections.sort(keys);
         keyIt = keys.iterator();
