@@ -380,9 +380,9 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
                         if (ppoint instanceof GlobalProfilingPoint) {
                             SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        if (!ProfilingPointsWindow.getInstance().isOpened()) {
-                                            ProfilingPointsWindow.getInstance().open();
-                                            ProfilingPointsWindow.getInstance().requestVisible();
+                                        if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                            ProfilingPointsWindow.getDefault().open();
+                                            ProfilingPointsWindow.getDefault().requestVisible();
                                         }
                                     }
                                 });
