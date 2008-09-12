@@ -214,9 +214,13 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     }
 
     public void setResultsAvailable(boolean available) {
-        jScrollPane.setViewportView(available ? resTable : noDataPanel);
-        revalidate();
-        repaint();
+        JViewport viewport = jScrollPane.getViewport();
+        Component viewComponent = available ? resTable : noDataPanel;
+        if (viewComponent != viewport.getView()) {
+            viewport.setView(viewComponent);
+            revalidate();
+            repaint();
+        }
     }
 
     public Object getResultsViewReference() {
