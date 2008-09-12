@@ -58,15 +58,6 @@ public interface MemoryResUserActionsHandler {
     public static final String CANNOT_SHOW_PRIMITIVE_SRC_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle")
                                                                              .getString("MemoryResUserActionsHandler_CannotShowPrimitiveSrcMsg"); // NOI18N
                                                                                                                                                   // -----
-    public static final String BOOLEAN_CODE = "Z"; // NOI18N
-    public static final String CHAR_CODE = "C"; // NOI18N
-    public static final String BYTE_CODE = "B"; // NOI18N
-    public static final String SHORT_CODE = "S"; // NOI18N
-    public static final String INT_CODE = "I"; // NOI18N
-    public static final String LONG_CODE = "J"; // NOI18N
-    public static final String FLOAT_CODE = "F"; // NOI18N
-    public static final String DOUBLE_CODE = "D"; // NOI18N
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void showSourceForMethod(String className, String methodName, String methodSig);
