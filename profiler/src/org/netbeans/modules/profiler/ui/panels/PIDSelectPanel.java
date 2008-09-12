@@ -44,7 +44,6 @@ import org.netbeans.lib.profiler.jps.JpsProxy;
 import org.netbeans.lib.profiler.jps.RunningVM;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
@@ -52,6 +51,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 
 /**
@@ -123,11 +123,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     private JButton button;
     private JButton okButton;
     private JComboBox combo;
-    private JLabel argumentsLabel;
-    private JLabel mainClassLabel;
-    private JLabel pidLabel;
-    private JLabel vmArgumentsLabel;
-    private JLabel vmFlagsLabel;
+    private HTMLTextArea detailsArea;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -137,42 +133,18 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         combo = new JComboBox();
         button = new JButton(REFRESH_BUTTON_NAME);
 
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new GridBagLayout());
-
-        GridBagConstraints labelGbc = new GridBagConstraints();
-        labelGbc.insets = new Insets(3, 5, 0, 0);
-        labelGbc.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints valueGbc = new GridBagConstraints();
-        valueGbc.weightx = 1.0;
-        valueGbc.fill = GridBagConstraints.HORIZONTAL;
-        valueGbc.insets = new Insets(3, 5, 0, 5);
-        valueGbc.gridwidth = GridBagConstraints.REMAINDER;
-        valueGbc.anchor = GridBagConstraints.WEST;
-
-        JLabel l;
-
-        l = new JLabel(PID_LABEL_TEXT);
-        l.setFont(l.getFont().deriveFont(Font.BOLD));
-        infoPanel.add(l, labelGbc);
-        infoPanel.add(pidLabel = new JLabel(), valueGbc);
-        l = new JLabel(MAIN_CLASS_LABEL_TEXT);
-        l.setFont(l.getFont().deriveFont(Font.BOLD));
-        infoPanel.add(l, labelGbc);
-        infoPanel.add(mainClassLabel = new JLabel(), valueGbc);
-        l = new JLabel(ARGUMENTS_LABEL_TEXT);
-        l.setFont(l.getFont().deriveFont(Font.BOLD));
-        infoPanel.add(l, labelGbc);
-        infoPanel.add(argumentsLabel = new JLabel(), valueGbc);
-        l = new JLabel(VM_ARGUMENTS_LABEL_TEXT);
-        l.setFont(l.getFont().deriveFont(Font.BOLD));
-        infoPanel.add(l, labelGbc);
-        infoPanel.add(vmArgumentsLabel = new JLabel(), valueGbc);
-        l = new JLabel(VM_FLAGS_LABEL_TEXT);
-        l.setFont(l.getFont().deriveFont(Font.BOLD));
-        infoPanel.add(l, labelGbc);
-        infoPanel.add(vmFlagsLabel = new JLabel(), valueGbc);
+        JPanel infoPanel = new JPanel(new BorderLayout());
+        detailsArea = new HTMLTextArea();
+        detailsArea.setEditable(false);
+        detailsArea.setOpaque(true);
+        detailsArea.setBackground(UIManager.getDefaults().getColor("Panel.background")); //NOI18N
+        detailsArea.setPreferredSize(new Dimension(1, 1));
+        JScrollPane detailsAreaScroll = new JScrollPane(detailsArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        detailsAreaScroll.setBorder(BorderFactory.createEmptyBorder());
+        detailsAreaScroll.setViewportBorder(BorderFactory.createEmptyBorder());
+        detailsAreaScroll.setPreferredSize(new Dimension(250, 200));
+        infoPanel.add(detailsAreaScroll, BorderLayout.CENTER);
 
         combo.setRenderer(new PIDComboRenderer());
         combo.getAccessibleContext().setAccessibleName(COMBO_ACCESS_NAME);
@@ -272,21 +244,99 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     }
 
     private void updateInfo() {
+        String pid = ""; //NOI18N
+        String mainClass = ""; //NOI18N
+        String arguments = ""; //NOI18N
+        String vmArguments = ""; //NOI18N
+        String vmFlags = ""; //NOI18N
+        
         Object sel = combo.getSelectedItem();
-
+        
         if ((sel != null) && sel instanceof RunningVM) {
             RunningVM vm = (RunningVM) sel;
-            pidLabel.setText("" + vm.getPid()); //NOI18N
-            mainClassLabel.setText(vm.getMainClass());
-            argumentsLabel.setText(vm.getMainArgs());
-            vmArgumentsLabel.setText(vm.getVMArgs());
-            vmFlagsLabel.setText(vm.getVMFlags());
-        } else {
-            pidLabel.setText(""); //NOI18N
-            mainClassLabel.setText(""); //NOI18N
-            argumentsLabel.setText(""); //NOI18N
-            vmArgumentsLabel.setText(""); //NOI18N
-            vmFlagsLabel.setText(""); //NOI18N
+            pid = "" + vm.getPid(); //NOI18N
+            mainClass = vm.getMainClass();
+            arguments = vm.getMainArgs();
+            vmArguments = vm.getVMArgs();
+            vmFlags = vm.getVMFlags();
         }
+        
+        StringBuffer buffer = new StringBuffer();
+        
+        buffer.append("<table cellspacing=\"3\" cellpadding=\"0\">"); //NOI18N
+        
+        // --- PID -------------------------------------------------------------
+        buffer.append("<tr>"); //NOI18N
+        
+        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append(PID_LABEL_TEXT);
+        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        
+        buffer.append("<td>"); //NOI18N
+        buffer.append(pid);
+        buffer.append("</td>"); //NOI18N
+        
+        buffer.append("</tr>"); //NOI18N
+        
+        // --- Main Class ------------------------------------------------------
+        
+        buffer.append("<tr>"); //NOI18N
+        
+        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append(MAIN_CLASS_LABEL_TEXT);
+        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        
+        buffer.append("<td>"); //NOI18N
+        buffer.append(mainClass);
+        buffer.append("</td>"); //NOI18N
+        
+        buffer.append("</tr>"); //NOI18N
+        
+        // --- Arguments -------------------------------------------------------
+        
+        buffer.append("<tr>"); //NOI18N
+        
+        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append(ARGUMENTS_LABEL_TEXT);
+        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        
+        buffer.append("<td>"); //NOI18N
+        buffer.append(arguments);
+        buffer.append("</td>"); //NOI18N
+        
+        buffer.append("</tr>"); //NOI18N
+        
+        // --- VM Arguments ----------------------------------------------------
+        
+        buffer.append("<tr>"); //NOI18N
+        
+        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append(VM_ARGUMENTS_LABEL_TEXT);
+        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        
+        buffer.append("<td>"); //NOI18N
+        buffer.append(vmArguments);
+        buffer.append("</td>"); //NOI18N
+        
+        buffer.append("</tr>"); //NOI18N
+        
+        // --- VM Flags --------------------------------------------------------
+        
+        buffer.append("<tr>"); //NOI18N
+        
+        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append(VM_FLAGS_LABEL_TEXT);
+        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        
+        buffer.append("<td>"); //NOI18N
+        buffer.append(vmFlags);
+        buffer.append("</td>"); //NOI18N
+        
+        buffer.append("</tr>"); //NOI18N
+        
+        buffer.append("</table>"); //NOI18N
+        
+        detailsArea.setText(buffer.toString());
+        detailsArea.setCaretPosition(0);
     }
 }
