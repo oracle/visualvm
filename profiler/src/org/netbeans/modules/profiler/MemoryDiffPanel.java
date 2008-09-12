@@ -68,6 +68,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.*;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.Utils;
 
@@ -84,8 +85,13 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void showSourceForMethod(String className, String methodName, String methodSig) {
+            // Check if primitive type/array
             if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
                  VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+            // Check if allocated by reflection
+            else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
+                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+            // Display source
             else NetBeansProfiler.getDefaultNB().openJavaSource(project, className, methodName, methodSig);
         }
 

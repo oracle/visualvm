@@ -71,7 +71,6 @@ import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDown;
 import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
@@ -115,6 +114,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
 
@@ -441,8 +441,13 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
+            // Check if primitive type/array
             if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
                  VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+            // Check if allocated by reflection
+            else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
+                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+            // Display source
             else NetBeansProfiler.getDefaultNB().openJavaSource(className, methodName, methodSig);
         }
 
