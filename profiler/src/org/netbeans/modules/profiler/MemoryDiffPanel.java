@@ -68,6 +68,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.*;
+import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.Utils;
 
 
@@ -80,30 +81,12 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class DiffActionsHandler implements MemoryResUserActionsHandler {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
-
-        public static final String BOOLEAN_CODE = "boolean"; // NOI18N
-        public static final String CHAR_CODE = "char"; // NOI18N
-        public static final String BYTE_CODE = "byte"; // NOI18N
-        public static final String SHORT_CODE = "short"; // NOI18N
-        public static final String INT_CODE = "int"; // NOI18N
-        public static final String LONG_CODE = "long"; // NOI18N
-        public static final String FLOAT_CODE = "float"; // NOI18N
-        public static final String DOUBLE_CODE = "double"; // NOI18N
-
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void showSourceForMethod(String className, String methodName, String methodSig) {
-            if (BOOLEAN_CODE.equals(className) || CHAR_CODE.equals(className) || BYTE_CODE.equals(className)
-                    || SHORT_CODE.equals(className) || INT_CODE.equals(className) || LONG_CODE.equals(className)
-                    || FLOAT_CODE.equals(className) || DOUBLE_CODE.equals(className)) {
-                // primitive type
-                Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
-
-                return;
-            }
-
-            NetBeansProfiler.getDefaultNB().openJavaSource(project, className, methodName, methodSig);
+            if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
+                 VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+            else NetBeansProfiler.getDefaultNB().openJavaSource(project, className, methodName, methodSig);
         }
 
         public void showStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {

@@ -443,7 +443,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
             if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
                  VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
-            else Profiler.getDefault().openJavaSource(className, methodName, methodSig);
+            else NetBeansProfiler.getDefaultNB().openJavaSource(className, methodName, methodSig);
         }
 
         public void showStacksForClass(final int selectedClassId, final int sortingColumn, final boolean sortingOrder) {
