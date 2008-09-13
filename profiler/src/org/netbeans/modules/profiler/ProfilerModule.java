@@ -51,6 +51,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.NbBundle;
 import javax.swing.*;
+import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 
 
 /**
@@ -176,6 +177,7 @@ public final class ProfilerModule extends ModuleInstall {
                         ThreadsWindow.closeIfOpened();
                         SnapshotResultsWindow.closeAllWindows();
                         HeapWalkerManager.getDefault().closeAllHeapWalkers();
+                        ProfilingPointsWindow.closeIfOpened();
 
                         // perform any shutdown
                         ((NetBeansProfiler) Profiler.getDefault()).shutdown();
