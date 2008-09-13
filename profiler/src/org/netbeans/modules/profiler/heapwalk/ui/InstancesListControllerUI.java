@@ -550,8 +550,6 @@ public class InstancesListControllerUI extends JTitledPanel {
         //    tablePopup = createTablePopup();
         cornerPopup = new JPopupMenu();
 
-        JButton cornerButton = createHeaderPopupCornerButton(cornerPopup);
-
         JTreeTablePanel tablePanel = new JTreeTablePanel(instancesListTable);
         tablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
 
