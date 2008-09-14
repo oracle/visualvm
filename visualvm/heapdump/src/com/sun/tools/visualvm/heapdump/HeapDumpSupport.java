@@ -107,7 +107,7 @@ public final class HeapDumpSupport {
     /**
      * Returns PluggableDataSourceViewProvider for heap dumps.
      * 
-     * @return PluggableView instance to be used to customize the heap dump view.
+     * @return PluggableDataSourceViewProvider for heap dumps.
      */
     public PluggableDataSourceViewProvider<HeapDump> getHeapDumpView() {
         return heapDumpViewProvider;
