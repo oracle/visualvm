@@ -39,7 +39,7 @@ import com.sun.tools.visualvm.threaddump.impl.ThreadDumpProvider;
 import com.sun.tools.visualvm.threaddump.impl.ThreadDumpViewProvider;
 
 /**
- * A public entrypoint to the thread dump support in VisualVM.
+ * Support for thread dumps in VisualVM.
  *
  * @author Jiri Sedlacek
  */
@@ -72,6 +72,12 @@ public final class ThreadDumpSupport {
         return category;
     }
     
+    /**
+     * Returns true if taking thread dumps is supported for the application, false otherwise.
+     * 
+     * @param application application from which to take the thread dump.
+     * @return true if taking thread dumps is supported for the application, false otherwise.
+     */
     public boolean supportsThreadDump(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         return JvmFactory.getJVMFor(application).isTakeThreadDumpSupported();
@@ -87,14 +93,20 @@ public final class ThreadDumpSupport {
         threadDumpProvider.createThreadDump(application, openView);
     }
     
+    /**
+     * Takes thread dump from CoreDump.
+     * 
+     * @param coreDump CoreDump to take the thread dump,
+     * @param openView true if taken thread dump should be opened, false otherwise.
+     */
     public void takeThreadDump(CoreDump coreDump, boolean openView) {
         threadDumpProvider.createThreadDump(coreDump, openView);
     }
     
     /**
-     * Returns PluggableView instance to be used to customize the thread dump view.
+     * Returns PluggableDataSourceViewProvider for thread dumps.
      * 
-     * @return PluggableView instance to be used to customize the thread dump view.
+     * @return PluggableDataSourceViewProvider for thread dumps.
      */
     public PluggableDataSourceViewProvider<ThreadDump> getThreadDumpView() {
         return threadDumpViewProvider;

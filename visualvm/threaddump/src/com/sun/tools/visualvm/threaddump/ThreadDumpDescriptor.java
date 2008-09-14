@@ -31,6 +31,7 @@ import java.awt.Image;
 import org.openide.util.Utilities;
 
 /**
+ * DataSourceDescriptor for ThreadDump.
  *
  * @author Jiri Sedlacek
  */
@@ -39,6 +40,11 @@ public class ThreadDumpDescriptor extends SnapshotDescriptor<ThreadDump> {
     private static final Image ICON = SnapshotsSupport.getInstance().createSnapshotIcon(
             Utilities.loadImage("com/sun/tools/visualvm/threaddump/resources/threaddumpBase.png", true)); // NOI18N
 
+    /**
+     * Creates new instance of ThreadDumpDescriptor.
+     * 
+     * @param threadDump
+     */
     public ThreadDumpDescriptor(ThreadDump threadDump) {
         super(threadDump, ICON);
     }
