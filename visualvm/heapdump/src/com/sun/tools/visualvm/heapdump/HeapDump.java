@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
 
 /**
  * Abstract implementation of HeapDump.
- * Each coredump is defined by a heapdump file.
+ * Each heapdump is defined by a heapdump file.
  *
  * @author Jiri Sedlacek
  */
