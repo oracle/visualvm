@@ -31,6 +31,8 @@ import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.host.views.overview.HostOverviewViewProvider;
 
 /**
+ * Support for built-in host views in VisualVM.
+ * Currently publishes Overview subtab for Host.
  *
  * @author Jiri Sedlacek
  */
@@ -41,11 +43,21 @@ public final class HostViewsSupport {
     private HostOverviewViewProvider viewProvider = new HostOverviewViewProvider();
     
     
+    /**
+     * Returns singleton instance of HostViewsSupport.
+     * 
+     * @return singleton instance of HostViewsSupport.
+     */
     public static synchronized HostViewsSupport sharedInstance() {
         if (sharedInstance == null) sharedInstance = new HostViewsSupport();
         return sharedInstance;
     }
     
+    /**
+     * Returns PluggableDataSourceViewProvider for Overview host subtab.
+     * 
+     * @return
+     */
     public PluggableDataSourceViewProvider<Host> getOverviewView() {
         return viewProvider;
     }
