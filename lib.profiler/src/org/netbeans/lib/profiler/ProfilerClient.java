@@ -403,13 +403,9 @@ public class ProfilerClient implements CommonConstants {
         appStatusHandler = ash;
         serverCommandHandler = sch;
         instrumentor = new Instrumentor(status, settings);
-
-        if (separateCmdExecThread == null) {
-            separateCmdExecThread = new SeparateCmdExecutionThread();
-            separateCmdExecThread.setDaemon(true);
-            separateCmdExecThread.start();
-        }
-
+        separateCmdExecThread = new SeparateCmdExecutionThread();
+        separateCmdExecThread.setDaemon(true);
+        separateCmdExecThread.start();
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
     }
