@@ -93,7 +93,6 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
                                     boolean twoStamps) {
         super(timeInMcs0, timeInMcs1, nInvocations, marks, nMethods);
         this.methodNames = methodNames;
-        this.status = status;
         this.wholeGraphNetTime0 = wholeGraphNetTime0;
         this.wholeGraphNetTime1 = wholeGraphNetTime1;
 
