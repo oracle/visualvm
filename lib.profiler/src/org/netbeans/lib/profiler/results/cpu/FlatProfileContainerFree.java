@@ -78,7 +78,6 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
     public FlatProfileContainerFree(ProfilingSessionStatus status, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations,
                                     char[] marks, double wholeGraphNetTime0, double wholeGraphNetTime1, int nMethods) {
         super(timeInMcs0, timeInMcs1, nInvocations, marks, nMethods);
-        this.status = status;
         this.wholeGraphNetTime0 = wholeGraphNetTime0;
         this.wholeGraphNetTime1 = wholeGraphNetTime1;
 
