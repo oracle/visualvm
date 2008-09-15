@@ -70,6 +70,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.MessageFormat;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -78,6 +79,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -211,6 +213,9 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
             setAlwaysOnTop(true);
             setUndecorated(true);
             setResizable(false);
+            WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+                public void run() { setIconImage(WindowManager.getDefault().getMainWindow().getIconImage()); }
+            });
         }
     }
 
@@ -230,11 +235,15 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
                                                                     "ToggleProfilingPointAction_CancelString"); // NOI18N
     private static final String SWITCHER_WINDOW_CAPTION = NbBundle.getMessage(ToggleProfilingPointAction.class,
                                                                               "ToggleProfilingPointAction_SwitcherWindowCaption"); // NOI18N
+    private static final String INVALID_SHORTCUT_MSG = NbBundle.getMessage(ToggleProfilingPointAction.class,
+                                                                              "ToggleProfilingPointAction_InvalidShortcutMsg"); // NOI18N
                                                                                                                                    // -----
+    
+    private static ToggleProfilingPointAction instance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ProfilingPointsSwitcher chooserFrame;
+    private ProfilingPointsSwitcher ppSwitcher;
     private ProfilingPointFactory[] ppFactories;
     private boolean modifierKeyDown = false;
     private boolean warningDialogOpened = false;
@@ -246,10 +255,11 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
-
-        initChooser();
-
-        Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
+    }
+    
+    public static synchronized ToggleProfilingPointAction getInstance() {
+        if (instance == null) instance = new ToggleProfilingPointAction();
+        return instance;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -262,6 +272,12 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
+        KeyStroke acceleratorKeyStroke = (KeyStroke)getValue(ACCELERATOR_KEY);
+        if (acceleratorKeyStroke == null || acceleratorKeyStroke.getModifiers() == 0) {
+            NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(INVALID_SHORTCUT_MSG, new Object[] { ACTION_NAME }));
+            return;
+        }
+        
         if (warningDialogOpened) {
             return;
         }
@@ -281,6 +297,8 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
 
             return;
         }
+        
+        ProfilingPointsSwitcher chooserFrame = getChooserFrame();
 
         if (chooserFrame.isVisible()) {
             nextFactory();
@@ -297,20 +315,16 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
     }
 
     public void eventDispatched(AWTEvent event) {
-        if (!(event instanceof KeyEvent)) {
-            return;
-        }
-
-        KeyEvent e = (KeyEvent) event;
-
-        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-            boolean oldModifierKeyDown = modifierKeyDown;
-            modifierKeyDown = (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) != 0;
-
-            if (oldModifierKeyDown != modifierKeyDown) {
-                modifierKeyStateChanged();
-            }
-        }
+        if (!(event instanceof KeyEvent)) return;
+        
+        KeyStroke acceleratorKeyStroke = (KeyStroke)getValue(ACCELERATOR_KEY);
+        KeyStroke eventKeyStroke = KeyStroke.getKeyStrokeForEvent((KeyEvent)event);
+        if (acceleratorKeyStroke == null || eventKeyStroke == null) return;
+        
+        int acceleratorModifiers = acceleratorKeyStroke.getModifiers();
+        if (acceleratorModifiers == 0) return;
+        
+        if (acceleratorModifiers != eventKeyStroke.getModifiers()) modifierKeyStateChanged();
     }
 
     private boolean currentlyInEditor() {
@@ -351,14 +365,19 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         // Return whether focused TopComponent == editor TopComponent
         return top1 == top2;
     }
-
-    private void initChooser() {
-        chooserFrame = new ProfilingPointsSwitcher();
-        chooserFrame.addWindowListener(new WindowAdapter() {
+    
+    private synchronized ProfilingPointsSwitcher getChooserFrame() {
+        if (ppSwitcher == null) {
+            ppSwitcher = new ProfilingPointsSwitcher();
+            ppSwitcher.addWindowListener(new WindowAdapter() {
                 public void windowDeactivated(WindowEvent event) {
-                    chooserFrame.setVisible(false);
+                    ppSwitcher.setVisible(false);
                 }
             });
+            Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
+        }
+        
+        return ppSwitcher;
     }
 
     private synchronized void modifierKeyStateChanged() {
@@ -367,6 +386,8 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         }
 
         if (!modifierKeyDown) {
+            ProfilingPointsSwitcher chooserFrame = getChooserFrame();
+            
             if (chooserFrame.isVisible()) {
                 ProfilingPointFactory ppFactory = chooserFrame.getProfilingPointFactory();
                 Project project = Utils.getCurrentProject();
@@ -380,9 +401,9 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
                         if (ppoint instanceof GlobalProfilingPoint) {
                             SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        if (!ProfilingPointsWindow.getInstance().isOpened()) {
-                                            ProfilingPointsWindow.getInstance().open();
-                                            ProfilingPointsWindow.getInstance().requestVisible();
+                                        if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                            ProfilingPointsWindow.getDefault().open();
+                                            ProfilingPointsWindow.getDefault().requestVisible();
                                         }
                                     }
                                 });
@@ -408,7 +429,7 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
     private void resetFactories() {
         if (ppFactories == null) {
             ppFactories = ProfilingPointsManager.getDefault().getProfilingPointFactories();
-            chooserFrame.initPanel(ppFactories);
+            getChooserFrame().initPanel(ppFactories);
         }
 
         currentFactory = 0;

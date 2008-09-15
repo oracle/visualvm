@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -21,11 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -36,17 +31,51 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.actions;
 
-package org.netbeans.lib.profiler;
-
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.filesystems.FileObject;
 
 /**
- *
- * @author Jaroslav Bachorik
+ * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.
+ * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
-public interface ContextAware {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+final public class SelectJavaRootMethodsAction extends BaseSelectRootMethodsAction {
 
-    void setContext(ProfilerClient client);
+    @Override
+    protected String getFileClassName(FileObject file) {
+        String className = null;
+        // Read current offset in editor
+        int currentOffsetInEditor = SourceUtils.getCurrentOffsetInEditor();
+
+        if (currentOffsetInEditor == -1) {
+            return null;
+        }
+
+        // Try to get class at cursor or type of field at cursor
+        SourceUtils.ResolvedClass resolvedClass = SourceUtils.resolveClassAtPosition(file,
+                currentOffsetInEditor, true);
+
+        if ((resolvedClass != null) && (resolvedClass.getJClass() != null)) {
+            className = resolvedClass.getVMClassName();
+
+        //      NetBeansProfiler.getDefaultNB().displayInfo("<html><br><b>Will open root method selector for class at cursor:</b><br><br><code>" + resolvedClass.getVMClassName() + "</code></html>");
+        }
+
+        if (className == null) {
+            // Try to get method enclosing cursor position
+            className = SourceUtils.getEnclosingClassName(file, currentOffsetInEditor);
+        }
+
+        if (className == null) {
+            // Get toplevel class
+            className = SourceUtils.getToplevelClassName(file);
+        }
+        return className;
+    }
 }
