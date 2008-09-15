@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
 
 /**
+ * ModelFactory for DataSourceDescriptors.
  *
  * @author Tomas Hurka
  */
@@ -40,6 +41,11 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
     private DataSourceDescriptorFactory() {
     }
     
+    /**
+     * Returns the singleton instance of DataSourceDescriptorFactory.
+     * 
+     * @return singleton instance of DataSourceDescriptorFactory.
+     */
     public static synchronized DataSourceDescriptorFactory getDefault() {
         if (dsDescFactory == null) {
             dsDescFactory = new DataSourceDescriptorFactory();
@@ -48,10 +54,26 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
         return dsDescFactory;
     }
     
+    /**
+     * Returns DataSourceDescriptor for given DataSource.
+     * Use this method to get for example a DataSource name or icon.
+     * 
+     * @param ds DataSource for which to get the descriptor.
+     * @return DataSourceDescriptor for given DataSource.
+     */
     public static DataSourceDescriptor getDescriptor(DataSource ds) {
         return getDefault().getModel(ds);
     }
     
+    /**
+     * Creates DataSourceDescriptor for given DataSource.
+     * This method is used by the ModelFactory framework, typically you need
+     * to use the DataSourceDescriptor.getDescriptor(DataSource) method to get
+     * properties of a DataSource.
+     * 
+     * @param ds DataSource for which to create the descriptor.
+     * @return new DataSourceDescriptor for given DataSource.
+     */
     public DataSourceDescriptor createModelFor(DataSource ds) {
         return new DefaultDataSourceDescriptor(ds);
     }

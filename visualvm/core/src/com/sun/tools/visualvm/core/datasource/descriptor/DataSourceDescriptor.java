@@ -33,30 +33,52 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
+ * DataSourceDescriptor defines runtime appearance of the DataSource in Applications window.
  *
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
 public abstract class DataSourceDescriptor<X extends DataSource> extends Model implements Positionable {
     
+    /**
+     * Named property for DataSource icon.
+     */
     public static final String PROPERTY_ICON = "prop_icon"; // NOI18N
-    
+    /**
+     * Named property for DataSource name.
+     */
     public static final String PROPERTY_NAME = "prop_name"; // NOI18N
-    
+    /**
+     * Named property for DataSource description.
+     */
     public static final String PROPERTY_DESCRIPTION = "prop_description";   // NOI18N
-    
+    /**
+     * Named property for DataSource position within its owner.
+     */
     public static final String PROPERTY_PREFERRED_POSITION = "prop_preferred_position"; // NOI18N
-    
+    /**
+     * Named property for DataSource expansion policy.
+     */
     public static final String PROPERTY_EXPANSION_POLICY = "prop_expansion_policy"; // NOI18N
-    
+    /**
+     * Expansion policy - DataSource will never expand automatically.
+     */
     public static final int EXPAND_NEVER = 0;
-    
+    /**
+     * Expansion policy - DataSource will be automatically expanded when first child is added, not more than once.
+     */
     public static final int EXPAND_ON_FIRST_CHILD = 1;
-    
+    /**
+     * Expansion policy - DataSource will be automatically expanded whenever first child is added, for each first child.
+     */
     public static final int EXPAND_ON_EACH_FIRST_CHILD = 2;
-    
+    /**
+     * Expansion policy - DataSource will be automatically expanded whenever new child is added.
+     */
     public static final int EXPAND_ON_EACH_NEW_CHILD = 3;
-    
+    /**
+     * Expansion policy - DataSource will be automatically expanded whenever a child is added or removed.
+     */
     public static final int EXPAND_ON_EACH_CHILD_CHANGE = 4;
     
     private X dataSource;
@@ -68,14 +90,36 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     private final PropertyChangeSupport changeSupport;
     
     
+    /**
+     * Creates new instance of DataSourceDescriptor.
+     * THIS METHOD IS PUBLIC BY MISTAKE AND WILL BE REMOVED SOON - DO NOT USE IT!!!
+     * EACH DESCRIPTOR NEEDS TO BE CREATED FOR A CONCRETE DataSource.
+     * 
+     * @deprecated 
+     */
     public DataSourceDescriptor() {
         this(null);
     }
     
+    /**
+     * Creates new instance of DataSourceDescriptor.
+     * 
+     * @param dataSource DataSource described by the descriptor.
+     */
     public DataSourceDescriptor(X dataSource) {
         this(dataSource, dataSource != null ? dataSource.toString() : null, null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
     }
     
+    /**
+     * Creates new instance of DataSourceDescriptor.
+     * 
+     * @param ds DataSource described by the descriptor.
+     * @param n DataSource name.
+     * @param desc DataSource description.
+     * @param ic DataSource icon.
+     * @param pos DataSource position.
+     * @param aep DataSource expansion policy.
+     */
     public DataSourceDescriptor(X ds, String n, String desc, Image ic, int pos, int aep) {   
         dataSource = ds;
         changeSupport = dataSource != null ? new PropertyChangeSupport(dataSource) : null;
@@ -87,14 +131,29 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     }
     
 
+    /**
+     * Returns icon of the DataSource.
+     * 
+     * @return icon of the DataSource.
+     */
     public Image getIcon() {
         return icon;
     }
     
+    /**
+     * Returns true if the DataSource can be renamed using the Rename action, false otherwise.
+     * 
+     * @return true if the DataSource can be renamed using the Rename action, false otherwise.
+     */
     public boolean supportsRename() {
         return false;
     }
     
+    /**
+     * Sets DataSource name.
+     * 
+     * @param newName DataSource name.
+     */
     public void setName(String newName) {
         if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor"); // NOI18N
         if (newName == null) throw new IllegalArgumentException("Name cannot be null"); // NOI18N
@@ -104,34 +163,101 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
     }
 
+    /**
+     * Returns name of the DataSource.
+     * 
+     * @return name of the DataSource.
+     */
     public String getName() {
         return name;
     }
     
+    /**
+     * Returns description of the DataSource.
+     * 
+     * @return description of the DataSource.
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns preferred position of the DataSource.
+     * 
+     * @return preferred position of the DataSource.
+     */
     public int getPreferredPosition() {
         return preferredPosition;
     }
     
+    /**
+     * Returns expansion policy of the DataSource.
+     * 
+     * @return expansion policy of the DataSource.
+     */
     public int getAutoExpansionPolicy() {
         return autoExpansionPolicy;
     }
     
+    /**
+     * Add a PropertyChangeListener to the listener list.
+     * The listener is registered for all properties.
+     * The same listener object may be added more than once, and will be called
+     * as many times as it is added.
+     * If <code>listener</code> is null, no exception is thrown and no action
+     * is taken.
+     *
+     * @param listener  The PropertyChangeListener to be added
+     */
     public final void addPropertyChangeListener(PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(listener);
     }
 
+    /**
+     * Add a PropertyChangeListener for a specific property.  The listener
+     * will be invoked only when a call on firePropertyChange names that
+     * specific property.
+     * The same listener object may be added more than once.  For each
+     * property,  the listener will be invoked the number of times it was added
+     * for that property.
+     * If <code>propertyName</code> or <code>listener</code> is null, no
+     * exception is thrown and no action is taken.
+     *
+     * @param propertyName  The name of the property to listen on.
+     * @param listener  The PropertyChangeListener to be added
+     */
     public final void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(propertyName, listener);
     }
 
+    /**
+     * Remove a PropertyChangeListener from the listener list.
+     * This removes a PropertyChangeListener that was registered
+     * for all properties.
+     * If <code>listener</code> was added more than once to the same event
+     * source, it will be notified one less time after being removed.
+     * If <code>listener</code> is null, or was never added, no exception is
+     * thrown and no action is taken.
+     *
+     * @param listener  The PropertyChangeListener to be removed
+     */
     public final void removePropertyChangeListener(PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(listener);
     }
 
+    /**
+     * Remove a PropertyChangeListener for a specific property.
+     * If <code>listener</code> was added more than once to the same event
+     * source for the specified property, it will be notified one less time
+     * after being removed.
+     * If <code>propertyName</code> is null,  no exception is thrown and no
+     * action is taken.
+     * If <code>listener</code> is null, or was never added for the specified
+     * property, no exception is thrown and no action is taken.
+     *
+     * @param propertyName  The name of the property that was listened on.
+     * @param listener  The PropertyChangeListener to be removed
+     */
     public final void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(propertyName, listener);
     }
