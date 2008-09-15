@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  * Default implementation of DataSourceContainer.
- * This class implements all neccessary methods to act as a repository of a DataSource.
+ * This class implements all neccessary methods to act as a repository of a DataSource (DataSource.getRepository()).
  *
  * @author Jiri Sedlacek
  */
@@ -51,22 +51,48 @@ public final class DataSourceContainer extends DataSourceProvider {
     }
     
 
+    /**
+     * Adds a DataSource to the container.
+     * 
+     * @param added DataSource to be added.
+     */
     public void addDataSource(DataSource added) {
         registerDataSource(added);
     }
 
+    /**
+     * Adds several DataSources to the container at once.
+     * 
+     * @param added DataSources to be added.
+     */
     public void addDataSources(Set<? extends DataSource> added) {
         super.registerDataSources(added);
     }
 
+    /**
+     * Removes a DataSource from the container.
+     * 
+     * @param removed DataSource to be removed.
+     */
     public void removeDataSource(DataSource removed) {
         unregisterDataSource(removed);
     }
 
+    /**
+     * Removes several DataSources from the container at once.
+     * 
+     * @param removed DataSources to be removed.
+     */
     public void removeDataSources(Set<? extends DataSource> removed) {
         super.unregisterDataSources(removed);
     }
     
+    /**
+     * Adds and removes several DataSources to/from the container in a single operation.
+     * 
+     * @param added DataSources to be added.
+     * @param removed DataSources to be removed.
+     */
     public void updateDataSources(Set<? extends DataSource> added, Set<? extends DataSource> removed) {
         super.changeDataSources(added, removed);
     }

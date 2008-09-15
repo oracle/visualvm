@@ -31,11 +31,8 @@ import java.util.Set;
 
 /**
  * Central repository of all known DataSources.
- * Each DataSourceProvider which wants to publish created DataSources
- * should register into DataSourceRepository. This allows other (depending) providers
- * to discover new DataSource and process it. For example Host provider registers
- * new Host instances into DataSourceRepository, the instances are the discovered
- * by Application provider which tries to detect all applications running on the Host.
+ * Whenever is a new DataSource added to DataSources tree, DataSourceRepository
+ * detects it and emits notifications to listeners.
  *
  * @author Jiri Sedlacek
  */

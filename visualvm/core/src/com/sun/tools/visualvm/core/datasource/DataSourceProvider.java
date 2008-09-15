@@ -48,12 +48,19 @@ public class DataSourceProvider {
     
     
     /**
-     * Creates new instance of DefaultDataSourceProvider.
+     * Creates new instance of DataSourceProvider.
      */
     DataSourceProvider() {
     }
     
 
+    /**
+     * Adds a DataChangeListener to listen for added/removed DataSources.
+     * 
+     * @param <Y> any DataSource type.
+     * @param listener listener to be added.
+     * @param scope scope of DataSource types for which to get notifications.
+     */
     public final <Y extends DataSource> void addDataChangeListener(final DataChangeListener<Y> listener, final Class<Y> scope) {
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
@@ -64,6 +71,12 @@ public class DataSourceProvider {
         });
     }
 
+    /**
+     * Removes a DataChange listener.
+     * 
+     * @param <Y> any DataSource type.
+     * @param listener listener to be removed.
+     */
     public final <Y extends DataSource> void removeDataChangeListener(final DataChangeListener<Y> listener) {
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
@@ -73,10 +86,21 @@ public class DataSourceProvider {
         });
     }
 
+    /**
+     * Returns DataSources managed by this provider.
+     * @return DataSources managed by this provider.
+     */
     public final Set<DataSource> getDataSources() {
         return new HashSet(dataSources);
     }
 
+    /**
+     * Returns DataSources of a certain type managed by this provider.
+     * 
+     * @param <Y> any DataSource type.
+     * @param scope DataSource types to return.
+     * @return DataSources of a certain type managed by this provider.
+     */
     public final <Y extends DataSource> Set<Y> getDataSources(Class<Y> scope) {
         return Utils.getFilteredSet(dataSources, scope);
     }

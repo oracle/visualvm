@@ -52,6 +52,11 @@ public interface Stateful {
     public static final int STATE_AVAILABLE = 1;
     
     
+    /**
+     * Returns current state of an entity.
+     * 
+     * @return current state an entity.
+     */
     public int getState();
     
     

@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Storage for a DataSource.
  *
  * @author Jiri Sedlacek
  */
@@ -48,6 +49,9 @@ public final class Storage {
     
     private static final Logger LOGGER = Logger.getLogger(Storage.class.getName());
     
+    /**
+     * Default extension for storage file.
+     */
     public static final String DEFAULT_PROPERTIES_EXT = ".properties";  // NOI18N
     
     private static final Object temporaryStorageDirectoryLock = new Object();
@@ -69,10 +73,21 @@ public final class Storage {
     private Properties properties;
     
     
+    /**
+     * Creates new instance of Storage.
+     * 
+     * @param directory directory where storage data will be stored.
+     */
     public Storage(File directory) {
         this(directory, null);
     }
     
+    /**
+     * Creates new instance of Storage.
+     * 
+     * @param directory directory where storage data will be stored.
+     * @param propertiesFile filename of storage file.
+     */
     public Storage(File directory, String propertiesFile) {
         if (directory == null) throw new NullPointerException("Directory cannot be null");  // NOI18N
         if (directory.isFile()) throw new IllegalArgumentException("Not a valid directory: " + directory);  // NOI18N
@@ -81,19 +96,41 @@ public final class Storage {
     }
     
     
+    /**
+     * Returns true if storage directory exists, false otherwise.
+     * 
+     * @return true if storage directory exists, false otherwise.
+     */
     public synchronized boolean directoryExists() {
         return directory.exists();
     }
     
+    /**
+     * Returns storage directory.
+     * 
+     * @return storage directory.
+     */
     public synchronized File getDirectory() {
         if (!Utils.prepareDirectory(directory)) throw new IllegalStateException("Cannot create storage directory " + directory);    // NOI18N
         return directory;
     }
     
+    /**
+     * Returns defined custom property.
+     * 
+     * @param key property name.
+     * @return defined custom property.
+     */
     public String getCustomProperty(String key) {
         return getCustomProperties(new String[] { key })[0];
     }
     
+    /**
+     * Returns defined custom properties.
+     * 
+     * @param keys property names.
+     * @return defined custom properties.
+     */
     public synchronized String[] getCustomProperties(String[] keys) {
         String[] values = new String[keys.length];
         Properties prop = getCustomProperties();
@@ -101,16 +138,33 @@ public final class Storage {
         return values;
     }
     
+    /**
+     * Sets persistent custom property.
+     * 
+     * @param key property name.
+     * @param value property value.
+     */
     public void setCustomProperty(String key, String value) {
         setCustomProperties(new String[] { key }, new String[] { value });
     }
     
+    /**
+     * Sets persistent custom properties.
+     * 
+     * @param keys property names.
+     * @param values property values.
+     */
     public synchronized void setCustomProperties(String[] keys, String[] values) {
         Properties prop = getCustomProperties();
         for (int i = 0; i < keys.length; i++) prop.put(keys[i], values[i]);
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
     }
     
+    /**
+     * Saves persistent custom properties to a file.
+     * 
+     * @param file file where the properties will be saved.
+     */
     public synchronized void saveCustomPropertiesTo(File file) {
         if (file == null) throw new NullPointerException("File cannot be null");    // NOI18N
         if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);    // NOI18N
@@ -119,6 +173,9 @@ public final class Storage {
         if (!prop.isEmpty()) storeProperties(prop, file);
     }
     
+    /**
+     * Deletes properties file.
+     */
     public synchronized void deleteCustomPropertiesStorage() {
         if (propertiesFile != null && propertiesFile.exists())
             if (!propertiesFile.delete()) propertiesFile.deleteOnExit();
@@ -195,6 +252,10 @@ public final class Storage {
         }
     }
     
+    /**
+     * Returns true if persistent storage directory exists, false otherwise.
+     * @return true if persistent storage directory exists, false otherwise.
+     */
     public static boolean persistentStorageDirectoryExists() {
         return new File(getPersistentStorageDirectoryString()).isDirectory();
     }
