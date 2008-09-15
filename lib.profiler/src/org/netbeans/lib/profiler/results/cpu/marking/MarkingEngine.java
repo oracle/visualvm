@@ -40,12 +40,15 @@
 
 package org.netbeans.lib.profiler.results.cpu.marking;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import java.util.Iterator;
+import java.util.Set;
 import org.netbeans.lib.profiler.marker.Marker;
-import org.openide.util.Lookup;
 
 
 /**
@@ -77,7 +80,7 @@ public class MarkingEngine {
     // @GuardedBy markGuard
     private MarkMapping[] marks;
 
-    private Lookup.Result observers;
+    private Set observers = new HashSet();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +88,6 @@ public class MarkingEngine {
      * Creates a new instance of MarkingEngine
      */
     private MarkingEngine() {
-        observers = Lookup.getDefault().lookupResult(StateObserver.class);
         mapper = new MarkMapper();
     }
 
@@ -100,8 +102,10 @@ public class MarkingEngine {
     }
 
     // configure the engine for a given set of {@linkplain MarkMapping}
-    public synchronized void configure(MarkMapping[] mappings) {
+    public synchronized void configure(MarkMapping[] mappings, Collection observers) {
         setMarks(mappings != null ? mappings : Marker.DEFAULT.getMappings());
+        this.observers.clear();
+        this.observers.addAll(observers);
     }
 
     public synchronized void deconfigure() {
@@ -170,9 +174,7 @@ public class MarkingEngine {
         boolean stateChange = false;
 
         synchronized (markGuard) {
-            stateChange = !((this.marks == null) && (marks == null))
-                          && (((this.marks == null) && (marks != null)) || ((this.marks != null) && (marks == null))
-                             || !this.marks.equals(marks));
+            stateChange = !Arrays.equals(this.marks,marks);
             this.marks = marks;
         }
         if (stateChange) {
@@ -181,7 +183,7 @@ public class MarkingEngine {
     }
 
     private void fireStateChanged() {
-        for (Iterator iter = observers.allInstances().iterator(); iter.hasNext();) {
+        for (Iterator iter = observers.iterator(); iter.hasNext();) {
             ((StateObserver) iter.next()).stateChanged(this);
         }
     }
