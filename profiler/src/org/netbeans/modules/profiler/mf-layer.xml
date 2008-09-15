@@ -248,7 +248,7 @@ made subject to such option by the copyright holder.
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.ResetResultsAction"/>
         </file>
         <file name="S-F9.instance">
-            <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction"/>
+            <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction.getInstance"/>
         </file>
         <file name="C-U D.instance">
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.LiveResultsWindow$ActivateDrillDownAction"/>
@@ -278,6 +278,9 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
+            <file name="org-netbeans-modules-profiler-ppoints-ui-ToggleProfilingPointAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction.getInstance"/>
+            </file>
             <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
