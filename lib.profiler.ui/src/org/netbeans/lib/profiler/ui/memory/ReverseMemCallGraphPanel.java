@@ -42,7 +42,6 @@ package org.netbeans.lib.profiler.ui.memory;
 
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.ResultsPanel;
-import org.netbeans.lib.profiler.ui.components.*;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
@@ -57,6 +56,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.lib.profiler.utils.VMUtils;
 
 
 /**
@@ -263,7 +263,13 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     void performDefaultAction(TreePath path) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode) path.getLastPathComponent();
         String[] classMethodAndSig = node.getMethodClassNameAndSig();
-        actionsHandler.showSourceForMethod(classMethodAndSig[0], classMethodAndSig[1], classMethodAndSig[2]);
+        if (node.getParent() == null) showSourceForClass(classMethodAndSig[0]);
+        else actionsHandler.showSourceForMethod(classMethodAndSig[0], classMethodAndSig[1], classMethodAndSig[2]);
+    }
+    
+    private void showSourceForClass(String className) {
+        className = className.replaceAll("\\[]", ""); // NOI18N
+        actionsHandler.showSourceForMethod(className, null, null);
     }
 
     private void addMenuItemListener(JCheckBoxMenuItem menuItem) {

@@ -376,7 +376,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             return;
         }
 
-        if ((ti != null) && ti.inCallGraph && (ti.rootMethodStackDepth > 0)) {
+        if (ti.isInitialized() && ti.inCallGraph && (ti.rootMethodStackDepth > 0)) {
             methodEntry(methodId);
         } else { // Entered the root method from outside this call subgraph
                  //if (instrMethodClasses != null && methodId < instrMethodClasses.length) System.out.println("++++++Root methodEntry for " + instrMethodClasses[methodId] + "." + instrMethodNames[methodId] + ", thread = " + Thread.currentThread());
