@@ -2174,9 +2174,9 @@ public final class NetBeansProfiler extends Profiler {
             if (processesProfilingPoints) {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (!ProfilingPointsWindow.getInstance().isOpened()) {
-                                ProfilingPointsWindow.getInstance().open();
-                                ProfilingPointsWindow.getInstance().requestVisible();
+                            if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                ProfilingPointsWindow.getDefault().open();
+                                ProfilingPointsWindow.getDefault().requestVisible();
                             }
                         }
                     });
