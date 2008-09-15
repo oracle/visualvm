@@ -94,39 +94,32 @@ public class ComboSelector extends javax.swing.JPanel implements ListDataListene
     private void initComponents() {
 
         selector = new javax.swing.JComboBox();
-        hintScroller = new javax.swing.JScrollPane();
-        labelHint = new javax.swing.JTextPane();
+        hintPanel = new org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel();
 
         selector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        hintScroller.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-        labelHint.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        labelHint.setContentType(org.openide.util.NbBundle.getMessage(ComboSelector.class, "ComboSelector.labelHint.contentType")); // NOI18N
-        labelHint.setForeground(javax.swing.UIManager.getDefaults().getColor("EditorPane.inactiveForeground"));
-        hintScroller.setViewportView(labelHint);
+        hintPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(selector, 0, 255, Short.MAX_VALUE)
-            .add(hintScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+            .add(selector, 0, 298, Short.MAX_VALUE)
+            .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(selector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(hintScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
+                .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
         );
 
         selector.getAccessibleContext().setAccessibleName("null");
         selector.getAccessibleContext().setAccessibleDescription("null");
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane hintScroller;
-    private javax.swing.JTextPane labelHint;
+    private org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel hintPanel;
     private javax.swing.JComboBox selector;
     // End of variables declaration//GEN-END:variables
     // <editor-fold defaultstate="collapsed" desc="ListDataListener implementation">
@@ -143,15 +136,15 @@ public class ComboSelector extends javax.swing.JPanel implements ListDataListene
     }
     // </editor-fold>
     public String getHint() {
-        return labelHint.getText();
+        return hintPanel.getHint();
     }
 
     public void setHint(String hint) {
-        labelHint.setText(hint);
+        hintPanel.setHint(hint);
         if (hint == null || hint.length() == 0) {
-            this.hintScroller.setVisible(false);
+            hintPanel.setVisible(false);
         } else {
-            this.hintScroller.setVisible(true);
+            hintPanel.setVisible(true);
         }
         firePropertyChange(LAYOUT_CHANGED_PROPERTY, null, null);
     }
@@ -192,19 +185,19 @@ public class ComboSelector extends javax.swing.JPanel implements ListDataListene
     }
 
     public Color getHintForeground() {
-        return labelHint.getDisabledTextColor();
+        return hintPanel.getForeground();
     }
 
     public void setHintForeground(Color color) {
-        labelHint.setDisabledTextColor(color);
+        hintPanel.setForeground(color);
     }
 
     public Color getHintBackground() {
-        return labelHint.getBackground();
+        return hintPanel.getBackground();
     }
 
     public void setHintBackground(Color bgcolor) {
-        labelHint.setBackground(bgcolor);
+        hintPanel.setBackground(bgcolor);
     }
 
     private void updateModelProxy() {
