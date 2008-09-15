@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.datasupport;
 import java.beans.PropertyChangeListener;
 
 /**
+ * Common interface for entities that can specify their state.
  *
  * @author Jiri Sedlacek
  */

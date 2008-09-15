@@ -23,26 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.core.datasupport;
-
-import java.util.Comparator;
-
 /**
- * Comparator based on class names.
- *
- * @author Jiri Sedlacek
+ * Various helper methods and interfaces for manipulations with DataSources.
  */
-public final class ClassNameComparator implements Comparator {
-    
-    /**
-     * Shared instance of ClassNameComparator.
-     */
-    public static final ClassNameComparator INSTANCE = new ClassNameComparator();
-
-    public int compare(Object o1, Object o2) {
-        return o1.getClass().getName().compareTo(o2.getClass().getName());
-    }
-    
-    private ClassNameComparator() {}
-
-}
+package com.sun.tools.visualvm.core.datasupport;

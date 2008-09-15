@@ -53,33 +53,72 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
 /**
+ * Utils class encapsulating various helper methods.
  *
  * @author Jiri Sedlacek
  */
 public final class Utils {
     
+    /**
+     * Shared RequestProcessor to be used for file operations that need to be synchronized.
+     */
     public static final RequestProcessor FILE_QUEUE = new RequestProcessor("File Queue");   // NOI18N
     
     private static final int COPY_PACKET_SIZE = 16384;
     private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
 
+    /**
+     * Returns true if given set contains at least one subclass of provided instance.
+     * 
+     * @param <X>
+     * @param <Y>
+     * @param classes Set of classes that will be searched.
+     * @param superclassInstance instance to be searched.
+     * @return true if given set contains at least one subclass of provided instance, false otherwise.
+     */
     public static <X, Y> boolean containsSubclass(Set<? extends Class<? extends Y>> classes, X superclassInstance) {
         for (Class<? extends Y> classs : classes) if (classs.isInstance(superclassInstance)) return true;
         return false;
     }
 
+    /**
+     * Returns true if given set contains at least one superclass of provided instance.
+     * 
+     * @param <X>
+     * @param <Y>
+     * @param classes Set of classes that will be searched.
+     * @param subclassInstance instance to be searched.
+     * @return true if given set contains at least one superclass of provided instance, false otherwise.
+     */
     public static <X, Y> boolean containsSuperclass(Set<? extends Class<? extends Y>> classes, X subclassInstance) {
         Class subclass = subclassInstance.getClass();
         for (Class<? extends Y> classs : classes) if (classs.isAssignableFrom(subclass)) return true;
         return false;
     }
 
+    /**
+     * Returns filtered set containing only instances of the given class.
+     * 
+     * @param <X>
+     * @param <Y>
+     * @param <Z>
+     * @param set Set to be filtered.
+     * @param filter Class defining the filter.
+     * @return filtered set containing only instances of the given class.
+     */
     public static <X, Y extends X, Z extends X> Set<Z> getFilteredSet(Set<Y> set, Class<Z> filter) {
         Set<Z> filteredSet = new HashSet();
         for (Y item : set) if (filter.isInstance(item)) filteredSet.add((Z)item);
         return filteredSet;
     }
     
+    /**
+     * Returns list of given DataSources sorted by distance from DataSource.ROOT.
+     * 
+     * @param <X> any DataSource.
+     * @param dataSources DataSources to be sorted.
+     * @return list of given DataSources sorted by distance from DataSource.ROOT.
+     */
     public static <X extends DataSource> List<X> getSortedDataSources(Set<X> dataSources) {
         List<DataSourcePath<X>> dataSourcePaths = getSortedDataSourcePaths(dataSources);
         List<X> sortedDataSources = new ArrayList();
@@ -90,10 +129,26 @@ public final class Utils {
         return sortedDataSources;
     }
     
+    /**
+     * Returns true if provided DataSources are independent. Independent means that no DataSource
+     * is (super)owner of any other DataSource.
+     * 
+     * @param <X> any DataSource.
+     * @param dataSources DataSources to be checked.
+     * @return true if provided DataSources are independent, false otherwise.
+     */
     public static <X extends DataSource> boolean areDataSourcesIndependent(Set<X> dataSources) {
         return dataSources.size() == getIndependentDataSources(dataSources).size();
     }
     
+    /**
+     * Returns Set of independent DataSources. Independent means that no DataSource
+     * is (super)owner of any other DataSource - this means that (sub)childs are removed.
+     * 
+     * @param <X> any DataSource.
+     * @param dataSources DataSources to be filtered.
+     * @return Set of independent DataSources.
+     */
     public static <X extends DataSource> Set<X> getIndependentDataSources(Set<X> dataSources) {
         Map<Integer, Set<X>> independentDataSourcesMap = new HashMap();
         List<DataSourcePath<X>> dataSourcePaths = getSortedDataSourcePaths(dataSources);
@@ -156,39 +211,79 @@ public final class Utils {
     }
     
     
+    /**
+     * Returns filename without extension.
+     * 
+     * @param fileName file name.
+     * @return filename without extension.
+     */
     public static String getFileBase(String fileName) {
-        int extIndex = fileName.lastIndexOf(".");
+        int extIndex = fileName.lastIndexOf("."); // NOI18N
         if (extIndex == -1) return fileName;
         return fileName.substring(0, extIndex);
     }
     
+    /**
+     * Returns file extension.
+     * 
+     * @param fileName file name.
+     * @return file extension.
+     */
     public static String getFileExt(String fileName) {
-        int extIndex = fileName.lastIndexOf(".");
-        if (extIndex == -1) return "";
+        int extIndex = fileName.lastIndexOf("."); // NOI18N
+        if (extIndex == -1) return ""; // NOI18N
         return fileName.substring(extIndex);
     }
     
-    // NOTE: the query is synchronized, however creating a new file has to be synchronized in custom code
+    /**
+     * Returns new File in provided directory based on the given filename.
+     * NOTE: the query is synchronized, however creating a new file has to be synchronized in custom code
+     * 
+     * @param directory directory in which to create the file.
+     * @param file preferred filename.
+     * @return new File in provided directory based on the given filename.
+     */
     public static File getUniqueFile(File directory, String file) {
         return getUniqueFile(directory, getFileBase(file), getFileExt(file));
     }
     
-    // NOTE: the query is synchronized, however creating a new file has to be synchronized in custom code
+    /**
+     * Returns new File in provided directory based on the given filename.
+     * NOTE: the query is synchronized, however creating a new file has to be synchronized in custom code
+     * 
+     * @param directory directory in which to create the file.
+     * @param fileName file name.
+     * @param fileExt file extension.
+     * @return new File in provided directory based on the given filename.
+     */
     public synchronized static File getUniqueFile(File directory, String fileName, String fileExt) {
         File newFile = new File(directory, fileName + fileExt);
         while (newFile.exists()) {
-            fileName = fileName + "_";
+            fileName = fileName + "_"; // NOI18N
             newFile = new File(directory, fileName + fileExt);
         }
         return newFile;
     }
     
+    /**
+     * Tries to create the directory incl. all super directories, returns true if at the end of the operation the directory exists.
+     * 
+     * @param directory directory to be created.
+     * @return true if the directory exists, false otherwise.
+     */
     public static synchronized boolean prepareDirectory(File directory) {
         if (directory.exists()) return true;
         directory.mkdirs();
         return directory.exists();
     }
     
+    /**
+     * Copies source file to the destination file, returns true if the file was successfuly copied.
+     * 
+     * @param file source file.
+     * @param copy destination file.
+     * @return true if the file was successfuly copied, false otherwise.
+     */
     public static boolean copyFile(File file, File copy) {
         if (file == null || copy == null) throw new NullPointerException("File cannot be null");    // NOI18N
         if (!file.isFile() || copy.isDirectory()) throw new IllegalArgumentException("Not a valid file");   // NOI18N       
@@ -218,7 +313,7 @@ public final class Utils {
      * Deletes file or folder.
      * Optionally invokes deleteOnExit if necessary.
      * 
-     * @param file file or folder to be deleted,
+     * @param file file or folder to be deleted.
      * @param deleteOnExit true if deleteOnExit should be invoked on not deleted file or directory.
      * @return true if the file or folder has been completely deleted, false otherwise.
      */
@@ -247,6 +342,13 @@ public final class Utils {
         
     }
     
+    /**
+     * Creates a zip archive of the given directory. Currently doesn't support
+     * archiving subdirectories (only files are added to the archive).
+     * 
+     * @param directory directory to be archived.
+     * @param archive archive file.
+     */
     public static void createArchive(File directory, File archive) {        
         ZipOutputStream zos = null;
         FileInputStream fis = null;
@@ -278,6 +380,14 @@ public final class Utils {
         }
     }
     
+    /**
+     * Extracts given zip archive, returns extracted directory. Currently doesn't support extracting subdirectories,
+     * (only extracts toplevel files).
+     * 
+     * @param archive archive to be extracted.
+     * @param destination destination directory.
+     * @return extracted directory or null if extracting the archive failed.
+     */
     public static File extractArchive(File archive, File destination) {
         // TODO: implement extracting directories
         
@@ -314,19 +424,47 @@ public final class Utils {
         return directory;
     }
     
+    /**
+     * Encodes given string using the Base64 encoding.
+     * 
+     * @param value String to be encoded.
+     * @return encoded String.
+     */
     public static String encodePassword(String value) {
         return Base64.byteArrayToBase64(value.getBytes());
     }
     
+    /**
+     * Decodes given string using the Base64 enconding.
+     * 
+     * @param value String to be decoded.
+     * @return decoded String.
+     */
     public static String decodePassword(String value) {
         return new String(Base64.base64ToByteArray(value));
     }
     
+    /**
+     * Encodes given image to String using the Base64 encoding.
+     * This is primarily intended to store small images (icons)
+     * in text (properties) files, no compression algorithms are
+     * used.
+     * 
+     * @param image Image to be encoded.
+     * @param format image format.
+     * @return String containing the encoded image.
+     */
     public static String imageToString(Image image, String format) {
         byte[] imageBytes = imageToBytes(image, format);
         return imageBytes != null ? Base64.byteArrayToBase64(imageBytes) : null;
     }
     
+    /**
+     * Decodes an image encoded by imageToString(Image, String) method.
+     * 
+     * @param string String to be decoded.
+     * @return decoded Image.
+     */
     public static Image stringToImage(String string) {
         return Toolkit.getDefaultToolkit().createImage(Base64.base64ToByteArray(string));
     }

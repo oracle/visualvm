@@ -28,15 +28,31 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
 /**
+ * WeakReference delegating hashCode() and equals(Object) methods to the referenced object.
  *
  * @author Jaroslav Bachorik
  */
 public final class ComparableWeakReference<T> extends WeakReference<T> {
 
+    
+    /**
+     * Creates new instance of ComparableWeakReference that refers to the given object and is
+     * registered with the given queue.
+     *
+     * @param referent object the new weak reference will refer to
+     * @param q the queue with which the reference is to be registered,
+     *          or <tt>null</tt> if registration is not required
+     */
     public ComparableWeakReference(T referent, ReferenceQueue<? super T> q) {
         super(referent, q);
     }
 
+    /**
+     * Creates new instance of ComparableWeakReference that refers to the given object.  The new
+     * reference is not registered with any queue.
+     *
+     * @param referent object the new weak reference will refer to
+     */
     public ComparableWeakReference(T referent) {
         super(referent);
     }
