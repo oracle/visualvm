@@ -23,29 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.core.explorer;
-
-import com.sun.tools.visualvm.core.datasource.DataSource;
-
 /**
- * Listener receiving notifications about explorer tree expansion changes.
- *
- * @author Jiri Sedlacek
+ * APIs for accessing explorer tree (Applications tree).
  */
-public interface ExplorerExpansionListener {
-    
-    /**
-     * DataSource node has been expanded.
-     * 
-     * @param dataSource expanded DataSource.
-     */
-    public void dataSourceExpanded(DataSource dataSource);
-    
-    /**
-     * DataSource node has been collapsed.
-     * 
-     * @param dataSource collapsed DataSource.
-     */
-    public void dataSourceCollapsed(DataSource dataSource);
-
-}
+package com.sun.tools.visualvm.core.explorer;
