@@ -174,7 +174,8 @@ public class InstancesListController extends AbstractController {
 
                         if (filteredInstances.size() == 0) {
                             // Class has no instances
-                            children = new HeapWalkerNode[0];
+                            children = new HeapWalkerNode[1];
+                            children[0] = HeapWalkerNodeFactory.createNoItemsNode(InstancesListClassNode.this);
                         } else if (filteredInstances.size() > HeapWalkerNodeFactory.ITEMS_COLLAPSE_THRESHOLD) {
                             int instanceToSelectIndex = -1;
 

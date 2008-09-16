@@ -147,17 +147,10 @@ public class Utils {
     public static SelectProfilingTask.SettingsConfigurator getSettingsConfigurator(Project project) {
         ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
-        if (ptp == null) {
-            return DefaultSettingsConfigurator.SHARED_INSTANCE; // Just to be sure, should not happen
-        } else {
-            SelectProfilingTask.SettingsConfigurator configurator = ptp.getSettingsConfigurator();
+        SelectProfilingTask.SettingsConfigurator configurator = ptp.getSettingsConfigurator();
+        if (configurator == null) return DefaultSettingsConfigurator.SHARED_INSTANCE;
 
-            if (configurator == null) {
-                return DefaultSettingsConfigurator.SHARED_INSTANCE; // Just to be sure, should not happen
-            }
-
-            return configurator;
-        }
+        return configurator;
     }
 
     public static JPanel createFillerPanel() {
