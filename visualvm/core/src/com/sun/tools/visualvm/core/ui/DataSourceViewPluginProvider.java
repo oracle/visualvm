@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Definition of a plugin which can modify pluggable DataSourceView.
+ * Provider of DataSourceViewPlugin for a DataSource.
  *
  * @author Jiri Sedlacek
  */
@@ -40,15 +40,47 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
     private final Map<X, DataSourceViewPlugin> pluginsCache = new HashMap();
     
     
+    /**
+     * Returns true if the plugin provider provides a plugin for the DataSource.
+     * 
+     * @param dataSource DataSource for which to provide the plugin.
+     * @return true if the plugin provider provides a plugin for the DataSource, false otherwise.
+     */
     protected abstract boolean supportsPluginFor(X dataSource);
 
+    /**
+     * Returns DataSourceViewPlugin instance for the DataSource.
+     * 
+     * @param dataSource DataSource for which to create the plugin.
+     * @return DataSourceViewPlugin instance for the DataSource.
+     */
     protected abstract DataSourceViewPlugin createPlugin(X dataSource);
     
+    /**
+     * Returns true if the plugin provider supports saving DataSourceViewPlugin for the DataSource into
+     * the Snapshot type.
+     * 
+     * @param dataSource DataSource for which to save the plugin.
+     * @param snapshotClass snapshot type into which to save the plugin.
+     * @return true if the plugin provider supports saving DataSourceViewPlugin for the DataSource, false otherwise.
+     */
     protected boolean supportsSavePluginFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; };
     
+    /**
+     * Saves DataSourceViewPlugin for the DataSource into the Snapshot.
+     * 
+     * @param dataSource DataSource for which to save the plugin.
+     * @param snapshot Snapshot into which to save the plugin.
+     */
     protected void savePlugin(X dataSource, Snapshot snapshot) {};
     
     
+    /**
+     * Returns DataSourceViewPlugin for the DataSource if already created (cached).
+     * 
+     * @param dataSource DataSource of the plugin.
+     * @return DataSourceViewPlugin for the DataSource if already created (cached), null otherwise.
+     */
     protected final DataSourceViewPlugin getCachedPlugin(X dataSource) {
         synchronized(pluginsCache) {
             return pluginsCache.get(dataSource);
@@ -68,6 +100,14 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
         }
     }
     
+    /**
+     * Returns DataSourceViewPlugin for the DataSource. Tries to resolve already
+     * created plugin from cache, creates new DataSourceViewPlugin instance using
+     * the createPlugin(DataSource) method if needed.
+     * 
+     * @param dataSource
+     * @return DataSourceViewPlugin for the DataSource.
+     */
     protected final DataSourceViewPlugin getPlugin(X dataSource) {
         synchronized(pluginsCache) {
             DataSourceViewPlugin plugin = getCachedPlugin(dataSource);

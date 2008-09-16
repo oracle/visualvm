@@ -33,11 +33,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Extensible DataSourceViewProvider with support for customizations via DataSourceViewPluginProvider.
  *
  * @author Jiri Sedlacek
  */
 public abstract class PluggableDataSourceViewProvider<X extends DataSource> extends DataSourceViewProvider<X> {
     
+    /**
+     * Set defining all pluggable locations.
+     */
     public static final Set<Integer> ALL_LOCATIONS;
     static {
         ALL_LOCATIONS = new HashSet();
@@ -50,17 +54,39 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
     private final Set<DataSourceViewPluginProvider<X>> pluginProviders = Collections.synchronizedSet(new HashSet());
     
     
+    /**
+     * Registers new DataSourceViewPluginProvider.
+     * 
+     * @param pluginProvider DataSourceViewPluginProvider to register.
+     */
     public final void registerPluginProvider(DataSourceViewPluginProvider<X> pluginProvider) {
         pluginProviders.add(pluginProvider);
     }
     
+    /**
+     * Unregisters DataSourceViewPluginProvider.
+     * 
+     * @param pluginProvider DataSourceViewPluginProvider to unregister.
+     */
     public final void unregisterPluginProvider(DataSourceViewPluginProvider<X> pluginProvider) {
         pluginProviders.remove(pluginProvider);
     }
     
+    /**
+     * Returns Set of all locations of the DataSourceView which can be customized by DataSourceViewPluginProviders.
+     * 
+     * @param view DataSourceView to be customized.
+     * @return Set of all locations of the DataSourceView which can be customized by DataSourceViewPluginProviders.
+     */
     public abstract Set<Integer> getPluggableLocations(DataSourceView view);
     
     
+    /**
+     * Saves the DataSourceView for the DataSource into the Snapshot.
+     * 
+     * @param dataSource DataSource for which to save the view.
+     * @param snapshot Snapshot into which to save the view.
+     */
     protected void saveView(X dataSource, Snapshot snapshot) {
     };
     

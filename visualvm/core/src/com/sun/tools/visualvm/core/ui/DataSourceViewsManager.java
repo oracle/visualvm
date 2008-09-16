@@ -82,6 +82,15 @@ public final class DataSourceViewsManager {
         providers.remove(provider);
     }
     
+    /**
+     * Returns true if there's at least one DataSourceView for the DataSource which can
+     * be saved into the Snapshot type.
+     * 
+     * @param dataSource DataSource for which to save the views.
+     * @param snapshotClass Snapshot type into which to save the views.
+     * @return true if there's at least one DataSourceView for the DataSource which can
+     * be saved into the Snapshot type, false otherwise.
+     */
     public boolean canSaveViewsFor(DataSource dataSource, Class<? extends Snapshot> snapshotClass) {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         if (compatibleProviders.isEmpty()) return false;
@@ -95,6 +104,12 @@ public final class DataSourceViewsManager {
         return false;
     }
     
+    /**
+     * Saves views for the DataSource into the Snapshot.
+     * 
+     * @param dataSource DataSource for which to save the views.
+     * @param snapshot Snapshot into which to save the views.
+     */
     public void saveViewsFor(DataSource dataSource, Snapshot snapshot) {
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)

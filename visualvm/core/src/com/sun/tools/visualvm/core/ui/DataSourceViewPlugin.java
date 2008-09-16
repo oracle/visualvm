@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 
 /**
+ * Plugin to an existing DataSourceView which adds an additional view.
  *
  * @author Jiri Sedlacek
  */
@@ -38,24 +39,55 @@ public abstract class DataSourceViewPlugin {
     private DataSourceViewPluginProvider controller;
     
     
+    /**
+     * Creates new DataSourrceViewPlugin for a DataSource.
+     * 
+     * @param dataSource DataSource for which to add the plugin.
+     */
     public DataSourceViewPlugin(DataSource dataSource) {
         this.dataSource = dataSource;
     }
     
     
+    /**
+     * Returns DataSource for the plugin.
+     * 
+     * @return DataSource for the plugin.
+     */
     public final DataSource getDataSource() {
         return dataSource;
     }
     
+    /**
+     * Creates DataViewComponent.DetailsView which will be plugged into the DataSourceView.
+     * 
+     * @param location location where the DataViewComponent.DetailsView will be added.
+     * @return DataViewComponent.DetailsView of the plugin for the location or null.
+     */
     public abstract DataViewComponent.DetailsView createView(int location);
     
 
+    /**
+     * Notification when the view is about to be added to DataSourceWindow.
+     * This notification comes from a thread other than EDT and its main intention
+     * is to provide a possibility to do some models inits before the actual UI is displayed.
+     * This call is blocking (blocks opening the view, progress bar is shown) but long-running initializations should
+     * still use separate thread and update the UI after the models are ready.
+     */
     protected void willBeAdded() {
     }
     
+    /**
+     * Notification when the view has been added to DataSourceWindow.
+     * This notification comes from a thread other than EDT.
+     */
     protected void added() {
     }
     
+    /**
+     * Notification when the view has been either programatically removed from tabbed pane or closed by the user by clicking the X.
+     * This notification comes from a thread other than EDT
+     */
     protected void removed() {
     }
     

@@ -48,6 +48,11 @@ public final class DesktopUtils {
     private static boolean openAvailableInitialized = false;
 
 
+    /**
+     * Returns true if java.awt.Desktop is supported on host platform.
+     * 
+     * @return true if java.awt.Desktop is supported on host platform, false otherwise.
+     */
     public synchronized static boolean isDesktopSupported() {
         if (!desktopSupportedInitialized) {
             desktopSupported = Desktop.isDesktopSupported();
@@ -57,6 +62,11 @@ public final class DesktopUtils {
     }
     
     // NOTE: should always return true if in NetBeans IDE (uses its own user-customizable mechanism)
+    /**
+     * Returns true if opening a www address in a web browser is supported on host platform.
+     * 
+     * @return true if opening a www address in a web browser is supported on host platform, false otherwise.
+     */
     public synchronized static boolean isBrowseAvailable() {
         if (!browseAvailableInitialized) {
             if (!isDesktopSupported()) browseAvailable = false;
@@ -66,6 +76,11 @@ public final class DesktopUtils {
         return browseAvailable;
     }
     
+    /**
+     * Returns true if opening a file in native displayer is supported on host platform.
+     * 
+     * @return true if opening a file in native displayer is supported on host platform, false otherwise.
+     */
     public synchronized static boolean isOpenAvailable() {
         if (!openAvailableInitialized) {
              // NOTE: Open is disabled by default, crashes the VM at least on Windows
@@ -77,10 +92,22 @@ public final class DesktopUtils {
     }
     
     // NOTE: If in NetBeans IDE use HtmlBrowser.URLDisplayer.showURL(URL u)
+    /**
+     * Performs Desktop.getDesktop().browse(URI).
+     * 
+     * @param uri URI to open.
+     * @throws java.io.IOException
+     */
     public static void browse(URI uri) throws IOException {
         Desktop.getDesktop().browse(uri);
     }
     
+    /**
+     * Performs Desktop.getDesktop().open(File).
+     * 
+     * @param file File to open.
+     * @throws java.io.IOException
+     */
     public static void open(File file) throws IOException {
         Desktop.getDesktop().open(file);
     }

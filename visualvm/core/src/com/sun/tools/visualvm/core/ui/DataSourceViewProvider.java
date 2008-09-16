@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Provider of DataSourceView for a DataSource.
  * 
  * @author Jiri Sedlacek
  */
@@ -40,15 +41,46 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
     private final Map<X, DataSourceView> viewsCache = new HashMap();
     
 
+    /**
+     * Returns true if the view provider provides a view for the DataSource.
+     * 
+     * @param dataSource DataSource for which to provide the view.
+     * @return true if the view provider provides a view for the DataSource, false otherwise.
+     */
     protected abstract boolean supportsViewFor(X dataSource);
 
+    /**
+     * Returns DataSourceView instance for the DataSource.
+     * 
+     * @param dataSource DataSource for which to create the view.
+     * @return DataSourceView instance for the DataSource.
+     */
     protected abstract DataSourceView createView(X dataSource);
     
+    /**
+     * Returns true if the view provider supports saving DataSourceView for the DataSource into
+     * the Snapshot type.
+     * 
+     * @param dataSource DataSource for which to save the view.
+     * @param snapshotClass snapshot type into which to save the view.
+     * @return true if the view provider supports saving DataSourceView for the DataSource, false otherwise.
+     */
     protected boolean supportsSaveViewFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; };
     
+    /**
+     * Saves DataSourceView for the DataSource into the Snapshot.
+     * 
+     * @param dataSource DataSource for which to save the view.
+     * @param snapshot Snapshot into which to save the view.
+     */
     protected void saveView(X dataSource, Snapshot snapshot) {};
     
-    
+    /**
+     * Returns DataSourceView for the DataSource if already created (cached).
+     * 
+     * @param dataSource DataSource of the plugin.
+     * @return DataSourceView for the DataSource if already created (cached), null otherwise.
+     */
     protected final DataSourceView getCachedView(X dataSource) {
         synchronized(viewsCache) {
             return viewsCache.get(dataSource);
@@ -56,6 +88,14 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
     }
     
     
+    /**
+     * Returns DataSourceView for the DataSource. Tries to resolve already
+     * created plugin from cache, creates new DataSourceView instance using
+     * the createView(DataSource) method if needed.
+     * 
+     * @param dataSource
+     * @return DataSourceView for the DataSource.
+     */
     protected final DataSourceView getView(X dataSource) {
         synchronized(viewsCache) {
             DataSourceView view = getCachedView(dataSource);

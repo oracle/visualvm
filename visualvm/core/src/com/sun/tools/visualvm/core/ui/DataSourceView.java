@@ -90,9 +90,9 @@ public abstract class DataSourceView implements Positionable {
     }
 
     /**
-     * Returns of the view as it appears in the subtab.
+     * Returns icon of the view as it appears in the subtab.
      * 
-     * @return of the view as it appears in the subtab.
+     * @return icon of the view as it appears in the subtab.
      */
     public final Image getImage() {
         return icon;
