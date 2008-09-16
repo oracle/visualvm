@@ -89,21 +89,6 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
         removeZeroInvocationEntries();
     }
 
-    public FlatProfileContainerFree(MethodInfo[] methodNames, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations,
-                                    char[] marks, double wholeGraphNetTime0, double wholeGraphNetTime1, int nMethods,
-                                    boolean twoStamps) {
-        super(timeInMcs0, timeInMcs1, nInvocations, marks, nMethods);
-        this.methodNames = methodNames;
-        this.wholeGraphNetTime0 = wholeGraphNetTime0;
-        this.wholeGraphNetTime1 = wholeGraphNetTime1;
-
-        collectingTwoTimeStamps = twoStamps;
-
-        // Now get rid of zero-invocation entries once and forever. Also set nTotalInvocations and set negative times
-        // (that may be possible due to time cleansing inaccuracies) to zero.
-        removeZeroInvocationEntries();
-    }
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public String getMethodNameAtRow(int row) {
