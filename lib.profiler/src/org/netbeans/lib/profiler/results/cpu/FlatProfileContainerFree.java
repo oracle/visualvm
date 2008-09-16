@@ -75,14 +75,14 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
      * @param wholeGraphNetTime1 Total CPU time - not used if CPU timer is not used
      * @param nMethods           Total number of profiled methods - length of the provided arrays
      */
-    public FlatProfileContainerFree(ProfilingSessionStatus status, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations,
+    public FlatProfileContainerFree(ProfilingSessionStatus sessionStatus, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations,
                                     char[] marks, double wholeGraphNetTime0, double wholeGraphNetTime1, int nMethods) {
         super(timeInMcs0, timeInMcs1, nInvocations, marks, nMethods);
-        this.status = status;
+        this.status = sessionStatus;
         this.wholeGraphNetTime0 = wholeGraphNetTime0;
         this.wholeGraphNetTime1 = wholeGraphNetTime1;
 
-        collectingTwoTimeStamps = status.collectingTwoTimeStamps();
+        collectingTwoTimeStamps = sessionStatus.collectingTwoTimeStamps();
 
         // Now get rid of zero-invocation entries once and forever. Also set nTotalInvocations and set negative times
         // (that may be possible due to time cleansing inaccuracies) to zero.
@@ -94,7 +94,6 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
                                     boolean twoStamps) {
         super(timeInMcs0, timeInMcs1, nInvocations, marks, nMethods);
         this.methodNames = methodNames;
-        this.status = status;
         this.wholeGraphNetTime0 = wholeGraphNetTime0;
         this.wholeGraphNetTime1 = wholeGraphNetTime1;
 
