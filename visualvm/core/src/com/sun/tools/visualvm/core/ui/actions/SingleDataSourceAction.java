@@ -31,11 +31,17 @@ import java.util.Set;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 
 /**
+ * Abstract DataSourceAction which can be used as a basis for any action available (enabled) just for single selected DataSource in Applications window..
  *
  * @author Jiri Sedlacek
  */
 public abstract class SingleDataSourceAction<X extends DataSource> extends DataSourceAction<X> {
         
+    /**
+     * Creates new instance of SingleDataSourceAction available for defined DataSource type.
+     * 
+     * @param scope DataSource type for the action.
+     */
     public SingleDataSourceAction(Class<X> scope) {
         super(scope);
     }
@@ -50,8 +56,20 @@ public abstract class SingleDataSourceAction<X extends DataSource> extends DataS
     }
 
 
+    /**
+     * Performs the action for the DataSource.
+     * 
+     * @param dataSource DataSource for which to perform the action.
+     * @param actionEvent ActionEvent for the action.
+     */
     protected abstract void actionPerformed(X dataSource, ActionEvent actionEvent);
 
+    /**
+     * Returns true if the action is available (enabled) for the DataSource, false otherwise.
+     * 
+     * @param dataSource DataSource for the action.
+     * @return true if the action is available (enabled) for the DataSource, false otherwise.
+     */
     protected abstract boolean isEnabled(X dataSource);
 
     protected void updateState(Set<X> selectedDataSources) {

@@ -31,11 +31,17 @@ import java.util.Set;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 
 /**
+ * Abstract DataSourceAction which can be used as a basis for any action available (enabled) just for one or more selected DataSources in Applications window..
  *
  * @author Jiri Sedlacek
  */
 public abstract class MultiDataSourceAction<X extends DataSource> extends DataSourceAction<X> {
         
+    /**
+     * Creates new instance of MultiDataSourceAction available for defined DataSource type.
+     * 
+     * @param scope DataSource type for the action.
+     */
     public MultiDataSourceAction(Class<X> scope) {
        super(scope);
     }
@@ -50,8 +56,20 @@ public abstract class MultiDataSourceAction<X extends DataSource> extends DataSo
     }
         
         
+    /**
+     * Performs the action for the DataSources.
+     * 
+     * @param dataSources Set of DataSources for which to perform the action.
+     * @param actionEvent ActionEvent for the action.
+     */
     protected abstract void actionPerformed(Set<X> dataSources, ActionEvent actionEvent);
         
+    /**
+     * Returns true if the action is available (enabled) for the DataSources, false otherwise.
+     * 
+     * @param dataSources Set of DataSources for the action.
+     * @return true if the action is available (enabled) for the DataSources, false otherwise.
+     */
     protected abstract boolean isEnabled(Set<X> dataSources);
         
     protected void updateState(Set<X> selectedDataSources) {

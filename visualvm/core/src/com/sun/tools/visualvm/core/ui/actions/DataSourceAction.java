@@ -37,6 +37,7 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.NbBundle;
 
 /**
+ * Abstract Action which can be used as a basis for any DataSource-aware action.
  *
  * @author Jiri Sedlacek
  */
@@ -46,17 +47,33 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
     private boolean initialized = false;
 
 
+    /**
+     * Creates new instance of DataSourceAction available for defined DataSource type.
+     * 
+     * @param scope DataSource type for the action.
+     */
     public DataSourceAction(Class<X> scope) {
         this.scope = scope;
     }
     
     
+    /**
+     * Updates enabled state based on currently selected DataSources in Applications window.
+     * 
+     * @param selectedDataSources currently selected DataSources in Applications window.
+     */
     protected abstract void updateState(Set<X> selectedDataSources);
 
+    /**
+     * Displays a dialog that the action cannot be invoked in current context.
+     */
     protected void notifyCannotPerform() {
         NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(DataSourceAction.class, "MSG_Cannot_perform_action_in_this_context")); // NOI18N
     }
     
+    /**
+     * Initializes the action. By default registers selection listener which invokes updateState(Set<DataSource>) on selection change.
+     */
     protected void initialize() {
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
             public void selectionChanged(Set<DataSource> selected) {
@@ -85,6 +102,11 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
     }
 
 
+    /**
+     * Returns DataSource type for this action.
+     * 
+     * @return DataSource type for this action.
+     */
     public final Class<X> getScope() {
         return scope;
     }

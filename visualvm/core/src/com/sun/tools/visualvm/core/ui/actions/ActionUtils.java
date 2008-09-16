@@ -32,26 +32,50 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
+ * Utils class providing useful methods mostly for Actions implementation.
  *
  * @author Jiri Sedlacek
  */
 public final class ActionUtils {
     
+    /**
+     * Returns selected DataSource is exactly one DataSource is selected in Applications window, null otherwise.
+     * @return selected DataSource is exactly one DataSource is selected in Applications window, null otherwise.
+     */
     public static DataSource getSelectedDataSource() {
         Set<DataSource> selectedDataSources = getSelectedDataSources();
         return (selectedDataSources.size() == 1 ? selectedDataSources.iterator().next() : null);
     }
     
+    /**
+     * Returns selected DataSource is exactly one DataSource of a certain type is selected in Applications window, null otherwise.
+     * 
+     * @param <X> any DataSource.
+     * @param scope DataSource type.
+     * @return selected DataSource is exactly one DataSource of a certain type is selected in Applications window, null otherwise.
+     */
     public static <X extends DataSource> X getSelectedDataSource(Class<X> scope) {
         Set<X> selectedDataSources = getSelectedDataSources(scope);
         return (selectedDataSources.size() == 1 ? selectedDataSources.iterator().next() : null);
     }
     
+    /**
+     * Returns Set of selected DataSources in Applications window or empty Set for no selection.
+     * 
+     * @return Set of selected DataSources in Applications window or empty Set for no selection.
+     */
     public static Set<DataSource> getSelectedDataSources() {
         Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         return selectedDataSources;
     }
     
+    /**
+     * Returns Set of selected DataSources of a certain type in Applications window or empty Set if no DataSource of this type is selected.
+     * 
+     * @param <X> any DataSource.
+     * @param scope DataSource type.
+     * @return Set of selected DataSources of a certain type in Applications window or empty Set if no DataSource of this type is selected.
+     */
     public static <X extends DataSource> Set<X> getSelectedDataSources(Class<X> scope) {
         Set<DataSource> selectedDataSources = getSelectedDataSources();
         Set<X> filteredSelectedDataSources = Utils.getFilteredSet(selectedDataSources, scope);
