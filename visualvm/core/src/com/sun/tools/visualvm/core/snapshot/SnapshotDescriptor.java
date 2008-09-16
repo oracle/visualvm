@@ -30,12 +30,18 @@ import java.awt.Image;
 import java.io.File;
 
 /**
+ * Abstract implementation of DataSourceDescriptor for snapshots.
  *
  * @author Jiri Sedlacek
  */
 public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceDescriptor<X> {
     
-    
+    /**
+     * Creates new instance of SnapshotDescriptor.
+     * 
+     * @param snapshot Snapshot for the descriptor.
+     * @param icon icon for the Snapshot.
+     */
     public SnapshotDescriptor(X snapshot, Image icon) {
         super(snapshot, resolveName(snapshot),
               snapshot.getFile().getAbsolutePath(),
@@ -61,6 +67,11 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
         return name;
     }
     
+    /**
+     * Returns true if the snapshot can be renamed from UI, false otherwise.
+     * 
+     * @return true if the snapshot can be renamed from UI, false otherwise.
+     */
     public boolean supportsRename() {
         return true;
     }

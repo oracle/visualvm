@@ -57,10 +57,20 @@ public final class RegisteredSnapshotCategories {
     }
 
 
+    /**
+     * Adds a listener for changes of registered snapshot categories.
+     * 
+     * @param listener listener for changes of registered snapshot categories.
+     */
     public void addCategoriesListener(SnapshotCategoriesListener listener) {
         listeners.add(listener);
     }
     
+    /**
+     * Removes a listener for changes of registered snapshot categories.
+     * 
+     * @param listener listener for changes of registered snapshot categories.
+     */
     public void removeCategoriesListener(SnapshotCategoriesListener listener) {
         listeners.remove(listener);
     }
@@ -102,6 +112,11 @@ public final class RegisteredSnapshotCategories {
         return visibleCategories;
     }
     
+    /**
+     * Returns list of registered SnapshotCategory instances capable of opening snapshot files.
+     * 
+     * @return list of registered SnapshotCategory instances capable of opening snapshot files.
+     */
     public List<SnapshotCategory> getOpenSnapshotCategories() {
         List<SnapshotCategory> allCategories = new ArrayList(categories);
         List<SnapshotCategory> openSnapshotCategories = new ArrayList();

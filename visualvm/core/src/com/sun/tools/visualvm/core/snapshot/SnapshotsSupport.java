@@ -62,6 +62,12 @@ public final class SnapshotsSupport {
     }
     
     
+    /**
+     * Saves the snapshot to a used-defined file (opens Save File dialog with defined caption).
+     * 
+     * @param snapshot Snapshot to be saved.
+     * @param dialogTitle Save File dialog caption.
+     */
     public void saveAs(final Snapshot snapshot, String dialogTitle) {
         final File file = snapshot.getFile();
         JFileChooser chooser = new JFileChooser();
@@ -91,10 +97,22 @@ public final class SnapshotsSupport {
         }
     }
     
+    /**
+     * Creates a timestamp String (typically used in Snaphshot filename).
+     * 
+     * @param time
+     * @return timestamp String (typically used in Snaphshot filename).
+     */
     public String getTimeStamp(long time) {
         return org.netbeans.lib.profiler.utils.StringUtils.formatUserDate(new Date(time));
     }
     
+    /**
+     * Creates icon for a snapshot by adding a snapshot badge to the provided image.
+     * 
+     * @param icon original image.
+     * @return image with snapshot badge.
+     */
     public Image createSnapshotIcon(Image icon) {
         return Utilities.mergeImages(icon, SNAPSHOT_BADGE, 0, 0);
     }

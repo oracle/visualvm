@@ -71,11 +71,20 @@ public abstract class Snapshot extends DataSource {
     }
     
 
-    // NOTE: file can be null (snapshot not saved or doesn't support saving to file)
+    /**
+     * Returns snapshot file or null if no file context is defined or snapshot doesn't support saving to file.
+     * 
+     * @return snapshot file or null if no file context is defined or snapshot doesn't support saving to file.
+     */
     public final File getFile() {
         return file;
     }
     
+    /**
+     * Returns snapshot category.
+     * 
+     * @return snapshot category.
+     */
     public final SnapshotCategory getCategory() {
         return category;
     }
@@ -92,6 +101,11 @@ public abstract class Snapshot extends DataSource {
         getChangeSupport().firePropertyChange(PROPERTY_FILE, oldFile, newFile);
     }
     
+    /**
+     * Saves the snapshot to a directory.
+     * 
+     * @param directory directory where to save the snapshot.
+     */
     public void save(File directory) {
         File f = getFile();
         if (f != null && f.isFile()) {  
@@ -103,18 +117,37 @@ public abstract class Snapshot extends DataSource {
         }
     }
     
+    /**
+     * Returns true if the snapshot supports saving to an external (user defined) destination, false otherwise.
+     * 
+     * @return true if the snapshot supports saving to an external (user defined) destination, false otherwise.
+     */
     public boolean supportsSaveAs() {
         return false;
     }
     
+    /**
+     * Saves the snapshot to an external (user defined) destination.
+     * Default implementation does nothing, custom implementations should open
+     * a Save File dialog and save the snapshot to selected destination.
+     * Throws an UnsupportedOperationException if supportsSaveAs() returns false.
+     */
     public void saveAs() {
         throw new UnsupportedOperationException("Save as not supported");   // NOI18N
     }
     
+    /**
+     * Returns true if the snapshot can be deleted by the user from UI, false otherwise.
+     * 
+     * @return true if the snapshot can be deleted by the user from UI, false otherwise.
+     */
     public boolean supportsDelete() {
         return true;
     }
     
+    /**
+     * Deletes the snapshot.
+     */
     public void delete() {
         DataSourceWindowManager.sharedInstance().closeDataSource(this);
         getOwner().getRepository().removeDataSource(this);

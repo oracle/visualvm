@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -60,6 +59,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
      * @param type type of snapshots described by this category,
      * @param prefix prefix of files containing the snapshots (can be null),
      * @param suffix suffix of files containing the snapshots (can be null).
+     * @param preferredPosition preferred position of this category within other categories when presented in UI.
      */
     public SnapshotCategory(String name, Class<X> type, String prefix, String suffix, int preferredPosition) {
         super();
@@ -97,11 +97,23 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
         return preferredPosition;
     }
     
-    
+    /**
+     * Returns true if the category can restore snapshot from a saved file, false otherwise.
+     * 
+     * @return true if the category can restore snapshot from a saved file, false otherwise.
+     */
     public boolean supportsOpenSnapshot() {
         return false;
     }
     
+    /**
+     * Opens a saved snapshot.
+     * Default implementation does nothing, custom implementations should open
+     * an Open File dialog and open the choosen snapshot.
+     * Throws an UnsupportedOperationException if supportsOpenSnapshot() returns false.
+     * 
+     * @param file saved snapshot.
+     */
     public void openSnapshot(File file) {
         throw new UnsupportedOperationException("Open snapshot not supported"); // NOI18N
     }
@@ -171,6 +183,11 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
         return fileName;
     }
     
+    /**
+     * Returns a FilenameFilter for the category.
+     * 
+     * @return FilenameFilter for the category.
+     */
     public FilenameFilter getFilenameFilter() {
         return new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -179,6 +196,11 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
         };
     }
     
+    /**
+     * Returns a FileFilter for the category.
+     * 
+     * @return FileFilter for the category.
+     */
     public FileFilter getFileFilter() {
         return new FileFilter() {
             public boolean accept(File f) {

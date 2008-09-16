@@ -26,13 +26,24 @@
 package com.sun.tools.visualvm.core.snapshot;
 
 /**
+ * Listener for changes of registered snapshot categories.
  *
  * @author Jiri Sedlacek
  */
 public interface SnapshotCategoriesListener {
     
+    /**
+     * Invoked when new SnapshotCategory is registered in RegisteredSnapshotCategories.
+     * 
+     * @param category registered category.
+     */
     public void categoryRegistered(SnapshotCategory category);
     
+    /**
+     * Invoked when a SnapshotCategory is unregistered from RegisteredSnapshotCategories.
+     * 
+     * @param category unregistered category.
+     */
     public void categoryUnregistered(SnapshotCategory category);
 
 }
