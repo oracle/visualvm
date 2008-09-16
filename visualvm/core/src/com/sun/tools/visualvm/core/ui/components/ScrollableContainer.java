@@ -30,11 +30,18 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 /**
+ * Predefined JScrollPane to be used for details views. Scrollbars are displayed
+ * only when needed.
  *
  * @author Jiri Sedlacek
  */
 public final class ScrollableContainer extends JScrollPane {
 
+    /**
+     * Creates new instance of ScrollableContainer.
+     * 
+     * @param view component to be displayed.
+     */
     public ScrollableContainer(JComponent view) {
         setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
         setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);

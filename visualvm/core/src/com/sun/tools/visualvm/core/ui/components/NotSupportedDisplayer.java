@@ -32,16 +32,34 @@ import javax.swing.SwingConstants;
 import org.openide.util.NbBundle;
 
 /**
+ * JPanel showing a predefined message.
  *
  * @author Jiri Sedlacek
  */
 public final class NotSupportedDisplayer extends JPanel {
 
+    /**
+     * Not supported for this application.
+     */
     public static final String APPLICATION = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_application");   // NOI18N
+    /**
+     * Not supported for this JVM.
+     */
     public static final String JVM = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_JVM");   // NOI18N
+    /**
+     * Not supported for this host.
+     */
     public static final String HOST = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_host"); // NOI18N
+    /**
+     * Not supported for this OS.
+     */
     public static final String OS = NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_OS"); // NOI18N
 
+    /**
+     * Creates new instance of NotSupportedDisplayer.
+     * 
+     * @param object type of the not supported object (any string or predefined constant).
+     */
     public NotSupportedDisplayer(String object) {
         JLabel notSupportedLabel = new JLabel(NbBundle.getMessage(NotSupportedDisplayer.class, "MSG_Not_supported", object), SwingConstants.CENTER);    // NOI18N
         notSupportedLabel.setEnabled(false);

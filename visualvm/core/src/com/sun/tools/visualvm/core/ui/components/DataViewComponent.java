@@ -38,14 +38,27 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 /**
+ * UI component displaying single subtab for opened DataSource.
  *
  * @author Jiri Sedlacek
  */
 public final class DataViewComponent extends JPanel {
 
+    /**
+     * Top left details area of the view.
+     */
     public static final int TOP_LEFT = 1;
+    /**
+     * Top right details area of the view.
+     */
     public static final int TOP_RIGHT = 2;
+    /**
+     * Bottom left details area of the view.
+     */
     public static final int BOTTOM_LEFT = 3;
+    /**
+     * Bottom right details area of the view.
+     */
     public static final int BOTTOM_RIGHT = 4;
 
     private boolean isMasterViewResizable;
@@ -64,6 +77,12 @@ public final class DataViewComponent extends JPanel {
     private DisplayArea detailsBottomRightArea;
     
     
+    /**
+     * Creates new instance of DataViewComponent.
+     * 
+     * @param masterView MasterView for the component.
+     * @param masterAreaConfiguration MasterAreaConfiguration for the component.
+     */
     public DataViewComponent(MasterView masterView, MasterViewConfiguration masterAreaConfiguration) {
         initComponents();
         createMasterView(masterView);
@@ -75,6 +94,11 @@ public final class DataViewComponent extends JPanel {
         setMasterViewResizable(masterViewConfiguration.isMasterViewResizable());
     }
     
+    /**
+     * Configures properties of the details view.
+     * 
+     * @param detailsViewConfiguration configuration for the details view.
+     */
     public void configureDetailsView(DetailsViewConfiguration detailsViewConfiguration) {
         double topHorizontalDividerResizeWeight = detailsViewConfiguration.getTopHorizontalDividerResizeWeight();
         if (topHorizontalDividerResizeWeight != -1) detailsTopHorizontalSplitter.setResizeWeight(topHorizontalDividerResizeWeight);
@@ -92,22 +116,42 @@ public final class DataViewComponent extends JPanel {
         if (verticalDividerLocation != -1) detailsVerticalSplitter.setDividerLocation(verticalDividerLocation);
     }
     
+    /**
+     * Shows details area on provided location.
+     * 
+     * @param location location to be shown.
+     */
     public void showDetailsArea(int location) {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) displayArea.setVisible(true);
     }
     
+    /**
+     * Hides details area on provided location.
+     * 
+     * @param location location to be hidden.
+     */
     public void hideDetailsArea(int location) {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) displayArea.setVisible(false);
     }
     
+    /**
+     * Returns true if the details area on provided location is currently shown, false otherwise.
+     * @param location location to be checked.
+     * @return true if the details area on provided location is currently shown, false otherwise.
+     */
     public boolean isDetailsAreaShown(int location) {
         DisplayArea displayArea = getDisplayArea(location);
         return displayArea != null ? displayArea.isVisible() : false;
     }
     
-    // Configures area (closable etc.)
+    /**
+     * Configures properties of the details area.
+     * 
+     * @param detailsAreaConfiguration configuration for the details area.
+     * @param location location of the details area to be configured.
+     */
     public void configureDetailsArea(DetailsAreaConfiguration detailsAreaConfiguration, int location) {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) {
@@ -122,7 +166,12 @@ public final class DataViewComponent extends JPanel {
         masterArea.addTab(new DisplayArea.Tab(masterView.getName(), masterView.getDescription(), 0, masterView.getView(), options));
     }
     
-    // Adds a tab to details area
+    /**
+     * Adds new details view.
+     * 
+     * @param detailsView DetailsView to be added.
+     * @param location location where the DetailsView will be added.
+     */
     public void addDetailsView(DetailsView detailsView, int location) {
         DisplayArea displayArea = getDisplayArea(location);
         if (displayArea != null) {
@@ -133,16 +182,31 @@ public final class DataViewComponent extends JPanel {
         }
     }
     
-    // Removes a tab from details area
+    /**
+     * Removes details view.
+     * 
+     * @param detailsView DetailsView to be removed.
+     */
     public void removeDetailsView(DetailsView detailsView) {
         DisplayArea displayArea = getDisplayArea(detailsView.getTab());
         if (displayArea != null) displayArea.removeTab(detailsView.getTab());
     }
     
+    /**
+     * Returns true if DataViewComponent contains the DetailsView, false otherwise.
+     * 
+     * @param detailsView DetailsView to check.
+     * @return true if DataViewComponent contains the DetailsView, false otherwise.
+     */
     public boolean containsDetailsView(DetailsView detailsView) {
         return getDisplayArea(detailsView.getTab()) != null;
     }
     
+    /**
+     * Selects the DetailsView.
+     * 
+     * @param detailsView DetailsView to be selected.
+     */
     public void selectDetailsView(DetailsView detailsView) {
         DisplayArea displayArea = getDisplayArea(detailsView.getTab());
         if (displayArea != null) displayArea.setSelectedTab(detailsView.getTab());
@@ -396,12 +460,23 @@ public final class DataViewComponent extends JPanel {
         }
     }
     
+    /**
+     * Master view of DataViewComponent. This is the upper part of the component showing the master contents and/or
+     * controls for details views. Master view is always shown for each DataViewComponent.
+     */
     public static class MasterView {
         
         private String name;
         private String description;
         private JComponent view;
         
+        /**
+         * Creates new instance of MasterView.
+         * 
+         * @param name name of the view.
+         * @param description description of the view.
+         * @param view UI component to be shown.
+         */
         public MasterView(String name, String description, JComponent view) {
             this.name = name;
             this.description = description;
@@ -414,10 +489,23 @@ public final class DataViewComponent extends JPanel {
         
     }
     
+    /**
+     * Details vieww of DataViewComponent. This is an optional view of the DataViewComponent which can be hidden or
+     * not used at all.
+     */
     public static class DetailsView {
         
         private DisplayArea.Tab tab;
         
+        /**
+         * Creates new instance of DetailsView.
+         * 
+         * @param name name of the view.
+         * @param description description of the view.
+         * @param preferredPosition preferred position of the view among other views.
+         * @param view UI component to be shown.
+         * @param options components to be shown in view's caption.
+         */
         public DetailsView(String name, String description, int preferredPosition, JComponent view, JComponent[] options) {
             tab = new DisplayArea.Tab(name, description, preferredPosition, view, options);
         }
@@ -426,10 +514,18 @@ public final class DataViewComponent extends JPanel {
         
     }
     
+    /**
+     * Configuration of the MasterView.
+     */
     public static class MasterViewConfiguration {
         
         private boolean isMasterViewResizable;
         
+        /**
+         * Creates new instance of MasterViewConfiguration.
+         * 
+         * @param isMasterAreaResizable controls if master area can be dynamically resized in the UI (effective only if at least one details view is displayed).
+         */
         public MasterViewConfiguration(boolean isMasterAreaResizable) {
             this.isMasterViewResizable = isMasterAreaResizable;
         }
@@ -438,6 +534,9 @@ public final class DataViewComponent extends JPanel {
         
     }
     
+    /**
+     * Configuration of the DetailsView.
+     */
     public static class DetailsViewConfiguration {
         
         private double topHorizontalDividerLocation;
@@ -447,6 +546,16 @@ public final class DataViewComponent extends JPanel {
         private double verticalDividerLocation;
         private double verticalDividerResizeWeight;
         
+        /**
+         * Creates new instance of DetailsViewConfiguration.
+         * 
+         * @param topHorizontalDividerLocation preferred relative location of top horizontal divider.
+         * @param topHorizontalDividerResizeWeight preferred resize weight of top horizontal divider.
+         * @param bottomHorizontalDividerLocation preferred relative location of bottom horizontal divider.
+         * @param bottomHorizontalDividerResizeWeight preferred resize weight of bottom horizontal divider.
+         * @param verticalDividerLocation preferred location of vertical divider.
+         * @param verticalDividerResizeWeight preferred resize weight of vertical divider.
+         */
         public DetailsViewConfiguration(double topHorizontalDividerLocation, double topHorizontalDividerResizeWeight, double bottomHorizontalDividerLocation,
                                         double bottomHorizontalDividerResizeWeight, double verticalDividerLocation, double verticalDividerResizeWeight) {
             this.topHorizontalDividerLocation = topHorizontalDividerLocation;
@@ -457,20 +566,53 @@ public final class DataViewComponent extends JPanel {
             this.verticalDividerResizeWeight = verticalDividerResizeWeight;
         }
         
+        /**
+         * Returns preferred relative location of top horizontal divider.
+         * @return preferred relative location of top horizontal divider.
+         */
         public double getTopHorizontalDividerLocation() { return topHorizontalDividerLocation; };
+        /**
+         * Returns preferred resize weight of top horizontal divider.
+         * @return preferred resize weight of top horizontal divider.
+         */
         public double getTopHorizontalDividerResizeWeight() { return topHorizontalDividerResizeWeight; };
+        /**
+         * Returns preferred relative location of bottom horizontal divider.
+         * @return preferred relative location of bottom horizontal divider.
+         */
         public double getBottomHorizontalDividerLocation() { return bottomHorizontalDividerLocation; };
+        /**
+         * Returns preferred resize weight of bottom horizontal divider.
+         * @return preferred resize weight of bottom horizontal divider.
+         */
         public double getBottomHorizontalDividerResizeWeight() { return bottomHorizontalDividerResizeWeight; };
+        /**
+         * Returns preferred relative location of vertical divider.
+         * @return preferred relative location of vertical divider.
+         */
         public double getVerticalDividerLocation() { return verticalDividerLocation; };
+        /**
+         * Returns preferred resize weight of vertical divider.
+         * @return preferred resize weight of vertical divider.
+         */
         public double getVerticalDividerResizeWeight() { return verticalDividerResizeWeight; };
         
     }
     
+    /**
+     * Configuration for details area.
+     */
     public static class DetailsAreaConfiguration {
         
         private String name;
         private boolean closable;
         
+        /**
+         * Creates new instance of DetailsAreaConfiguration.
+         * 
+         * @param name name of the details area.
+         * @param closable controls if the details area is closable or always shown.
+         */
         public DetailsAreaConfiguration(String name, boolean closable) {
             this.name = name;
             this.closable = closable;
