@@ -58,13 +58,14 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import org.openide.util.HelpCtx;
 
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ProfilingPointsDisplayer extends JPanel {
+public class ProfilingPointsDisplayer extends JPanel implements HelpCtx.Provider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -74,6 +75,10 @@ public class ProfilingPointsDisplayer extends JPanel {
     private static final String NO_ACTIVE_PPS_STRING = NbBundle.getMessage(ProfilingPointsDisplayer.class,
                                                                            "ProfilingPointsDisplayer_NoActivePpsString"); // NOI18N
                                                                                                                           // -----
+    
+    private static final String HELP_CTX_KEY = "ProfilingPointsDisplayer.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    
     private static ProfilingPointsDisplayer defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -88,6 +93,10 @@ public class ProfilingPointsDisplayer extends JPanel {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
+    }
 
     public static void displayProfilingPoints(Project project, ProfilingSettings settings) {
         ProfilingPointsDisplayer ppd = getDefault();
