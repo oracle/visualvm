@@ -43,6 +43,7 @@ import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
 /**
+ * General VisualVM settings defined in Options.
  *
  * @author Jaroslav Bachorik
  */
@@ -72,6 +73,11 @@ public final class GlobalPreferences implements PreferenceChangeListener {
         prefs.addPreferenceChangeListener(this);
     }
     
+    /**
+     * Returns singleton instance of GlobalPreferences.
+     * 
+     * @return singleton instance of GlobalPreferences.
+     */
     public static GlobalPreferences sharedInstance() {
         return INSTANCE;
     }
@@ -101,66 +107,147 @@ public final class GlobalPreferences implements PreferenceChangeListener {
         }
     }
 
+    /**
+     * Returns polling interval for monitored host.
+     * 
+     * @return polling interval for monitored host.
+     */
     public int getMonitoredHostPoll() {
         return getPollingInterval(INT_KEY_MONHOST_POLL, MONHOST_POLL_DEFAULT);
     }
     
+    /**
+     * Sets polling interval for monitored host.
+     * 
+     * @param value polling interval for monitored host.
+     */
     public void setMonitoredHostPoll(int value) {
         setPollingInterval(INT_KEY_MONHOST_POLL, value);
     }
     
+    /**
+     * Registers a listener for changes of polling interval for monitored host.
+     * 
+     * @param pcl listener for changes of polling interval for monitored host.
+     */
     public void watchMonitoredHostPoll(PreferenceChangeListener pcl) {
         addListener(INT_KEY_MONHOST_POLL, pcl);
     }
     
+    /**
+     * Returns polling interval for threads.
+     * 
+     * @return polling interval for threads.
+     */
     public int getThreadsPoll() {
         return getPollingInterval(INT_KEY_THREADS_POLL, THREADS_POLL_DEFAULT);
     }
     
+    /**
+     * Sets polling interval for threads.
+     * 
+     * @param value polling interval for threads.
+     */
     public void setThreadsPoll(int value) {
         setPollingInterval(INT_KEY_THREADS_POLL, value);
     }
     
+    /**
+     * Registers a listener for changes of polling interval for threads.
+     * 
+     * @param pcl listener for changes of polling interval for threads.
+     */
     public void watchThreadsPoll(PreferenceChangeListener pcl) {
         addListener(INT_KEY_THREADS_POLL, pcl);
     }
     
+    /**
+     * Returns polling interval for monitored data.
+     * 
+     * @return polling interval for monitored data.
+     */
     public int getMonitoredDataPoll() {
         return getPollingInterval(INT_KEY_MONDATA_POLL, MONDATA_POLL_DEFAULT);
     }
     
+    /**
+     * Sets polling interval for monitored data.
+     * 
+     * @param value polling interval for monitored data.
+     */
     public void setMonitoredDataPoll(int value) {
         setPollingInterval(INT_KEY_MONDATA_POLL, value);
     }
     
+    /**
+     * Registerz a listener for changes of polling interval for monitored data.
+     * 
+     * @param pcl listener for changes of polling interval for monitored data.
+     */
     public void watchMonitoredDataPoll(PreferenceChangeListener pcl) {
         addListener(INT_KEY_MONDATA_POLL, pcl);
     }
     
+    /**
+     * Returns size of cache for monitored host data.
+     * 
+     * @return size of cache for monitored host data.
+     */
     public int getMonitoredHostCache() {
         return getPollingInterval(INT_KEY_MONHOST_CACHE, MONHOST_CACHE_DEFAULT);
     }
     
+    /**
+     * Sets size of cache for monitored host data.
+     * 
+     * @param value size of cache for monitored host data.
+     */
     public void setMonitoredHostCache(int value) {
         setPollingInterval(INT_KEY_MONHOST_CACHE, value);
     }
     
+    /**
+     * Registers a listener for changes of size of cache for monitored host data.
+     * 
+     * @param pcl listener for changes of size of cache for monitored host data.
+     */
     public void watchMonitoredHostCache(PreferenceChangeListener pcl) {
         addListener(INT_KEY_MONHOST_CACHE, pcl);
     }
     
+    /**
+     * Returns size of cache for monitored data.
+     * 
+     * @return size of cache for monitored data.
+     */
     public int getMonitoredDataCache() {
         return getPollingInterval(INT_KEY_MONDATA_CACHE, MONDATA_CACHE_DEFAULT);
     }
     
+    /**
+     * Sets size of cache for monitored data.
+     * 
+     * @param value size of cache for monitored data.
+     */
     public void setMonitoredDataCache(int value) {
         setPollingInterval(INT_KEY_MONDATA_CACHE, value);
     }
     
+    /**
+     * Registers a listener for changes of size of cache for monitored data.
+     * 
+     * @param pcl listener for changes of size of cache for monitored data.
+     */
     public void watchMonitoredDataCache(PreferenceChangeListener pcl) {
         addListener(INT_KEY_MONDATA_CACHE, pcl);
     }
     
+    /**
+     * Persistently stores preferences values. This method is called automatically,
+     * typically you don't need to call it explicitely.
+     * 
+     * @return true if the preferences have been stored successfuly, false otherwise.
+     */
     public boolean store() {
         try {
             prefs.sync();
