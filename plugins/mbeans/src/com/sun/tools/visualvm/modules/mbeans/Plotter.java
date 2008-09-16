@@ -125,18 +125,26 @@ class Plotter extends JComponent
     private int bottomMargin = 45;
     private int leftMargin = 65;
     private int rightMargin = 70;
+    // if display legend is true, the name of the attribute is displayed
+    // next to the attribute value on the right of the plotter...
+    private final boolean displayLegend;
 
     public Plotter() {
-        this(Unit.NONE, 0);
+        this(Unit.NONE, 0, true);
     }
 
     public Plotter(Unit unit) {
-        this(unit, 0);
+        this(unit, 0, true);
+    }
+
+    public Plotter(Unit unit, int decimals) {
+        this(unit, decimals, true);
     }
 
     // Note: If decimals > 0 then values must be decimally shifted left
     // that many places, i.e. multiplied by Math.pow(10.0, decimals).
-    public Plotter(Unit unit, int decimals) {
+    public Plotter(Unit unit, int decimals, boolean displayLegend) {
+        this.displayLegend = displayLegend;
         setUnit(unit);
         setDecimals(decimals);
 
@@ -668,7 +676,7 @@ class Plotter extends JComponent
                         curValue += "%"; // NOI18N
                     }
                     int valWidth = fm.stringWidth(curValue);
-                    String legend = seq.name;
+                    String legend = displayLegend?seq.name:"";
                     int legendWidth = fm.stringWidth(legend);
                     if (checkRightMargin(valWidth) || checkRightMargin(legendWidth)) {
                         // Wait for next repaint

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -35,13 +36,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.Timer;
 
 @SuppressWarnings("serial")
 class XPlottingViewer extends PlotterPanel implements ActionListener {
 
-    private final static Logger LOGGER = Logger.getLogger(XPlottingViewer.class.getName());
+    private final static Logger LOGGER =
+            Logger.getLogger(XPlottingViewer.class.getName());
 
     // TODO: Make number of decimal places customizable
     private static final int PLOTTER_DECIMALS = 4;
@@ -69,7 +73,7 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
         this.key = key;
         this.mbean = mbean;
         this.table = table;
-        this.attributeName = attributeName;        
+        this.attributeName = attributeName;
         setupDisplay(createPlotter(mbean, attributeName, key, table));
     }
 
@@ -99,7 +103,8 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
 
     // Fired by dbl click
     public static Component loadPlotting(
-            XMBean mbean, String attributeName, Object value, JTable table, MBeansTab tab) {
+            XMBean mbean, String attributeName, Object value, JTable table,
+            MBeansTab tab) {
         Component comp = null;
         if (isViewableValue(value)) {
             String key = String.valueOf(tab.hashCode()) + " " + // NOI18N
@@ -107,7 +112,8 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
                     mbean.getObjectName().getCanonicalName() + attributeName;
             XPlottingViewer p = plotterCache.get(key);
             if (p == null) {
-                p = new XPlottingViewer(key, mbean, attributeName, value, table, tab);
+                p = new XPlottingViewer(key, mbean, attributeName, value,
+                        table, tab);
                 plotterCache.put(key, p);
             }
             comp = p;
@@ -158,7 +164,8 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
         tab.getRequestProcessor().post(new Runnable() {
             public void run() {
                 try {
-                    Number n = (Number) mbean.getCachedMBeanServerConnection().getAttribute(
+                    Number n = (Number) mbean.getCachedMBeanServerConnection().
+                            getAttribute(
                             mbean.getObjectName(), attributeName);
                     long v;
                     if (n instanceof Float || n instanceof Double) {
@@ -170,7 +177,8 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
                     }
                     p.addValues(System.currentTimeMillis(), v);
                 } catch (Exception e) {
-                    LOGGER.throwing(XPlottingViewer.class.getName(), "intervalElapsed", e); // NOI18N
+                    LOGGER.throwing(XPlottingViewer.class.getName(),
+                            "intervalElapsed", e); // NOI18N
                 }
             }
         });
@@ -178,30 +186,40 @@ class XPlottingViewer extends PlotterPanel implements ActionListener {
 
     // Create Plotter display
     private void setupDisplay(Plotter p) {
-        //setLayout(new GridLayout(2,0));
-        GridBagLayout gbl = new GridBagLayout();
-        setLayout(gbl);
+        final JPanel buttonPanel = new JPanel();
+        final GridBagLayout gbl = new GridBagLayout();
+        buttonPanel.setLayout(gbl);
+        setLayout(new BorderLayout());
         plotButton = new JButton(Resources.getText("LBL_DiscardChart")); // NOI18N
         plotButton.addActionListener(this);
         plotButton.setEnabled(true);
 
-        // Add the display to the top four cells
         GridBagConstraints buttonConstraints = new GridBagConstraints();
         buttonConstraints.gridx = 0;
         buttonConstraints.gridy = 0;
         buttonConstraints.fill = GridBagConstraints.VERTICAL;
         buttonConstraints.anchor = GridBagConstraints.CENTER;
         gbl.setConstraints(plotButton, buttonConstraints);
-        add(plotButton);
+        buttonPanel.add(plotButton);
 
-        GridBagConstraints plotterConstraints = new GridBagConstraints();
-        plotterConstraints.gridx = 0;
-        plotterConstraints.gridy = 1;
-        plotterConstraints.weightx = 1;
-        plotterConstraints.fill = GridBagConstraints.VERTICAL;
-        gbl.setConstraints(p, plotterConstraints);
+        if (attributeName != null && attributeName.length()!=0) {
+            final JPanel plotterLabelPanel = new JPanel();
+            final JLabel atlabel = new JLabel(attributeName);
+            final GridBagLayout gbl2 = new GridBagLayout();
+            plotterLabelPanel.setLayout(gbl2);
+            final GridBagConstraints labelConstraints = new GridBagConstraints();
+            labelConstraints.gridx = 0;
+            labelConstraints.gridy = 0;
+            labelConstraints.fill = GridBagConstraints.VERTICAL;
+            labelConstraints.anchor = GridBagConstraints.CENTER;
+            labelConstraints.ipady = 10;
+            gbl2.setConstraints(atlabel, labelConstraints);
+            plotterLabelPanel.add(atlabel);
+            add(plotterLabelPanel, BorderLayout.NORTH);
+        }
 
         setPlotter(p);
+        add(buttonPanel, BorderLayout.SOUTH);
         repaint();
     }
 }
