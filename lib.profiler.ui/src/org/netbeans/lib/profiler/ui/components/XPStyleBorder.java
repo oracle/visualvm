@@ -52,18 +52,20 @@ import javax.swing.border.AbstractBorder;
 public class XPStyleBorder extends AbstractBorder {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    private static boolean isNimbus = UIUtils.isNimbus();
+            
     public static final int BORDER_STATE_DEFAULT = 10;
     public static final int BORDER_STATE_FOCUSED = 20;
     public static final int BORDER_STATE_SELECTED = 30;
     private static final Color OUTLINE_CLR = new Color(0, 0, 0);
-    private static final Color FOCUSED_TOP_LIGHT_CLR = new Color(206, 231, 255);
-    private static final Color FOCUSED_TOP_DARK_CLR = new Color(188, 212, 246);
-    private static final Color FOCUSED_BOTTOM_LIGHT_CLR = new Color(137, 173, 228);
-    private static final Color FOCUSED_BOTTOM_DARK_CLR = new Color(105, 130, 238);
-    private static final Color SELECTED_TOP_LIGHT_CLR = new Color(255, 240, 207);
-    private static final Color SELECTED_TOP_DARK_CLR = new Color(253, 216, 137);
-    private static final Color SELECTED_BOTTOM_LIGHT_CLR = new Color(248, 178, 48);
-    private static final Color SELECTED_BOTTOM_DARK_CLR = new Color(229, 151, 0);
+    private static final Color FOCUSED_TOP_LIGHT_CLR = isNimbus ? new Color(200, 212, 222) : new Color(206, 231, 255);
+    private static final Color FOCUSED_TOP_DARK_CLR = isNimbus ? new Color(200, 212, 222) : new Color(188, 212, 246);
+    private static final Color FOCUSED_BOTTOM_LIGHT_CLR = isNimbus ? new Color(200, 212, 222) : new Color(137, 173, 228);
+    private static final Color FOCUSED_BOTTOM_DARK_CLR = isNimbus ? new Color(200, 212, 222) : new Color(105, 130, 238);
+    private static final Color SELECTED_TOP_LIGHT_CLR = isNimbus ? new Color(182, 203, 222) : new Color(255, 240, 207);
+    private static final Color SELECTED_TOP_DARK_CLR = isNimbus ? new Color(182, 203, 222) : new Color(253, 216, 137);
+    private static final Color SELECTED_BOTTOM_LIGHT_CLR = isNimbus ? new Color(182, 203, 222) : new Color(248, 178, 48);
+    private static final Color SELECTED_BOTTOM_DARK_CLR = isNimbus ? new Color(182, 203, 222) : new Color(229, 151, 0);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
