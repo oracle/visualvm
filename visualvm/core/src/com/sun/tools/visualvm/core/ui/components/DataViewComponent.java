@@ -490,7 +490,7 @@ public final class DataViewComponent extends JPanel {
     }
     
     /**
-     * Details vieww of DataViewComponent. This is an optional view of the DataViewComponent which can be hidden or
+     * Details view of DataViewComponent. This is an optional view of the DataViewComponent which can be hidden or
      * not used at all.
      */
     public static class DetailsView {
