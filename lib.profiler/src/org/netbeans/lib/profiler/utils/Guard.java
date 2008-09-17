@@ -59,7 +59,6 @@ public class Guard {
 
     private final Map readLocks = new HashMap();
     private Thread owner = null;
-    private boolean flag = false;
     private boolean starving = false;
     private int xLockCounter = 0;
 

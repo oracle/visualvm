@@ -72,7 +72,7 @@ made subject to such option by the copyright holder.
 
     <target name="jar" depends="init,compile,jar-prep">
         <!-- Client side -->
-        <jarwithmoduleattributes jarfile="${cluster}/${module.jar}" compress="${build.package.compress}" index="${build.package.index}" manifest="${manifest.mf}">
+        <jarwithmoduleattributes jarfile="${cluster}/${module.jar}" compress="${build.package.compress}" index="${build.package.index}" manifest="${manifest.mf}" stamp="${cluster}/.lastModified">
             <fileset dir="${build.classes.dir}">
               <exclude name="org/netbeans/lib/profiler/server/**"/>
             </fileset>
