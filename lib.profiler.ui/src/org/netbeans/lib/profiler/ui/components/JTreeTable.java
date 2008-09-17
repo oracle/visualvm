@@ -439,6 +439,8 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     public JTreeTable(AbstractTreeTableModel treeTableModel) {
         super();
         this.treeTableModel = treeTableModel;
+        
+        setBackground(UIUtils.getProfilerResultsBackground());
 
         int initialSortingColumn = treeTableModel.getInitialSortingColumn();
         boolean initialSortingOrder = treeTableModel.getInitialSortingOrder();
