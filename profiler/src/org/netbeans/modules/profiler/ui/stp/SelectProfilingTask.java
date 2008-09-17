@@ -433,10 +433,6 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     SimpleFilter getResolvedPredefinedFilter(SimpleFilter key) {
         ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
-        if (ptp == null) {
-            return null; // Should never happen
-        }
-
         int resolvedIndex = predefinedInstrFilterKeys.indexOf(key); // takes some time for long filter values
 
         if (resolvedIndex == -1) {
@@ -1149,6 +1145,6 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     
     private static boolean isProjectTypeSupportedForAttach(Project project) {
         ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-        return ptp != null ? ptp.isAttachSupported(project) : false;
+        return ptp.isAttachSupported(project);
     }
 }
