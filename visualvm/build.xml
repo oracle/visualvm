@@ -118,4 +118,68 @@
             </zipfileset>
         </zip>
     </target>
+    
+    <target name="javadoc" depends="-init,branding">
+        <delete dir="build/javadoc"/>
+        
+        <javadoc destdir="build/javadoc" author="true" version="true" use="true" encoding="UTF-8" windowtitle="${app.title} API">
+            
+            <!--group title="VisualVM-Application" packages="com.sun.tools.visualvm.application*"/-->
+            <fileset dir="application/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Application Views" packages="com.sun.tools.visualvm.application.views*"/-->
+            <fileset dir="applicationviews/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/application/views/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Core" packages="com.sun.tools.visualvm.core*"/-->
+            <fileset dir="core/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/core/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-CoreDump" packages="com.sun.tools.visualvm.coredump*"/-->
+            <fileset dir="coredump/src" defaultexcludes="yes">
+                <include name="com/sun/tools/visualvm/coredump/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-HeapDump" packages="com.sun.tools.visualvm.heapdump*"/-->
+            <fileset dir="heapdump/src" defaultexcludes="yes">
+                <include name="com/sun/tools/visualvm/heapdump/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Host" packages="com.sun.tools.visualvm.host*"/-->
+            <fileset dir="host/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/host/impl/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Host Views" packages="com.sun.tools.visualvm.host.views*"/-->
+            <fileset dir="hostviews/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/host/views/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-ThreadDump" packages="com.sun.tools.visualvm.threaddump*"/-->
+            <fileset dir="threaddump/src" defaultexcludes="yes">
+                <include name="com/sun/tools/visualvm/threaddump/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Tools" packages="com.sun.tools.visualvm.tools*"/-->
+            <fileset dir="tools/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/tools/*.java"/>
+            </fileset>
+
+            <link href="http://java.sun.com/javase/6/docs/api/"/>
+
+
+            <doctitle><![CDATA[<h1>${app.title} API Specification</h1><p align="left">This document is the API specification for ${app.title}. See the <a href="https://visualvm.dev.java.net/api-quickstart.html">Getting Started Extending VisualVM</a> document for information about developing plugins for VisualVM.</p><br/>]]></doctitle>
+            <header><![CDATA[<b>${app.title} API<br>Specification</b>]]></header>
+        
+        </javadoc>
+        
+        <nbbrowse file="build/javadoc/index.html"/>
+    </target>
 </project>
