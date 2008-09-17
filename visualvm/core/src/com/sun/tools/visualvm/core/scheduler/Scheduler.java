@@ -37,7 +37,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.results.ProfilingResultsProvider.Dispatcher;
 
 /**
  * An interval based scheduler service
@@ -115,6 +114,9 @@ public class Scheduler implements PropertyChangeListener {
         task.suspend();
     }
 
+    /**
+     * @see PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
     public void propertyChange(PropertyChangeEvent evt) {
         DefaultScheduledTask task = (DefaultScheduledTask) evt.getSource();
         reschedule(task, (Quantum) evt.getOldValue(), (Quantum) evt.getNewValue());

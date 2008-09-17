@@ -84,22 +84,37 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
         }
     }
 
+    /**
+     * @see PropertyChangeSupport#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+     */
     public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(propertyName, listener);
     }
 
+    /**
+     * @see PropertyChangeSupport#addPropertyChangeListener(java.beans.PropertyChangeListener)
+     */
     public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
 
+    /**
+     * @see PropertyChangeSupport#hasListeners(java.lang.String)
+     */
     public synchronized boolean hasListeners(String propertyName) {
         return pcs.hasListeners(propertyName);
     }
 
+    /**
+     * @see PropertyChangeSupport#removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+     */
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
 
+    /**
+     * @see PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+     */
     public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
@@ -112,11 +127,17 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
         setInterval(Quantum.SUSPENDED);
     }
 
+    /**
+     * @see ScheduledTask#resume()
+     */
     public void resume() {
         setInterval(suspendedFrom);
         suspendedFrom = Quantum.SUSPENDED;
     }
-    
+
+    /**
+     * @see ScheduledTask#isSuspended()
+     */
     public boolean isSuspended() {
         return interval.equals(Quantum.SUSPENDED);
     }
