@@ -104,7 +104,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         TimedCPUCCTNode comboNodeDst;
         TimedCPUCCTNode comboNodeSrc;
         int totalNNodes; // total number of call tree nodes for this thread
-        long lastCallIndex = -1;
         long rootGrossTimeAbs;
         long rootGrossTimeThreadCPU; // Accumulated absolute and thread CPU gross time for the root method
                                      // - blackout data subtracted, calibration data not
