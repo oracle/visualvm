@@ -159,7 +159,6 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
                                                                        int methodIdx) {
         List newPoints = null;
         String className = classInfo.getName().replace('/', '.'); // NOI18N
-        className = className.replace('$', '.'); // NOI18N
 
         for (int i = 0; i < points.length; i++) {
             RuntimeProfilingPoint point = points[i];
