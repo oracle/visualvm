@@ -235,14 +235,14 @@ public final class AntActions {
                     if (!lightweightOnly) {
                         final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
-                        if (ptp == null) {
+                        if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
-
-                        return (ptp.isFileObjectSupported(project, fos[0]));
                     } else {
                         return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
+                    
+                    return true;
                 }
 
                 public void perform(final Project project, final Lookup context) {
