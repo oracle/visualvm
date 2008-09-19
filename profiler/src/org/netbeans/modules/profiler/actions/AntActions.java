@@ -96,8 +96,9 @@ public final class AntActions {
     private static final String INCORRECT_JAVA_SPECVERSION_DIALOG_MSG = NbBundle.getMessage(AntActions.class,
                                                                                             "AntActions_IncorrectJavaSpecVersionDialogMsg"); // NOI18N
     private static final String UNSUPPORTED_PROJECT_TYPE_MSG = NbBundle.getMessage(AntActions.class,
-                                                                                   "AntActions_UnsupportedProjectTypeMsg"); // NOI18N
-                                                                                                                            // -----
+                                                                                   "AntActions_UnsupportedProjectTypeMsg"); // NOI18N                                                                                                                            
+    private static final String INVALID_JAVAPLATFORM_MSG = NbBundle.getMessage(AntActions.class,
+                                                                                   "AntActions_InvalidJavaplatformMsg"); // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -231,17 +232,17 @@ public final class AntActions {
                         return false;
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
-                        if (ptp == null) {
+                        if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
-
-                        return (ptp.isFileObjectSupported(project, fos[0]));
                     } else {
-                        return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
+                        System.out.println("ProfilSingle::Lightweight -> " + ptp.isProfilingSupported(project) + ", " + ProjectUtilities.hasAction(project, "profile-single"));
+                        return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
+                    
+                    return true;
                 }
 
                 public void perform(final Project project, final Lookup context) {
@@ -281,14 +282,13 @@ public final class AntActions {
                         return false;
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
                         if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
                     } else {
-                        return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
+                        return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
 
                     return true;
@@ -342,12 +342,11 @@ public final class AntActions {
                         return false; // not a test and test for it does not exist
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
                         return (ptp.isFileObjectSupported(project, fo));
                     } else {
-                        return true;
+                        return ptp.isProfilingSupported(project);
                     }
                 }
 
@@ -579,19 +578,26 @@ public final class AntActions {
 
                             if (profilingSettings.getOverrideGlobalSettings()) {
                                 String javaPlatformName = profilingSettings.getJavaPlatformName();
-
+                                JavaPlatform jp;
+                                
                                 if (javaPlatformName != null) {
                                     usedJavaExecutable = Profiler.getDefault().getPlatformJavaFile(javaPlatformName);
 
-                                    // added to support nbstartprofiledserver
-                                    JavaPlatform jp = IDEUtils.getJavaPlatformByName(javaPlatformName);
+                                    jp = IDEUtils.getJavaPlatformByName(javaPlatformName);
 
-                                    if (jp != null) {
-                                        props.setProperty("profiler.info.javaPlatform",
-                                                          jp.getProperties().get("platform.ant.name")); // NOI18N
+                                    if (jp == null) {
+                                        // selected platform does not exist, use 
+                                        String text = MessageFormat.format(INVALID_JAVAPLATFORM_MSG,new Object[] {javaPlatformName});
+                                        NetBeansProfiler.getDefaultNB().displayWarningAndWait(text);
+                                        jp = platform;
                                     }
+                                } else { 
+                                    // javaPlatformName == null -> do not override java platform, use platform from global settings
+                                    jp = platform;
                                 }
-
+                                // added to support nbstartprofiledserver
+                                props.setProperty("profiler.info.javaPlatform",
+                                                  jp.getProperties().get("platform.ant.name")); // NOI18N
                                 usedJvmArgs = profilingSettings.getJVMArgs();
                             } else {
                                 // added to support nbstartprofiledserver

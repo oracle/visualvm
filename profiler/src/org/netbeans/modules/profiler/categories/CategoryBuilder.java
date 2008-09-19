@@ -74,8 +74,10 @@ public class CategoryBuilder {
     private static final String SHADOW_SUFFIX = "shadow";
     private String projectType;
     private CategoryContainer rootCategory = null;
-
-    public CategoryBuilder(Project project, String projectTypeId) {
+    private Project project;
+    
+    public CategoryBuilder(Project proj, String projectTypeId) {
+        project = proj;
         projectType = projectTypeId;
     }
 
@@ -170,7 +172,7 @@ public class CategoryBuilder {
                             try {
                                 ClassLoader cl = Lookup.getDefault().lookup(ClassLoader.class);
                                 Class<CustomMarker> markerClz = (Class<CustomMarker>) cl.loadClass(instanceClass);
-                                CustomMarker marker = markerClz.getConstructor(Project.class, Mark.class).newInstance(NetBeansProfiler.getDefaultNB().getProfiledProject(), newCategory.getAssignedMark());
+                                CustomMarker marker = markerClz.getConstructor(Project.class, Mark.class).newInstance(project, newCategory.getAssignedMark());
                                 if (marker != null) {
                                     newCategory.getDefinitions().add(new CustomCategoryDefinition(newCategory, marker));
                                 }
