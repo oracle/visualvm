@@ -44,7 +44,6 @@ import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ContextAware;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -98,6 +97,7 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -137,6 +137,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
+import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
@@ -1397,8 +1399,7 @@ public final class NetBeansProfiler extends Profiler {
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    GoToSourceHelper.openSource(project, className, methodName, className);
-//                    SourceUtils.openSource(project, className, methodName, methodSig);
+                    GoToSourceHelper.openSource(project, className, methodName, methodSig);
                 }
             });
     }
@@ -1590,12 +1591,20 @@ public final class NetBeansProfiler extends Profiler {
 
             lock = fo.lock();
 
-            final OutputStream fos = fo.getOutputStream(lock);
-            final BufferedOutputStream bos = new BufferedOutputStream(fos);
+            final BufferedOutputStream bos = new BufferedOutputStream(fo.getOutputStream(lock));
             final Properties globalProps = new Properties();
-            as.store(globalProps);
-            globalProps.storeToXML(bos, ""); //NOI18N
-            bos.close();
+            try {
+                as.store(globalProps);
+                globalProps.storeToXML(bos, ""); //NOI18N
+            } finally {
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException ex) {
+                        // ignore
+                    }
+                }
+            }
         } catch (Exception e) {
             ProfilerLogger.log(e);
             ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_ATTACH_SETTINGS_MESSAGE,
@@ -2093,16 +2102,22 @@ public final class NetBeansProfiler extends Profiler {
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
             CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
+            filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
+
             if (filter != null) {
                 filter.reset(); // clean up the filter before reusing it
             }
 
             // init context aware instances
-            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
-
-            for (ContextAware instance : contextAwareInstances) {
-                instance.setContext(client);
-            }
+            FlatProfileBuilder fpb = Lookup.getDefault().lookup(FlatProfileBuilder.class);
+            TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
+            fpb.setContext(client, tc, filter);
+            
+//            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
+//
+//            for (ContextAware instance : contextAwareInstances) {
+//                instance.setContext(client);
+//            }
 
 //            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
 //                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
@@ -2159,9 +2174,9 @@ public final class NetBeansProfiler extends Profiler {
             if (processesProfilingPoints) {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (!ProfilingPointsWindow.getInstance().isOpened()) {
-                                ProfilingPointsWindow.getInstance().open();
-                                ProfilingPointsWindow.getInstance().requestVisible();
+                            if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                ProfilingPointsWindow.getDefault().open();
+                                ProfilingPointsWindow.getDefault().requestVisible();
                             }
                         }
                     });
