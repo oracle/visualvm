@@ -71,7 +71,6 @@ import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDown;
 import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
@@ -87,6 +86,7 @@ import org.openide.windows.TopComponentGroup;
 import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -114,6 +114,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
 
 
@@ -439,18 +441,14 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
-            if (className.length() == 1) {
-                if (BOOLEAN_CODE.equals(className) || CHAR_CODE.equals(className) || BYTE_CODE.equals(className)
-                        || SHORT_CODE.equals(className) || INT_CODE.equals(className) || LONG_CODE.equals(className)
-                        || FLOAT_CODE.equals(className) || DOUBLE_CODE.equals(className)) {
-                    // primitive type
-                    Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
-
-                    return;
-                }
-            }
-
-            Profiler.getDefault().openJavaSource(className, methodName, methodSig);
+            // Check if primitive type/array
+            if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
+                 VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+            // Check if allocated by reflection
+            else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
+                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+            // Display source
+            else NetBeansProfiler.getDefaultNB().openJavaSource(className, methodName, methodSig);
         }
 
         public void showStacksForClass(final int selectedClassId, final int sortingColumn, final boolean sortingOrder) {
@@ -550,7 +548,6 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         cpuActionsHandler = new CPUActionsHandler();
 
         toolBar = createToolBar();
-        toolBar.setBorder(new EmptyBorder(5, 5, 0, 5));
 
         add(toolBar, BorderLayout.NORTH);
 
@@ -598,11 +595,22 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.add(graphTab.zoomOutButton);
         toolBar.add(graphTab.scaleToFitButton);
 
-        JPanel toolbarSpacer = new JPanel(new FlowLayout(0, 0, FlowLayout.LEADING));
+        JPanel toolbarSpacer = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
+            public Dimension getPreferredSize() {
+                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+                    int currentWidth = toolBar.getSize().width;
+                    int minimumWidth = toolBar.getMinimumSize().width;
+                    int extraWidth = currentWidth - minimumWidth;
+                    return new Dimension(Math.max(extraWidth, 0), 0);
+                } else {
+                    return super.getPreferredSize();
+                }
+            }
+        };
         toolbarSpacer.setOpaque(false);
 
         final DrillDownWindow drillDownWin = DrillDownWindow.getDefault();
-        drillDownWin.closeIfOpened();
+        DrillDownWindow.closeIfOpened();
         drillDownWin.getPresenter().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (drillDownWin.getPresenter().isSelected()) {
@@ -968,6 +976,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         toolBar.setFloatable(false);
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
+        toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        
         autoToggle = new JToggleButton(new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/autoRefresh.png") // NOI18N
         ));
         autoToggle.setSelected(true);
