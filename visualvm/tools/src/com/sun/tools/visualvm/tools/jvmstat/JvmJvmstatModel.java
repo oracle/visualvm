@@ -36,7 +36,12 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 /**
- *
+ * 
+ * This class encapsulates information available via Jvmstat counters.
+ * It is preferred to use this class to get access to java home, 
+ * total loaded classes, number of running threads etc. The advantage is 
+ * that user code does not depend on particular counter name, which can be
+ * different for different JVM.
  * @author Tomas Hurka
  */
 public abstract class JvmJvmstatModel extends Model {
@@ -66,42 +71,122 @@ public abstract class JvmJvmstatModel extends Model {
         jvmstat = stat;
     }
     
+    /**
+     * Returns the Java virtual machine command line.
+     *
+     * @return String - contains the command line of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  command line cannot be determined.
+     */
     public String getCommandLine() {
         return jvmstat.findByName("sun.rt.javaCommand"); // NOI18N
     }
     
+    /**
+     * Returns the Java virtual machine command line arguments.
+     *
+     * @return String - contains the command line arguments of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  command line arguments cannot be determined.
+     */
     public String getJvmArgs() {
         return jvmstat.findByName("java.rt.vmArgs");    // NOI18N
     }
     
+    /**
+     * Returns the Java virtual machine flags.
+     *
+     * @return String - contains the flags of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  flags be determined.
+     */
     public String getJvmFlags() {
         return jvmstat.findByName("java.rt.vmFlags");   // NOI18N
     }   
     
+   /**
+     * Returns the Java virtual machine home directory. 
+     * This method is equivalent to {@link System#getProperty 
+     * System.getProperty("java.home")}.
+     *
+     * @return the Java virtual machine home directory.
+     *
+     * @see java.lang.System#getProperty
+     */
     public String getJavaHome() {
         return jvmstat.findByName("java.property.java.home");   // NOI18N
     }
     
+   /**
+     * Returns the Java virtual machine VM info. 
+     * This method is equivalent to {@link System#getProperty 
+     * System.getProperty("java.vm.info")}.
+     *
+     * @return the Java virtual machine VM info.
+     *
+     * @see java.lang.System#getProperty
+     */
     public String getVmInfo() {
         return jvmstat.findByName("java.property.java.vm.info");    // NOI18N
     }
     
+    /**
+     * Returns the Java virtual machine implementation name. 
+     * This method is equivalent to {@link System#getProperty 
+     * System.getProperty("java.vm.name")}.
+     *
+     * @return the Java virtual machine implementation name.
+     *
+     * @see java.lang.System#getProperty
+     */
     public String getVmName() {
         return jvmstat.findByName("java.property.java.vm.name");    // NOI18N
     }
     
+    /**
+     * Returns the Java virtual machine implementation version. 
+     * This method is equivalent to {@link System#getProperty 
+     * System.getProperty("java.vm.version")}.
+     *
+     * @return the Java virtual machine implementation version.
+     *
+     * @see java.lang.System#getProperty
+     */
     public String getVmVersion() {
         return jvmstat.findByName("java.property.java.vm.version"); // NOI18N
     }
     
+    /**
+     * Returns the Java virtual machine implementation version. 
+     * This method is equivalent to {@link System#getProperty 
+     * System.getProperty("java.vm.vendor")}.
+     *
+     * @return the Java virtual machine vendor.
+     *
+     * @see java.lang.System#getProperty
+     */
     public String getVmVendor() {
         return jvmstat.findByName("java.property.java.vm.vendor");  // NOI18N
     }
     
+    /**
+     * Returns the Java virtual machine implementation version. 
+     * This method is equivalent to {@link System#getProperty 
+     * System.getProperty("java.class.path")}.
+     *
+     * @return the Java virtual machine classpath.
+     *
+     * @see java.lang.System#getProperty
+     */
     public String getClassPath() {
         return jvmstat.findByName("java.property.java.class.path"); // NOI18N
     }
     
+    /**
+     * Returns true if the JVM supports attach-on-demand. 
+     * 
+     * @return true if JVM support attach-on-demand, false otherwise.
+     */
     public boolean isAttachable() {
         String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");  // NOI18N
         if (jvmCapabilities == null) {
@@ -110,6 +195,16 @@ public abstract class JvmJvmstatModel extends Model {
         return jvmCapabilities.charAt(0) == '1';
     }
     
+    /**
+     * Return the arguments to the main class for the target Java application.
+     * Returns the arguments to the main class. If the arguments can't be
+     * found, <code>null</code> is returned.
+     *
+     * @return String - contains the arguments to the main class for the
+     *                  target Java application or the <code>null</code>
+     *                  if the command line cannot be determined.
+     */
+
     public String getMainArgs() {
         String commandLine = getCommandLine();
         String arg0 = getFirstArgument();
@@ -121,6 +216,15 @@ public abstract class JvmJvmstatModel extends Model {
         return null;
     }
     
+    /**
+     * Return the main class for the target Java application.
+     * Returns the main class, if the application started with the <em>-jar</em> option,
+     * it tries to determine main class from the jar file. If
+     * the jar file is not accessible, the main class is simple
+     * name of the jar file.
+     * @return String - the main class of the target Java
+     *                  application.
+     */
     public String getMainClass() {
         String mainClassName = getFirstArgument();
         // if we are on localhost try read main class from jar file
@@ -177,58 +281,148 @@ public abstract class JvmJvmstatModel extends Model {
         return mainClassName;
     }
 
+    /** 
+     * Returns the total number of classes that have been loaded since
+     * the Java virtual machine has started execution.
+     *
+     * @return the total number of classes loaded.
+     *
+     */
     public long getLoadedClasses() {
         return getLongValue(loadedClasses);
     }
     
+    /** 
+     * Returns the total number of shared classes that have been loaded since
+     * the Java virtual machine has started execution.
+     *
+     * @return the total number of shared classes loaded.
+     *
+     */
     public long getSharedLoadedClasses() {
         return getLongValue(sharedLoadedClasses);
     }
     
+    /** 
+     * Returns the total number of shared classes unloaded since the Java virtual machine
+     * has started execution.
+     *
+     * @return the total number of unloaded shared classes.
+     */
     public long getSharedUnloadedClasses() {
         return getLongValue(sharedUnloadedClasses);
    }
     
+    /** 
+     * Returns the total number of classes unloaded since the Java virtual machine
+     * has started execution.
+     *
+     * @return the total number of unloaded classes.
+     */
     public long getUnloadedClasses() {
         return getLongValue(unloadedClasses);
     }
     
+    /**
+     * Returns the current number of live daemon threads.
+     *
+     * @return the current number of live daemon threads.
+     */
     public long getThreadsDaemon() {
         return getLongValue(threadsDaemon);
     }
     
+    /**
+     * Returns the current number of live threads including both 
+     * daemon and non-daemon threads.
+     *
+     * @return the current number of live threads.
+     */
     public long getThreadsLive() {
         return getLongValue(threadsLive);
     }
     
+    /**
+     * Returns the peak live thread count since the Java virtual machine 
+     * started or peak was reset.
+     *
+     * @return the peak live thread count.
+     */
     public long getThreadsLivePeak() {
         return getLongValue(threadsLivePeak);
     }
     
+    /**
+     * Returns the total number of threads created and also started 
+     * since the Java virtual machine started.
+     *
+     * @return the total number of threads started.
+     */
     public long getThreadsStarted() {
         return getLongValue(threadsStarted);
     }
     
+    /**
+     * Returns the total time of when application is running in OS ticks.
+     * Application time is the uptime minus time spent in safe points.
+     * Note that this value is updated only at the beginning and e 
+     * @return application time of the Java virtual machine in OS ticks.
+     * @see JvmJvmstatModel#getOsFrequency()
+     */
     public long getApplicationTime() {
         return getLongValue(applicationTime);
     }
     
+    /**
+     * Returns the uptime of the Java virtual machine in OS ticks.
+     * @return uptime of the Java virtual machine in OS ticks.
+     * @see JvmJvmstatModel#getOsFrequency()
+     */
     public long getUpTime() {
         return getLongValue(upTime);
     }
     
+    /** 
+     * Returns the amount of memory in bytes that is committed for
+     * the Java virtual machine to use.  This amount of memory is
+     * guaranteed for the Java virtual machine to use. 
+     *
+     * @return long[0] - the amount of committed heap memory in bytes.
+     *         long[1] - the amount of committed Perm Gen memory in bytes.
+     *
+     */
     public long[] getGenCapacity() {
         return getGenerationSum(genCapacity);
     }
     
+    /** 
+     * Returns the amount of used memory in bytes.
+     *
+     * @return long[0] - the amount of used heap memory in bytes.
+     *         long[1] - the amount of used Perm Gen memory in bytes.
+     *
+     */
     public long[] getGenUsed() {
         return getGenerationSum(genUsed);
     }
     
+    /** 
+     * Returns the maximum amount of memory in bytes that can be 
+     * used for memory management.  This method returns <tt>-1</tt> 
+     * if the maximum memory size is undefined.
+     * 
+     * @return long[0] - the maximum amount of heap memory in bytes; 
+     *         long[1] - the maximum amount of Perm Gen memory in bytes;
+     */
     public long[] getGenMaxCapacity() {
         return genMaxCapacity;
     }
     
+    /**
+     * Returns the number of OS ticks per second.
+     *
+     * @return number of OS ticks per second.
+     */
     public long getOsFrequency() {
         return osFrequency;
     }

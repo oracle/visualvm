@@ -26,10 +26,18 @@
 package com.sun.tools.visualvm.tools.jvmstat;
 
 /**
- *
+ * 
+ * Interface for listeners of JvmstatModel changes.
+ * 
  * @author Tomas Hurka
  */
 public interface JvmstatListener {
    
+    /**
+     * Invoked when counters are updated. This event is
+     * generated at a fixed interval as determined by the polling rate
+     * of the {@link JvmstatModel} that the {@link JvmstatListener} is registered with.
+     * @param jvmstat the {@link JvmstatModel} that this listener is registered with.
+     */
     public void dataChanged(JvmstatModel jvmstat);
 }

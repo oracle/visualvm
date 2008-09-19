@@ -24,6 +24,6 @@
  */
 
 /**
- * DESCRIPTION TBD.
+ * Attach API support in VisualVM.
  */
 package com.sun.tools.visualvm.tools.attach;

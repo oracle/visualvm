@@ -24,6 +24,6 @@
  */
 
 /**
- * DESCRIPTION TBD.
+ * JMX support in VisualVM.
  */
 package com.sun.tools.visualvm.tools.jmx;

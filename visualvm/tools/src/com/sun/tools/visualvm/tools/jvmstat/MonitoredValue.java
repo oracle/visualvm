@@ -26,10 +26,22 @@
 package com.sun.tools.visualvm.tools.jvmstat;
 
 /**
- *
+ * 
+ * This class encapsulates a counter exported via Jvmstat
  * @author Tomas Hurka
  */
 public abstract class MonitoredValue  {
+    
+    /**
+     * Returns the name of this counter.
+     * @return String - the name assigned to this counter
+     */
     public abstract String getName();
+    
+    /**
+     * Return an Object that encapsulates this counter's
+     * current data value.
+     * @return value of the counter, primitive types are wrapped into Integer, Long, Float objects,
+     */
     public abstract Object getValue();
 }

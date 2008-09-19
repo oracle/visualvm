@@ -33,6 +33,7 @@ import java.util.Properties;
  * (http://openjdk.java.net/groups/hotspot/docs/Serviceability.html)
  * to obtatin various information from JVM. Note that
  * Serviceability Agent is available in JDK 5 and up and only for Linux and Solaris.
+ * 
  * @author Tomas Hurka
  */
 public abstract class SaModel extends Model {

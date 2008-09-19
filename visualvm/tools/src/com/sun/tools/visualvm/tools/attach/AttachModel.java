@@ -31,8 +31,9 @@ import java.util.Properties;
 /**
  * This class uses Attach API (http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html)
  * to obtatin various information from JVM. Note that
- * Attach API is available in JDK 6 and up and only for local processes running as
+ * Attach API is available in JDK 6 and up and only for local processes running as the
  * same user. See Attach API documentaion for mode details.
+ * 
  * @author Tomas Hurka
  */
 public abstract class AttachModel extends Model {

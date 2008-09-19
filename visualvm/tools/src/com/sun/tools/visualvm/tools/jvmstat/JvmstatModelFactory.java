@@ -29,7 +29,9 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 
 /**
- *
+ * The JvmstatModelFactory class is a factory class for getting the
+ * {@link JvmstatModel} representation for the {@link Application}.
+ * 
  * @author Tomas Hurka
  */
 public final class JvmstatModelFactory extends ModelFactory<JvmstatModel, Application> {
@@ -39,6 +41,10 @@ public final class JvmstatModelFactory extends ModelFactory<JvmstatModel, Applic
     private JvmstatModelFactory() {
     }
 
+    /**
+     * Getter for the default version of the JvmstatModelFactory.
+     * @return instance of {@link JvmstatModelFactory}.
+     */
     public static synchronized JvmstatModelFactory getDefault() {
         if (jvmstatFactory == null) {
             jvmstatFactory = new JvmstatModelFactory();
@@ -46,6 +52,15 @@ public final class JvmstatModelFactory extends ModelFactory<JvmstatModel, Applic
         return jvmstatFactory;
     }
     
+    /**
+     * Factory method for obtaining {@link JvmstatModel} for {@link Application}. Note that there
+     * is only one instance of {@link JvmstatModel} for a concrete application. This {@link JvmstatModel}
+     * instance is cached. This method can return <CODE>null</CODE> if there is no JvmstatModel
+     * available
+     * @param app application
+     * @return {@link JvmstatModel} instance or <CODE>null</CODE> if there is no
+     * {@link JvmstatModel}
+     */
     public static JvmstatModel getJvmstatFor(Application app) {
         return getDefault().getModel(app);
     }

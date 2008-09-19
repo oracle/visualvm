@@ -24,6 +24,6 @@
  */
 
 /**
- * DESCRIPTION TBD.
+ * Serviceability Agent support in VisualVM.
  */
 package com.sun.tools.visualvm.tools.sa;
