@@ -52,15 +52,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 
 
 /**
@@ -187,7 +184,6 @@ public class HeapFragmentWalkerUI extends JPanel {
 
             public Dimension getPreferredSize() {
                 Dimension dim = super.getPreferredSize();
-
                 return new Dimension(dim.width, dim.height + 4);
             }
         };
@@ -244,7 +240,18 @@ public class HeapFragmentWalkerUI extends JPanel {
             toolBar.add(analysisControllerPresenter);
         }
 
-        JPanel toolBarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        JPanel toolBarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
+            public Dimension getPreferredSize() {
+                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+                    int currentWidth = toolBar.getSize().width;
+                    int minimumWidth = toolBar.getMinimumSize().width;
+                    int extraWidth = currentWidth - minimumWidth;
+                    return new Dimension(Math.max(extraWidth, 0), 0);
+                } else {
+                    return super.getPreferredSize();
+                }
+            }
+        };
         toolBarFiller.setOpaque(false);
         toolBar.add(toolBarFiller);
         subControllersIndex = toolBar.getComponentCount();
@@ -419,6 +426,8 @@ public class HeapFragmentWalkerUI extends JPanel {
         for (int i = 0; i < clientPresenters.length; i++) {
             toolBar.add(clientPresenters[i]);
         }
+        
+        toolBar.repaint();
     }
 
     private void updatePresenters() {
