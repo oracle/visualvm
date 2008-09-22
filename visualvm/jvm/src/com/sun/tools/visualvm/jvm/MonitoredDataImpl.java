@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jvm;
 
 
+import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
@@ -78,6 +79,7 @@ public class MonitoredDataImpl extends MonitoredData {
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
+    OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) jmxModel.getOperatingSystemMXBean();
     MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
     MemoryUsage perm = jmxSupport.getPermGenPool().getUsage();
     unloadedClasses = classBean.getUnloadedClassCount();
@@ -90,6 +92,7 @@ public class MonitoredDataImpl extends MonitoredData {
     threadsStarted = threadBean.getTotalStartedThreadCount();
     applicationTime = 0;
     upTime = runtimeBean.getUptime();
+    processCpuTime = osMXBean.getProcessCpuTime();
     genCapacity = new long[2];
     genUsed = new long[2];
     genMaxCapacity = new long[2];

@@ -164,4 +164,8 @@ class DefaultJvm extends Jvm {
     return false;
   }
 
+  public boolean isCpuMonitoringSupported() {
+    return false;
+  }
+
 }

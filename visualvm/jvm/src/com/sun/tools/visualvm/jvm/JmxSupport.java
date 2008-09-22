@@ -41,6 +41,7 @@ import java.lang.management.LockInfo;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.lang.management.MonitorInfo;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -91,6 +92,14 @@ public class JmxSupport implements DataRemovedListener {
         return null;
     }
 
+    OperatingSystemMXBean getOperationSystem() {
+        JvmMXBeans jmx = getJvmMXBeans();
+        if (jmx != null) {
+            return jmx.getOperatingSystemMXBean();
+        }
+        return null;
+    }
+    
     synchronized JvmMXBeans getJvmMXBeans() {
         if (mxbeans == null) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
