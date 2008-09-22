@@ -76,6 +76,10 @@ public class JmxSupport implements DataRemovedListener {
     private boolean hotspotDiagnosticInitialized;
     private Object hotspotDiagnosticLock = new Object();
     private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
+    // OperatingSystemMXBean
+    private boolean operatingSystemMXBeanInitialized;
+    private Object operatingSystemMXBeanLock = new Object();
+    private OperatingSystemMXBean operatingSystemMXBean;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
 
@@ -94,18 +98,23 @@ public class JmxSupport implements DataRemovedListener {
     }
 
     OperatingSystemMXBean getOperationSystem() {
-        JvmMXBeans jmx = getJvmMXBeans();
-        if (jmx != null) {
-            ObjectName osName;
-            try {
-                osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
-            } catch (Exception ex) {
-                LOGGER.throwing(JmxSupport.class.getName(), "getOperationSystem", ex); // NOI18N
-                return null;
+        synchronized (operatingSystemMXBeanLock) {
+            if (operatingSystemMXBeanInitialized) {
+                return operatingSystemMXBean;
             }
-            return jmx.getMXBean(osName,OperatingSystemMXBean.class);
+            JvmMXBeans jmx = getJvmMXBeans();
+            if (jmx != null) {
+                ObjectName osName;
+                try {
+                    osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+                } catch (Exception ex) {
+                    LOGGER.throwing(JmxSupport.class.getName(), "getOperationSystem", ex); // NOI18N
+                    return null;
+                }
+                operatingSystemMXBean = jmx.getMXBean(osName,OperatingSystemMXBean.class);
+            }
+            return operatingSystemMXBean;
         }
-        return null;
     }
     
     synchronized JvmMXBeans getJvmMXBeans() {
