@@ -230,8 +230,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
 
     protected byte[] instrumentMethod(DynamicClassInfo clazz, int methodIdx) {
         return InstrumentationFactory.instrumentForMemoryProfiling(clazz, methodIdx, allUnprofiledClassStatusArray, injType,
-                                                                   getRuntimeProfilingPoints(engineSettings
-                                                                                                                                                                                                                                          .getRuntimeProfilingPoints(),
+                                                                   getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(),
                                                                                              clazz, methodIdx));
     }
 
