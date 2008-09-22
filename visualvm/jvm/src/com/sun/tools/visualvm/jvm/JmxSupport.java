@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
@@ -38,10 +39,10 @@ import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.management.LockInfo;
+import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.lang.management.MonitorInfo;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -95,7 +96,14 @@ public class JmxSupport implements DataRemovedListener {
     OperatingSystemMXBean getOperationSystem() {
         JvmMXBeans jmx = getJvmMXBeans();
         if (jmx != null) {
-            return jmx.getOperatingSystemMXBean();
+            ObjectName osName;
+            try {
+                osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+            } catch (Exception ex) {
+                LOGGER.throwing(JmxSupport.class.getName(), "getOperationSystem", ex); // NOI18N
+                return null;
+            }
+            return jmx.getMXBean(osName,OperatingSystemMXBean.class);
         }
         return null;
     }
