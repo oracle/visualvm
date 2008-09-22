@@ -45,7 +45,11 @@ public class MonitoredDataImpl extends MonitoredData {
 
   final private Jvm jvm;
 
-  MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel) {
+  MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
+    OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
+    if (osMXBean != null) {
+        processCpuTime = osMXBean.getProcessCpuTime();
+    }
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();
@@ -66,7 +70,7 @@ public class MonitoredDataImpl extends MonitoredData {
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
-    OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) jmxModel.getOperatingSystemMXBean();
+    OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
     MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
     MemoryUsage perm = jmxSupport.getPermGenPool().getUsage();
     unloadedClasses = classBean.getUnloadedClassCount();
@@ -79,7 +83,9 @@ public class MonitoredDataImpl extends MonitoredData {
     threadsStarted = threadBean.getTotalStartedThreadCount();
     applicationTime = 0;
     upTime = runtimeBean.getUptime();
-    processCpuTime = osMXBean.getProcessCpuTime();
+    if (osMXBean != null) {
+        processCpuTime = osMXBean.getProcessCpuTime();
+    }
     genCapacity = new long[2];
     genUsed = new long[2];
     genMaxCapacity = new long[2];

@@ -433,7 +433,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
 
     public void dataChanged(JvmstatModel stat) {
         assert stat == monitoredVm;
-        MonitoredData data = new MonitoredDataImpl(this,jvmstatModel);
+        MonitoredData data = new MonitoredDataImpl(this,jvmstatModel,jmxSupport);
         notifyListeners(data);        
     }
 
