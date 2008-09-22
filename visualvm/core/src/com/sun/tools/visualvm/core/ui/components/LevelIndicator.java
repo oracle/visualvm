@@ -40,7 +40,7 @@ import javax.swing.border.BevelBorder;
 
 
 /**
- *
+ * Graphical component for fall-off level indicator
  * @author Jaroslav Bachorik
  */
 public class LevelIndicator extends JComponent {
@@ -74,22 +74,43 @@ public class LevelIndicator extends JComponent {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Sets the auto repainting of the component on/off
+     * @param autoRepaint The auto repainting on/off
+     */
     public void setAutoRepaint(boolean autoRepaint) {
         this.autoRepaint = autoRepaint;
     }
 
+    /**
+     * Status of the component auto repainting
+     * @return Returns the status of the component auto repainting
+     */
     public boolean isAutoRepaint() {
         return autoRepaint;
     }
 
+    /**
+     * When set the component will mark the so-far highest value
+     * @param markPeaks Set peak following on/off
+     */
     public void setFollowPeak(boolean markPeaks) {
         this.followPeak = markPeaks;
     }
 
+    /**
+     * Status of the follow-peak
+     * @return Returns the status of the follow-peak property
+     */
     public boolean isFollowPeak() {
         return followPeak;
     }
 
+    /**
+     * Sets the component maximum value
+     * Will repaint the component if {@linkplain #isAutoRepaint() } is on
+     * @param max The maximum value the component would display
+     */
     public void setMaximum(long max) {
         this.max = max;
 
@@ -98,18 +119,36 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Returns the component maximum value
+     * @return Returns the component maximum value
+     */
     public long getMaximum() {
         return max;
     }
 
+    /**
+     * With this property you can control the {@linkplain Color} of the highest value
+     * Will repaint the component if {@linkplain #isAutoRepaint() } is on
+     * @param maximumColor The {@linkplain Color} to be used for the highest values
+     */
     public void setMaximumColor(Color maximumColor) {
         this.maximumColor = maximumColor;
     }
 
+    /**
+     * Returns the {@linkplain Color} of the highest values
+     * @return Returns the {@linkplain Color} of the highest values
+     */
     public Color getMaximumColor() {
         return maximumColor;
     }
 
+    /**
+     * Sets the minimum displayable value of the component
+     * Will repaint the component if {@linkplain #isAutoRepaint() } is on
+     * @param min The minimal value that should be displayed
+     */
     public void setMinimum(long min) {
         this.min = min;
 
@@ -118,18 +157,35 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Returns the component minimal value
+     * @return Returns the component minimal value
+     */
     public long getMinimum() {
         return min;
     }
 
+    /**
+     * Sets the {@linkplain Color} for the minimal value
+     * Will repaint the component if {@linkplain #isAutoRepaint() } is on
+     * @param minimumColor The {@linkplain Color} to use for the minimal value
+     */
     public void setMinimumColor(Color minimumColor) {
         this.minimumColor = minimumColor;
     }
 
+    /**
+     * Returns the {@linkplain Color} used for the minimal value
+     * @return Returns the {@linkplain Color} used for the minimal value
+     */
     public Color getMinimumColor() {
         return minimumColor;
     }
 
+    /**
+     * Manually sets the actual value as the peak
+     * Will repaint the component if {@linkplain #isAutoRepaint() } is on
+     */
     public void setPeak() {
         peak = val;
 
@@ -138,6 +194,11 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Manually sets the peak
+     * Will repaint the component if {@linkplain #isAutoRepaint() } is on
+     * @param value The value to set as the peak
+     */
     public void setPeak(long value) {
         if (peak <= max) {
             peak = value;
@@ -148,10 +209,19 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Returns the current peak value
+     * @return Returns the current peak value
+     */
     public long getPeak() {
         return peak;
     }
 
+    /**
+     * Sets the peak mark size in pixels
+     * The peak mark is rendered in the indicator at the place of peak value
+     * @param peakMarkSize The peak mark size in pixels
+     */
     public void setPeakMarkSize(int peakMarkSize) {
         this.peakMarkSize = peakMarkSize;
 
@@ -160,10 +230,19 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Returns the peak mark size in pixels
+     * The peak mark is rendered in the indicator at the place of peak value
+     * @return Returns the peak mark size in pixels
+     */
     public int getPeakMarkSize() {
         return peakMarkSize;
     }
 
+    /**
+     * Sets the current value of the inidicator
+     * @param value The current value
+     */
     public void setValue(long value) {
         val = Math.max(Math.min(value, max), 0);
 
@@ -176,6 +255,10 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Returns the current value
+     * @return Returns the current value
+     */
     public long getValue() {
         return val;
     }
@@ -219,6 +302,10 @@ public class LevelIndicator extends JComponent {
         }
     }
 
+    /**
+     * Cleans the peak mark
+     * Will repaint the component
+     */
     public void unsetPeak() {
         peak = Integer.MIN_VALUE;
         repaint();
