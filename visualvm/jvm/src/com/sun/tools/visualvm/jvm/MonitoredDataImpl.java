@@ -43,19 +43,6 @@ import sun.jvmstat.monitor.LongMonitor;
  */
 public class MonitoredDataImpl extends MonitoredData {
 
-  final private long loadedClasses;
-  final private long sharedLoadedClasses;
-  final private long sharedUnloadedClasses;
-  final private long unloadedClasses;
-  final private long threadsDaemon;
-  final private long threadsLive;
-  final private long threadsLivePeak;
-  final private long threadsStarted;
-  final private long applicationTime;
-  final private long upTime;
-  final private long[] genCapacity;
-  final private long[] genUsed;
-  final private long[] genMaxCapacity;
   final private Jvm jvm;
 
   MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel) {
@@ -112,59 +99,8 @@ public class MonitoredDataImpl extends MonitoredData {
     return 0;
   }
   
-  public long getLoadedClasses() {
-    return loadedClasses;
-  }
-
-  public long getSharedLoadedClasses() {
-    return sharedLoadedClasses;
-  }
-
-  public long getSharedUnloadedClasses() {
-    return sharedUnloadedClasses;
-  }
-
-  public long getUnloadedClasses() {
-    return unloadedClasses;
-  }
-
-  public long getThreadsDaemon() {
-    return threadsDaemon;
-  }
-
-  public long getThreadsLive() {
-    return threadsLive;
-  }
-
-  public long getThreadsLivePeak() {
-    return threadsLivePeak;
-  }
-
-  public long getThreadsStarted() {
-    return threadsStarted;
-  }
-
-  public long getApplicationTime() {
-    return applicationTime;
-  }
-
   public Jvm getJVM() {
     return jvm;
   }
 
-  public long getUpTime() {
-    return upTime;
-  }
-
-  public long[] getGenCapacity() {
-    return genCapacity;
-  }
-
-  public long[] getGenUsed() {
-    return genUsed;
-  }
-  
-  public long[] getGenMaxCapacity() {
-    return genMaxCapacity;
-  }
 }
