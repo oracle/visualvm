@@ -112,12 +112,14 @@ class ApplicationMonitorView extends DataSourceView {
                 masterViewSupport.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap"), true), DataViewComponent.TOP_LEFT);  // NOI18N
-        dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
+        final CpuViewSupport cpuViewSupport = new CpuViewSupport(jvm);
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu"), true), DataViewComponent.TOP_LEFT);  // NOI18N
+        dvc.addDetailsView(cpuViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
+        final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm);
         final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(jvm);
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
+        dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
         final ClassesViewSupport classesViewSupport = new ClassesViewSupport(jvm);
@@ -135,6 +137,7 @@ class ApplicationMonitorView extends DataSourceView {
                     public void run() {
                         try {
                             masterViewSupport.refresh(data);
+                            cpuViewSupport.refresh(data, time);
                             heapViewSupport.refresh(data, time);
                             permGenViewSupport.refresh(data, time);
                             classesViewSupport.refresh(data, time);
@@ -263,6 +266,112 @@ class ApplicationMonitorView extends DataSourceView {
             String sSeconds = ((seconds < 10) ? "0" + seconds : "" + seconds) + " sec"; // NOI18N
 
             return sHours + sMinutes + sSeconds;
+        }
+        
+    }
+
+    
+    // --- CPU -----------------------------------------------------------------
+    
+    private static class CpuViewSupport extends JPanel  {
+        
+        private boolean cpuMonitoringSupported;
+        private ChartsSupport.Chart cpuUsageChart;
+        private HTMLLabel cpuLabel;
+        private static final NumberFormat formatter = NumberFormat.getNumberInstance();
+        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String CPU = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu"); // NOI18N
+        private static final String CPU_USAGE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu_Usage"); // NOI18N
+        
+        private long lastProcessCpuTime = -1;
+        private long lastUpTime = -1;
+
+        public CpuViewSupport(Jvm jvm) {
+            cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
+            initComponents();
+        }        
+        
+        public DataViewComponent.DetailsView getDetailsView() {
+            return new DataViewComponent.DetailsView(CPU, null, 10, this, null);
+        }
+        
+        public void refresh(MonitoredData data, long time) {
+            if (cpuMonitoringSupported) {
+                long upTime = data.getUpTime() * 1000000;
+                long processCpuTime = data.getProcessCpuTime();
+                
+                if (lastProcessCpuTime != -1 && lastUpTime != -1) {
+                    
+                    long upTimeDiff = upTime - lastUpTime;
+                    long processTimeDiff = processCpuTime - lastProcessCpuTime;
+                    long cpuUsage = upTimeDiff > 0 ? Math.min((long)(100 * (float)processTimeDiff / (float)upTimeDiff), 100) : 0;
+                
+                    cpuUsageChart.getModel().addItemValues(time, new long[] { cpuUsage });
+                    cpuLabel.setText("<nobr><b>"+CPU_USAGE+":</b> " + formatter.format(cpuUsage) + "% </nobr>");    // NOI18N
+
+                    cpuUsageChart.setToolTipText(
+                            "<html><nobr><b>"+CPU_USAGE+":</b> " + formatter.format(cpuUsage) + "% </nobr></html>"); // NOI18N
+
+                }
+                
+                lastUpTime = upTime;
+                lastProcessCpuTime = processCpuTime;
+            }
+        }
+        
+        private void initComponents() {
+            setLayout(new BorderLayout());
+            
+            JComponent contents;
+            
+            if (cpuMonitoringSupported) {
+              // cpuMetricsPanel
+              cpuLabel = new HTMLLabel() {
+                public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
+                public Dimension getMinimumSize() { return getPreferredSize(); }
+                public Dimension getMaximumSize() { return getPreferredSize(); }
+              };
+              cpuLabel.setText("<nobr><b>"+CPU+":</b></nobr>");  // NOI18N
+              cpuLabel.setOpaque(false);
+              final JPanel heapMetricsDataPanel = new JPanel(new GridLayout(2, 2));
+              heapMetricsDataPanel.setOpaque(false);
+              heapMetricsDataPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+              heapMetricsDataPanel.add(cpuLabel);
+
+              cpuUsageChart = new ChartsSupport.CpuMetricsChart();
+              cpuUsageChart.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20), cpuUsageChart.getBorder()));
+              JPanel heapMetricsLegendContainer = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+              heapMetricsLegendContainer.setOpaque(false);
+              heapMetricsLegendContainer.add(cpuUsageChart.getBigLegendPanel());
+              final JPanel heapMetricsPanel = new JPanel(new BorderLayout());
+              heapMetricsPanel.setOpaque(true);
+              heapMetricsPanel.setBackground(Color.WHITE);
+              heapMetricsPanel.add(heapMetricsDataPanel, BorderLayout.NORTH);
+              heapMetricsPanel.add(cpuUsageChart, BorderLayout.CENTER);
+              heapMetricsPanel.add(heapMetricsLegendContainer, BorderLayout.SOUTH);
+
+              final boolean[] heapMetricsPanelResizing = new boolean[] { false };
+              heapMetricsPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
+              heapMetricsPanel.addComponentListener(new ComponentAdapter() {
+                  public void componentResized(ComponentEvent e) {
+                      if (heapMetricsPanelResizing[0] == true) {
+                          heapMetricsPanelResizing[0] = false;
+                          return;
+                      }
+
+                      boolean shouldBeVisible = heapMetricsPanel.getSize().height > ChartsSupport.MINIMUM_CHART_HEIGHT;
+                      if (shouldBeVisible == heapMetricsDataPanel.isVisible()) return;
+
+                      heapMetricsPanelResizing[0] = true;
+                      heapMetricsDataPanel.setVisible(shouldBeVisible);
+                  }
+              });
+              contents = heapMetricsPanel;
+            } else {
+                contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);
+            }
+            
+            add(contents, BorderLayout.CENTER);
         }
         
     }

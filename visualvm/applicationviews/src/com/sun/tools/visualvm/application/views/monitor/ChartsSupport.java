@@ -191,6 +191,40 @@ class ChartsSupport {
   }
   
   
+  public static class CpuMetricsChart extends Chart {
+    
+    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
+      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Cpu_Usage")}, new Color[] { new Color(255, 127, 127)} );   // NOI18N
+    }
+
+    protected SynchronousXYChart createChart() {
+      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_LINE, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
+      xyChart.setVerticalAxisValueDivider(1024*1024);
+      xyChart.setVerticalAxisValueString("%"); // NOI18N
+      xyChart.setTopChartMargin(20);
+      xyChart.denySelection();
+      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
+      return xyChart;
+    }
+
+    protected JPanel createBigLegend() {
+      JLabel cpuUsage = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
+      cpuUsage.setOpaque(false);
+      cpuUsage.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
+      JPanel legendPanel = new JPanel();
+      legendPanel.setOpaque(false);
+      legendPanel.add(cpuUsage);
+      
+      return legendPanel;
+    }
+
+    protected JPanel createSmallLegend() {
+      return null;
+    }
+    
+  }
+  
   public static class HeapMetricsChart extends Chart {
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
