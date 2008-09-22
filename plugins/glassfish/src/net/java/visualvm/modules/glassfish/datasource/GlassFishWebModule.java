@@ -41,7 +41,7 @@ public class GlassFishWebModule extends GlassFishApplication {
                                                                    true);
     private WebModuleVirtualServerMonitor monitor;
     
-    private DataSourceDescriptor descriptor = new DataSourceDescriptor() {
+    private final DataSourceDescriptor descriptor = new DataSourceDescriptor(this) {
 
         @Override
         public Image getIcon() {

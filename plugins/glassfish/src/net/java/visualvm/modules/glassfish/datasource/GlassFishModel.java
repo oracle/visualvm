@@ -36,7 +36,7 @@ import java.awt.Image;
 public class GlassFishModel extends GlassFishDataSource {
 
     private Application application;
-    private final static DataSourceDescriptor DESCRIPTOR = new DataSourceDescriptor() {
+    private final DataSourceDescriptor descriptor = new DataSourceDescriptor(this) {
 
         @Override
         public Image getIcon() {
@@ -70,7 +70,7 @@ public class GlassFishModel extends GlassFishDataSource {
 
     @Override
     public DataSourceDescriptor getDescriptor() {
-        return DESCRIPTOR;
+        return descriptor;
     }
 }
 
