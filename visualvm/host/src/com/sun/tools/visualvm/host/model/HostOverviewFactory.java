@@ -30,32 +30,55 @@ import com.sun.tools.visualvm.core.model.ModelProvider;
 import com.sun.tools.visualvm.host.Host;
 
 /**
+ * The HostOverviewFactory class is a factory class for getting the
+ * {@link HostOverview} representation for the {@link Host}.
  *
  * @author Tomas Hurka
  */
 public class HostOverviewFactory extends ModelFactory<HostOverview,Host> implements ModelProvider<HostOverview,Host> {
-
-  private static HostOverviewFactory overviewFactory;
-
-  private HostOverviewFactory() {
-  }
-
-  public static synchronized HostOverviewFactory getDefault() {
-    if (overviewFactory == null) {
-      overviewFactory = new HostOverviewFactory();
-      overviewFactory.registerProvider(overviewFactory);
+    
+    private static HostOverviewFactory overviewFactory;
+    
+    private HostOverviewFactory() {
     }
-    return overviewFactory;
-  }
-
-  public static HostOverview getSystemOverviewFor(Host host) {
-    return getDefault().getModel(host);
-  }
-
-  public HostOverview createModelFor(Host host) {
-    if (Host.LOCALHOST.equals(host)) {
-      return new LocalHostOverview();
+    
+    /**
+     * Getter for the default version of the HostOverviewFactory.
+     * @return instance of {@link HostOverviewFactory}.
+     */
+    public static synchronized HostOverviewFactory getDefault() {
+        if (overviewFactory == null) {
+            overviewFactory = new HostOverviewFactory();
+            overviewFactory.registerProvider(overviewFactory);
+        }
+        return overviewFactory;
     }
-    return null;
-  }
+    
+    /**
+     * Factory method for obtaining {@link HostOverview} for {@link Host}. Note that there
+     * is only one instance of {@link HostOverview} for a concrete application. This {@link HostOverview}
+     * instance is cached. This method can return <CODE>null</CODE> if there is no HostOverview
+     * available
+     * @param host host
+     * @return {@link HostOverview} instance or <CODE>null</CODE> if there is no
+     * {@link HostOverview}
+     */
+    public static HostOverview getSystemOverviewFor(Host host) {
+        return getDefault().getModel(host);
+    }
+    
+    /**
+     * Default {@link ModelProvider} implementation, which creates 
+     * HostOverview for localhost. If you want to extend HostOverviewFactory use 
+     * {@link HostOverviewFactory#registerProvider()} to register the new instances
+     * of {@link ModelProvider} for the different types of {@link Host}.
+     * @param host host
+     * @return instance of {@link HostOverview} for localhost
+     */
+    public HostOverview createModelFor(Host host) {
+        if (Host.LOCALHOST.equals(host)) {
+            return new LocalHostOverview();
+        }
+        return null;
+    }
 }
