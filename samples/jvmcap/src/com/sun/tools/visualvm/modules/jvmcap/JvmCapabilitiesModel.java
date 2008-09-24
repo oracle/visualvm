@@ -53,6 +53,8 @@ class JvmCapabilitiesModel {
     public static final String PROP_CLASS_MONITORING_SUPPORTED = PROP_PREFIX + "class_monitoring_supported";
     public static final String PROP_THREAD_MONITORING_SUPPORTED = PROP_PREFIX + "thread_monitoring_supported";
     public static final String PROP_MEMORY_MONITORING_SUPPORTED = PROP_PREFIX + "memory_monitoring_supported";
+    public static final String PROP_CPU_MONITORING_SUPPORTED = PROP_PREFIX + "cpu_monitoring_supported";
+    public static final String PROP_COLLECTIONTIME_MONITORING_SUPPORTED = PROP_PREFIX + "collection_monitoring_supported";
     public static final String PROP_GET_SYSTEM_PROPERTIES_SUPPORTED = PROP_PREFIX + "get_system_properties_supported";
     public static final String PROP_DUMP_ON_OOM_SUPPORTED = PROP_PREFIX + "dump_on_oom_supported";
     public static final String PROP_TAKE_HEAP_DUMP_SUPPORTED = PROP_PREFIX + "take_heap_dump_supported";
@@ -71,11 +73,12 @@ class JvmCapabilitiesModel {
     private String isClassMonitoringSupported;
     private String isThreadMonitoringSupported;
     private String isMemoryMonitoringSupported;
+    private String isCpuMonitoringSupported;
+    private String isCollectionTimeMonitoringSupported;
     private String isGetSystemPropertiesSupported;
     private String isDumpOnOOMSupported;
     private String isTakeHeapDumpSupported;
-    private String isTakeThreadDumpSupported;
-    
+    private String isTakeThreadDumpSupported;    
     
     static JvmCapabilitiesModel create(Application application) {
         JvmCapabilitiesModel model = new JvmCapabilitiesModel();
@@ -111,6 +114,8 @@ class JvmCapabilitiesModel {
         storage.setCustomProperty(PROP_CLASS_MONITORING_SUPPORTED, isClassMonitoringSupported);
         storage.setCustomProperty(PROP_THREAD_MONITORING_SUPPORTED, isThreadMonitoringSupported);
         storage.setCustomProperty(PROP_MEMORY_MONITORING_SUPPORTED, isMemoryMonitoringSupported);
+        storage.setCustomProperty(PROP_CPU_MONITORING_SUPPORTED, isCpuMonitoringSupported);
+        storage.setCustomProperty(PROP_COLLECTIONTIME_MONITORING_SUPPORTED, isCollectionTimeMonitoringSupported);
         storage.setCustomProperty(PROP_GET_SYSTEM_PROPERTIES_SUPPORTED, isGetSystemPropertiesSupported);
         storage.setCustomProperty(PROP_DUMP_ON_OOM_SUPPORTED, isDumpOnOOMSupported);
         storage.setCustomProperty(PROP_TAKE_HEAP_DUMP_SUPPORTED, isTakeHeapDumpSupported);
@@ -124,6 +129,8 @@ class JvmCapabilitiesModel {
     String isClassMonitoringSupported() { return isClassMonitoringSupported; }
     String isThreadMonitoringSupported() { return isThreadMonitoringSupported; }
     String isMemoryMonitoringSupported() { return isMemoryMonitoringSupported; }
+    String isCpuMonitoringSupported() { return isCpuMonitoringSupported; }
+    String isCollectionTimeMonitoringSupported() { return isCollectionTimeMonitoringSupported; }
     String isGetSystemPropertiesSupported() { return isGetSystemPropertiesSupported; }
     String isDumpOnOOMSupported() { return isDumpOnOOMSupported; }
     String isTakeHeapDumpSupported() { return isTakeHeapDumpSupported; }
@@ -139,6 +146,8 @@ class JvmCapabilitiesModel {
         isClassMonitoringSupported = getValue(jvm.isClassMonitoringSupported());
         isThreadMonitoringSupported = getValue(jvm.isThreadMonitoringSupported());
         isMemoryMonitoringSupported = getValue(jvm.isMemoryMonitoringSupported());
+        isCpuMonitoringSupported = getValue(jvm.isCpuMonitoringSupported());
+        isCollectionTimeMonitoringSupported = getValue(jvm.isCollectionTimeSupported());
         isGetSystemPropertiesSupported = getValue(jvm.isGetSystemPropertiesSupported());
         isDumpOnOOMSupported = getValue(jvm.isDumpOnOOMEnabledSupported());
         isTakeHeapDumpSupported = getValue(jvm.isTakeHeapDumpSupported());
@@ -154,6 +163,8 @@ class JvmCapabilitiesModel {
         isClassMonitoringSupported = getValue(storage, PROP_CLASS_MONITORING_SUPPORTED);
         isThreadMonitoringSupported = getValue(storage, PROP_THREAD_MONITORING_SUPPORTED);
         isMemoryMonitoringSupported = getValue(storage, PROP_MEMORY_MONITORING_SUPPORTED);
+        isCpuMonitoringSupported = getValue(storage, PROP_CPU_MONITORING_SUPPORTED);
+        isCollectionTimeMonitoringSupported = getValue(storage, PROP_COLLECTIONTIME_MONITORING_SUPPORTED);
         isGetSystemPropertiesSupported = getValue(storage, PROP_GET_SYSTEM_PROPERTIES_SUPPORTED);
         isDumpOnOOMSupported = getValue(storage, PROP_DUMP_ON_OOM_SUPPORTED);
         isTakeHeapDumpSupported = getValue(storage, PROP_TAKE_HEAP_DUMP_SUPPORTED);

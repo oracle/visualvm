@@ -58,7 +58,9 @@ class JvmCapabilitiesViewComponent extends JPanel {
         builder.append("<b>Basic info supported:</b> " + model.isBasicInfoSupported() + "<br>");
         builder.append("<b>System properties supported:</b> " + model.isGetSystemPropertiesSupported() + "<br>");
         builder.append("<b>Monitoring supported:</b> " + model.isMonitoringSupported() + "<br>");
+        builder.append("<b>CPU monitoring supported:</b> " + model.isCpuMonitoringSupported() + "<br>");
         builder.append("<b>Memory monitoring supported:</b> " + model.isMemoryMonitoringSupported() + "<br>");
+        builder.append("<b>GC activity monitoring supported:</b> " + model.isCollectionTimeMonitoringSupported() + "<br>");
         builder.append("<b>Class monitoring supported:</b> " + model.isClassMonitoringSupported() + "<br>");
         builder.append("<b>Thread monitoring supported:</b> " + model.isThreadMonitoringSupported() + "<br>");
         builder.append("<b>Thread dump supported:</b> " + model.isTakeThreadDumpSupported() + "<br>");
