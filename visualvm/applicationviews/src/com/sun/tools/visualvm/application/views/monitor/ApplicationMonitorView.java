@@ -276,18 +276,23 @@ class ApplicationMonitorView extends DataSourceView {
     private static class CpuViewSupport extends JPanel  {
         
         private boolean cpuMonitoringSupported;
+        private boolean gcMonitoringSupported;
         private ChartsSupport.Chart cpuUsageChart;
         private HTMLLabel cpuLabel;
-        private static final NumberFormat formatter = NumberFormat.getNumberInstance();
+        private HTMLLabel gcLabel;
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
+        private static final String UNKNOWN = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Unknown"); // NOI18N
         private static final String CPU = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu"); // NOI18N
         private static final String CPU_USAGE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu_Usage"); // NOI18N
+        private static final String GC_USAGE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Gc_Usage"); // NOI18N
         
-        private long lastProcessCpuTime = -1;
         private long lastUpTime = -1;
+        private long lastProcessCpuTime = -1;
+        private long lastProcessGcTime = -1;
 
         public CpuViewSupport(Jvm jvm) {
             cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
+            gcMonitoringSupported = jvm.isCollectionTimeSupported();
             initComponents();
         }        
         
@@ -296,26 +301,48 @@ class ApplicationMonitorView extends DataSourceView {
         }
         
         public void refresh(MonitoredData data, long time) {
-            if (cpuMonitoringSupported) {
-                long upTime = data.getUpTime() * 1000000;
-                long processCpuTime = data.getProcessCpuTime();
+            if (cpuMonitoringSupported || gcMonitoringSupported) {
                 
-                if (lastProcessCpuTime != -1 && lastUpTime != -1) {
+                long upTime = data.getUpTime() * 1000000;
+                long processCpuTime = cpuMonitoringSupported ? data.getProcessCpuTime() : -1;
+                long processGcTime  = gcMonitoringSupported  ? data.getCollectionTime() * 1000000 : -1;
+                
+                boolean tracksProcessCpuTime = lastProcessCpuTime != -1;
+                boolean tracksProcessGcTime  = lastProcessGcTime != -1;
+                
+                if (lastUpTime != -1 && (tracksProcessCpuTime || tracksProcessGcTime)) {
                     
                     long upTimeDiff = upTime - lastUpTime;
-                    long processTimeDiff = processCpuTime - lastProcessCpuTime;
-                    long cpuUsage = upTimeDiff > 0 ? Math.min((long)(100 * (float)processTimeDiff / (float)upTimeDiff), 100) : 0;
-                
-                    cpuUsageChart.getModel().addItemValues(time, new long[] { cpuUsage });
-                    cpuLabel.setText("<nobr><b>"+CPU_USAGE+":</b> " + formatter.format(cpuUsage) + "% </nobr>");    // NOI18N
-
+                    long cpuUsage = -1;
+                    long gcUsage = -1;
+                    
+                    if (lastProcessCpuTime != -1) {
+                        long processTimeDiff = processCpuTime - lastProcessCpuTime;
+                        cpuUsage = upTimeDiff > 0 ? Math.min((long)(100 * (float)processTimeDiff / (float)upTimeDiff), 100) : 0;
+                        cpuLabel.setText("<nobr><b>"+CPU_USAGE+":</b> " + cpuUsage + "% </nobr>");    // NOI18N
+                    }
+                    
+                    if (lastProcessGcTime != -1) {
+                        long processGcTimeDiff = processGcTime - lastProcessGcTime;
+                        gcUsage = upTimeDiff > 0 ? Math.min((long)(100 * (float)processGcTimeDiff / (float)upTimeDiff), 100) : 0;
+                        if (cpuUsage != -1 && cpuUsage < gcUsage) gcUsage = cpuUsage;
+                        gcLabel.setText("<nobr><b>"+GC_USAGE+":</b> " + gcUsage + "% </nobr>");    // NOI18N
+                    }
+                    
+                    cpuUsageChart.getModel().addItemValues(time, new long[] { Math.max(cpuUsage, 0), Math.max(gcUsage, 0) });
+                    
+                    String cpuUsageString = cpuUsage == -1 ? UNKNOWN : cpuUsage + "%";   // NOI18N
+                    String gcUsageString =  gcUsage == -1  ? UNKNOWN : gcUsage + "%";   // NOI18N
+                    
                     cpuUsageChart.setToolTipText(
-                            "<html><nobr><b>"+CPU_USAGE+":</b> " + formatter.format(cpuUsage) + "% </nobr></html>"); // NOI18N
+                        "<html><nobr><b>"+CPU_USAGE+":</b> " + cpuUsageString + " </nobr>" + "<br>" +   // NOI18N
+                        "<html><nobr><b>"+GC_USAGE+":</b> " + gcUsageString + " </nobr></html>"); // NOI18N
 
                 }
                 
                 lastUpTime = upTime;
                 lastProcessCpuTime = processCpuTime;
+                lastProcessGcTime = processGcTime;
             }
         }
         
@@ -324,19 +351,27 @@ class ApplicationMonitorView extends DataSourceView {
             
             JComponent contents;
             
-            if (cpuMonitoringSupported) {
+            if (cpuMonitoringSupported || gcMonitoringSupported) {
               // cpuMetricsPanel
               cpuLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
                 public Dimension getMaximumSize() { return getPreferredSize(); }
               };
-              cpuLabel.setText("<nobr><b>"+CPU+":</b></nobr>");  // NOI18N
+              cpuLabel.setText("<nobr><b>"+CPU_USAGE+":</b> " + UNKNOWN + "</nobr>");  // NOI18N
               cpuLabel.setOpaque(false);
+              gcLabel = new HTMLLabel() {
+                public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
+                public Dimension getMinimumSize() { return getPreferredSize(); }
+                public Dimension getMaximumSize() { return getPreferredSize(); }
+              };
+              gcLabel.setText("<nobr><b>"+GC_USAGE+":</b> " + UNKNOWN + "</nobr>");  // NOI18N
+              gcLabel.setOpaque(false);
               final JPanel heapMetricsDataPanel = new JPanel(new GridLayout(2, 2));
               heapMetricsDataPanel.setOpaque(false);
               heapMetricsDataPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
               heapMetricsDataPanel.add(cpuLabel);
+              heapMetricsDataPanel.add(gcLabel);
 
               cpuUsageChart = new ChartsSupport.CpuMetricsChart();
               cpuUsageChart.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20), cpuUsageChart.getBorder()));

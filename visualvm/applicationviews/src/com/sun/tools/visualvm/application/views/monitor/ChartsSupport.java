@@ -209,7 +209,9 @@ class ChartsSupport {
     }
     
     protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Cpu_Usage")}, new Color[] { new Color(255, 127, 127)} );   // NOI18N
+      xyChartModel.setupModel(new String[] { NbBundle.getMessage(ChartsSupport.class, "LBL_Cpu_Usage"),   // NOI18N
+                                             NbBundle.getMessage(ChartsSupport.class, "LBL_Gc_Usage") },   // NOI18N
+                              new Color[]  { new Color(255, 127, 127), new Color(127, 63, 191) } );
     }
 
     protected SynchronousXYChart createChart() {
@@ -232,10 +234,14 @@ class ChartsSupport {
       JLabel cpuUsage = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
       cpuUsage.setOpaque(false);
       cpuUsage.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+      JLabel gcUsage = new JLabel(getModel().getSeriesName(1), new ColorIcon(getModel().getSeriesColor(1), Color.BLACK, 18, 9), SwingConstants.LEADING);
+      gcUsage.setOpaque(false);
+      gcUsage.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
       JPanel legendPanel = new JPanel();
       legendPanel.setOpaque(false);
       legendPanel.add(cpuUsage);
+      legendPanel.add(gcUsage);
       
       return legendPanel;
     }
