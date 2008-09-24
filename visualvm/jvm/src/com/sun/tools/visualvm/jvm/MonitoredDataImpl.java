@@ -32,9 +32,11 @@ import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
+import java.util.Collection;
 import sun.jvmstat.monitor.LongMonitor;
 
 /**
@@ -45,11 +47,22 @@ public class MonitoredDataImpl extends MonitoredData {
 
   final private Jvm jvm;
 
-  MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
+  private MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport) {
     OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
+    Collection<GarbageCollectorMXBean> gcList = jmxSupport.getGarbageCollectorMXBeans();
     if (osMXBean != null) {
         processCpuTime = osMXBean.getProcessCpuTime();
     }
+    if (gcList != null && !gcList.isEmpty()) {
+        for (GarbageCollectorMXBean gcBean : gcList) {
+            collectionTime+=gcBean.getCollectionTime();
+        }
+    }
+    jvm = vm;
+  }
+  
+  MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
+    this(vm,jmxSupport);
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();
@@ -63,13 +76,14 @@ public class MonitoredDataImpl extends MonitoredData {
     genCapacity = jvmstatModel.getGenCapacity();
     genUsed = jvmstatModel.getGenUsed();
     genMaxCapacity = jvmstatModel.getGenMaxCapacity();
-    jvm = vm;
   }
 
   MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport,JvmMXBeans jmxModel) {
+    this(vm,jmxSupport);
+    RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
+    upTime = runtimeBean.getUptime();
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
-    RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
     OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
     MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
     MemoryUsage perm = jmxSupport.getPermGenPool().getUsage();
@@ -82,10 +96,6 @@ public class MonitoredDataImpl extends MonitoredData {
     threadsLivePeak = threadBean.getPeakThreadCount();
     threadsStarted = threadBean.getTotalStartedThreadCount();
     applicationTime = 0;
-    upTime = runtimeBean.getUptime();
-    if (osMXBean != null) {
-        processCpuTime = osMXBean.getProcessCpuTime();
-    }
     genCapacity = new long[2];
     genUsed = new long[2];
     genMaxCapacity = new long[2];
@@ -95,7 +105,6 @@ public class MonitoredDataImpl extends MonitoredData {
     genCapacity[1] = perm.getCommitted();
     genUsed[1] = perm.getUsed();
     genMaxCapacity[1] = perm.getMax();
-    jvm = vm;
   }
   
   private long getLongValue(LongMonitor mon) {

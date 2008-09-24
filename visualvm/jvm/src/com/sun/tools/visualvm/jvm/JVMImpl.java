@@ -47,6 +47,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -374,7 +375,12 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     public boolean isCpuMonitoringSupported() {
         return jmxSupport.getOperationSystem() instanceof OperatingSystemMXBean;
     }
-
+    
+    public boolean isCollectionTimeSupported() {
+        Collection gcList = jmxSupport.getGarbageCollectorMXBeans();
+        return gcList != null && !gcList.isEmpty();
+    }
+    
     protected AttachModel getAttach() {
         return AttachModelFactory.getAttachFor(application);
     }

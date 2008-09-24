@@ -45,6 +45,7 @@ public abstract class MonitoredData {
   protected long[] genUsed;
   protected long[] genMaxCapacity;
   protected long processCpuTime;
+  protected long collectionTime;
   protected Jvm monitoredVm;
   
   
@@ -106,5 +107,9 @@ public abstract class MonitoredData {
   
   public long getProcessCpuTime() {
       return processCpuTime;
+  }
+  
+  public long getCollectionTime() {
+      return collectionTime;
   }
 }

@@ -167,5 +167,9 @@ class DefaultJvm extends Jvm {
   public boolean isCpuMonitoringSupported() {
     return false;
   }
+  
+  public boolean isCollectionTimeSupported() {
+    return false;
+  }
 
 }
