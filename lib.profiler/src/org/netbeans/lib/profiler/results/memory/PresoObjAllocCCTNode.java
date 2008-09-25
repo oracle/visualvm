@@ -61,8 +61,8 @@ import java.util.ResourceBundle;
 public class PresoObjAllocCCTNode implements CCTNode {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final String VM_ALLOC_CLASS = "org.netbeans.lib.profiler.server.ProfilerRuntimeMemory"; // NOI18N
-    private static final String VM_ALLOC_METHOD = "traceVMObjectAlloc"; // NOI18N
+    public static final String VM_ALLOC_CLASS = "org.netbeans.lib.profiler.server.ProfilerRuntimeMemory"; // NOI18N
+    public static final String VM_ALLOC_METHOD = "traceVMObjectAlloc"; // NOI18N
     private static final String VM_ALLOC_TEXT = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle") // NOI18N
     .getString("PresoObjAllocCCTNode_VMAllocMsg"); // NOI18N
     public static final int SORT_BY_NAME = 1;

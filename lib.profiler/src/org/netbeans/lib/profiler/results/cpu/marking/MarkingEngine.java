@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.marking;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.lib.profiler.marker.Mark;
@@ -173,9 +174,7 @@ public class MarkingEngine {
         boolean stateChange = false;
 
         synchronized (markGuard) {
-            stateChange = !((this.marks == null) && (marks == null))
-                          && (((this.marks == null) && (marks != null)) || ((this.marks != null) && (marks == null))
-                             || !this.marks.equals(marks));
+            stateChange = !Arrays.equals(this.marks,marks);
             this.marks = marks;
         }
         if (stateChange) {
