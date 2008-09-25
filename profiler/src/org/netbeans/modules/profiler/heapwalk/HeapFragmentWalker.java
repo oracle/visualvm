@@ -62,8 +62,6 @@ public class HeapFragmentWalker {
     private InstancesController instancesController;
     private NavigationHistoryManager navigationHistoryManager;
     private SummaryController summaryController;
-    private int totalLiveBytes; // TODO: will be read from HeapSummary
-    private int totalLiveInstances; // TODO: will be read from HeapSummary
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -71,11 +69,6 @@ public class HeapFragmentWalker {
     public HeapFragmentWalker(Heap heapFragment, HeapWalker heapWalker) {
         this.heapFragment = heapFragment;
         this.heapWalker = heapWalker;
-
-        HeapSummary summary = heapFragment.getSummary();
-
-        totalLiveBytes = summary.getTotalLiveBytes();
-        totalLiveInstances = summary.getTotalLiveInstances();
 
         summaryController = new SummaryController(this);
         classesController = new ClassesController(this);
@@ -153,15 +146,11 @@ public class HeapFragmentWalker {
     }
 
     public int getTotalLiveBytes() {
-        return totalLiveBytes;
-
-        //    return heapFragment.getSummary().getTotalLiveBytes();
+        return heapFragment.getSummary().getTotalLiveBytes();
     }
 
     public int getTotalLiveInstances() {
-        return totalLiveInstances;
-
-        //    return heapFragment.getSummary().getTotalLiveInstances();
+        return heapFragment.getSummary().getTotalLiveInstances();
     }
 
     // --- Navigation history support
