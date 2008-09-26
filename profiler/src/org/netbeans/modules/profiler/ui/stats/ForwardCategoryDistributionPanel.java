@@ -270,7 +270,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
         }
     }
 
-    public void refresh(RuntimeCPUCCTNode appNode) {
+    synchronized public void refresh(RuntimeCPUCCTNode appNode) {
         if (appNode != null) {
             if (walker != null) {
                 appNode.accept(walker);
