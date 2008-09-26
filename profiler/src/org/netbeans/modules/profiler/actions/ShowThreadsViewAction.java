@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.ThreadsWindow;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
@@ -68,7 +69,7 @@ public final class ShowThreadsViewAction extends AbstractAction {
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
-                 new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/threadsWindow.png")) // NOI18N
+                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/threadsWindow.png")) // NOI18N
         );
         putValue("iconBase", "org/netbeans/modules/profiler/resources/threadsWindow.png"); // NOI18N
     }
