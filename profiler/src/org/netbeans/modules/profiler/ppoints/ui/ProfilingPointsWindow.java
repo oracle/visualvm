@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler.ppoints.ui;
 
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -77,7 +78,7 @@ public class ProfilingPointsWindow extends TopComponent {
 
     public ProfilingPointsWindow() {
         setName(COMPONENT_NAME);
-        setIcon(org.openide.util.Utilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/ppoint.png", true)); // NOI18N
+        setIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/ppoint.png", true)); // NOI18N
         setLayout(new BorderLayout());
         getAccessibleContext().setAccessibleDescription(COMPONENT_ACCESS_DESCR);
         windowUI = new ProfilingPointsWindowUI();

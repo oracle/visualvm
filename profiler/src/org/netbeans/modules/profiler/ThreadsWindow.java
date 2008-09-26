@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
@@ -94,7 +95,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     private static final String HELP_CTX_KEY = "ThreadsWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static ThreadsWindow defaultInstance;
-    private static final Image windowIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/threadsWindow.png"); // NOI18N
+    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/threadsWindow.png"); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

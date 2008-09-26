@@ -45,6 +45,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.Dialog;
@@ -129,9 +130,9 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
     private static NewCustomConfiguration defaultInstance;
 
     // --- UI components declaration ---------------------------------------------
-    private static final Icon ICON_MONITOR = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png")); // NOI18N
-    private static final Icon ICON_CPU = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png")); // NOI18N
-    private static final Icon ICON_MEMORY = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N
+    private static final Icon ICON_MONITOR = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png")); // NOI18N
+    private static final Icon ICON_CPU = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png")); // NOI18N
+    private static final Icon ICON_MEMORY = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
