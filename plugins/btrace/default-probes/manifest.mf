@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: net.java.visualvm.btrace.defaultprobes
-OpenIDE-Module-Localizing-Bundle: net/java/visualvm/btrace/defaultprobes/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-
