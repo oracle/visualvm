@@ -46,6 +46,7 @@ import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
 import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -76,7 +77,7 @@ public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
     private static final String PP_DEFAULT_NAME = NbBundle.getMessage(LoadGenProfilingPointFactory.class,
                                                                       "LoadGenProfilingPointFactory_PpDefaultName"); // NOI18N
                                                                                                                      // -----
-    private static final Icon LOADGEN_PP_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/loadgenProfilingPoint.png")); // NOI18N
+    private static final Icon LOADGEN_PP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/loadgenProfilingPoint.png")); // NOI18N
     private static final String LOADGEN_PP_TYPE = PP_TYPE;
     private static final String LOADGEN_PP_DESCR = PP_DESCR;
     private static final String START_LOCATION_PREFIX = "start_"; // NOI18N

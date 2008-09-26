@@ -47,6 +47,7 @@ import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -87,7 +88,7 @@ public final class LoadSnapshotAction extends AbstractAction {
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
-                 new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png")) //NOI18N
+                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png")) //NOI18N
         );
     }
 
