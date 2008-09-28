@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.openide.actions.FindAction;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.actions.CallbackSystemAction;
@@ -75,7 +76,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
     private static final String LIVENESS_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
                                                                             "SnapshotDiffWindow_LivenessAccessDescr"); // NOI18N
                                                                                                                        // -----
-    private static final Image WINDOW_ICON_MEMORY = Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"); // NOI18N
+    private static final Image WINDOW_ICON_MEMORY = ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
