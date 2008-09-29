@@ -44,6 +44,7 @@ import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.actions.SystemAction;
@@ -74,7 +75,7 @@ public class OpenHeapWalkerAction extends SystemAction {
 
     public OpenHeapWalkerAction() {
         putValue("noIconInMenu", null); // NOI18N        
-        setIcon(new ImageIcon(org.openide.util.Utilities.loadImage("org/netbeans/modules/profiler/resources/memory.png", true))); // NOI18N
+        setIcon(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png", true))); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
