@@ -44,6 +44,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
@@ -67,7 +68,7 @@ public final class AttachAction extends AbstractAction {
                  "org/netbeans/modules/profiler/actions/resources/attach.png" // NOI18N
         );
         putValue(Action.SMALL_ICON,
-                 new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/attach.png")) //NOI18N
+                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/attach.png")) //NOI18N
         );
     }
 

@@ -45,6 +45,7 @@ import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownListener;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownPanel;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.Mode;
@@ -77,7 +78,7 @@ public final class DrillDownWindow extends TopComponent {
     private static final String HELP_CTX_KEY = "DrillDownWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static final String PREFERRED_ID = "DrillDownWindow"; // NOI18N // for winsys persistence
-    private static final Image pieIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/pie.png"); // NOI18N
+    private static final Image pieIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/pie.png"); // NOI18N
     private static DrillDownWindow defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

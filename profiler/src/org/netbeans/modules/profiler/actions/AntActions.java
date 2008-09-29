@@ -62,6 +62,7 @@ import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -148,7 +149,7 @@ public final class AntActions {
                    "org/netbeans/modules/profiler/actions/resources/profile.png" // NOI18N
         );
         a.putValue(Action.SMALL_ICON,
-                   new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
+                   new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
         );
 
         return a;

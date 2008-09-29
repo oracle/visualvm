@@ -43,6 +43,7 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.modules.profiler.heapwalk.ClassesController;
 import org.netbeans.modules.profiler.heapwalk.LegendPanel;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -69,7 +70,7 @@ public class ClassesControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_CLASS = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png")); // NOI18N
+        private static ImageIcon ICON_CLASS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png")); // NOI18N
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
