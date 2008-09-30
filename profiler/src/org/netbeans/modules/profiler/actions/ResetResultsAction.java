@@ -45,6 +45,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
@@ -67,7 +68,7 @@ public final class ResetResultsAction extends AbstractAction {
         putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ResetResultsAction.class, "HINT_ResetResultsAction" // NOI18N
         ));
         putValue(Action.SMALL_ICON,
-                 new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/resetResults.png")) //NOI18N
+                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/resetResults.png")) //NOI18N
         );
         putValue("iconBase", // NOI18N
                  "org/netbeans/modules/profiler/actions/resources/resetResults.png" // NOI18N

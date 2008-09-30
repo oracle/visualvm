@@ -48,6 +48,7 @@ import org.openide.cookies.SaveCookie;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.actions.CallbackSystemAction;
@@ -128,9 +129,9 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
     private static final String MEMORY_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
                                                                                    "SnapshotResultsWindow_MemorySnapshotAccessDescr"); // NOI18N
                                                                                                                                        // -----
-    private static final Image WINDOW_ICON_CPU = Utilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png"); // NOI18N
-    private static final Image WINDOWS_ICON_FRAGMENT = Utilities.loadImage("org/netbeans/modules/profiler/resources/fragment.png"); // NOI18N
-    private static final Image WINDOWS_ICON_MEMORY = Utilities.loadImage("org/netbeans/modules/profiler/resources/memory.png"); // NOI18N
+    private static final Image WINDOW_ICON_CPU = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png"); // NOI18N
+    private static final Image WINDOWS_ICON_FRAGMENT = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/fragment.png"); // NOI18N
+    private static final Image WINDOWS_ICON_MEMORY = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png"); // NOI18N
     private static final HashMap /*<ResultsSnapshot, SnapshotResultsWindow>*/ windowsList = new HashMap();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

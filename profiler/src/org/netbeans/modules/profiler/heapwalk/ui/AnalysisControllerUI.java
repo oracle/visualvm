@@ -46,6 +46,7 @@ import org.netbeans.modules.profiler.heapwalk.AnalysisController;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -131,7 +132,7 @@ public class AnalysisControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_INFO = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/memoryLint.png")); // NOI18N
+        private static ImageIcon ICON_INFO = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/memoryLint.png")); // NOI18N
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
