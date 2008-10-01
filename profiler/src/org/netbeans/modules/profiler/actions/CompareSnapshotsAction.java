@@ -48,6 +48,7 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.*;
@@ -781,9 +782,9 @@ public class CompareSnapshotsAction extends AbstractAction {
     private static final String SNAPSHOTS_LIST_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                                   "CompareSnapshotsAction_SnapshotsListAccessDescr"); // NOI18N
                                                                                                                                       // -----
-    private static final ImageIcon cpuIcon = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png")); // NOI18N
-    private static final ImageIcon fragmentIcon = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/fragmentSmall.png")); // NOI18N
-    private static final ImageIcon memoryIcon = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png")); // NOI18N
+    private static final ImageIcon cpuIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png")); // NOI18N
+    private static final ImageIcon fragmentIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/fragmentSmall.png")); // NOI18N
+    private static final ImageIcon memoryIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png")); // NOI18N
     private static JFileChooser snapshotFileChooser;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -799,7 +800,7 @@ public class CompareSnapshotsAction extends AbstractAction {
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
-                 new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"))); // NOI18N
+                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"))); // NOI18N
     }
 
     public CompareSnapshotsAction(LoadedSnapshot snapshot) {

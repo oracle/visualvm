@@ -57,6 +57,7 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerFieldNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.InstanceNode;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -242,7 +243,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
                                                                          "ReferencesBrowserControllerUI_ValueColumnDescr"); // NOI18N
                                                                                                                             // -----
-    private static ImageIcon ICON_FIELDS = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png")); // NOI18N
+    private static ImageIcon ICON_FIELDS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png")); // NOI18N
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
@@ -388,7 +389,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
