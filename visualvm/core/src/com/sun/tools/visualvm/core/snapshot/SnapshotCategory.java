@@ -36,6 +36,7 @@ import javax.swing.filechooser.FileFilter;
  * Category should return POSITION_NONE for getPreferredPosition() if it's not to be shown in UI.
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 public abstract class SnapshotCategory<X extends Snapshot> implements Positionable {
     
@@ -138,16 +139,16 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     protected boolean isSnapshot(File file) {
-        return isSnapshot(file.getName());
-    }
-    
-    protected boolean isSnapshot(String fileName) {
 //        String pref = getPrefix();
         String suff = getSuffix();
         // Fix for #92 - supported snapshot is detected just based on the SUFFIX by default
 //        if (pref != null && !fileName.startsWith(pref + PREFIX_DIVIDER)) return false;
-        if (suff != null && !fileName.endsWith(suff)) return false;
+        if (suff != null && !file.getName().endsWith(suff)) return false;
         return true;
+    }
+    
+    protected boolean isSnapshot(String fileName) {
+        return isSnapshot(new File(fileName));
     }
     
     protected String getBaseFileName(String fileName) {
@@ -191,7 +192,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     public FilenameFilter getFilenameFilter() {
         return new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return isSnapshot(name);
+                return isSnapshot(new File(dir,name));
             }
         };
     }
@@ -204,8 +205,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     public FileFilter getFileFilter() {
         return new FileFilter() {
             public boolean accept(File f) {
-                String suff = getSuffix();
-                return f.isDirectory() || (suff != null ? f.getName().endsWith(suff) : true);
+                return f.isDirectory() || isSnapshot(f);
             }
             public String getDescription() {
                 String suff = getSuffix();
