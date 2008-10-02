@@ -243,13 +243,13 @@ char* getUserHomeFromRegistry(char* userhome)
 char * GetStringValue(HKEY key, const char *name)
 {
     DWORD type, size;
-    char *value = 0;
+    char *value = NULL;
 
     if (RegQueryValueEx(key, name, 0, &type, 0, &size) == 0 && type == REG_SZ) {
         value = (char*) malloc(size);
         if (RegQueryValueEx(key, name, 0, 0, (unsigned char*)value, &size) != 0) {
             free(value);
-            value = 0;
+            value = NULL;
         }
     }
     return value;
@@ -292,18 +292,18 @@ void parseConfigFile(const char* path) {
                 pc--;
             }
             *(pc+1) = '\0';
-	    *userdir = '\0';
+            *userdir = '\0';
             if (strstr(q, "${HOME}") == q) {
                 char userhome[MAX_PATH];
                 strcpy(userdir, getUserHomeFromRegistry(userhome));
-		q = q + strlen("${HOME}");
+                q = q + strlen("${HOME}");
             }
-	    char *r = NULL;
-	    if ((r = strstr(q, "${APPNAME}")) != NULL) {
-	        strncat(userdir, q, r - q);
-		strcat(userdir, appname);
-		q = r + strlen("${APPNAME}");
-	    }
+            char *r = NULL;
+            if ((r = strstr(q, "${APPNAME}")) != NULL) {
+                strncat(userdir, q, r - q);
+                strcat(userdir, appname);
+                q = r + strlen("${APPNAME}");
+            }
             strcat(userdir, q);
         } else if (strstr(pc, "default_options=") == pc) {
             char *q = strstr(pc, "=") + 1;
