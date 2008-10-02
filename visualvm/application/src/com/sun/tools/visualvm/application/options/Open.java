@@ -25,6 +25,8 @@
 package com.sun.tools.visualvm.application.options;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceContainer;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
@@ -32,7 +34,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.Timer;
@@ -45,50 +47,76 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
 /**
- * Handling of --openpid commandline option
+ * Handling of --openpid and --openid commandline option
  *
  * @author Tomas Hurka
  */
-public final class Openpid extends OptionProcessor {
+public final class Open extends OptionProcessor {
     private Option openpid = Option.requiredArgument(Option.NO_SHORT_NAME,"openpid");    // NOI18N
+    private Option openid = Option.requiredArgument(Option.NO_SHORT_NAME,"openid");    // NOI18N
     private static final int TIMEOUT = 5000;
+    private static final String ID = "visualvm.id";
 
-    public Openpid() {
+    public Open() {
     }
 
     protected Set<Option> getOptions() {
-        return Collections.singleton(openpid);
+        Set<Option> options = new HashSet();
+        options.add(openpid);
+        options.add(openid);
+        return options;
     }
 
     protected void process(Env env, Map<Option, String[]> optionValues) throws CommandException {
+        Integer pid = null;
+        String id = null;
         String[] pids = optionValues.get(openpid);
-        int pid = Integer.parseInt(pids[0]);
+        String[] ids = optionValues.get(openid);
+        
+        if (pids != null && pids.length>0) {
+            pid = Integer.valueOf(pids[0]);
+        }
+        if (ids != null && ids.length>0) {
+            id = "-D"+ID+"="+ids[0];
+        }
         DataSourceContainer container = Host.LOCALHOST.getRepository();
         Set<Application> apps = container.getDataSources(Application.class);
-        if (openApplication(pid, apps)) {
+        if (openApplication(id, pid, apps)) {
             return;
         }
-        Listener l = new Listener(pid, container);
+        Listener l = new Listener(id, pid, container);
         container.addDataChangeListener(l,Application.class);
     }
 
-    private boolean openApplication(final int pid, final Set<Application> apps) {
+    private boolean openApplication(final String id, final Integer pid, final Set<Application> apps) {
         for (Application app : apps) {
-            if (app.getPid() == pid) {
+            if (pid != null && app.getPid() == pid.intValue()) {
                 DataSourceWindowManager.sharedInstance().openDataSource(app);
                 return true;
+            }
+            if (id != null) {
+                Jvm jvm = JvmFactory.getJVMFor(app);
+                if (jvm.isBasicInfoSupported()) {
+                    String args = jvm.getJvmArgs();
+                    if (args != null && args.contains(id)) {
+                        DataSourceWindowManager.sharedInstance().openDataSource(app);
+                        return true;                        
+                    }
+                }
             }
         }
         return false;
     }
 
     private class Listener implements DataChangeListener<Application>, ActionListener {
-        private final int pid;
+        private final Integer pid;
+        private final String id;
         private final DataSourceContainer container;
         private volatile boolean removed;
         private final Timer timer;
 
-        private Listener(int p,DataSourceContainer c) {
+        private Listener(String i,Integer p,DataSourceContainer c) {
+            id = i;
             pid = p;
             container = c;
             timer = new Timer(TIMEOUT,this);
@@ -97,7 +125,7 @@ public final class Openpid extends OptionProcessor {
 
         public synchronized void dataChanged(DataChangeEvent<Application> event) {
             Set<Application> added = event.getAdded();
-            if (openApplication(pid,added)) {
+            if (openApplication(id,pid,added)) {
                 if (!removed) {
                     container.removeDataChangeListener(this);
                     removed = true;
@@ -110,7 +138,7 @@ public final class Openpid extends OptionProcessor {
             if (!removed) {
                 container.removeDataChangeListener(this);
                 removed = true;
-                String msg = NbBundle.getMessage(Openpid.class,"MSG_NO_APP_PID",new Object[] {Integer.toString(pid)});    // NOI18N
+                String msg = NbBundle.getMessage(Open.class,"MSG_NO_APP_PID",new Object[] {Integer.toString(pid)});    // NOI18N
                 NotifyDescriptor desc = new NotifyDescriptor.Message(msg,NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notifyLater(desc);
             }
