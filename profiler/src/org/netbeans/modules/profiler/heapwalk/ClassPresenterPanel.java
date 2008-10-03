@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.lib.profiler.heap.*;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -96,7 +97,7 @@ public class ClassPresenterPanel extends JPanel {
     private static final String TOTAL_SIZE_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
                                                                         "ClassPresenterPanel_TotalSizeString"); // NOI18N
                                                                                                                 // -----
-    private static ImageIcon ICON_CLASS = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png")); // NOI18N
+    private static ImageIcon ICON_CLASS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png")); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

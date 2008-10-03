@@ -43,6 +43,7 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -80,8 +81,8 @@ public class HeapFragmentWalkerUI extends JPanel {
                                                                                                                            // -----
 
     // --- UI definition ---------------------------------------------------------
-    private static ImageIcon ICON_BACK = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/back.png")); // NOI18N
-    private static ImageIcon ICON_FORWARD = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/forward.png")); // NOI18N
+    private static ImageIcon ICON_BACK = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/back.png")); // NOI18N
+    private static ImageIcon ICON_FORWARD = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/forward.png")); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

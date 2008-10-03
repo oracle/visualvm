@@ -47,6 +47,7 @@ import org.netbeans.modules.profiler.ui.ImagePreviewPanel;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -132,7 +133,7 @@ class SaveViewAction extends AbstractAction {
                                                                           "SaveViewAction_SaveDialogVisible"); //NOI18N
     private static final String OOME_SAVING_MSG = NbBundle.getMessage(ExportSnapshotAction.class, "SaveViewAction_OomeSavingMsg"); //NOI18N
                                                                                                                                    // -----
-    private static final ImageIcon ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/saveView.png")); // NOI18N
+    private static final ImageIcon ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/saveView.png")); // NOI18N
     private static File exportDir;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
