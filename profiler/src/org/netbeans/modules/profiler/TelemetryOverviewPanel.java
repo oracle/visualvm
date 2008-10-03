@@ -42,6 +42,7 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.Mode;
@@ -70,7 +71,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
     private static final String HELP_CTX_KEY = "TelemetryOverviewPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryOverviewPanel defaultInstance;
-    private static final Image windowIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/telemetryOverviewWindow.png"); // NOI18N
+    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryOverviewWindow.png"); // NOI18N
     private static final String ID = "profiler_to"; // NOI18N // for winsys persistence
     private static final Dimension PREFFERED_SIZE = new Dimension(580, 430);
 

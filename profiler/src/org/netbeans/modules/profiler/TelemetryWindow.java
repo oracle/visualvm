@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
@@ -78,10 +79,10 @@ public final class TelemetryWindow extends TopComponent {
                                                                   SaveViewAction.ViewProvider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final ImageIcon zoomInIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomIn.png")); //NOI18N
-        private static final ImageIcon zoomOutIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomOut.png")); //NOI18N
-        private static final ImageIcon zoomIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoom.png")); //NOI18N
-        private static final ImageIcon scaleToFitIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); //NOI18N
+        private static final ImageIcon zoomInIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomIn.png")); //NOI18N
+        private static final ImageIcon zoomOutIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomOut.png")); //NOI18N
+        private static final ImageIcon zoomIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoom.png")); //NOI18N
+        private static final ImageIcon scaleToFitIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); //NOI18N
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -302,7 +303,7 @@ public final class TelemetryWindow extends TopComponent {
     private static final String HELP_CTX_KEY = "TelemetryWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryWindow defaultInstance;
-    private static final Image windowIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png"); // NOI18N
+    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png"); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

@@ -46,6 +46,7 @@ import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.heapwalk.SummaryController;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -85,7 +86,7 @@ public class SummaryControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_INFO = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/infoTab.png")); // NOI18N
+        private static ImageIcon ICON_INFO = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/infoTab.png")); // NOI18N
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
