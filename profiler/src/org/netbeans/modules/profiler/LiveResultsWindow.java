@@ -71,11 +71,11 @@ import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDown;
 import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -115,6 +115,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
 
 
@@ -279,10 +281,10 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     private static final class GraphTab extends JPanel implements ActionListener, ChartActionListener {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final ImageIcon zoomInIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomIn.png")); //NOI18N
-        private static final ImageIcon zoomOutIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomOut.png")); //NOI18N
-        private static final ImageIcon zoomIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoom.png")); //NOI18N
-        private static final ImageIcon scaleToFitIcon = new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); //NOI18N
+        private static final ImageIcon zoomInIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomIn.png")); //NOI18N
+        private static final ImageIcon zoomOutIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomOut.png")); //NOI18N
+        private static final ImageIcon zoomIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoom.png")); //NOI18N
+        private static final ImageIcon scaleToFitIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); //NOI18N
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -440,18 +442,14 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
-            if (className.length() == 1) {
-                if (BOOLEAN_CODE.equals(className) || CHAR_CODE.equals(className) || BYTE_CODE.equals(className)
-                        || SHORT_CODE.equals(className) || INT_CODE.equals(className) || LONG_CODE.equals(className)
-                        || FLOAT_CODE.equals(className) || DOUBLE_CODE.equals(className)) {
-                    // primitive type
-                    Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
-
-                    return;
-                }
-            }
-
-            Profiler.getDefault().openJavaSource(className, methodName, methodSig);
+            // Check if primitive type/array
+            if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
+                 VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+            // Check if allocated by reflection
+            else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
+                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+            // Display source
+            else NetBeansProfiler.getDefaultNB().openJavaSource(className, methodName, methodSig);
         }
 
         public void showStacksForClass(final int selectedClassId, final int sortingColumn, final boolean sortingOrder) {
@@ -510,7 +508,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static LiveResultsWindow defaultLiveInstance;
     private static final TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-    private static final Image liveWindowIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/liveResultsWindow.png"); // NOI18N
+    private static final Image liveWindowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/liveResultsWindow.png"); // NOI18N
     private static final AtomicBoolean resultsDumpForced = new AtomicBoolean(false);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -561,7 +559,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         final JLabel noResultsLabel = new JLabel(NO_PROFILING_RESULTS_LABEL_TEXT);
 
         noResultsLabel.setFont(noResultsLabel.getFont().deriveFont(14));
-        noResultsLabel.setIcon(new javax.swing.ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/ui/resources/monitoring.png")) //NOI18N
+        noResultsLabel.setIcon(new javax.swing.ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ui/resources/monitoring.png")) //NOI18N
         );
         noResultsLabel.setIconTextGap(10);
         noResultsLabel.setEnabled(false);
@@ -981,7 +979,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
         toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         
-        autoToggle = new JToggleButton(new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/autoRefresh.png") // NOI18N
+        autoToggle = new JToggleButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/autoRefresh.png") // NOI18N
         ));
         autoToggle.setSelected(true);
         autoToggle.addActionListener(new ActionListener() {
@@ -992,7 +990,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         autoToggle.setToolTipText(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
         autoToggle.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
 
-        updateNowButton = new JButton(new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/updateNow.png") // NOI18N
+        updateNowButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/updateNow.png") // NOI18N
         ));
         updateNowButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -1002,7 +1000,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         updateNowButton.setToolTipText(UPDATE_RESULTS_NOW_TOOLTIP);
         updateNowButton.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_NOW_TOOLTIP);
 
-        runGCButton = new JButton(new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/runGC.png") // NOI18N
+        runGCButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/runGC.png") // NOI18N
         ));
         runGCButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {

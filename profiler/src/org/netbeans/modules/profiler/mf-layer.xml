@@ -248,7 +248,7 @@ made subject to such option by the copyright holder.
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.actions.ResetResultsAction"/>
         </file>
         <file name="S-F9.instance">
-            <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction"/>
+            <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction.getInstance"/>
         </file>
         <file name="C-U D.instance">
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.LiveResultsWindow$ActivateDrillDownAction"/>
@@ -278,6 +278,9 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
+            <file name="org-netbeans-modules-profiler-ppoints-ui-ToggleProfilingPointAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction.getInstance"/>
+            </file>
             <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
@@ -371,6 +374,26 @@ made subject to such option by the copyright holder.
     </folder>
   
     <folder name="Windows2">
+        <folder name="Components">
+            <file name="profiler_cp.settings" url="profiler_cp.settings"/>
+            <file name="profiler_to.settings" url="profiler_to.settings"/>
+            <file name="profiler_pp.settings" url="profiler_pp.settings"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="explorer">
+                <file name="profiler_cp.wstcref" url="profiler_cp.wstcref">
+                    <attr name="position" intvalue="800"/>
+                </file>
+            </folder>
+            <folder name="output">
+                <file name="profiler_to.wstcref" url="profiler_to.wstcref">
+                    <attr name="position" intvalue="1500"/>
+                </file>
+                <file name="profiler_pp.wstcref" url="profiler_pp.wstcref">
+                    <attr name="position" intvalue="1550"/>
+                </file>
+            </folder>
+        </folder>
         <folder name="Groups">
             <file name="LiveResultsGroup.wsgrp" url="LiveResultsGroupWsgrp.xml"/>
             <folder name="LiveResultsGroup">

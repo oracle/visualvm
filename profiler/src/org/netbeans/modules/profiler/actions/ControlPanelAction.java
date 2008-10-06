@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
@@ -64,7 +65,7 @@ public final class ControlPanelAction extends AbstractAction {
         putValue(Action.NAME, NAME_STRING);
         putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
         putValue(Action.SMALL_ICON,
-                 new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/controlPanel.gif")) //NOI18N
+                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/controlPanel.gif")) //NOI18N
         );
     }
 

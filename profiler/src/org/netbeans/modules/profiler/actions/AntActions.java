@@ -62,6 +62,7 @@ import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -148,7 +149,7 @@ public final class AntActions {
                    "org/netbeans/modules/profiler/actions/resources/profile.png" // NOI18N
         );
         a.putValue(Action.SMALL_ICON,
-                   new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
+                   new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
         );
 
         return a;
@@ -232,17 +233,17 @@ public final class AntActions {
                         return false;
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
-                        if (ptp == null) {
+                        if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
-
-                        return (ptp.isFileObjectSupported(project, fos[0]));
                     } else {
-                        return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
+                        System.out.println("ProfilSingle::Lightweight -> " + ptp.isProfilingSupported(project) + ", " + ProjectUtilities.hasAction(project, "profile-single"));
+                        return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
+                    
+                    return true;
                 }
 
                 public void perform(final Project project, final Lookup context) {
@@ -282,14 +283,13 @@ public final class AntActions {
                         return false;
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
                         if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
                     } else {
-                        return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
+                        return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
 
                     return true;
@@ -343,12 +343,11 @@ public final class AntActions {
                         return false; // not a test and test for it does not exist
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
                         return (ptp.isFileObjectSupported(project, fo));
                     } else {
-                        return true;
+                        return ptp.isProfilingSupported(project);
                     }
                 }
 

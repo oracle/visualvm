@@ -42,6 +42,7 @@ package org.netbeans.modules.profiler.heapwalk.model;
 
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -78,13 +79,13 @@ public class BrowserUtils {
     // I18N String constants
     private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_OutOfMemoryMsg"); // NOI18N
                                                                                                                             // -----
-    public static ImageIcon ICON_INSTANCE = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png")); // NOI18N
-    public static ImageIcon ICON_PRIMITIVE = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png")); // NOI18N
-    public static ImageIcon ICON_ARRAY = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/array.png")); // NOI18N
-    public static ImageIcon ICON_PROGRESS = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/progress.png")); // NOI18N
-    public static ImageIcon ICON_STATIC = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/static.png")); // NOI18N
-    public static ImageIcon ICON_LOOP = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/loop.png")); // NOI18N
-    public static ImageIcon ICON_GCROOT = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png")); // NOI18N
+    public static ImageIcon ICON_INSTANCE = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png")); // NOI18N
+    public static ImageIcon ICON_PRIMITIVE = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png")); // NOI18N
+    public static ImageIcon ICON_ARRAY = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/array.png")); // NOI18N
+    public static ImageIcon ICON_PROGRESS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/progress.png")); // NOI18N
+    public static ImageIcon ICON_STATIC = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/static.png")); // NOI18N
+    public static ImageIcon ICON_LOOP = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/loop.png")); // NOI18N
+    public static ImageIcon ICON_GCROOT = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png")); // NOI18N
     private static RequestProcessor requestProcessor = new RequestProcessor("HeapWalker Processor", 3); // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -186,15 +187,15 @@ public class BrowserUtils {
     }
 
     public static ImageIcon createGCRootIcon(ImageIcon icon) {
-        return new ImageIcon(Utilities.mergeImages(icon.getImage(), ICON_GCROOT.getImage(), 0, 0));
+        return new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), ICON_GCROOT.getImage(), 0, 0));
     }
 
     public static ImageIcon createLoopIcon(ImageIcon icon) {
-        return new ImageIcon(Utilities.mergeImages(icon.getImage(), ICON_LOOP.getImage(), 0, 0));
+        return new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), ICON_LOOP.getImage(), 0, 0));
     }
 
     public static ImageIcon createStaticIcon(ImageIcon icon) {
-        return new ImageIcon(Utilities.mergeImages(icon.getImage(), ICON_STATIC.getImage(), 0, 0));
+        return new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), ICON_STATIC.getImage(), 0, 0));
     }
 
     public static HeapWalkerNode[] lazilyCreateChildren(final HeapWalkerNode parent, final ChildrenComputer childrenComputer) {

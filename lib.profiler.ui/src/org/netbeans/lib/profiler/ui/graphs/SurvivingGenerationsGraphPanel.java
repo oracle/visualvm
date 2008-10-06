@@ -156,6 +156,9 @@ public class SurvivingGenerationsGraphPanel extends GraphPanel implements ChartM
                 public String getToolTipText(MouseEvent event) {
                     return getChartToolTipText(event);
                 }
+                public Point getToolTipLocation(MouseEvent event) {
+                    return new Point(event.getX(), event.getY() + 20);
+                }
             };
 
         xyChart.setUseSecondaryVerticalAxis(true);
