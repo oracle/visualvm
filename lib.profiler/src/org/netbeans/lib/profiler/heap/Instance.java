@@ -107,7 +107,7 @@ public interface Instance {
      * returns the list of references to this instance. The references can be of two kinds.
      * The first one is from {@link ObjectFieldValue} and the second one if from {@link ArrayItemValue}
      * <br>
-     * Speed: slow
+     * Speed: first invocation is slow, all subsequent invocations are fast
      * @return list of {@link Value} representing all references to this instance
      */
     List /*<Value>*/ getReferences();

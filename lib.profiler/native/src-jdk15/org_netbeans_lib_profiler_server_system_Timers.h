@@ -47,6 +47,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#ifdef CVM
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Method:    getCurrentTimeInCounts
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getCurrentTimeInCounts
+  (JNIEnv *, jclass);
+
+#endif
+
 /*
  * Class:     org_netbeans_lib_profiler_server_system_Timers
  * Method:    getThreadCPUTimeInNanos

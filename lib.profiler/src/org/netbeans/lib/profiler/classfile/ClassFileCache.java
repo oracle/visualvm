@@ -212,6 +212,8 @@ public class ClassFileCache {
                 } catch (ZipException e2) {
                     throw new IOException("Could not open archive " + classFileLocation); // NOI18N
                 }
+            } else {
+                throw new IOException("Could not get classpath for " + classFileName + " in " + classFileLocation); // NOI18N
             }
 
             ZipEntry entry = zip.getEntry(classFileName);

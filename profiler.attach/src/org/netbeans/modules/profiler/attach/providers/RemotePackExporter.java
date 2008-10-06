@@ -65,7 +65,6 @@ public class RemotePackExporter {
         private static final RemotePackExporter INSTANCE = new RemotePackExporter();
     }
     private static final Map<String, String> scriptMapper = new HashMap<String, String>() {
-
         {
             put(IntegrationUtils.PLATFORM_LINUX_AMD64_OS, "linuxamd64"); //NOI18N
             put(IntegrationUtils.PLATFORM_LINUX_OS, "linux"); //NOI18N
@@ -76,6 +75,14 @@ public class RemotePackExporter {
             put(IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS, "solsparcv9"); //NOI18N
             put(IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS, "winamd64"); //NOI18N
             put(IntegrationUtils.PLATFORM_WINDOWS_OS, "win"); //NOI18N
+        }
+    };
+    private static final Map<String, String> jdkMapper = new HashMap<String, String>() {
+        {
+            put(TargetPlatformEnum.JDK5.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK6.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK7.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK_CVM.toString(), "cvm"); //NOI18N
         }
     };
     private AntProjectCookie cookie;
@@ -93,7 +100,7 @@ public class RemotePackExporter {
         }
     }
 
-    public String export(final String exportPath, final String hostOS) throws IOException {
+    public String export(final String exportPath, final String hostOS, final String jvm) throws IOException {
         String packPath = getRemotePackPath(exportPath, hostOS);
         ProgressHandle ph = ProgressHandleFactory.createHandle("Generating Remote Pack to " + packPath);
         ph.setInitialDelay(500);
@@ -107,7 +114,7 @@ public class RemotePackExporter {
             antProperties.setProperty("dest.dir", exportPath != null ? exportPath : System.getProperty("java.io.tmpdir")); //NOI18N
             env.setProperties(antProperties);
             AntTargetExecutor ate = AntTargetExecutor.createTargetExecutor(env);
-            ate.execute(cookie, new String[]{"profiler-server-" + scriptMapper.get(hostOS) + "-15"}).result();            
+            ate.execute(cookie, new String[]{"profiler-server-" + scriptMapper.get(hostOS) + "-" + jdkMapper.get(jvm)}).result();            
         } finally {
             ph.finish();
         }
@@ -118,7 +125,7 @@ public class RemotePackExporter {
         return exportPath + File.separator + "profiler-server-" + scriptMapper.get(hostOS) + ".zip";
     }
 
-    public void export(String hostOS) throws IOException {
-        export(null, hostOS);
+    public void export(String hostOS, final String jvm) throws IOException {
+        export(null, hostOS, jvm);
     }
 }

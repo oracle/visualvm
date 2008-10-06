@@ -227,7 +227,7 @@ public class ClientUtils implements CommonConstants {
                 flattenedBuf.append(methodSignature);
             }
 
-            return flattenedBuf.toString().replaceAll("\\.\\*", ""); //NOI18N
+            return flattenedBuf.toString().replaceAll("\\.[\\*]+", ""); //NOI18N
         }
 
         public String toString() {

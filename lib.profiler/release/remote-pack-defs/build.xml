@@ -48,7 +48,7 @@ made subject to such option by the copyright holder.
   -->
   
   <property name="lib.dir" value="${cluster}/lib"/>
-  <property name="dest.dir" value="./build"/>
+  <property name="dest.dir" value="../../build"/>
   <property name="build.dir" value="${dest.dir}/nb-profiler-server"/>
   <property name="profiler.cluster" value=".."/>
   
@@ -68,6 +68,16 @@ made subject to such option by the copyright holder.
     </antcall>
   </target>
 
+  <target name="profiler-server-win-cvm">
+    <antcall target="profiler-server-windows-cvm">
+      <param name="os-version" value="win"/>
+      <param name="os-long-version" value="windows"/>
+      <param name="jdk-version" value="cvm"/>
+      <param name="calibrate-suffix" value="-win-cvm"/>
+    </antcall>
+  </target>
+
+
   <target name="profiler-server-windows">
     <property name="calibrate-suffix" value="-15"/>
     <antcall target="profiler-server-common-windows">
@@ -82,10 +92,29 @@ made subject to such option by the copyright holder.
     </antcall>
  </target>
 
+  <target name="profiler-server-windows-cvm">
+    <antcall target="profiler-server-common-windows">
+    </antcall>
+    <copy tofile="${build.dir}/bin/profile.bat" file="profile-${os-version}-${jdk-version}.bat" />
+    <copy todir="${build.dir}/lib">
+      <fileset file="${lib.dir}/jfluid-server-${jdk-version}.jar" />
+    </copy>
+    <mkdir dir="${build.dir}/lib/deployed/${jdk-version}"/>
+    <copy todir="${build.dir}/lib/deployed/${jdk-version}/${os-long-version}">
+      <fileset dir="${profiler.cluster}/lib/deployed/${jdk-version}/${os-long-version}" />
+    </copy>
+    <antcall target="profiler-server-zip-windows">
+      <param name="os-version" value="${os-version}cvm"/>
+    </antcall>
+ </target>
+
+
   <target name="profiler-server-mac-15">
-    <antcall target="profiler-server-15">
+    <property name="jdk-version" value="15"/>
+    <antcall target="profiler-server-unix">
       <param name="os-version" value="mac"/>
       <param name="os-long-version" value="mac"/>
+      <param name="calibrate-suffix" value="-mac-${jdk-version}"/>
     </antcall>
   </target>
 
@@ -100,6 +129,15 @@ made subject to such option by the copyright holder.
     <antcall target="profiler-server-15">
       <param name="os-version" value="linuxamd64"/>
       <param name="os-long-version" value="linux-amd64"/>
+    </antcall>
+  </target>
+
+  <target name="profiler-server-linux-cvm">
+    <antcall target="profiler-server-unix-cvm">
+      <param name="os-version" value="linux"/>
+      <param name="os-long-version" value="linux"/>
+      <param name="jdk-version" value="cvm"/>
+      <param name="calibrate-suffix" value="-linux-cvm"/>
     </antcall>
   </target>
 
@@ -144,6 +182,22 @@ made subject to such option by the copyright holder.
       <param name="calibrate-suffix" value="-${jdk-version}"/>
     </antcall>
   </target>
+
+  <target name="profiler-server-unix-cvm">
+    <antcall target="profiler-server-common-unix">
+    </antcall>
+    <copy tofile="${build.dir}/bin/profile.sh" file="profile-${os-version}-${jdk-version}.sh" />
+    <copy todir="${build.dir}/lib">
+       <fileset file="${lib.dir}/jfluid-server-${jdk-version}.jar" />
+    </copy>
+    <mkdir dir="${build.dir}/lib/deployed/${jdk-version}"/>
+    <copy todir="${build.dir}/lib/deployed/${jdk-version}/${os-long-version}">
+       <fileset dir="${profiler.cluster}/lib/deployed/${jdk-version}/${os-long-version}" />
+    </copy>
+    <antcall target="profiler-server-zip-unix">
+       <param name="os-version" value="${os-version}cvm"/>
+    </antcall>
+ </target>
 
   <target name="profiler-server-unix">
     <antcall target="profiler-server-common-unix">
@@ -215,7 +269,7 @@ made subject to such option by the copyright holder.
   </target>
 
   <!-- creates the remote packs as a profiler-server for all platforms -->
-  <target name="profiler-server-all" depends="profiler-server-win-15, profiler-server-winamd64-15, profiler-server-mac-15, profiler-server-linux-15, profiler-server-linuxamd64-15, profiler-server-solx86-15, profiler-server-solamd64-15, profiler-server-solsparc-15, profiler-server-solsparcv9-15" />
+  <target name="profiler-server-all" depends="profiler-server-win-15, profiler-server-winamd64-15, profiler-server-win-cvm, profiler-server-mac-15, profiler-server-linux-15, profiler-server-linuxamd64-15, profiler-server-linux-cvm, profiler-server-solx86-15, profiler-server-solamd64-15, profiler-server-solsparc-15, profiler-server-solsparcv9-15" />
 
 </project>
 

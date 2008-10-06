@@ -49,10 +49,12 @@ import org.netbeans.modules.profiler.categories.CategoryDefinitionProcessor;
  */
 public class PackageCategoryDefinition extends CategoryDefinition {
     private String packageName;
-    
-    public PackageCategoryDefinition(Category category, String packageName) {
+    private boolean recursive;
+
+    public PackageCategoryDefinition(Category category, String packageName, boolean recursive) {
         super(category);
         this.packageName = packageName;
+        this.recursive = recursive;
     }
     
     @Override
@@ -63,4 +65,9 @@ public class PackageCategoryDefinition extends CategoryDefinition {
     public String getPackageName() {
         return packageName;
     }
+
+    public boolean isRecursive() {
+        return recursive;
+    }
+
 }

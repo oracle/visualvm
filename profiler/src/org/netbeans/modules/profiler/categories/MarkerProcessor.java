@@ -89,8 +89,12 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
 
     private Project project;
 
+    private ClasspathInfo cpInfo;
+    private JavaSource js;
     public MarkerProcessor(Project project) {
         this.project = project;
+        this.cpInfo = ProjectUtilities.getClasspathInfo(project, true);
+        this.js = JavaSource.create(cpInfo, new FileObject[0]);
     }
     
     @Override
@@ -128,7 +132,7 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
 
     @Override
     public void process(PackageCategoryDefinition def) {
-        pMarker.addPackageMark(def.getPackageName(), def.getAssignedMark());
+        pMarker.addPackageMark(def.getPackageName(), def.getAssignedMark(), def.isRecursive());
     }
     
     public MarkMapping[] getMappings() {
@@ -155,10 +159,7 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
 
     protected void addInterfaceMarker(final MethodMarker marker, final String interfaceName,
             final String[] methodNameRestriction, final boolean inclusive, final Mark mark) {
-        final ClasspathInfo cpInfo = ProjectUtilities.getClasspathInfo(project, true);
-
-        JavaSource js = JavaSource.create(cpInfo, new FileObject[0]);
-
+        
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {
 
@@ -176,10 +177,6 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
     }
 
     protected void addInterfaceMarkers(final MethodMarker marker, final String[] interfaceNames, final Mark mark) {
-        final ClasspathInfo cpInfo = ProjectUtilities.getClasspathInfo(project, true);
-
-        JavaSource js = JavaSource.create(cpInfo, new FileObject[0]);
-
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {
 
@@ -200,10 +197,6 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
 
     protected void addInterfaceMarkers(final MethodMarker marker, final String[] interfaceNames,
             final String[] methodNameRestriction, final boolean inclusive, final Mark mark) {
-        final ClasspathInfo cpInfo = ProjectUtilities.getClasspathInfo(project, true);
-
-        JavaSource js = JavaSource.create(cpInfo, new FileObject[0]);
-
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {
 
@@ -229,9 +222,6 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
     protected void addTypeMarker(final MethodMarker marker, final String type, final String[] methodNameRestriction,
             final boolean inclusive, final Mark mark) {
         final List<String> restrictors = (methodNameRestriction != null) ? Arrays.asList(methodNameRestriction) : new ArrayList();
-        final ClasspathInfo cpInfo = ProjectUtilities.getClasspathInfo(project, true);
-
-        JavaSource js = JavaSource.create(cpInfo, new FileObject[0]);
 
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {

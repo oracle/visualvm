@@ -46,13 +46,18 @@
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "jvmti.h"
 
 #include "common_functions.h"
 
 #define JF_SERVER_JAR_1  "/jfluid-server.jar"
+#ifdef CVM
+#define JF_SERVER_JAR_2  "/jfluid-server-cvm.jar"
+#else
 #define JF_SERVER_JAR_2  "/jfluid-server-15.jar"
+#endif
 
 static char *_jfluid_dir;
 static int _port_no;

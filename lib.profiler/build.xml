@@ -53,6 +53,12 @@ made subject to such option by the copyright holder.
             <include name="org/netbeans/lib/profiler/server/system/**"/>
             <compilerarg line="${javac.compilerargs}"/>
         </javac>
+        <mkdir dir="${buildcvm.classes.dir}"/>
+        <javac  srcdir="${srccvm.dir}" destdir="${buildcvm.classes.dir}" deprecation="${build.compiler.deprecation}"
+             debug="${build.compiler.debug}" source="1.4" target="1.4" includeantruntime="false" optimize="${build.compiler.optimize}" >
+             <include name="org/netbeans/lib/profiler/server/system/**"/>
+             <compilerarg line="${javac.compilerargs}"/>
+        </javac>
     </target>
 
     <target name="post-compile" depends="projectized-common.compile">
@@ -66,7 +72,7 @@ made subject to such option by the copyright holder.
 
     <target name="jar" depends="init,compile,jar-prep">
         <!-- Client side -->
-        <jarwithmoduleattributes jarfile="${cluster}/${module.jar}" compress="${build.package.compress}" index="${build.package.index}" manifest="${manifest.mf}">
+        <jarwithmoduleattributes jarfile="${cluster}/${module.jar}" compress="${build.package.compress}" index="${build.package.index}" manifest="${manifest.mf}" stamp="${cluster}/.lastModified">
             <fileset dir="${build.classes.dir}">
               <exclude name="org/netbeans/lib/profiler/server/**"/>
             </fileset>
@@ -83,18 +89,29 @@ made subject to such option by the copyright holder.
          manifest="${src15.dir}/manifest.mf"
          basedir="${build15.classes.dir}"
          compress="false">
-      </jar>
+       </jar>
+       <jar destfile="${cluster}/${jfluid.server.cvm.jar}"
+         manifest="${srccvm.dir}/manifest.mf"
+         basedir="${buildcvm.classes.dir}"
+         compress="false">
+       </jar>
     </target>
 
     <target name="release" depends="projectized-common.release">
         <fixcrlf eol="crlf" srcdir="${cluster}/lib/deployed" includes="**/*.map"/>
+        <chmod perm="ugo+x">
+          <fileset dir="${cluster}/lib/deployed">
+          <include name="**/hpux*/lib*.sl"/>
+        </fileset>
+    </chmod>
+
     </target>
 
     <target name="netbeans-extra">
        <ant dir="release/remote-pack-defs" target="profiler-server-all"/>
     </target>
 
-    <target name="clean" depends="init,projectized-common.clean">
+    <target name="clean" depends="projectized-common.clean">
        <delete dir="remote-packs/build"/>
     </target>
 

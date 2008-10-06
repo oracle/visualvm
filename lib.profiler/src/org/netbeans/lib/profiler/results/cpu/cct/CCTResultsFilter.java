@@ -50,7 +50,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.util.Lookup;
 
 
 /**
@@ -77,6 +76,8 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Set /*<Evaluator>*/ evaluators = null;
+    private Set evaluatorProviders = new HashSet();
+
     private Stack passFlagStack;
     private boolean passingFilter;
 
@@ -89,6 +90,11 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
         doReset();
     }
 
+    public void setEvaluators(Collection evaluatorProviders) {
+        this.evaluatorProviders.clear();
+        this.evaluatorProviders.addAll(evaluatorProviders);
+    }
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     public synchronized boolean passesFilter() {
         return passingFilter;
@@ -98,8 +104,7 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
         super.beforeWalk();
         evaluators.clear();
         
-        Collection providers = Lookup.getDefault().lookupAll(EvaluatorProvider.class);
-        for(Iterator iter = providers.iterator();iter.hasNext();) {
+        for(Iterator iter = evaluatorProviders.iterator();iter.hasNext();) {
             evaluators.addAll(((EvaluatorProvider)iter.next()).getEvaluators());
         }
     }

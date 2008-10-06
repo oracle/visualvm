@@ -773,7 +773,7 @@ public class FilterComponent extends JPanel {
         }
 
         filterStringCombo.setEditable(true);
-        componentBorder = UIUtils.isGTKLookAndFeel() ? BorderFactory.createBevelBorder(BevelBorder.LOWERED) :
+        componentBorder = UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel() ? BorderFactory.createBevelBorder(BevelBorder.LOWERED) :
             filterStringCombo.getBorder();
         filterStringCombo.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 0));
         filterStringCombo.setMaximumRowCount(7);

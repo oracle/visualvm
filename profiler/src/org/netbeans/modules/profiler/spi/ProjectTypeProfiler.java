@@ -130,6 +130,10 @@ public interface ProjectTypeProfiler {
                                                                    String[][] projectPackagesDescr) {
             return null;
         }
+        
+        public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties) {
+            return false;
+        }
 
         public String getProfilerTargetName(Project project, FileObject buildScript, int type, FileObject profiledClassFile) {
             return null;
@@ -363,6 +367,18 @@ public interface ProjectTypeProfiler {
     boolean supportsSettingsOverride();
 
     boolean supportsUnintegrate(Project project);
+    
+    /**
+     * Returns true when the ProjectTypeProfiler itself is able to start the profiling session and doesn't rely on the underlying (Ant-based) framework.
+     * Currently used for Maven support.
+     * 
+     * @param project Project to be profiled
+     * @param profiledClassFile File to be profiled or null if profiling entire Project
+     * @param isTest True if profiledClassFile is test
+     * @param properties Properties containing settings for the upcoming profiling session
+     * @return true when the ProjectTypeProfiler is able to start the profiling session.
+     */
+    public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties);
 
     void unintegrateProfiler(Project project);
 }

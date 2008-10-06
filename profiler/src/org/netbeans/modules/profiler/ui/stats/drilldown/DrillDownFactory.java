@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter.Evaluator;
+import org.netbeans.modules.profiler.categories.Categorization;
 
 /**
  *
@@ -72,9 +73,22 @@ public class DrillDownFactory implements CCTResultsFilter.EvaluatorProvider {
     final private Set<WeakEvaluator> drillDownEvaluators = Collections.synchronizedSet(new HashSet<WeakEvaluator>());
     
     public DrillDown createDrillDown(Project project, ProfilerClient client) {
-        DrillDown dd = new DrillDown(project.getLookup(), client);
-        drillDownEvaluators.add(new WeakEvaluator(dd));
-        return dd;
+        /*
+         * #143850 - drilldown fails when profiling a global attach
+         */
+        if (project == null) {
+            return null;
+        }
+        
+        Categorization cat = project.getLookup().lookup(Categorization.class);
+
+        if (cat != null) {
+            DrillDown dd = new DrillDown(cat, client);
+            drillDownEvaluators.add(new WeakEvaluator(dd));
+            return dd;
+        } else {
+            return null;
+        }
     }
 
     /**

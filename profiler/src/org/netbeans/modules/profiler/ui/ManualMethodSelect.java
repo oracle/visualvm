@@ -50,6 +50,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -58,7 +59,7 @@ import javax.swing.event.DocumentListener;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-public final class ManualMethodSelect extends JPanel {
+public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private final class MethodSelectDocumentListener implements DocumentListener {
@@ -99,6 +100,10 @@ public final class ManualMethodSelect extends JPanel {
     private static final String METHOD_SIGNATURE_ACCESS_NAME = NbBundle.getMessage(ManualMethodSelect.class,
                                                                                    "ManualMethodSelect_MethodSignatureAccessName"); //NOI18N
                                                                                                                                     // -----
+    
+    private static final String HELP_CTX_KEY = "ManualMethodSelect.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    
     private static ManualMethodSelect mms;
     private static JButton okButton = new JButton(OK_BUTTON_TEXT);
 
@@ -220,6 +225,10 @@ public final class ManualMethodSelect extends JPanel {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
+    }
 
     public static ClientUtils.SourceCodeSelection selectMethod() {
         if (mms == null) {

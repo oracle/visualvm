@@ -57,6 +57,8 @@ made subject to such option by the copyright holder.
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.attach.impl</friend>
@@ -67,14 +69,14 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.utilities</friend>
-                <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.wtk.profiler</friend>
                 <package>org.netbeans.lib.profiler.common</package>
                 <package>org.netbeans.lib.profiler.common.event</package>
                 <package>org.netbeans.lib.profiler.common.filters</package>
                 <package>org.netbeans.lib.profiler.common.integration</package>
-                <package>org.netbeans.lib.profiler.common.integration.exceptions</package>
             </friend-packages>
         </data>
     </configuration>

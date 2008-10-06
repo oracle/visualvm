@@ -549,6 +549,8 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
         setStartLocation(customizer.getPPStartLocation());
         setEndLocation(customizer.getPPEndLocation());
         setSriptFileName(customizer.getScriptFile());
+        
+        Utils.checkLocation(this);
     }
 
     void hit(final HitEvent hitEvent, int index) {

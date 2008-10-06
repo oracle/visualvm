@@ -4,7 +4,8 @@
 *     Use is subject to license terms.
 -->
 <html>
-    <head>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <title>Setting Profiling Points</title>
         <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
     </head>
@@ -13,7 +14,7 @@
         <h2>Setting Profiling Points</h2>
         <p><small><a href="#seealso">See Also</a></small></p>
         <p>A profiling point is a marker in your source code
-        which can invoke specific profiler actions. 
+        which can invoke specific profiling actions. 
         You set a profiling point in your code by using the popup menu in the Source Editor or by using the
         toolbar in the Profiling Points window.</p>
         <p>You can set the following types of profiling points:</p>
@@ -25,9 +26,13 @@
             <li>Timed Take Snapshot</li>
             <li>Triggered Take Snapshot</li>
         </ul>
-        
+        <p>You can use a profiling point to reset profiling results, 
+        <a href="snap_taking.html#pp">take a snapshot</a> or record the timestamp or execution time of
+        a code fragment.</p>
+        <ul class="note"><li>You can also use a profiling to stop and start a load generator script 
+        (requires the load generator plugin).</li></ul>
         <p>Once you set a profiling point it becomes part of the project until you delete it.
-        In the Profiling Points window you can view, modify and delete the Profiling Points in your projects.</p>
+        You can view, modify and delete the Profiling Points in your projects in the <a href="csh/view_profilingpoints.html">Profiling Points window</a>.</p>
         
         <p><b>To set a profiling point:</b></p>
         <ol>
@@ -50,6 +55,18 @@
         The Profiling Points window displays all profiling points in open projects.
         You can select a profiling point and then use the toolbar to edit, remove, enable and disable
         the profiling point.</p>
+        
+        <p><b>To view active profiling point:</b></p>
+        <p>You can see the profiling points that are enabled for a specific profiling session in the Select Profiling Task dialog box.</p>
+        <ol>
+            <li>Right-click the project node and choose Profile to open the Select Profiling Task dialog box.</li>
+            <li>Select the profiling task (CPU or Memory).</li>
+            <li>Click Show active Profiling Points.</li>
+        </ol>
+        <p>When you click Show active Profiling Points a dialog box opens that lists all the profiling points that
+        are set in the project. Profiling points that are set but disabled are greyed out.
+        If you want to enable, disable or customize the settings of a profiling point, 
+        open the <a href="csh/view_profilingpoints.html">Profiling Points window</a> by choosing Window &gt; Profiling &gt; Profiling Points.</p>
         
         <dl>
             <dt><a name="seealso">See Also</a></dt>

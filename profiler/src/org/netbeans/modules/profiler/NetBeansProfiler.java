@@ -44,7 +44,6 @@ import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ContextAware;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -98,6 +97,7 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -136,6 +136,10 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
+import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
@@ -854,7 +858,8 @@ public final class NetBeansProfiler extends Profiler {
                     printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
                     flushDebugMsgs();
 
-                    GestureSubmitter.logAttach(getProfiledProject(), profilingSettings, attachSettings);
+                    GestureSubmitter.logAttach(getProfiledProject(), attachSettings);
+                    GestureSubmitter.logConfig(profilingSettings);
 
                     changeStateTo(PROFILING_STARTED);
 
@@ -1078,7 +1083,8 @@ public final class NetBeansProfiler extends Profiler {
                     printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
                     flushDebugMsgs();
 
-                    GestureSubmitter.logProfileApp(getProfiledProject(), profilingSettings, sessionSettings); // NOI18N
+                    GestureSubmitter.logProfileApp(getProfiledProject(), sessionSettings);
+                    GestureSubmitter.logConfig(profilingSettings);
 
                     changeStateTo(PROFILING_STARTED);
 
@@ -1304,7 +1310,7 @@ public final class NetBeansProfiler extends Profiler {
         printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
         flushDebugMsgs();
 
-        GestureSubmitter.logModify(getProfiledProject(), getProfiledSingleFile(), profilingSettings);
+        GestureSubmitter.logConfig(profilingSettings);
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
@@ -1393,8 +1399,7 @@ public final class NetBeansProfiler extends Profiler {
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    GoToSourceHelper.openSource(project, className, methodName, className);
-//                    SourceUtils.openSource(project, className, methodName, methodSig);
+                    GoToSourceHelper.openSource(project, className, methodName, methodSig);
                 }
             });
     }
@@ -1439,7 +1444,9 @@ public final class NetBeansProfiler extends Profiler {
         printDebugMsg("Instrumentation filter:\n" + sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
         flushDebugMsgs();
 
-        GestureSubmitter.logProfileClass(getProfiledSingleFile(), profilingSettings, sessionSettings); // NOI18N
+        Project owningProject = FileOwnerQuery.getOwner(getProfiledSingleFile());
+        GestureSubmitter.logProfileClass(owningProject, sessionSettings);
+        GestureSubmitter.logConfig(profilingSettings);
 
         changeStateTo(PROFILING_STARTED);
 
@@ -1584,12 +1591,20 @@ public final class NetBeansProfiler extends Profiler {
 
             lock = fo.lock();
 
-            final OutputStream fos = fo.getOutputStream(lock);
-            final BufferedOutputStream bos = new BufferedOutputStream(fos);
+            final BufferedOutputStream bos = new BufferedOutputStream(fo.getOutputStream(lock));
             final Properties globalProps = new Properties();
-            as.store(globalProps);
-            globalProps.storeToXML(bos, ""); //NOI18N
-            bos.close();
+            try {
+                as.store(globalProps);
+                globalProps.storeToXML(bos, ""); //NOI18N
+            } finally {
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException ex) {
+                        // ignore
+                    }
+                }
+            }
         } catch (Exception e) {
             ProfilerLogger.log(e);
             ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_ATTACH_SETTINGS_MESSAGE,
@@ -1842,6 +1857,7 @@ public final class NetBeansProfiler extends Profiler {
     private void cleanupAfterProfiling() {
         stopLoadGenerator();
         teardownDispatcher();
+        MarkingEngine.getDefault().deconfigure();
         ClassRepository.cleanup();
     }
 
@@ -2086,31 +2102,37 @@ public final class NetBeansProfiler extends Profiler {
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
             CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
+            filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
+
             if (filter != null) {
                 filter.reset(); // clean up the filter before reusing it
             }
 
             // init context aware instances
-            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
+            FlatProfileBuilder fpb = Lookup.getDefault().lookup(FlatProfileBuilder.class);
+            TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
+            fpb.setContext(client, tc, filter);
+            
+//            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
+//
+//            for (ContextAware instance : contextAwareInstances) {
+//                instance.setContext(client);
+//            }
 
-            for (ContextAware instance : contextAwareInstances) {
-                instance.setContext(client);
-            }
-
-            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
-                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
-
-            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-//            Marker marker = ptp.getProjectMarker(project);
-//            final MarkMapping[] marks = isMarksEnabled
-//                                        ? marker.getMarks()
-//                                        : new MarkMapping[0];
-            // TODO profilingSettings should go to the Project-Lookup
-            if (isMarksEnabled) {
-                MarkingEngine.configure(project.getLookup());
-            } else {
-                MarkingEngine.deconfigure();
-            }
+//            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
+//                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
+//
+////            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+//            Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
+//
+//            isMarksEnabled &= (ctg != null);
+//
+//            if (isMarksEnabled) {
+//                ctg.reset();
+//                MarkingEngine.getDefault().configure(ctg.getMappings());
+//            } else {
+//                MarkingEngine.getDefault().deconfigure();
+//            }
 
             Collection listeners = null;
 
@@ -2152,9 +2174,9 @@ public final class NetBeansProfiler extends Profiler {
             if (processesProfilingPoints) {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (!ProfilingPointsWindow.getInstance().isOpened()) {
-                                ProfilingPointsWindow.getInstance().open();
-                                ProfilingPointsWindow.getInstance().requestVisible();
+                            if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                ProfilingPointsWindow.getDefault().open();
+                                ProfilingPointsWindow.getDefault().requestVisible();
                             }
                         }
                     });
@@ -2247,8 +2269,9 @@ public final class NetBeansProfiler extends Profiler {
             // deconfigure the profiler client
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
             client.registerFlatProfileProvider(null);
-            // deconfigure the marking engine
-            MarkingEngine.deconfigure();
+
+//            // deconfigure the marking engine
+//            MarkingEngine.getDefault().deconfigure();
         }
     }
 
@@ -2270,7 +2293,7 @@ public final class NetBeansProfiler extends Profiler {
 
         return false;
     }
-    
+
     /**
      * Runs an target in Ant script with properties context.
      *

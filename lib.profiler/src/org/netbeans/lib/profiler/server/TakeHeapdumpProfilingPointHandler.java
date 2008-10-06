@@ -111,6 +111,6 @@ public class TakeHeapdumpProfilingPointHandler extends ProfilingPointServerHandl
     }
 
     private String getHeapDumpName(long time) {
-        return heapdumpFilePrefix + time + "." + HEAPDUMP_EXTENSION;
+        return heapdumpFilePrefix + (time & 0xFFFFFFFFFFFFFFL) + "." + HEAPDUMP_EXTENSION;
     }
 }

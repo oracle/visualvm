@@ -242,13 +242,11 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
     private JLabel noMethods = new JLabel(NO_METHOD_LABEL_TEXT);
     private Model model;
     private RuntimeCPUCCTNode lastAppNode;
-    private Project project;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of ForwardCategoryDistributionPanel */
     public ForwardCategoryDistributionPanel() {
-        this.project = NetBeansProfiler.getDefaultNB().getProfiledProject();
         initComponents();
         model = new Model();
         walker = new CompositeCPUCCTWalker();
@@ -256,6 +254,10 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    private Project getProject() {
+        return NetBeansProfiler.getDefaultNB().getProfiledProject();
+    }
 
     @Override
     public void setSelectedMethodId(int methodId) {
@@ -268,7 +270,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
         }
     }
 
-    public void refresh(RuntimeCPUCCTNode appNode) {
+    synchronized public void refresh(RuntimeCPUCCTNode appNode) {
         if (appNode != null) {
             if (walker != null) {
                 appNode.accept(walker);
@@ -344,7 +346,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
 
                 uiUpdater = new Runnable() {
                         public void run() {
-                            final Categorization categorization = project.getLookup().lookup(Categorization.class);
+                            final Categorization categorization = getProject().getLookup().lookup(Categorization.class);
                             
                             removeAll();
 

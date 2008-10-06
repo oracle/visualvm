@@ -41,11 +41,12 @@
 package org.netbeans.modules.profiler.ppoints.ui;
 
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 
 
 /**
@@ -66,23 +67,22 @@ public class ProfilingPointsWindow extends TopComponent {
     private static final String HELP_CTX_KEY = "ProfilingPointsWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static final long serialVersionUID = 1L;
-    private static final String PREFERRED_ID = "PROFILINGPOINTSWINDOW_TC"; // NOI18N // for winsys persistence
+    private static final String ID = "profiler_pp"; // NOI18N // for winsys persistence
     private static ProfilingPointsWindow defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ProfilingPointsWindowUI ui;
-    private boolean needsNewDock = false; // TODO: fix according to ProfilerControlPanel2
+    private ProfilingPointsWindowUI windowUI;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ProfilingPointsWindow() {
         setName(COMPONENT_NAME);
-        setIcon(org.openide.util.Utilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/ppoint.png", true)); // NOI18N
+        setIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/ppoint.png", true)); // NOI18N
         setLayout(new BorderLayout());
         getAccessibleContext().setAccessibleDescription(COMPONENT_ACCESS_DESCR);
-        ui = new ProfilingPointsWindowUI();
-        add(ui, BorderLayout.CENTER);
+        windowUI = new ProfilingPointsWindowUI();
+        add(windowUI, BorderLayout.CENTER);
         setFocusable(true);
     }
 
@@ -91,22 +91,26 @@ public class ProfilingPointsWindow extends TopComponent {
     public HelpCtx getHelpCtx() {
         return HELP_CTX;
     }
-
-    public static synchronized ProfilingPointsWindow getInstance() {
-        // TODO: fix according to ProfilerControlPanel2
+    
+    public static synchronized ProfilingPointsWindow getDefault() {
         if (defaultInstance == null) {
-            final TopComponent tc = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-
-            if ((tc != null) && tc instanceof ProfilingPointsWindow) {
-                defaultInstance = (ProfilingPointsWindow) tc;
-                defaultInstance.needsNewDock = false;
-            } else {
-                defaultInstance = new ProfilingPointsWindow();
-                defaultInstance.needsNewDock = true;
-            }
+            IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+                public void run() {
+                    defaultInstance = (ProfilingPointsWindow) WindowManager.getDefault().findTopComponent(ID);
+                    if (defaultInstance == null) defaultInstance = new ProfilingPointsWindow();
+                }
+            });
         }
 
         return defaultInstance;
+    }
+    
+    public static synchronized void closeIfOpened() {
+        IDEUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
+            }
+        });
     }
 
     public int getPersistenceType() {
@@ -114,25 +118,10 @@ public class ProfilingPointsWindow extends TopComponent {
     }
 
     public void notifyProfilingStateChanged() {
-        ui.notifyProfilingStateChanged();
-    }
-
-    public void open() {
-        // TODO: fix according to ProfilerControlPanel2
-        if (needsNewDock) {
-            final Mode myMode = WindowManager.getDefault().findMode("output"); //NOI18N
-
-            if (myMode != null) {
-                myMode.dockInto(this);
-            }
-
-            needsNewDock = false;
-        }
-
-        super.open();
+        windowUI.notifyProfilingStateChanged();
     }
 
     protected String preferredID() {
-        return PREFERRED_ID;
+        return ID;
     }
 }

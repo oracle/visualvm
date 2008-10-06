@@ -78,6 +78,15 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         //    setCPUSelectionHandler(selectionHandler);
         this.runner = runner;
 
+        addFilterListener(new FilterComponent.FilterListener() {
+
+            public void filterChanged() {
+                if (flatProfileContainer != null) {
+                    setDataToDisplay(flatProfileContainer);
+                }
+            }
+        });
+
         initComponents();
     }
 

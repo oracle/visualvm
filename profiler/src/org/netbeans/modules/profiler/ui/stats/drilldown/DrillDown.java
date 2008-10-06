@@ -90,18 +90,21 @@ public class DrillDown implements CCTResultsFilter.Evaluator {
     final private List<Category> subCategories = new ArrayList<Category>();
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-    public DrillDown(Lookup lookup, final ProfilerClient client, final boolean secondTimeStamp) {
-        categorization = lookup.lookup(Categorization.class);
-
+    public DrillDown(Categorization cat, final ProfilerClient client, final boolean secondTimeStamp) {
         this.secondTime = secondTimeStamp;
         this.client = client;
-        reset();
+        categorization = cat;
+        if (categorization == null) {
+            this.validFlag = false;
+        } else {
+            reset();
 
-        this.validFlag = !categorization.getRoot().getSubcategories().isEmpty();
+            this.validFlag = !categorization.getRoot().getSubcategories().isEmpty();
+        }
     }
 
-    public DrillDown(Lookup lookup, final ProfilerClient client) {
-        this(lookup, client, false);
+    public DrillDown(Categorization cat, final ProfilerClient client) {
+        this(cat, client, false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -223,10 +226,8 @@ public class DrillDown implements CCTResultsFilter.Evaluator {
     }
 
     public boolean evaluate(Mark categoryMark) {
-        if ((currentCategory == null || currentCategory.getAssignedMark() == Mark.DEFAULT)) {
-            if (currentCategory.getSubcategories().size() > 1) {
-                return true;
-            }
+        if ((currentCategory == null || (currentCategory.getAssignedMark() == Mark.DEFAULT && currentCategory.getSubcategories().size() > 1))) {
+            return true;
         }
 
         Boolean passed = currentCategory.accept(new Visitor<Visitable<Category>, Boolean, Mark>() {

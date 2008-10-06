@@ -4,7 +4,8 @@
 *     Use is subject to license terms.
 -->
 <html>
-    <head>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <title>Analyze Performance: Advanced Options</title>
         <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
     </head>
@@ -74,12 +75,14 @@
                 the number of instrumented methods and the number of methods actually called 
                 by the application when it is profiled are the same or very close.)
                 <ul>
-                    <li>Total (default) - This scheme is more appropriate if you want to profile application startup, or an 
-                    entire application such as a short-running command line utility.</li>
+                    <li>Total - This scheme is more appropriate if you want to profile application startup, or an 
+                    entire application such as a short-running command line utility
+                    This scheme is selected by default when profiling the entire application.</li>
                     <li>"Lazy" - This scheme is usually the most appropriate when you 
                     want to profile a subset of the application code (for example, just one 
                     or more servlets running on top of an application server). Results in  
-                    the smallest number of methods being instrumented.</li>
+                    the smallest number of methods being instrumented.
+                    This scheme is selected by default when profiling part of an application.</li>
                     <li>Eager - This scheme is not recommended for long-running applications.
                     Eager instrumentation is a compromise between the Total and Lazy schemes. </li>
                 </ul>

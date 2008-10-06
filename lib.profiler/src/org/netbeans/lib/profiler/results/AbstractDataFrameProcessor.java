@@ -41,11 +41,9 @@
 package org.netbeans.lib.profiler.results;
 
 import org.netbeans.lib.profiler.ProfilerClient;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,34 +68,44 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected volatile ProfilerClient client = null;
-    private final AtomicBoolean batchInProgress = new AtomicBoolean(false);
-    private final Set listeners = Collections.synchronizedSet(new HashSet());
+    private final Set listeners = new HashSet();
+
+    // @GuardedBy this
+    private boolean processorLives = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean hasListeners() {
-        return !listeners.isEmpty();
+        synchronized(listeners) {
+            return !listeners.isEmpty();
+        }
     }
 
     public void processDataFrame(byte[] buffer) {
-        try {
-            fireBatchStart();
-            doProcessDataFrame(buffer);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error while processing data frame", e);
-        } finally {
-            fireBatchStop();
+        synchronized(this) {
+            if (!processorLives) return;
+            
+            try {
+                fireBatchStart();
+                doProcessDataFrame(buffer);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error while processing data frame", e);
+            } finally {
+                fireBatchStop();
+            }
         }
     }
 
     public void removeAllListeners() {
-        Set tmpListeners = new HashSet(listeners);
+        Set tmpListeners ;
+        synchronized(listeners) {
+            tmpListeners = new HashSet(listeners);
+            listeners.clear();
+        }
 
         for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
             ((ProfilingResultListener) iter.next()).shutdown();
         }
-
-        listeners.clear();
     }
 
     public void reset() {
@@ -106,16 +114,23 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
 
     public void shutdown() {
         // finalize the batch
-        fireBatchStop();
-        fireShutdown();
+        synchronized(this) {
+            processorLives = false;
+            fireShutdown();
+        }
     }
 
     public void startup(ProfilerClient client) {
-        this.client = client;
+        synchronized(this) {
+            processorLives = true;
+            this.client = client;
+        }
     }
 
     protected void addListener(final ProfilingResultListener listener) {
-        listeners.add(listener);
+        synchronized(listeners) {
+            listeners.add(listener);
+        }
     }
 
     protected abstract void doProcessDataFrame(byte[] buffer);
@@ -137,22 +152,24 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     protected void foreachListener(ListenerFunctor functor) {
-        //    Set tmpListeners = null;
-        //    synchronized(listeners) {
-        //      tmpListeners = new HashSet(listeners);
-        //    }
-        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+        Set tmpListeners;
+        synchronized(listeners) {
+            tmpListeners = new HashSet(listeners);
+        }
+        for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
             functor.execute((ProfilingResultListener) iter.next());
         }
     }
 
     protected void removeListener(final ProfilingResultListener listener) {
-        listener.shutdown();
-        listeners.remove(listener);
+        synchronized(listeners) {
+            if (listeners.remove(listener)) {
+                listener.shutdown();
+            }
+        }
     }
 
     private void fireBatchStart() {
-        batchInProgress.set(true);
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
                     listener.onBatchStart();
@@ -161,13 +178,11 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     private void fireBatchStop() {
-        if (batchInProgress.compareAndSet(true, false)) {
-            foreachListener(new ListenerFunctor() {
-                    public void execute(ProfilingResultListener listener) {
-                        listener.onBatchStop();
-                    }
-                });
-        }
+        foreachListener(new ListenerFunctor() {
+                public void execute(ProfilingResultListener listener) {
+                    listener.onBatchStop();
+                }
+            });
     }
 
     private void fireShutdown() {

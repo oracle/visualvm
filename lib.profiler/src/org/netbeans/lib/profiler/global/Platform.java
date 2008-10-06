@@ -196,6 +196,8 @@ public class Platform implements CommonConstants {
             libSuffix = ".dll"; // Windows // NOI18N
         } else if (isMac()) {
             libSuffix = ".jnilib"; // Mac // NOI18N
+        } else if (isHpux()) {
+            libSuffix = ".sl"; // HP-UX // NOI18N
         } else {
             libSuffix = ".so"; // UNIXes // NOI18N
         }
@@ -203,9 +205,18 @@ public class Platform implements CommonConstants {
         String libSubPath = "/"; // NOI18N
 
         if (!fullPathToLibSpecified) {
-            String libSubDir = isWindows() ? "windows" : (isMac() ? // NOI18N
-            "mac" : (isLinux() ? // NOI18N
-            "linux" : "solaris")); // NOI18N
+            String libSubDir;
+            if (isWindows()) {
+               libSubDir = "windows"; // NOI18N
+            } else if (isMac()) {
+               libSubDir = "mac";
+            } else if (isLinux()) {
+               libSubDir = "linux"; // NOI18N
+            } else if (isHpux()) {
+               libSubDir = "hpux"; // NOI18N
+            } else {
+               libSubDir = "solaris"; // NOI18N
+            }
             String procArch = null;
 
             if (is64bitArch) {
@@ -213,6 +224,8 @@ public class Platform implements CommonConstants {
                     procArch = "amd64"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparcv9"; // NOI18N
+                } else if (isHpux()) {
+                    procArch = "pa_risc2.0w"; // NOI18N
                 }
             } else { // 32bit
 
@@ -220,6 +233,8 @@ public class Platform implements CommonConstants {
                     procArch = "i386"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparc"; // NOI18N
+                } else if (isHpux()) {
+                    procArch = "pa_risc2.0"; // NOI18N
                 }
             }
 
@@ -278,6 +293,8 @@ public class Platform implements CommonConstants {
                 jdkVersion = JDK_16;
             } else if (javaVersion.startsWith("1.7")) { // NOI18N
                 jdkVersion = JDK_17;
+            } else if (javaVersion.startsWith("phoneme_advanced")) { // NOI18N
+                jdkVersion = JDK_CVM;
             } else {
                 jdkVersion = JDK_UNSUPPORTED;
             }
@@ -304,6 +321,8 @@ public class Platform implements CommonConstants {
         } else if (javaVersionString.startsWith("1.7")) { // NOI18N
 
             return JDK_17_STRING;
+         } else if (javaVersionString.startsWith("phoneme_advanced")) {// NOI18N
+	    return JDK_CVM_STRING;
         } else {
             return JDK_UNSUPPORTED_STRING;
         }
@@ -344,7 +363,11 @@ public class Platform implements CommonConstants {
     public static boolean isMac() {
         return (getOperatingSystem() == OS_MAC);
     }
-
+    
+    public static boolean isHpux() {
+        return (getOperatingSystem() == OS_HP);
+    }
+    
     /**
      * Get the operating system on which we are is running.
      * Returns one of the <code>OS_*</code> constants (such as {@link #OS_WINNT})
@@ -536,8 +559,10 @@ public class Platform implements CommonConstants {
      */
     public static boolean supportsThreadSleepingStateMonitoring(String jdkVersionString) {
         return ((jdkVersionString != null)
-               && (jdkVersionString.equals(JDK_15_STRING) || jdkVersionString.equals(JDK_16_STRING)
-                  || jdkVersionString.equals(JDK_17_STRING)));
+               && (jdkVersionString.equals(JDK_15_STRING) ||
+		   jdkVersionString.equals(JDK_16_STRING) ||
+		   jdkVersionString.equals(JDK_17_STRING) ||
+		   jdkVersionString.equals(JDK_CVM_STRING)));
     }
 
     /**
@@ -551,6 +576,9 @@ public class Platform implements CommonConstants {
      * Returns true if the given JVM version number correctly reports "sleeping" state
      */
     private static boolean supportsThreadSleepingStateMonitoring(int jdkVersionNumber) {
-        return ((jdkVersionNumber == JDK_15) || (jdkVersionNumber == JDK_16) || (jdkVersionNumber == JDK_17));
+        return ((jdkVersionNumber == JDK_15) ||
+		(jdkVersionNumber == JDK_16) ||
+		(jdkVersionNumber == JDK_17) ||
+		(jdkVersionNumber == JDK_CVM));
     }
 }

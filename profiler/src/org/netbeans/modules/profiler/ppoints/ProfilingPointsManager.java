@@ -541,7 +541,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
             IDEUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
-                        ProfilingPointsWindow.getInstance().notifyProfilingStateChanged(); // this needs to be called on EDT
+                        ProfilingPointsWindow.getDefault().notifyProfilingStateChanged(); // this needs to be called on EDT
                     }
                 });
         }

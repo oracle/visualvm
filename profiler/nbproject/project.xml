@@ -359,7 +359,7 @@ made subject to such option by the copyright holder.
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.9</specification-version>
+                        <specification-version>7.15</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -372,8 +372,10 @@ made subject to such option by the copyright holder.
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>org.netbeans.modules.autoproject.profiler</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
@@ -383,6 +385,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
+                <friend>org.netbeans.modules.wtk.profiler</friend>
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.categories</package>

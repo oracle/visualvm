@@ -45,9 +45,11 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -56,7 +58,6 @@ import java.awt.event.HierarchyListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -129,9 +130,9 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
     private static NewCustomConfiguration defaultInstance;
 
     // --- UI components declaration ---------------------------------------------
-    private static final Icon ICON_MONITOR = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png")); // NOI18N
-    private static final Icon ICON_CPU = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png")); // NOI18N
-    private static final Icon ICON_MEMORY = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N
+    private static final Icon ICON_MONITOR = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png")); // NOI18N
+    private static final Icon ICON_CPU = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png")); // NOI18N
+    private static final Icon ICON_MEMORY = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -216,6 +217,9 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         } else if (Utils.isMemorySettings(type)) {
             typeString = " (" + MEMORY_STRING + ")"; // NOI18N
         }
+        
+        // Remove mnemonics wildcard
+        typeString = typeString.replace("&", "");
 
         //    final DialogDescriptor dd = new DialogDescriptor(ncc, "New Custom Configuration" + typeString);
         final DialogDescriptor dd = new DialogDescriptor(ncc, NEW_CONFIG_DIALOG_CAPTION + typeString, true,
@@ -375,6 +379,20 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
 
         return nameBasis + indexStr;
     }
+    
+    private void showTypeSettings() {
+        typeLabel.setVisible(true);
+        monitorTypeRadio.setVisible(true);
+        cpuTypeRadio.setVisible(true);
+        memoryTypeRadio.setVisible(true);
+    }
+    
+    private void hideTypeSettings() {
+        typeLabel.setVisible(false);
+        monitorTypeRadio.setVisible(false);
+        cpuTypeRadio.setVisible(false);
+        memoryTypeRadio.setVisible(false);
+    }
 
     // --- UI definition ---------------------------------------------------------
     private void initComponents() {
@@ -450,6 +468,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         // nameTextfield
         nameTextfield = new JTextField();
         nameTextfield.getDocument().addDocumentListener(this);
+        nameTextfield.setPreferredSize(new Dimension(250, nameTextfield.getPreferredSize().height));
         nameLabel.setLabelFor(nameTextfield);
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -558,6 +577,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         cpuTypeRadio.setSelected(cpuTypeRadio.isEnabled());
         memoryTypeRadio.setEnabled(Utils.isMemorySettings(originalSettings));
         memoryTypeRadio.setSelected(memoryTypeRadio.isEnabled());
+        hideTypeSettings();
 
         settingsLabel.setVisible(true);
         defaultSettingsRadio.setVisible(true);
@@ -595,6 +615,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         cpuTypeRadio.setSelected(cpuTypeRadio.isEnabled());
         memoryTypeRadio.setEnabled(Utils.isMemorySettings(originalSettings));
         memoryTypeRadio.setSelected(memoryTypeRadio.isEnabled());
+        hideTypeSettings();
 
         settingsLabel.setVisible(false);
         defaultSettingsRadio.setVisible(false);
@@ -618,6 +639,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         cpuTypeRadio.setSelected(cpuTypeRadio.isEnabled());
         memoryTypeRadio.setEnabled(Utils.isMemorySettings(type));
         memoryTypeRadio.setSelected(memoryTypeRadio.isEnabled());
+        hideTypeSettings();
 
         settingsLabel.setVisible(true);
         defaultSettingsRadio.setVisible(true);
@@ -643,6 +665,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         cpuTypeRadio.setEnabled(true);
         cpuTypeRadio.setSelected(true);
         memoryTypeRadio.setEnabled(true);
+        showTypeSettings();
 
         settingsLabel.setVisible(true);
         defaultSettingsRadio.setVisible(true);

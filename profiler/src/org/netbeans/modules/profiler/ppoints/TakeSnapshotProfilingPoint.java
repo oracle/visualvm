@@ -42,15 +42,9 @@ package org.netbeans.modules.profiler.ppoints;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LoadedSnapshot;
@@ -58,7 +52,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ppoints.ui.TakeSnapshotCustomizer;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
@@ -70,7 +63,6 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -89,6 +81,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.openide.cookies.EditorCookie;
+import org.openide.loaders.DataObject;
 
 
 /**
@@ -620,6 +614,8 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
         setSnapshotTarget(customizer.getPPTarget() ? TARGET_PROJECT_KEY : TARGET_CUSTOM_KEY);
         setSnapshotFile(customizer.getPPFile());
         setResetResults(customizer.getPPResetResults());
+        
+        Utils.checkLocation(this);
     }
 
     void hit(RuntimeProfilingPoint.HitEvent hitEvent, int index) {

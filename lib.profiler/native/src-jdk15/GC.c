@@ -70,6 +70,8 @@
 #include "common_functions.h"
 
 #define OBSERVED_PERIODS   10  /* must match OBSERVED_PERIODS in GC.java */
+#define OBJECT_INT_SIZE 2
+#define OBJECT_SIZE (sizeof(int)*OBJECT_INT_SIZE)
 
 static int gc_epoch_counter, start_index, end_index;
 static jlong gc_start_timestamp, gc_finish_timestamp;
@@ -174,7 +176,7 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_GC_objec
     char* obj1 = jobj1 == NULL ? (char*) NULL : *((char**)(jobj1));
     char* obj2 = jobj2 == NULL ? (char*) NULL : *((char**)(jobj2));
     int diff = obj2 - obj1;
-    return (diff == 8) || (diff == -8);
+    return (diff == OBJECT_SIZE) || (diff == -OBJECT_SIZE);
 }
 
 

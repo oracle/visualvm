@@ -43,16 +43,20 @@ package org.netbeans.modules.profiler.ui.panels;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
+import org.openide.util.HelpCtx;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ProjectSelectRootMethodsPanel extends AbstractSelectRootMethodsPanel {
+public class ProjectSelectRootMethodsPanel extends AbstractSelectRootMethodsPanel implements HelpCtx.Provider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static ProjectSelectRootMethodsPanel instance = null;
+    
+    private static final String HELP_CTX_KEY = "ProjectSelectRootMethodsPanel.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -60,6 +64,10 @@ public class ProjectSelectRootMethodsPanel extends AbstractSelectRootMethodsPane
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
+    }
 
     public static synchronized ProjectSelectRootMethodsPanel getDefault() {
         if (instance == null) {

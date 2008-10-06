@@ -42,10 +42,13 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 
 import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 
 
 /**
@@ -63,6 +66,7 @@ public class HeapWalkerUI extends TopComponent {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapWalker heapWalker;
+    private Component lastFocusOwner;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -75,6 +79,18 @@ public class HeapWalkerUI extends TopComponent {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public void componentActivated() {
+        if (lastFocusOwner != null) {
+            lastFocusOwner.requestFocus();
+        } else {
+            heapWalker.getMainHeapWalker().getPanel().requestFocus();
+        }
+    }
+
+    public void componentDeactivated() {
+        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    }
 
     // --- TopComponent support --------------------------------------------------
     public int getPersistenceType() {
@@ -97,7 +113,7 @@ public class HeapWalkerUI extends TopComponent {
 
     private void initDefaults() {
         setName(heapWalker.getName());
-        setIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N);
+        setIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N);
         getAccessibleContext().setAccessibleDescription(COMPONENT_DESCR);
     }
 }

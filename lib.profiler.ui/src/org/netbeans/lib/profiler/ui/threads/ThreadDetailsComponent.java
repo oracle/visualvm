@@ -1115,26 +1115,28 @@ public class ThreadDetailsComponent extends JPanel {
         threadDescriptionArea.setText(viewManager.getThreadDescription(threadIndex));
 
         if ((threadData == null) || (threadData.size() == 0)) {
-            resetData();
+            if (threadIndex != lastThreadIndex) {
+                resetData();
 
-            runningValueLabel.setText("-"); // NOI18N
-            runningValueRelLabel.setText("(-%)"); // NOI18N
+                runningValueLabel.setText("-"); // NOI18N
+                runningValueRelLabel.setText("(-%)"); // NOI18N
 
-            if (supportsSleepingState) {
-                sleepingValueLabel.setText("-"); // NOI18N
-                sleepingValueRelLabel.setText("(-%)"); // NOI18N
-            }
+                if (supportsSleepingState) {
+                    sleepingValueLabel.setText("-"); // NOI18N
+                    sleepingValueRelLabel.setText("(-%)"); // NOI18N
+                }
 
-            waitValueLabel.setText("-"); // NOI18N
-            waitValueRelLabel.setText("(-%)"); // NOI18N
-            monitorValueLabel.setText("-"); // NOI18N
-            monitorValueRelLabel.setText("(-%)"); // NOI18N
-            totalValueLabel.setText(NO_DATA_COLLECTED_STRING);
+                waitValueLabel.setText("-"); // NOI18N
+                waitValueRelLabel.setText("(-%)"); // NOI18N
+                monitorValueLabel.setText("-"); // NOI18N
+                monitorValueRelLabel.setText("(-%)"); // NOI18N
+                totalValueLabel.setText(NO_DATA_COLLECTED_STRING);
 
-            if (supportsSleepingState) {
-                pieChartModel.setItemValues(new double[] { 0d, 0d, 0d, 0d });
-            } else {
-                pieChartModel.setItemValues(new double[] { 0d, 0d, 0d });
+                if (supportsSleepingState) {
+                    pieChartModel.setItemValues(new double[] { 0d, 0d, 0d, 0d });
+                } else {
+                    pieChartModel.setItemValues(new double[] { 0d, 0d, 0d });
+                }
             }
         } else {
             // When the threadIndex was changed (component displays data of different thread) details textarea is cleared

@@ -125,8 +125,9 @@ public class DiffLivenessResultsPanel extends SnapshotLivenessResultsPanel {
             case 4:
                 return ((nTrackedAllocObjects[index] > 0) ? "+" : "") + intFormat.format(nTrackedAllocObjects[index]); // NOI18N
             case 5:
+                if (avgObjectAge[index] == 0) return "0.0"; // NOI18N
                 // NOTE: StringUtils.floatPerCentToString() doesn't handle correctly negative values!
-                return ((avgObjectAge[index] > 0) ? "+" : "-") + StringUtils.floatPerCentToString(Math.abs(avgObjectAge[index])); // NOI18N
+                else return ((avgObjectAge[index] > 0) ? "+" : "-") + StringUtils.floatPerCentToString(Math.abs(avgObjectAge[index])); // NOI18N
             case 6:
                 return ((maxSurvGen[index] > 0) ? "+" : "") + intFormat.format(maxSurvGen[index]); // NOI18N
             case 7:

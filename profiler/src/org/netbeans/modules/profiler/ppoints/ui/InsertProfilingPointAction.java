@@ -120,9 +120,9 @@ public class InsertProfilingPointAction extends NodeAction {
                 if (profilingPoint instanceof GlobalProfilingPoint) {
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                if (!ProfilingPointsWindow.getInstance().isOpened()) {
-                                    ProfilingPointsWindow.getInstance().open();
-                                    ProfilingPointsWindow.getInstance().requestVisible();
+                                if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                    ProfilingPointsWindow.getDefault().open();
+                                    ProfilingPointsWindow.getDefault().requestVisible();
                                 }
                             }
                         });

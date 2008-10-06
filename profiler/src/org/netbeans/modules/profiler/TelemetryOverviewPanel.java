@@ -42,12 +42,15 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
 
 
 /** A panel with mini graphs intended to be displayed in the output area.
@@ -68,8 +71,8 @@ public final class TelemetryOverviewPanel extends TopComponent {
     private static final String HELP_CTX_KEY = "TelemetryOverviewPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryOverviewPanel defaultInstance;
-    private static final Image windowIcon = Utilities.loadImage("org/netbeans/modules/profiler/resources/telemetryOverviewWindow.png"); // NOI18N
-    private static final String PREFERRED_ID = "PROFILERTELEMETRYOVERVIEW_TC"; // NOI18N // for winsys persistence
+    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryOverviewWindow.png"); // NOI18N
+    private static final String ID = "profiler_to"; // NOI18N // for winsys persistence
     private static final Dimension PREFFERED_SIZE = new Dimension(580, 430);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -83,18 +86,17 @@ public final class TelemetryOverviewPanel extends TopComponent {
      * Initializes the Form
      */
     public TelemetryOverviewPanel() {
-        if (defaultInstance == null) {
-            defaultInstance = this;
-        }
-
         setName(NbBundle.getMessage(TelemetryOverviewPanel.class, "LAB_TelemetryOverviewPanelName")); // NOI18N
         setIcon(windowIcon);
         getAccessibleContext().setAccessibleDescription(TELEMETRY_OVERVIEW_ACCESS_DESCR);
 
         graphsPanel = new MonitoringGraphsPanel();
-        graphsPanel.setPreferredSize(new Dimension(600, 200));
+        JScrollPane graphsPanelScroll = new JScrollPane(graphsPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        graphsPanelScroll.setBorder(BorderFactory.createEmptyBorder());
+        graphsPanelScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         setLayout(new BorderLayout());
-        add(graphsPanel, BorderLayout.CENTER);
+        add(graphsPanelScroll, BorderLayout.CENTER);
 
         setFocusable(true);
         setRequestFocusEnabled(true);
@@ -104,39 +106,24 @@ public final class TelemetryOverviewPanel extends TopComponent {
 
     public static synchronized TelemetryOverviewPanel getDefault() {
         if (defaultInstance == null) {
-            final TopComponent tc = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-
-            if ((tc != null) && tc instanceof TelemetryOverviewPanel) {
-                defaultInstance = (TelemetryOverviewPanel) tc;
-            } else {
-                defaultInstance = new TelemetryOverviewPanel();
-            }
+            IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+                public void run() {
+                    defaultInstance = (TelemetryOverviewPanel) WindowManager.getDefault().findTopComponent(ID);
+                    if (defaultInstance == null) defaultInstance = new TelemetryOverviewPanel();
+                }
+            });
         }
 
         return defaultInstance;
     }
 
     /** Possibly closes the window avoiding unnecessary initialization if not created and displayed yet. */
-    public static void closeIfOpened() {
+    public static synchronized void closeIfOpened() {
         IDEUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    TelemetryOverviewPanel instance = defaultInstance;
-
-                    if (instance == null) {
-                        final TopComponent tc = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-
-                        if ((tc != null) && tc instanceof TelemetryOverviewPanel) {
-                            instance = (TelemetryOverviewPanel) tc;
-                        }
-                    }
-
-                    if (instance != null) {
-                        if (instance.isOpened()) {
-                            instance.close();
-                        }
-                    }
-                }
-            });
+            public void run() {
+                if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
+            }
+        });
     }
 
     public HelpCtx getHelpCtx() {
@@ -187,6 +174,6 @@ public final class TelemetryOverviewPanel extends TopComponent {
      * Value should be preferably unique, but need not be.
      */
     protected String preferredID() {
-        return PREFERRED_ID;
+        return ID;
     }
 }

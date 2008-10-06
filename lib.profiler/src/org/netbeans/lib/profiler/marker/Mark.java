@@ -49,10 +49,9 @@ public class Mark implements Cloneable {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     
     public static final short DEFAULT_ID = 0;
-    public static final Mark DEFAULT = new Mark(DEFAULT_ID); 
     public static final char ID_NONE = (char) 0;
-
     private static short counter = 1;
+    public static final Mark DEFAULT = new Mark(DEFAULT_ID); 
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     public final short id;
@@ -78,8 +77,8 @@ public class Mark implements Cloneable {
         return id;
     }
 
-    public Object clone() {
-        return new Mark(id);
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public boolean equals(Object other) {

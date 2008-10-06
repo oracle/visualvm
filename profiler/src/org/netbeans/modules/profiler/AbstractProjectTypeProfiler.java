@@ -67,7 +67,7 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     protected static final Logger LOGGER = Logger.getLogger("org.netbeans.modules.profiler.spi.ProjectTypeProfiler");
-    
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public abstract String getProfilerTargetName(Project project, FileObject buildScript, int type, FileObject profiledClassFile);
@@ -181,6 +181,10 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     }
 
     public void unintegrateProfiler(Project project) {
+    }
+    
+    public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties) {
+        return false;
     }
     
 }

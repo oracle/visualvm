@@ -12,6 +12,6 @@ PROG_NAME=`type $0 | awk '{print $3}'`
 INSTALL_DIR=`dirname $PROG_NAME`
 cd $INSTALL_DIR
 INSTALL_DIR=`pwd`
-cd $ORIGDIR
+cd $ORIG_DIR
 
 $JAVA_HOME/bin/java -agentpath:$INSTALL_DIR/../lib/deployed/jdk15/linux/libprofilerinterface.so=$INSTALL_DIR/../lib/,5140 $@

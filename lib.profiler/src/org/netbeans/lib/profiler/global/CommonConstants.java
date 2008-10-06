@@ -82,12 +82,14 @@ public interface CommonConstants {
     public static final int JDK_15 = 2;
     public static final int JDK_16 = 3; // we treat JDK 1.5 the same as Tiger for now
     public static final int JDK_17 = 4; // we treat JDK 17 the same as JDK 1.5 for now
+    public static final int JDK_CVM = 5;
     public static final int JDK_UNSUPPORTED = -1;
 
     /** Denoting strings for JDK versions that we currently distinguish between */
     public static final String JDK_15_STRING = "jdk15"; // NOI18N
     public static final String JDK_16_STRING = "jdk16"; // NOI18N
     public static final String JDK_17_STRING = "jdk17"; // NOI18N
+    public static final String JDK_CVM_STRING = "cvm";  // NOI18N
     public static final String JDK_UNSUPPORTED_STRING = "UNSUPPORTED_JDK"; // NOI18N
 
     /** Constants for determining 32/64bit architecture */

@@ -110,12 +110,7 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public List getReferences() {
-        HprofByteBuffer buffer = dumpClass.getHprofBuffer();
-        byte[] idArr = new byte[buffer.getIDSize()];
-
-        buffer.get(fileOffset + 1, idArr);
-
-        return dumpClass.getHprof().findReferencesFor(getInstanceId(), idArr);
+        return dumpClass.getHprof().findReferencesFor(getInstanceId());
     }
 
     public int getRetainedSize() {

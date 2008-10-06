@@ -39,6 +39,7 @@
 
 package org.netbeans.modules.profiler.categories;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -84,6 +85,10 @@ public class CategoryContainer extends Category implements Iterable<Category> {
 
     public boolean add(Category e) {
         return contained.add(e);
+    }
+
+    public boolean addAll(Collection<Category> categories) {
+        return contained.addAll(categories);
     }
 
     @Override

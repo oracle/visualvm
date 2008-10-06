@@ -224,19 +224,6 @@ class ClassDumpSegment extends TagBounds {
         return classes;
     }
 
-    List findStaticReferencesFor(long instanceId) {
-        List refs = new ArrayList();
-        Iterator classIt = classes.iterator();
-
-        while (classIt.hasNext()) {
-            ClassDump cls = (ClassDump) classIt.next();
-
-            cls.findStaticReferencesFor(instanceId, refs);
-        }
-
-        return refs;
-    }
-
     private void extractSpecialClasses() {
         primitiveArrayMap = new HashMap();
 

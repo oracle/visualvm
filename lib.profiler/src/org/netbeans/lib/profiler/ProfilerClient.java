@@ -357,7 +357,6 @@ public class ProfilerClient implements CommonConstants {
     private Object instrumentationLock = new Object(); // To make sure all instrumentation-related operations
                                                        // happen serially
     private Object responseLock = new Object();
-    private Object wdLock = new Object();
     private ObjectInputStream socketIn;
     private ObjectOutputStream socketOut;
     private ProfilerEngineSettings settings;
@@ -387,7 +386,6 @@ public class ProfilerClient implements CommonConstants {
     private volatile boolean handlingEventBufferDump;
     private volatile boolean instrMethodsLimitReported;
     private boolean serverClassesInitialized;
-    private boolean shouldDisplayDialog = true;
     private volatile boolean targetVMAlive;
     private volatile boolean terminateOrDetachCommandIssued;
     private int currentAgentId = -1;
@@ -403,13 +401,9 @@ public class ProfilerClient implements CommonConstants {
         appStatusHandler = ash;
         serverCommandHandler = sch;
         instrumentor = new Instrumentor(status, settings);
-
-        if (separateCmdExecThread == null) {
-            separateCmdExecThread = new SeparateCmdExecutionThread();
-            separateCmdExecThread.setDaemon(true);
-            separateCmdExecThread.start();
-        }
-
+        separateCmdExecThread = new SeparateCmdExecutionThread();
+        separateCmdExecThread.setDaemon(true);
+        separateCmdExecThread.start();
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
     }

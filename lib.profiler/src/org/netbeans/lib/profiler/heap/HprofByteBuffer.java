@@ -109,7 +109,7 @@ abstract class HprofByteBuffer {
 
     long getID(long offset) {
         if (idSize == 4) {
-            return getInt(offset);
+            return ((long)getInt(offset)) & 0xFFFFFFFFL;
         } else if (idSize == 8) {
             return getLong(offset);
         }

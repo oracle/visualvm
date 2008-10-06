@@ -53,12 +53,11 @@ import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.ReferencesBrowserController;
-import org.netbeans.modules.profiler.heapwalk.model.ClassNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerFieldNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.InstanceNode;
-import org.netbeans.modules.profiler.heapwalk.model.ObjectFieldNode;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -94,6 +93,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
 
 
 /**
@@ -243,7 +243,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
                                                                          "ReferencesBrowserControllerUI_ValueColumnDescr"); // NOI18N
                                                                                                                             // -----
-    private static ImageIcon ICON_FIELDS = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png")); // NOI18N
+    private static ImageIcon ICON_FIELDS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png")); // NOI18N
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
@@ -256,7 +256,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
     private FieldsListTreeTableModel realFieldsListTableModel = new FieldsListTreeTableModel();
     private ExtendedTreeTableModel fieldsListTableModel = new ExtendedTreeTableModel(realFieldsListTableModel);
-    private JMenuItem showClassItem;
+//    private JMenuItem showClassItem;
+    private JMenuItem showGcRootItem;
     private JMenuItem showInstanceItem;
     private JMenuItem showLoopOriginItem;
     private JMenuItem showSourceItem;
@@ -388,7 +389,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
@@ -443,30 +444,30 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
             });
         showInstanceItem.setFont(popup.getFont().deriveFont(Font.BOLD));
 
-        showClassItem = new JMenuItem(SHOW_IN_CLASSES_ITEM_TEXT);
-        showClassItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int row = fieldsListTable.getSelectedRow();
+//        showClassItem = new JMenuItem(SHOW_IN_CLASSES_ITEM_TEXT);
+//        showClassItem.addActionListener(new ActionListener() {
+//                public void actionPerformed(ActionEvent e) {
+//                    int row = fieldsListTable.getSelectedRow();
+//
+//                    if (row != -1) {
+//                        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+//
+//                        if (node instanceof HeapWalkerInstanceNode) {
+//                            HeapWalkerInstanceNode instanceNode = (HeapWalkerInstanceNode) node;
+//
+//                            if (instanceNode instanceof ObjectFieldNode && ((ObjectFieldNode) instanceNode).isStatic()) {
+//                                referencesBrowserController.navigateToClass(((ObjectFieldNode) instanceNode).getFieldValue()
+//                                                                             .getField().getDeclaringClass());
+//                            } else if (instanceNode.hasInstance()) {
+//                                referencesBrowserController.navigateToClass(instanceNode.getInstance().getJavaClass());
+//                            }
+//                        }
+//                    }
+//                }
+//            });
 
-                    if (row != -1) {
-                        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-
-                        if (node instanceof HeapWalkerInstanceNode) {
-                            HeapWalkerInstanceNode instanceNode = (HeapWalkerInstanceNode) node;
-
-                            if (instanceNode instanceof ObjectFieldNode && ((ObjectFieldNode) instanceNode).isStatic()) {
-                                referencesBrowserController.navigateToClass(((ObjectFieldNode) instanceNode).getFieldValue()
-                                                                             .getField().getDeclaringClass());
-                            } else if (instanceNode.hasInstance()) {
-                                referencesBrowserController.navigateToClass(instanceNode.getInstance().getJavaClass());
-                            }
-                        }
-                    }
-                }
-            });
-
-        showClassItem = new JMenuItem(SHOW_GCROOT_ITEM_TEXT);
-        showClassItem.addActionListener(new ActionListener() {
+        showGcRootItem = new JMenuItem(SHOW_GCROOT_ITEM_TEXT);
+        showGcRootItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = fieldsListTable.getSelectedRow();
 
@@ -518,7 +519,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
             });
 
         popup.add(showInstanceItem);
-        popup.add(showClassItem);
+//        popup.add(showClassItem);
+        popup.add(showGcRootItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
         popup.add(showSourceItem);
@@ -629,8 +631,6 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         cornerPopup = new JPopupMenu();
 
-        JButton cornerButton = createHeaderPopupCornerButton(cornerPopup);
-
         JTreeTablePanel tablePanel = new JTreeTablePanel(fieldsListTable);
         tablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
 
@@ -717,7 +717,9 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                                         && !(node instanceof HeapWalkerFieldNode && ((HeapWalkerFieldNode) node).isStatic()));
         }
 
-        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
+//        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
+        showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && node.currentlyHasChildren() &&
+                (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0)))); // #124306
         showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
 
         if ((x == -1) || (y == -1)) {

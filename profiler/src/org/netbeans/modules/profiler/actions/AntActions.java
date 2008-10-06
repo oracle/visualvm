@@ -62,6 +62,7 @@ import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -96,8 +97,9 @@ public final class AntActions {
     private static final String INCORRECT_JAVA_SPECVERSION_DIALOG_MSG = NbBundle.getMessage(AntActions.class,
                                                                                             "AntActions_IncorrectJavaSpecVersionDialogMsg"); // NOI18N
     private static final String UNSUPPORTED_PROJECT_TYPE_MSG = NbBundle.getMessage(AntActions.class,
-                                                                                   "AntActions_UnsupportedProjectTypeMsg"); // NOI18N
-                                                                                                                            // -----
+                                                                                   "AntActions_UnsupportedProjectTypeMsg"); // NOI18N                                                                                                                            
+    private static final String INVALID_JAVAPLATFORM_MSG = NbBundle.getMessage(AntActions.class,
+                                                                                   "AntActions_InvalidJavaplatformMsg"); // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -147,7 +149,7 @@ public final class AntActions {
                    "org/netbeans/modules/profiler/actions/resources/profile.png" // NOI18N
         );
         a.putValue(Action.SMALL_ICON,
-                   new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
+                   new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
         );
 
         return a;
@@ -231,17 +233,17 @@ public final class AntActions {
                         return false;
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
-                        if (ptp == null) {
+                        if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
-
-                        return (ptp.isFileObjectSupported(project, fos[0]));
                     } else {
-                        return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
+                        System.out.println("ProfilSingle::Lightweight -> " + ptp.isProfilingSupported(project) + ", " + ProjectUtilities.hasAction(project, "profile-single"));
+                        return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
+                    
+                    return true;
                 }
 
                 public void perform(final Project project, final Lookup context) {
@@ -281,14 +283,13 @@ public final class AntActions {
                         return false;
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
                         if (!ptp.isFileObjectSupported(project, fos[0])) {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
                     } else {
-                        return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
+                        return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
 
                     return true;
@@ -342,12 +343,11 @@ public final class AntActions {
                         return false; // not a test and test for it does not exist
                     }
 
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
                     if (!lightweightOnly) {
-                        final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-
                         return (ptp.isFileObjectSupported(project, fo));
                     } else {
-                        return true;
+                        return ptp.isProfilingSupported(project);
                     }
                 }
 
@@ -579,19 +579,26 @@ public final class AntActions {
 
                             if (profilingSettings.getOverrideGlobalSettings()) {
                                 String javaPlatformName = profilingSettings.getJavaPlatformName();
-
+                                JavaPlatform jp;
+                                
                                 if (javaPlatformName != null) {
                                     usedJavaExecutable = Profiler.getDefault().getPlatformJavaFile(javaPlatformName);
 
-                                    // added to support nbstartprofiledserver
-                                    JavaPlatform jp = IDEUtils.getJavaPlatformByName(javaPlatformName);
+                                    jp = IDEUtils.getJavaPlatformByName(javaPlatformName);
 
-                                    if (jp != null) {
-                                        props.setProperty("profiler.info.javaPlatform",
-                                                          jp.getProperties().get("platform.ant.name")); // NOI18N
+                                    if (jp == null) {
+                                        // selected platform does not exist, use 
+                                        String text = MessageFormat.format(INVALID_JAVAPLATFORM_MSG,new Object[] {javaPlatformName});
+                                        NetBeansProfiler.getDefaultNB().displayWarningAndWait(text);
+                                        jp = platform;
                                     }
+                                } else { 
+                                    // javaPlatformName == null -> do not override java platform, use platform from global settings
+                                    jp = platform;
                                 }
-
+                                // added to support nbstartprofiledserver
+                                props.setProperty("profiler.info.javaPlatform",
+                                                  jp.getProperties().get("platform.ant.name")); // NOI18N
                                 usedJvmArgs = profilingSettings.getJVMArgs();
                             } else {
                                 // added to support nbstartprofiledserver
@@ -631,44 +638,50 @@ public final class AntActions {
                                 );
                                 activateOOMProtection(gps, props, project);
                             } else {
-                                throw new IllegalArgumentException("Unsoported JDK " + javaVersion); // NOI18N
+                                throw new IllegalArgumentException("Unsupported JDK " + javaVersion); // NOI18N
+                            }
+                            
+                            if (!ptp.startProfilingSession(project, profiledClassFile, isTest, props)) { // Used for Maven - ProjectTypeProfiler itself controls starting profiling session
+                                
+                                // 8. determine the build script and target to run
+                                final FileObject buildScriptFO = ptp.getProjectBuildScript(project);
+
+                                if (buildScriptFO == null) {
+                                    Profiler.getDefault()
+                                            .displayError(MessageFormat.format(FAILED_DETERMINE_PROJECT_BUILDSCRIPT_MSG,
+                                                                               new Object[] {
+                                                                                   ProjectUtils.getInformation(project).getName()
+                                                                               }));
+
+                                    return;
+                                }
+
+                                // determine which type fo target shoudl be called, and request its name
+                                int type;
+
+                                if (isTest) {
+                                    type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE_TEST
+                                                                       : ProjectTypeProfiler.TARGET_PROFILE_TEST_SINGLE;
+                                } else {
+                                    type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE
+                                                                       : ProjectTypeProfiler.TARGET_PROFILE_SINGLE;
+                                }
+
+                                final String profileTarget = ptp.getProfilerTargetName(project, buildScriptFO, type, profiledClassFile);
+
+                                if (profileTarget == null) {
+                                    return; // already notified the user or user's choice
+                                }
+
+                                // 9. final ability of the ProjectTypeProfiler to influence the properties passed to Ant
+                                ptp.configurePropertiesForProfiling(props, project, profiledClassFile);
+
+                                // 10. Run the target
+                                NetBeansProfiler.getDefaultNB().runTarget(buildScriptFO, profileTarget, props);
+                                
                             }
 
-                            // 8. determine the build script and target to run
-                            final FileObject buildScriptFO = ptp.getProjectBuildScript(project);
-
-                            if (buildScriptFO == null) {
-                                Profiler.getDefault()
-                                        .displayError(MessageFormat.format(FAILED_DETERMINE_PROJECT_BUILDSCRIPT_MSG,
-                                                                           new Object[] {
-                                                                               ProjectUtils.getInformation(project).getName()
-                                                                           }));
-
-                                return;
-                            }
-
-                            // determine which type fo target shoudl be called, and request its name
-                            int type;
-
-                            if (isTest) {
-                                type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE_TEST
-                                                                   : ProjectTypeProfiler.TARGET_PROFILE_TEST_SINGLE;
-                            } else {
-                                type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE
-                                                                   : ProjectTypeProfiler.TARGET_PROFILE_SINGLE;
-                            }
-
-                            final String profileTarget = ptp.getProfilerTargetName(project, buildScriptFO, type, profiledClassFile);
-
-                            if (profileTarget == null) {
-                                return; // already notified the user or user's choice
-                            }
-
-                            // 9. final ability of the ProjectTypeProfiler to influence the properties passed to Ant
-                            ptp.configurePropertiesForProfiling(props, project, profiledClassFile);
-
-                            // 10. Run the target
-                            NetBeansProfiler.getDefaultNB().runTarget(buildScriptFO, profileTarget, props);
+                            
                         }
                     } finally {
                         ProfilingSupport.getDefault().setProfilingActionInvoked(false);

@@ -235,10 +235,12 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
     
     private Data createData(int threadIndex) {
         ThreadData threadData = tdmanager.getThreadData(threadIndex);
-        long runningTime = 0;
-        long sleepingTime = 0;
-        long waitTime = 0;
-        long monitorTime = 0;
+        boolean dataAvailable = threadData.size() > 0;
+        
+        long runningTime = dataAvailable ? 0 : -1;
+        long sleepingTime = dataAvailable ? 0 : -1;
+        long waitTime = dataAvailable ? 0 : -1;
+        long monitorTime = dataAvailable ? 0 : -1;
         
         for (int i = 0; i < threadData.size(); i++) {
                 
@@ -367,8 +369,10 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
 
             public Object getValueAt(int row, int col) {
                 Data data = filteredDataToDataIndex.get(row);
-
-                switch (col) {
+                
+                if (data.runningTime == -1) {
+                    return col == 0 ? data.threadName : "- (-%)";
+                } else switch (col) {
                     case 0:
                         return data.threadName;
                     case 1:

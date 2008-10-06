@@ -87,8 +87,11 @@ made subject to such option by the copyright holder.
         
         <mapID target="ThreadsWindow.HelpCtx" url="helppages/csh/view_threads.html"/>
         <mapID target="TelemetryWindow.HelpCtx" url="helppages/csh/view_telemetry.html"/>
+        <mapID target="TelemetryOverviewPanel.HelpCtx" url="helppages/csh/view_telemetryoverview.html"/>
         <mapID target="LiveResultsWindow.HelpCtx" url="helppages/results_liveresults.html"/>
         <mapID target="DrillDownWindow.HelpCtx" url="helppages/csh/view_drilldown.html"/>
+        <mapID target="ProfilingPointsWindow.HelpCtx" url="helppages/csh/view_profilingpoints.html"/>
+        <mapID target="ProfilerControlPanel.HelpCtx" url="helppages/csh/view_profiler.html"/>
         
         
         
@@ -106,5 +109,23 @@ made subject to such option by the copyright holder.
         <mapID target="ProfilerOptions.Help" url="helppages/csh/options_profiler.html"/>
         <!--CSH ID for select profiling task target dialog when profiling a freeform project -->
         <mapID target="FreeFormProjectTypeProfiler.AntTaskSelectPanel.HelpCtx" url="helppages/profile_freeform.html"/>
+        
+        <!--CSH ID for set profiling points dialog -->
+        <mapID target="PPointsWizardPanel1UI.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="ResetResultsCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="StopwatchCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+        <mapID target="TakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
+        <mapID target="TimedTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
+        <mapID target="TriggeredTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
+        <mapID target="LoadGeneratorCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+
+        <!--CSH ID for root methods dialogs -->
+        <mapID target="RootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
+        <mapID target="ProjectSelectRootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
+        <mapID target="ManualMethodSelect.HelpCtx" url="helppages/profile_rootmethod.html"/>
+
+        <!--CSH ID for active profiling points dialog -->
+        <mapID target="ProfilingPointsDisplayer.HelpCtx" url="helppages/profile_profilepoints.html"/>
+
         
     </map>

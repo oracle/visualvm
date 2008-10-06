@@ -364,7 +364,9 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     /** Create a single-class packet of instrumented methods or classes in response to a class load event. */
     protected Object[] createInstrumentedMethodPack(DynamicClassInfo clazz) {
-        if (nInstrMethods == 0) {
+        // if there is no method to instrument _and_ no profiling point for this class
+        // return immediately
+        if (nInstrMethods == 0 && getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(), clazz).length == 0) {
             return null;
         }
 

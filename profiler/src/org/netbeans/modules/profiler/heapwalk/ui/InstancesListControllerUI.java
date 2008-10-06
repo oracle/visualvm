@@ -53,6 +53,7 @@ import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.modules.profiler.heapwalk.InstancesListController;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.BorderLayout;
@@ -220,7 +221,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     private static final String REACHABLE_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
                                                                                   "InstancesListControllerUI_ReachableSizeColumnDescr"); // NOI18N
                                                                                                                                          // -----
-    private static ImageIcon ICON_INSTANCES = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png")); // NOI18N
+    private static ImageIcon ICON_INSTANCES = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png")); // NOI18N
     private static final int columnCount = 2; // TODO: restore back to 4 once retained & reachable size implemented
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -396,7 +397,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(Utilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
@@ -549,8 +550,6 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         //    tablePopup = createTablePopup();
         cornerPopup = new JPopupMenu();
-
-        JButton cornerButton = createHeaderPopupCornerButton(cornerPopup);
 
         JTreeTablePanel tablePanel = new JTreeTablePanel(instancesListTable);
         tablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));

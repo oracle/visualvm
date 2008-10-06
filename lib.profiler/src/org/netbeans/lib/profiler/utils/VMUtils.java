@@ -58,6 +58,16 @@ public class VMUtils {
     public static final String FLOAT_CODE = "F"; // NOI18N
     public static final String DOUBLE_CODE = "D"; // NOI18N
     public static final String VOID_CODE = "V"; // NOI18N
+    
+    public static final String BOOLEAN_STRING = "boolean"; // NOI18N
+    public static final String CHAR_STRING = "char"; // NOI18N
+    public static final String BYTE_STRING = "byte"; // NOI18N
+    public static final String SHORT_STRING = "short"; // NOI18N
+    public static final String INT_STRING = "int"; // NOI18N
+    public static final String LONG_STRING = "long"; // NOI18N
+    public static final String FLOAT_STRING = "float"; // NOI18N
+    public static final String DOUBLE_STRING = "double"; // NOI18N
+    public static final String VOID_STRING = "void"; // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -66,24 +76,24 @@ public class VMUtils {
         String ret = type.replaceAll("\\.", "/"); // NOI18N
 
         // 1. replace primitive types or surround class name
-        if (ret.startsWith("boolean")) {
-            ret = ret.replaceAll("boolean", BOOLEAN_CODE); // NOI18N
-        } else if (ret.startsWith("char")) {
-            ret = ret.replaceAll("char", CHAR_CODE); // NOI18N
-        } else if (ret.startsWith("byte")) {
-            ret = ret.replaceAll("byte", BYTE_CODE); // NOI18N
-        } else if (ret.startsWith("short")) {
-            ret = ret.replaceAll("short", SHORT_CODE); // NOI18N
-        } else if (ret.startsWith("int")) {
-            ret = ret.replaceAll("int", INT_CODE); // NOI18N
-        } else if (ret.startsWith("long")) {
-            ret = ret.replaceAll("long", LONG_CODE); // NOI18N
-        } else if (ret.startsWith("float")) {
-            ret = ret.replaceAll("float", FLOAT_CODE); // NOI18N
-        } else if (ret.startsWith("double")) {
-            ret = ret.replaceAll("double", DOUBLE_CODE); // NOI18N
-        } else if (ret.startsWith("void")) {
-            ret = ret.replaceAll("void", VOID_CODE); // NOI18N
+        if (ret.startsWith(BOOLEAN_STRING)) {
+            ret = ret.replaceAll(BOOLEAN_STRING, BOOLEAN_CODE);
+        } else if (ret.startsWith(CHAR_STRING)) {
+            ret = ret.replaceAll(CHAR_STRING, CHAR_CODE);
+        } else if (ret.startsWith(BYTE_STRING)) {
+            ret = ret.replaceAll(BYTE_STRING, BYTE_CODE);
+        } else if (ret.startsWith(SHORT_STRING)) {
+            ret = ret.replaceAll(SHORT_STRING, SHORT_CODE);
+        } else if (ret.startsWith(INT_STRING)) {
+            ret = ret.replaceAll(INT_STRING, INT_CODE);
+        } else if (ret.startsWith(LONG_STRING)) {
+            ret = ret.replaceAll(LONG_STRING, LONG_CODE);
+        } else if (ret.startsWith(FLOAT_STRING)) {
+            ret = ret.replaceAll(FLOAT_STRING, FLOAT_CODE);
+        } else if (ret.startsWith(DOUBLE_STRING)) {
+            ret = ret.replaceAll(DOUBLE_STRING, DOUBLE_CODE);
+        } else if (ret.startsWith(VOID_STRING)) {
+            ret = ret.replaceAll(VOID_STRING, VOID_CODE);
         } else {
             // if the remainder is a class, surround it with "L...;"
             final int arIdx = ret.indexOf('['); // NOI18N
@@ -102,5 +112,21 @@ public class VMUtils {
 
         //    System.err.println("is: "+ret);
         return ret;
+    }
+    
+    public static boolean isVMPrimitiveType(String className) {
+        if (className == null || className.length() != 1) return false;
+        if (VMUtils.BOOLEAN_CODE.equals(className) || VMUtils.CHAR_CODE.equals(className) || VMUtils.BYTE_CODE.equals(className) ||
+            VMUtils.SHORT_CODE.equals(className) || VMUtils.INT_CODE.equals(className) || VMUtils.LONG_CODE.equals(className) ||
+            VMUtils.FLOAT_CODE.equals(className) || VMUtils.DOUBLE_CODE.equals(className)) return true;
+        return false;
+    }
+    
+    public static boolean isPrimitiveType(String className) {
+        if (className == null || className.length() < 1) return false;
+        if (VMUtils.BOOLEAN_STRING.equals(className) || VMUtils.CHAR_STRING.equals(className) || VMUtils.BYTE_STRING.equals(className) ||
+            VMUtils.SHORT_STRING.equals(className) || VMUtils.INT_STRING.equals(className) || VMUtils.LONG_STRING.equals(className) ||
+            VMUtils.FLOAT_STRING.equals(className) || VMUtils.DOUBLE_STRING.equals(className)) return true;
+        return false;
     }
 }

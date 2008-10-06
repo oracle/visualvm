@@ -151,6 +151,9 @@ class ProfilerCalibrator extends ProfilerRuntime {
             init(localStatus);
         }
 
+        if (Platform.getJDKVersionString().equals(Platform.JDK_CVM_STRING)) {
+            System.loadLibrary("profilerinterface"); // NOI18N
+        }
         Timers.initialize();
 
         measureBCIOverhead(inDevelMode);

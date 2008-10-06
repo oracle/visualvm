@@ -45,16 +45,7 @@ made subject to such option by the copyright holder.
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
             <code-name-base>org.netbeans.lib.profiler</code-name-base>
-            <module-dependencies>
-                <dependency>
-                    <code-name-base>org.openide.util</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.14</specification-version>
-                    </run-dependency>
-                </dependency>
-            </module-dependencies>
+            <module-dependencies/>
             <friend-packages>
                 <friend>org.netbeans.lib.profiler.common</friend>
                 <friend>org.netbeans.lib.profiler.ui</friend>
@@ -69,6 +60,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
                 <friend>org.netbeans.modules.profiler.utilities</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.wtk.profiler</friend>
                 <package>org.netbeans.lib.profiler</package>
                 <package>org.netbeans.lib.profiler.classfile</package>
                 <package>org.netbeans.lib.profiler.client</package>

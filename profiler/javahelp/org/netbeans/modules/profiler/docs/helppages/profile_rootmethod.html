@@ -4,7 +4,8 @@
 *     Use is subject to license terms.
 -->
 <html>
-    <head>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <title>Specifying a Root Method</title>
         <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
     </head>
@@ -22,16 +23,9 @@
         Each profile application performance configuration is associated with a specific set of selected root methods.
         </p>
         
-        <!--To open the dialog box, click Select next to the Part of Application option for the 
-        Analyze Performance profiling task. You can also open this dialog box from the Custom 
-        Profiling dialog box when editing or creating a custom CPU profiling configuration.</p>
-        <p>Threads emit a "method entry" event when entering a method and generate 
-        a corresponding "method exit" event when exiting the method. 
-        Both of these events contain timestamps. When you instrument a method, 
-        Profiler processes this timestamp data. </p>-->
-
-        
-        
+        <p>You can specify root methods in the source code of a class or in the Select Profiling Task dialog box when setting 
+        options for analyzing application performance.</p>
+            
         <p><b>To specify a single root method in a class:</b></p>                
         <ol>
             <li>Locate the class containing the method you want to add and open the class in the Source Editor.</li>
@@ -66,6 +60,31 @@
             Once partial application profiling is initiated, profiling data 
             is not collected until one of the application's threads enters the profiling root method.</li>
         </ul>
+        
+        <p><b>To specify root methods when setting options for analyzing application performance:</b></p>
+        <ol>
+            <li>Open the Select Profiling Task dialog box and select the analyze CPU task.</li>
+            <li>Select Part of Application.</li>
+            <li>Click <strong>define</strong> (if no methods are defined) or <strong>edit</strong> (if some methods
+            are already defined) to open the Specify Root Methods dialog.</li>
+            <li>Click one of the following options.
+            <ul>
+                <li><b>Add From Project.</b> Choose Add From Project to select root methods displayed in a tree view.
+                In the Select Root Methods dialog box you can select the specific methods in the project that 
+                you want to add as root methods. You can choose the project view to see project methods or 
+                Default Package View to view the methods in the project sources and dependent libraries.</li>
+                <li><b>Add Manual.</b> Choose Add Manual to add a specific method by typing the class name,
+                method name and signature.</li>
+            </ul>
+            </li>
+            <li>Click OK.
+            </li>
+        </ol>
+        <p>When you click OK the root method is added to the list of root methods displayed in the 
+        Specify Root Method dialog box.
+        You can select a method from the list and click Remove to delete the method from the list.</p>
+        
+        
         
         <p>For more, see the following NetBeans FAQ:
             <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">

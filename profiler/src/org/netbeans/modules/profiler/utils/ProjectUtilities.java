@@ -78,9 +78,11 @@ import org.openide.util.NbBundle;
 import org.w3c.dom.Element;
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -349,7 +351,11 @@ public final class ProjectUtilities {
     }
 
     public static String getProjectBuildScript(final Project project) {
-        final FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+        final FileObject buildFile = findBuildFile(project);
+        if (buildFile == null) {
+            return null;
+        }
+
         RandomAccessFile file = null;
         byte[] data = null;
 
@@ -383,6 +389,18 @@ public final class ProjectUtilities {
 
             return null;
         }
+    }
+
+    public static FileObject findBuildFile(final Project project) {
+        FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+        if (buildFile == null) {
+            Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
+            String buildFileName = props.getProperty("buildfile"); // NOI18N
+            if (buildFileName != null) {
+                buildFile = project.getProjectDirectory().getFileObject(buildFileName);
+            }
+        }
+        return buildFile;
     }
 
     public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
@@ -603,10 +621,10 @@ public final class ProjectUtilities {
     }
 
     public static boolean backupBuildScript(final Project project) {
-        final FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+        final FileObject buildFile = findBuildFile(project);
         final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
-        if (buildBackupFile != null) {
+        if (buildFile != null && buildBackupFile != null) {
             try {
                 buildBackupFile.delete();
             } catch (IOException e) {
@@ -966,10 +984,10 @@ public final class ProjectUtilities {
         FileLock buildBackup2FileLock = null;
 
         try {
-            final FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+            final FileObject buildFile = findBuildFile(project); //NOI18N
             final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
-            if ((buildBackupFile != null) && buildBackupFile.isValid()) {
+            if (buildFile != null && (buildBackupFile != null && buildBackupFile.isValid())) {
                 try {
                     buildBackupFileLock = buildBackupFile.lock();
 

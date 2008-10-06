@@ -61,6 +61,7 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.text.Line;
 import org.openide.text.NbDocument;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.Component;
@@ -68,6 +69,7 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -330,11 +332,12 @@ public class Utils {
     private static final String TODAY_DATE_FORMAT_HIRES = NbBundle.getMessage(Utils.class, "Utils_TodayDateFormatHiRes"); // NOI18N
     private static final String DAY_DATE_FORMAT = NbBundle.getMessage(Utils.class, "Utils_DayDateFormat"); // NOI18N
     private static final String CANNOT_OPEN_SOURCE_MSG = NbBundle.getMessage(Utils.class, "Utils_CannotOpenSourceMsg"); // NOI18N
+    private static final String INVALID_PP_LOCATION_MSG = NbBundle.getMessage(Utils.class, "Utils_InvalidPPLocationMsg"); // NOI18N
                                                                                                            // -----
     private static final String PROJECT_DIRECTORY_MARK = "{$projectDirectory}"; // NOI18N
 
     // TODO: Move to more "universal" location
-    public static final ImageIcon EMPTY_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/empty16.gif")); // NOI18N
+    public static final ImageIcon EMPTY_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/empty16.gif")); // NOI18N
     private static final ProjectPresenterRenderer projectRenderer = new ProjectPresenterRenderer();
     private static final ProjectPresenterListRenderer projectListRenderer = new ProjectPresenterListRenderer();
     private static final EnhancedTableCellRenderer scopeRenderer = new ProfilingPointScopeRenderer();
@@ -375,6 +378,22 @@ public class Utils {
         }
 
         return SourceUtils.getEnclosingClassName(fileObject, documentOffset);
+    }
+    
+    public static String getMethodName(CodeProfilingPoint.Location location) {
+        FileObject fileObject = FileUtil.toFileObject(new File(location.getFile()));
+
+        if ((fileObject == null) || !fileObject.isValid()) {
+            return null;
+        }
+
+        int documentOffset = getDocumentOffset(location);
+
+        if (documentOffset == -1) {
+            return null;
+        }
+
+        return SourceUtils.getEnclosingMethodName(fileObject, documentOffset);
     }
 
     public static CodeProfilingPoint.Location getCurrentLocation(int lineOffset) {
@@ -656,6 +675,41 @@ public class Utils {
         }
 
         return null;
+    }
+    
+    public static boolean isValidLocation(CodeProfilingPoint.Location location) {
+        // Fail if location not in method
+        String methodName = Utils.getMethodName(location);
+        if (methodName == null) return false;
+        
+        // Succeed if location in method body
+        if (location.isLineStart()) return true;
+        else if (location.isLineEnd()) {
+            CodeProfilingPoint.Location startLocation = new CodeProfilingPoint.Location(
+                    location.getFile(), location.getLine(), CodeProfilingPoint.Location.OFFSET_START);
+            if (methodName.equals(Utils.getMethodName(startLocation))) return true;
+        }
+
+        Line line = getEditorLine(location); 
+        if (line == null) return false;
+        
+        // Fail if location immediately after method declaration - JUST A BEST GUESS!
+        String lineText = line.getText().trim();
+        if (lineText.endsWith("{") && lineText.indexOf("{") == lineText.lastIndexOf("{")) return false; // NOI18N
+        
+        return true;
+    }
+    
+    public static void checkLocation(CodeProfilingPoint.Single ppoint) {
+        if (!isValidLocation(ppoint.getLocation())) NetBeansProfiler.getDefaultNB().displayWarningAndWait(
+                MessageFormat.format(INVALID_PP_LOCATION_MSG, new Object[] { ppoint.getName() }));
+    }
+    
+    public static void checkLocation(CodeProfilingPoint.Paired ppoint) {
+        if (!isValidLocation(ppoint.getStartLocation())) NetBeansProfiler.getDefaultNB().displayWarningAndWait(
+                MessageFormat.format(INVALID_PP_LOCATION_MSG, new Object[] { ppoint.getName() }));
+        else if (ppoint.usesEndLocation() && !isValidLocation(ppoint.getEndLocation())) NetBeansProfiler.getDefaultNB().displayWarningAndWait(
+                MessageFormat.format(INVALID_PP_LOCATION_MSG, new Object[] { ppoint.getName() }));
     }
 
     public static Project getMostActiveJavaProject() {

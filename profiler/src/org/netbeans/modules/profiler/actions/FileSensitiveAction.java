@@ -71,10 +71,12 @@ public final class FileSensitiveAction extends ProjectSensitiveAction {
         return new FileSensitiveAction(performer, name, namePattern, icon, null);
     }
 
+    @Override
     public Action createContextAwareInstance(final Lookup actionContext) {
         return new FileSensitiveAction(getPerformer(), getName(), getNamePattern(), (Icon) getValue(SMALL_ICON), actionContext);
     }
 
+    @Override
     protected void doRefresh(final Lookup context) {
         final Project[] projects = ActionsUtil.getProjectsFromLookup(context, null);
 
@@ -85,7 +87,7 @@ public final class FileSensitiveAction extends ProjectSensitiveAction {
             final FileObject[] files = ActionsUtil.getFilesFromLookup(context, projects[0]);
 
             if ((files != null) && (files.length == 1)) {
-                setEnabled(true);
+                setEnabled(getPerformer().enable(projects[0], context, true));
             } else {
                 setEnabled(false);
             }

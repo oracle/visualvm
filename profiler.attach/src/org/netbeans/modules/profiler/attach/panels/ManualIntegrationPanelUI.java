@@ -83,30 +83,15 @@ public class ManualIntegrationPanelUI extends javax.swing.JPanel implements List
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        stepsPanel = new org.netbeans.modules.profiler.attach.panels.components.StepsPanelComponent();
-        comboJvms = new javax.swing.JComboBox();
-        label = new javax.swing.JLabel();
         generateRemotePack = new javax.swing.JButton();
+        stepsPanel = new org.netbeans.modules.profiler.attach.panels.components.StepsPanelComponent();
+        label = new javax.swing.JTextArea();
+        comboJvms = new javax.swing.JComboBox();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         setMaximumSize(new java.awt.Dimension(800, 600));
-        setMinimumSize(new java.awt.Dimension(470, 300));
+        setMinimumSize(new java.awt.Dimension(200, 300));
         setPreferredSize(new java.awt.Dimension(500, 400));
-
-        stepsPanel.setHintText(org.openide.util.NbBundle.getMessage(ManualIntegrationPanelUI.class, "ManualIntegrationPanelUI.stepsPanel.hintText")); // NOI18N
-        stepsPanel.setMinimumSize(new java.awt.Dimension(400, 200));
-        stepsPanel.setPreferredSize(new java.awt.Dimension(500, 200));
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle"); // NOI18N
-        stepsPanel.setTitle(bundle.getString("ManualIntegrationStepsWizardPanelUI_ManualIntegrationHintMsg")); // NOI18N
-
-        comboJvms.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Java" }));
-        comboJvms.setMaximumSize(new java.awt.Dimension(470, 24));
-        comboJvms.setMinimumSize(new java.awt.Dimension(200, 24));
-        comboJvms.setPreferredSize(new java.awt.Dimension(466, 24));
-        comboJvms.getModel().addListDataListener(this);
-
-        label.setLabelFor(comboJvms);
-        org.openide.awt.Mnemonics.setLocalizedText(label, "null");
 
         org.openide.awt.Mnemonics.setLocalizedText(generateRemotePack, org.openide.util.NbBundle.getMessage(ManualIntegrationPanelUI.class, "ManualIntegrationPanelUI.generateRemotePack.text")); // NOI18N
         generateRemotePack.addActionListener(new java.awt.event.ActionListener() {
@@ -115,29 +100,46 @@ public class ManualIntegrationPanelUI extends javax.swing.JPanel implements List
             }
         });
 
+        stepsPanel.setTitle(org.openide.util.NbBundle.getMessage(ManualIntegrationPanelUI.class, "ManualIntegrationStepsWizardPanelUI_ManualIntegrationHintMsg")); // NOI18N
+
+        label.setEditable(false);
+        label.setLineWrap(true);
+        label.setText(org.openide.util.NbBundle.getMessage(ManualIntegrationPanelUI.class, "TargetJVMWizardPanelUI_SelectJvmString")); // NOI18N
+        label.setWrapStyleWord(true);
+        label.setDisabledTextColor(javax.swing.UIManager.getDefaults().getColor("Label.foreground"));
+        label.setEnabled(false);
+        label.setMinimumSize(new java.awt.Dimension(0, 0));
+        label.setOpaque(false);
+
+        comboJvms.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Java" }));
+        comboJvms.setMaximumSize(new java.awt.Dimension(470, 24));
+        comboJvms.setMinimumSize(new java.awt.Dimension(200, 24));
+        comboJvms.setPreferredSize(new java.awt.Dimension(466, 24));
+        comboJvms.getModel().addListDataListener(this);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, label)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, comboJvms, 0, 472, Short.MAX_VALUE)
-                    .add(generateRemotePack))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(label, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+                    .add(comboJvms, 0, 472, Short.MAX_VALUE)
+                    .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, generateRemotePack))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(label)
+                .add(label, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(comboJvms, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(14, 14, 14)
-                .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(comboJvms, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(generateRemotePack)
                 .addContainerGap())
         );
@@ -171,7 +173,7 @@ private void generateRemotePackActionPerformed(java.awt.event.ActionEvent evt) {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboJvms;
     private javax.swing.JButton generateRemotePack;
-    private javax.swing.JLabel label;
+    private javax.swing.JTextArea label;
     private org.netbeans.modules.profiler.attach.panels.components.StepsPanelComponent stepsPanel;
     // End of variables declaration//GEN-END:variables
     public ComboBoxModel getJvmListModel() {
@@ -218,7 +220,7 @@ private void generateRemotePackActionPerformed(java.awt.event.ActionEvent evt) {
 
         showIntegrationHints();
 
-        org.openide.awt.Mnemonics.setLocalizedText(label, MessageFormat.format(NbBundle.getMessage(ManualIntegrationPanel.class, "TargetJVMWizardPanelUI_SelectJvmString"), new Object[]{model.getApplication()})); // NOI18N
+        label.setText(MessageFormat.format(NbBundle.getMessage(ManualIntegrationPanel.class, "TargetJVMWizardPanelUI_SelectJvmString"), new Object[]{model.getApplication()})); // NOI18N
 
         generateRemotePack.setVisible(model.isRemote());
     }

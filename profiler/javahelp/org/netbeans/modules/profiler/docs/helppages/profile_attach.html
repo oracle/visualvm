@@ -4,7 +4,8 @@
 *     Use is subject to license terms.
 -->
 <html>
-    <head>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <title>Profiling Using Attach Mode</title>
         <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
     </head>
@@ -74,18 +75,13 @@
           </tr>
           
           <tr> 
-              <td valign="top"><b>Remote Direct</b></td>
+            <td valign="top"><b>Remote Direct</b></td>
             <td valign="top">Use this mode if you want to obtain profiling data 
             on an <a href="profile_remote.html">application running on a remote JVM</a>.
             To use this mode, you need to install the Profiler Remote Pack on the target machine.
-            You can download the Profiler Remote Pack at the following URL:
-            <p><object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
-                <param name="content" value="http://profiler.netbeans.org/">
-                <param name="text" value="<html><u>http://profiler.netbeans.org/</u></html>">
-                <param name="textFontSize" value="medium">
-                <param name="textColor" value="blue">
-            </object>
-            </p>
+            You specify the details of the remote system and generate the Profiler Remote Pack 
+            using the Attach Wizard.
+            
             <p>When you use this mode, the remote application starts after the profiler is attached.
             This mode enables you to obtain profiling data on the startup of the target JVM.</p></td>
             </tr>
@@ -95,6 +91,7 @@
         <dl>
             <dt><a name="seealso">See Also</a></dt>
             <dd><a href="profile_running.html">Profiling a Running Application</a></dd>
+            <dd><a href="profile_remote.html">Attaching to a Remote Application</a></dd>
             <dd><a href="profile_tasks_overview.html">Selecting a Profiling Task</a></dd>
         </dl>
         <hr>

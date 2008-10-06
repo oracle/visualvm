@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -56,7 +58,7 @@ import java.util.Map;
  */
 public class PackageMarker implements Marker {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    private static Logger LOGGER = Logger.getLogger(PackageMarker.class.getName());
     private Map markMap;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -73,7 +75,7 @@ public class PackageMarker implements Marker {
 
         for (Iterator iter = markMap.keySet().iterator(); iter.hasNext();) {
             String packageName = (String) iter.next();
-            ClientUtils.SourceCodeSelection markerMethod = new ClientUtils.SourceCodeSelection(packageName + ".*", "", ""); // NOI18N
+            ClientUtils.SourceCodeSelection markerMethod = new ClientUtils.SourceCodeSelection(packageName, "", ""); // NOI18N
             markerMethod.setMarkerMethod(true);
             mappings.add(new MarkMapping(markerMethod, (Mark) markMap.get(packageName)));
         }
@@ -85,19 +87,27 @@ public class PackageMarker implements Marker {
         return (Mark[])new HashSet(markMap.values()).toArray(new Mark[0]);
     }
 
-    public void addPackageMark(String packageName, Mark mark) {
+    public void addPackageMark(String packageName, Mark mark, boolean recursive) {
         if (packageName.length() == 0) {
             packageName = "default"; // NOI18N
         }
-
-        markMap.put(packageName, mark);
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Marking package " + packageName + " with " + mark.getId());
+        }
+        markMap.put(packageName + (recursive ? ".**" : ".*"), mark);
     }
 
     public void removePackageMark(String packageName) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking package " + packageName);
+        }
         markMap.remove(packageName);
     }
 
     public void resetPackageMarks() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Unmarking all packages");
+        }
         markMap.clear();
     }
 }
