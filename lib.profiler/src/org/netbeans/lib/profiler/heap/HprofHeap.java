@@ -110,6 +110,7 @@ class HprofHeap implements Heap {
     NearestGCRoot nearestGCRoot;
     private ComputedSummary computedSummary;
     private Map gcRoots;
+    private Object gcRootLock = new Object();
     private TagBounds allInstanceDumpBounds;
     private TagBounds heapDumpSegment;
     private TagBounds[] heapTagBounds;
@@ -153,33 +154,37 @@ class HprofHeap implements Heap {
         return classDumpBounds.createClassCollection();
     }
 
-    public synchronized GCRoot getGCRoot(Instance instance) {
-        Long instanceId = Long.valueOf(instance.getInstanceId());
+    public GCRoot getGCRoot(Instance instance) {
+        synchronized (gcRootLock) {
+            Long instanceId = Long.valueOf(instance.getInstanceId());
 
-        if (gcRoots == null) {
-            getGCRoots();
+            if (gcRoots == null) {
+                getGCRoots();
+            }
+
+            return (GCRoot) gcRoots.get(instanceId);
         }
-
-        return (GCRoot) gcRoots.get(instanceId);
     }
 
-    public synchronized Collection getGCRoots() {
-        if (heapDumpSegment == null) {
-            return Collections.EMPTY_LIST;
-        }
-        if (gcRoots == null) {
-            gcRoots = computeGCRootsFor(heapTagBounds[ROOT_UNKNOWN]);
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_GLOBAL]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_LOCAL]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JAVA_FRAME]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_NATIVE_STACK]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_STICKY_CLASS]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_BLOCK]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_MONITOR_USED]));
-            gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_OBJECT]));
-        }
+    public Collection getGCRoots() {
+        synchronized (gcRootLock) {
+            if (heapDumpSegment == null) {
+                return Collections.EMPTY_LIST;
+            }
+            if (gcRoots == null) {
+                gcRoots = computeGCRootsFor(heapTagBounds[ROOT_UNKNOWN]);
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_GLOBAL]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_LOCAL]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JAVA_FRAME]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_NATIVE_STACK]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_STICKY_CLASS]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_BLOCK]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_MONITOR_USED]));
+                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_OBJECT]));
+            }
 
-        return gcRoots.values();
+            return gcRoots.values();
+        }
     }
 
     public Instance getInstanceByID(long instanceID) {
