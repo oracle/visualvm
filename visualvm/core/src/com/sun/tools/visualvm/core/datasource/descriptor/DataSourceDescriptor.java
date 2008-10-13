@@ -92,19 +92,8 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     
     /**
      * Creates new instance of DataSourceDescriptor.
-     * THIS METHOD IS PUBLIC BY MISTAKE AND WILL BE REMOVED SOON - DO NOT USE IT!!!
-     * EACH DESCRIPTOR NEEDS TO BE CREATED FOR A CONCRETE DataSource.
      * 
-     * @deprecated 
-     */
-    public DataSourceDescriptor() {
-        this(null);
-    }
-    
-    /**
-     * Creates new instance of DataSourceDescriptor.
-     * 
-     * @param dataSource DataSource described by the descriptor.
+     * @param dataSource DataSource described by the descriptor, cannot be null.
      */
     public DataSourceDescriptor(X dataSource) {
         this(dataSource, dataSource != null ? dataSource.toString() : null, null, null, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
@@ -113,14 +102,18 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     /**
      * Creates new instance of DataSourceDescriptor.
      * 
-     * @param ds DataSource described by the descriptor.
+     * @param ds DataSource described by the descriptor, cannot be null.
      * @param n DataSource name.
      * @param desc DataSource description.
      * @param ic DataSource icon.
      * @param pos DataSource position.
      * @param aep DataSource expansion policy.
+     * 
+     * @throws NullPointerException if the provided DataSource is null.
      */
-    public DataSourceDescriptor(X ds, String n, String desc, Image ic, int pos, int aep) {   
+    public DataSourceDescriptor(X ds, String n, String desc, Image ic, int pos, int aep) {
+        if (ds == null) throw new NullPointerException("DataSource cannot be null");
+        
         dataSource = ds;
         changeSupport = dataSource != null ? new PropertyChangeSupport(dataSource) : null;
         name = n;
