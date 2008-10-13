@@ -104,18 +104,19 @@ public class JmxSupport implements DataRemovedListener {
             if (operatingSystemMXBeanInitialized) {
                 return operatingSystemMXBean;
             }
+            operatingSystemMXBeanInitialized = true;
             JvmMXBeans jmx = getJvmMXBeans();
             if (jmx != null) {
                 ObjectName osName;
                 try {
                     osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
-                } catch (Exception ex) {
+                    operatingSystemMXBean = jmx.getMXBean(osName,OperatingSystemMXBean.class);
+                 } catch (Exception ex) {
                     LOGGER.throwing(JmxSupport.class.getName(), "getOperationSystem", ex); // NOI18N
                     return null;
                 }
-                operatingSystemMXBean = jmx.getMXBean(osName,OperatingSystemMXBean.class);
-            }
-            return operatingSystemMXBean;
+           }
+           return operatingSystemMXBean;
         }
     }
     
