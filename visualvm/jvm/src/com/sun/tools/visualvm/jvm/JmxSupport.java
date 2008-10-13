@@ -70,6 +70,7 @@ public class JmxSupport implements DataRemovedListener {
             "com.sun.management:type=HotSpotDiagnostic";    // NOI18N
     private static final String PERM_GEN = "Perm Gen";  // NOI18N
     private static final String PS_PERM_GEN = "PS Perm Gen";    // NOI18N
+    private static final String IBM_PERM_GEN = "class storage";    // NOI18N
     private Application application;
     private JvmMXBeans mxbeans;
     private JVMImpl jvm;
@@ -290,9 +291,12 @@ public class JmxSupport implements DataRemovedListener {
                 if (jmx != null) {
                     Collection<MemoryPoolMXBean> pools = jmx.getMemoryPoolMXBeans();
                     for (MemoryPoolMXBean pool : pools) {
-                        if (pool.getType().equals(MemoryType.NON_HEAP) &&
-                                (PERM_GEN.equals(pool.getName()) ||
-                                PS_PERM_GEN.equals(pool.getName()))) {
+                        MemoryType type = pool.getType();
+                        String name = pool.getName();
+                        if (MemoryType.NON_HEAP.equals(type) &&
+                                (PERM_GEN.equals(name) ||
+                                PS_PERM_GEN.equals(name) ||
+                                IBM_PERM_GEN.equals(name))) {
                             permGenPool = pool;
                             break;
                         }
