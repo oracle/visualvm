@@ -385,6 +385,7 @@ class HprofHeap implements Heap {
             long start = offset[0];
             int tag = readDumpTag(offset);
             long instanceId = 0L;
+            LongMap.Entry instanceEntry = null;
 
             if (tag == INSTANCE_DUMP) {
                 instanceIdOffset = 1;
@@ -399,8 +400,7 @@ class HprofHeap implements Heap {
             }
 
             if (instanceIdOffset != 0) {
-                instanceId = dumpBuffer.getID(start + instanceIdOffset);
-                idToOffsetMap.put(instanceId, start);
+                instanceEntry = idToOffsetMap.put(instanceId, start);
             }
 
             if (classIdOffset != 0) {
@@ -411,7 +411,7 @@ class HprofHeap implements Heap {
             if (classDump != null) {
                 classDump.incrementInstance();
                 idToOffsetMap.get(instanceId).setIndex(classDump.getInstancesCount());
-                classDumpBounds.addInstanceSize(classDump, tag, start);
+                instanceEntry.setIndex(classDump.getInstancesCount());
             }
         }
 
