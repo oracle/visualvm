@@ -116,6 +116,10 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                 return hasResults;
             }
         }
+
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -297,7 +301,7 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
 
         FlatProfileBuilder flattener = new FlatProfileBuilder();
         builder.addListener(flattener);
-        flattener.setContext(runner.getProfilerClient());
+        flattener.setContext(runner.getProfilerClient(),null,null);
 
         ProfilingResultsDispatcher.getDefault().addListener(builder);
 
@@ -365,7 +369,7 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
         } finally {
             ProfilingResultsDispatcher.getDefault().pause(true);
             builder.shutdown();
-            flattener.setContext(null);
+            flattener.setContext(null,null,null);
             builder.removeListener(flattener);
             builder.removeListener(resultListener);
             ProfilingResultsDispatcher.getDefault().removeListener(builder);
