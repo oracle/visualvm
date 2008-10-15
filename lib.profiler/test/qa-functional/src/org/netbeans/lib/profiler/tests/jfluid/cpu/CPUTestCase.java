@@ -126,6 +126,10 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                 return hasResults;
             }
         }
+
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -321,7 +325,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
         FlatProfileBuilder flattener = new FlatProfileBuilder();
         builder.addListener(flattener);
-        flattener.setContext(runner.getProfilerClient());
+        flattener.setContext(runner.getProfilerClient(),null,null);
 
         EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
 
@@ -388,7 +392,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         } finally {
             ProfilingResultsDispatcher.getDefault().pause(true);
             builder.shutdown();
-            flattener.setContext(null);
+            flattener.setContext(null,null,null);
             builder.removeListener(flattener);
             builder.removeListener(resultListener);
             ProfilingResultsDispatcher.getDefault().removeListener(builder);
@@ -416,7 +420,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
         FlatProfileBuilder flattener = new FlatProfileBuilder();
         builder.addListener(flattener);
-        flattener.setContext(runner.getProfilerClient());
+        flattener.setContext(runner.getProfilerClient(),null,null);
 
         EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
 
@@ -498,7 +502,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         } finally {
             ProfilingResultsDispatcher.getDefault().pause(true);
             builder.shutdown();
-            flattener.setContext(null);
+            flattener.setContext(null,null,null);
             builder.removeListener(flattener);
             builder.removeListener(resultListener);
             ProfilingResultsDispatcher.getDefault().removeListener(builder);
