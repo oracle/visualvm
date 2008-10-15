@@ -37,6 +37,7 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.Collection;
+import java.util.logging.Logger;
 import sun.jvmstat.monitor.LongMonitor;
 
 /**
@@ -44,19 +45,23 @@ import sun.jvmstat.monitor.LongMonitor;
  * @author Tomas Hurka
  */
 public class MonitoredDataImpl extends MonitoredData {
-
+  private final static Logger LOGGER = Logger.getLogger(MonitoredDataImpl.class.getName());
   final private Jvm jvm;
 
   private MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport) {
-    OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
-    Collection<GarbageCollectorMXBean> gcList = jmxSupport.getGarbageCollectorMXBeans();
-    if (osMXBean != null) {
-        processCpuTime = osMXBean.getProcessCpuTime();
-    }
-    if (gcList != null && !gcList.isEmpty()) {
-        for (GarbageCollectorMXBean gcBean : gcList) {
-            collectionTime+=gcBean.getCollectionTime();
+    try {
+        OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
+        Collection<GarbageCollectorMXBean> gcList = jmxSupport.getGarbageCollectorMXBeans();
+        if (osMXBean != null) {
+            processCpuTime = osMXBean.getProcessCpuTime();
         }
+        if (gcList != null && !gcList.isEmpty()) {
+            for (GarbageCollectorMXBean gcBean : gcList) {
+                collectionTime+=gcBean.getCollectionTime();
+            }
+        }
+    } catch (Exception ex) {
+        LOGGER.throwing(MonitoredDataImpl.class.getName(), "MonitoredDataImpl.<init>", ex); // NOI18N
     }
     jvm = vm;
   }
