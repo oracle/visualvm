@@ -150,6 +150,10 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
                 return hasResults;
             }
         }
+
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -329,7 +333,7 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
 
         FlatProfileBuilder flattener = new FlatProfileBuilder();
         builder.addListener(flattener);
-        flattener.setContext(runner.getProfilerClient());
+        flattener.setContext(runner.getProfilerClient(),null,null);
 
         try {
             runner.readSavedCalibrationData();
