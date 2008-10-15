@@ -25,9 +25,11 @@
 
 package com.sun.tools.visualvm.modules.appui.welcome;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import org.openide.awt.StatusDisplayer;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -35,20 +37,27 @@ import org.openide.awt.StatusDisplayer;
  */
 public class WebLink extends LinkButton {
 
+    private static String sourceId;
     private String url;
+    private boolean includeSource;
 
     /** Creates a new instance of WebLink */
     public WebLink( String key ) {
-        this( BundleSupport.getLabel( key ), BundleSupport.getURL( key ) );
+        this( BundleSupport.getLabel( key ), BundleSupport.getURL( key ), true );
     }
-
-    public WebLink( String label, String url ) {
+    
+    public WebLink( String key, boolean includeSource ) {
+        this( BundleSupport.getLabel( key ), BundleSupport.getURL( key ), includeSource );
+    }
+    
+    public WebLink( String label, String url, boolean includeSource ) {
         super( label );
         this.url = url;
+        this.includeSource = includeSource;
     }
 
     public void actionPerformed(ActionEvent e) {
-        Utils.showURL( url );
+        Utils.showURL( includeSource ? url + getSourceId() : url );
     }
     
     @Override
@@ -59,6 +68,20 @@ public class WebLink extends LinkButton {
     @Override
     protected void onMouseEntered(MouseEvent e) {
         StatusDisplayer.getDefault().setStatusText( url );
+    }
+    
+    private static synchronized String getSourceId() {
+        if (sourceId == null) {
+            Frame mainWindow = WindowManager.getDefault().getMainWindow();
+            if (mainWindow == null) sourceId = "VisualVM (Unknown Version)"; // NOI18N
+            else {
+                String sourceName = mainWindow.getTitle();
+                if (sourceName == null) sourceId = "VisualVM (Unknown Version)"; // NOI18N
+                else sourceId = "?" + sourceName.replace(" ", "_"); // NOI18N
+            }
+        }
+        
+        return sourceId;
     }
 }
 

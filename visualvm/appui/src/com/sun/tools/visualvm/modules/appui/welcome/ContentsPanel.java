@@ -48,22 +48,22 @@ class ContentsPanel extends JPanel implements Constants {
     private void initComponents() {
         setLayout(new GridLayout(4, 2, 0, 0));
         
-        addLink( "Link1", false, false );
-        addLink( "Link2", false, true );
-        addLink( "Link3", false, false );
-        addLink( "Link4", false, true );
-        addLink( "Link5", false, false );
-        addLink( "Link6", false, true );
-        addLink( "Link7", true, false );
-        addLink( "Link8", true, true );
+        addLink( "Link1", true, false, false );
+        addLink( "Link2", false, false, true );
+        addLink( "Link3", true, false, false );
+        addLink( "Link4", false, false, true );
+        addLink( "Link5", true, false, false );
+        addLink( "Link6", false, false, true );
+        addLink( "Link7", true, true, false );
+        addLink( "Link8", false, true, true );
         
         setBackground(Utils.getColor(COLOR_CONTENT_BACKGROUND));
     }
     
-    private void addLink( String resourceKey, boolean drawBottom, boolean drawRight ) {
+    private void addLink( String resourceKey, boolean includeSource, boolean drawBottom, boolean drawRight ) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque( false );
-        panel.add( new WebLink(resourceKey), BorderLayout.CENTER );
+        panel.add( new WebLink(resourceKey, includeSource), BorderLayout.CENTER );
         panel.setBorder( new MyBorder(drawBottom, drawRight) );
         add( panel );
     }
