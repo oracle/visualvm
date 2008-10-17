@@ -400,6 +400,7 @@ class HprofHeap implements Heap {
             }
 
             if (instanceIdOffset != 0) {
+                instanceId = dumpBuffer.getID(start + instanceIdOffset);
                 instanceEntry = idToOffsetMap.put(instanceId, start);
             }
 
@@ -410,7 +411,6 @@ class HprofHeap implements Heap {
 
             if (classDump != null) {
                 classDump.incrementInstance();
-                idToOffsetMap.get(instanceId).setIndex(classDump.getInstancesCount());
                 instanceEntry.setIndex(classDump.getInstancesCount());
             }
         }
