@@ -47,7 +47,6 @@ import java.util.Map;
 /**
  *
  * @author Tomas Hurka
- * @author Tomas Hurka
  */
 class HprofGCRoot extends HprofObject implements GCRoot {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
