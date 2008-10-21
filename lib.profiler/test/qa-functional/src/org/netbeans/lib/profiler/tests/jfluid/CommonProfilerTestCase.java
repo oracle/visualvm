@@ -74,7 +74,8 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     public static final int STATUS_FINISHED = 16;
     public static final int STATUS_LIVERESULTS_AVAILABLE = 32;
     private static final boolean CREATE_GOLDENS = false;
-    private static final String GOLDENS_CVS_PATH = "/space/cvs/profiler/profiler/libs/jfluid/test/functional/data/goldenfiles";
+    private static final String GOLDENS_CVS_PATH = CommonProfilerTestCase.class.getResource("CommonProfilerTestCase.class").toString().replace("classes/org/netbeans/lib/profiler/tests/jfluid/CommonProfilerTestCase.class", "data/goldenfiles").replace("file:/", "");
+    private static final String PROFILER_HOME = GOLDENS_CVS_PATH.replace("lib.profiler/build/test/qa-functional/data/goldenfiles", "nbbuild/netbeans/profiler3");
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -339,7 +340,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             String profilerHome = System.getProperty("profiler.home");
 
             if ((profilerHome == null) || !new File(profilerHome).exists()) {
-                profilerHome = "/space/Builds/profiler/profiler2";
+                profilerHome = PROFILER_HOME;
             }
 
             settings.initialize(profilerHome + "/lib");
