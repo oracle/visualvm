@@ -234,12 +234,10 @@ class ApplicationProfilerView extends DataSourceView {
                   disableControlButtons();
                   ProfilerSupport.getInstance().setProfiledApplication(application);
                   IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                    public void run() {
-                      NetBeansProfiler.getDefaultNB().attachToApp(cpuSettingsSupport.getSettings(), attachSettings);
-                    }
+                    public void run() { startProfiling(application, cpuSettingsSupport.getSettings()); }
                   });
                 }
-            }
+             }
           }
         }
 
@@ -261,11 +259,38 @@ class ApplicationProfilerView extends DataSourceView {
               disableControlButtons();
               ProfilerSupport.getInstance().setProfiledApplication(application);
               IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() {
-                  NetBeansProfiler.getDefaultNB().attachToApp(memorySettingsSupport.getSettings(), attachSettings);
-                }
+                public void run() { startProfiling(application, memorySettingsSupport.getSettings()); }
               });
             }
+          }
+        }
+        
+        private void startProfiling(Application application, ProfilingSettings pSettings) {
+          Runnable calibrationStartUpdater = new Runnable() {
+              public void run() {
+                  SwingUtilities.invokeLater(new Runnable() {
+                      public void run() {
+                          statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_calibration_progress")); // NOI18N
+                      }
+                  });
+              }
+          };
+          Runnable calibrationEndUpdater = new Runnable() {
+              public void run() {
+                  // Not used
+              }
+          };
+          if (ProfilerSupport.getInstance().checkJDKCalibration(application, calibrationStartUpdater, calibrationEndUpdater)) {
+              NetBeansProfiler.getDefaultNB().attachToApp(pSettings, attachSettings);
+          } else {
+              SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                  ProfilerSupport.getInstance().setProfiledApplication(null);
+                  statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_inactive")); // NOI18N
+                  resetControlButtons();
+                  enableControlButtons();
+                }
+              });
           }
         }
 

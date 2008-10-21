@@ -195,16 +195,37 @@ public final class ProfilerSupport {
     
     
     // TODO: move to JVM?
-    private static String getJDKExecutable() {
-        String jdkPath = System.getProperty("java.home"); // NOI18N
-        if (jdkPath == null || jdkPath.trim().length() == 0) return null;
+    private static String getCurrentJDKExecutable() {
+        return getJDKExecutable(System.getProperty("java.home")); // NOI18N
+    }
+    
+    private static String getJDKExecutable(String jdkHome) {
+        if (jdkHome == null || jdkHome.trim().length() == 0) return null;
         String jreSuffix = File.separator + "jre"; // NOI18N
-        if (jdkPath.endsWith(jreSuffix)) jdkPath = jdkPath.substring(0, jdkPath.length() - jreSuffix.length());
-        String jdkExe = jdkPath + File.separator + "bin" + File.separator + "java" + (Platform.isWindows() ? ".exe" : ""); // NOI18N
+        if (jdkHome.endsWith(jreSuffix)) jdkHome = jdkHome.substring(0, jdkHome.length() - jreSuffix.length());
+        String jdkExe = jdkHome + File.separator + "bin" + File.separator + "java" + (Platform.isWindows() ? ".exe" : ""); // NOI18N
         return jdkExe;
     }
+    
+    private boolean checkCurrentJDKCalibration() {
+        return checkCalibration(getCurrentJDKExecutable(), Platform.getJDKVersionString(),
+                Platform.getSystemArchitecture(), null, null);
+    }
+    
+    boolean checkJDKCalibration(Application application, Runnable preCalibrator, Runnable postCalibrator) {
+        Jvm jvm = JvmFactory.getJVMFor(application);
+        Properties properties = jvm.getSystemProperties();
+        if (properties == null) return false;
+        
+        return checkCalibration(getJDKExecutable(properties.getProperty("java.home")), // NOI18N
+                Platform.getJDKVersionString(properties.getProperty("java.version")), // NOI18N
+                Platform.getSystemArchitecture(), preCalibrator, postCalibrator);
+    }
 
-    private boolean checkCalibration() {
+    private boolean checkCalibration(String jvmExecutable, String jdkString, int architecture,
+                                     Runnable preCalibrator, Runnable postCalibrator) {
+        if (jvmExecutable == null) return false;
+        
         // Get ProfilerEngineSettings instance
         org.netbeans.lib.profiler.ProfilerEngineSettings pes = NetBeansProfiler.getDefaultNB().getTargetAppRunner().getProfilerEngineSettings();
 
@@ -215,12 +236,6 @@ public final class ProfilerSupport {
         String savedJDKVersionString = pes.getTargetJDKVersionString();
         int savedArch = pes.getSystemArchitecture();
         String savedCP = pes.getMainClassPath();
-
-        // Set JVM properties
-        String jvmExecutable = getJDKExecutable();
-        if (jvmExecutable == null) return false;
-        String jdkString = Platform.getJDKVersionString();
-        int architecture = Platform.getSystemArchitecture();
 
         boolean result = true;
 
@@ -233,7 +248,11 @@ public final class ProfilerSupport {
         pes.setMainClassPath(""); // NOI18N
 
         // Perform calibration if necessary
-        if (!NetBeansProfiler.getDefaultNB().getTargetAppRunner().readSavedCalibrationData()) result = calibrateJVM();
+        if (!NetBeansProfiler.getDefaultNB().getTargetAppRunner().readSavedCalibrationData()) {
+            if (preCalibrator != null) preCalibrator.run();
+            result = calibrateJVM();
+            if (postCalibrator != null) postCalibrator.run();
+        }
 
         // Restore original ProfilerEngineSettings
         pes.setPortNo(savedPort);
@@ -266,7 +285,7 @@ public final class ProfilerSupport {
     
     
     private ProfilerSupport() {
-        isInitialized = NetBeansProfiler.isInitialized() && checkCalibration();
+        isInitialized = NetBeansProfiler.isInitialized() && checkCurrentJDKCalibration();
         
         if (isInitialized) {
         
