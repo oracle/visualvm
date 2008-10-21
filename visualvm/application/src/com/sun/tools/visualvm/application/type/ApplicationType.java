@@ -22,20 +22,38 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
-
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  *
  * @author Tomas Hurka
  */
-public abstract class ApplicationType extends Model  {
-  public abstract String getName();
-  public abstract String getVersion();
-  public abstract String getDescription();
-  public abstract Image getIcon();
+public abstract class ApplicationType extends Model {
+    static public enum Property {
+        NAME, DESCRIPTION, VERSION, ICON
+    }
+
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        pcs.addPropertyChangeListener(pcl);
+    }
+        
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        pcs.removePropertyChangeListener(pcl);
+    }
+
+    protected void firePropertyChange(Property property, Object oldValue, Object newValue) {
+        pcs.firePropertyChange(property.name(), oldValue, newValue);
+    }
+
+    public abstract String getName();
+    public abstract String getVersion();
+    public abstract String getDescription();
+    public abstract Image getIcon();
 }

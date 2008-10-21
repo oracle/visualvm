@@ -28,6 +28,8 @@ package com.sun.tools.visualvm.application;
 import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * DataSourceDescriptor for Application.
@@ -40,9 +42,19 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
         this(application, ApplicationTypeFactory.getApplicationTypeFor(application));
     }
 
-    private ApplicationDescriptor(Application application, ApplicationType type) {
+    private ApplicationDescriptor(final Application application, final ApplicationType type) {
         super(application, resolveName(application, type), type.getDescription(),
                 type.getIcon(), POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+        type.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (supportsRename()) {
+                    setName(resolveName(application, type));
+                }
+                setIcon(type.getIcon());
+                setDescription(type.getDescription());
+            }
+        });
     }
 
     private static String resolveName(Application application, ApplicationType type) {
