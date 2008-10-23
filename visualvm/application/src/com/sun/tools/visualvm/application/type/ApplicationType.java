@@ -34,8 +34,21 @@ import java.beans.PropertyChangeSupport;
  * @author Tomas Hurka
  */
 public abstract class ApplicationType extends Model {
-    static public enum Property {
-        NAME, DESCRIPTION, VERSION, ICON
+    static public class Property {
+        private String value;
+
+        protected Property(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public static final Property NAME = new Property("name");
+        public static final Property DESCRIPTION = new Property("description");
+        public static final Property VERSION = new Property("version");
+        public static final Property ICON = new Property("icon");
     }
 
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -49,7 +62,7 @@ public abstract class ApplicationType extends Model {
     }
 
     protected void firePropertyChange(Property property, Object oldValue, Object newValue) {
-        pcs.firePropertyChange(property.name(), oldValue, newValue);
+        pcs.firePropertyChange(property.value(), oldValue, newValue);
     }
 
     public abstract String getName();
