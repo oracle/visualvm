@@ -294,6 +294,7 @@ public final class ProfilerSupport {
             profilerViewProvider.initialize();
 
             new ProfilerSnapshotViewProvider().initialize();
+            new SnapshotDiffViewProvider().initialize();
 
             category = new ProfilerSnapshotCategory();
             RegisteredSnapshotCategories.sharedInstance().registerCategory(category);

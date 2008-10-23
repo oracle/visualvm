@@ -24,12 +24,12 @@
  */
 package com.sun.tools.visualvm.profiler;
 
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.util.NbBundle;
 
     
@@ -55,7 +55,8 @@ class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapshot> {
         // Two memory snapshots of different type (alloc vs. liveness) or different
         // getAllocTrackEvery() values can be selected, perform the full check here
         if (org.netbeans.modules.profiler.actions.CompareSnapshotsAction.areComparableSnapshots(s2, s1)) { 
-            ResultsManager.getDefault().compareSnapshots(s1, s2);
+            SnapshotDiffContainer sdc = new SnapshotDiffContainer(snapshotsArr[0], snapshotsArr[1], snapshotsArr[0].getMaster());
+            DataSourceWindowManager.sharedInstance().openDataSource(sdc);
         } else {
             String msg = NbBundle.getMessage(CompareSnapshotsAction.class, "MSG_Not_Comparable");    // NOI18N
             NetBeansProfiler.getDefaultNB().displayError(msg);
