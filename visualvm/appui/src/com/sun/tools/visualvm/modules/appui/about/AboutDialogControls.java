@@ -215,10 +215,13 @@ public class AboutDialogControls extends JPanel {
         RandomAccessFile raf = null;
         try {
             raf = new RandomAccessFile(logfile, "r"); // NOI18N
-            final byte[] buffer = new byte[(int)raf.length()];
+            byte[] buffer = new byte[(int)raf.length()];
             raf.readFully(buffer);
+            final String logfileContents = new String(buffer);
             SwingUtilities.invokeAndWait(new Runnable() {
                public void run() {
+                   String string = logfileContents;
+                   if (string.length() == 0) string = NbBundle.getMessage(AboutDialogControls.class, "MSG_Logfile_notready"); // NOI18N
                    final TextBrowser tb = TextBrowser.getInstance();
                    JButton helperButton = new JButton() {
                        protected void fireActionPerformed(ActionEvent event) {
@@ -226,9 +229,10 @@ public class AboutDialogControls extends JPanel {
                         }
                    };
                    Mnemonics.setLocalizedText(helperButton, NbBundle.getMessage(AboutDialogControls.class, "BTN_Save_file")); // NOI18N
+                   helperButton.setEnabled(logfileContents.length() > 0);
                    tb.setPreferredBrowserSize(new Dimension(700, 550));
                    tb.setHelperButton(helperButton);
-                   tb.showCodeText(new String(buffer));
+                   tb.showCodeText(string);
                } 
             });
         } finally {
