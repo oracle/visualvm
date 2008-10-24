@@ -23,9 +23,10 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom;
+package com.sun.tools.visualvm.modules.customtype;
 
-import com.sun.tools.visualvm.application.type.custom.images.ImageCache;
+import com.sun.tools.visualvm.modules.customtype.icons.IconCache;
+import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -47,31 +48,40 @@ public class ApplicationType extends com.sun.tools.visualvm.application.type.App
         public static final Property INFO_URL = new ApplicationType.Property("info_url"); // NOI18N
         public static final Property MAIN_CLASS = new ApplicationType.Property("main-class"); // NOI18N
     }
-    private ApplicationTypeModel model;
+    private String mainClass;
+    private String name;
+    private String version;
+    private String description;
+    private URL iconUrl;
+    private URL infoUrl;
 
-    private Image icon;
+    private BufferedImage icon;
     final private static Image DEFAULT_ICON = Utilities.loadImage("com/sun/tools/visualvm/application/resources/application.png"); // NOI18N
 
-    public ApplicationType(ApplicationTypeModel model) {
-        this.model = model;
-        loadIcon();
+    ApplicationType(String mainClass, String name, String version, String description, URL iconUrl, URL infoUrl) {
+        this.mainClass = mainClass;
+        this.name = name;
+        this.version = version;
+        this.description = description;
+        this.iconUrl = iconUrl;
+        this.infoUrl = infoUrl;
     }
 
-    private void loadIcon() {
-        if (model.getIconURL() == null) {
-            this.icon = DEFAULT_ICON;
+    void loadIcon() {
+        if (iconUrl == null) {
+            setIcon(null);
         } else {
             try {
-                this.icon = ImageIO.read(model.getIconURL());
+                setIcon(ImageIO.read(iconUrl));
             } catch (IOException e) {}
         }
 
-        if (this.icon == null && model.getInfoURL() != null) {
+        if (iconUrl == null && infoUrl != null) {
             RequestProcessor.getDefault().post(new Runnable() {
 
                 @Override
                 public void run() {
-                    BufferedImage img = ImageCache.getDefault().retrieveObject(model.getInfoURL());
+                    BufferedImage img = IconCache.getDefault().retrieveObject(infoUrl);
                     if (img != null) {
                         setIcon(img);
                     }
@@ -82,67 +92,80 @@ public class ApplicationType extends com.sun.tools.visualvm.application.type.App
 
     @Override
     public String getDescription() {
-        return model.getDescription();
+        return description;
     }
 
     public void setDescription(String description) {
-        String oldDescription = model.getDescription();
-        model.setDescription(description);
+        String oldDescription = this.description;
+        this.description = description;
         firePropertyChange(Property.DESCRIPTION, oldDescription, description);
     }
 
-    public void setVersion(String version) {
-        String oldVersion = model.getVersion();
-        model.setVersion(version);
-        firePropertyChange(Property.VERSION, oldVersion, version);
+    public URL getIconURL() {
+        return iconUrl;
+    }
+
+    public void setIconURL(URL iconUrl) {
+        this.iconUrl = iconUrl;
+        loadIcon();
+    }
+
+    public URL getInfoURL() {
+        return infoUrl;
+    }
+
+    public void setInfoUrl(URL infoUrl) {
+        URL oldUrl = this.infoUrl;
+        this.infoUrl = infoUrl;
+        firePropertyChange(Property.INFO_URL, oldUrl, infoUrl);
+//        IconCache.getDefault().invalidateObject(oldUrl);
+        loadIcon();
     }
 
     public String getMainClass() {
-        return model.getMainClass();
+        return mainClass;
     }
 
     public void setMainClass(String mainClass) {
-        String oldClass = model.getMainClass();
-        model.setMainClass(mainClass);
+        String oldClass = this.mainClass;
+        this.mainClass = mainClass;
         firePropertyChange(Property.MAIN_CLASS, oldClass, mainClass);
     }
 
     @Override
-    public Image getIcon() {
-        return icon;
-    }
-
-    @Override
     public String getName() {
-        return model.getName();
+        return name;
     }
 
     public void setName(String name) {
-        String oldName = model.getName();
-        model.setName(name);
+        String oldName = this.name;
+        this.name = name;
         firePropertyChange(Property.NAME, oldName, name);
     }
 
     @Override
     public String getVersion() {
-        return model.getVersion();
+        return version;
     }
 
-    public URL getInfoUrl() {
-        return model.getInfoURL();
+    public void setVersion(String version) {
+        String oldVersion = this.version;
+        this.version = version;
+        firePropertyChange(Property.VERSION, oldVersion, version);
     }
 
-    public void setInfoUrl(URL url) {
-        model.setInfoUrl(url);
+    @Override
+    public Image getIcon() {
+        if (icon == null) {
+            return DEFAULT_ICON;
+        }
+
+        return ImageUtils.resizeImage(icon, 16, 16);
     }
 
-    private void setIcon(Image icon) {
-        Image oldIcon = this.icon;
+    private void setIcon(BufferedImage icon) {
+        BufferedImage oldIcon = this.icon;
         this.icon = icon;
         firePropertyChange(Property.ICON, oldIcon, icon);
-    }
-
-    public ApplicationTypeModel getModel() {
-        return model;
     }
 }

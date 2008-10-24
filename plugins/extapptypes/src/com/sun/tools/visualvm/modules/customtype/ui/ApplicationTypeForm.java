@@ -29,10 +29,10 @@
  * Created on Oct 22, 2008, 2:40:07 PM
  */
 
-package com.sun.tools.visualvm.application.type.custom.ui;
+package com.sun.tools.visualvm.modules.customtype.ui;
 
-import com.sun.tools.visualvm.application.type.custom.ApplicationTypeModel;
-import com.sun.tools.visualvm.application.type.custom.images.ImageUtils;
+import com.sun.tools.visualvm.modules.customtype.ApplicationType;
+import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -52,16 +52,16 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
     final private static String defaultName = "<" + "New Application Type" + ">";
     final private static String defaultDescription = "<" + "Put description here" + ">";
 
-    final private static ImageIcon DEFAULT_ICON = new javax.swing.ImageIcon(ApplicationTypeForm.class.getResource("/com/sun/tools/visualvm/application/type/ex/ui/application.png")); // NOI18N
+    final private static ImageIcon DEFAULT_ICON = new javax.swing.ImageIcon(ApplicationTypeForm.class.getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png")); // NOI18N
 
-    private ApplicationTypeModel applicationTypeModel;
+    private ApplicationType applicationType;
 
     private File iconFile = null;
 
     /** Creates new form NewApplicationTypeForm */
-    public ApplicationTypeForm(ApplicationTypeModel appTypeModel) {
+    public ApplicationTypeForm(ApplicationType appType) {
         initComponents();
-        applicationTypeModel = appTypeModel;
+        applicationType = appType;
         loadData();
     }
 
@@ -129,10 +129,9 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         });
 
         appTypeIcon.setDisplayedMnemonic('I');
-        appTypeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/tools/visualvm/application/type/custom/ui/application.png"))); // NOI18N
+        appTypeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png"))); // NOI18N
         appTypeIcon.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeIcon.text")); // NOI18N
         appTypeIcon.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        appTypeIcon.setFocusTraversalPolicyProvider(true);
         appTypeIcon.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 appTypeIconMouseClicked(evt);
@@ -221,7 +220,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(descriptionLabel)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -306,12 +305,19 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void loadData() {
-        appTypeName.setText(applicationTypeModel.getName().isEmpty() ? defaultName : applicationTypeModel.getName());
-        appTypeMainClass.setText(applicationTypeModel.getMainClass());
-        appTypeUrl.setText(applicationTypeModel.getInfoURL() != null ? applicationTypeModel.getInfoURL().toString() : "");
-        appTypeDescription.setText((applicationTypeModel.getDescription() != null && !applicationTypeModel.getDescription().isEmpty()) ? applicationTypeModel.getDescription() : defaultDescription);
-        if (applicationTypeModel.getIconURL() != null) {
-            appTypeIcon.setIcon(new ImageIcon(applicationTypeModel.getIconURL()));
+        appTypeName.setText(applicationType.getName() == null || applicationType.getName().isEmpty() ? defaultName : applicationType.getName());
+        appTypeMainClass.setText(applicationType.getMainClass());
+        appTypeUrl.setText(applicationType.getInfoURL() != null ? applicationType.getInfoURL().toString() : "");
+        appTypeDescription.setText((applicationType.getDescription() != null && !applicationType.getDescription().isEmpty()) ? applicationType.getDescription() : defaultDescription);
+        if (applicationType.getIconURL() != null) {
+            BufferedImage iconImage = null;
+            try {
+                iconImage = ImageIO.read(applicationType.getIconURL());
+            } catch (IOException e) {}
+            if (iconImage != null) {
+                iconImage = ImageUtils.resizeImage(iconImage, 16, 16);
+            }
+            appTypeIcon.setIcon(new ImageIcon(iconImage));
         } else {
             appTypeIcon.setIcon(DEFAULT_ICON);
         }
@@ -339,15 +345,15 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         }
 
         if (result) {
-            applicationTypeModel.setName(appTypeName.getText());
-            applicationTypeModel.setMainClass(appTypeMainClass.getText());
-            applicationTypeModel.setDescription(appTypeDescription.getText().equals(defaultDescription) ? "" : appTypeDescription.getText());
+            applicationType.setName(appTypeName.getText());
+            applicationType.setMainClass(appTypeMainClass.getText());
+            applicationType.setDescription(appTypeDescription.getText().equals(defaultDescription) ? "" : appTypeDescription.getText());
             if (iconFile != null) {
                 try {
-                    applicationTypeModel.setIconURL(iconFile.toURI().toURL());
+                    applicationType.setIconURL(iconFile.toURI().toURL());
                 } catch (IOException e) {}
             }
-            applicationTypeModel.setInfoUrl(infoUrl);
+            applicationType.setInfoUrl(infoUrl);
         }
         return result;
     }

@@ -23,42 +23,30 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom.cache;
+package com.sun.tools.visualvm.modules.customtype.icons;
+
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 /**
- * Generic key/value persistor
- * Supports retrieving a value by the given key and storing a value with the given key
+ *
  * @author Jaroslav Bachorik
  */
-public interface Persistor<K, V> {
-    /**
-     * Retrieves {@linkplain Entry} for the given key
-     * @param key The key to retrieve {@linkplain Entry} instance
-     * @return Returns the retrieved {@linkplain Entry} instance or NULL
-     */
-    Entry<V> retrieve(K key);
-    /**
-     * Stores the {@linkplain Entry} together with its key
-     * @param key The key to be used
-     * @param value The value to be used
-     */
-    void store(K key, Entry<V> value);
+public class ImageUtils {
+    final public static BufferedImage resizeImage(BufferedImage img, int width, int height) {
+        Graphics2D gin = img.createGraphics();
+        GraphicsConfiguration gc = gin.getDeviceConfiguration();
+        gin.dispose();
 
-    /**
-     * The default (NULL-value) instance
-     */
-    final public static Persistor DEFAULT = new Persistor() {
+        BufferedImage dst = gc.createCompatibleImage(width, height, BufferedImage.BITMASK);
+        Graphics2D gr = dst.createGraphics();
+        gr.setComposite(AlphaComposite.Src);
 
-        @Override
-        public Entry retrieve(Object key) {
-            // do nothing
-            return null;
-        }
-
-        @Override
-        public void store(Object key, Entry value) {
-            // do nothing
-        }
-
-    };
+        AffineTransform at = AffineTransform.getScaleInstance((double)width/img.getWidth(), (double)height/img.getHeight());
+        gr.drawRenderedImage(img,at);
+        return dst;
+    }
 }

@@ -22,25 +22,45 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package com.sun.tools.visualvm.application.type.custom;
 
-import org.openide.modules.ModuleInstall;
+package com.sun.tools.visualvm.modules.customtype.icons;
+
+import com.sun.tools.visualvm.modules.customtype.cache.AbstractCache;
+import com.sun.tools.visualvm.modules.customtype.cache.Entry;
+import com.sun.tools.visualvm.modules.customtype.cache.Persistor;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
+ *
+ * @author Jaroslav Bachorik
  */
-public class Installer extends ModuleInstall {
+public class IconCache extends AbstractCache<URL, BufferedImage> {
+    final private IconResolver resolver = new IconResolver();
 
-    @Override
-    public void restored() {
-        ApplicationTypeFactory.initialize();
+    final private static class Singleton {
+
+        final private static IconCache INSTANCE = new IconCache();
+    }
+
+    final public static IconCache getDefault() {
+        return Singleton.INSTANCE;
+    }
+
+    private IconCache() {
+        try {
+            setPersistor(new FileImagePersistor());
+        } catch (InstantiationException e) {
+            setPersistor(Persistor.DEFAULT);
+        }
     }
 
     @Override
-    public void uninstalled() {
-        ApplicationTypeFactory.shutdown();
+    protected Entry<BufferedImage> cacheMiss(URL key) {
+        BufferedImage img = resolver.resolveIcon(key);
+        if (img != null) {
+            img = ImageUtils.resizeImage(img, 16, 16);
+        }
+        return new Entry<BufferedImage>(resolver.resolveIcon(key));
     }
-
-
 }

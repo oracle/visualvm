@@ -23,9 +23,9 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom;
+package com.sun.tools.visualvm.modules.customtype;
 
-import com.sun.tools.visualvm.application.type.custom.images.ImageUtils;
+import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -58,7 +58,11 @@ public class ApplicationTypeManager {
         defRepository = Repository.getDefault().getDefaultFileSystem().findResource("VisualVM/ApplicationTypes"); // NOI18N
     }
 
-    public ApplicationTypeModel findModel(String mainClass) {
+    public ApplicationType newType(String mainClass) {
+        return new ApplicationType(mainClass, null, null, null, null, null);
+    }
+
+    public ApplicationType findType(String mainClass) {
         Enumeration<? extends FileObject> defs = defRepository.getFolders(false);
         while (defs.hasMoreElements()) {
             FileObject def = defs.nextElement();
@@ -82,34 +86,34 @@ public class ApplicationTypeManager {
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     }
-                    return new ApplicationTypeModel(mainClass, name, "", description, iconUrl, infoUrl);
+                    return new ApplicationType(mainClass, name, "", description, iconUrl, infoUrl);
                 }
             }
         }
         return null;
     }
 
-    public void storeModel(final ApplicationTypeModel model) throws IOException {
+    public void storeType(final ApplicationType type) throws IOException {
         Repository.getDefault().getDefaultFileSystem().runAtomicAction(new AtomicAction() {
 
             @Override
             public void run() throws IOException {
-                String defName = model.getName().replace(' ', '_') + ".def";
+                String defName = type.getName().replace(' ', '_') + ".def";
                 FileObject defFolder = defRepository.getFileObject(defName);
                 if (defFolder == null) {
                     defFolder = defRepository.createFolder(defName);
                 }
-                defFolder.setAttribute("displayName", model.getName());
-                defFolder.setAttribute("mainClass", model.getMainClass());
-                if (model.getInfoURL() != null) {
-                    defFolder.setAttribute("url", model.getInfoURL().toString());
+                defFolder.setAttribute("displayName", type.getName());
+                defFolder.setAttribute("mainClass", type.getMainClass());
+                if (type.getInfoURL() != null) {
+                    defFolder.setAttribute("url", type.getInfoURL().toString());
                 }
-                if (model.getIconURL() != null) {
+                if (type.getIconURL() != null) {
                     FileObject iconFile = defFolder.getFileObject("icon.png");
                     if (iconFile == null) {
                         iconFile = defFolder.createData("icon.png");
                     }
-                    BufferedImage bIcon = ImageIO.read(model.getIconURL());
+                    BufferedImage bIcon = ImageIO.read(type.getIconURL());
 
                     FileLock lock = iconFile.lock();
                     OutputStream os = iconFile.getOutputStream(lock);

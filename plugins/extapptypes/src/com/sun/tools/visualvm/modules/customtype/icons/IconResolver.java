@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package com.sun.tools.visualvm.application.type.custom.images;
+package com.sun.tools.visualvm.modules.customtype.icons;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -38,13 +38,13 @@ import javax.imageio.ImageIO;
  *
  * @author Jaroslav Bachorik
  */
-class ImageResolver {
+class IconResolver {
 
     final private static Pattern favicoLinkPattern = Pattern.compile("\\<link(.+?)/?\\>", Pattern.MULTILINE | Pattern.DOTALL);
     final private static Pattern favicoHrefPattern = Pattern.compile("href=[\\\"'](.+?)[\\\"']", Pattern.MULTILINE | Pattern.DOTALL);
     final private static String[] extensions = new String[]{"png", "gif", "jpg", "jpeg"};
 
-    BufferedImage resolveImage(URL url) {
+    BufferedImage resolveIcon(URL url) {
         BufferedImage resolvedImage = null;
 
         for (String extension : extensions) {
@@ -74,7 +74,7 @@ class ImageResolver {
             String favicoPath = null;
             while (linkMatcher.find()) {
                 String content = linkMatcher.group(1);
-                if (content.contains("shortcut") || content.contains("link")) {
+                if (content.contains("shortcut") || content.contains("icon")) {
                     Matcher hrefMatcher = favicoHrefPattern.matcher(content);
                     if (hrefMatcher.find()) {
                         favicoPath = hrefMatcher.group(1);
@@ -87,14 +87,12 @@ class ImageResolver {
                 }
             }
             if (favicoPath != null) {
-                String basePath = url.toString();
-                if (basePath.endsWith("/") || favicoPath.startsWith("/")) {
-                    favicoPath = basePath + favicoPath;
+                URL favicoUrl = null;
+                if (favicoPath.startsWith("/")) { // absolute path
+                    favicoUrl = new URL(url.getProtocol(), url.getHost(), favicoPath);
                 } else {
-                    favicoPath = basePath + "/" + favicoPath;
+                    favicoUrl = new URL(url.getProtocol(), url.getHost(), url.getFile() + "/" + favicoPath);
                 }
-
-                URL favicoUrl = new URL(favicoPath);
                 System.err.println("Resolving image: " + favicoUrl.toString());
 
                 return ImageIO.read(favicoUrl);
@@ -126,6 +124,10 @@ class ImageResolver {
     }
 
     private boolean isSupported(String imagePath) {
+        int jsIndex = imagePath.indexOf(";");
+        if (jsIndex > -1) {
+            imagePath = imagePath.substring(0, jsIndex);
+        }
         for (String ext : extensions) {
             if (imagePath.endsWith(ext)) {
                 return true;

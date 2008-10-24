@@ -22,10 +22,10 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package com.sun.tools.visualvm.application.type.custom.images;
+package com.sun.tools.visualvm.modules.customtype.icons;
 
-import com.sun.tools.visualvm.application.type.custom.cache.Persistor;
-import com.sun.tools.visualvm.application.type.custom.cache.Entry;
+import com.sun.tools.visualvm.modules.customtype.cache.Persistor;
+import com.sun.tools.visualvm.modules.customtype.cache.Entry;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import java.awt.image.BufferedImage;
 import java.io.IOException;

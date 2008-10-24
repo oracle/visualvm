@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom;
+package com.sun.tools.visualvm.modules.customtype;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
@@ -74,12 +74,10 @@ public class ApplicationTypeFactory extends com.sun.tools.visualvm.application.t
     }
 
     private ApplicationType findType(String mainClass) {
-        ApplicationType type = null;
-        ApplicationTypeModel model = manager.findModel(mainClass);
+        ApplicationType type = manager.findType(mainClass);
 
-        if (model != null) {
-            type = new ApplicationType(model);
-
+        if (type != null) {
+            type.loadIcon();
             synchronized(typeMap) {
                 typeMap.put(mainClass, type);
             }

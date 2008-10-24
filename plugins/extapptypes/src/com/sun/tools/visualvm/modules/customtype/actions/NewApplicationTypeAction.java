@@ -23,18 +23,17 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom.actions;
+package com.sun.tools.visualvm.modules.customtype.actions;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.application.type.DefaultApplicationType;
-import com.sun.tools.visualvm.application.type.custom.ApplicationTypeManager;
-import com.sun.tools.visualvm.application.type.custom.ApplicationTypeModel;
-import com.sun.tools.visualvm.application.type.custom.ui.ApplicationTypeForm;
+import com.sun.tools.visualvm.modules.customtype.ApplicationTypeManager;
+import com.sun.tools.visualvm.modules.customtype.ui.ApplicationTypeForm;
 import com.sun.tools.visualvm.core.ui.actions.DataSourceAction;
+import com.sun.tools.visualvm.modules.customtype.ApplicationType;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,7 +67,7 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
     protected void updateState(Set<Application> selectedApps) {
         if (selectedApps.size() == 1) {
             selectedApp = selectedApps.iterator().next();
-            ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(selectedApp);
+            com.sun.tools.visualvm.application.type.ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(selectedApp);
             if (at instanceof DefaultApplicationType) {
                 if (!JvmFactory.getJVMFor(selectedApp).getMainClass().isEmpty()) {
                     setEnabled(true);
@@ -87,7 +86,7 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
     public void actionPerformed(ActionEvent e) {
         Jvm jvm = JvmFactory.getJVMFor(selectedApp);
         if (jvm != null) {
-            ApplicationTypeModel eat = new ApplicationTypeModel(jvm.getMainClass(), "", null, null, null, null);
+            ApplicationType eat = ApplicationTypeManager.getDefault().newType(jvm.getMainClass());
             final ApplicationTypeForm form = new ApplicationTypeForm(eat);
 
             final DialogDescriptor[] dd = new DialogDescriptor[1];
@@ -96,7 +95,7 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (e.getActionCommand().equals(DialogDescriptor.OK_OPTION) && form.storeData()) {
+                    if (e.getSource().equals(DialogDescriptor.OK_OPTION) && form.storeData()) {
                         dd[0].setClosingOptions(new Object[] {DialogDescriptor.OK_OPTION});
                     }
                 }
@@ -108,7 +107,7 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
             dlg.setVisible(true);
             if (dd[0].getValue() == DialogDescriptor.OK_OPTION) {
                 try {
-                    ApplicationTypeManager.getDefault().storeModel(eat);
+                    ApplicationTypeManager.getDefault().storeType(eat);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

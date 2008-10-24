@@ -22,41 +22,25 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+package com.sun.tools.visualvm.modules.customtype;
 
-package com.sun.tools.visualvm.application.type.custom.images;
-
-import com.sun.tools.visualvm.application.type.custom.cache.AbstractCache;
-import com.sun.tools.visualvm.application.type.custom.cache.Entry;
-import com.sun.tools.visualvm.application.type.custom.cache.Persistor;
-import java.awt.image.BufferedImage;
-import java.net.URL;
+import org.openide.modules.ModuleInstall;
 
 /**
- *
- * @author Jaroslav Bachorik
+ * Manages a module's lifecycle. Remember that an installer is optional and
+ * often not needed at all.
  */
-public class ImageCache extends AbstractCache<URL, BufferedImage> {
-    final private ImageResolver resolver = new ImageResolver();
+public class Installer extends ModuleInstall {
 
-    final private static class Singleton {
-
-        final private static ImageCache INSTANCE = new ImageCache();
-    }
-
-    final public static ImageCache getDefault() {
-        return Singleton.INSTANCE;
-    }
-
-    private ImageCache() {
-        try {
-            setPersistor(new FileImagePersistor());
-        } catch (InstantiationException e) {
-            setPersistor(Persistor.DEFAULT);
-        }
+    @Override
+    public void restored() {
+        ApplicationTypeFactory.initialize();
     }
 
     @Override
-    protected Entry<BufferedImage> cacheMiss(URL key) {
-        return new Entry(resolver.resolveImage(key));
+    public void uninstalled() {
+        ApplicationTypeFactory.shutdown();
     }
+
+
 }

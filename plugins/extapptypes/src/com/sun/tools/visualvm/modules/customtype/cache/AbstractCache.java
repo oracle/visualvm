@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom.cache;
+package com.sun.tools.visualvm.modules.customtype.cache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +53,7 @@ abstract public class AbstractCache<K, V> {
             }
             if (entry == null) {
                 entry = cacheMiss(key);
-                if (entry != null) {
+                if (entry != null && entry.getContent() != null) {
                     persistor.store(key, entry);
                     imageCache.put(key, entry);
                 }
@@ -61,7 +61,7 @@ abstract public class AbstractCache<K, V> {
                 long timestamp = System.currentTimeMillis();
                 if ((timestamp - entry.getUpdateTimeStamp()) > update_interval) {
                     Entry<V> newEntry = cacheMiss(key);
-                    if (newEntry != null) {
+                    if (newEntry != null && newEntry.getContent() != null) {
                         persistor.store(key, entry);
                         imageCache.put(key, newEntry);
                         entry = newEntry;
@@ -72,6 +72,12 @@ abstract public class AbstractCache<K, V> {
         }
     }
 
+    public V invalidateObject(K key) {
+        synchronized(imageCache) {
+            Entry<V> entry = imageCache.remove(key);
+            return entry.getContent();
+        }
+    }
     /**
      * Property getter
      * @return Returns {@linkplain Persistor} instance used by the cache

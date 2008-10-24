@@ -23,14 +23,14 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.application.type.custom.actions;
+package com.sun.tools.visualvm.modules.customtype.actions;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.application.type.custom.ApplicationType;
-import com.sun.tools.visualvm.application.type.custom.ApplicationTypeManager;
-import com.sun.tools.visualvm.application.type.custom.ui.ApplicationTypeForm;
+import com.sun.tools.visualvm.modules.customtype.ApplicationType;
+import com.sun.tools.visualvm.modules.customtype.ApplicationTypeManager;
+import com.sun.tools.visualvm.modules.customtype.ui.ApplicationTypeForm;
 import com.sun.tools.visualvm.core.ui.actions.DataSourceAction;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -83,7 +83,7 @@ public class EditApplicationTypeAction extends DataSourceAction<Application> {
     @Override
     public void actionPerformed(ActionEvent e) {
         final ApplicationType at = (ApplicationType)ApplicationTypeFactory.getApplicationTypeFor(selectedApp);
-        final ApplicationTypeForm form = new ApplicationTypeForm(at.getModel());
+        final ApplicationTypeForm form = new ApplicationTypeForm(at);
 
         final DialogDescriptor[] dd = new DialogDescriptor[1];
 
@@ -103,7 +103,7 @@ public class EditApplicationTypeAction extends DataSourceAction<Application> {
         dlg.setVisible(true);
         if (dd[0].getValue() == DialogDescriptor.OK_OPTION) {
             try {
-                ApplicationTypeManager.getDefault().storeModel(at.getModel());
+                ApplicationTypeManager.getDefault().storeType(at);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
