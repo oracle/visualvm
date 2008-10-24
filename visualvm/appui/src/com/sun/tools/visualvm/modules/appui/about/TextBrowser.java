@@ -51,6 +51,7 @@ import org.openide.util.NbBundle;
  */
 public class TextBrowser {
 
+    private boolean copyingAllHtmlToClipboard = false;
 
     // --- Internal API --------------------------------------------------------
 
@@ -92,9 +93,25 @@ public class TextBrowser {
         dialog.setVisible(true);
     }
     
+    void setHelperButton(JButton helperButton) {
+        if (this.helperButton != null && helperButton == null)
+            buttonsContainer.remove(this.helperButton);
+        else if (this.helperButton == null && helperButton != null)
+            buttonsContainer.add(helperButton, BorderLayout.WEST);
+        this.helperButton = helperButton;
+    }
+    
     void close() {
         dialog.setVisible(false);
         dialog.dispose();
+    }
+    
+    void copyAllHtmlToClipboard() {
+        if (!htmlTextDisplayer.getText().isEmpty()) {
+            copyingAllHtmlToClipboard = true;
+            try { htmlTextDisplayer.copy(); }
+            finally { copyingAllHtmlToClipboard = false; }
+        }
     }
     
     
@@ -116,7 +133,16 @@ public class TextBrowser {
                 public void actionPerformed(ActionEvent e) { close(); }});
         
         textDisplayer = new TextViewerComponent();
-        htmlTextDisplayer = new HTMLTextArea();
+        htmlTextDisplayer = new HTMLTextArea() {
+            public int getSelectionStart() {
+                if (copyingAllHtmlToClipboard) return 0;
+                else return super.getSelectionStart();
+            }
+            public int getSelectionEnd() {
+                if (copyingAllHtmlToClipboard) return getText().length();
+                else return super.getSelectionEnd();
+            }
+        };
         displayerScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
         textDisplayer.setForeground(htmlTextDisplayer.getForeground());
@@ -137,7 +163,7 @@ public class TextBrowser {
             }
         });
         
-        JPanel buttonsContainer = new JPanel(new BorderLayout());
+        buttonsContainer = new JPanel(new BorderLayout());
         buttonsContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 6, 10));
         buttonsContainer.add(closeButton, BorderLayout.EAST);
         
@@ -150,6 +176,7 @@ public class TextBrowser {
     }
     
     private void cleanup() {
+        setHelperButton(null);
         displayerScrollPane.getViewport().removeAll();
         textDisplayer.setText(""); // NOI18N
         htmlTextDisplayer.setText(""); // NOI18N
@@ -159,7 +186,9 @@ public class TextBrowser {
     
     private JDialog dialog;
     private JComponent contentPane;
+    private JPanel buttonsContainer;
     private JButton closeButton;
+    private JButton helperButton;
     private TextViewerComponent textDisplayer;
     private HTMLTextArea htmlTextDisplayer;
     private JScrollPane displayerScrollPane;

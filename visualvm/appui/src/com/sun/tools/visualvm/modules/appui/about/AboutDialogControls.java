@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.about;
 
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -37,12 +38,17 @@ import java.io.RandomAccessFile;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -55,6 +61,14 @@ public class AboutDialogControls extends JPanel {
 
     AboutDialogControls() {
         initComponents();
+        
+        lastLogfileSave = System.getProperty("user.home"); // NOI18N
+        if (!new File(lastLogfileSave).isDirectory()) {
+            lastLogfileSave = System.getProperty("java.io.tmpdir"); // NOI18N
+            if (!new File(lastLogfileSave).isDirectory()) lastLogfileSave = null;
+        }
+        if (lastLogfileSave != null) lastLogfileSave = lastLogfileSave +
+                                     File.separator + "logfile.txt"; // NOI18N
     }
 
     JButton getDefaultButton() {
@@ -138,9 +152,21 @@ public class AboutDialogControls extends JPanel {
     }
     
     private void showDetails() {
-        TextBrowser.getInstance().setCaption(NbBundle.getMessage(AboutDialogControls.class, "TITLE_Details"));    // NOI18N
-        TextBrowser.getInstance().setPreferredBrowserSize(new Dimension(450, 250));
-        TextBrowser.getInstance().showHTMLText(AboutDialog.getInstance().getDetails());
+        final TextBrowser tb = TextBrowser.getInstance();
+        JButton helperButton = new JButton() {
+            protected void fireActionPerformed(ActionEvent event) {
+                tb.copyAllHtmlToClipboard();
+                JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(),
+                        NbBundle.getMessage(AboutDialogControls.class, "MSG_Copy_Clipboard"), // NOI18N
+                        NbBundle.getMessage(AboutDialogControls.class, "CAPTION_Copy_Clipbard"), // NOI18N
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        };
+        Mnemonics.setLocalizedText(helperButton, NbBundle.getMessage(AboutDialogControls.class, "BTN_Copy_Clipboard")); // NOI18N
+        tb.setCaption(NbBundle.getMessage(AboutDialogControls.class, "TITLE_Details"));    // NOI18N
+        tb.setPreferredBrowserSize(new Dimension(450, 250));
+        tb.setHelperButton(helperButton);
+        tb.showHTMLText(AboutDialog.getInstance().getDetails());
     }
     
     private void showLogfile() {
@@ -185,7 +211,7 @@ public class AboutDialogControls extends JPanel {
         new Thread(logfileDisplayer).start();
     }
     
-    private void showLogfileInBrowser(File logfile) throws Exception {
+    private void showLogfileInBrowser(final File logfile) throws Exception {
         RandomAccessFile raf = null;
         try {
             raf = new RandomAccessFile(logfile, "r"); // NOI18N
@@ -193,12 +219,52 @@ public class AboutDialogControls extends JPanel {
             raf.readFully(buffer);
             SwingUtilities.invokeAndWait(new Runnable() {
                public void run() {
-                   TextBrowser.getInstance().setPreferredBrowserSize(new Dimension(700, 550));
-                   TextBrowser.getInstance().showCodeText(new String(buffer));
+                   final TextBrowser tb = TextBrowser.getInstance();
+                   JButton helperButton = new JButton() {
+                       protected void fireActionPerformed(ActionEvent event) {
+                            saveFileAs(logfile);
+                        }
+                   };
+                   Mnemonics.setLocalizedText(helperButton, NbBundle.getMessage(AboutDialogControls.class, "BTN_Save_file")); // NOI18N
+                   tb.setPreferredBrowserSize(new Dimension(700, 550));
+                   tb.setHelperButton(helperButton);
+                   tb.showCodeText(new String(buffer));
                } 
             });
         } finally {
             if (raf != null) raf.close();
+        }
+    }
+    
+    private void saveFileAs(final File file) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle(NbBundle.getMessage(AboutDialogControls.class, "CAPTION_Save_logfile")); // NOI18N
+        chooser.setSelectedFile(new File(lastLogfileSave));
+        if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
+            final File copy = chooser.getSelectedFile();
+//            if (copy.isFile()) // TODO: show a confirmation dialog for already existing file
+            lastLogfileSave = copy.getAbsolutePath();
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    ProgressHandle pHandle = null;
+                    try {
+                        pHandle = ProgressHandleFactory.createHandle(
+                                NbBundle.getMessage(AboutDialogControls.class,
+                                "MSG_Saving_logfile", file.getName()));  // NOI18N
+                        pHandle.setInitialDelay(0);
+                        pHandle.start();
+                        if (!Utils.copyFile(file, copy)) JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(), 
+                            NbBundle.getMessage(AboutDialogControls.class, "MSG_Save_logfile_failed"),   // NOI18N
+                            NbBundle.getMessage(AboutDialogControls.class, "CAPTION_Save_logfile_failed"),    // NOI18N
+                            JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        final ProgressHandle pHandleF = pHandle;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { if (pHandleF != null) pHandleF.finish(); }
+                        });
+                    }
+                }
+            });
         }
     }
     
@@ -208,5 +274,7 @@ public class AboutDialogControls extends JPanel {
     private JButton detailsButton;
     private JButton logfileButton;
     private JPanel buttonsContainer;
+    
+    private String lastLogfileSave;
 
 }
