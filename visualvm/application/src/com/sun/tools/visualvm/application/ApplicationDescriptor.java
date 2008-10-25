@@ -28,8 +28,10 @@ package com.sun.tools.visualvm.application;
 import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * DataSourceDescriptor for Application.
@@ -37,6 +39,8 @@ import java.beans.PropertyChangeListener;
  * @author Jiri Sedlacek
  */
  public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
+     
+    private String name;
 
     protected ApplicationDescriptor(Application application) {
         this(application, ApplicationTypeFactory.getApplicationTypeFor(application));
@@ -45,28 +49,59 @@ import java.beans.PropertyChangeListener;
     private ApplicationDescriptor(final Application application, final ApplicationType type) {
         super(application, resolveName(application, type), type.getDescription(),
                 type.getIcon(), POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+        name = super.getName();
         type.addPropertyChangeListener(new PropertyChangeListener() {
-
             public void propertyChange(PropertyChangeEvent evt) {
-                if (supportsRename()) {
-                    setName(resolveName(application, type));
+                String propertyName = evt.getPropertyName();
+                if (ApplicationType.Property.NAME.value().equals(propertyName)) {
+                    // Name already customized by the user, do not change it
+                    if (getPersistedName(application) != null) return;
+                    
+                    if (supportsRename()) {
+                        // Descriptor supports renaming, use setName(), sync name
+                        setName((String)evt.getNewValue());
+                        name = ApplicationDescriptor.super.getName();
+                    } else {
+                        // Descriptor doesn't support renaming, set name for overriden getName()
+                        String oldName = name;
+                        name = createGenericName(application, type.getName());
+                        PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
+                        if (pcs != null) pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
+                    }
+                } else if (ApplicationType.Property.ICON.value().equals(propertyName)) {
+                    setIcon((Image)evt.getNewValue());
+                } else if (ApplicationType.Property.DESCRIPTION.value().equals(propertyName)) {
+                    setDescription((String)evt.getNewValue());
+                } else if (ApplicationType.Property.VERSION.value().equals(propertyName)) {
+                    // Not supported by ApplicationDescriptor
                 }
-                setIcon(type.getIcon());
-                setDescription(type.getDescription());
             }
         });
+    }
+    
+    public String getName() {
+        if (supportsRename()) return super.getName();
+        else return name;
     }
 
     private static String resolveName(Application application, ApplicationType type) {
         // Check for persisted displayname (currently only for JmxApplications)
-        String persistedName = application.getStorage().getCustomProperty(PROPERTY_NAME);
+        String persistedName = getPersistedName(application);
         if (persistedName != null) return persistedName;
 
         // Provide generic displayname
+        return createGenericName(application, type.getName());
+    }
+    
+    private static String createGenericName(Application application, String nameBase) {
         int pid = application.getPid();
         String id = Application.CURRENT_APPLICATION.getPid() == pid ||
         pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")"; // NOI18N
-        return type.getName() + id;
+        return nameBase + id;
+    }
+    
+    private static String getPersistedName(Application application) {
+        return application.getStorage().getCustomProperty(PROPERTY_NAME);
     }
     
 }
