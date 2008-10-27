@@ -244,7 +244,7 @@ class LongMap {
         }
     }
 
-    void put(long key, long value) {
+    Entry put(long key, long value) {
         long index = getIndex(key);
 
         while (true) {
@@ -252,7 +252,7 @@ class LongMap {
                 putID(index, key);
                 putFoffset(index + KEY_SIZE, value);
 
-                return;
+                return new Entry(index);
             }
 
             index = getNextIndex(index);
