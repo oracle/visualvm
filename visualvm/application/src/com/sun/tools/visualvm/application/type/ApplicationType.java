@@ -34,35 +34,23 @@ import java.beans.PropertyChangeSupport;
  * @author Tomas Hurka
  */
 public abstract class ApplicationType extends Model {
-    static public class Property {
-        private String value;
-
-        protected Property(String value) {
-            this.value = value;
-        }
-
-        public String value() {
-            return value;
-        }
-
-        public static final Property NAME = new Property("name");
-        public static final Property DESCRIPTION = new Property("description");
-        public static final Property VERSION = new Property("version");
-        public static final Property ICON = new Property("icon");
-    }
+    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_DESCRIPTION = "description";
+    public static final String PROPERTY_VERSION = "version";
+    public static final String PROPERTY_ICON = "icon";
 
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
         pcs.addPropertyChangeListener(pcl);
     }
-        
+
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
         pcs.removePropertyChangeListener(pcl);
     }
 
-    protected void firePropertyChange(Property property, Object oldValue, Object newValue) {
-        pcs.firePropertyChange(property.value(), oldValue, newValue);
+    protected void firePropertyChange(String property, Object oldValue, Object newValue) {
+        pcs.firePropertyChange(property, oldValue, newValue);
     }
 
     public abstract String getName();

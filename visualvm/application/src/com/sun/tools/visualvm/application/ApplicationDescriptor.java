@@ -53,7 +53,7 @@ import java.beans.PropertyChangeSupport;
         type.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 String propertyName = evt.getPropertyName();
-                if (ApplicationType.Property.NAME.value().equals(propertyName)) {
+                if (ApplicationType.PROPERTY_NAME.equals(propertyName)) {
                     // Name already customized by the user, do not change it
                     if (getPersistedName(application) != null) return;
                     
@@ -68,11 +68,11 @@ import java.beans.PropertyChangeSupport;
                         PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
                         if (pcs != null) pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
                     }
-                } else if (ApplicationType.Property.ICON.value().equals(propertyName)) {
+                } else if (ApplicationType.PROPERTY_ICON.equals(propertyName)) {
                     setIcon((Image)evt.getNewValue());
-                } else if (ApplicationType.Property.DESCRIPTION.value().equals(propertyName)) {
+                } else if (ApplicationType.PROPERTY_DESCRIPTION.equals(propertyName)) {
                     setDescription((String)evt.getNewValue());
-                } else if (ApplicationType.Property.VERSION.value().equals(propertyName)) {
+                } else if (ApplicationType.PROPERTY_VERSION.equals(propertyName)) {
                     // Not supported by ApplicationDescriptor
                 }
             }
