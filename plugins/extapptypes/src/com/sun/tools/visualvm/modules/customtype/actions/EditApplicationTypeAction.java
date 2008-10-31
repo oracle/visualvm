@@ -87,7 +87,7 @@ public class EditApplicationTypeAction extends DataSourceAction<Application> {
 
         final DialogDescriptor[] dd = new DialogDescriptor[1];
 
-        dd[0] = new DialogDescriptor(form, "Application Type Details", true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.OK_OPTION, new ActionListener() {
+        dd[0] = new DialogDescriptor(form, "Application Type Details", true, new Object[]{form.getValidationSupport().getOkButton(), DialogDescriptor.CANCEL_OPTION}, form.getValidationSupport().getOkButton(), DialogDescriptor.DEFAULT_ALIGN, null, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

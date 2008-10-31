@@ -32,6 +32,7 @@
 package com.sun.tools.visualvm.modules.customtype.ui;
 
 import com.sun.tools.visualvm.modules.customtype.ApplicationType;
+import com.sun.tools.visualvm.modules.customtype.actions.ValidationSupport;
 import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -42,6 +43,8 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -58,10 +61,35 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
 
     private File iconFile = null;
 
+    private ValidationSupport validationSupport = new ValidationSupport() {
+
+        @Override
+        public boolean isValid() {
+            return !appTypeName.getText().isEmpty();
+        }
+    };
+
     /** Creates new form NewApplicationTypeForm */
     public ApplicationTypeForm(ApplicationType appType) {
         initComponents();
         applicationType = appType;
+        appTypeName.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                validationSupport.updateValidity();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                validationSupport.updateValidity();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                validationSupport.updateValidity();
+            }
+        });
         loadData();
     }
 
@@ -114,6 +142,11 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
                 appTypeNameFocusLost(evt);
             }
         });
+        appTypeName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                appTypeNameKeyTyped(evt);
+            }
+        });
 
         appTypeMainClass.setEditable(false);
         appTypeMainClass.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeMainClass.text")); // NOI18N
@@ -162,6 +195,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
 
         jScrollPane2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane2.setViewportBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jScrollPane2.setOpaque(false);
 
         jTextPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jTextPane1.setContentType(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.jTextPane1.contentType")); // NOI18N
@@ -173,27 +207,27 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(mainClassLabel)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+                    .addComponent(mainClassLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(urlLabel)
                             .addComponent(descriptionLabel)
                             .addComponent(nameLabel))
                         .addGap(8, 8, 8)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(appTypeName, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(appTypeName, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(appTypeIcon))
-                            .addComponent(appTypeUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-                            .addComponent(appTypeMainClass, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE))
+                            .addComponent(appTypeUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                            .addComponent(appTypeMainClass, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -209,7 +243,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
                         .addGap(6, 6, 6))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(appTypeIcon)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(mainClassLabel)
                     .addComponent(appTypeMainClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -220,11 +254,14 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(descriptionLabel)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {appTypeIcon, appTypeName});
+
     }// </editor-fold>//GEN-END:initComponents
 
     private void appTypeIconMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appTypeIconMousePressed
@@ -286,6 +323,10 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
     private void appTypeUrlFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_appTypeUrlFocusLost
         appTypeUrl.setSelectionEnd(0);
     }//GEN-LAST:event_appTypeUrlFocusLost
+
+    private void appTypeNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_appTypeNameKeyTyped
+        validationSupport.updateValidity();
+    }//GEN-LAST:event_appTypeNameKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -356,5 +397,9 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
             applicationType.setInfoUrl(infoUrl);
         }
         return result;
+    }
+
+    public ValidationSupport getValidationSupport() {
+        return validationSupport;
     }
 }

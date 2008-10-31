@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -67,7 +68,7 @@ class IconResolver {
         return resolvedImage != null ? (resolvedImage.getWidth() > -1 ? resolvedImage : null) : null;
     }
 
-    private BufferedImage resolveFromLink(URL url) {
+    private synchronized BufferedImage resolveFromLink(URL url) {
         try {
             String index = readIndex(url.openStream());
             Matcher linkMatcher = favicoLinkPattern.matcher(index);
@@ -93,7 +94,7 @@ class IconResolver {
                 } else {
                     favicoUrl = new URL(url.getProtocol(), url.getHost(), url.getFile() + "/" + favicoPath);
                 }
-                System.err.println("Resolving image: " + favicoUrl.toString());
+                Logger.getLogger(IconResolver.class.getName()).fine("Resolving image: " + favicoUrl.toString());
 
                 return ImageIO.read(favicoUrl);
             }

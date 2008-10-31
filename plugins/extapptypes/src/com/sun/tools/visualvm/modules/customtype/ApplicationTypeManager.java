@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Random;
 import javax.imageio.ImageIO;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -43,6 +44,8 @@ import org.openide.filesystems.Repository;
  * @author Jaroslav Bachorik
  */
 public class ApplicationTypeManager {
+    final private Random random = new Random(System.currentTimeMillis());
+
     final private FileObject defRepository;
 
     final private static class Singleton {
@@ -86,7 +89,9 @@ public class ApplicationTypeManager {
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     }
-                    return new ApplicationType(mainClass, name, "", description, iconUrl, infoUrl);
+                    ApplicationType at = new ApplicationType(mainClass, name, "", description, iconUrl, infoUrl);
+                    at.setDefName(def.getNameExt());
+                    return at;
                 }
             }
         }
@@ -98,7 +103,14 @@ public class ApplicationTypeManager {
 
             @Override
             public void run() throws IOException {
-                String defName = type.getName().replace(' ', '_') + ".def";
+                String defName = type.getDefName();
+                if (defName == null) {
+                    do {
+                        defName = calculateDefName(type);
+                    } while (defRepository.getFileObject(defName) != null);
+                    type.setDefName(defName);
+                }
+
                 FileObject defFolder = defRepository.getFileObject(defName);
                 if (defFolder == null) {
                     defFolder = defRepository.createFolder(defName);
@@ -107,6 +119,8 @@ public class ApplicationTypeManager {
                 defFolder.setAttribute("mainClass", type.getMainClass());
                 if (type.getInfoURL() != null) {
                     defFolder.setAttribute("url", type.getInfoURL().toString());
+                } else {
+                    defFolder.setAttribute("url", null);
                 }
                 if (type.getIconURL() != null) {
                     FileObject iconFile = defFolder.getFileObject("icon.png");
@@ -125,8 +139,15 @@ public class ApplicationTypeManager {
                         os.close();
                         lock.releaseLock();
                     }
+                } else {
+                    defFolder.setAttribute("icon", null);
                 }
             }
         });
+    }
+
+    private String calculateDefName(ApplicationType type) {
+        String rndString = String.valueOf(random.nextInt());
+        return type.getMainClass().replace('.', '_') + "#" + rndString + ".def";
     }
 }

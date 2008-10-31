@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
+import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
@@ -75,6 +76,7 @@ public class FileImagePersistor implements Persistor<URL, BufferedImage> {
     @Override
     public void store(URL key, Entry<BufferedImage> value) {
         if (value.getContent() == null) return;
+        FileLock outputLock = null;
         try {
             String fileName = entryFileName(key);
             FileObject imageFile = storage.getFileObject(fileName);
@@ -82,10 +84,15 @@ public class FileImagePersistor implements Persistor<URL, BufferedImage> {
                 imageFile = storage.createData(fileName);
             }
             if (imageFile != null) {
-                ImageIO.write(value.getContent(), "png", imageFile.getOutputStream());
+                outputLock = imageFile.lock();
+                ImageIO.write(value.getContent(), "png", imageFile.getOutputStream(outputLock));
             }
         } catch (IOException ex) {
             ex.printStackTrace();
+        } finally {
+            if (outputLock != null) {
+                outputLock.releaseLock();
+            }
         }
     }
 
