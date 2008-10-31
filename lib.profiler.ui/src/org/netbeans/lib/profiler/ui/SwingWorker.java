@@ -114,6 +114,7 @@ public abstract class SwingWorker {
                     } finally {
                         synchronized (warmupLock) {
                             workerRunning = false;
+                            warmupLock.notify();
                         }
 
                         if (useEQ) {
