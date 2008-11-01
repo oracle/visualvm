@@ -56,7 +56,6 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.utils.VMUtils;
 
 
 /**
