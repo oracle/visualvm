@@ -95,8 +95,8 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (e.getSource().equals(DialogDescriptor.OK_OPTION) && form.storeData()) {
-                        dd[0].setClosingOptions(new Object[] {DialogDescriptor.OK_OPTION});
+                    if (e.getSource().equals(form.getValidationSupport().getOkButton()) && form.storeData()) {
+                        dd[0].setClosingOptions(new Object[] {form.getValidationSupport().getOkButton()});
                     }
                 }
             });
@@ -105,7 +105,7 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
 
             Dialog dlg = DialogDisplayer.getDefault().createDialog(dd[0]);
             dlg.setVisible(true);
-            if (dd[0].getValue() == DialogDescriptor.OK_OPTION) {
+            if (dd[0].getValue() == form.getValidationSupport().getOkButton()) {
                 try {
                     ApplicationTypeManager.getDefault().storeType(eat);
                 } catch (IOException ex) {

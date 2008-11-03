@@ -184,12 +184,4 @@ public class ApplicationType extends com.sun.tools.visualvm.application.type.App
     void setDefName(String defName) {
         this.defName = defName;
     }
-
-    public URL getIconUrl() {
-        return iconUrl;
-    }
-
-    public void setIconUrl(URL iconUrl) {
-        this.iconUrl = iconUrl;
-    }
 }

@@ -22,17 +22,22 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package com.sun.tools.visualvm.modules.customtype;
 
+import com.sun.tools.visualvm.modules.customtype.cache.AbstractCache;
+import com.sun.tools.visualvm.modules.customtype.cache.Entry;
 import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -44,9 +49,45 @@ import org.openide.filesystems.Repository;
  * @author Jaroslav Bachorik
  */
 public class ApplicationTypeManager {
-    final private Random random = new Random(System.currentTimeMillis());
 
+    final private Random random = new Random(System.currentTimeMillis());
     final private FileObject defRepository;
+    final private AbstractCache<String, ApplicationType> appTypeCache = new AbstractCache<String, ApplicationType>() {
+
+        @Override
+        protected Entry<ApplicationType> cacheMiss(String key) {
+            Enumeration<? extends FileObject> defs = defRepository.getFolders(false);
+            while (defs.hasMoreElements()) {
+                FileObject def = defs.nextElement();
+                if (def.getExt().equals("def")) { // NOI18N
+                    String defMainClass = (String) def.getAttribute("mainClass"); // NOI18N
+                    if (defMainClass != null && defMainClass.equals(key)) {
+                        String name = (String) def.getAttribute("displayName"); // NOI18N
+                        String description = (String) def.getAttribute("descritpion"); // NOI18N
+                        String iconPath = (String) def.getAttribute("icon"); // NOI18N
+                        String urlPath = (String) def.getAttribute("url"); // NOI18N
+
+                        URL infoUrl = null;
+                        URL iconUrl = null;
+                        try {
+                            if (urlPath != null) {
+                                infoUrl = new URL(urlPath);
+                            }
+                            if (iconPath != null) {
+                                iconUrl = new URL(iconPath);
+                            }
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
+                        ApplicationType at = new ApplicationType(key, name, "", description, iconUrl, infoUrl);
+                        at.setDefName(def.getNameExt());
+                        return new Entry(at);
+                    }
+                }
+            }
+            return null;
+        }
+    };
 
     final private static class Singleton {
 
@@ -66,36 +107,41 @@ public class ApplicationTypeManager {
     }
 
     public ApplicationType findType(String mainClass) {
+        return appTypeCache.retrieveObject(mainClass);
+    }
+
+    public boolean removeType(ApplicationType type) {
+        FileObject def = defRepository.getFileObject(type.getDefName());
+        if (def != null) {
+            try {
+                def.delete();
+                appTypeCache.invalidateObject(type.getMainClass());
+                return true;
+            } catch (IOException e) {
+            }
+        }
+        return false;
+    }
+
+    public Set<ApplicationType> listTypes() {
+        Set<ApplicationType> types = new HashSet<ApplicationType>();
+        Collection<String> mainClasses = new ArrayList<String>();
+
         Enumeration<? extends FileObject> defs = defRepository.getFolders(false);
         while (defs.hasMoreElements()) {
             FileObject def = defs.nextElement();
             if (def.getExt().equals("def")) { // NOI18N
-                String defMainClass = (String)def.getAttribute("mainClass"); // NOI18N
-                if (defMainClass != null && defMainClass.equals(mainClass)) {
-                    String name = (String)def.getAttribute("displayName"); // NOI18N
-                    String description = (String)def.getAttribute("descritpion"); // NOI18N
-                    String iconPath = (String)def.getAttribute("icon"); // NOI18N
-                    String urlPath = (String)def.getAttribute("url"); // NOI18N
-
-                    URL infoUrl = null;
-                    URL iconUrl = null;
-                    try {
-                        if (urlPath != null) {
-                            infoUrl = new URL(urlPath);
-                        }
-                        if (iconPath != null) {
-                            iconUrl = new URL(iconPath);
-                        }
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
-                    ApplicationType at = new ApplicationType(mainClass, name, "", description, iconUrl, infoUrl);
-                    at.setDefName(def.getNameExt());
-                    return at;
-                }
+                String mainClass = (String) def.getAttribute("mainClass"); // NOI18N
+                mainClasses.add(mainClass);
             }
         }
-        return null;
+        for(String mainClass : mainClasses) {
+            ApplicationType cachedType = appTypeCache.retrieveObject(mainClass);
+            if (cachedType != null) {
+                types.add(cachedType);
+            }
+        }
+        return types;
     }
 
     public void storeType(final ApplicationType type) throws IOException {

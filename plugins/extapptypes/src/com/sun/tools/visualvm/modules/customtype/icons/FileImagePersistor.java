@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.modules.customtype.cache.Entry;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import org.openide.filesystems.FileLock;
@@ -60,16 +61,24 @@ public class FileImagePersistor implements Persistor<URL, BufferedImage> {
 
     @Override
     public Entry<BufferedImage> retrieve(URL key) {
+        InputStream is = null;
         try {
             FileObject imageFile = storage.getFileObject(entryFileName(key));
             if (imageFile != null) {
-                return new Entry<BufferedImage>(ImageIO.read(imageFile.getInputStream()), imageFile.lastModified().getTime());
+                is = imageFile.getInputStream();
+                return new Entry<BufferedImage>(ImageIO.read(is), imageFile.lastModified().getTime());
             } else {
                 return null;
             }
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception e){}
+            }
         }
     }
 

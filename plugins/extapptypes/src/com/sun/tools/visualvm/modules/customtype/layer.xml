@@ -26,4 +26,10 @@
             -->
         </folder>
     </folder>
+    <folder name="OptionsDialog">
+        <file name="com-sun-tools-visualvm-modules-customtype-options-ApplicationTypeOptionsCategory.instance">
+            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.customtype.options.ApplicationTypeOptionsCategory.instance"/>
+            <attr name="position" intvalue="890"/>
+        </file>
+    </folder>
 </filesystem>

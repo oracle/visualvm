@@ -28,7 +28,6 @@
  *
  * Created on Oct 22, 2008, 2:40:07 PM
  */
-
 package com.sun.tools.visualvm.modules.customtype.ui;
 
 import com.sun.tools.visualvm.modules.customtype.ApplicationType;
@@ -52,15 +51,13 @@ import javax.swing.filechooser.FileFilter;
  * @author Jaroslav Bachorik
  */
 public class ApplicationTypeForm extends javax.swing.JPanel {
+
     final private static String defaultName = "<" + "New Application Type" + ">";
     final private static String defaultDescription = "<" + "Put description here" + ">";
-
     final private static ImageIcon DEFAULT_ICON = new javax.swing.ImageIcon(ApplicationTypeForm.class.getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png")); // NOI18N
-
     private ApplicationType applicationType;
-
     private File iconFile = null;
-
+    private boolean iconFileReset = false;
     private ValidationSupport validationSupport = new ValidationSupport() {
 
         @Override
@@ -102,6 +99,8 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        iconMenu = new javax.swing.JPopupMenu();
+        resetIcon = new javax.swing.JMenuItem();
         nameLabel = new javax.swing.JLabel();
         mainClassLabel = new javax.swing.JLabel();
         urlLabel = new javax.swing.JLabel();
@@ -109,12 +108,20 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         appTypeName = new javax.swing.JTextField();
         appTypeMainClass = new javax.swing.JTextField();
         appTypeUrl = new javax.swing.JTextField();
-        appTypeIcon = new javax.swing.JLabel();
         descriptionLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         appTypeDescription = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
+        appTypeIcon = new javax.swing.JButton();
+
+        resetIcon.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.resetIcon.text")); // NOI18N
+        resetIcon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetIconActionPerformed(evt);
+            }
+        });
+        iconMenu.add(resetIcon);
 
         nameLabel.setDisplayedMnemonic('N');
         nameLabel.setLabelFor(appTypeName);
@@ -134,6 +141,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
 
         appTypeName.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeName.text")); // NOI18N
         appTypeName.setFocusCycleRoot(true);
+        appTypeName.setNextFocusableComponent(appTypeIcon);
         appTypeName.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 appTypeNameFocusGained(evt);
@@ -150,8 +158,10 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
 
         appTypeMainClass.setEditable(false);
         appTypeMainClass.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeMainClass.text")); // NOI18N
+        appTypeMainClass.setNextFocusableComponent(appTypeUrl);
 
         appTypeUrl.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeUrl.text")); // NOI18N
+        appTypeUrl.setNextFocusableComponent(appTypeDescription);
         appTypeUrl.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 appTypeUrlFocusGained(evt);
@@ -161,28 +171,13 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
             }
         });
 
-        appTypeIcon.setDisplayedMnemonic('I');
-        appTypeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png"))); // NOI18N
-        appTypeIcon.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeIcon.text")); // NOI18N
-        appTypeIcon.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        appTypeIcon.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                appTypeIconMouseClicked(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                appTypeIconMousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                appTypeIconMouseReleased(evt);
-            }
-        });
-
         descriptionLabel.setDisplayedMnemonic('D');
         descriptionLabel.setLabelFor(appTypeDescription);
         descriptionLabel.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.descriptionLabel.text")); // NOI18N
 
         appTypeDescription.setColumns(20);
         appTypeDescription.setRows(5);
+        appTypeDescription.setNextFocusableComponent(appTypeName);
         appTypeDescription.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 appTypeDescriptionFocusGained(evt);
@@ -203,6 +198,17 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         jTextPane1.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.jTextPane1.text")); // NOI18N
         jScrollPane2.setViewportView(jTextPane1);
 
+        appTypeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png"))); // NOI18N
+        appTypeIcon.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeIcon.text")); // NOI18N
+        appTypeIcon.setComponentPopupMenu(iconMenu);
+        appTypeIcon.setHideActionText(true);
+        appTypeIcon.setNextFocusableComponent(appTypeMainClass);
+        appTypeIcon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                appTypeIconActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -210,7 +216,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                     .addComponent(mainClassLabel, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -219,15 +225,15 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
                             .addComponent(nameLabel))
                         .addGap(8, 8, 8)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(appTypeName, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                                .addComponent(appTypeName, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(appTypeIcon))
-                            .addComponent(appTypeUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
-                            .addComponent(appTypeMainClass, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE))))
+                            .addComponent(appTypeUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                            .addComponent(appTypeMainClass, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -259,43 +265,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {appTypeIcon, appTypeName});
-
     }// </editor-fold>//GEN-END:initComponents
-
-    private void appTypeIconMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appTypeIconMousePressed
-        appTypeIcon.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-    }//GEN-LAST:event_appTypeIconMousePressed
-
-    private void appTypeIconMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appTypeIconMouseReleased
-        appTypeIcon.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-    }//GEN-LAST:event_appTypeIconMouseReleased
-
-    private void appTypeIconMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appTypeIconMouseClicked
-        JFileChooser jfc = new JFileChooser();
-        jfc.setFileFilter(new FileFilter() {
-
-            @Override
-            public boolean accept(File f) {
-                return (f.isDirectory() || f.getName().endsWith("png") || f.getName().endsWith("jpg") || f.getName().endsWith("jpeg") || f.getName().endsWith("gif"));
-            }
-
-            @Override
-            public String getDescription() {
-                return "Icon files";
-            }
-        });
-        if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            iconFile = jfc.getSelectedFile();
-            try {
-                BufferedImage img = ImageIO.read(iconFile);
-                appTypeIcon.setIcon(new ImageIcon(ImageUtils.resizeImage(img, 16, 16)));
-            } catch (IOException iOException) {
-            }
-        }
-
-    }//GEN-LAST:event_appTypeIconMouseClicked
 
     private void appTypeNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_appTypeNameFocusGained
         appTypeName.setSelectionStart(0);
@@ -328,24 +298,57 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         validationSupport.updateValidity();
     }//GEN-LAST:event_appTypeNameKeyTyped
 
+    private void appTypeIconActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_appTypeIconActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return (f.isDirectory() || f.getName().endsWith("png") || f.getName().endsWith("jpg") || f.getName().endsWith("jpeg") || f.getName().endsWith("gif"));
+            }
+
+            @Override
+            public String getDescription() {
+                return "Icon files";
+            }
+        });
+        if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            iconFile = jfc.getSelectedFile();
+            try {
+                BufferedImage img = ImageIO.read(iconFile);
+                appTypeIcon.setIcon(new ImageIcon(ImageUtils.resizeImage(img, 16, 16)));
+                iconFileReset = false;
+            } catch (IOException iOException) {
+            }
+        }
+}//GEN-LAST:event_appTypeIconActionPerformed
+
+    private void resetIconActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetIconActionPerformed
+        iconFile = null;
+        appTypeIcon.setIcon(DEFAULT_ICON);
+        iconFileReset = true;
+    }//GEN-LAST:event_resetIconActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea appTypeDescription;
-    private javax.swing.JLabel appTypeIcon;
+    private javax.swing.JButton appTypeIcon;
     private javax.swing.JTextField appTypeMainClass;
     private javax.swing.JTextField appTypeName;
     private javax.swing.JTextField appTypeUrl;
     private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JPopupMenu iconMenu;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JLabel mainClassLabel;
     private javax.swing.JLabel nameLabel;
+    private javax.swing.JMenuItem resetIcon;
     private javax.swing.JLabel urlLabel;
     // End of variables declaration//GEN-END:variables
 
     private void loadData() {
+        iconFileReset = false;
         appTypeName.setText(applicationType.getName() == null || applicationType.getName().isEmpty() ? defaultName : applicationType.getName());
         appTypeMainClass.setText(applicationType.getMainClass());
         appTypeUrl.setText(applicationType.getInfoURL() != null ? applicationType.getInfoURL().toString() : "");
@@ -354,7 +357,8 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
             BufferedImage iconImage = null;
             try {
                 iconImage = ImageIO.read(applicationType.getIconURL());
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
             if (iconImage != null) {
                 iconImage = ImageUtils.resizeImage(iconImage, 16, 16);
             }
@@ -362,6 +366,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         } else {
             appTypeIcon.setIcon(DEFAULT_ICON);
         }
+        appTypeMainClass.setEditable(appTypeMainClass.getText().isEmpty());
     }
 
     public boolean storeData() {
@@ -389,10 +394,13 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
             applicationType.setName(appTypeName.getText());
             applicationType.setMainClass(appTypeMainClass.getText());
             applicationType.setDescription(appTypeDescription.getText().equals(defaultDescription) ? "" : appTypeDescription.getText());
-            if (iconFile != null) {
+            if (iconFileReset) {
+                applicationType.setIconURL(null);
+            } else if (iconFile != null) {
                 try {
                     applicationType.setIconURL(iconFile.toURI().toURL());
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                }
             }
             applicationType.setInfoUrl(infoUrl);
         }

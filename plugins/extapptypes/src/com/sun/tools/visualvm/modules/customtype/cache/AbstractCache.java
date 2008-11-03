@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Jaroslav Bachorik
  */
 abstract public class AbstractCache<K, V> {
-    final private Map<K, Entry<V>> imageCache = new HashMap<K, Entry<V>>();
+    final private Map<K, Entry<V>> objectCache = new HashMap<K, Entry<V>>();
 
     private long update_interval = 60480000; // 7 days in milliseconds
 
@@ -46,8 +46,8 @@ abstract public class AbstractCache<K, V> {
      * @return Returns the cached object or NULL
      */
     public V retrieveObject(K key) {
-        synchronized(imageCache) {
-            Entry<V> entry = imageCache.get(key);
+        synchronized(objectCache) {
+            Entry<V> entry = objectCache.get(key);
             if (entry == null) {
                 entry = persistor.retrieve(key);
             }
@@ -55,7 +55,7 @@ abstract public class AbstractCache<K, V> {
                 entry = cacheMiss(key);
                 if (entry != null && entry.getContent() != null) {
                     persistor.store(key, entry);
-                    imageCache.put(key, entry);
+                    objectCache.put(key, entry);
                 }
             } else {
                 long timestamp = System.currentTimeMillis();
@@ -63,7 +63,7 @@ abstract public class AbstractCache<K, V> {
                     Entry<V> newEntry = cacheMiss(key);
                     if (newEntry != null && newEntry.getContent() != null) {
                         persistor.store(key, entry);
-                        imageCache.put(key, newEntry);
+                        objectCache.put(key, newEntry);
                         entry = newEntry;
                     }
                 }
@@ -71,11 +71,11 @@ abstract public class AbstractCache<K, V> {
             return entry.getContent();
         }
     }
-
+    
     public V invalidateObject(K key) {
-        synchronized(imageCache) {
-            Entry<V> entry = imageCache.remove(key);
-            return entry.getContent();
+        synchronized(objectCache) {
+            Entry<V> entry = objectCache.remove(key);
+            return entry != null ? entry.getContent() : null;
         }
     }
     /**
