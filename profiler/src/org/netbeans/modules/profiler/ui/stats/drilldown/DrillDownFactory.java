@@ -55,6 +55,7 @@ import org.netbeans.modules.profiler.categories.Categorization;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter.EvaluatorProvider.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory.class)})
 public class DrillDownFactory implements CCTResultsFilter.EvaluatorProvider {
     private class WeakEvaluator extends WeakReference<CCTResultsFilter.Evaluator> implements Evaluator {
         public WeakEvaluator(Evaluator referent, ReferenceQueue<? super Evaluator> q) {

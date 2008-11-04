@@ -1,8 +1,0 @@
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.CollapsedHashMap
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.DeepSize
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.DuplicatedString
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.HashMapHistogram
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.OverallocatedString
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.RetainedSetByInstance
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.TooManyBooleans
-org.netbeans.modules.profiler.heapwalk.memorylint.rules.WrongWeakHashMap

@@ -225,12 +225,10 @@ public abstract class AbstractSelectRootMethodsPanel extends JPanel {
                         return;
                     }
 
-                    if ((currentProject != null) && (e.getStateChange() == ItemEvent.SELECTED)) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
                         rp.post(new Runnable() {
                                 public void run() {
                                     advancedLogicalPackageTree.setSelectionTreeView((SelectionTreeView) e.getItem());
-
-                                    //                                    updateSelectorProjects();
                                 }
                             });
                     }
