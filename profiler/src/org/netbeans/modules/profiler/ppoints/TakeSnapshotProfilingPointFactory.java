@@ -58,6 +58,7 @@ import javax.swing.ImageIcon;
  *
  * @author Jiri Sedlacek
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.ppoints.ProfilingPointFactory.class)
 public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 

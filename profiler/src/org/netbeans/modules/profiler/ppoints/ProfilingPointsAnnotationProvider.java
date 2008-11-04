@@ -50,6 +50,7 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
+@org.openide.util.lookup.ServiceProvider(service=org.openide.text.AnnotationProvider.class)
 public class ProfilingPointsAnnotationProvider implements AnnotationProvider {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
