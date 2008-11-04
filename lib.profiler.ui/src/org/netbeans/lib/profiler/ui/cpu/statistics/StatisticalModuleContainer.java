@@ -54,6 +54,7 @@ import java.util.Set;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.Listener.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModuleContainer.class)})
 public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
