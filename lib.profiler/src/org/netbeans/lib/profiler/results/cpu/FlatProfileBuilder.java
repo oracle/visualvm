@@ -57,6 +57,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.Listener.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder.class)})
 public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.Listener {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 

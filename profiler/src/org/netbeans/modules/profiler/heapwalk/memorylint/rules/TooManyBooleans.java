@@ -47,6 +47,7 @@ import org.netbeans.modules.profiler.heapwalk.memorylint.*;
 import org.openide.util.NbBundle;
 
 
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
 public class TooManyBooleans extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
