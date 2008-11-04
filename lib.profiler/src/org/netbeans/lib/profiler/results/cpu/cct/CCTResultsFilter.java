@@ -56,6 +56,7 @@ import java.util.logging.Logger;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter.class)
 public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 

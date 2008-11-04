@@ -79,6 +79,7 @@ import org.netbeans.modules.profiler.utilities.Visitor;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule.class)
 public class ForwardCategoryDistributionPanel extends StatisticalModule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

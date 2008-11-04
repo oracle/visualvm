@@ -106,6 +106,10 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
                 return hasResults;
             }
         }
+
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
