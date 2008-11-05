@@ -174,6 +174,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         }
     }
 
+    @org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.Listener.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.memory.MemoryCCTProvider.Listener.class)})
     public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
