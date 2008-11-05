@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
@@ -91,7 +92,7 @@ public class MonitoredDataImpl extends MonitoredData {
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
     OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
     MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
-    MemoryUsage perm = jmxSupport.getPermGenPool().getUsage();
+    MemoryPoolMXBean permBean = jmxSupport.getPermGenPool();
     unloadedClasses = classBean.getUnloadedClassCount();
     loadedClasses = classBean.getLoadedClassCount() + unloadedClasses;
     sharedLoadedClasses = 0;
@@ -107,9 +108,12 @@ public class MonitoredDataImpl extends MonitoredData {
     genCapacity[0] = mem.getCommitted();
     genUsed[0] = mem.getUsed();
     genMaxCapacity[0] = mem.getMax();
-    genCapacity[1] = perm.getCommitted();
-    genUsed[1] = perm.getUsed();
-    genMaxCapacity[1] = perm.getMax();
+    if (permBean != null) {
+        MemoryUsage perm = permBean.getUsage();
+        genCapacity[1] = perm.getCommitted();
+        genUsed[1] = perm.getUsed();
+        genMaxCapacity[1] = perm.getMax();
+    }
   }
   
   private long getLongValue(LongMonitor mon) {
