@@ -13,9 +13,9 @@
     </main-window>
     <editor-area state="joined">
         <constraints>
-            <path orientation="vertical" number="20" weight="0.7" />
-            <path orientation="horizontal" number="40" weight="0.68" />
+            <path orientation="horizontal" number="60" weight="0.7" />
             <path orientation="vertical" number="40" weight="0.7" />
+            <path orientation="horizontal" number="40" weight="0.7" />
         </constraints>
     </editor-area>
     <active-mode name="explorer" />
