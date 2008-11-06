@@ -158,6 +158,7 @@ import org.openide.execution.ExecutorTask;
  * @author Misha Dmitriev
  * @author Jiri Sedlacek
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.common.Profiler.class)
 public final class NetBeansProfiler extends Profiler {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

@@ -48,6 +48,7 @@ import org.openide.filesystems.Repository;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery.class)
 public class SettingsFolderQueryImpl extends SettingsFolderQuery {
     private static final String PROFILER_FOLDER = "org-netbeans-modules-profiler";
     
