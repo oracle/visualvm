@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,36 +31,28 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
- * Portions Copyrighted 2007 Sun Microsystems, Inc.
+ *
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.utilities.queries.impl;
+package org.netbeans.lib.profiler.tests.jfluid;
 
-import java.io.IOException;
-import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.Repository;
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author tester
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery.class)
-public class SettingsFolderQueryImpl extends SettingsFolderQuery {
-    private static final String PROFILER_FOLDER = "org-netbeans-modules-profiler";
-    
-    @Override
-    public FileObject getSettingsFolder(boolean create) throws IOException {
-        final FileObject folder = Repository.getDefault().getDefaultFileSystem().findResource("Services"); //NOI18N
-        FileObject settingsFolder = folder.getFileObject(PROFILER_FOLDER, null);
+public class ProfilerStableTestSuite {
+    public static Test suite() {
+    return NbModuleSuite.create(
+      NbModuleSuite.emptyConfiguration()
+        .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
+    );
+  }
 
-        if ((settingsFolder == null) && create) {
-            settingsFolder = folder.createFolder(PROFILER_FOLDER);
-        }
 
-        return settingsFolder;
-    }
 }
