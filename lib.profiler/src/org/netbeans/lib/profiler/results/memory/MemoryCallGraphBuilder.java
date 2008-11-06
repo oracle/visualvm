@@ -60,6 +60,7 @@ import java.util.Set;
  * @author Misha Dmitirev
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.memory.MemoryCCTProvider.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener.class)})
 public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements MemoryProfilingResultsListener, MemoryCCTProvider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

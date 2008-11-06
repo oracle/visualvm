@@ -52,6 +52,7 @@ import java.util.Map;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.cct.TimeCollector.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine.StateObserver.class)})
 public class TimeCollector extends MarkBasedNodeVisitor {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
