@@ -32,7 +32,7 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
- *
+ * Detects SAP JVM
  * @author Tomas Hurka
  */
 public class SapJvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatModel, Application> {
