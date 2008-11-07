@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,18 +25,32 @@
 
 package com.sun.tools.visualvm.modules.extensions;
 
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import org.openide.modules.ModuleInstall;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
- * Manages a module's lifecycle.
+ * Detects Diablo JVM 1.5 (FreeBSD)
+ * Note that Diablo JVM 1.6 is detected by default VisualVM implemntation
+ * 
+ * @author Tomas Hurka
  */
-public class Installer extends ModuleInstall {
-    @Override
-    public void restored() {
-        JvmJvmstatModelFactory factory = JvmJvmstatModelFactory.getDefault();
-        
-        factory.registerProvider(new SapJvmJvmstatModelProvider());
-        factory.registerProvider(new DiabloJvmJvmstatModelProvider());
+public class DiabloJvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatModel, Application> {
+    
+    public JvmJvmstatModel createModelFor(Application app) {
+        JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
+        if (jvmstat != null) {
+            String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
+
+            if (vmVersion != null) {
+                if (vmVersion.startsWith("diablo-1.5.")) {  // NOI18N // Diablo VM
+                    return new ExtendedJvmJvmstatModel(app, jvmstat);
+                }
+            }
+        }
+        return null;
     }
+    
 }
