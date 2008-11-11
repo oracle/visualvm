@@ -48,77 +48,46 @@ import java.util.Map;
  * @author Tomas Hurka
  * @author Toms Hurka
  */
-class LoadClassSegment extends TagBounds {
+class StackTraceSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
-    final int classIDOffset;
-    final int classSerialNumberOffset;
+    final int threadSerialNumberOffset;
+    final int stackTraceSerialNumberOffset;
     final int lengthOffset;
-    final int nameStringIDOffset;
-    final int stackTraceSerialOffset;
+    final int framesListOffset;
+    final int numberOfFramesOffset;
     final int timeOffset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    LoadClassSegment(HprofHeap heap, long start, long end) {
-        super(HprofHeap.LOAD_CLASS, start, end);
+    StackTraceSegment(HprofHeap heap, long start, long end) {
+        super(HprofHeap.STACK_TRACE, start, end);
 
         int idSize = heap.dumpBuffer.getIDSize();
         hprofHeap = heap;
         timeOffset = 1;
         lengthOffset = timeOffset + 4;
-        classSerialNumberOffset = lengthOffset + 4;
-        classIDOffset = classSerialNumberOffset + 4;
-        stackTraceSerialOffset = classIDOffset + idSize;
-        nameStringIDOffset = stackTraceSerialOffset + 4;
+        stackTraceSerialNumberOffset = lengthOffset + 4;
+        threadSerialNumberOffset = stackTraceSerialNumberOffset + 4;
+        numberOfFramesOffset = threadSerialNumberOffset + 4;
+        framesListOffset = numberOfFramesOffset + 4;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    LoadClass getClassByID(long classObjectID) {
+    StackTrace getStackTraceBySerialNumber(long stackTraceSerialNumber) {
         long[] offset = new long[] { startOffset };
 
         while (offset[0] < endOffset) {
             long start = offset[0];
-            long classID = readLoadClassID(offset);
+            long serialNumber = readStackTraceTag(offset);
 
-            if (classID == classObjectID) {
-                return new LoadClass(this, start);
+            if (serialNumber == stackTraceSerialNumber) {
+                return new StackTrace(this, start);
             }
         }
-
         return null;
-    }
-
-    LoadClass getClassBySerialNumber(long classSerialNumber) {
-        long[] offset = new long[] { startOffset };
-
-        while (offset[0] < endOffset) {
-            long start = offset[0];
-            long serial = readLoadClassSerialNumber(offset);
-
-            if (serial == classSerialNumber) {
-                return new LoadClass(this, start);
-            }
-        }
-
-        return null;
-    }
-    
-    void setLoadClassOffsets() {
-        ClassDumpSegment classDumpSegment = hprofHeap.getClassDumpSegment();
-        long[] offset = new long[] { startOffset };
-
-        while (offset[0] < endOffset) {
-            long start = offset[0];
-            long classID = readLoadClassID(offset);
-            ClassDump classDump = classDumpSegment.getClassDumpByID(classID);
-
-            if (classDump != null) {
-                classDump.setClassLoadOffset(start);
-            }
-        }
     }
 
     private HprofByteBuffer getDumpBuffer() {
@@ -127,23 +96,12 @@ class LoadClassSegment extends TagBounds {
         return dumpBuffer;
     }
 
-    private long readLoadClassSerialNumber(long[] offset) {
+    private long readStackTraceTag(long[] offset) {
         long start = offset[0];
 
-        if (hprofHeap.readTag(offset) != HprofHeap.LOAD_CLASS) {
+        if (hprofHeap.readTag(offset) != HprofHeap.STACK_TRACE) {
             return 0;
         }
-
-        return getDumpBuffer().getInt(start + classSerialNumberOffset);
-    }
-    
-    private long readLoadClassID(long[] offset) {
-        long start = offset[0];
-
-        if (hprofHeap.readTag(offset) != HprofHeap.LOAD_CLASS) {
-            return 0;
-        }
-
-        return getDumpBuffer().getID(start + classIDOffset);
+        return getDumpBuffer().getID(start + stackTraceSerialNumberOffset);
     }
 }
