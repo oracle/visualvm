@@ -226,9 +226,14 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             node.setPreferredPosition(preferredPosition);
             final ExplorerNode parent = (ExplorerNode)node.getParent();
             if (parent != null) {
-                parent.addNode(node);
                 try { SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() { explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) }); }
+                    public void run() {
+                        int nodeIndex = parent.getIndex(node);
+                        parent.remove(node);
+                        explorerModel.nodesWereRemoved(parent, new int[] { nodeIndex }, new Object[] { node });
+                        parent.addNode(node);
+                        explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) });
+                    }
                 }); } catch (Exception e) {}
             }
         } else if (DataSourceDescriptor.PROPERTY_EXPANSION_POLICY.equals(property)) {
