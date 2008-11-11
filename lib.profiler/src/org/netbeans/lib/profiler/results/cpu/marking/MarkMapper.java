@@ -50,6 +50,7 @@ import java.util.Map;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine.StateObserver.class)
 public class MarkMapper implements MarkingEngine.StateObserver {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

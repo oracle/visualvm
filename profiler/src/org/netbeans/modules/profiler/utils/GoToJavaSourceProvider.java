@@ -58,6 +58,7 @@ import org.netbeans.modules.profiler.spi.GoToSourceProvider;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.GoToSourceProvider.class)
 public class GoToJavaSourceProvider implements GoToSourceProvider {
 
     public boolean openSource(final Project project, final String className, final String methodName, final String signature) {

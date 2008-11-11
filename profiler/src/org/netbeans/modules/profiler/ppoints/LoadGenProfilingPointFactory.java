@@ -65,6 +65,7 @@ import javax.swing.ImageIcon;
  *
  * @author Jaroslav Bachorik
  */
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.ppoints.ProfilingPointFactory.class)
 public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
