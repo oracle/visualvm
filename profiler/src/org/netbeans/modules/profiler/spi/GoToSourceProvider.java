@@ -47,4 +47,5 @@ import org.netbeans.api.project.Project;
  */
 public interface GoToSourceProvider {
     public boolean openSource(Project project, String className, String methodName, String signature);
+    public boolean openSource(String className, int line);
 }
