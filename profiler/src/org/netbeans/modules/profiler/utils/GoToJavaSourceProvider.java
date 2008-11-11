@@ -42,9 +42,14 @@ package org.netbeans.modules.profiler.utils;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
+import javax.swing.text.StyledDocument;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.classpath.GlobalPathRegistry;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
@@ -53,6 +58,13 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
+import org.netbeans.spi.java.classpath.support.ClassPathSupport;
+import org.openide.cookies.EditorCookie;
+import org.openide.cookies.LineCookie;
+import org.openide.cookies.OpenCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.loaders.DataObject;
+import org.openide.text.Line;
 
 /**
  *
@@ -120,5 +132,46 @@ public class GoToJavaSourceProvider implements GoToSourceProvider {
             Thread.currentThread().interrupt();
         }
         return result.get();
+    }
+
+    public boolean openSource(String className, int line) {
+        FileObject source = GlobalPathRegistry.getDefault().findResource(className);
+        if (source != null) {
+            doOpen(source, line);
+        }
+        return false;
+    }
+
+    private static boolean doOpen(FileObject fo, int line) {
+        try {
+            DataObject od = DataObject.find(fo);
+            EditorCookie ec = (EditorCookie) od.getCookie(EditorCookie.class);
+            LineCookie lc = (LineCookie) od.getCookie(LineCookie.class);
+
+            if (ec != null && lc != null && line != -1) {
+                StyledDocument doc = ec.openDocument();
+                if (doc != null) {
+                    if (line != -1) {
+                        Line l = lc.getLineSet().getCurrent(line-1);
+
+                        if (l != null) {
+                            l.show(Line.ShowOpenType.OPEN, Line.ShowVisibilityType.FOCUS);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            OpenCookie oc = (OpenCookie) od.getCookie(OpenCookie.class);
+
+            if (oc != null) {
+                oc.open();
+                return true;
+            }
+        } catch (IOException e) {
+            Logger.getLogger(GoToJavaSourceProvider.class.getName()).log(Level.FINE, "Can not open " + fo.getPath(), e);
+        }
+
+        return false;
     }
 }

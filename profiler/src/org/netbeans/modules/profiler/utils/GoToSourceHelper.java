@@ -83,4 +83,31 @@ final public class GoToSourceHelper {
         
         return false;
     }
+
+    public static boolean openSource(String className, int line) {
+        // *** logging stuff ***
+        ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N
+        ProfilerLogger.debug("Open Source: Line number: " + line); // NOI18N
+
+        Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
+
+        String st = MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class, "OpeningSourceMsg"),
+                                                             new Object[] { className }); // NOI18N
+        final String finalStatusText = st + " ..."; // NOI18N
+        StatusDisplayer.getDefault().setStatusText(finalStatusText);
+
+        for(GoToSourceProvider impl : implementations) {
+            try {
+                if (impl.openSource(className, line)) return true;
+            } catch (Exception e) {
+                ProfilerLogger.log(e);
+            }
+        }
+
+        Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class,
+                                                                                        "NoSourceFoundMessage"), // NOI18N
+                                                                                        new Object[] { className }));
+
+        return false;
+    }
 }
