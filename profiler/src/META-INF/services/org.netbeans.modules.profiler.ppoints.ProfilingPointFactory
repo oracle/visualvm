@@ -1,6 +1,0 @@
-org.netbeans.modules.profiler.ppoints.ResetResultsProfilingPointFactory
-org.netbeans.modules.profiler.ppoints.StopwatchProfilingPointFactory
-org.netbeans.modules.profiler.ppoints.TakeSnapshotProfilingPointFactory
-org.netbeans.modules.profiler.ppoints.LoadGenProfilingPointFactory
-org.netbeans.modules.profiler.ppoints.TimedTakeSnapshotProfilingPointFactory
-org.netbeans.modules.profiler.ppoints.TriggeredTakeSnapshotProfilingPointFactory
