@@ -42,6 +42,8 @@ package org.netbeans.lib.profiler.tests.jfluid.others;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
@@ -60,13 +62,23 @@ public class MeasureDiffsTest extends MeasureDiffsTestCase {
         super(name);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.others.MeasureDiffsTest.class);
-
-        return suite;
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(MeasureDiffsTest.class).addTest(
+            "testSettingsInstrumentAllEager",
+            "testSettingsInstrumentAllEagerServer",
+            "testSettingsInstrumentAllLazy",
+            "testSettingsInstrumentAllLazyServer",
+            "testSettingsInstrumentAllTotal",
+            "testSettingsInstrumentAllTotalServer",
+            "temptestSettingsInstrumentAll").enableModules(".*").clusters(".*"));
     }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testSettingsInstrumentAllEager() {
         temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_EAGER, false);
