@@ -48,102 +48,63 @@ import java.util.Map;
  * @author Tomas Hurka
  * @author Toms Hurka
  */
-class LoadClassSegment extends TagBounds {
+class StackFrameSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
-    final int classIDOffset;
-    final int classSerialNumberOffset;
+    final int methodIDOffset;
+    final int stackFrameIDOffset;
     final int lengthOffset;
-    final int nameStringIDOffset;
-    final int stackTraceSerialOffset;
+    final int sourceIDOffset;
+    final int methodSignatureIDOffset;
     final int timeOffset;
+    final int classSerialNumberOffset;
+    final int lineNumberOffset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    LoadClassSegment(HprofHeap heap, long start, long end) {
-        super(HprofHeap.LOAD_CLASS, start, end);
+    StackFrameSegment(HprofHeap heap, long start, long end) {
+        super(HprofHeap.STACK_TRACE, start, end);
 
         int idSize = heap.dumpBuffer.getIDSize();
         hprofHeap = heap;
         timeOffset = 1;
         lengthOffset = timeOffset + 4;
-        classSerialNumberOffset = lengthOffset + 4;
-        classIDOffset = classSerialNumberOffset + 4;
-        stackTraceSerialOffset = classIDOffset + idSize;
-        nameStringIDOffset = stackTraceSerialOffset + 4;
+        stackFrameIDOffset = lengthOffset + 4;
+        methodIDOffset = stackFrameIDOffset + idSize;
+        methodSignatureIDOffset = methodIDOffset + idSize;
+        sourceIDOffset = methodSignatureIDOffset + idSize;
+        classSerialNumberOffset = sourceIDOffset + idSize;
+        lineNumberOffset = classSerialNumberOffset + 4;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    LoadClass getClassByID(long classObjectID) {
+    StackFrame getStackFrameByID(long stackFrameID) {
         long[] offset = new long[] { startOffset };
 
         while (offset[0] < endOffset) {
             long start = offset[0];
-            long classID = readLoadClassID(offset);
+            long frameID = readStackFrameTag(offset);
 
-            if (classID == classObjectID) {
-                return new LoadClass(this, start);
+            if (frameID == stackFrameID) {
+                return new StackFrame(this, start);
             }
         }
-
         return null;
-    }
-
-    LoadClass getClassBySerialNumber(long classSerialNumber) {
-        long[] offset = new long[] { startOffset };
-
-        while (offset[0] < endOffset) {
-            long start = offset[0];
-            long serial = readLoadClassSerialNumber(offset);
-
-            if (serial == classSerialNumber) {
-                return new LoadClass(this, start);
-            }
-        }
-
-        return null;
-    }
-    
-    void setLoadClassOffsets() {
-        ClassDumpSegment classDumpSegment = hprofHeap.getClassDumpSegment();
-        long[] offset = new long[] { startOffset };
-
-        while (offset[0] < endOffset) {
-            long start = offset[0];
-            long classID = readLoadClassID(offset);
-            ClassDump classDump = classDumpSegment.getClassDumpByID(classID);
-
-            if (classDump != null) {
-                classDump.setClassLoadOffset(start);
-            }
-        }
     }
 
     private HprofByteBuffer getDumpBuffer() {
-        HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
-
-        return dumpBuffer;
+        return  hprofHeap.dumpBuffer;
     }
 
-    private long readLoadClassSerialNumber(long[] offset) {
+    private long readStackFrameTag(long[] offset) {
         long start = offset[0];
 
-        if (hprofHeap.readTag(offset) != HprofHeap.LOAD_CLASS) {
+        if (hprofHeap.readTag(offset) != HprofHeap.STACK_FRAME) {
             return 0;
         }
 
-        return getDumpBuffer().getInt(start + classSerialNumberOffset);
-    }
-    
-    private long readLoadClassID(long[] offset) {
-        long start = offset[0];
-
-        if (hprofHeap.readTag(offset) != HprofHeap.LOAD_CLASS) {
-            return 0;
-        }
-
-        return getDumpBuffer().getID(start + classIDOffset);
+        return getDumpBuffer().getID(start + stackFrameIDOffset);
     }
 }
