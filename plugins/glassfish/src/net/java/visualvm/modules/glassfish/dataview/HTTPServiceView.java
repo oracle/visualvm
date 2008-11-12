@@ -24,7 +24,7 @@ import net.java.visualvm.modules.glassfish.ui.FileCachePanel;
 import net.java.visualvm.modules.glassfish.ui.GenericModel.RangedLong;
 import net.java.visualvm.modules.glassfish.ui.KeepAlivePanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 class HTTPServiceView extends DataSourceView {
 
@@ -37,7 +37,7 @@ class HTTPServiceView extends DataSourceView {
     private ScheduledTask kaRefreshTask;
 
     public HTTPServiceView(Application app, HTTPServiceMonitor monitor) {
-        super(app, "HTTP Service", new ImageIcon(Utilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END, false);
+        super(app, "HTTP Service", new ImageIcon(ImageUtilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END, false);
         this.monitor = monitor;
         initComponents();
     }

@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.modules.mbeans;
 import java.awt.Image;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 class IconManager {
 
@@ -40,7 +40,7 @@ class IconManager {
             getSmallIcon(getImage("xobject.gif")); // NOI18N
 
     private static ImageIcon getImage(String img) {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/" + img, true)); // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/" + img, true)); // NOI18N
     }
 
     private static ImageIcon getSmallIcon(ImageIcon icon) {

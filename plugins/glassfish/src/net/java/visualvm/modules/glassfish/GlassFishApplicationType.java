@@ -26,7 +26,7 @@
 package net.java.visualvm.modules.glassfish;
 
 import com.sun.tools.visualvm.application.type.ApplicationType;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 import java.awt.Image;
 
 
@@ -49,6 +49,6 @@ public abstract class GlassFishApplicationType extends ApplicationType {
 
     @Override
     public Image getIcon() {
-        return Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/GlassFish.png", true);
+        return ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/GlassFish.png", true);
     }
 }

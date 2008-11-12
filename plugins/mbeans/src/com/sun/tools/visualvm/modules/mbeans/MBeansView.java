@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 import org.openide.util.WeakListeners;
 
 /**
@@ -48,7 +48,7 @@ class MBeansView extends DataSourceView {
     private MBeansTab mbeansTab;
     
     public MBeansView(Application application) {
-        super(application, Resources.getText("LBL_MBeans"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false); // NOI18N
+        super(application, Resources.getText("LBL_MBeans"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false); // NOI18N
         this.application = application;
     }
 

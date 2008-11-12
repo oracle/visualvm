@@ -30,14 +30,14 @@ import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Map;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class GlassFishWebModule extends GlassFishApplication {
-    private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png",
+    private static final Image NODE_ICON = ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png",
                                                                    true);
     private WebModuleVirtualServerMonitor monitor;
     

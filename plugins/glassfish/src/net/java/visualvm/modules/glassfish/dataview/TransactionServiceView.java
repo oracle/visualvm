@@ -16,7 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import net.java.visualvm.modules.glassfish.ui.TransactionsPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 class TransactionServiceView extends DataSourceView {
 
@@ -26,7 +26,7 @@ class TransactionServiceView extends DataSourceView {
     private ScheduledTask transRefreshTask;
 
     public TransactionServiceView(Application app, TransactionServiceMonitor monitor) {
-        super(app, "Transaction Service", new ImageIcon(Utilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END, false);
+        super(app, "Transaction Service", new ImageIcon(ImageUtilities.loadImage(ICON_PATH, true)).getImage(), POSITION_AT_THE_END, false);
         this.monitor = monitor;
 
         initComponents();

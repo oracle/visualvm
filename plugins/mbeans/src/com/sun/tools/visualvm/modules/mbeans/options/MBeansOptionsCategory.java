@@ -29,8 +29,8 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.spi.options.OptionsCategory;
 import org.netbeans.spi.options.OptionsPanelController;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -39,7 +39,7 @@ import org.openide.util.Utilities;
 public final class MBeansOptionsCategory extends OptionsCategory {
 
     public Icon getIcon() {
-        return new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans32.png")); // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans32.png")); // NOI18N
     }
 
     public String getCategoryName() {

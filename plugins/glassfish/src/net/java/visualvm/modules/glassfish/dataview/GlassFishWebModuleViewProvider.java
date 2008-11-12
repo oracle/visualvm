@@ -51,7 +51,7 @@ import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
 import net.java.visualvm.modules.glassfish.ui.Chart;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;
@@ -83,7 +83,7 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
     private static class GlassfishWebModuleView extends DataSourceView {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png",
+        private static final Image NODE_ICON = ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/application.png",
                                                                    true);
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ import org.openide.DialogDisplayer;
 import org.openide.LifecycleManager;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 import org.openide.windows.WindowManager;
 
 /**
@@ -174,12 +174,12 @@ class SysTray {
         int iconHeight = iconDimension.height;
         
         if (iconWidth <= 16 && iconHeight <= 16)
-            return Utilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon16.png"); // NOI18N
+            return ImageUtilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon16.png"); // NOI18N
         
         if (iconWidth <= 32 && iconHeight <= 32)
-            return Utilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon32.png"); // NOI18N
+            return ImageUtilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon32.png"); // NOI18N
         
-        return Utilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon48.png"); // NOI18N
+        return ImageUtilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon48.png"); // NOI18N
     }
     
     private PopupMenu createTrayPopup() {

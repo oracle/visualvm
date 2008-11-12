@@ -39,14 +39,12 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.JPanel;
 import net.java.visualvm.modules.glassfish.ui.Chart;
 
@@ -64,7 +62,7 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
     private static class GlassfishServletView extends DataSourceView {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png",
+        private static final Image NODE_ICON = ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png",
                                                                    true);
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------

@@ -29,8 +29,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  * @author Leif Samuelsson
@@ -44,7 +44,7 @@ class JConsoleView extends DataSourceView {
     private JConsolePluginWrapper wrapper;
 
     public JConsoleView(Application application) {
-        super(application, NbBundle.getMessage(JConsoleView.class, "JConsole_Plugins"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false); // NOI18N
+        super(application, NbBundle.getMessage(JConsoleView.class, "JConsole_Plugins"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false); // NOI18N
         this.application = application;
     }
 

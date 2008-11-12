@@ -31,7 +31,7 @@ import java.awt.Image;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Logger;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 
 
@@ -66,8 +66,8 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
     public Image getIcon() {
         Image icon = super.getIcon();
 
-        return Utilities.mergeImages(icon,
-                                     Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/instance_badge.png", true),
+        return ImageUtilities.mergeImages(icon,
+                                     ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/instance_badge.png", true),
                                      8, 8);
     }
 

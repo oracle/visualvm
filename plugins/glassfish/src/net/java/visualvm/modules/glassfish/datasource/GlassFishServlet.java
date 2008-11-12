@@ -28,14 +28,14 @@ package net.java.visualvm.modules.glassfish.datasource;
 import com.sun.appserv.management.monitor.ServletMonitor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class GlassFishServlet extends GlassFishDataSource {
-    private static final Image NODE_ICON = Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png",
+    private static final Image NODE_ICON = ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/servlet_icon.png",
                                                                    true);
     private ServletMonitor monitor;
     private String name;

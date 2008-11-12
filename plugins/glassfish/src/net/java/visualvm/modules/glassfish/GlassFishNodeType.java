@@ -26,7 +26,7 @@
 package net.java.visualvm.modules.glassfish;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 import java.awt.Image;
 import java.text.MessageFormat;
 import java.util.regex.Matcher;
@@ -62,8 +62,8 @@ public class GlassFishNodeType extends GlassFishApplicationType {
     public Image getIcon() {
         Image icon = super.getIcon();
 
-        return Utilities.mergeImages(icon,
-                                     Utilities.loadImage("net/java/visualvm/modules/glassfish/resources/node_badge.png", true), 8, 8);
+        return ImageUtilities.mergeImages(icon,
+                                     ImageUtilities.loadImage("net/java/visualvm/modules/glassfish/resources/node_badge.png", true), 8, 8);
     }
 
     @Override
