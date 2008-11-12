@@ -36,7 +36,6 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.profiler.utils;
 
 import java.io.IOException;
@@ -45,133 +44,122 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
+import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.classpath.GlobalPathRegistry;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationController;
+import org.netbeans.api.java.source.ElementUtilities;
 import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
-import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
-import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.text.Line;
+import org.openide.text.NbDocument;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.GoToSourceProvider.class)
-public class GoToJavaSourceProvider implements GoToSourceProvider {
-
-    public boolean openSource(final Project project, final String className, final String methodName, final String signature) {
-        final JavaSource js = SourceUtils.getSources(project);
+@org.openide.util.lookup.ServiceProvider(service = org.netbeans.modules.profiler.spi.GoToSourceProvider.class)
+public class GoToJavaSourceProvider extends GoToSourceProvider {
+    @Override
+    public boolean openSource(final Project project, final String className, final String methodName, final String signature, final int line) {
         final AtomicBoolean result = new AtomicBoolean(false);
-        final CountDownLatch latch = new CountDownLatch(1);
-        
-        try {
-            // use the prepared javasource repository and perform a task
-            js.runUserActionTask(new CancellableTask<CompilationController>() {
-                    public void cancel() {
-                    }
 
-                    public void run(CompilationController controller)
-                             throws Exception {
-                        controller.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
+        ClassPath cp = ClassPathSupport.createClassPath(GlobalPathRegistry.getDefault().getSourceRoots().toArray(new FileObject[0]));
+        if (cp == null) {
+            return false;
+        }
 
-                        Element destinationElement = null;
+        final FileObject sourceFile = cp.findResource(getJavaFileName(className));
+        if (sourceFile == null) {
+            return false;
+        }
 
-                        // resolve the class by name
-                        TypeElement classElement = SourceUtils.resolveClassByName(className, controller);
+        JavaSource js = JavaSource.forFileObject(sourceFile);
+        if (js != null) {
 
-                        if ((methodName != null) && (methodName.length() > 0)) {
-                            // if a method name has been specified try to resolve the method
-                            if (classElement != null) {
-                                destinationElement = SourceUtils.resolveMethodByName(classElement, methodName, signature);
-                            }
+            try {
+
+                js.runWhenScanFinished(new Task<CompilationController>() {
+
+                    public void run(CompilationController controller) throws Exception {
+                        if (!controller.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED).equals(JavaSource.Phase.ELEMENTS_RESOLVED)) {
+                            return;
                         }
-
-                        if (destinationElement == null) {
-                            // unsuccessful attempt to resolve a method -> use the class instead
-                            destinationElement = classElement;
-                        }
-
-                        if (destinationElement != null) {
-                            ProfilerLogger.debug("Opening element: " + destinationElement); // NOI18N
-
-                            final Element openElement = destinationElement;
-                            
-                            SwingUtilities.invokeLater(new Runnable() {
-                                    // manipulates the TopComponent - must be executed in EDT
-                                    public void run() {
-                                        // opens the source code on the found method position
-                                        result.set(ElementOpen.open(js.getClasspathInfo(), openElement));
-                                        latch.countDown();
+                        TypeElement parentClass = SourceUtils.resolveClassByName(className, controller);
+                        if (ElementOpen.open(controller.getClasspathInfo(), parentClass)) {
+                            Document doc = controller.getDocument();
+                            if (doc != null && doc instanceof StyledDocument) {
+                                if (openAtLine(controller, doc, methodName, line)) {
+                                    result.set(true);
+                                    return;
+                                }
+                                if (methodName != null) {
+                                    ExecutableElement methodElement = SourceUtils.resolveMethodByName(parentClass, methodName, signature);
+                                    if (methodElement != null && ElementOpen.open(controller.getClasspathInfo(), methodElement)) {
+                                        result.set(true);
+                                        return;
                                     }
-                                });
-                        } else {
-                            latch.countDown();
+                                }
+                            }
+                            result.set(true);
                         }
                     }
-                }, false);
-        } catch (IOException ex) {
-            ProfilerLogger.log(ex);
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return result.get();
-    }
-
-    public boolean openSource(String className, int line) {
-        FileObject source = GlobalPathRegistry.getDefault().findResource(className);
-        if (source != null) {
-            doOpen(source, line);
+                }, true);
+            } catch (IOException e) {
+            }
+            return result.get();
         }
         return false;
     }
 
-    private static boolean doOpen(FileObject fo, int line) {
+    private static boolean openAtLine(CompilationController controller, Document doc, String methodName, int line) {
         try {
-            DataObject od = DataObject.find(fo);
-            EditorCookie ec = (EditorCookie) od.getCookie(EditorCookie.class);
-            LineCookie lc = (LineCookie) od.getCookie(LineCookie.class);
+            if (line > -1) {
+                DataObject od = DataObject.find(controller.getFileObject());
+                int offset = NbDocument.findLineOffset((StyledDocument) doc, line);
+                ExecutableElement parentMethod = controller.getTreeUtilities().scopeFor(offset).getEnclosingMethod();
+                if (parentMethod != null) {
+                    String offsetMethodName = parentMethod.getSimpleName().toString();
+                    if (methodName.equals(offsetMethodName)) {
+                        LineCookie lc = od.getCookie(LineCookie.class);
+                        if (lc != null) {
+                            Line l = lc.getLineSet().getCurrent(line - 1);
 
-            if (ec != null && lc != null && line != -1) {
-                StyledDocument doc = ec.openDocument();
-                if (doc != null) {
-                    if (line != -1) {
-                        Line l = lc.getLineSet().getCurrent(line-1);
-
-                        if (l != null) {
-                            l.show(Line.ShowOpenType.OPEN, Line.ShowVisibilityType.FOCUS);
-                            return true;
+                            if (l != null) {
+                                l.show(Line.ShowOpenType.OPEN, Line.ShowVisibilityType.FOCUS);
+                                return true;
+                            }
                         }
                     }
                 }
             }
-
-            OpenCookie oc = (OpenCookie) od.getCookie(OpenCookie.class);
-
-            if (oc != null) {
-                oc.open();
-                return true;
-            }
-        } catch (IOException e) {
-            Logger.getLogger(GoToJavaSourceProvider.class.getName()).log(Level.FINE, "Can not open " + fo.getPath(), e);
+        } catch (DataObjectNotFoundException e) {
+            Logger.getLogger(GoToJavaSourceProvider.class.getName()).log(Level.WARNING, "Error accessing dataobject", e);
         }
-
         return false;
+    }
+
+    private static String getJavaFileName(String className) {
+        String classNameIntern = className.replace('.', '/');
+        int innerIndex = classNameIntern.indexOf("$");
+        if (innerIndex > -1) {
+            classNameIntern = classNameIntern.substring(0, innerIndex);
+        }
+        return classNameIntern.concat(".java");
     }
 }

@@ -97,7 +97,6 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -139,10 +138,9 @@ import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
-import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
+import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 import org.openide.execution.ExecutorTask;
 
 
@@ -1394,11 +1392,7 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() {
-                    GoToSourceHelper.openSource(project, className, methodName, methodSig);
-                }
-            });
+        GoToSourceHelper.openSource(project, new JavaSourceLocation(className, methodName, methodSig));
     }
 
     public boolean processesProfilingPoints() {
