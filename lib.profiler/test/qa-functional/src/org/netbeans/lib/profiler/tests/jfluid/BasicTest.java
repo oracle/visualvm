@@ -41,7 +41,8 @@
 package org.netbeans.lib.profiler.tests.jfluid;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.*;
 import org.netbeans.lib.profiler.tests.jfluid.utils.*;
 import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
@@ -54,15 +55,20 @@ public class BasicTest extends CommonProfilerTestCase {
         super(testName);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class);
-
-        return suite;
+    public static void main(String[] args) {
+        TestRunner.run(suite());
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            "testCalibrate").enableModules(".*").clusters(".*"));
+    }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
+
     public void testCalibrate() {
+        System.out.println(">>>dvt");
         ProfilerEngineSettings settings;
         settings = new ProfilerEngineSettings();
         setTargetVM(settings);
@@ -75,6 +81,7 @@ public class BasicTest extends CommonProfilerTestCase {
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
         runner.addProfilingEventListener(Utils.createProfilingListener(this));
+        System.out.println(">>>dvt");
 
         try {
             assertTrue("Error in calibration", runner.calibrateInstrumentationCode());

@@ -41,7 +41,8 @@
 package org.netbeans.lib.profiler.tests.jfluid.monitor;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 
 
@@ -57,13 +58,22 @@ public class BasicTest extends MonitorTestCase {
         super(name);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class);
-
-        return suite;
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            "testBasic",
+            "testBasicCPU",
+            "testBasicMemory",
+            "testCascadeThreads",
+            "testCascadeThreadsCPU",
+            "testCascadeThreadsMemory").enableModules(".*").clusters(".*"));
     }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testBasic() {
         ProfilerEngineSettings settings = initMonitorTest("j2se-simple", "simple.Monitor");
