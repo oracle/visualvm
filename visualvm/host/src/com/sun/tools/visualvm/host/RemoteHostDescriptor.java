@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.host;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  * DataSourceDescriptor for remote hosts.
@@ -35,7 +35,7 @@ import org.openide.util.Utilities;
  */
 public class RemoteHostDescriptor extends DataSourceDescriptor {
 
-    private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHost.png", true);   // NOI18N
+    private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHost.png", true);   // NOI18N
 
     /**
      * Creates new instance of RemoteHostDescriptor for a given host.

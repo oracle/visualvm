@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.application.ApplicationDescriptor;
 import java.awt.Image;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -35,7 +35,7 @@ import org.openide.util.Utilities;
  */
 public class JmxApplicationDescriptor extends ApplicationDescriptor {
      
-    private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/jmx/application/resources/jmxBadge.png", true); // NOI18N
+    private static final Image NODE_BADGE = ImageUtilities.loadImage("com/sun/tools/visualvm/jmx/application/resources/jmxBadge.png", true); // NOI18N
      
 
     protected JmxApplicationDescriptor(JmxApplication application) {
@@ -48,7 +48,7 @@ public class JmxApplicationDescriptor extends ApplicationDescriptor {
     
     public Image getIcon() {
         Image originalIcon = super.getIcon();
-        return originalIcon == null ? null : Utilities.mergeImages(originalIcon, NODE_BADGE, 0, 0);
+        return originalIcon == null ? null : ImageUtilities.mergeImages(originalIcon, NODE_BADGE, 0, 0);
     }
     
 }

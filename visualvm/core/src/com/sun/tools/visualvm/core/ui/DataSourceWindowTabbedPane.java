@@ -41,6 +41,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Utilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -293,15 +294,15 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private Image getCloseTabImage() {
     if( null == closeTabImage ) {
       if( isWindowsVistaLaF() ) {
-        closeTabImage = Utilities.loadImage("org/openide/awt/resources/vista_close_enabled.png"); // NOI18N
+        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_enabled.png"); // NOI18N
       } else if( isWindowsXPLaF() ) {
-        closeTabImage = Utilities.loadImage("org/openide/awt/resources/xp_close_enabled.png"); // NOI18N
+        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_enabled.png"); // NOI18N
       } else if( isWindowsLaF() ) {
-        closeTabImage = Utilities.loadImage("org/openide/awt/resources/win_close_enabled.png"); // NOI18N
+        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_enabled.png"); // NOI18N
       } else if( isAquaLaF() ) {
-        closeTabImage = Utilities.loadImage("org/openide/awt/resources/mac_close_enabled.png"); // NOI18N
+        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_enabled.png"); // NOI18N
       } else {
-        closeTabImage = Utilities.loadImage("org/openide/awt/resources/metal_close_enabled.png"); // NOI18N
+        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_enabled.png"); // NOI18N
       }
     }
     return closeTabImage;
@@ -310,15 +311,15 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private Image getCloseTabPressedImage() {
     if( null == closeTabPressedImage ) {
       if( isWindowsVistaLaF() ) {
-        closeTabPressedImage = Utilities.loadImage("org/openide/awt/resources/vista_close_pressed.png"); // NOI18N
+        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_pressed.png"); // NOI18N
       } else if( isWindowsXPLaF() ) {
-        closeTabPressedImage =Utilities.loadImage("org/openide/awt/resources/xp_close_pressed.png"); // NOI18N
+        closeTabPressedImage =ImageUtilities.loadImage("org/openide/awt/resources/xp_close_pressed.png"); // NOI18N
       } else if( isWindowsLaF() ) {
-        closeTabPressedImage = Utilities.loadImage("org/openide/awt/resources/win_close_pressed.png"); // NOI18N
+        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_pressed.png"); // NOI18N
       } else if( isAquaLaF() ) {
-        closeTabPressedImage = Utilities.loadImage("org/openide/awt/resources/mac_close_pressed.png"); // NOI18N
+        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_pressed.png"); // NOI18N
       } else {
-        closeTabPressedImage = Utilities.loadImage("org/openide/awt/resources/metal_close_pressed.png"); // NOI18N
+        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_pressed.png"); // NOI18N
       }
     }
     return closeTabPressedImage;
@@ -327,15 +328,15 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   private Image getCloseTabMouseOverImage() {
     if( null == closeTabMouseOverImage ) {
       if( isWindowsVistaLaF() ) {
-        closeTabMouseOverImage = Utilities.loadImage("org/openide/awt/resources/vista_close_rollover.png"); // NOI18N
+        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_rollover.png"); // NOI18N
       } else if( isWindowsXPLaF() ) {
-        closeTabMouseOverImage = Utilities.loadImage("org/openide/awt/resources/xp_close_rollover.png"); // NOI18N
+        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_rollover.png"); // NOI18N
       } else if( isWindowsLaF() ) {
-        closeTabMouseOverImage = Utilities.loadImage("org/openide/awt/resources/win_close_rollover.png"); // NOI18N
+        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_rollover.png"); // NOI18N
       } else if( isAquaLaF() ) {
-        closeTabMouseOverImage = Utilities.loadImage("org/openide/awt/resources/mac_close_rollover.png"); // NOI18N
+        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_rollover.png"); // NOI18N
       } else {
-        closeTabMouseOverImage = Utilities.loadImage("org/openide/awt/resources/metal_close_rollover.png"); // NOI18N
+        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_rollover.png"); // NOI18N
       }
     }
     return closeTabMouseOverImage;

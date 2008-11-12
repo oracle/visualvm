@@ -28,8 +28,8 @@ package com.sun.tools.visualvm.core.explorer;
 import java.awt.BorderLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -53,7 +53,7 @@ final class ExplorerTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(ExplorerTopComponent.class, "LBL_Applications"));   // NOI18N
         setToolTipText(NbBundle.getMessage(ExplorerTopComponent.class, "LBL_Applications"));    // NOI18N
-        setIcon(Utilities.loadImage(ICON_PATH, true));
+        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
         setFocusable(true);
         setRequestFocusEnabled(true);

@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  * DataSourceDescriptor for ApplicationSnapshot.
@@ -38,7 +38,7 @@ import org.openide.util.Utilities;
  */
 public class ApplicationSnapshotDescriptor extends SnapshotDescriptor<ApplicationSnapshot> {
 
-    private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);    // NOI18N
+    private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);    // NOI18N
 
     
     /**

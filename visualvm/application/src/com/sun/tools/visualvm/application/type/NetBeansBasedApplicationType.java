@@ -29,8 +29,8 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
 import java.util.Set;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 
 /**
@@ -67,6 +67,6 @@ public class NetBeansBasedApplicationType extends ApplicationType {
 
   public Image getIcon() {
     String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
-    return Utilities.loadImage(iconPath, true);
+    return ImageUtilities.loadImage(iconPath, true);
   }
 }

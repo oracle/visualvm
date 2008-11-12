@@ -34,9 +34,9 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 /**
@@ -46,7 +46,7 @@ import org.openide.windows.WindowManager;
  */
 public final class SnapshotsSupport {
     
-    private static final Image SNAPSHOT_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
+    private static final Image SNAPSHOT_BADGE = ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     
     private static SnapshotsSupport instance;
 
@@ -114,7 +114,7 @@ public final class SnapshotsSupport {
      * @return image with snapshot badge.
      */
     public Image createSnapshotIcon(Image icon) {
-        return Utilities.mergeImages(icon, SNAPSHOT_BADGE, 0, 0);
+        return ImageUtilities.mergeImages(icon, SNAPSHOT_BADGE, 0, 0);
     }
     
     

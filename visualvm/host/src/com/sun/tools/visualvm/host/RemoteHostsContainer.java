@@ -30,8 +30,8 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import java.awt.Image;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  * Toplevel node Remote in Applications window.
@@ -70,7 +70,7 @@ public class RemoteHostsContainer extends DataSource {
         }
 
         private static class HostsContainerDescriptor extends DataSourceDescriptor {
-            private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);  // NOI18N
+            private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHosts.png", true);  // NOI18N
 
             HostsContainerDescriptor() {
                 super(RemoteHostsContainer.sharedInstance(), NbBundle.getMessage(RemoteHostsContainer.class, "LBL_Remote"), null, NODE_ICON, 10, EXPAND_ON_EACH_NEW_CHILD); // NOI18N

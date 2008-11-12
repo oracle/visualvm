@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.modules.appui.welcome;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import javax.swing.JPanel;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -47,9 +47,9 @@ class FooterPanel extends JPanel {
     
     
     private void initComponents() {
-        Image bottomLeftImage = Utilities.loadImage(BOTTOM_LEFT_RESOURCE, true);
-        Image bottomRightImage = Utilities.loadImage(BOTTOM__RIGHT_RESOURCE, true);
-        Image bottomMiddleImage = Utilities.loadImage(BOTTOM__MIDDLE_RESOURCE, true);
+        Image bottomLeftImage = ImageUtilities.loadImage(BOTTOM_LEFT_RESOURCE, true);
+        Image bottomRightImage = ImageUtilities.loadImage(BOTTOM__RIGHT_RESOURCE, true);
+        Image bottomMiddleImage = ImageUtilities.loadImage(BOTTOM__MIDDLE_RESOURCE, true);
         
         setLayout(new BorderLayout());
         setOpaque(false);

@@ -27,8 +27,8 @@ package com.sun.tools.visualvm.host;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  * DataSourceDescriptor for Host.LOCALHOST.
@@ -37,7 +37,7 @@ import org.openide.util.Utilities;
  */
 public class LocalHostDescriptor extends DataSourceDescriptor {
 
-    private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/host/resources/localHost.png", true);    // NOI18N
+    private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/host/resources/localHost.png", true);    // NOI18N
 
     /**
      * Creates new instance of LocalHostDescriptor.

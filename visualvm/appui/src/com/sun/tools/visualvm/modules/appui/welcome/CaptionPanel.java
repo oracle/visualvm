@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.modules.appui.welcome;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import javax.swing.JPanel;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -50,9 +50,9 @@ class CaptionPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
         
-        Image topLeftImage = Utilities.loadImage(TOP_LEFT_RESOURCE, true);
-        Image topRightImage = Utilities.loadImage(TOP_RIGHT_RESOURCE, true);
-        Image topMiddleImage = Utilities.loadImage(TOP_MIDDLE_RESOURCE, true);
+        Image topLeftImage = ImageUtilities.loadImage(TOP_LEFT_RESOURCE, true);
+        Image topRightImage = ImageUtilities.loadImage(TOP_RIGHT_RESOURCE, true);
+        Image topMiddleImage = ImageUtilities.loadImage(TOP_MIDDLE_RESOURCE, true);
         
         add(new FixedImagePanel(topLeftImage), BorderLayout.WEST);
         add(new FixedImagePanel(topRightImage), BorderLayout.EAST);

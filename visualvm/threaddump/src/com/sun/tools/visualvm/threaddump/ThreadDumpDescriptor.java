@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.threaddump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  * DataSourceDescriptor for ThreadDump.
@@ -38,7 +38,7 @@ import org.openide.util.Utilities;
 public class ThreadDumpDescriptor extends SnapshotDescriptor<ThreadDump> {
         
     private static final Image ICON = SnapshotsSupport.getInstance().createSnapshotIcon(
-            Utilities.loadImage("com/sun/tools/visualvm/threaddump/resources/threaddumpBase.png", true)); // NOI18N
+            ImageUtilities.loadImage("com/sun/tools/visualvm/threaddump/resources/threaddumpBase.png", true)); // NOI18N
 
     /**
      * Creates new instance of ThreadDumpDescriptor.

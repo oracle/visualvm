@@ -50,8 +50,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -66,7 +66,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
 
     public HostOverviewView(Host host) {
-        super(host, NbBundle.getMessage(HostOverviewView.class, "LBL_Overview"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
+        super(host, NbBundle.getMessage(HostOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
     protected void willBeAdded() {

@@ -29,8 +29,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -47,7 +47,7 @@ class ApplicationOverviewView extends DataSourceView {
     
 
     public ApplicationOverviewView(DataSource dataSource, ApplicationOverviewModel model) {
-        super(dataSource, NbBundle.getMessage(ApplicationOverviewView.class, "LBL_Overview"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 10, false);  // NOI18N
+        super(dataSource, NbBundle.getMessage(ApplicationOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 10, false);  // NOI18N
         this.model = model;
     }
     

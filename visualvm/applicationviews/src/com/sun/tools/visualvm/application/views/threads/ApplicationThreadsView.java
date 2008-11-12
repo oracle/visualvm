@@ -55,8 +55,8 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
 
 /**
@@ -72,7 +72,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     private MBeanCacheListener listener;
 
     ApplicationThreadsView(Application application) {
-        super(application, NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
+        super(application, NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
     }
 
     @Override

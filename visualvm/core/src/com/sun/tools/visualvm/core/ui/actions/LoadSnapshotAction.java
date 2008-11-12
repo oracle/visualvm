@@ -39,14 +39,14 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicFileChooserUI;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 class LoadSnapshotAction extends AbstractAction {
     
     private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/loadSnapshot.png";    // NOI18N
-    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
+    private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private String lastFile = null;
     

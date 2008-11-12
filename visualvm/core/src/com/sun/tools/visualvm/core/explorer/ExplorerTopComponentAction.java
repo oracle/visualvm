@@ -29,8 +29,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  * Action which shows ExplorerTopComponent component.
@@ -57,7 +57,7 @@ class ExplorerTopComponentAction extends AbstractAction {
     
     private ExplorerTopComponentAction() {
         super(NbBundle.getMessage(ExplorerTopComponentAction.class, "CTL_ExplorerTopComponentAction")); // NOI18N
-        putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(ExplorerTopComponent.ICON_PATH, true)));
+        putValue(SMALL_ICON, new ImageIcon(ImageUtilities.loadImage(ExplorerTopComponent.ICON_PATH, true)));
     }
   
 }

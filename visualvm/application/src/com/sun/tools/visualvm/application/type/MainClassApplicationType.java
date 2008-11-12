@@ -27,8 +27,8 @@ package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 
 /**
@@ -57,6 +57,6 @@ public class MainClassApplicationType extends ApplicationType  {
   }
 
   public Image getIcon() {
-    return Utilities.loadImage(iconPath, true);
+    return ImageUtilities.loadImage(iconPath, true);
   }
 }

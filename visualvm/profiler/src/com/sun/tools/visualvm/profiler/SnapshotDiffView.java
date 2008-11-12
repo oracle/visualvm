@@ -39,6 +39,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.modules.profiler.MemoryDiffPanel;
 import org.netbeans.modules.profiler.SnapshotsDiffWindow;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
@@ -53,7 +54,7 @@ class SnapshotDiffView extends DataSourceView {
 
     public SnapshotDiffView(SnapshotDiffContainer snapshotDiff) {
         super(snapshotDiff, NbBundle.getMessage(SnapshotDiffView.class, "LBL_Snapshots_Comparison"), // NOI18N
-              Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/diff.png", true), // NOI18N
+              ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/diff.png", true), // NOI18N
               Positionable.POSITION_AT_THE_END, true);
     }
     

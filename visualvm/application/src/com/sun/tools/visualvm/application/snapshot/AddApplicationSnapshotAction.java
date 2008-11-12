@@ -31,8 +31,8 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
     
 /**
@@ -42,7 +42,7 @@ import org.openide.util.Utilities;
 class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsContainer> {
     
     private static final String ICON_PATH = "com/sun/tools/visualvm/application/resources/addApplicationSnapshot.png";  // NOI18N
-    private static final Image ICON =  Utilities.loadImage(ICON_PATH);
+    private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;
     

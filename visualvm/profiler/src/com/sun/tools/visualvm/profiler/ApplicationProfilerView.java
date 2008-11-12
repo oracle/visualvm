@@ -67,6 +67,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -88,7 +89,7 @@ class ApplicationProfilerView extends DataSourceView {
 
     
     public ApplicationProfilerView(Application application) {
-        super(application, NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);    // NOI18N
+        super(application, NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);    // NOI18N
         cpuSettingsSupport = new CPUSettingsSupport(application);
         memorySettingsSupport = new MemorySettingsSupport(application);
     }
@@ -530,7 +531,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // cpuButton
               cpuButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Cpu"));    // NOI18N
-              cpuButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/cpu.png", true))); // NOI18N
+              cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/cpu.png", true))); // NOI18N
               cpuButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleCPUProfiling(); }
               });
@@ -545,7 +546,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // memoryButton
               memoryButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Memory"));  // NOI18N
-              memoryButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/memory.png", true)));   // NOI18N
+              memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/memory.png", true)));   // NOI18N
               memoryButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleMemoryProfiling(); }
               });
@@ -560,7 +561,7 @@ class ApplicationProfilerView extends DataSourceView {
 
               // stopButton
               stopButton = new JButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Stop")); // NOI18N
-              stopButton.setIcon(new ImageIcon(Utilities.loadImage("com/sun/tools/visualvm/profiler/resources/stop.png", true)));   // NOI18N
+              stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/stop.png", true)));   // NOI18N
               stopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
               });

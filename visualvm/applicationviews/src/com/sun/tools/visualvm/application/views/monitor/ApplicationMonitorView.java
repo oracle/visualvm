@@ -65,9 +65,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
 
 /**
@@ -85,7 +85,7 @@ class ApplicationMonitorView extends DataSourceView {
     
 
     public ApplicationMonitorView(Application application) {
-        super(application, NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Monitor"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);   // NOI18N
+        super(application, NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Monitor"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);   // NOI18N
     }
     
     @Override

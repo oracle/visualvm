@@ -30,6 +30,7 @@ import java.awt.Image;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Utilities;
 
 /**
@@ -39,9 +40,9 @@ import org.openide.util.Utilities;
 public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
     
-    private static final Image CPU_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
-    private static final Image MEMORY_ICON = Utilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png", true);  // NOI18N
-    private static final Image NODE_BADGE = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
+    private static final Image CPU_ICON = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
+    private static final Image MEMORY_ICON = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png", true);  // NOI18N
+    private static final Image NODE_BADGE = ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     
 
     public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
@@ -53,9 +54,9 @@ public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnaps
         try {
             int snapshotType = snapshot.getLoadedSnapshot().getType();
             if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_CPU)
-                return Utilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
+                return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
             else if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
-                return Utilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
+                return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
             else return null;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to determine profiler snapshot type", e);  // NOI18N

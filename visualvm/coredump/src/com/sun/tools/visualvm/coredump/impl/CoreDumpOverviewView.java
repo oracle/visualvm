@@ -36,8 +36,8 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -49,7 +49,7 @@ class CoreDumpOverviewView extends DataSourceView {
     
     
     public CoreDumpOverviewView(CoreDump coreDump) {
-        super(coreDump, NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Overview"), new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
+        super(coreDump, NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
     protected DataViewComponent createComponent() {

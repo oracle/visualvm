@@ -120,7 +120,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.10.0.1</specification-version>
+                        <specification-version>7.18.1.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
