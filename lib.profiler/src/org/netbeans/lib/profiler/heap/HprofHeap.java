@@ -64,8 +64,8 @@ class HprofHeap implements Heap {
     static final int STRING = 1;
     static final int LOAD_CLASS = 2;
     private static final int UNLOAD_CLASS = 3;
-    private static final int STACK_FRAME = 4;
-    private static final int STACK_TRACE = 5;
+    static final int STACK_FRAME = 4;
+    static final int STACK_TRACE = 5;
     private static final int ALLOC_SITES = 6;
     static final int HEAP_SUMMARY = 7;
     private static final int START_THREAD = 0xa;
@@ -283,7 +283,15 @@ class HprofHeap implements Heap {
     StringSegment getStringSegment() {
         return (StringSegment) tagBounds[STRING];
     }
-
+    
+    StackTraceSegment getStackTraceSegment() {
+        return (StackTraceSegment) tagBounds[STACK_TRACE];
+    }
+    
+    StackFrameSegment getStackFrameSegment() {
+        return (StackFrameSegment) tagBounds[STACK_FRAME];
+    }
+    
     int getValueSize(final byte type) {
         switch (type) {
             case HprofHeap.OBJECT:
@@ -385,6 +393,7 @@ class HprofHeap implements Heap {
             long start = offset[0];
             int tag = readDumpTag(offset);
             long instanceId = 0L;
+            LongMap.Entry instanceEntry = null;
 
             if (tag == INSTANCE_DUMP) {
                 instanceIdOffset = 1;
@@ -400,7 +409,7 @@ class HprofHeap implements Heap {
 
             if (instanceIdOffset != 0) {
                 instanceId = dumpBuffer.getID(start + instanceIdOffset);
-                idToOffsetMap.put(instanceId, start);
+                instanceEntry = idToOffsetMap.put(instanceId, start);
             }
 
             if (classIdOffset != 0) {
@@ -410,8 +419,7 @@ class HprofHeap implements Heap {
 
             if (classDump != null) {
                 classDump.incrementInstance();
-                idToOffsetMap.get(instanceId).setIndex(classDump.getInstancesCount());
-                classDumpBounds.addInstanceSize(classDump, tag, start);
+                instanceEntry.setIndex(classDump.getInstancesCount());
             }
         }
 
@@ -847,7 +855,12 @@ class HprofHeap implements Heap {
                 long start = offset[0];
 
                 if (readDumpTag(offset) == rootTag) {
-                    HprofGCRoot root = new HprofGCRoot(this, start);
+                    HprofGCRoot root;
+                    if (rootTag == ROOT_THREAD_OBJECT) {
+                        root = new ThreadObjectHprofGCRoot(this, start);                        
+                    } else {
+                        root = new HprofGCRoot(this, start);
+                    }
                     roots.put(Long.valueOf(root.getInstanceId()), root);
                 }
             }
@@ -972,6 +985,10 @@ class HprofHeap implements Heap {
                     newBounds = new LoadClassSegment(this, start, end);
                 } else if (tag == STRING) {
                     newBounds = new StringSegment(this, start, end);
+                } else if (tag == STACK_TRACE) {
+                    newBounds = new StackTraceSegment(this, start, end);
+                } else if (tag == STACK_FRAME) {
+                    newBounds = new StackFrameSegment(this, start, end);
                 } else {
                     newBounds = new TagBounds(tag, start, end);
                 }

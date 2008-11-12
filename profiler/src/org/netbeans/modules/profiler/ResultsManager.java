@@ -77,6 +77,7 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /** An manager for management/notifications about obtainer profiling results.
@@ -84,6 +85,7 @@ import javax.swing.*;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@ServiceProvider(service=ResultsManager.class) // XXX is this really useful?
 public final class ResultsManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
