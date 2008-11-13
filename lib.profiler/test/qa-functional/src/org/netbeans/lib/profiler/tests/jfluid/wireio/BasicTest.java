@@ -40,6 +40,9 @@
 
 package org.netbeans.lib.profiler.tests.jfluid.wireio;
 
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.server.system.Timers;
 import org.netbeans.lib.profiler.wireprotocol.*;
@@ -56,6 +59,20 @@ public class BasicTest extends CommonWireIOTestCase {
     /** Creates a new instance of BasicTest */
     public BasicTest(String name) {
         super(name);
+    }
+
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
+
+    public static Test suite() {
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            "testComplexCommands",
+            "testComplexResponse",
+            "testSimpleCommands",
+            "testSimpleResponse",
+            "testUnknownSimpleCommand").enableModules(".*").clusters(".*"));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

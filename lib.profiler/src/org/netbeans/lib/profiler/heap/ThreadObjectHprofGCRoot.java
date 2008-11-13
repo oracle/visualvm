@@ -38,60 +38,57 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.netbeans.lib.profiler.heap;
 
-import junit.framework.Test;
-import junit.textui.TestRunner;
-import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
+import java.util.HashMap;
+import java.util.Map;
 
 
-public class BasicTest extends CommonProfilerTestCase {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public BasicTest(String testName) {
-        super(testName);
-    }
-
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
-            "testCalibrate").enableModules(".*").clusters(".*"));
+/**
+ *
+ * @author Tomas Hurka
+ */
+class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot {
+    
+    ThreadObjectHprofGCRoot(HprofHeap h, long offset) {
+        super(h,offset);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void testCalibrate() {
-        System.out.println(">>>dvt");
-        ProfilerEngineSettings settings;
-        settings = new ProfilerEngineSettings();
-        setTargetVM(settings);
-        settings.setPortNo(5140);
-        settings.setSeparateConsole(false);
-        setStatus(STATUS_NONE);
+    public StackTraceElement[] getStackTrace() {
+        int stackTraceSerialNumber = getStackTraceSerialNumber();
+        
+        if (stackTraceSerialNumber != 0) {
+            StackTrace stackTrace = heap.getStackTraceSegment().getStackTraceBySerialNumber(stackTraceSerialNumber);
+            StackFrame[] frames = stackTrace.getStackFrames();
+            StackTraceElement[] stackElements = new StackTraceElement[frames.length];
 
-        setProfilerHome(settings);
-
-        TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
-                                                     new TestProfilingPointsProcessor());
-        runner.addProfilingEventListener(Utils.createProfilingListener(this));
-        System.out.println(">>>dvt");
-
-        try {
-            assertTrue("Error in calibration", runner.calibrateInstrumentationCode());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            assertFalse("Error in calibration", true);
-        } finally {
-            runner.terminateTargetJVM();
-
-            //            waitForStatus(STATUS_FINISHED, 60 * 1000);
+            for (int i=0;i<frames.length;i++) {
+                StackFrame f = frames[i];
+                String className = f.getClassName();
+                String method = f.getMethodName();
+                String source = f.getSourceFile();
+                int number = f.getLineNumber();
+                
+                if (number == StackFrame.NATIVE_METHOD) {
+                    number = -2;
+                } else if (number == StackFrame.NO_LINE_INFO || number == StackFrame.UNKNOWN_LOCATION) {
+                    number = -1;
+                }
+                stackElements[i] = new StackTraceElement(className,method,source,number);
+            }
+            return stackElements;
         }
+        return null;
     }
+    
+    private int getThreadSerialNumber() {
+        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
+    }
+
+    private int getStackTraceSerialNumber() {
+        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize() + 4);
+    }    
+
 }

@@ -38,80 +38,66 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.others;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
+package org.netbeans.lib.profiler.heap;
 
 
 /**
  *
- * @author ehucka
+ * @author Tomas Hurka
  */
-public class MeasureDiffsTest extends MeasureDiffsTestCase {
+class StackFrame extends HprofObject {
+    
+    static final int NO_LINE_INFO = 0;
+    static final int UNKNOWN_LOCATION = -1;
+    static final int COMPILED_METHOD = -2;
+    static final int NATIVE_METHOD = -3;
+    
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    
+    private final StackFrameSegment stackFrameSegment;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Creates a new instance of MeasureDiffsTest
-     */
-    public MeasureDiffsTest(String name) {
-        super(name);
+    
+    StackFrame(StackFrameSegment segment, long offset) {
+        super(offset);
+        stackFrameSegment = segment;
+        assert getHprofBuffer().get(offset) == HprofHeap.STACK_FRAME;
     }
-
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(MeasureDiffsTest.class).addTest(
-            "testSettingsInstrumentAllEager",
-            "testSettingsInstrumentAllEagerServer",
-            "testSettingsInstrumentAllLazy",
-            "testSettingsInstrumentAllLazyServer",
-            "testSettingsInstrumentAllTotal",
-            "testSettingsInstrumentAllTotalServer",
-            "temptestSettingsInstrumentAll").enableModules(".*").clusters(".*"));
-    }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void testSettingsInstrumentAllEager() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_EAGER, false);
+    
+    long getStackFrameID() {
+        return getHprofBuffer().getID(fileOffset + stackFrameSegment.stackFrameIDOffset);
     }
-
-    public void testSettingsInstrumentAllEagerServer() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_EAGER, true);
+    
+    String getMethodName() {
+        return getStringByOffset(stackFrameSegment.methodIDOffset);
     }
-
-    public void testSettingsInstrumentAllLazy() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_LAZY, false);
+    
+    String getMethodSignature() {
+        return getStringByOffset(stackFrameSegment.methodSignatureIDOffset);
     }
-
-    public void testSettingsInstrumentAllLazyServer() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_LAZY, true);
+    
+    String getSourceFile() {
+        return getStringByOffset(stackFrameSegment.sourceIDOffset);
     }
-
-    public void testSettingsInstrumentAllTotal() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_TOTAL, false);
+    
+    String getClassName() {
+        long classSerial = getHprofBuffer().getID(fileOffset + stackFrameSegment.classSerialNumberOffset);
+        LoadClass loadClass = stackFrameSegment.hprofHeap.getLoadClassSegment().getClassBySerialNumber(classSerial);
+        return loadClass.getName();
     }
-
-    public void testSettingsInstrumentAllTotalServer() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_TOTAL, true);
+    
+    int getLineNumber() {
+        return getHprofBuffer().getInt(fileOffset + stackFrameSegment.lineNumberOffset);
     }
-
-    protected void temptestSettingsInstrumentAll(int instrScheme, boolean server) {
-        ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.Measure");
-        settings.setInstrScheme(instrScheme);
-
-        if (server) {
-            addJVMArgs(settings, "-server");
-        }
-
-        startCPUTest(settings, new String[] { "simple.cpu.Measure.run" });
+    
+    private HprofByteBuffer getHprofBuffer() {
+        return stackFrameSegment.hprofHeap.dumpBuffer;
+    }
+    
+    private String getStringByOffset(long offset) {
+        long stringID = getHprofBuffer().getID(fileOffset + offset);
+        return stackFrameSegment.hprofHeap.getStringSegment().getStringByID(stringID);
     }
 }
