@@ -25,8 +25,10 @@
 
 package com.sun.tools.visualvm.tools.jmx;
 
+import com.sun.tools.visualvm.core.datasupport.AsyncPropertyChangeSupport;
 import com.sun.tools.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.event.SwingPropertyChangeSupport;
@@ -67,8 +69,8 @@ import javax.swing.event.SwingPropertyChangeSupport;
  */
 public abstract class JmxModel extends Model {
 
-    protected SwingPropertyChangeSupport propertyChangeSupport =
-            new SwingPropertyChangeSupport(this, true);
+    protected PropertyChangeSupport propertyChangeSupport =
+            new AsyncPropertyChangeSupport(this);
     /**
      * The {@link ConnectionState ConnectionState} bound property name.
      */
