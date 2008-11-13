@@ -41,7 +41,7 @@ public class ExtendedJvmJvmstatModelProvider extends AbstractModelProvider<JvmJv
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         if (jvmstat != null) {
             String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
-            if (vmVersion != null && vmVersion.startsWith("13.0")) { // NOI18N
+            if (vmVersion != null && (vmVersion.startsWith("13.0") || vmVersion.startsWith("14.0"))) { // NOI18N
                 return new ExtendedJvmJvmstatModel(app, jvmstat);
             }
         }

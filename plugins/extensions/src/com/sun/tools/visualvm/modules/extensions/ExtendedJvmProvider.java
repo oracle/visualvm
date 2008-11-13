@@ -48,7 +48,7 @@ public class ExtendedJvmProvider extends AbstractModelProvider<Jvm, Application>
         ExtendedJVMImpl jvm = null;
         if (jvmstat != null) {
             String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
-            if (vmVersion != null && vmVersion.startsWith("13.0")) { // NOI18N
+            if (vmVersion != null && (vmVersion.startsWith("13.0") || vmVersion.startsWith("14.0"))) { // NOI18N
                 jvm = new ExtendedJVMImpl(app, jvmstat);
             }
         } else {
@@ -57,7 +57,7 @@ public class ExtendedJvmProvider extends AbstractModelProvider<Jvm, Application>
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                 if (mxbeans != null) {
                     RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
-                    if (runtime != null && runtime.getVmVersion().startsWith("13.0")) { // NOI18N
+                    if (runtime != null && (runtime.getVmVersion().startsWith("13.0") || runtime.getVmVersion().startsWith("14.0"))) { // NOI18N
                         jvm = new ExtendedJVMImpl(app);
                     }
                 }
