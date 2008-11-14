@@ -31,7 +31,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
-import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  * <p>This class encapsulates the JMX functionality of the target Java application.</p>
