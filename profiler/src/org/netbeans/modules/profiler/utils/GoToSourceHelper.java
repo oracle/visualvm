@@ -55,23 +55,23 @@ import org.openide.util.NbBundle;
  * @author Jaroslav Bachorik
  */
 final public class GoToSourceHelper {
-    public static boolean openSource(Project project, String className, String methodName, String signature) {
+    public static boolean openSource(Project project, JavaSourceLocation location) {
         // *** logging stuff ***
         ProfilerLogger.debug("Open Source: Project: " + ((project == null) ? "null" : ProjectUtilities.getProjectName(project))); // NOI18N
-        ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N
-        ProfilerLogger.debug("Open Source: Method name: " + methodName); // NOI18N
-        ProfilerLogger.debug("Open Source: Method sig: " + signature); // NOI18N
+        ProfilerLogger.debug("Open Source: Class name: " + location.className); // NOI18N
+        ProfilerLogger.debug("Open Source: Method name: " + location.methodName); // NOI18N
+        ProfilerLogger.debug("Open Source: Method sig: " + location.signature); // NOI18N
         
         Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
         
         String st = MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class, "OpeningSourceMsg"),
-                                                             new Object[] { className }); // NOI18N
+                                                             new Object[] { location.toString() }); // NOI18N
         final String finalStatusText = st + " ..."; // NOI18N
         StatusDisplayer.getDefault().setStatusText(finalStatusText);
         
         for(GoToSourceProvider impl : implementations) {
             try {
-                if (impl.openSource(project, className, methodName, signature)) return true;
+                if (impl.openSource(project, location.className, location.methodName, location.signature, location.line)) return true;
             } catch (Exception e) {
                 ProfilerLogger.log(e);
             }
@@ -79,7 +79,7 @@ final public class GoToSourceHelper {
         
         Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class,
                                                                                         "NoSourceFoundMessage"), // NOI18N
-                                                                                        new Object[] { className }));
+                                                                                        new Object[] { location.toString() }));
         
         return false;
     }
