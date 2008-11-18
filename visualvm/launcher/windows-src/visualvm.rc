@@ -1,5 +1,9 @@
+#include "winuser.h"
+
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 
 100 ICON DISCARDABLE "visualvm.ico"
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "visualvm.exe.manifest"
 
