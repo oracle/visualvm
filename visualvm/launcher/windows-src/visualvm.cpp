@@ -213,16 +213,18 @@ int WINAPI
                         &pi)) {
         sprintf(buf, "Cannot start %s", appname);
         ErrorExit(buf, "CreateProcess");
+        return 255;
     } else {
         // Wait until child process exits.
         WaitForSingleObject( pi.hProcess, INFINITE );
 
+        DWORD retCode = 0;
+        GetExitCodeProcess(pi.hProcess, &retCode);
         // Close process and thread handles. 
         CloseHandle( pi.hProcess );
-        CloseHandle( pi.hThread );        
-        exit(0);
+        CloseHandle( pi.hThread );
+        return retCode;
     }
-    return 0;
 }
     
 char* getUserHomeFromRegistry(char* userhome)
