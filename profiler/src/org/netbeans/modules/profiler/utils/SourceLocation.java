@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,33 +31,17 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
+ *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.spi;
-
-import java.util.logging.Logger;
-import org.netbeans.api.project.Project;
+package org.netbeans.modules.profiler.utils;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class GoToSourceProvider {
-    /**
-     * Implementors will provide a specific functionality to open a source code
-     * @param project The associated project
-     * @param className The class name
-     * @param methodName The method name or NULL
-     * @param signature The signature or NULL
-     * @param line The line number or {@linkplain Integer#MIN_VALUE}
-     * @return Returns TRUE if the infrastructure was able to open the source code, FALSE otherwise
-     */
-    public boolean openSource(Project project, String className, String methodName, String signature, int line) {
-        Logger.getLogger(GoToSourceProvider.class.getName()).warning("Using the default implementation of GoToSourceProvider!");
-        return false;
-    }
+public interface SourceLocation {
 }
