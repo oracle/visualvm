@@ -204,7 +204,7 @@ int WINAPI
     if (!CreateProcess (NULL, cmdline2,
                         NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS,
                         NULL, 
-                        _T(topdir), // lpCurrentDirectory
+                        NULL, // lpCurrentDirectory
                         &start,
                         &pi)) {
         sprintf(buf, "Cannot start %s", appname);
