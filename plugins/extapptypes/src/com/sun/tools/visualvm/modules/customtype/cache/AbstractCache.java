@@ -68,7 +68,7 @@ abstract public class AbstractCache<K, V> {
                     }
                 }
             }
-            return entry.getContent();
+            return entry != null ? entry.getContent() : null;
         }
     }
     
