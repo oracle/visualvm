@@ -22,6 +22,7 @@
                     <attr name="icon" stringvalue="<URL to Icon; can use special NB protocols like nbres:/ or nbfs:/ >"/>
                     <attr name="mainClass" stringvalue="<main class identifier>"/>
                     <attr name="url" stringvalue="URL for more information"/>
+                    <attr name="description" stringvalue="description"/>
                 </folder>
             -->
         </folder>
