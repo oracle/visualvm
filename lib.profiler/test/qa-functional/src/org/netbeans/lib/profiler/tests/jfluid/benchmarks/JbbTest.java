@@ -41,7 +41,8 @@
 package org.netbeans.lib.profiler.tests.jfluid.benchmarks;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
@@ -60,13 +61,22 @@ public class JbbTest extends JbbTestType {
         super(name);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.benchmarks.JbbTest.class);
-
-        return suite;
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(JbbTestType.class).addTest(
+            "testBasic",
+            "testDefaultEntire",
+            "testDefaultPart",
+            "testInstrumentEager",
+            "testInstrumentSampledLazy",
+            "testInstrumentSampledTotal").enableModules(".*").clusters(".*"));
     }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testBasic() {
         ProfilerEngineSettings settings = initCpuTest("jbb", "spec.jbb.JBBmain");

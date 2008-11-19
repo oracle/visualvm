@@ -38,60 +38,73 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.netbeans.lib.profiler.heap;
 
-import junit.framework.Test;
-import junit.textui.TestRunner;
-import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
+import java.util.Map;
 
 
-public class BasicTest extends CommonProfilerTestCase {
+/**
+ *
+ * @author Tomas Hurka
+ * @author Toms Hurka
+ */
+class StackFrameSegment extends TagBounds {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+
+    HprofHeap hprofHeap;
+    final int methodIDOffset;
+    final int stackFrameIDOffset;
+    final int lengthOffset;
+    final int sourceIDOffset;
+    final int methodSignatureIDOffset;
+    final int timeOffset;
+    final int classSerialNumberOffset;
+    final int lineNumberOffset;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public BasicTest(String testName) {
-        super(testName);
-    }
+    StackFrameSegment(HprofHeap heap, long start, long end) {
+        super(HprofHeap.STACK_TRACE, start, end);
 
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
-            "testCalibrate").enableModules(".*").clusters(".*"));
+        int idSize = heap.dumpBuffer.getIDSize();
+        hprofHeap = heap;
+        timeOffset = 1;
+        lengthOffset = timeOffset + 4;
+        stackFrameIDOffset = lengthOffset + 4;
+        methodIDOffset = stackFrameIDOffset + idSize;
+        methodSignatureIDOffset = methodIDOffset + idSize;
+        sourceIDOffset = methodSignatureIDOffset + idSize;
+        classSerialNumberOffset = sourceIDOffset + idSize;
+        lineNumberOffset = classSerialNumberOffset + 4;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void testCalibrate() {
-        System.out.println(">>>dvt");
-        ProfilerEngineSettings settings;
-        settings = new ProfilerEngineSettings();
-        setTargetVM(settings);
-        settings.setPortNo(5140);
-        settings.setSeparateConsole(false);
-        setStatus(STATUS_NONE);
+    StackFrame getStackFrameByID(long stackFrameID) {
+        long[] offset = new long[] { startOffset };
 
-        setProfilerHome(settings);
+        while (offset[0] < endOffset) {
+            long start = offset[0];
+            long frameID = readStackFrameTag(offset);
 
-        TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
-                                                     new TestProfilingPointsProcessor());
-        runner.addProfilingEventListener(Utils.createProfilingListener(this));
-        System.out.println(">>>dvt");
-
-        try {
-            assertTrue("Error in calibration", runner.calibrateInstrumentationCode());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            assertFalse("Error in calibration", true);
-        } finally {
-            runner.terminateTargetJVM();
-
-            //            waitForStatus(STATUS_FINISHED, 60 * 1000);
+            if (frameID == stackFrameID) {
+                return new StackFrame(this, start);
+            }
         }
+        return null;
+    }
+
+    private HprofByteBuffer getDumpBuffer() {
+        return  hprofHeap.dumpBuffer;
+    }
+
+    private long readStackFrameTag(long[] offset) {
+        long start = offset[0];
+
+        if (hprofHeap.readTag(offset) != HprofHeap.STACK_FRAME) {
+            return 0;
+        }
+
+        return getDumpBuffer().getID(start + stackFrameIDOffset);
     }
 }

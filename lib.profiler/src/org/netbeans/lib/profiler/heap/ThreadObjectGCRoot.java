@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -21,6 +21,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,30 +36,33 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.netbeans.lib.profiler.heap;
 
-import junit.framework.Test;
-import org.netbeans.junit.NbModuleSuite;
 
 /**
- *
- * @author tester
+ * This represents one Thred Object GC root. It has kind ({@link GCRoot#THREAD_OBJECT}) and also corresponding
+ * {@link Instance}, which is actual GC root.
+ * @author Tomas Hurka
  */
-public class ProfilerStableTestSuite {
-    public static Test suite() {
-    return NbModuleSuite.create(
-      NbModuleSuite.emptyConfiguration()
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
-        //.addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class)
-    );
-  }
+public interface ThreadObjectGCRoot extends GCRoot {
 
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Returns an array of stack trace elements,
+     * each representing one stack frame.  The zeroth element of the array
+     * (assuming the array's length is non-zero) represents the top of the
+     * stack, which is the last method invocation in the sequence.  Typically,
+     * this is the point at which this throwable was created and thrown.
+     * The last element of the array (assuming the array's length is non-zero)
+     * represents the bottom of the stack, which is the first method invocation
+     * in the sequence.
+     * <br>
+     * Speed:normal
+     * @return an array of stack trace elements representing the stack trace
+     *         pertaining to this throwable.
+     */
+    StackTraceElement[] getStackTrace();
 }
