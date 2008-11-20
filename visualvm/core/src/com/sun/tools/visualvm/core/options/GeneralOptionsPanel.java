@@ -82,18 +82,21 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Host")); // NOI18N
+        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         mhRefresh.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(3), Integer.valueOf(1), null, Integer.valueOf(1)));
 
         jLabel2.setDisplayedMnemonic('t');
         jLabel2.setLabelFor(thrdRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Threads")); // NOI18N
+        jLabel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         thrdRefresh.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
 
         jLabel3.setDisplayedMnemonic('m');
         jLabel3.setLabelFor(dataRefresh);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Data")); // NOI18N
+        jLabel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         dataRefresh.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
 
@@ -110,6 +113,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel10.setDisplayedMnemonic('h');
         jLabel10.setLabelFor(mhRefresh1);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel10, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Host2")); // NOI18N
+        jLabel10.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         mhRefresh1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(60), Integer.valueOf(1), null, Integer.valueOf(1)));
 
@@ -122,6 +126,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jLabel13.setDisplayedMnemonic('m');
         jLabel13.setLabelFor(dataRefresh1);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel13, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Monitored_Data2")); // NOI18N
+        jLabel13.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Profiler")); // NOI18N
 
@@ -133,6 +138,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel14, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "MSG_Do_Not_Show_Again")); // NOI18N
+        jLabel14.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -146,10 +152,9 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel4)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
                             .add(layout.createSequentialGroup()
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(jLabel1)
                                     .add(jLabel2)
@@ -168,7 +173,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel9)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                        .add(jSeparator3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
@@ -188,7 +193,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                        .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                         .addContainerGap())
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(jLabel14)
