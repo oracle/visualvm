@@ -25,10 +25,15 @@
 
 package com.sun.tools.visualvm.core.options;
 
+import com.sun.tools.visualvm.core.datasupport.Utils;
+import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.openide.util.RequestProcessor;
 
 final class GeneralOptionsPanel extends javax.swing.JPanel {
 
@@ -78,6 +83,8 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         jSeparator4 = new javax.swing.JSeparator();
         jButton1 = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jLabel15 = new javax.swing.JLabel();
 
         jLabel1.setDisplayedMnemonic('h');
         jLabel1.setLabelFor(mhRefresh);
@@ -140,6 +147,16 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel14, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "MSG_Do_Not_Show_Again")); // NOI18N
         jLabel14.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton2, "R&eset");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel15, "Reset calibration data:");
+        jLabel15.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -152,7 +169,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel4)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
                             .add(layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -173,7 +190,7 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel9)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+                        .add(jSeparator3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
@@ -193,12 +210,17 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                        .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
                         .addContainerGap())
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(jLabel14)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 29, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 76, Short.MAX_VALUE)
                         .add(jButton1)
+                        .addContainerGap())
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(jLabel15)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 161, Short.MAX_VALUE)
+                        .add(jButton2)
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -245,6 +267,10 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jButton1)
                     .add(jLabel14))
+                .add(4, 4, 4)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jButton2)
+                    .add(jLabel15))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -253,6 +279,27 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     ProfilerIDESettings.getInstance().clearDoNotShowAgainMap();
     jButton1.setEnabled(false);
 }//GEN-LAST:event_jButton1ActionPerformed
+
+private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    jButton2.setEnabled(false);
+    RequestProcessor.getDefault().post(new Runnable() {
+        public void run() {
+            try {
+                File calibrationDirectory = new File(Platform.getProfilerUserDir());
+                if (calibrationDirectory.isDirectory()) {
+                    File[] calibrationFiles = calibrationDirectory.listFiles();
+                    for (File calibrationFile : calibrationFiles) {
+                        if (calibrationFile.isFile() && calibrationFile.getName().startsWith("machinedata.")) // NOI18N
+                            Utils.delete(calibrationFile, false);
+                                    
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error resetting calibration data", e);  // NOI18N
+            }
+        }
+    });
+}//GEN-LAST:event_jButton2ActionPerformed
 
     void load() {
         // TODO read settings and initialize GUI
@@ -263,6 +310,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         // or:
         // someTextField.setText(SomeSystemOption.getDefault().getSomeStringProperty());
         jButton1.setEnabled(true);
+        jButton2.setEnabled(true);
         mhRefresh.setValue(GlobalPreferences.sharedInstance().getMonitoredHostPoll());
         dataRefresh.setValue(GlobalPreferences.sharedInstance().getMonitoredDataPoll());
         thrdRefresh.setValue(GlobalPreferences.sharedInstance().getThreadsPoll());
@@ -303,12 +351,14 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JSpinner dataRefresh;
     private javax.swing.JSpinner dataRefresh1;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
