@@ -49,11 +49,13 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
+import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -130,14 +132,21 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         final DetailsViewSupport detailsViewSupport = new DetailsViewSupport(threadsManager);
         final DataViewComponent.DetailsView detailsView = detailsViewSupport.getDetailsView();
-        ThreadsPanel.ThreadsDetailsCallback callback = new ThreadsPanel.ThreadsDetailsCallback() {
+        ThreadsPanel.ThreadsDetailsCallback timelineCallback = new ThreadsPanel.ThreadsDetailsCallback() {
+            public void showDetails(final int[] indexes) {
+                detailsViewSupport.showDetails(indexes);
+                dvc.selectDetailsView(detailsView);
+            }
+        };
+        ThreadsTablePanel.ThreadsDetailsCallback tableCallback = new ThreadsTablePanel.ThreadsDetailsCallback() {
             public void showDetails(final int[] indexes) {
                 detailsViewSupport.showDetails(indexes);
                 dvc.selectDetailsView(detailsView);
             }
         };
 
-        dvc.addDetailsView(new TimelineViewSupport(threadsManager, callback).getDetailsView(), DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(new TimelineViewSupport(threadsManager, timelineCallback).getDetailsView(), DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(new TableViewSupport(threadsManager, tableCallback).getDetailsView(), DataViewComponent.TOP_LEFT);
         dvc.addDetailsView(detailsView, DataViewComponent.TOP_LEFT);
 
         return dvc;
@@ -258,6 +267,36 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
     }
 
+    // --- Timeline ------------------------------------------------------------
+
+    private static class TableViewSupport extends JPanel {
+
+        TableViewSupport(ThreadMXBeanDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
+            initComponents(threadsManager, callback);
+        }
+
+        DataViewComponent.DetailsView getDetailsView() {
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Table"), null, 20, this, null);  // NOI18N
+        }
+
+        private void initComponents(ThreadMXBeanDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
+            setLayout(new BorderLayout());
+            setOpaque(false);
+
+            ThreadsTablePanel threadsPanel = new ThreadsTablePanel(threadsManager, callback, true);
+            threadsPanel.setOpaque(false);
+
+            JComponent toolbar = (JComponent)threadsPanel.getComponent(0);
+            toolbar.setOpaque(false);
+            toolbar.setBorder(BorderFactory.createEmptyBorder(9, 5, 5, 5));
+            
+            JComponent tablePanel = (JComponent)threadsPanel.getComponent(1);
+            tablePanel.setOpaque(false);
+
+            add(threadsPanel, BorderLayout.CENTER);
+        }
+    }
+
     // --- Details -------------------------------------------------------------
 
     private static class DetailsViewSupport extends JPanel {
@@ -269,7 +308,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
 
         DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Details"), null, 20, this, null);   // NOI18N
+            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Details"), null, 30, this, null);   // NOI18N
         }
 
         void showDetails(int[] indexes) {
