@@ -38,60 +38,70 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.netbeans.lib.profiler.heap;
 
-import junit.framework.Test;
-import junit.textui.TestRunner;
-import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
+import java.util.Map;
 
 
-public class BasicTest extends CommonProfilerTestCase {
+/**
+ *
+ * @author Tomas Hurka
+ * @author Toms Hurka
+ */
+class StackTraceSegment extends TagBounds {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+
+    HprofHeap hprofHeap;
+    final int threadSerialNumberOffset;
+    final int stackTraceSerialNumberOffset;
+    final int lengthOffset;
+    final int framesListOffset;
+    final int numberOfFramesOffset;
+    final int timeOffset;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public BasicTest(String testName) {
-        super(testName);
-    }
+    StackTraceSegment(HprofHeap heap, long start, long end) {
+        super(HprofHeap.STACK_TRACE, start, end);
 
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
-            "testCalibrate").enableModules(".*").clusters(".*"));
+        int idSize = heap.dumpBuffer.getIDSize();
+        hprofHeap = heap;
+        timeOffset = 1;
+        lengthOffset = timeOffset + 4;
+        stackTraceSerialNumberOffset = lengthOffset + 4;
+        threadSerialNumberOffset = stackTraceSerialNumberOffset + 4;
+        numberOfFramesOffset = threadSerialNumberOffset + 4;
+        framesListOffset = numberOfFramesOffset + 4;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void testCalibrate() {
-        System.out.println(">>>dvt");
-        ProfilerEngineSettings settings;
-        settings = new ProfilerEngineSettings();
-        setTargetVM(settings);
-        settings.setPortNo(5140);
-        settings.setSeparateConsole(false);
-        setStatus(STATUS_NONE);
+    StackTrace getStackTraceBySerialNumber(long stackTraceSerialNumber) {
+        long[] offset = new long[] { startOffset };
 
-        setProfilerHome(settings);
+        while (offset[0] < endOffset) {
+            long start = offset[0];
+            long serialNumber = readStackTraceTag(offset);
 
-        TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
-                                                     new TestProfilingPointsProcessor());
-        runner.addProfilingEventListener(Utils.createProfilingListener(this));
-        System.out.println(">>>dvt");
-
-        try {
-            assertTrue("Error in calibration", runner.calibrateInstrumentationCode());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            assertFalse("Error in calibration", true);
-        } finally {
-            runner.terminateTargetJVM();
-
-            //            waitForStatus(STATUS_FINISHED, 60 * 1000);
+            if (serialNumber == stackTraceSerialNumber) {
+                return new StackTrace(this, start);
+            }
         }
+        return null;
+    }
+
+    private HprofByteBuffer getDumpBuffer() {
+        HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
+
+        return dumpBuffer;
+    }
+
+    private long readStackTraceTag(long[] offset) {
+        long start = offset[0];
+
+        if (hprofHeap.readTag(offset) != HprofHeap.STACK_TRACE) {
+            return 0;
+        }
+        return getDumpBuffer().getID(start + stackTraceSerialNumberOffset);
     }
 }

@@ -41,7 +41,8 @@
 package org.netbeans.lib.profiler.tests.jfluid.cpu;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 
 
@@ -57,13 +58,25 @@ public class CPUSnapshotTest extends CPUSnapshotTestCase {
         super(name);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.cpu.CPUSnapshotTest.class);
-
-        return suite;
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            "testMethods",
+            "testMethodsServer",
+            "testNoThreads",
+            "testSimple",
+            "testSimpleServer",
+            "testThreads",
+            "testThreadsServer",
+            "testWaits",
+            "testWaitsServer").enableModules(".*").clusters(".*"));
     }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testMethods() {
         ProfilerEngineSettings settings = initSnapshotTest("j2se-simple", "simple.cpu.Methods", null);

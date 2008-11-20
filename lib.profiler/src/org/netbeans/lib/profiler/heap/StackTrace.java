@@ -38,80 +38,52 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.others;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
+package org.netbeans.lib.profiler.heap;
 
 
 /**
  *
- * @author ehucka
+ * @author Tomas Hurka
  */
-public class MeasureDiffsTest extends MeasureDiffsTestCase {
+class StackTrace extends HprofObject {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    
+    private final StackTraceSegment stackTraceSegment;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Creates a new instance of MeasureDiffsTest
-     */
-    public MeasureDiffsTest(String name) {
-        super(name);
+    
+    StackTrace(StackTraceSegment segment, long offset) {
+        super(offset);
+        stackTraceSegment = segment;
+        assert getHprofBuffer().get(offset) == HprofHeap.STACK_TRACE;
     }
-
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(MeasureDiffsTest.class).addTest(
-            "testSettingsInstrumentAllEager",
-            "testSettingsInstrumentAllEagerServer",
-            "testSettingsInstrumentAllLazy",
-            "testSettingsInstrumentAllLazyServer",
-            "testSettingsInstrumentAllTotal",
-            "testSettingsInstrumentAllTotalServer",
-            "temptestSettingsInstrumentAll").enableModules(".*").clusters(".*"));
-    }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void testSettingsInstrumentAllEager() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_EAGER, false);
+    
+    long getSerialNumber() {
+        return getHprofBuffer().getInt(fileOffset + stackTraceSegment.stackTraceSerialNumberOffset);
+    }
+    
+    long getThreadSerialNumber() {
+        return getHprofBuffer().getInt(fileOffset + stackTraceSegment.threadSerialNumberOffset);
     }
 
-    public void testSettingsInstrumentAllEagerServer() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_EAGER, true);
-    }
-
-    public void testSettingsInstrumentAllLazy() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_LAZY, false);
-    }
-
-    public void testSettingsInstrumentAllLazyServer() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_LAZY, true);
-    }
-
-    public void testSettingsInstrumentAllTotal() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_TOTAL, false);
-    }
-
-    public void testSettingsInstrumentAllTotalServer() {
-        temptestSettingsInstrumentAll(CommonConstants.INSTRSCHEME_TOTAL, true);
-    }
-
-    protected void temptestSettingsInstrumentAll(int instrScheme, boolean server) {
-        ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.Measure");
-        settings.setInstrScheme(instrScheme);
-
-        if (server) {
-            addJVMArgs(settings, "-server");
+    StackFrame[] getStackFrames() {
+        HprofByteBuffer buf = getHprofBuffer();
+        int frames = buf.getInt(fileOffset + stackTraceSegment.numberOfFramesOffset);
+        StackFrame[] fr = new StackFrame[frames];
+        long idOffset = fileOffset + stackTraceSegment.framesListOffset;
+        StackFrameSegment stackFrameSegment = stackTraceSegment.hprofHeap.getStackFrameSegment();
+                
+         for (int i=0;i<frames;i++,idOffset+=buf.getIDSize()) {
+             long frameID = buf.getID(idOffset);
+             fr[i] = stackFrameSegment.getStackFrameByID(frameID);
         }
-
-        startCPUTest(settings, new String[] { "simple.cpu.Measure.run" });
+        return fr;
     }
+    
+    private HprofByteBuffer getHprofBuffer() {
+        return stackTraceSegment.hprofHeap.dumpBuffer;
+    }
+    
 }

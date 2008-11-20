@@ -41,7 +41,8 @@
 package org.netbeans.lib.profiler.tests.jfluid.memory;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
@@ -57,14 +58,23 @@ public class MemorySnapshotTest extends MemorySnapshotTestCase {
     public MemorySnapshotTest(String name) {
         super(name);
     }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.memory.MemorySnapshotTest.class);
-
-        return suite;
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            "testSettingsAllocations",
+            "testSettingsAllocationsServer",
+            "testSettingsAllocationsStackTraces",
+            "testSettingsAllocationsStackTracesServer",
+            "testSettingsLiveness",
+            "testSettingsLivenessServer",
+            "testSettingsLivenessStackTraces",
+            "testSettingsLivenessStackTracesServer").enableModules(".*").clusters(".*"));
     }
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testSettingsAllocations() {
         ProfilerEngineSettings settings = initMemorySnapshotTest("j2se-simple", "simple.memory.Memory1");
