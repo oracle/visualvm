@@ -150,7 +150,7 @@ public final class Walker {
                 int i = 0;
                 for (Instance target : out) {
                     if (target != null) {
-                        if (f.accept(new ArrayEntryValue(i, act, target)) && !log.isCounted(target)) {
+                        if ((f == null || f.accept(new ArrayEntryValue(i, act, target))) && !log.isCounted(target)) {
                             log.add(target);
                             q.add(target);
                         }
