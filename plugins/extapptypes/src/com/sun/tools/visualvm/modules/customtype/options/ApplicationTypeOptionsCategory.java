@@ -25,8 +25,11 @@
 
 package com.sun.tools.visualvm.modules.customtype.options;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import org.netbeans.spi.options.OptionsCategory;
 import org.netbeans.spi.options.OptionsPanelController;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -49,6 +52,11 @@ public class ApplicationTypeOptionsCategory extends OptionsCategory {
     @Override
     public String getTitle() {
         return "VisualVM";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/customtype/resources/type_options.png"));
     }
 
 }
