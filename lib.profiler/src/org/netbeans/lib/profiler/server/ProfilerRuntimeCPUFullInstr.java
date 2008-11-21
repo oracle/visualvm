@@ -103,9 +103,16 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
         // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
         methodId = (char) ((int) methodId);
 
-        // DO NOT perform instrumentation of its immediate callees
         if (!instrMethodInvoked[methodId]) {
-            instrMethodInvoked[methodId] = true;
+            if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
+                long absTimeStamp = Timers.getCurrentTimeInCounts();
+                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
+                instrMethodInvoked[methodId] = true; // Mark this method as invoked
+                writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+            } else { // DO NOT perform instrumentation of its immediate callees
+                instrMethodInvoked[methodId] = true;
+            }
         }
 
         ti.stackDepth++; //= 1;  // This is the logical stack depth
@@ -127,21 +134,17 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
                 return;
             }
 
-            if (ti.rootMethodStackDepth > 0) {
-                methodExit(methodId);
-            } else {
-                ti.inProfilingRuntimeMethod++;
+            ti.inProfilingRuntimeMethod++;
 
-                //System.out.println("------markerMethodExit for " + instrMethodClasses[methodId] + "." + instrMethodNames[methodId] + ", depth = " + ti.stackDepth + ", id = " + (int) methodId);
-                ti.stackDepth--;
+            //System.out.println("------markerMethodExit for " + instrMethodClasses[methodId] + "." + instrMethodNames[methodId] + ", depth = " + ti.stackDepth + ", id = " + (int) methodId);
+            ti.stackDepth--;
 
-                if (ti.stackDepth < 1) {
-                    ti.inCallGraph = false; // We are exiting the marker method of our call subgraph
-                }
-
-                writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
-                ti.inProfilingRuntimeMethod--;
+            if (ti.stackDepth < 1) {
+                ti.inCallGraph = false; // We are exiting the marker method of our call subgraph
             }
+
+            writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
+            ti.inProfilingRuntimeMethod--;
         }
     }
 
