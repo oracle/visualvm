@@ -335,6 +335,8 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             if (ti.stackDepth < 1) {
                 ti.inCallGraph = false; // We are exiting the root method of our call subgraph
                 writeTimeStampedEvent(ROOT_EXIT, ti, methodId);
+            } else if (ti.rootMethodStackDepth == 0) { // We are exiting the root method, which was under marker method
+                writeTimeStampedEvent(ROOT_EXIT, ti, methodId);
             } else {
                 if (!ti.sampleDue) {
                     // short path: not taking time stamp
@@ -404,17 +406,10 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
                     return;
                 }
             } else {
-                if (ti.stackDepth > 0) {
-                    ti.rootMethodStackDepth = ti.stackDepth + 1;
-                    methodEntry(methodId);
+                ti.inProfilingRuntimeMethod++;
 
-                    return;
-                } else {
-                    ti.inProfilingRuntimeMethod++;
-
-                    if (!ProfilerServer.startProfilingPointsActive()) {
-                        ti.inCallGraph = true;
-                    }
+                if (ti.stackDepth == 0 && !ProfilerServer.startProfilingPointsActive()) {
+                    ti.inCallGraph = true;
                 }
             }
 
