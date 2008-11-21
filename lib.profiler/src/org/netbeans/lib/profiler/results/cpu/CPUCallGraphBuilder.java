@@ -498,15 +498,24 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             TimedCPUCCTNode oneMoreNode = ti.peek();
 
             // category must go with a method node; so close them together
-            if ((oneMoreNode != null)
-                    && (oneMoreNode instanceof MarkedCPUCCTNode || oneMoreNode instanceof ServletRequestCPUCCTNode)) {
+            if (oneMoreNode instanceof MarkedCPUCCTNode) {
                 //        oneMoreNode.addNCalls(oldNode.getNCalls());
                 //        oneMoreNode.addNetTime0(oldNode.getNetTime0());
                 //        oneMoreNode.addNetTime1(oldNode.getNetTime1());
                 //        oneMoreNode.addSleepTime0(oldNode.getSleepTime0());
                 //        oneMoreNode.addWaitTime0(oldNode.getWaitTime0());
                 ti.pop();
+                oneMoreNode = ti.peek();
             }
+            // Servelt node must go with a method node; so close them together
+            if (oneMoreNode instanceof ServletRequestCPUCCTNode) {
+                //        oneMoreNode.addNCalls(oldNode.getNCalls());
+                //        oneMoreNode.addNetTime0(oldNode.getNetTime0());
+                //        oneMoreNode.addNetTime1(oldNode.getNetTime1());
+                //        oneMoreNode.addSleepTime0(oldNode.getSleepTime0());
+                //        oneMoreNode.addWaitTime0(oldNode.getWaitTime0());
+                ti.pop();
+            }        
         }
 
         batchNotEmpty = true;
@@ -538,8 +547,17 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             TimedCPUCCTNode oneMoreNode = ti.peek();
 
             // category must go with a method node; so close them together
-            if ((oneMoreNode != null)
-                    && (oneMoreNode instanceof MarkedCPUCCTNode || oneMoreNode instanceof ServletRequestCPUCCTNode)) {
+            if (oneMoreNode instanceof MarkedCPUCCTNode) {
+                //        oneMoreNode.addNCalls(oldNode.getNCalls());
+                //        oneMoreNode.addNetTime0(oldNode.getNetTime0());
+                //        oneMoreNode.addNetTime1(oldNode.getNetTime1());
+                //        oneMoreNode.addSleepTime0(oldNode.getSleepTime0());
+                //        oneMoreNode.addWaitTime0(oldNode.getWaitTime0());
+                ti.pop();
+                oneMoreNode = ti.peek();
+            }
+            // Servelt node must go with a method node; so close them together
+            if (oneMoreNode instanceof ServletRequestCPUCCTNode) {
                 //        oneMoreNode.addNCalls(oldNode.getNCalls());
                 //        oneMoreNode.addNetTime0(oldNode.getNetTime0());
                 //        oneMoreNode.addNetTime1(oldNode.getNetTime1());

@@ -36,7 +36,6 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.profiler.categories;
 
 import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
@@ -46,6 +45,7 @@ import org.netbeans.modules.profiler.categories.definitions.CustomCategoryDefini
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,24 +79,23 @@ import org.openide.filesystems.FileObject;
  *
  * @author Jaroslav Bachorik
  */
-public class MarkerProcessor extends  CategoryDefinitionProcessor implements Marker {
+public class MarkerProcessor extends CategoryDefinitionProcessor implements Marker {
+
     private final static Logger LOGGER = Logger.getLogger(MarkerProcessor.class.getName());
-    
     private MethodMarker mMarker = new MethodMarker();
     private ClassMarker cMarker = new ClassMarker();
     private PackageMarker pMarker = new PackageMarker();
     private CompositeMarker cmMarker = new CompositeMarker();
-
     private Project project;
-
     private ClasspathInfo cpInfo;
     private JavaSource js;
+
     public MarkerProcessor(Project project) {
         this.project = project;
         this.cpInfo = ProjectUtilities.getClasspathInfo(project, true);
         this.js = JavaSource.create(cpInfo, new FileObject[0]);
     }
-    
+
     @Override
     public void process(SubtypeCategoryDefinition def) {
         if (def.getExcludes() == null && def.getIncludes() == null) {
@@ -134,7 +133,7 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
     public void process(PackageCategoryDefinition def) {
         pMarker.addPackageMark(def.getPackageName(), def.getAssignedMark(), def.isRecursive());
     }
-    
+
     public MarkMapping[] getMappings() {
         List<MarkMapping> mappings = new ArrayList<MarkMapping>();
         mappings.addAll(Arrays.asList(mMarker.getMappings()));
@@ -152,14 +151,14 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
         marks.addAll(Arrays.asList(cmMarker.getMarks()));
         return marks.toArray(new Mark[marks.size()]);
     }
-    
+
     protected void addInterfaceMarker(MethodMarker marker, String interfaceName, Mark mark) {
         addInterfaceMarker(marker, interfaceName, null, false, mark);
     }
 
     protected void addInterfaceMarker(final MethodMarker marker, final String interfaceName,
             final String[] methodNameRestriction, final boolean inclusive, final Mark mark) {
-        
+
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {
 
@@ -218,7 +217,7 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
     protected void addTypeMarker(final MethodMarker marker, final String type, final Mark mark) {
         addTypeMarker(marker, type, new String[]{}, false, mark);
     }
-    
+
     protected void addTypeMarker(final MethodMarker marker, final String type, final String[] methodNameRestriction,
             final boolean inclusive, final Mark mark) {
         final List<String> restrictors = (methodNameRestriction != null) ? Arrays.asList(methodNameRestriction) : new ArrayList();
@@ -239,8 +238,8 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
             ex.printStackTrace();
         }
     }
-    
-    private void addImplementorMethods(final MethodMarker marker, final TypeElement superElement, final List<String> restrictors,
+
+    private void addImplementorMethods(final MethodMarker marker, final TypeElement superElement, final Collection<String> restrictors,
             final boolean inclusive, final Mark mark, final CompilationController controller) {
         try {
             controller.toPhase(JavaSource.Phase.RESOLVED);
@@ -253,6 +252,23 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
             final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[]{
                         ClassIndex.SearchScope.SOURCE
                     }));
+
+            Set<String> adjustedRestrictors = new HashSet<String>();
+
+            for (ExecutableElement method : ElementFilter.methodsIn(superElement.getEnclosedElements())) {
+                if (!method.getModifiers().contains(Modifier.PRIVATE)) {
+                    String methodName = method.getSimpleName().toString();
+                    if (inclusive) {
+                        if (restrictors.contains(methodName)) {
+                            adjustedRestrictors.add(methodName);
+                        }
+                    } else {
+                        if (!restrictors.contains(methodName)) {
+                            adjustedRestrictors.add(methodName);
+                        }
+                    }
+                }
+            }
 
             Set<ElementHandle<TypeElement>> allImplementors = new HashSet<ElementHandle<TypeElement>>();
             Set<ElementHandle<TypeElement>> implementors = controller.getClasspathInfo().getClassIndex().getElements(ElementHandle.create(superElement), kind, scope);
@@ -271,14 +287,14 @@ public class MarkerProcessor extends  CategoryDefinitionProcessor implements Mar
             for (ElementHandle<TypeElement> handle : allImplementors) {
                 // resolve the implementor's type element
                 TypeElement implementor = handle.resolve(controller);
-                addTypeMethods(marker, implementor, restrictors, inclusive, mark, controller);
+                addTypeMethods(marker, implementor, adjustedRestrictors, true, mark, controller);
             }
         } catch (IOException e) {
             LOGGER.throwing(AbstractProjectTypeProfiler.class.getName(), "addImplementorMethods", e); // NOI18N
         }
     }
 
-    private void addTypeMethods(final MethodMarker marker, final TypeElement type, final List<String> restrictors,
+    private void addTypeMethods(final MethodMarker marker, final TypeElement type, final Collection<String> restrictors,
             final boolean inclusive, final Mark mark, final CompilationController controller) {
         if ((marker == null) || (type == null) || (restrictors == null) || (mark == null) || (controller == null)) {
             return;
