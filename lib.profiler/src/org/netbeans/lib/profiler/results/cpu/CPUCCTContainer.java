@@ -601,6 +601,7 @@ public class CPUCCTContainer {
 
                 if (existingChild == null) {
                     newChild = (TimedCPUCCTNode) node.clone();
+                    compParent = newChild;
                 } else {
                     newChild = null;
                     existingChild.addNCalls(node.getNCalls());
@@ -609,9 +610,8 @@ public class CPUCCTContainer {
                     existingChild.addNetTime1(node.getNetTime1());
                     existingChild.addSleepTime0(node.getSleepTime0());
                     existingChild.addWaitTime0(node.getWaitTime0());
+                    compParent = existingChild;
                 }
-
-                compParent = newChild;
 
                 break;
             }
