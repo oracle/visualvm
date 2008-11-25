@@ -38,68 +38,52 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
-
-import org.netbeans.lib.profiler.common.Profiler;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
-import javax.swing.Action;
+package org.netbeans.lib.profiler.heap;
 
 
 /**
- * Modify the instrumentation in the current profiling session
  *
- * @author Ian Formanek
+ * @author Tomas Hurka
  */
-public final class ModifyProfilingAction extends ProfilingAwareAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED };
-
+class StackTrace extends HprofObject {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    
+    private final StackTraceSegment stackTraceSegment;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    protected ModifyProfilingAction() {
-        super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_ModifyProfilingAction")); //NOI18N
+    
+    StackTrace(StackTraceSegment segment, long offset) {
+        super(offset);
+        stackTraceSegment = segment;
+        assert getHprofBuffer().get(offset) == HprofHeap.STACK_TRACE;
     }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    @Override
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().rerunAvaliable();
+    
+    long getSerialNumber() {
+        return getHprofBuffer().getInt(fileOffset + stackTraceSegment.stackTraceSerialNumberOffset);
+    }
+    
+    long getThreadSerialNumber() {
+        return getHprofBuffer().getInt(fileOffset + stackTraceSegment.threadSerialNumberOffset);
     }
 
-    /**
-     *  Updates the action to react to rename or delete of the profiled project only
-     */
-    public void updateAction() {
-        if (!Profiler.getDefault().rerunAvaliable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
+    StackFrame[] getStackFrames() {
+        HprofByteBuffer buf = getHprofBuffer();
+        int frames = buf.getInt(fileOffset + stackTraceSegment.numberOfFramesOffset);
+        StackFrame[] fr = new StackFrame[frames];
+        long idOffset = fileOffset + stackTraceSegment.framesListOffset;
+        StackFrameSegment stackFrameSegment = stackTraceSegment.hprofHeap.getStackFrameSegment();
+                
+         for (int i=0;i<frames;i++,idOffset+=buf.getIDSize()) {
+             long frameID = buf.getID(idOffset);
+             fr[i] = stackFrameSegment.getStackFrameByID(frameID);
         }
+        return fr;
     }
-
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
-
-        // If you will provide context help then use:
-        // return new HelpCtx(MyAction.class);
+    
+    private HprofByteBuffer getHprofBuffer() {
+        return stackTraceSegment.hprofHeap.dumpBuffer;
     }
-
-    public String getName() {
-        return NbBundle.getMessage(ModifyProfilingAction.class, "LBL_ModifyProfilingAction"); //NOI18N
-    }
-
-    public void performAction() {
-        ProfilingSupport.getDefault().modifyProfiling();
-    }
-
-    protected int[] enabledStates() {
-        return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png"; //NOI18N
-    }
+    
 }

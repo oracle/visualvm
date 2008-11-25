@@ -38,68 +38,70 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.netbeans.lib.profiler.heap;
 
-import org.netbeans.lib.profiler.common.Profiler;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
-import javax.swing.Action;
+import java.util.Map;
 
 
 /**
- * Modify the instrumentation in the current profiling session
  *
- * @author Ian Formanek
+ * @author Tomas Hurka
+ * @author Toms Hurka
  */
-public final class ModifyProfilingAction extends ProfilingAwareAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+class StackTraceSegment extends TagBounds {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED };
+    HprofHeap hprofHeap;
+    final int threadSerialNumberOffset;
+    final int stackTraceSerialNumberOffset;
+    final int lengthOffset;
+    final int framesListOffset;
+    final int numberOfFramesOffset;
+    final int timeOffset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    protected ModifyProfilingAction() {
-        super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_ModifyProfilingAction")); //NOI18N
+    StackTraceSegment(HprofHeap heap, long start, long end) {
+        super(HprofHeap.STACK_TRACE, start, end);
+
+        int idSize = heap.dumpBuffer.getIDSize();
+        hprofHeap = heap;
+        timeOffset = 1;
+        lengthOffset = timeOffset + 4;
+        stackTraceSerialNumberOffset = lengthOffset + 4;
+        threadSerialNumberOffset = stackTraceSerialNumberOffset + 4;
+        numberOfFramesOffset = threadSerialNumberOffset + 4;
+        framesListOffset = numberOfFramesOffset + 4;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().rerunAvaliable();
-    }
+    StackTrace getStackTraceBySerialNumber(long stackTraceSerialNumber) {
+        long[] offset = new long[] { startOffset };
 
-    /**
-     *  Updates the action to react to rename or delete of the profiled project only
-     */
-    public void updateAction() {
-        if (!Profiler.getDefault().rerunAvaliable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
+        while (offset[0] < endOffset) {
+            long start = offset[0];
+            long serialNumber = readStackTraceTag(offset);
+
+            if (serialNumber == stackTraceSerialNumber) {
+                return new StackTrace(this, start);
+            }
         }
+        return null;
     }
 
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
+    private HprofByteBuffer getDumpBuffer() {
+        HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
 
-        // If you will provide context help then use:
-        // return new HelpCtx(MyAction.class);
+        return dumpBuffer;
     }
 
-    public String getName() {
-        return NbBundle.getMessage(ModifyProfilingAction.class, "LBL_ModifyProfilingAction"); //NOI18N
-    }
+    private long readStackTraceTag(long[] offset) {
+        long start = offset[0];
 
-    public void performAction() {
-        ProfilingSupport.getDefault().modifyProfiling();
-    }
-
-    protected int[] enabledStates() {
-        return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png"; //NOI18N
+        if (hprofHeap.readTag(offset) != HprofHeap.STACK_TRACE) {
+            return 0;
+        }
+        return getDumpBuffer().getID(start + stackTraceSerialNumberOffset);
     }
 }

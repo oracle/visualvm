@@ -38,68 +38,66 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
-
-import org.netbeans.lib.profiler.common.Profiler;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
-import javax.swing.Action;
+package org.netbeans.lib.profiler.heap;
 
 
 /**
- * Modify the instrumentation in the current profiling session
  *
- * @author Ian Formanek
+ * @author Tomas Hurka
  */
-public final class ModifyProfilingAction extends ProfilingAwareAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED };
-
+class StackFrame extends HprofObject {
+    
+    static final int NO_LINE_INFO = 0;
+    static final int UNKNOWN_LOCATION = -1;
+    static final int COMPILED_METHOD = -2;
+    static final int NATIVE_METHOD = -3;
+    
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    
+    private final StackFrameSegment stackFrameSegment;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    protected ModifyProfilingAction() {
-        super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_ModifyProfilingAction")); //NOI18N
+    
+    StackFrame(StackFrameSegment segment, long offset) {
+        super(offset);
+        stackFrameSegment = segment;
+        assert getHprofBuffer().get(offset) == HprofHeap.STACK_FRAME;
     }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    @Override
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().rerunAvaliable();
+    
+    long getStackFrameID() {
+        return getHprofBuffer().getID(fileOffset + stackFrameSegment.stackFrameIDOffset);
     }
-
-    /**
-     *  Updates the action to react to rename or delete of the profiled project only
-     */
-    public void updateAction() {
-        if (!Profiler.getDefault().rerunAvaliable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        }
+    
+    String getMethodName() {
+        return getStringByOffset(stackFrameSegment.methodIDOffset);
     }
-
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
-
-        // If you will provide context help then use:
-        // return new HelpCtx(MyAction.class);
+    
+    String getMethodSignature() {
+        return getStringByOffset(stackFrameSegment.methodSignatureIDOffset);
     }
-
-    public String getName() {
-        return NbBundle.getMessage(ModifyProfilingAction.class, "LBL_ModifyProfilingAction"); //NOI18N
+    
+    String getSourceFile() {
+        return getStringByOffset(stackFrameSegment.sourceIDOffset);
     }
-
-    public void performAction() {
-        ProfilingSupport.getDefault().modifyProfiling();
+    
+    String getClassName() {
+        long classSerial = getHprofBuffer().getID(fileOffset + stackFrameSegment.classSerialNumberOffset);
+        LoadClass loadClass = stackFrameSegment.hprofHeap.getLoadClassSegment().getClassBySerialNumber(classSerial);
+        return loadClass.getName();
     }
-
-    protected int[] enabledStates() {
-        return ENABLED_STATES;
+    
+    int getLineNumber() {
+        return getHprofBuffer().getInt(fileOffset + stackFrameSegment.lineNumberOffset);
     }
-
-    protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png"; //NOI18N
+    
+    private HprofByteBuffer getHprofBuffer() {
+        return stackFrameSegment.hprofHeap.dumpBuffer;
+    }
+    
+    private String getStringByOffset(long offset) {
+        long stringID = getHprofBuffer().getID(fileOffset + offset);
+        return stackFrameSegment.hprofHeap.getStringSegment().getStringByID(stringID);
     }
 }

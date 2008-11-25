@@ -38,68 +38,73 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.netbeans.lib.profiler.heap;
 
-import org.netbeans.lib.profiler.common.Profiler;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
-import javax.swing.Action;
+import java.util.Map;
 
 
 /**
- * Modify the instrumentation in the current profiling session
  *
- * @author Ian Formanek
+ * @author Tomas Hurka
+ * @author Toms Hurka
  */
-public final class ModifyProfilingAction extends ProfilingAwareAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+class StackFrameSegment extends TagBounds {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED };
+    HprofHeap hprofHeap;
+    final int methodIDOffset;
+    final int stackFrameIDOffset;
+    final int lengthOffset;
+    final int sourceIDOffset;
+    final int methodSignatureIDOffset;
+    final int timeOffset;
+    final int classSerialNumberOffset;
+    final int lineNumberOffset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    protected ModifyProfilingAction() {
-        super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_ModifyProfilingAction")); //NOI18N
+    StackFrameSegment(HprofHeap heap, long start, long end) {
+        super(HprofHeap.STACK_TRACE, start, end);
+
+        int idSize = heap.dumpBuffer.getIDSize();
+        hprofHeap = heap;
+        timeOffset = 1;
+        lengthOffset = timeOffset + 4;
+        stackFrameIDOffset = lengthOffset + 4;
+        methodIDOffset = stackFrameIDOffset + idSize;
+        methodSignatureIDOffset = methodIDOffset + idSize;
+        sourceIDOffset = methodSignatureIDOffset + idSize;
+        classSerialNumberOffset = sourceIDOffset + idSize;
+        lineNumberOffset = classSerialNumberOffset + 4;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().rerunAvaliable();
-    }
+    StackFrame getStackFrameByID(long stackFrameID) {
+        long[] offset = new long[] { startOffset };
 
-    /**
-     *  Updates the action to react to rename or delete of the profiled project only
-     */
-    public void updateAction() {
-        if (!Profiler.getDefault().rerunAvaliable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
+        while (offset[0] < endOffset) {
+            long start = offset[0];
+            long frameID = readStackFrameTag(offset);
+
+            if (frameID == stackFrameID) {
+                return new StackFrame(this, start);
+            }
         }
+        return null;
     }
 
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
-
-        // If you will provide context help then use:
-        // return new HelpCtx(MyAction.class);
+    private HprofByteBuffer getDumpBuffer() {
+        return  hprofHeap.dumpBuffer;
     }
 
-    public String getName() {
-        return NbBundle.getMessage(ModifyProfilingAction.class, "LBL_ModifyProfilingAction"); //NOI18N
-    }
+    private long readStackFrameTag(long[] offset) {
+        long start = offset[0];
 
-    public void performAction() {
-        ProfilingSupport.getDefault().modifyProfiling();
-    }
+        if (hprofHeap.readTag(offset) != HprofHeap.STACK_FRAME) {
+            return 0;
+        }
 
-    protected int[] enabledStates() {
-        return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png"; //NOI18N
+        return getDumpBuffer().getID(start + stackFrameIDOffset);
     }
 }

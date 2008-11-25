@@ -38,68 +38,31 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
-
-import org.netbeans.lib.profiler.common.Profiler;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
-import javax.swing.Action;
+package org.netbeans.lib.profiler.heap;
 
 
 /**
- * Modify the instrumentation in the current profiling session
- *
- * @author Ian Formanek
+ * This represents one Thred Object GC root. It has kind ({@link GCRoot#THREAD_OBJECT}) and also corresponding
+ * {@link Instance}, which is actual GC root.
+ * @author Tomas Hurka
  */
-public final class ModifyProfilingAction extends ProfilingAwareAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED };
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    protected ModifyProfilingAction() {
-        super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_ModifyProfilingAction")); //NOI18N
-    }
+public interface ThreadObjectGCRoot extends GCRoot {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().rerunAvaliable();
-    }
-
     /**
-     *  Updates the action to react to rename or delete of the profiled project only
+     * Returns an array of stack trace elements,
+     * each representing one stack frame.  The zeroth element of the array
+     * (assuming the array's length is non-zero) represents the top of the
+     * stack, which is the last method invocation in the sequence.  Typically,
+     * this is the point at which this throwable was created and thrown.
+     * The last element of the array (assuming the array's length is non-zero)
+     * represents the bottom of the stack, which is the first method invocation
+     * in the sequence.
+     * <br>
+     * Speed:normal
+     * @return an array of stack trace elements representing the stack trace
+     *         pertaining to this throwable.
      */
-    public void updateAction() {
-        if (!Profiler.getDefault().rerunAvaliable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        }
-    }
-
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
-
-        // If you will provide context help then use:
-        // return new HelpCtx(MyAction.class);
-    }
-
-    public String getName() {
-        return NbBundle.getMessage(ModifyProfilingAction.class, "LBL_ModifyProfilingAction"); //NOI18N
-    }
-
-    public void performAction() {
-        ProfilingSupport.getDefault().modifyProfiling();
-    }
-
-    protected int[] enabledStates() {
-        return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png"; //NOI18N
-    }
+    StackTraceElement[] getStackTrace();
 }

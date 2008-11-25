@@ -41,7 +41,8 @@
 package org.netbeans.lib.profiler.tests.jfluid.cpu;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
@@ -63,13 +64,55 @@ public class BasicTest extends CPUTestCase {
         super(name);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static void main(String[] args) {
+        TestRunner.run(suite());
+    }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class);
-
-        return suite;
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            "testLiveResultsAll",
+            "testLiveResultsBasic",
+            "testLiveResultsWaitEager",
+            "testLiveResultsWaitLazy",
+            "testLiveResultsWaitSampled",
+            "testLiveResultsWaitServer",
+            "testLiveResultsWaitTotal",
+            "testMethodWithWaitEager",
+            "testMethodWithWaitEagerServer",
+            "testMethodWithWaitExcludeWEager",
+            "testMethodWithWaitExcludeWLazy",
+            "testMethodWithWaitExcludeWTotal",
+            "testMethodWithWaitLazy",
+            "testMethodWithWaitLazyServer",
+            "testMethodWithWaitTotal",
+            "testMethodWithWaitTotalServer",
+            "testSettingsDefault",
+            "testSettingsInstrumenManyMethodsLazy",
+            "testSettingsInstrumentAllEager",
+            "testSettingsInstrumentAllEagerServer",
+            "testSettingsInstrumentAllLazy",
+            "testSettingsInstrumentAllLazyServer",
+            "testSettingsInstrumentAllTotal",
+            "testSettingsInstrumentAllTotalServer",
+            "testSettingsInstrumentExcludeJavas",
+            "testSettingsInstrumentExcludeJavasServer",
+            "testSettingsInstrumentManyMethodsTotal",
+            "testSettingsInstrumentNotSpawnedThreads",
+            "testSettingsInstrumentNotSpawnedThreadsServer",
+            "testSettingsInstrumentRootMethod",
+            "testSettingsInstrumentRootMethodServer",
+            "testSettingsLimitedThreads",
+            "testSettingsLimitedThreadsServer",
+            "testSettingsSampledProfilingEager",
+            "testSettingsSampledProfilingLazy",
+            "testSettingsSampledProfilingServerEager",
+            "testSettingsSampledProfilingServerLazy",
+            "testSettingsSampledProfilingServerTotal",
+            "testSettingsSampledProfilingTotal").enableModules(".*").clusters(".*"));
     }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void temptestSettingsInstrumentRootMethod(boolean server) {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.CPU1",

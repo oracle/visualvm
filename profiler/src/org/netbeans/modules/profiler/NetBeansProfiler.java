@@ -97,7 +97,6 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -139,10 +138,9 @@ import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
-import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
+import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 import org.openide.execution.ExecutorTask;
 
 
@@ -496,15 +494,13 @@ public final class NetBeansProfiler extends Profiler {
     private DefinedFilterSets definedFilterSets;
     private FileObject profiledSingleFile;
 
-    // remembered values for rerun
-    private FileObject rerunScript;
+    // remembered values for rerun and modify actions
+    private ProfilerControlPanel2Support actionSupport = new ProfilerControlPanel2Support();
     private GlobalFilters globalFilters;
     private final Object setupLock = new Object();
     private ProfilingSettings lastProfilingSettings;
     private Project profiledProject = null;
-    private Properties rerunProps;
     private SessionSettings lastSessionSettings;
-    private String rerunTarget;
     private StringBuilder logMsgs = new StringBuilder();
     private ThreadsDataManager threadsManager;
     private VMTelemetryDataManager vmTelemetryManager;
@@ -671,7 +667,7 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public Properties getCurrentProfilingProperties() {
-        return rerunProps;
+        return actionSupport.getProperties();
     }
 
     public SessionSettings getCurrentSessionSettings() {
@@ -834,9 +830,7 @@ public final class NetBeansProfiler extends Profiler {
                     lastMode = MODE_ATTACH;
 
                     // clear rerun
-                    rerunTarget = null;
-                    rerunProps = null;
-                    rerunScript = null;
+                    actionSupport.nullAll();
                     IDEUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 CallableSystemAction.get(RerunAction.class).updateAction();
@@ -1292,8 +1286,8 @@ public final class NetBeansProfiler extends Profiler {
     public void modifyCurrentProfiling(final ProfilingSettings profilingSettings) {
         lastProfilingSettings = profilingSettings;
 
-        if (rerunProps != null) {
-            lastProfilingSettings.store(rerunProps); // Fix for http://www.netbeans.org/issues/show_bug.cgi?id=95651, update settings for ReRun
+        if (actionSupport.getProperties()!=null) {
+            lastProfilingSettings.store(actionSupport.getProperties()); // Fix for http://www.netbeans.org/issues/show_bug.cgi?id=95651, update settings for ReRun
         }
 
         if (!targetAppRunner.targetJVMIsAlive()) {
@@ -1398,11 +1392,7 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() {
-                    GoToSourceHelper.openSource(project, className, methodName, methodSig);
-                }
-            });
+        GoToSourceHelper.openSource(project, new JavaSourceLocation(className, methodName, methodSig));
     }
 
     public boolean processesProfilingPoints() {
@@ -1522,12 +1512,12 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public boolean rerunAvaliable() {
-        return (rerunTarget != null);
+        return actionSupport.isActionAvalaible();
     }
 
     public void rerunLastProfiling() {
-        if (rerunTarget != null) {
-            doRunTarget(rerunScript, rerunTarget, rerunProps);
+        if (actionSupport.getTarget()!=null) {
+            doRunTarget(actionSupport.getScript(), actionSupport.getTarget(), actionSupport.getProperties());
         }
     }
 
@@ -1652,9 +1642,7 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void runTarget(FileObject buildScriptFO, String target, Properties props) {
-        rerunScript = buildScriptFO;
-        rerunTarget = target;
-        rerunProps = IDEUtils.duplicateProperties(props);
+        actionSupport.setAll(buildScriptFO, target, props);
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
