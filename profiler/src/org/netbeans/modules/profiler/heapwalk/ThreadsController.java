@@ -54,7 +54,8 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
 import org.netbeans.modules.profiler.heapwalk.ui.ThreadsControllerUI;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.utils.GoToSourceHelper;
+import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 
 
 /**
@@ -172,7 +173,8 @@ public class ThreadsController extends AbstractTopLevelController implements Nav
             String className = parts[0];
             String method = parts[1];
             int linenumber = Integer.parseInt(parts[2]);
-            SourceUtils.openSource(project,className,method,null);
+            GoToSourceHelper.openSource(project, new JavaSourceLocation(className, method, linenumber));
+//            SourceUtils.openSource(project,className,method,null);
         }        
     }
     
