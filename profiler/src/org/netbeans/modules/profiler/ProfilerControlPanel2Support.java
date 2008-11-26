@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler;
 
 import java.util.Properties;
+import org.netbeans.modules.profiler.actions.ModifyProfilingAction;
 import org.netbeans.modules.profiler.actions.RerunAction;
 import org.openide.filesystems.FileAttributeEvent;
 import org.openide.filesystems.FileChangeListener;
@@ -51,63 +52,56 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.actions.CallableSystemAction;
 
 /**
- *
+ *  This class enables actions (rerun last profiling session, modify profiling session)
+ *  to react to renaming (deleting) of the profiled project.
  * @author cyhelsky
  */
-class RerunSupport implements FileChangeListener {
+class ProfilerControlPanel2Support implements FileChangeListener {
 
-    private Properties rerunProps;    
-    private String rerunTarget;
-    private FileObject rerunScript;
+    private Properties properties;
+    private String target;
+    private FileObject script;
 
     void nullAll() {
-        rerunProps = null;
-        rerunTarget = null;
+        properties = null;
+        target = null;
         unRegisterListener();
-        rerunScript = null;
+        script = null;
+    }    
+
+    boolean isActionAvalaible() {
+        return (this.target!=null)&&(this.script.isValid());
     }
-    
+
+    void setAll(FileObject script, String target, Properties properties) {
+        this.script = script;
+        this.target = target;
+        this.properties = properties;
+        registerListener();
+    }
+
+    FileObject getScript() {
+        return script;
+    }
+
+    Properties getProperties() {
+        return properties;
+    }
+
+    String getTarget() {
+        return target;
+    }
+
     private void registerListener() {
-        if (this.rerunScript != null) {
-            this.rerunScript.addFileChangeListener(FileUtil.weakFileChangeListener(this, this.rerunScript));
+        if (this.script != null) {
+            this.script.addFileChangeListener(FileUtil.weakFileChangeListener(this, this.script));
         }
     }
 
     private void unRegisterListener() {
-        if (this.rerunScript!=null) {
-            this.rerunScript.removeFileChangeListener(this);
+        if (this.script!=null) {
+            this.script.removeFileChangeListener(this);
         }
-    }
-
-    boolean isRerunAvalaible() {
-        return (this.rerunTarget!=null)&&(this.rerunScript.isValid());
-    }
-
-    boolean isRerunTargetNotNull() {
-        return this.rerunTarget!=null;
-    }
-
-    boolean isRerunPropsNotNull() {
-        return this.rerunProps!=null;
-    }
-
-    void setAll(FileObject rerunScript, String rerunTarget, Properties rerunProps) {
-        this.rerunScript = rerunScript;
-        this.rerunTarget = rerunTarget;
-        this.rerunProps = rerunProps;
-        registerListener();
-    }
-
-    FileObject getRerunScript() {
-        return rerunScript;
-    }
-
-    Properties getRerunProps() {
-        return rerunProps;
-    }
-
-    String getRerunTarget() {
-        return rerunTarget;
     }
 
     public void fileFolderCreated(FileEvent fe) {
@@ -120,8 +114,8 @@ class RerunSupport implements FileChangeListener {
     }
 
     public void fileDeleted(FileEvent fe) {
-
         this.nullAll();
+        CallableSystemAction.get(ModifyProfilingAction.class).updateAction();
         CallableSystemAction.get(RerunAction.class).updateAction();
     }
 
