@@ -51,7 +51,7 @@ public class ProfilerStableTestSuite {
     return NbModuleSuite.create(
       NbModuleSuite.emptyConfiguration()
         .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
-        //.addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
+        .addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
         .addTest(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class)
     );
   }
