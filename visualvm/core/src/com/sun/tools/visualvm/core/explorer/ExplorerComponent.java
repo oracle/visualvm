@@ -48,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
@@ -180,25 +181,32 @@ class ExplorerComponent extends JPanel {
     }
     
     private class ExplorerTreeMouseAdapter extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
-            // Select path on location or clear selection
-            TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
+        private void updatePathSelection(TreePath path, MouseEvent e) {
             if (path != null) {
-                if (e.getModifiers() == InputEvent.BUTTON3_MASK && !explorerTree.isPathSelected(path))
+                if (!explorerTree.isPathSelected(path))
                     explorerTree.setSelectionPath(path);
             } else {
                 explorerTree.clearSelection();
             }
         }
+
+        public void mousePressed(MouseEvent e) {
+            TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
+            updatePathSelection(path, e);
+            if (e.isPopupTrigger()) displayContextMenu(e.getX(), e.getY());
+        }
         
         public void mouseReleased(MouseEvent e) {
-            if (e.getModifiers() == InputEvent.BUTTON3_MASK)
-                displayContextMenu(e.getX(), e.getY());
+            TreePath path = explorerTree.getPathForLocation(e.getX(), e.getY());
+            updatePathSelection(path, e);
+            if (e.isPopupTrigger()) displayContextMenu(e.getX(), e.getY());
         }
     
         public void mouseClicked(MouseEvent e) {
-            if (e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() == explorerTree.getToggleClickCount())
+            if (SwingUtilities.isLeftMouseButton(e) &&
+                    e.getClickCount() == explorerTree.getToggleClickCount()) {
                 performDefaultAction();
+            }
         }
     }
 
