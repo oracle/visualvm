@@ -229,7 +229,7 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
     private final Object refreshRequestLock = new Object();
     private final ProfilerProjectActionPerformer performer;
     private final String namePattern;
-    private final LookupListener[] resultListeners;
+    private final Lookup.Result[] results;
     private final Class[] watch;
 
     // @GuarderBy initLock
@@ -258,7 +258,7 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
 
         this.lookup = lookup;
         this.watch = new Class[] { Project.class, DataObject.class };
-        this.resultListeners = new LookupListener[watch.length];
+        this.results = new Lookup.Result[watch.length];
 
         // Needs to listen on changes in results
         for (int i = 0; i < watch.length; i++) {
@@ -267,6 +267,8 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
 //            resultListeners[i] = (LookupListener) WeakListeners.create(LookupListener.class, this, result);
 //            result.addLookupListener(resultListeners[i]);
             result.addLookupListener(this);
+            // MUST hold on the reference to the result; otherwise it will vanish in a puff of smoke
+            results[i] = result;
         }
 
         this.performer = performer;
