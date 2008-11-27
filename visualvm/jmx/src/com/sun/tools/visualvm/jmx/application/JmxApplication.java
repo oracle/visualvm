@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
+import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.Storage;
@@ -58,6 +59,8 @@ public final class JmxApplication extends Application {
     // hard reference jvm from application so we are sure that it is not garbage collected
     Jvm jvm;
 
+    // Note: storage may be null, in this case the JmxApplication isn't persistent
+    // and creates a temporary storage just like any other regular Application
     public JmxApplication(Host host, JMXServiceURL url, String username,
             String password, boolean saveCredentials, Storage storage) {
         super(host, url.toString() + (username == null || username.isEmpty() ? "" : " (" + username + ")"));
@@ -120,6 +123,11 @@ public final class JmxApplication extends Application {
     
     @Override
     protected Storage createStorage() {
+        if (storage == null) {
+            File directory = Utils.getUniqueFile(JmxApplicationsSupport.getStorageDirectory(),
+                        "" + System.currentTimeMillis(), JmxApplicationProvider.JMX_SUFFIX);    // NOI18N
+            return new Storage(directory);
+        }
         return storage;
     }
     

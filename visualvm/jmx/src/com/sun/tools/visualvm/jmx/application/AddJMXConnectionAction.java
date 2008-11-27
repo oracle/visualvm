@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.jmx.application;
 
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -75,10 +76,10 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
         if (appConfig != null) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    JmxApplicationProvider.sharedInstance().createJmxApplication(
+                    JmxApplicationsSupport.getInstance().createJmxApplicationInteractive(
                             appConfig.getConnection(), appConfig.getDisplayName(),
                             appConfig.getUsername(), appConfig.getPassword(),
-                            appConfig.getSaveCredentialsFlag());
+                            appConfig.getSaveCredentialsFlag(), true);
                 }
             });
         }

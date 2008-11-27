@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.application;
 
+import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
@@ -36,7 +37,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import com.sun.tools.visualvm.jmx.JmxApplicationException;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -56,8 +57,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.SwingUtilities;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -69,7 +68,7 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-class JmxApplicationProvider {
+public class JmxApplicationProvider {
     private static final Logger LOGGER = Logger.getLogger(JmxApplicationProvider.class.getName());
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
@@ -87,20 +86,13 @@ class JmxApplicationProvider {
     private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
     
     private static final String PROPERTIES_FILE = "jmxapplication" + Storage.DEFAULT_PROPERTIES_EXT;  // NOI18N
-    private static final String JMX_SUFFIX = ".jmx";  // NOI18N
-
-    private static JmxApplicationProvider sharedInstance;
+    static final String JMX_SUFFIX = ".jmx";  // NOI18N
     
     
     private boolean trackingNewHosts;
     private Map<String, Set<Storage>> persistedApplications =
             new HashMap<String, Set<Storage>>();
     
-    
-    public synchronized static JmxApplicationProvider sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new JmxApplicationProvider();
-        return sharedInstance;
-    }
 
     private static boolean isLocalHost(String hostname) throws IOException {
         InetAddress remoteAddr = InetAddress.getByName(hostname);
@@ -148,34 +140,26 @@ class JmxApplicationProvider {
         //          is added under the <Unknown Host> tree node.
         return Host.UNKNOWN_HOST;
     }
-    
-    public void createJmxApplication(String connectionName, final String displayName,
-            String username, String password, boolean saveCredentials) {
+
+    public JmxApplication createJmxApplication(String connectionName, String displayName,
+            String username, String password, boolean saveCredentials, boolean persistent) throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionName);
         final JMXServiceURL serviceURL = getServiceURL(normalizedConnectionName);
-        if (serviceURL == null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    NetBeansProfiler.getDefaultNB().displayError(
-                            NbBundle.getMessage(JmxApplicationProvider.class, 
-                            "MSG_Invalid_JMX_connection",normalizedConnectionName));    // NOI18N
-                }
-            });
-            return;
-        }
+        if (serviceURL == null)
+            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                                "MSG_Invalid_JMX_connection",normalizedConnectionName)); // NOI18N
 
-        // Create Host & JmxApplication
-        ProgressHandle pHandle = null;
-        try {
-            pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(JmxApplicationProvider.class, "LBL_Adding") + displayName + "...");    // NOI18N
-            pHandle.setInitialDelay(0);
-            pHandle.start();
-            
+        String hostName = getHostName(serviceURL);
+        hostName = hostName == null ? "" : hostName; // NOI18N
+
+        Storage storage = null;
+
+        if (persistent) {
             File storageDirectory = Utils.getUniqueFile(JmxApplicationsSupport.getStorageDirectory(),
                     "" + System.currentTimeMillis(), JMX_SUFFIX);    // NOI18N
             Utils.prepareDirectory(storageDirectory);
-            Storage storage = new Storage(storageDirectory, PROPERTIES_FILE);
+            storage = new Storage(storageDirectory, PROPERTIES_FILE);
 
             String[] keys = new String[]{
                 SNAPSHOT_VERSION,
@@ -185,10 +169,8 @@ class JmxApplicationProvider {
                 DataSourceDescriptor.PROPERTY_NAME
             };
 
-            String hostName = getHostName(serviceURL);
-            hostName = hostName == null ? "" : hostName;
-            String user = "";
-            String passwd = "";
+            String user = ""; // NOI18N
+            String passwd = ""; // NOI18N
             if (saveCredentials) {
                 user = username;
                 passwd = password;
@@ -202,63 +184,51 @@ class JmxApplicationProvider {
             };
 
             storage.setCustomProperties(keys, values);
-            addJmxApplication(serviceURL, normalizedConnectionName,
-                    hostName, username, password, saveCredentials, storage);
-        } finally {
-            final ProgressHandle pHandleF = pHandle;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (pHandleF != null) {
-                        pHandleF.finish();
-                    }
-                }
-            });
         }
+
+        return addJmxApplication(serviceURL, normalizedConnectionName, displayName,
+                           hostName, username, password, saveCredentials, storage);
     }
 
-    private void addJmxApplication(JMXServiceURL serviceURL,
-            final String connectionName, final String hostName,
+    private JmxApplication addJmxApplication(JMXServiceURL serviceURL,
+            String connectionName, String displayName, String hostName,
             String username, String password, boolean saveCredentials,
-            Storage storage) {
+            Storage storage) throws JmxApplicationException {
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) serviceURL = getServiceURL(connectionName);
         if (serviceURL == null) {
-            File appStorage = storage.getDirectory();
-            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    NetBeansProfiler.getDefaultNB().displayError(
-                            NbBundle.getMessage(JmxApplicationProvider.class, 
-                            "MSG_Invalid_JMX_connection",connectionName));  // NOI18N
-                }
-            });
-            return;
+            if (storage != null) {
+                File appStorage = storage.getDirectory();
+                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            }
+            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                                "MSG_Invalid_JMX_connection",connectionName)); // NOI18N
         }
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
         Host host;
         try {
             host = getHost(hostName, serviceURL);
         } catch (Exception e) {
-            File appStorage = storage.getDirectory();
-            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    NetBeansProfiler.getDefaultNB().displayError(
-                            NbBundle.getMessage(JmxApplicationProvider.class, 
-                            "MSG_Cannot_resolve_host",hostName));   // NOI18N
-                }
-            });
-            return;            
+            if (storage != null) {
+                File appStorage = storage.getDirectory();
+                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            }
+            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                                       "MSG_Cannot_resolve_host",hostName)); // NOI18N
         }
         // Create the JmxApplication
-        storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
+        if (storage != null)
+            storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
+
         final JmxApplication application =
                 new JmxApplication(host, serviceURL, username, password, saveCredentials, storage);
         // Check if the given JmxApplication has been already added to the application tree
         final Set<JmxApplication> jmxapps = host.getRepository().getDataSources(JmxApplication.class);
         if (jmxapps.contains(application)) {
-            File appStorage = storage.getDirectory();
-            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            if (storage != null) {
+                File appStorage = storage.getDirectory();
+                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            }
             JmxApplication tempapp = null;
             for (JmxApplication jmxapp : jmxapps) {
                 if (jmxapp.equals(application)) {
@@ -267,30 +237,20 @@ class JmxApplicationProvider {
                 }
             }
             final JmxApplication app = tempapp;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    ExplorerSupport.sharedInstance().selectDataSource(application);
-                    NetBeansProfiler.getDefaultNB().displayWarning(
-                            NbBundle.getMessage(JmxApplicationProvider.class, "MSG_JMX_connection") +   // NOI18N
-                            application.getId() + NbBundle.getMessage(JmxApplicationProvider.class, "MSG_already_exists") + // NOI18N
-                            DataSourceDescriptorFactory.getDescriptor(app).getName());
-                }
-            });
-            return;
+            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_JMX_connection") +   // NOI18N
+                                application.getId() + NbBundle.getMessage(JmxApplicationProvider.class, "MSG_already_exists") + // NOI18N
+                                DataSourceDescriptorFactory.getDescriptor(app).getName());
         }
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
             application.setStateImpl(Stateful.STATE_UNAVAILABLE);
-            File appStorage = storage.getDirectory();
-            if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    NetBeansProfiler.getDefaultNB().displayError(
-                            NbBundle.getMessage(JmxApplicationProvider.class, "MSG_Cannot_connect_using") + connectionName);    // NOI18N
-                }
-            });
-            return;
+            if (storage != null) {
+                File appStorage = storage.getDirectory();
+                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            }
+            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                                       "MSG_Cannot_connect_using") + connectionName); // NOI18N
         }
         model.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -301,10 +261,15 @@ class JmxApplicationProvider {
                 }
             }
         });
+        // set displayname if not peristent (already set for such case)
+        if (storage == null)
+            application.getStorage().setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
         // precompute JVM
         application.jvm = JvmFactory.getJVMFor(application);
         // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
+
+        return application;
     }
     
     private String normalizeConnectionName(String connectionName) {
@@ -402,7 +367,16 @@ class JmxApplicationProvider {
                             final String[] values = storage.getCustomProperties(keys);
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
-                                    addJmxApplication(null, values[0], values[1], values[2], Utils.decodePassword(values[3]), false, storage);
+                                    try {
+                                        addJmxApplication(null, values[0], null, values[1], values[2],
+                                               Utils.decodePassword(values[3]), false, storage);
+                                    } catch (final JmxApplicationException e) {
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            public void run() {
+                                                NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
+                                            }
+                                        });
+                                    }
                                 }
                             });
                         }
@@ -423,12 +397,12 @@ class JmxApplicationProvider {
         }
     }
 
-    public static void initialize() {
+    public void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
-                        JmxApplicationProvider.sharedInstance().initPersistedApplications();
+                        initPersistedApplications();
                     }
                 });
             }

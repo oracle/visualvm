@@ -117,7 +117,7 @@ import sun.rmi.transport.LiveRef;
  *
  * @author Luis-Miguel Alventosa
  */
-public class JmxModelImpl extends JmxModel {
+class JmxModelImpl extends JmxModel {
     private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
     private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
     private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());

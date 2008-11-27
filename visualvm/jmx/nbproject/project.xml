@@ -110,7 +110,9 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>com.sun.tools.visualvm.jmx</package>
+            </public-packages>
         </data>
     </configuration>
 </project>

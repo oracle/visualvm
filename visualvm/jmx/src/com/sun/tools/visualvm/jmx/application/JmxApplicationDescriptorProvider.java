@@ -35,11 +35,8 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
  * @author Jiri Sedlacek
  * @author Luis-Miguel Alventosa
  */
-class JmxApplicationDescriptorProvider extends
+public class JmxApplicationDescriptorProvider extends
         AbstractModelProvider<DataSourceDescriptor, DataSource> {
-
-    JmxApplicationDescriptorProvider() {
-    }
 
     public DataSourceDescriptor createModelFor(DataSource ds) {
         if (ds instanceof JmxApplication) {

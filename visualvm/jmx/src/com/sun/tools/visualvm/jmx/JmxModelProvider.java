@@ -39,7 +39,7 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
  *
  * @author Luis-Miguel Alventosa
  */
-public class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
+class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
     
     
     /**
