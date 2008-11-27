@@ -205,7 +205,8 @@ public class JmxApplicationProvider {
                                 "MSG_Invalid_JMX_connection",connectionName)); // NOI18N
         }
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
-        Host host;
+        Set<Host> hosts = DataSourceRepository.sharedInstance().getDataSources(Host.class);
+        Host host = null;
         try {
             host = getHost(hostName, serviceURL);
         } catch (Exception e) {
@@ -213,6 +214,7 @@ public class JmxApplicationProvider {
                 File appStorage = storage.getDirectory();
                 if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             }
+            cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
                                        "MSG_Cannot_resolve_host",hostName)); // NOI18N
         }
@@ -236,10 +238,10 @@ public class JmxApplicationProvider {
                     break;
                 }
             }
-            final JmxApplication app = tempapp;
+            cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_JMX_connection") +   // NOI18N
                                 application.getId() + NbBundle.getMessage(JmxApplicationProvider.class, "MSG_already_exists") + // NOI18N
-                                DataSourceDescriptorFactory.getDescriptor(app).getName());
+                                DataSourceDescriptorFactory.getDescriptor(tempapp).getName());
         }
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
@@ -249,6 +251,7 @@ public class JmxApplicationProvider {
                 File appStorage = storage.getDirectory();
                 if (appStorage.isDirectory()) Utils.delete(appStorage, true);
             }
+            cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
                                        "MSG_Cannot_connect_using") + connectionName); // NOI18N
         }
@@ -270,6 +273,14 @@ public class JmxApplicationProvider {
         host.getRepository().addDataSource(application);
 
         return application;
+    }
+
+    private void cleanupCreatedHost(Set<Host> hosts, Host host) {
+        // NOTE: this is not absolutely failsafe, if resolving the JMX application
+        // took a long time and its host has been added by the user/plugin, it may
+        // be removed by this call. Hopefully just a hypothetical case...
+        if (!hosts.contains(host))
+            host.getOwner().getRepository().removeDataSource(host);
     }
     
     private String normalizeConnectionName(String connectionName) {
