@@ -115,6 +115,11 @@ public final class JmxApplicationsSupport {
                                             String password, boolean saveCredentials,
                                             boolean persistent) throws JmxApplicationException {
 
+        if (username == null) username = ""; // NOI18N
+        if (password == null) password = ""; // NOI18N
+        if (displayName == null)
+            displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
+
         return this.createJmxApplicationImpl(connectionString, displayName, username,
                                     password, saveCredentials, persistent);
     }
@@ -160,17 +165,23 @@ public final class JmxApplicationsSupport {
      * @return created JMX application or null if creating the application failed
      */
     public Application createJmxApplicationInteractive(String connectionString,
-                                            final String displayName, String username,
+                                            String displayName, String username,
                                             String password, boolean saveCredentials,
                                             boolean persistent) {
+
+        if (username == null) username = ""; // NOI18N
+        if (password == null) password = ""; // NOI18N
+        if (displayName == null)
+            displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
         
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         try {
+            final String displayNameF = displayName;
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         pHandle[0] = ProgressHandleFactory.createHandle(
                                 NbBundle.getMessage(JmxApplicationsSupport.class,
-                                                    "LBL_Adding", displayName)); // NOI18N
+                                                    "LBL_Adding", displayNameF)); // NOI18N
                         pHandle[0].setInitialDelay(0);
                         pHandle[0].start();
                     }
@@ -206,11 +217,6 @@ public final class JmxApplicationsSupport {
                                             String password, boolean saveCredentials,
                                             boolean persistent)
                                             throws JmxApplicationException {
-
-        if (username == null) username = ""; // NOI18N
-        if (password == null) password = ""; // NOI18N
-        if (displayName == null)
-            displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
 
         return applicationProvider.createJmxApplication(connectionString,
                displayName, username, password, saveCredentials, persistent);
