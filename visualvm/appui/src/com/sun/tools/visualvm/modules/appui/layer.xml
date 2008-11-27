@@ -154,11 +154,13 @@
         <file name="S-F9.instance_hidden"/>
     </folder>
     <folder name="Toolbars">
+        <file name="Clipboard_hidden"/>
         <file name="Edit_hidden"/>
         <folder name="File">
             <file name="org-openide-actions-SaveAllAction.instance_hidden"/>
         </folder>
         <file name="Profile_hidden"/>
+            <file name="UndoRedo_hidden"/>
     </folder>
     <folder name="Windows2">
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
