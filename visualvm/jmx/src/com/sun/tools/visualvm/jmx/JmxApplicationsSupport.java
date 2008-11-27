@@ -41,6 +41,7 @@ import org.openide.util.NbBundle;
 /**
  * Support for JMX applications in VisualVM.
  *
+ * @since 1.1
  * @author Jiri Sedlacek
  */
 public final class JmxApplicationsSupport {
