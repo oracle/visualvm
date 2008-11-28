@@ -39,12 +39,25 @@
 
 package org.netbeans.modules.profiler.spi;
 
+import java.util.logging.Logger;
 import org.netbeans.api.project.Project;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface GoToSourceProvider {
-    public boolean openSource(Project project, String className, String methodName, String signature);
+public abstract class GoToSourceProvider {
+    /**
+     * Implementors will provide a specific functionality to open a source code
+     * @param project The associated project
+     * @param className The class name
+     * @param methodName The method name or NULL
+     * @param signature The signature or NULL
+     * @param line The line number or {@linkplain Integer#MIN_VALUE}
+     * @return Returns TRUE if the infrastructure was able to open the source code, FALSE otherwise
+     */
+    public boolean openSource(Project project, String className, String methodName, String signature, int line) {
+        Logger.getLogger(GoToSourceProvider.class.getName()).warning("Using the default implementation of GoToSourceProvider!");
+        return false;
+    }
 }
