@@ -46,7 +46,7 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
+import org.openide.util.Lookup;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
@@ -76,16 +76,11 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
     public static final String RESET_RESULTS_PP_DESCR = PP_DESCR;
     private static final String START_LOCATION_PREFIX = "start_"; // NOI18N
     private static final String END_LOCATION_PREFIX = "end_"; // NOI18N
-    private static StopwatchProfilingPointFactory defaultInstance;
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static synchronized StopwatchProfilingPointFactory getDefault() {
-        if (defaultInstance == null) {
-            defaultInstance = new StopwatchProfilingPointFactory();
-        }
-
-        return defaultInstance;
+        return Lookup.getDefault().lookup(StopwatchProfilingPointFactory.class);
     }
 
     public String getDescription() {
