@@ -145,10 +145,13 @@ public class JmxApplicationProvider {
             String username, String password, boolean saveCredentials, boolean persistent) throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionName);
-        final JMXServiceURL serviceURL = getServiceURL(normalizedConnectionName);
-        if (serviceURL == null)
+        final JMXServiceURL serviceURL;
+        try {
+            serviceURL = getServiceURL(normalizedConnectionName);
+        } catch (MalformedURLException ex) {
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                "MSG_Invalid_JMX_connection",normalizedConnectionName)); // NOI18N
+                                "MSG_Invalid_JMX_connection",normalizedConnectionName),ex); // NOI18N
+        }
 
         String hostName = getHostName(serviceURL);
         hostName = hostName == null ? "" : hostName; // NOI18N
@@ -195,14 +198,17 @@ public class JmxApplicationProvider {
             String username, String password, boolean saveCredentials,
             Storage storage) throws JmxApplicationException {
         // Resolve JMXServiceURL, finish if not resolved
-        if (serviceURL == null) serviceURL = getServiceURL(connectionName);
         if (serviceURL == null) {
-            if (storage != null) {
-                File appStorage = storage.getDirectory();
-                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            try {
+                serviceURL = getServiceURL(connectionName);
+            } catch (MalformedURLException ex) {
+                if (storage != null) {
+                    File appStorage = storage.getDirectory();
+                    if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+                }
+                throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                                    "MSG_Invalid_JMX_connection",connectionName),ex); // NOI18N
             }
-            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                "MSG_Invalid_JMX_connection",connectionName)); // NOI18N
         }
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
         Set<Host> hosts = DataSourceRepository.sharedInstance().getDataSources(Host.class);
@@ -216,7 +222,7 @@ public class JmxApplicationProvider {
             }
             cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                       "MSG_Cannot_resolve_host",hostName)); // NOI18N
+                                       "MSG_Cannot_resolve_host",hostName),e); // NOI18N
         }
         // Create the JmxApplication
         if (storage != null)
@@ -326,13 +332,8 @@ public class JmxApplicationProvider {
         return hostname;
     }
 
-    private JMXServiceURL getServiceURL(String connectionString) {
-        try {
-            return new JMXServiceURL(connectionString);
-        } catch (MalformedURLException e) {
-            LOGGER.throwing(JMXServiceURL.class.getName(), "getServiceURL", e); // NOI18N
-            return null;
-        }
+    private JMXServiceURL getServiceURL(String connectionString) throws MalformedURLException {
+        return new JMXServiceURL(connectionString);
     }
 
     private void initPersistedApplications() {
