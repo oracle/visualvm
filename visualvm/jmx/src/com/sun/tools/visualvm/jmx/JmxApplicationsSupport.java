@@ -186,20 +186,10 @@ public final class JmxApplicationsSupport {
                         pHandle[0].start();
                     }
                 });
-
-            Application application = null;
-            try {
-                application = this.createJmxApplicationImpl(connectionString, displayName,
+            return createJmxApplicationImpl(connectionString, displayName,
                             username, password, saveCredentials, persistent);
-            } catch (final JmxApplicationException e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
-                    }
-                });
-            }
-            return application;
-
+        } catch (JmxApplicationException e) {
+            NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
         } finally {
             final ProgressHandle pHandleF = pHandle[0];
             SwingUtilities.invokeLater(new Runnable() {
@@ -210,6 +200,7 @@ public final class JmxApplicationsSupport {
                 }
             });
         }
+        return null;
     }
 
     private Application createJmxApplicationImpl(String connectionString,
