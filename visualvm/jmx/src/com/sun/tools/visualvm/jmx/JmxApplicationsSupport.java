@@ -191,11 +191,10 @@ public final class JmxApplicationsSupport {
         } catch (JmxApplicationException e) {
             NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
         } finally {
-            final ProgressHandle pHandleF = pHandle[0];
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (pHandleF != null) {
-                        pHandleF.finish();
+                    if (pHandle[0] != null) {
+                        pHandle[0].finish();
                     }
                 }
             });
