@@ -46,7 +46,7 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
+import org.openide.util.Lookup;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
@@ -74,16 +74,11 @@ public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory
     public static final Icon TAKE_SNAPSHOT_PP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/takeSnapshotProfilingPoint.png")); // NOI18N
     public static final String TAKE_SNAPSHOT_PP_TYPE = PP_TYPE;
     public static final String TAKE_SNAPSHOT_PP_DESCR = PP_DESCR;
-    private static TakeSnapshotProfilingPointFactory defaultInstance;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static TakeSnapshotProfilingPointFactory getDefault() {
-        if (defaultInstance == null) {
-            defaultInstance = new TakeSnapshotProfilingPointFactory();
-        }
-
-        return defaultInstance;
+        return Lookup.getDefault().lookup(TakeSnapshotProfilingPointFactory.class);
     }
 
     public String getDescription() {
