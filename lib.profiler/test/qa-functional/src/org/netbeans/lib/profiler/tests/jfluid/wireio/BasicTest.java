@@ -44,7 +44,6 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.server.system.Timers;
 import org.netbeans.lib.profiler.wireprotocol.*;
 import java.net.Socket;
 
@@ -54,6 +53,9 @@ import java.net.Socket;
  * @author ehucka
  */
 public class BasicTest extends CommonWireIOTestCase {
+
+    private Socket clientSocket = null;
+    private LoggingThread t = null;
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of BasicTest */
@@ -75,18 +77,26 @@ public class BasicTest extends CommonWireIOTestCase {
             "testUnknownSimpleCommand").enableModules(".*").clusters(".*"));
     }
 
+    protected void tearDown() throws Exception {
+        //To prevent chain failures due to occupied socket or unclosed logging thread
+        try {
+            t.setRunning(false);
+            clientSocket.close();
+        } catch (Exception e) {}
+        super.tearDown();
+    }
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testComplexCommands() {
-        LoggingThread t = new LoggingThread();
+        t = new LoggingThread();
         t.start();
-
         try {
             while (!t.isPrepared()) {
                 Thread.sleep(1000);
             }
 
-            Socket clientSocket = new Socket("localhost", PORT);
+            clientSocket = new Socket("localhost", PORT);
             WireIO wireIO = createWireIOClient(clientSocket);
 
             Command cmd;
@@ -150,7 +160,6 @@ public class BasicTest extends CommonWireIOTestCase {
                 tm += 1000;
             }
 
-            t.setRunning(false);
             log("finished.");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -159,15 +168,14 @@ public class BasicTest extends CommonWireIOTestCase {
     }
 
     public void testComplexResponse() {
-        LoggingThread t = new LoggingThread();
+        t = new LoggingThread();
         t.start();
-
         try {
             while (!t.isPrepared()) {
                 Thread.sleep(1000);
             }
 
-            Socket clientSocket = new Socket("localhost", PORT);
+            clientSocket = new Socket("localhost", PORT);
             WireIO wireIO = createWireIOClient(clientSocket);
 
             Response resp;
@@ -228,10 +236,12 @@ public class BasicTest extends CommonWireIOTestCase {
             log("send response " + resp);
             wireIO.sendComplexResponse(resp);
 
-            resp = new MonitoredNumbersResponse(new long[] { 20L });
-            log("send response " + resp);
-            wireIO.sendComplexResponse(resp);
-
+            MonitoredNumbersResponse r = new MonitoredNumbersResponse(new long[] { 20L });
+            log("send response " + r);
+            // to prevent NPE due to null fields gcStarts, gcFinishes
+            r.setGCstartFinishData(new long[] { 0L }, new long[] { 20L });
+            wireIO.sendComplexResponse(r);
+            
             clientSocket.close();
             log("wait for thread");
 
@@ -242,7 +252,6 @@ public class BasicTest extends CommonWireIOTestCase {
                 tm += 1000;
             }
 
-            t.setRunning(false);
         } catch (Exception ex) {
             ex.printStackTrace();
             assertTrue(ex.getMessage(), false);
@@ -250,15 +259,14 @@ public class BasicTest extends CommonWireIOTestCase {
     }
 
     public void testSimpleCommands() {
-        LoggingThread t = new LoggingThread();
+        t = new LoggingThread();
         t.start();
-
         try {
             while (!t.isPrepared()) {
                 Thread.sleep(1000);
             }
 
-            Socket clientSocket = new Socket("localhost", PORT);
+            clientSocket = new Socket("localhost", PORT);
             WireIO wireIO = createWireIOClient(clientSocket);
 
             for (int cmd = 1; cmd < 40; cmd++) {
@@ -276,7 +284,6 @@ public class BasicTest extends CommonWireIOTestCase {
                 tm += 1000;
             }
 
-            t.setRunning(false);
             log("finished.");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -285,15 +292,14 @@ public class BasicTest extends CommonWireIOTestCase {
     }
 
     public void testSimpleResponse() {
-        LoggingThread t = new LoggingThread();
+        t = new LoggingThread();
         t.start();
-
         try {
             while (!t.isPrepared()) {
                 Thread.sleep(1000);
             }
 
-            Socket clientSocket = new Socket("localhost", PORT);
+            clientSocket = new Socket("localhost", PORT);
             WireIO wireIO = createWireIOClient(clientSocket);
 
             wireIO.sendSimpleResponse(true, "Error message.");
@@ -308,7 +314,6 @@ public class BasicTest extends CommonWireIOTestCase {
                 tm += 1000;
             }
 
-            t.setRunning(false);
         } catch (Exception ex) {
             ex.printStackTrace();
             assertTrue(ex.getMessage(), false);
@@ -316,15 +321,14 @@ public class BasicTest extends CommonWireIOTestCase {
     }
 
     public void testUnknownSimpleCommand() {
-        LoggingThread t = new LoggingThread();
+        t = new LoggingThread();
         t.start();
-
         try {
             while (!t.isPrepared()) {
                 Thread.sleep(1000);
             }
 
-            Socket clientSocket = new Socket("localhost", PORT);
+            clientSocket = new Socket("localhost", PORT);
             WireIO wireIO = createWireIOClient(clientSocket);
 
             int cmd = 0;
@@ -340,7 +344,6 @@ public class BasicTest extends CommonWireIOTestCase {
                 tm += 1000;
             }
 
-            t.setRunning(false);
         } catch (Exception ex) {
             ex.printStackTrace();
             assertTrue(ex.getMessage(), false);
