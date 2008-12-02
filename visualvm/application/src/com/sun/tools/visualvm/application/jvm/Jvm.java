@@ -41,6 +41,11 @@ import java.util.logging.Logger;
 public abstract class Jvm extends Model {
     protected static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
     
+    /**
+     * Propety name for {@link #isDumpOnOOMEnabled()}. 
+     * If property dumpOnOOMEnabled changes its state, property change is fired
+     * with this property name.
+     */
     public static final String PROPERTY_DUMP_OOME_ENABLED = "prop_oome";    // NOI18N
     
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
@@ -279,14 +284,44 @@ public abstract class Jvm extends Model {
      */
     public abstract File takeThreadDump() throws IOException;
     
+    /**
+     * Add a PropertyChangeListener to the listener list.
+     * The listener is registered for all properties.
+     * The same listener object may be added more than once, and will be called
+     * as many times as it is added.
+     * If <code>listener</code> is null, no exception is thrown and no action
+     * is taken.
+     *
+     * @param listener  The PropertyChangeListener to be added
+     */
     public final void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Remove a PropertyChangeListener from the listener list.
+     * This removes a PropertyChangeListener that was registered
+     * for all properties.
+     * If <code>listener</code> was added more than once to the same event
+     * source, it will be notified one less time after being removed.
+     * If <code>listener</code> is null, or was never added, no exception is
+     * thrown and no action is taken.
+     *
+     * @param listener  The PropertyChangeListener to be removed
+     */
     public final void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
     }
     
+    /**
+     * Report a bound property update to any registered listeners.
+     * No event is fired if old and new are equal and non-null.
+     *
+     * @param propertyName  The programmatic name of the property
+     *		that was changed.
+     * @param oldValue  The old value of the property.
+     * @param newValue  The new value of the property.
+     */
     protected final void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         changeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
