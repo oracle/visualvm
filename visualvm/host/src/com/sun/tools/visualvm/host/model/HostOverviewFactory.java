@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.host.Host;
  *
  * @author Tomas Hurka
  */
-public class HostOverviewFactory extends ModelFactory<HostOverview,Host> implements ModelProvider<HostOverview,Host> {
+public final class HostOverviewFactory extends ModelFactory<HostOverview,Host> implements ModelProvider<HostOverview,Host> {
     
     private static HostOverviewFactory overviewFactory;
     
