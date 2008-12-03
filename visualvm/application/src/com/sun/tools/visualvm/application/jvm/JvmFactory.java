@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.model.ModelProvider;
 
 /**
  * The JVMFactory class is a factory class for getting the
- * {@link JVM} representation  for the {@link Application}.
+ * {@link Jvm} representation  for the {@link Application}.
  * 
  * @author Tomas Hurka
  */
@@ -43,8 +43,8 @@ public final class JvmFactory extends ModelFactory<Jvm,Application> implements M
     }
     
     /**
-     * Getter for the default version of the JVMFactory.
-     * @return instance of {@link JVMFactory}.
+     * Getter for the default version of the JvmFactory.
+     * @return instance of {@link JvmFactory}.
      */
     public static synchronized JvmFactory getDefault() {
         if (jvmFactory == null) {
@@ -55,11 +55,11 @@ public final class JvmFactory extends ModelFactory<Jvm,Application> implements M
     }
     
     /**
-     * Factory method for obtaining {@link JVM} for {@link Application}. Note that there
-     * is only one instance of {@link JVM} for a concrete application. This {@link JVM}
+     * Factory method for obtaining {@link Jvm} for {@link Application}. Note that there
+     * is only one instance of {@link Jvm} for a concrete application. This {@link Jvm}
      * instance is cached.
      * @param app application 
-     * @return {@link JVM} instance which encapsulates application's JVM.
+     * @return {@link Jvm} instance which encapsulates application's JVM.
      */
     public static Jvm getJVMFor(Application app) {
         return getDefault().getModel(app);
@@ -67,11 +67,11 @@ public final class JvmFactory extends ModelFactory<Jvm,Application> implements M
     
     /**
      * Default {@link ModelProvider} implementation, which creates 
-     * dummy {@link JVM} instances. If you want to extend JVMFactory use 
-     * {@link JVMFactory#registerProvider()} to register the new instances
+     * dummy {@link Jvm} instances. If you want to extend JvmFactory use 
+     * {@link JvmFactory#registerProvider(ModelProvider )} to register the new instances
      * of {@link ModelProvider} for the different types of {@link Application}.
      * @param app application
-     * @return dummy instance of {@link JVM}
+     * @return dummy instance of {@link Jvm}
      */
     public Jvm createModelFor(Application app) {
         return new DefaultJvm();

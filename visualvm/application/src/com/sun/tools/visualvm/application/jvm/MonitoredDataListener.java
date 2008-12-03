@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.jvm;
 
 /**
- * "monitoredDataEvent" event is periodically fired by {@link JVM}.
+ * "monitoredDataEvent" event is periodically fired by {@link Jvm}.
  * 
  * @author Tomas Hurka
  */

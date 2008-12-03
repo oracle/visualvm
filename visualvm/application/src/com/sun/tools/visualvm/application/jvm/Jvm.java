@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 
 /**
  * This class encapsulates functionality of the target Java application. Use
- * {@link JVMFactory.getJVMFor()} to get instance of JVM class.
+ * {@link JvmFactory#getJVMFor(Application )} to get instance of Jvm class.
  * @author Tomas Hurka
  */
 public abstract class Jvm extends Model {
@@ -75,8 +75,8 @@ public abstract class Jvm extends Model {
     public abstract boolean is17();
 
     /**
-     * Tests if target JVM supports Attach API.
-     * {@link http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html}
+     * Tests if target JVM supports
+     * <a href=http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>.
      * @return <CODE>true</CODE> if JVM supports Attach API, <CODE>false</CODE> otherwise
      */
     public abstract boolean isAttachable();
@@ -159,7 +159,7 @@ public abstract class Jvm extends Model {
 
     /**
      * Tests if target JVM monitoring is supported. If true, JVM fires
-     * {@link MonitoredDataListener#monitoredDataEvent()}
+     * {@link MonitoredDataListener#monitoredDataEvent(MonitoredData )}
      * @return <CODE>true</CODE> if JVM is supports monitoring,
      * <CODE>false</CODE> otherwise
      */
