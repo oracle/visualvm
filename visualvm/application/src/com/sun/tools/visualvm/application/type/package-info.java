@@ -24,6 +24,6 @@
  */
 
 /**
- * DESCRIPTION TBD.
+ * Package with basic ApplicationType(s).
  */
 package com.sun.tools.visualvm.application.type;

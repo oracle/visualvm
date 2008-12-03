@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 
 /**
- *
+ * This {@link ApplicationType} represents NetBeans 3.x application 
  * @author Tomas Hurka
  */
 public class NetBeans3xApplicationType extends MainClassApplicationType {

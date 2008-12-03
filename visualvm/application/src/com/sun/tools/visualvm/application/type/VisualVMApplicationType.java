@@ -32,30 +32,42 @@ import org.openide.util.NbBundle;
 
 
 /**
- *
+ * This {@link ApplicationType} represents VisualVM.
  * @author Tomas Hurka
  */
 public class VisualVMApplicationType extends ApplicationType {
-  Application application;
-
-  VisualVMApplicationType(Application app) {
-    application = app;
-  }
-
-  public String getName() {
-    return "VisualVM";  // NOI18N
-  }
-
-  public String getVersion() {
-    return NbBundle.getMessage(VisualVMApplicationType.class, "LBL_Unknown");   // NOI18N
-  }
-
-  public String getDescription() {
-    return "";
-  }
-
-  public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/application/resources/visualvm.png";  // NOI18N
-    return ImageUtilities.loadImage(iconPath, true);
-  }
+    Application application;
+    
+    VisualVMApplicationType(Application app) {
+        application = app;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
+        return "VisualVM";  // NOI18N
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getVersion() {
+        return NbBundle.getMessage(VisualVMApplicationType.class, "LBL_Unknown");   // NOI18N
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+        return "";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Image getIcon() {
+        String iconPath = "com/sun/tools/visualvm/application/resources/visualvm.png";  // NOI18N
+        return ImageUtilities.loadImage(iconPath, true);
+    }
 }

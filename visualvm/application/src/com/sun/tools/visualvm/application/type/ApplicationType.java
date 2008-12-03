@@ -24,13 +24,23 @@
  */
 package com.sun.tools.visualvm.application.type;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
- *
+ * This class is used to indetify different type of Java
+ * applications. Using this class you can obtain 
+ * application's name and icon. VisualVM plugins can
+ * use instances of this class to identify particular
+ * application type (like GlassFish) and provide
+ * additional information for that application type.
+ * To get instance of ApplicationType for {@link Application}
+ * use the following factory method <code>
+ * ApplicationTypeFactory.getApplicationTypeFor(Application app)
+ * </code>
  * @author Tomas Hurka
  */
 public abstract class ApplicationType extends Model {
@@ -41,20 +51,69 @@ public abstract class ApplicationType extends Model {
 
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        pcs.addPropertyChangeListener(pcl);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        pcs.removePropertyChangeListener(pcl);
-    }
-
-    protected void firePropertyChange(String property, Object oldValue, Object newValue) {
-        pcs.firePropertyChange(property, oldValue, newValue);
-    }
-
+    /**
+     * Gets the name of the application.
+     * @return this application's name
+     */
     public abstract String getName();
+
+    /**
+     * Gets the version of the application.
+     * @return this application's version
+     */    
     public abstract String getVersion();
+
+    /**
+     * Gets the description of the application.
+     * @return this application's description
+     */    
     public abstract String getDescription();
+
+    /**
+     * Gets the icon of the application.
+     * @return this application's icon
+     */    
     public abstract Image getIcon();
+
+    /**
+     * Add a PropertyChangeListener to the listener list.
+     * The listener is registered for all properties.
+     * The same listener object may be added more than once, and will be called
+     * as many times as it is added.
+     * If <code>listener</code> is null, no exception is thrown and no action
+     * is taken.
+     *
+     * @param listener  The PropertyChangeListener to be added
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Remove a PropertyChangeListener from the listener list.
+     * This removes a PropertyChangeListener that was registered
+     * for all properties.
+     * If <code>listener</code> was added more than once to the same event
+     * source, it will be notified one less time after being removed.
+     * If <code>listener</code> is null, or was never added, no exception is
+     * thrown and no action is taken.
+     *
+     * @param listener  The PropertyChangeListener to be removed
+     */
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Report a bound property update to any registered listeners.
+     * No event is fired if old and new are equal and non-null.
+     *
+     * @param propertyName  The programmatic name of the property
+     *		that was changed.
+     * @param oldValue  The old value of the property.
+     * @param newValue  The new value of the property.
+     */
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
 }

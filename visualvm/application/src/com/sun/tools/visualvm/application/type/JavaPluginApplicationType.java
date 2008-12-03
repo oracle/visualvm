@@ -30,7 +30,8 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
- *
+ * This ApplicationType represent Java-Plugin.
+ * 
  * @author Luis-Miguel Alventosa
  */
 public class JavaPluginApplicationType extends ApplicationType {
@@ -41,18 +42,35 @@ public class JavaPluginApplicationType extends ApplicationType {
         this.version = version;
     }
 
+    /**
+     * Gets the name of the Java plugin.
+     * @return this application's name
+     */
     public String getName() {
         return NbBundle.getMessage(JavaPluginApplicationType.class, "LBL_Java_Plug-in_ver", version);   // NOI18N
     }
 
+    /**
+     * Gets the version of the Java-Plugin.
+     * The version is the same as java.version of the JVM
+     * @return this Java-Plugin's version
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * Gets the description of the application.
+     * @return this application's description
+     */
     public String getDescription() {
         return NbBundle.getMessage(JavaPluginApplicationType.class, "LBL_Java_Plug-in");    // NOI18N
     }
 
+    /**
+     * Gets the icon of the application.
+     * @return this application's icon
+     */
     public Image getIcon() {
         String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);

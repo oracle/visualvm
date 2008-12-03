@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 
 /**
- *
+ * Factory which recognizes Java-Plugin application 
  * @author Luis-Miguel Alventosa
  */
 public class JavaPluginApplicationTypeFactory
@@ -39,6 +39,12 @@ public class JavaPluginApplicationTypeFactory
 
     private static final String JAVA_PLUGIN = "-Djavaplugin.version=";  // NOI18N
 
+    /**
+     * Detects Java-Plugin application.
+     * @return {@link JavaPluginApplicationType} instance or <code>null</code>
+     * if application is not Java-Plugin application
+     * @param application Application
+     */
     @Override
     public ApplicationType createModelFor(Application application) {
         Jvm jvm = JvmFactory.getJVMFor(application);

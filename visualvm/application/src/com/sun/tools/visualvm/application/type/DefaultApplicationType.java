@@ -34,7 +34,11 @@ import org.openide.util.NbBundle;
 
 
 /**
- *
+ * Default application type, which returns main class name as 
+ * application name and uses generic Java icon as application
+ * icon. It is used when when application is not recognized
+ * by any of more specific ApplicationTypes.
+ * 
  * @author Tomas Hurka
  * @author Luis-Miguel Alventosa
  */
@@ -46,6 +50,12 @@ public class DefaultApplicationType extends ApplicationType  {
         application = app;
     }
     
+    /**
+     * Gets the name of the application.
+     * Application's main class is used as the name
+     * of the application.
+     * @return this application's name
+     */
     public String getName() {
         if (name == null) {
             Jvm jvm = JvmFactory.getJVMFor(application);
@@ -64,14 +74,23 @@ public class DefaultApplicationType extends ApplicationType  {
         return name;
     }
     
+    /**
+     * {@inheritDoc}
+     */ 
     public String getVersion() {
         return NbBundle.getMessage(DefaultApplicationType.class, "LBL_Unknown_Version");    // NOI18N
     }
     
+    /**
+     * {@inheritDoc}
+     */ 
     public String getDescription() {
         return "";
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */     
     public Image getIcon() {
         String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);

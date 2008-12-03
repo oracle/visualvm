@@ -34,39 +34,56 @@ import org.openide.util.NbBundle;
 
 
 /**
- *
+ * This {@link ApplicationType} represents application based on
+ * NetBeans Platform.
  * @author Tomas Hurka
  */
 public class NetBeansBasedApplicationType extends ApplicationType {
-  Application application;
-  String name;
-  String branding;
-  Set<String> clusters;
-
-  NetBeansBasedApplicationType(Application app,Jvm jvm,Set<String> cls, String br) {
-    application = app;
-    clusters = cls;
-    branding = br;
-  }
-
-  public Set<String> getClusters() {
-    return clusters;
-  }
-
-  public String getName() {
-    return "NetBeans Platform application"; // NOI18N
-  }
-
-  public String getVersion() {
-    return NbBundle.getMessage(NetBeansBasedApplicationType.class, "LBL_Unknown");  // NOI18N
-  }
-
-  public String getDescription() {
-    return "";
-  }
-
-  public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
-    return ImageUtilities.loadImage(iconPath, true);
-  }
+    Application application;
+    String name;
+    String branding;
+    Set<String> clusters;
+    
+    NetBeansBasedApplicationType(Application app,Jvm jvm,Set<String> cls, String br) {
+        application = app;
+        clusters = cls;
+        branding = br;
+    }
+    
+    /**
+     * Returns set of BetBeans' clusters.
+     *
+     */
+    public Set<String> getClusters() {
+        return clusters;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
+        return "NetBeans Platform application"; // NOI18N
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getVersion() {
+        return NbBundle.getMessage(NetBeansBasedApplicationType.class, "LBL_Unknown");  // NOI18N
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+        return "";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Image getIcon() {
+        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
+        return ImageUtilities.loadImage(iconPath, true);
+    }
 }

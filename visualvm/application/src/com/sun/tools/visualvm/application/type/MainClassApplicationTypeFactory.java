@@ -33,7 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * This application type factory recognizes some well-known Java application
+ * based on their main class name.
+ * 
  * @author Tomas Hurka
  */
 public class MainClassApplicationTypeFactory extends AbstractModelProvider<ApplicationType,Application> {
@@ -89,6 +91,12 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         }
     }
     
+    /**
+     * Detects well-known application.
+     * @param appl Application
+     * @return {@link MainClassApplicationType} instance or <code>null</code>
+     * if application is not well-known application
+     */
     public ApplicationType createModelFor(Application appl) {
         Jvm jvm = JvmFactory.getJVMFor(appl);
             
@@ -101,6 +109,16 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         return null;
     }
     
+    /**
+     * Creates ApplicationType for application, jvm and mainClass. Can overriden 
+     * by sublasses, which relies on mainClass name
+     * @param app Application
+     * @param jvm Applications's jvm
+     * @param mainClass Application's mainClass
+     * @return instance of {@link ApplicationType} or 
+     * <CODE>null</CODE> if the app cannot be recognized 
+     * by this ApplicationType factory
+     */ 
     public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
         String[] appDesc = map.get(mainClass);
         if (appDesc != null) {

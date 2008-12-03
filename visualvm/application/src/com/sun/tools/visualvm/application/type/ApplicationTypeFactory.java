@@ -30,34 +30,55 @@ import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
 
 /**
+ * The ApplicationTypeFactory class is a factory class for getting the
+ * {@link ApplicationType} representation for the {@link Application}.
  *
  * @author Tomas Hurka
  * @author Luis-Miguel Alventosa
  */
 public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,Application> implements ModelProvider<ApplicationType,Application> {
-
-  private static ApplicationTypeFactory appTypeFactory;
-
-  private ApplicationTypeFactory() {
-  }
-
-  public static synchronized ApplicationTypeFactory getDefault() {
-    if (appTypeFactory == null) {
-      appTypeFactory = new ApplicationTypeFactory();
-      appTypeFactory.registerProvider(appTypeFactory);
-      appTypeFactory.registerProvider(new MainClassApplicationTypeFactory());
-      appTypeFactory.registerProvider(new NetBeansApplicationTypeFactory());
-      appTypeFactory.registerProvider(new JavaPluginApplicationTypeFactory());
-      appTypeFactory.registerProvider(new JavaWebStartApplicationTypeFactory());
+    
+    private static ApplicationTypeFactory appTypeFactory;
+    
+    private ApplicationTypeFactory() {
     }
-    return appTypeFactory;
-  }
-  
-  public static ApplicationType getApplicationTypeFor(Application app) {
-    return getDefault().getModel(app);
-  }
-  
-  public ApplicationType createModelFor(Application app) {
-    return new DefaultApplicationType(app);
-  }
+    
+    /**
+     * Getter for the default version of the ApplicationTypeFactory.
+     * @return instance of {@link ApplicationTypeFactory}.
+     */
+    public static synchronized ApplicationTypeFactory getDefault() {
+        if (appTypeFactory == null) {
+            appTypeFactory = new ApplicationTypeFactory();
+            appTypeFactory.registerProvider(appTypeFactory);
+            appTypeFactory.registerProvider(new MainClassApplicationTypeFactory());
+            appTypeFactory.registerProvider(new NetBeansApplicationTypeFactory());
+            appTypeFactory.registerProvider(new JavaPluginApplicationTypeFactory());
+            appTypeFactory.registerProvider(new JavaWebStartApplicationTypeFactory());
+        }
+        return appTypeFactory;
+    }
+    
+    /**
+     * Factory method for obtaining {@link ApplicationType} for {@link Application}. Note that there
+     * is only one instance of {@link ApplicationType} for a concrete application. This {@link ApplicationType}
+     * instance is cached.
+     * @param app application 
+     * @return {@link ApplicationType} instance which describes application type.
+     */
+    public static ApplicationType getApplicationTypeFor(Application app) {
+        return getDefault().getModel(app);
+    }
+    
+    /**
+     * Default {@link ApplicationType} implementation, which creates 
+     * generic {@link ApplicationType} instances. If you want to extend ApplicationTypeFactory use 
+     * {@link ApplicationTypeFactory#registerProvider(ModelProvider )} to register the new instances
+     * of {@link ModelProvider} for the different types of {@link Application}.
+     * @param app application
+     * @return generic instance of {@link ApplicationType}
+     */
+    public ApplicationType createModelFor(Application app) {
+        return new DefaultApplicationType(app);
+    }
 }

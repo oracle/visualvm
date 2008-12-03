@@ -35,49 +35,65 @@ import org.openide.util.NbBundle;
 
 
 /**
- *
+ * This {@link ApplicationType} represents NetBeans application from version 4.0.
  * @author Tomas Hurka
  */
 public class NetBeansApplicationType extends ApplicationType {
-  Application application;
-  String name;
-  Set<String> clusters;
-  private static final String NB_CLUSTER = "nb";    // NOI18N
-
-  NetBeansApplicationType(Application app,Jvm jvm,Set<String> cls) {
-    application = app;
-    clusters = cls;
-  }
-
-  public Set<String> getClusters() {
-    return clusters;
-  }
-
-  public String getName() {
-    return "NetBeans " + getVersion();    // NOI18N
-  }
-
-  public String getVersion() {
-    Iterator<String> clIt = getClusters().iterator();
-      while(clIt.hasNext()) {
-        String cluster = clIt.next();
-        if (cluster.startsWith(NB_CLUSTER)) {
-          String ver = cluster.substring(NB_CLUSTER.length());
-          
-          if (ver.length()>0 && Character.isDigit(ver.charAt(0))) {
-            return ver;
-          }
-        } 
-      }
-    return NbBundle.getMessage(NetBeansApplicationType.class, "LBL_Unknown");   // NOI18N
-  }
-
-  public String getDescription() {
-    return "";
-  }
-
-  public Image getIcon() {
-    String iconPath = "com/sun/tools/visualvm/application/type/resources/NetBeans.png"; // NOI18N
-    return ImageUtilities.loadImage(iconPath, true);
-  }
+    Application application;
+    String name;
+    Set<String> clusters;
+    private static final String NB_CLUSTER = "nb";    // NOI18N
+    
+    NetBeansApplicationType(Application app,Jvm jvm,Set<String> cls) {
+        application = app;
+        clusters = cls;
+    }
+    
+    /**
+     * Returns set of BetBeans' clusters.
+     *
+     */
+    public Set<String> getClusters() {
+        return clusters;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
+        return "NetBeans " + getVersion();    // NOI18N
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getVersion() {
+        Iterator<String> clIt = getClusters().iterator();
+        while(clIt.hasNext()) {
+            String cluster = clIt.next();
+            if (cluster.startsWith(NB_CLUSTER)) {
+                String ver = cluster.substring(NB_CLUSTER.length());
+                
+                if (ver.length()>0 && Character.isDigit(ver.charAt(0))) {
+                    return ver;
+                }
+            }
+        }
+        return NbBundle.getMessage(NetBeansApplicationType.class, "LBL_Unknown");   // NOI18N
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+        return "";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Image getIcon() {
+        String iconPath = "com/sun/tools/visualvm/application/type/resources/NetBeans.png"; // NOI18N
+        return ImageUtilities.loadImage(iconPath, true);
+    }
 }

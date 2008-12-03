@@ -30,7 +30,7 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
- *
+ * This ApplicationType represent Java Web Start application.
  * @author Luis-Miguel Alventosa
  */
 public class JavaWebStartApplicationType extends ApplicationType {
@@ -41,18 +41,35 @@ public class JavaWebStartApplicationType extends ApplicationType {
         this.version = version;
     }
 
+    /**
+     * Gets the name of the Java Web Start.
+     * @return this application's name
+     */
     public String getName() {
         return NbBundle.getMessage(JavaWebStartApplicationType.class, "LBL_Java_Web_Start");    // NOI18N
     }
 
+    /**
+     * Gets the version of the Java Web Start.
+     * The version is the same as java.version of the JVM
+     * @return this Java Web Start's version
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * Gets the description of the application.
+     * @return this application's description
+     */
     public String getDescription() {
         return NbBundle.getMessage(JavaWebStartApplicationType.class, "LBL_Java_Web_Start");    // NOI18N
     }
 
+    /**
+     * Gets the icon of the application.
+     * @return this application's icon
+     */
     public Image getIcon() {
         String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);

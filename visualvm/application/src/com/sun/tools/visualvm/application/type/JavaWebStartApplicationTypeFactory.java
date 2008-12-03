@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 
 /**
- *
+ * Factory which recognizes Java Web Start Application
  * @author Luis-Miguel Alventosa
  */
 public class JavaWebStartApplicationTypeFactory
@@ -39,6 +39,12 @@ public class JavaWebStartApplicationTypeFactory
 
     private static final String JWS = "-Djnlpx.home=";  // NOI18N
 
+    /**
+     * Detects Java Web Start application.
+     * @return {@link JavaWebStartApplicationType} instance or <code>null</code>
+     * if application is not Java Web Start application
+     * @param application Application
+     */
     @Override
     public ApplicationType createModelFor(Application application) {
         Jvm jvm = JvmFactory.getJVMFor(application);

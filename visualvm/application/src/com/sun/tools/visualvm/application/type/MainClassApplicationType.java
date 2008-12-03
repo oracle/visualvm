@@ -32,7 +32,8 @@ import org.openide.util.NbBundle;
 
 
 /**
- *
+ * ApplicationType which has custom name and icon.
+ * Instance of this class is constructed by {@link MainClassApplicationTypeFactory}
  * @author Tomas Hurka
  */
 public class MainClassApplicationType extends ApplicationType  {
@@ -44,18 +45,30 @@ public class MainClassApplicationType extends ApplicationType  {
     iconPath = path;
   }
 
+  /**
+   * {@inheritDoc}
+   */ 
   public String getName() {
     return name;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public String getVersion() {
     return NbBundle.getMessage(MainClassApplicationType.class, "LBL_Unknown");  // NOI18N
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public String getDescription() {
     return "";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public Image getIcon() {
     return ImageUtilities.loadImage(iconPath, true);
   }

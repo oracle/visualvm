@@ -35,7 +35,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Factory which recognizes NetBeans IDE, NetBeans Platform based
+ * application and VisualVM itself 
  * @author Tomas Hurka
  */
 public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFactory {
@@ -88,6 +89,16 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
     return null;
   }
 
+  /**
+   * Detects NetBeans IDE, NetBeans Platform based
+   * application and VisualVM itself. It returns 
+   * {@link VisualVMApplicationType} for VisualVM,
+   * {@link NetBeansApplicationType} for NetBeans 4.0 and newer and
+   * {@link NetBeans3xApplicationType} for NetBeans 3.x
+   * 
+   * @return {@link ApplicationType} subclass or <code>null</code> if
+   * this application is not NetBeans 
+   */ 
   public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
     if (MAIN_CLASS.equals(mainClass)) {
       String branding = getBranding(jvm);
