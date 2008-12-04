@@ -350,7 +350,7 @@ public final class ProjectUtilities {
         return o;
     }
 
-    public static String getProjectBuildScript(final Project project) {
+    public static String getProjectBuildfilePath(final Project project) {
         final FileObject buildFile = findBuildFile(project);
         if (buildFile == null) {
             return null;
@@ -392,13 +392,15 @@ public final class ProjectUtilities {
     }
 
     public static FileObject findBuildFile(final Project project) {
-        FileObject buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+        FileObject buildFile = null;
+
+        Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
+        String buildFileName = props != null ? props.getProperty("buildfile") : null; // NOI18N
+        if (buildFileName != null) {
+            buildFile = project.getProjectDirectory().getFileObject(buildFileName);
+        }
         if (buildFile == null) {
-            Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
-            String buildFileName = props.getProperty("buildfile"); // NOI18N
-            if (buildFileName != null) {
-                buildFile = project.getProjectDirectory().getFileObject(buildFileName);
-            }
+            buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
         }
         return buildFile;
     }
