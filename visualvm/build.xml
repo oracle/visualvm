@@ -161,6 +161,11 @@
                 <include name="*com/sun/tools/visualvm/host/views/*.java"/>
             </fileset>
 
+            <!--group title="VisualVM-JMX" packages="com.sun.tools.visualvm.jmx*"/-->
+            <fileset dir="jmx/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/jmx/*.java"/>
+            </fileset>
+
             <!--group title="VisualVM-ThreadDump" packages="com.sun.tools.visualvm.threaddump*"/-->
             <fileset dir="threaddump/src" defaultexcludes="yes">
                 <include name="com/sun/tools/visualvm/threaddump/*.java"/>
