@@ -350,7 +350,7 @@ public final class ProjectUtilities {
         return o;
     }
 
-    public static String getProjectBuildfilePath(final Project project) {
+    public static String getProjectBuildScript(final Project project) {
         final FileObject buildFile = findBuildFile(project);
         if (buildFile == null) {
             return null;
