@@ -32,6 +32,10 @@ import java.util.Set;
 
 
 /**
+ * This is a utility class that can be used by similarly
+ * to PropertyChangeSupport. All DataChangeSupport instances 
+ * uses dedicated thread to for all the work, so all events 
+ * is processed asynchronously. 
  *
  * @author Tomas Hurka
  */
@@ -39,10 +43,19 @@ public final class DataChangeSupport<X> {
 
     private ChangeSupport<X> changeSupport;
 
+    /**
+     * Constructs a <code>DataChangeSupport</code> object.
+     */
     public DataChangeSupport() {
         changeSupport = new ChangeSupport();
     }
 
+    /**
+     * Add a DataChangeListener to the listener list.
+     * The same listener object may be added only once.
+     *
+     * @param listener  The DataChangeListener to be added
+     */
     public void addChangeListener(final DataChangeListener<X> listener) {
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
@@ -51,6 +64,11 @@ public final class DataChangeSupport<X> {
         });
     }
 
+    /**
+     * Remove a DataChangeListener from the listener list.
+     *
+     * @param listener  The DataChangeListener to be removed
+     */
     public void removeChangeListener(final DataChangeListener<X> listener) {
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
@@ -59,6 +77,13 @@ public final class DataChangeSupport<X> {
         });
     }
     
+    /**
+     * Report a update to any registered listeners.
+     *
+     * @param current  the set of currently available objects.
+     * @param added  the set of added objects since last event.
+     * @param removed  the set of removed objects since last event.
+     */
     public void fireChange(final Set<X> current, final Set<X> added, final Set<X> removed) {
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
