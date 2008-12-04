@@ -45,6 +45,10 @@ public final class OpenJmxApplication extends OptionProcessor {
     
     private Option openjmx = Option.requiredArgument(Option.NO_SHORT_NAME, "openjmx"); // NOI18N
 
+    public OpenJmxApplication() {
+        openjmx = Option.shortDescription(openjmx, "com.sun.tools.visualvm.jmx.application.Bundle","MSG_OPENJMX");
+    }
+    
     protected Set<Option> getOptions() {
         return Collections.singleton(openjmx);
     }

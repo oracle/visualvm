@@ -58,6 +58,8 @@ public final class Open extends OptionProcessor {
     private static final String ID = "visualvm.id";
 
     public Open() {
+        openpid = Option.shortDescription(openpid,"com.sun.tools.visualvm.application.options.Bundle","MSG_OPENPID"); // NOI18N
+        openid = Option.shortDescription(openid,"com.sun.tools.visualvm.application.options.Bundle","MSG_OPENID"); // NOI18N
     }
 
     protected Set<Option> getOptions() {

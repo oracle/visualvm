@@ -54,6 +54,7 @@ public final class Openfile extends OptionProcessor {
     private static final int TIMEOUT = 5000;
     
     public Openfile() {
+        openfile = Option.shortDescription(openfile, "com.sun.tools.visualvm.core.snapshot.options.Bundle", "MSG_OPENFILE");
     }
     
     protected Set<Option> getOptions() {
