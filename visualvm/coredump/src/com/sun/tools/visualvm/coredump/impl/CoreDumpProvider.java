@@ -88,8 +88,8 @@ public class CoreDumpProvider {
         protected void doInBackground() {
             SaModel model = SaModelFactory.getSAAgentFor(newCoreDump);
             if (model != null) {
-                CoreDumpsContainer.sharedInstance().getRepository().addDataSource(newCoreDump);
                 storage.setCustomProperties(propNames, propValues);
+                CoreDumpsContainer.sharedInstance().getRepository().addDataSource(newCoreDump);
 
                 success = true;
             }
