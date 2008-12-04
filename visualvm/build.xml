@@ -127,6 +127,7 @@
             <!--group title="VisualVM-Application" packages="com.sun.tools.visualvm.application*"/-->
             <fileset dir="application/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/application/options/*.java"/>
             </fileset>
 
             <!--group title="VisualVM-Application Views" packages="com.sun.tools.visualvm.application.views*"/-->
@@ -138,6 +139,7 @@
             <fileset dir="core/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
                 <exclude name="com/sun/tools/visualvm/core/*.java"/>
+                <exclude name="com/sun/tools/visualvm/core/snapshot/options/*.java"/>
             </fileset>
 
             <!--group title="VisualVM-CoreDump" packages="com.sun.tools.visualvm.coredump*"/-->
