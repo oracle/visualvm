@@ -146,7 +146,7 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     }
 
     public FileObject getProjectBuildScript(Project project) {
-        return org.netbeans.modules.profiler.utils.ProjectUtilities.findBuildFile(project);
+        return project.getProjectDirectory().getFileObject(GeneratedFilesHelper.BUILD_XML_PATH);
     }
 
     public JavaPlatform getProjectJavaPlatform(Project project) {
@@ -182,9 +182,9 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
 
     public void unintegrateProfiler(Project project) {
     }
-
+    
     public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties) {
         return false;
     }
-
+    
 }
