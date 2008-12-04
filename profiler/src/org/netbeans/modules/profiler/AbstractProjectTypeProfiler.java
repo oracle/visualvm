@@ -182,9 +182,9 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
 
     public void unintegrateProfiler(Project project) {
     }
-    
+
     public boolean startProfilingSession(Project project, FileObject profiledClassFile, boolean isTest, Properties properties) {
         return false;
     }
-    
+
 }
