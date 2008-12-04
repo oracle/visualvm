@@ -61,7 +61,7 @@
         <echo message="${zip.platform.clusters.bare}" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
         <echo message="&#10;" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
     </target>
-    
+
     <target name="build" depends="-init,branding,release" description="Build all modules in the suite.">
         <subant target="netbeans" buildpath="${modules.sorted}" inheritrefs="false" inheritall="false"/>
         <mkdir dir="${cluster}/config/Modules"/>
@@ -79,7 +79,7 @@
             </hidden>
         </createmodulexml>
     </target>
-    
+
     <target name="build-zip" depends="build,build-launchers" description="Builds a ZIP distribution of the suite, launchers, and selected modules from the platform.">
         <mkdir dir="dist"/>
         <zip destfile="dist/${app.name}.zip" >
@@ -89,7 +89,7 @@
                 <include name="**/lib/nbexec*"/>
                 <include name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
             </zipfileset>
-                
+
             <zipfileset dir="${netbeans.dest.dir}" prefix="${app.name}">
                 <and>
                     <not>
@@ -109,7 +109,7 @@
             </zipfileset>
 
             <zipfileset dir="startup/src/com/sun/tools/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
-                        
+
             <!-- Yes, the doubled app.name is a bit ugly, but better than the alternative; cf. #66441: -->
             <zipfileset dir="${cluster}" prefix="${app.name}/${app.name}">
                 <!--
@@ -118,15 +118,16 @@
             </zipfileset>
         </zip>
     </target>
-    
+
     <target name="javadoc" depends="-init,branding">
         <delete dir="build/javadoc"/>
-        
+
         <javadoc destdir="build/javadoc" author="true" version="true" use="true" encoding="UTF-8" windowtitle="${app.title} API">
-            
+
             <!--group title="VisualVM-Application" packages="com.sun.tools.visualvm.application*"/-->
             <fileset dir="application/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/application/options/*.java"/>
             </fileset>
 
             <!--group title="VisualVM-Application Views" packages="com.sun.tools.visualvm.application.views*"/-->
@@ -138,6 +139,7 @@
             <fileset dir="core/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
                 <exclude name="com/sun/tools/visualvm/core/*.java"/>
+                <exclude name="com/sun/tools/visualvm/core/snapshot/options/*.java"/>
             </fileset>
 
             <!--group title="VisualVM-CoreDump" packages="com.sun.tools.visualvm.coredump*"/-->
@@ -161,6 +163,11 @@
                 <include name="*com/sun/tools/visualvm/host/views/*.java"/>
             </fileset>
 
+            <!--group title="VisualVM-JMX" packages="com.sun.tools.visualvm.jmx*"/-->
+            <fileset dir="jmx/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/jmx/*.java"/>
+            </fileset>
+
             <!--group title="VisualVM-ThreadDump" packages="com.sun.tools.visualvm.threaddump*"/-->
             <fileset dir="threaddump/src" defaultexcludes="yes">
                 <include name="com/sun/tools/visualvm/threaddump/*.java"/>
@@ -177,12 +184,12 @@
 
             <doctitle><![CDATA[<h1>${app.title} API Specification</h1><p align="left">This document is the API specification for ${app.title}. See the <a href="https://visualvm.dev.java.net/api-quickstart.html">Getting Started Extending VisualVM</a> document for information about developing plugins for VisualVM.</p><br/>]]></doctitle>
             <header><![CDATA[<b>${app.title} API<br>Specification</b>]]></header>
-        
+
         </javadoc>
-        
+
         <nbbrowse file="build/javadoc/index.html"/>
     </target>
-    
+
     <target name="l10n-kit">
     	<mkdir dir="build/antclasses"/>
 	<javac srcdir="antsrc" destdir="build/antclasses" deprecation="true" debug="true" source="1.5" target="1.5">
