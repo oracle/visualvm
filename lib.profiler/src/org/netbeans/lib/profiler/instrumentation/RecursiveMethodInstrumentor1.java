@@ -112,7 +112,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                 boolean isMatch = false;
 
                 if (rootMethods.classesWildcard[rIdx]) {
-                    if (matchesWildcard(Wildcards.unwildPackage(rootClassName), className)) {
+                    if (Wildcards.matchesWildcard(rootClassName, className)) {
                         //            System.out.println("Matched package wildcard - " + rootClassName);
                         isMatch = true;
                     }
@@ -165,7 +165,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             final String rootClassName = rootMethods.classNames[rIdx].intern();
 
             if (rootMethods.classesWildcard[rIdx]) {
-                if (matchesWildcard(Wildcards.unwildPackage(rootClassName), className)) {
+                if (Wildcards.matchesWildcard(rootClassName, className)) {
                     //          System.out.println("Matched package wildcard - " + rootClassName);
                     isRootClass = true;
 
@@ -208,7 +208,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                 boolean isMatch = false;
 
                 if (rootMethods.classesWildcard[rIdx]) {
-                    if (matchesWildcard(Wildcards.unwildPackage(rootClassName), className)) {
+                    if (Wildcards.matchesWildcard(rootClassName, className)) {
                         //            System.out.println("Matched package wildcard - " + rootClassName);
                         isMatch = true;
                     }
