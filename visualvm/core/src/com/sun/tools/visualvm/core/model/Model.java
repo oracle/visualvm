@@ -25,8 +25,12 @@
 
 package com.sun.tools.visualvm.core.model;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
+
 /**
- *
+ * This abstact class which serves as root object for 
+ * all models attached to {@link DataSource} instances
+ * using {@link ModelFactory}.
  * @author Tomas Hurka
  */
 public abstract class Model {
