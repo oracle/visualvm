@@ -28,20 +28,24 @@ package com.sun.tools.visualvm.core.model;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
- *
+ * Abstract class, which simplifies implementation of {@link ModelProvider}.
+ * It uses class hierarchy to compute priority of providers.
  * @author Tomas Hurka
  */
 public abstract class AbstractModelProvider<M extends Model,B extends DataSource> implements ModelProvider<M,B> {
-
-  public abstract M createModelFor(B app);
-
-  public int priority() {
-    int depth = 1;
-    Class cls = getClass();
-
-    for (;!cls.equals(AbstractModelProvider.class);cls=cls.getSuperclass()) {
-      depth++;
+    
+    /**
+     * {@inheritDoc}
+     */ 
+    public abstract M createModelFor(B app);
+    
+    public int priority() {
+        int depth = 1;
+        Class cls = getClass();
+        
+        for (;!cls.equals(AbstractModelProvider.class);cls=cls.getSuperclass()) {
+            depth++;
+        }
+        return depth;
     }
-    return depth;
-  }
 }

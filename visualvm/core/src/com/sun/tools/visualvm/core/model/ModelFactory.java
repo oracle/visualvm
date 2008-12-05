@@ -44,7 +44,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 /**
- *
+ * This is abstact factory class for getting model
+ * for datasource. It as two functions. First it serves
+ * as cache for the model associated with datasource. 
+ * Second, ModelFactory uses list of ModelProviders registered 
+ * via {@link #registerProvider(ModelProvider )} to
+ * determine the order of in which they are consulted 
+ * to obtain the model for dataSource. First model 
+ * obtained from ModelProvider is associated with
+ * dataSource and returned in the future.
  * @author Tomas Hurka
  */
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
@@ -69,12 +77,19 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         providersLock = new ReentrantReadWriteLock();
     }
     
+    /**
+     * Returns model for dataSource. If model is in the cache
+     * return it, otherwise consult registered ModelProviders.
+     * @param dataSource {@link DataSource} for which {@link Model} should be returned
+     * @return model for dataSource or <CODE>null</CODE> 
+     * if there is not model associated with this dataSource.
+     */ 
     public final M getModel(D dataSource) {
         // take a read lock for providers
         Lock rlock = providersLock.readLock();
         rlock.lock();
         try {
-            // allow cuncurrent access to cache for different instances of DataSource
+            // allow concurrent access to cache for different instances of DataSource
             // note that DataSourceKey uses reference-equality in place of object-equality 
             // for DataSource
             synchronized (dataSource) {
@@ -109,6 +124,12 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         }
     }
     
+    /**
+     * register new {@link ModelProvider}. 
+     * Model provider can be registered only once.
+     * @param newProvider to register
+     * @return <CODE>true</CODE> if this ModelFactory does not contain registered provider.
+     */
     public final boolean registerProvider(ModelProvider<M, D> newProvider) {
         // take a write lock on providers
         Lock wlock = providersLock.writeLock();
@@ -126,6 +147,11 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         }
     }
     
+    /**
+     * Unregister {@link ModelProvider}.
+     * @param oldProvider provider, which should be unregistered
+     * @return <CODE>true</CODE> if provider was unregistered.
+     */
     public final boolean unregisterProvider(ModelProvider<M, D> oldProvider) {
         // take a write lock on providers
         Lock wlock = providersLock.writeLock();
@@ -143,14 +169,31 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
          }
     }
     
+    /**
+     * Add data change listener. Data change is fired when 
+     * {@link ModelProvider} is registered/unregister. 
+     * @param listener {@link DataChangeListener} to be added
+     */
     public final void addFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
         factoryChange.addChangeListener(listener);
     }
     
+    /**
+     * Remove data change listener.
+     * @param listener {@link DataChangeListener} to be removed
+     */
     public final void removeFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {
         factoryChange.removeChangeListener(listener);
     }
     
+    /**
+     * Default priority. Subclass of ModelFactory can implement 
+     * {@link ModelProvider}. In that case such provider should be
+     * used as last provider. This is ensured by returning -1, since
+     * providers, which subclass {@link AbstractModelProvider}, return 
+     * positive numbers. 
+     * @return -1
+     */
     public int priority() {
         return -1;
     }
