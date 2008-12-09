@@ -61,7 +61,7 @@ import org.netbeans.lib.profiler.tests.jfluid.utils.*;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
-
+import org.netbeans.lib.profiler.global.CommonConstants;
 
 /**
  *
@@ -77,7 +77,6 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
         private boolean hasResults = false;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
         public void cctEstablished(RuntimeCCTNode appRootNode) {
             System.out.println("Memory CCT Established");
 
@@ -108,17 +107,18 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (!emtpy) {
+                cctEstablished(appRootNode);
+            }
+        //throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     MemoryCallGraphBuilder builder = new MemoryCallGraphBuilder();
     MemoryResultListener resultListener = null;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     /**
      * Creates a new instance of MemoryTestCase
      */
@@ -127,10 +127,9 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     protected void checkMemoryResults(TargetAppRunner targetAppRunner, String[] matchingPrefixes,
-                                      MemoryResultListener resultListener)
-                               throws Exception {
+            MemoryResultListener resultListener, int instrMode)
+            throws Exception {
         boolean gotResults = false;
         int retryCounter = 4;
 
@@ -147,39 +146,8 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
         long[] totalAllocObjectsSize = null;
         ArrayList list = new ArrayList(128);
         totalAllocObjectsSize = builder.getAllocObjectNumbers();
-
-        for (int i = 0; i < totalAllocObjectsSize.length; i++) {
-            boolean match = false;
-
-            for (int j = 0; j < matchingPrefixes.length; j++) {
-                if (classnames[i].startsWith(matchingPrefixes[j])) {
-                    match = true;
-
-                    break;
-                }
-            }
-
-            if (match) {
-                StringBuffer out = new StringBuffer();
-                out.append(complete(StringUtils.userFormClassName(classnames[i]), 32));
-                out.append(complete(String.valueOf(totalAllocObjects[i]), 8));
-                //out.append(complete(StringUtils.nBytesToString(totalAllocObjectsSize[i]), 10));
-                list.add(out.toString());
-            }
-        }
-
-        ref(complete("Name", 32) + complete("DCount", 8)); //+complete("DSize", 10));
-
-        try {
-            MemoryCCTProvider.ObjectNumbersContainer liveness = builder.getLivenessObjectNumbers();
-
-            totalAllocObjectsSize = liveness.trackedLiveObjectsSize;
-
-            float[] avgage = liveness.avgObjectAge;
-            int[] maxSurvGen = liveness.maxSurvGen;
-            long[] ntrackedallocobjects = liveness.nTrackedAllocObjects;
-            int[] ntrackedliveobjects = liveness.nTrackedLiveObjects;
-
+        
+        if (instrMode == CommonConstants.INSTR_OBJECT_ALLOCATIONS) {
             for (int i = 0; i < totalAllocObjectsSize.length; i++) {
                 boolean match = false;
 
@@ -194,19 +162,53 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
                 if (match) {
                     StringBuffer out = new StringBuffer();
                     out.append(complete(StringUtils.userFormClassName(classnames[i]), 32));
+                    out.append(complete(String.valueOf(totalAllocObjects[i]), 8));
                     //out.append(complete(StringUtils.nBytesToString(totalAllocObjectsSize[i]), 10));
-                    out.append(complete(String.valueOf(ntrackedliveobjects[i]), 10));
-                    out.append(complete(String.valueOf(ntrackedallocobjects[i]), 8));
-                    //out.append(complete(String.valueOf((int)avgage[i]), 8));
-                    //out.append(complete(String.valueOf(maxSurvGen[i]), 8));
                     list.add(out.toString());
                 }
             }
 
-            ref(complete("Name", 32) /*complete("LiveBytes", 10)+*/ + complete("LiveObjs", 10) + complete("Allocs", 8)); //+complete("AvgAge", 8)+complete("MaxSurv", 8));
-        } catch (IllegalStateException e) {
+            ref(complete("Name", 32) + complete("DCount", 8)); //+complete("DSize", 10));
         }
 
+        if (instrMode == CommonConstants.INSTR_OBJECT_LIVENESS) {
+            try {
+                MemoryCCTProvider.ObjectNumbersContainer liveness = builder.getLivenessObjectNumbers();
+
+                totalAllocObjectsSize = liveness.trackedLiveObjectsSize;
+
+                float[] avgage = liveness.avgObjectAge;
+                int[] maxSurvGen = liveness.maxSurvGen;
+                long[] ntrackedallocobjects = liveness.nTrackedAllocObjects;
+                int[] ntrackedliveobjects = liveness.nTrackedLiveObjects;
+
+                for (int i = 0; i < totalAllocObjectsSize.length; i++) {
+                    boolean match = false;
+
+                    for (int j = 0; j < matchingPrefixes.length; j++) {
+                        if (classnames[i].startsWith(matchingPrefixes[j])) {
+                            match = true;
+
+                            break;
+                        }
+                    }
+
+                    if (match) {
+                        StringBuffer out = new StringBuffer();
+                        out.append(complete(StringUtils.userFormClassName(classnames[i]), 32));
+                        //out.append(complete(StringUtils.nBytesToString(totalAllocObjectsSize[i]), 10));
+                        out.append(complete(String.valueOf(ntrackedliveobjects[i]), 10));
+                        out.append(complete(String.valueOf(ntrackedallocobjects[i]), 8));
+                        //out.append(complete(String.valueOf((int)avgage[i]), 8));
+                        //out.append(complete(String.valueOf(maxSurvGen[i]), 8));
+                        list.add(out.toString());
+                    }
+                }
+
+                ref(complete("Name", 32) /*complete("LiveBytes", 10)+*/ + complete("LiveObjs", 10) + complete("Allocs", 8)); //+complete("AvgAge", 8)+complete("MaxSurv", 8));
+            } catch (IllegalStateException e) {
+            }
+        }
         //log results
         Collections.sort(list);
 
@@ -264,7 +266,7 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
                 waitForStatus(STATUS_APP_FINISHED);
             }
 
-            checkMemoryResults(runner, classPrefixes, resultListener);
+            checkMemoryResults(runner, classPrefixes, resultListener, instrMode);
             setStatus(STATUS_MEASURED);
         } catch (Exception ex) {
             log(ex);

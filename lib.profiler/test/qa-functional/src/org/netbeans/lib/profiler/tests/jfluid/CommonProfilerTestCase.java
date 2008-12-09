@@ -60,6 +60,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import org.openide.util.Exceptions;
 
 
 public abstract class CommonProfilerTestCase extends NbTestCase {
@@ -536,6 +537,12 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         log(runner.getProfilerEngineSettings());
         log("");
         System.err.println("Test " + getName() + " finalized.");
+        
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
     protected void initAppByStream(TargetAppRunner runner) {
