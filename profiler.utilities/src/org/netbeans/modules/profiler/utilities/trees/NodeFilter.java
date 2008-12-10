@@ -37,30 +37,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
-
-import junit.framework.Test;
-import org.netbeans.junit.NbModuleSuite;
+package org.netbeans.modules.profiler.utilities.trees;
 
 /**
  *
- * @author tester
+ * @author Jaroslav Bachorik
  */
-public class ProfilerStableTestSuite {
-    public static Test suite() {
-    return NbModuleSuite.create(
-      NbModuleSuite.emptyConfiguration()
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.BasicTest.class)
-	    .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.MemorySnapshotTest.class)
-	    .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.CPUSnapshotTest.class)
-	//.addTest(org.netbeans.lib.profiler.tests.jfluid.benchmarks.JbbTest.class)
-	//.addTest(org.netbeans.lib.profiler.tests.jfluid.others.MeasureDiffsTest.class)
-    );
-  }
-
-
+public interface NodeFilter<T> {
+    boolean match(T node);
+    boolean maymatch(T node);
 }

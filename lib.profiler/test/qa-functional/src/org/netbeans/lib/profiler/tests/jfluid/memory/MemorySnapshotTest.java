@@ -64,7 +64,7 @@ public class MemorySnapshotTest extends MemorySnapshotTestCase {
 
     public static Test suite() {
         return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            NbModuleSuite.createConfiguration(MemorySnapshotTest.class).addTest(
             "testSettingsAllocations",
             "testSettingsAllocationsServer",
             "testSettingsAllocationsStackTraces",
