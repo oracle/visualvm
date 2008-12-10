@@ -143,7 +143,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
 
                         ClientUtils.SourceCodeSelection[] rootMethodsSelection = ClassSelectRootMethodsPanel.getDefault()
                                                                                                                .getRootMethods(project,
-                                                                                                                               className,
+                                                                                                                               dobj.getPrimaryFile(),
                                                                                                                                settings
                                                                                                                                .getInstrumentationRootMethods());
 

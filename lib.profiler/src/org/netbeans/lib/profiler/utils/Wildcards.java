@@ -52,13 +52,19 @@ public class Wildcards {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static boolean isMatch(String mask, String value) {
-        if (isPackageWildcard(mask)) {
-            mask = unwildPackage(mask);
+    public static boolean matchesWildcard(String wildcard, String loadedClassName) {
+        //    System.err.println("Matches wildcard: "+loadedClassName+", wild: "+wildcard + " : " + (loadedClassName.startsWith(wildcard) && (loadedClassName.indexOf('/', wildcard.length()) == -1)));
+        boolean packageWildcard = false;
+        if (wildcard.endsWith(Wildcards.ALLWILDCARD)) { // package wild card - instrument all classes including subpackages
+            wildcard = Wildcards.unwildPackage(wildcard);
+            packageWildcard = true;
         }
-
-        return value.startsWith(mask) && (value.indexOf('/', mask.length()) == -1); // NOI18N
+        if (!loadedClassName.startsWith(wildcard)) {
+            return false;
+        }
+        return packageWildcard || (loadedClassName.indexOf('/', wildcard.length()) == -1); // NOI18N
     }
+
 
     public static boolean isMethodWildcard(String methodName) {
         return (methodName != null) ? (methodName.equals(ALLWILDCARD) || methodName.equals("<all>")) : false; // NOI18N
