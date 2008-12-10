@@ -37,32 +37,34 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.netbeans.lib.profiler.tests.jfluid.cpu;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
 
 /**
  *
- * @author tester
+ * @author dt153238
  */
-public class ProfilerStableTestSuite {
-    public static Test suite() {
-    return NbModuleSuite.create(
-      NbModuleSuite.emptyConfiguration()
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.BasicTest.class)
-	    .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.MemorySnapshotTest.class)
-	    .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class)
-//        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest2.class)
-//        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest3.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.CPUSnapshotTest.class)
-	//.addTest(org.netbeans.lib.profiler.tests.jfluid.benchmarks.JbbTest.class)
-	//.addTest(org.netbeans.lib.profiler.tests.jfluid.others.MeasureDiffsTest.class)
-    );
-  }
+public class BasicTest2 {
 
+    public static Test suite() {
+        return NbModuleSuite.create(
+            NbModuleSuite.createConfiguration(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class).addTest(
+            "testMethodWithWaitLazyServer",
+            "testMethodWithWaitTotal",
+            "testMethodWithWaitTotalServer",
+            "testSettingsDefault",
+            "testSettingsInstrumenManyMethodsLazy",
+            "testSettingsInstrumentAllEager",
+            "testSettingsInstrumentAllEagerServer",
+            "testSettingsInstrumentAllLazy",
+            "testSettingsInstrumentAllLazyServer",
+            "testSettingsInstrumentAllTotal",
+            "testSettingsInstrumentAllTotalServer",
+            "testSettingsInstrumentExcludeJavas",
+            "testSettingsInstrumentExcludeJavasServer"
+            ).enableModules(".*").clusters(".*"));
+    }
 
 }
