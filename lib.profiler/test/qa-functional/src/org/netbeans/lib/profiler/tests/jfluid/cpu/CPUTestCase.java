@@ -128,7 +128,10 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (!emtpy) {
+                cctEstablished(appRootNode);
+            }
+            //throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -353,7 +356,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                 assertTrue("Results do not exist - issue 65185.", runner.getProfilerClient().cpuResultsExist());
 
                 boolean gotResults = false;
-                int retryCounter = 4;
+                int retryCounter = 10; // was 4
 
                 do {
                     // just wait for the results to appear - forceObtainedResultsDump() has been alread called by ProfilerClient on shutdown
