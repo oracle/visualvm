@@ -37,62 +37,167 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.ui.panels;
 
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
-import org.netbeans.modules.profiler.selector.ui.RootSelectorNode;
-import org.netbeans.modules.profiler.utilities.trees.TreeDecimator;
-import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
-
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
+import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
+import org.netbeans.modules.profiler.selector.ui.SelectionTreeView;
+import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.DialogDescriptor;
+import org.openide.filesystems.FileObject;
+import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ClassSelectRootMethodsPanel extends AbstractSelectRootMethodsPanel {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+final public class ClassSelectRootMethodsPanel extends JPanel {
 
-    private static ClassSelectRootMethodsPanel instance = null;
+    final private static class Singleton {
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+        final private static ClassSelectRootMethodsPanel INSTANCE = new ClassSelectRootMethodsPanel();
+    }
 
-    private volatile String assignedClassName;
+    final public static ClassSelectRootMethodsPanel getDefault() {
+        return Singleton.INSTANCE;
+    }
+    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ClassSelectRootMethodsPanel.class,
+            "SelectRootMethodsPanel_OkButtonText"); // NOI18N
+    private static final String HELP_CTX_KEY = "ClassSelectRootMethodsPanel.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    private static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
+    private JButton okButton;
+    private RootSelectorTree advancedLogicalPackageTree;
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    private ClassSelectRootMethodsPanel() {
+        init(this);
+    }
 
-    public static synchronized ClassSelectRootMethodsPanel getDefault() {
-        if (instance == null) {
-            instance = new ClassSelectRootMethodsPanel();
+    private void init(final Container container) {
+        GridBagConstraints gridBagConstraints;
+
+        okButton = new JButton(OK_BUTTON_TEXT);
+
+        ProgressDisplayer pd = new ProgressDisplayer() {
+
+            ProfilerProgressDisplayer pd = null;
+
+            public synchronized void showProgress(String message) {
+                pd = ProfilerProgressDisplayer.showProgress(message);
+            }
+
+            public synchronized void showProgress(String message, ProgressController controller) {
+                pd = ProfilerProgressDisplayer.showProgress(message, controller);
+            }
+
+            public synchronized void showProgress(String caption, String message, ProgressController controller) {
+                pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
+            }
+
+            public synchronized boolean isOpened() {
+                return pd != null;
+            }
+
+            public synchronized void close() {
+                if (pd != null) {
+                    pd.close();
+                    pd = null;
+                }
+            }
+        };
+
+        advancedLogicalPackageTree = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
+
+        container.setLayout(new GridBagLayout());
+
+        advancedLogicalPackageTree.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+
+        JScrollPane advancedLogicalPackageTreeScrollPane = new JScrollPane(advancedLogicalPackageTree);
+        advancedLogicalPackageTreeScrollPane.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(10, 10, 0, 10);
+        container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
+    }
+
+    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project, final FileObject javaFile,
+            final ClientUtils.SourceCodeSelection[] currentSelection) {
+        advancedLogicalPackageTree.reset();
+
+        updateSelector(new Runnable() {
+
+            public void run() {
+                advancedLogicalPackageTree.setContext(Lookups.fixed(javaFile));
+                advancedLogicalPackageTree.setSelection(currentSelection);
+
+                List<Type> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
+                if (builderTypes.size() > 0) {
+                    advancedLogicalPackageTree.setBuilderType(builderTypes.get(0));
+                }
+            }
+        });
+
+        final DialogDescriptor dd = new DialogDescriptor(this,
+                NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_Title"), // NOI18N
+                true, new Object[]{okButton, DialogDescriptor.CANCEL_OPTION},
+                okButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
+
+//            Object[] additionalOptions = getAdditionalOptions();
+//
+//            if ((additionalOptions != null) && (additionalOptions.length > 0)) {
+//                dd.setAdditionalOptions(additionalOptions);
+//            }
+
+        final Dialog d = ProfilerDialogs.createDialog(dd);
+        d.pack(); // To properly layout HTML hint area
+        d.setVisible(true);
+
+        if (dd.getValue().equals(okButton)) {
+            ClientUtils.SourceCodeSelection[] selection = advancedLogicalPackageTree.getSelection();
+            return selection;
         }
-
-        return instance;
+        return null;
     }
 
-    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project, final String className,
-                                                            final ClientUtils.SourceCodeSelection[] currentSelection) {
-        assignedClassName = className;
+    private void updateSelector(Runnable updater) {
+        ProgressHandle ph = IDEUtils.indeterminateProgress(NbBundle.getMessage(this.getClass(),
+                "SelectRootMethodsPanel_ParsingProjectStructureMessage"),
+                500); // NOI18N
 
-        return super.getRootMethods(project, currentSelection);
-    }
-
-    @Override
-    protected NodeFilter<RootSelectorNode> getNodeFilter() {
-        return new TreeDecimator.NodeFilter<RootSelectorNode>() {
-                public boolean match(RootSelectorNode node) {
-                    return (node.getSignature() != null) && node.getSignature().toFlattened().equals(assignedClassName);
-                }
-
-                public boolean maymatch(RootSelectorNode node) {
-                    return (node.getSignature() == null) || assignedClassName.startsWith(node.getSignature().toFlattened());
-                }
-            };
-    }
-
-    @Override
-    protected boolean isShowAllProjectsEnabled() {
-        return false;
+        try {
+            advancedLogicalPackageTree.setEnabled(false);
+            okButton.setEnabled(false);
+            updater.run();
+        } finally {
+            ph.finish();
+            okButton.setEnabled(true);
+            advancedLogicalPackageTree.setEnabled(true);
+        }
     }
 }
