@@ -64,7 +64,7 @@ public class CPUSnapshotTest extends CPUSnapshotTestCase {
 
     public static Test suite() {
         return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+            NbModuleSuite.createConfiguration(CPUSnapshotTest.class).addTest(
             "testMethods",
             "testMethodsServer",
             "testNoThreads",
