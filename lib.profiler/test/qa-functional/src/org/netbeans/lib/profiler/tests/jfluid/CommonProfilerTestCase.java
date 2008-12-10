@@ -539,7 +539,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         System.err.println("Test " + getName() + " finalized.");
         
         try {
-            Thread.sleep(10000);
+            Thread.sleep(15000);
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         }
