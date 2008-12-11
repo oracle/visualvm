@@ -30,12 +30,15 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Tomas Hurka
  */
 public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatModel, Application> {
+    private final static Logger LOGGER = Logger.getLogger(JvmJvmstatModelProvider.class.getName());
     
     public JvmJvmstatModel createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
@@ -57,19 +60,25 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
             else if (vmVersion.startsWith("1.7.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
             
             // Hotspot Express
-            else if (vmVersion.startsWith("10.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("11.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N            
-            else if (vmVersion.startsWith("12.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("13.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
-            else if (vmVersion.startsWith("14.0")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("10.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("11.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N            
+            else if (vmVersion.startsWith("12.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("13.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+            else if (vmVersion.startsWith("14.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
             
             if (model == null) { // try java.property.java.version from HotSpot Express 14.0
                 String javaVersion = jvmstat.findByName("java.property.java.version"); // NOI18N
 
-                // JVM 1.6
-                if (javaVersion.startsWith("1.6.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
-                // JVM 1.7
-                else if (javaVersion.startsWith("1.7.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                if (javaVersion != null) {
+                    // JVM 1.6
+                    if (javaVersion.startsWith("1.6.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                    // JVM 1.7
+                    else if (javaVersion.startsWith("1.7.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                }
+                if (model == null) { // still not recognized, fallback to  JvmJvmstatModel_5
+                    LOGGER.log(Level.WARNING, "Unrecognized java.vm.version " + vmVersion); // NOI18N
+                    model = model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                }
             }
             return model;
         }

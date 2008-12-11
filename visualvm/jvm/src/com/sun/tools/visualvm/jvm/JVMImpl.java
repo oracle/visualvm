@@ -178,7 +178,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         if (ver == null) {
            ver = getVmVersion();
         }
-        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.0") || ver.startsWith("11.0"))) {    // NOI18N
+        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.") || ver.startsWith("11."))) {    // NOI18N
             return true;
         }
         return false;
@@ -189,7 +189,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         if (ver == null) {
            ver = getVmVersion();
         }
-        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("12.0") || ver.startsWith("13.0") || ver.startsWith("14.0"))) {  // NOI18N
+        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("12.") || ver.startsWith("13.") || ver.startsWith("14."))) {  // NOI18N
             return true;
         }
         return false;
