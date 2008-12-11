@@ -41,13 +41,12 @@
 package org.netbeans.modules.profiler.utilities.trees;
 
 import junit.framework.TestCase;
-import org.netbeans.modules.profiler.utilities.trees.TreeDecimator.NodeFilter;
+import org.netbeans.modules.profiler.utilities.trees.NodeFilter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 
 /**
@@ -104,7 +103,7 @@ public class TreeDecimatorTest extends TestCase {
     public void testDecimateRoot() {
         System.out.println("decimate Root");
 
-        TreeDecimator.NodeFilter<DefaultMutableTreeNode> filter = new TreeDecimator.NodeFilter() {
+        NodeFilter<DefaultMutableTreeNode> filter = new NodeFilter() {
             public boolean match(Object node) {
                 return node.toString().equals("A");
             }
@@ -122,7 +121,7 @@ public class TreeDecimatorTest extends TestCase {
     public void testDecimateAB() {
         System.out.println("decimate AB");
 
-        TreeDecimator.NodeFilter<DefaultMutableTreeNode> filter = new TreeDecimator.NodeFilter() {
+        NodeFilter<DefaultMutableTreeNode> filter = new NodeFilter() {
             public boolean match(Object node) {
                 return node.toString().equals("AB");
             }
@@ -140,7 +139,7 @@ public class TreeDecimatorTest extends TestCase {
     public void testDecimateAC() {
         System.out.println("decimate AC");
 
-        TreeDecimator.NodeFilter<DefaultMutableTreeNode> filter = new TreeDecimator.NodeFilter() {
+        NodeFilter<DefaultMutableTreeNode> filter = new NodeFilter() {
             public boolean match(Object node) {
                 return node.toString().equals("AC");
             }
@@ -158,7 +157,7 @@ public class TreeDecimatorTest extends TestCase {
     public void testDecimateACA() {
         System.out.println("decimate ACA");
 
-        TreeDecimator.NodeFilter<DefaultMutableTreeNode> filter = new TreeDecimator.NodeFilter() {
+        NodeFilter<DefaultMutableTreeNode> filter = new NodeFilter() {
             public boolean match(Object node) {
                 return node.toString().equals("ACA");
             }
@@ -176,7 +175,7 @@ public class TreeDecimatorTest extends TestCase {
     public void testDecimateACAB() {
         System.out.println("decimate ACAB");
 
-        TreeDecimator.NodeFilter<DefaultMutableTreeNode> filter = new TreeDecimator.NodeFilter() {
+        NodeFilter<DefaultMutableTreeNode> filter = new NodeFilter() {
             public boolean match(Object node) {
                 return node.toString().equals("ACAB");
             }

@@ -128,7 +128,10 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (!emtpy) {
+                cctEstablished(appRootNode);
+            }
+            //throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -464,7 +467,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                     //                    runner.getProfilerClient().forceObtainedResultsDump();
                     //                    assertTrue("Results do not exist on the server - issue 65185.", runner.getProfilerClient().cpuResultsExist());
                     boolean gotResults = false;
-                    int retryCounter = 2;
+                    int retryCounter = 4;
 
                     do {
                         runner.getProfilerClient().forceObtainedResultsDump();
