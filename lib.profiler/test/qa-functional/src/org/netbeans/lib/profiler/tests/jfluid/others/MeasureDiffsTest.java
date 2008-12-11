@@ -69,7 +69,7 @@ public class MeasureDiffsTest extends MeasureDiffsTestCase {
     public static Test suite() {
         return NbModuleSuite.create(
             NbModuleSuite.createConfiguration(MeasureDiffsTest.class).addTest(
-//            "testSettingsInstrumentAllEager",
+            "testSettingsInstrumentAllEager",
 //            "testSettingsInstrumentAllEagerServer",
 //            "testSettingsInstrumentAllLazy",
 //            "testSettingsInstrumentAllLazyServer",
