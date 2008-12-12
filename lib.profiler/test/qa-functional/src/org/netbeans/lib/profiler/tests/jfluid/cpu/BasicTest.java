@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.lib.profiler.tests.jfluid.cpu;
 
 import junit.framework.Test;
@@ -47,7 +46,6 @@ import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 
-
 /**
  *
  * @author ehucka
@@ -56,10 +54,56 @@ public class BasicTest extends CPUTestCase {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final long MAX_DELAY = 25000L;
+    
+    public static final String[] tests = new String[]{
+        "testLiveResultsAll",
+        "testLiveResultsBasic",
+        "testLiveResultsWaitEager",
+        "testLiveResultsWaitLazy",
+        //"testLiveResultsWaitSampled" // not stable
+        "testLiveResultsWaitServer",
+        "testLiveResultsWaitTotal",
+        "testMethodWithWaitEager",
+        "testMethodWithWaitEagerServer",
+        "testMethodWithWaitExcludeWEager",
+        "testMethodWithWaitExcludeWLazy",
+        "testMethodWithWaitExcludeWTotal",
+        "testMethodWithWaitLazy"
+    };
+    public static final String[] tests2 = new String[]{
+        "testMethodWithWaitLazyServer",
+        "testMethodWithWaitTotal",
+        "testMethodWithWaitTotalServer",
+        //"testSettingsDefault", // not stable
+        "testSettingsInstrumenManyMethodsLazy",
+        "testSettingsInstrumentAllEager",
+        "testSettingsInstrumentAllEagerServer",
+        "testSettingsInstrumentAllLazy",
+        "testSettingsInstrumentAllLazyServer",
+        "testSettingsInstrumentAllTotal",
+        "testSettingsInstrumentAllTotalServer",
+        "testSettingsInstrumentExcludeJavas",
+        "testSettingsInstrumentExcludeJavasServer"
+    };
+    public static final String[] tests3 = new String[]{
+        "testSettingsInstrumentManyMethodsTotal",
+        "testSettingsInstrumentNotSpawnedThreads",
+        "testSettingsInstrumentNotSpawnedThreadsServer",
+        "testSettingsInstrumentRootMethod",
+        "testSettingsInstrumentRootMethodServer",
+        "testSettingsLimitedThreads",
+        "testSettingsLimitedThreadsServer",
+        "testSettingsSampledProfilingEager",
+        "testSettingsSampledProfilingLazy",
+        "testSettingsSampledProfilingServerEager",
+        "testSettingsSampledProfilingServerLazy",
+        "testSettingsSampledProfilingServerTotal",
+        "testSettingsSampledProfilingTotal"
+    };
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
+            /** Creates a new instance of BasicTest */
 
-    /** Creates a new instance of BasicTest */
     public BasicTest(String name) {
         super(name);
     }
@@ -70,58 +114,56 @@ public class BasicTest extends CPUTestCase {
 
     public static Test suite() {
         return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(BasicTest.class).addTest(
-            "testLiveResultsAll",
-            "testLiveResultsBasic",
-            "testLiveResultsWaitEager",
-            "testLiveResultsWaitLazy",
-            //"testLiveResultsWaitSampled"
-            "testLiveResultsWaitServer",
-            "testLiveResultsWaitTotal",
-            "testMethodWithWaitEager",
-            "testMethodWithWaitEagerServer",
-            "testMethodWithWaitExcludeWEager",
-            "testMethodWithWaitExcludeWLazy",
-            "testMethodWithWaitExcludeWTotal",
-            "testMethodWithWaitLazy"
-//            /* --- in BasicTest2 --- */
-//            "testMethodWithWaitLazyServer",
-//            "testMethodWithWaitTotal",
-//            "testMethodWithWaitTotalServer",
-//            "testSettingsDefault",
-//            "testSettingsInstrumenManyMethodsLazy",
-//            "testSettingsInstrumentAllEager",
-//            "testSettingsInstrumentAllEagerServer",
-//            "testSettingsInstrumentAllLazy",
-//            "testSettingsInstrumentAllLazyServer",
-//            "testSettingsInstrumentAllTotal",
-//            "testSettingsInstrumentAllTotalServer",
-//            "testSettingsInstrumentExcludeJavas",
-//            "testSettingsInstrumentExcludeJavasServer",
-//            /* --- in BasicTest3 --- */
-//            "testSettingsInstrumentManyMethodsTotal",
-//            "testSettingsInstrumentNotSpawnedThreads",
-//            "testSettingsInstrumentNotSpawnedThreadsServer",
-//            "testSettingsInstrumentRootMethod",
-//            "testSettingsInstrumentRootMethodServer",
-//            "testSettingsLimitedThreads",
-//            "testSettingsLimitedThreadsServer",
-//            "testSettingsSampledProfilingEager",
-//            "testSettingsSampledProfilingLazy",
-//            "testSettingsSampledProfilingServerEager",
-//            "testSettingsSampledProfilingServerLazy",
-//            "testSettingsSampledProfilingServerTotal",
-//            "testSettingsSampledProfilingTotal"
-            ).enableModules(".*").clusters(".*"));
+                NbModuleSuite.createConfiguration(BasicTest.class).addTest(
+                "testLiveResultsAll",
+                "testLiveResultsBasic",
+                "testLiveResultsWaitEager",
+                "testLiveResultsWaitLazy",
+                //"testLiveResultsWaitSampled"
+                "testLiveResultsWaitServer",
+                "testLiveResultsWaitTotal",
+                "testMethodWithWaitEager",
+                "testMethodWithWaitEagerServer",
+                "testMethodWithWaitExcludeWEager",
+                "testMethodWithWaitExcludeWLazy",
+                "testMethodWithWaitExcludeWTotal",
+                "testMethodWithWaitLazy" //            /* --- in BasicTest2 --- */
+                //            "testMethodWithWaitLazyServer",
+                //            "testMethodWithWaitTotal",
+                //            "testMethodWithWaitTotalServer",
+                //            "testSettingsDefault",
+                //            "testSettingsInstrumenManyMethodsLazy",
+                //            "testSettingsInstrumentAllEager",
+                //            "testSettingsInstrumentAllEagerServer",
+                //            "testSettingsInstrumentAllLazy",
+                //            "testSettingsInstrumentAllLazyServer",
+                //            "testSettingsInstrumentAllTotal",
+                //            "testSettingsInstrumentAllTotalServer",
+                //            "testSettingsInstrumentExcludeJavas",
+                //            "testSettingsInstrumentExcludeJavasServer",
+                //            /* --- in BasicTest3 --- */
+                //            "testSettingsInstrumentManyMethodsTotal",
+                //            "testSettingsInstrumentNotSpawnedThreads",
+                //            "testSettingsInstrumentNotSpawnedThreadsServer",
+                //            "testSettingsInstrumentRootMethod",
+                //            "testSettingsInstrumentRootMethodServer",
+                //            "testSettingsLimitedThreads",
+                //            "testSettingsLimitedThreadsServer",
+                //            "testSettingsSampledProfilingEager",
+                //            "testSettingsSampledProfilingLazy",
+                //            "testSettingsSampledProfilingServerEager",
+                //            "testSettingsSampledProfilingServerLazy",
+                //            "testSettingsSampledProfilingServerTotal",
+                //            "testSettingsSampledProfilingTotal"
+                ).enableModules(".*").clusters(".*"));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public void temptestSettingsInstrumentRootMethod(boolean server) {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.CPU1",
-                                                      new String[][] {
-                                                          { "simple.cpu.CPUThread", "run", "()V" }
-                                                      });
+                new String[][]{
+                    {"simple.cpu.CPUThread", "run", "()V"}
+                });
         settings.setInstrumentSpawnedThreads(false);
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentGetterSetterMethods(true);
@@ -132,49 +174,49 @@ public class BasicTest extends CPUTestCase {
             addJVMArgs(settings, "-server");
         }
 
-        startCPUTest(settings, new String[] { "simple.cpu.CPUThread.run512()" }, new long[] { 512L }, 40.0,
-                     new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+        startCPUTest(settings, new String[]{"simple.cpu.CPUThread.run512()"}, new long[]{512L}, 40.0,
+                new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
     public void testLiveResultsAll() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.CPU1");
-        startCPUTest(settings, new String[] { "" }, 1000, MAX_DELAY);
+        startCPUTest(settings, new String[]{""}, 1000, MAX_DELAY);
     }
 
     public void testLiveResultsBasic() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.CPU");
-        startCPUTest(settings, new String[] { "simple" }, 1500, MAX_DELAY);
+        startCPUTest(settings, new String[]{"simple"}, 1500, MAX_DELAY);
     }
 
     public void testLiveResultsWaitEager() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.WaitingTest");
         settings.setInstrScheme(CommonConstants.INSTRSCHEME_EAGER);
-        startCPUTest(settings, new String[] { "simple" }, 1000, MAX_DELAY);
+        startCPUTest(settings, new String[]{"simple"}, 1000, MAX_DELAY);
     }
 
     public void testLiveResultsWaitLazy() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.WaitingTest");
         settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
-        startCPUTest(settings, new String[] { "simple" }, 1000, MAX_DELAY);
+        startCPUTest(settings, new String[]{"simple"}, 1000, MAX_DELAY);
     }
 
     public void testLiveResultsWaitSampled() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.WaitingTest");
         settings.setCPUProfilingType(CommonConstants.CPU_INSTR_SAMPLED);
         settings.setSamplingInterval(1);
-        startCPUTest(settings, new String[] { "simple" }, 1000, MAX_DELAY);
+        startCPUTest(settings, new String[]{"simple"}, 1000, MAX_DELAY);
     }
 
     public void testLiveResultsWaitServer() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.WaitingTest");
         addJVMArgs(settings, "-server");
-        startCPUTest(settings, new String[] { "simple" }, 1000, MAX_DELAY);
+        startCPUTest(settings, new String[]{"simple"}, 1000, MAX_DELAY);
     }
 
     public void testLiveResultsWaitTotal() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.WaitingTest");
         settings.setInstrScheme(CommonConstants.INSTRSCHEME_TOTAL);
-        startCPUTest(settings, new String[] { "simple" }, 1000, MAX_DELAY);
+        startCPUTest(settings, new String[]{"simple"}, 1000, MAX_DELAY);
     }
 
     public void testMethodWithWaitEager() {
@@ -216,10 +258,10 @@ public class BasicTest extends CPUTestCase {
     public void testSettingsDefault() {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.CPU1");
         startCPUTest(settings,
-                     new String[] {
-                         "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
-                         "simple.cpu.CPUThread.run512()"
-                     }, new long[] { 20L, 100L, 1000L, 512L }, 40.0, new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+                new String[]{
+                    "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
+                    "simple.cpu.CPUThread.run512()"
+                }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
     public void testSettingsInstrumenManyMethodsLazy() {
@@ -312,9 +354,9 @@ public class BasicTest extends CPUTestCase {
 
     protected void temptestMethodWithWait(int instrscheme, boolean withwaits, boolean server, long idealtime) {
         ProfilerEngineSettings settings = initCpuTest("j2se-simple", "simple.cpu.WaitingTest",
-                                                      new String[][] {
-                                                          { "simple.cpu.WaitingTest", "method1000", "()V" }
-                                                      });
+                new String[][]{
+                    {"simple.cpu.WaitingTest", "method1000", "()V"}
+                });
         settings.setInstrScheme(instrscheme);
         settings.setExcludeWaitTime(!withwaits);
 
@@ -322,8 +364,8 @@ public class BasicTest extends CPUTestCase {
             addJVMArgs(settings, "-server");
         }
 
-        startCPUTest(settings, new String[] { "simple.cpu.WaitingTest.method1000()" }, new long[] { idealtime }, 40.0,
-                     new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+        startCPUTest(settings, new String[]{"simple.cpu.WaitingTest.method1000()"}, new long[]{idealtime}, 40.0,
+                new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
     protected void temptestSettingsInstrumentAll(int instrScheme, boolean server) {
@@ -339,10 +381,10 @@ public class BasicTest extends CPUTestCase {
         }
 
         startCPUTest(settings,
-                     new String[] {
-                         "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
-                         "simple.cpu.CPUThread.run512()"
-                     }, new long[] { 20L, 100L, 1000L, 512L }, 40.0, new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+                new String[]{
+                    "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
+                    "simple.cpu.CPUThread.run512()"
+                }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
     protected void temptestSettingsInstrumentExcludeJavas(boolean server) {
@@ -362,10 +404,10 @@ public class BasicTest extends CPUTestCase {
         filter.setFilterStrings("java");
         settings.setInstrumentationFilter(filter);
         startCPUTest(settings,
-                     new String[] {
-                         "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
-                         "simple.cpu.CPUThread.run512()"
-                     }, new long[] { 20L, 100L, 1000L, 512L }, 40.0, new String[] { "simple", "java" }, ALL_INV_ERROR_METHOD);
+                new String[]{
+                    "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
+                    "simple.cpu.CPUThread.run512()"
+                }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple", "java"}, ALL_INV_ERROR_METHOD);
     }
 
     protected void temptestSettingsInstrumentManyMethods(int instrscheme) {
@@ -375,8 +417,8 @@ public class BasicTest extends CPUTestCase {
         settings.setInstrumentGetterSetterMethods(true);
         settings.setInstrumentEmptyMethods(true);
         settings.setInstrScheme(instrscheme);
-        startCPUTest(settings, new String[] { "simple.cpu.Methods2.method0()" }, new long[] { 400L }, 40.0,
-                     new String[] { "simple.cpu.Methods2.method1" }, ALL_INV_ERROR_METHOD);
+        startCPUTest(settings, new String[]{"simple.cpu.Methods2.method0()"}, new long[]{400L}, 40.0,
+                new String[]{"simple.cpu.Methods2.method1"}, ALL_INV_ERROR_METHOD);
     }
 
     protected void temptestSettingsInstrumentNotSpawnedThreads(boolean server) {
@@ -392,10 +434,10 @@ public class BasicTest extends CPUTestCase {
         }
 
         startCPUTest(settings,
-                     new String[] {
-                         "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
-                         "simple.cpu.CPUThread.run512()"
-                     }, new long[] { 20L, 100L, 1000L, 512L }, 40.0, new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+                new String[]{
+                    "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
+                    "simple.cpu.CPUThread.run512()"
+                }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
     protected void temptestSettingsLimitedThreads(boolean server) {
@@ -412,10 +454,10 @@ public class BasicTest extends CPUTestCase {
         }
 
         startCPUTest(settings,
-                     new String[] {
-                         "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
-                         "simple.cpu.CPUThread.run512()"
-                     }, new long[] { 20L, 100L, 1000L, 512L }, 40.0, new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+                new String[]{
+                    "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
+                    "simple.cpu.CPUThread.run512()"
+                }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
     protected void temptestSettingsSampledProfiling(boolean server, int instrScheme) {
@@ -433,9 +475,9 @@ public class BasicTest extends CPUTestCase {
         }
 
         startCPUTest(settings,
-                     new String[] {
-                         "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
-                         "simple.cpu.CPUThread.run512()"
-                     }, new long[] { 20L, 100L, 1000L, 512L }, 40.0, new String[] { "simple" }, ALL_INV_ERROR_METHOD);
+                new String[]{
+                    "simple.cpu.Bean.run20()", "simple.cpu.Bean.run100()", "simple.cpu.Bean.run1000()",
+                    "simple.cpu.CPUThread.run512()"
+                }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 }
