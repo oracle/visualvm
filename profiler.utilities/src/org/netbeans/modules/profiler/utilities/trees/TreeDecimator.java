@@ -48,18 +48,6 @@ import java.util.List;
  * @author Jaroslav Bachorik
  */
 public abstract class TreeDecimator<T> {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
-    public static interface NodeFilter<F> {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        boolean match(F node);
-
-        boolean maymatch(F node);
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     /**
      * Will decimate a tree given its root node and filter
      * @param oldRoot The tree root
