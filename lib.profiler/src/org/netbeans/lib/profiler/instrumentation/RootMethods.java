@@ -82,7 +82,7 @@ class RootMethods {
 
                 if (Wildcards.isPackageWildcard(rootName)) {
                     classesWildcard[i] = true;
-
+                    classNames[i] = Wildcards.unwildPackage(rootName);
                     //System.err.println("Uses wildcard: "+rootClasses[i]);
                     // root method name and signature is not used in this case
                 } else {
