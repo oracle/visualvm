@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import org.netbeans.lib.profiler.results.EventBufferResultsProvider;
 
 
 /**
@@ -152,7 +153,10 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (!emtpy) {
+                cctEstablished(appRootNode);
+            }
+            //throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -306,6 +310,7 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
 
     protected void startCPUTest(ProfilerEngineSettings settings, String[] methodsOrder) {
         HashMap results = new HashMap(64);
+        builder = new CPUCallGraphBuilder();
 
         assertTrue(builder != null);
 
@@ -334,6 +339,10 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         FlatProfileBuilder flattener = new FlatProfileBuilder();
         builder.addListener(flattener);
         flattener.setContext(runner.getProfilerClient(),null,null);
+        
+        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
+
+        builder.startup(runner.getProfilerClient());
 
         try {
             runner.readSavedCalibrationData();

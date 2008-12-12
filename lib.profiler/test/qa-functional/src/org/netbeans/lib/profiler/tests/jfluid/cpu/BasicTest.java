@@ -75,7 +75,7 @@ public class BasicTest extends CPUTestCase {
             "testLiveResultsBasic",
             "testLiveResultsWaitEager",
             "testLiveResultsWaitLazy",
-            "testLiveResultsWaitSampled",
+            //"testLiveResultsWaitSampled"
             "testLiveResultsWaitServer",
             "testLiveResultsWaitTotal",
             "testMethodWithWaitEager",
