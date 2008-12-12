@@ -121,7 +121,10 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (!emtpy) {
+                cctEstablished(appRootNode);
+            }
+            //throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
