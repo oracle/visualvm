@@ -318,6 +318,7 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         try {
             outFile = File.createTempFile("profiler", "test");
             startAppAlone(settings);
+            System.err.println(">>> startAppAlone");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -352,6 +353,7 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
             bindStreams(p);
 
             runner.connectToStartedVMAndStartTA();
+            System.err.println(">>> runner.connectToStartedVMAndStartTA");
 
             runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
 
