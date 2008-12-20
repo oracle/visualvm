@@ -67,7 +67,7 @@ public class JbbTest extends JbbTestType {
 
     public static Test suite() {
         return NbModuleSuite.create(
-            NbModuleSuite.createConfiguration(JbbTestType.class).addTest(
+            NbModuleSuite.createConfiguration(JbbTest.class).addTest(
             "testBasic",
             "testDefaultEntire",
             "testDefaultPart",
