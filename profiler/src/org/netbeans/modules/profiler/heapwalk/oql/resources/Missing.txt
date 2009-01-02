@@ -1,0 +1,6 @@
+  JHAT              |  HeapWalker                 |  Desc
+===============================================================================================================
+ JavaValueArray     | PrimitiveArrayInstance      | OQL needs objects while HW provides only toString() values
+ JavaStatic         | FieldValue                  | OQL needs object from getValue(); HW provides only toString() value
+ Snapshot           | Heap                        | getFinalizerObjects()
+ Snapshot           | Heap                        | getReachablesExcludes()
