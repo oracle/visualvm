@@ -219,7 +219,7 @@ public class OQLEngine {
                     }
                 }
                 // http://www.mozilla.org/rhino/ScriptingJava.html
-                XXX
+
             } else {
                 // simple "select <expr>" query
                 Object select = call("__select__", new Object[] {});
