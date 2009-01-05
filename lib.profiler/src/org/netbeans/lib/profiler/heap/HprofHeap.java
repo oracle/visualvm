@@ -192,6 +192,8 @@ class HprofHeap implements Heap {
             return null;
         }
 
+        computeInstances();
+
         ClassDump classDump;
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
