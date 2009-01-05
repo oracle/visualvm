@@ -78,6 +78,10 @@ public class Snapshot {
         return delegate.getJavaClassByName(name);
     }
 
+    public Instance findThing(long objectId) {
+        return delegate.getInstanceByID(objectId);
+    }
+
     /**
      * Return an Iterator of all of the classes in this snapshot.
      **/

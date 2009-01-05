@@ -21,7 +21,6 @@ package org.netbeans.modules.profiler.heapwalk.oql;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
@@ -150,6 +149,8 @@ public class OQLEngine {
  
     private void executeQuery(OQLQuery q, ObjectVisitor visitor) 
                               throws OQLException {
+        visitor = visitor != null ? visitor : ObjectVisitor.DEFAULT;
+        
         JavaClass clazz = null;
         if (q.className != null) {
             clazz = snapshot.findClass(q.className);
@@ -168,7 +169,7 @@ public class OQLEngine {
         buf.append("; }");
  
         String selectCode = buf.toString();
-        debugPrint(selectCode);
+//        debugPrint(selectCode);
         String whereCode = null;
         if (q.whereExpr != null) {
             buf = new StringBuffer();
@@ -179,7 +180,7 @@ public class OQLEngine {
             buf.append("; }");
             whereCode = buf.toString();
         }
-        debugPrint(whereCode);
+//        debugPrint(whereCode);
  
         // compile select expression and where condition 
         try {
@@ -207,9 +208,18 @@ public class OQLEngine {
  
                     if (b) {
                         Object select = call("__select__", args);
-                        if (visitor.visit(select)) return;
+                        if (select instanceof Iterator) {
+                            Iterator iter = (Iterator)select;
+                            while(iter.hasNext()) {
+                                if (visitor.visit(iter.next())) return;
+                            }
+                        } else {
+                            if (visitor.visit(select)) return;
+                        }
                     }
                 }
+                // http://www.mozilla.org/rhino/ScriptingJava.html
+                XXX
             } else {
                 // simple "select <expr>" query
                 Object select = call("__select__", new Object[] {});

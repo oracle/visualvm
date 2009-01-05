@@ -41,15 +41,12 @@ package org.netbeans.modules.profiler.heapwalk.oql;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Iterator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.netbeans.lib.profiler.heap.HeapFactory;
-import org.netbeans.lib.profiler.heap.JavaClass;
 import static org.junit.Assert.*;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
 
@@ -80,73 +77,157 @@ public class OQLEngineTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of executeQuery method, of class OQLEngine.
-     */
     @Test
-    public void testExecuteQuery() throws Exception {
-        System.out.println("executeQuery");
-        
-        String query = "select filter(heap.classes(), \"/java\\.net\\./(it.name)\")";
-        
-        final int[] counter = new int[]{0};
+    public void testHeapForEachClass() throws Exception {
+        System.out.println("heap.forEachClass");
+        String query = "select heap.forEachClass(function(xxx) { println(xxx.name); })";
 
-        ObjectVisitor visitor = new ObjectVisitor() {
+        instance.executeQuery(query, null);
+    }
+
+    @Test
+    public void testHeapForEachObject() throws Exception {
+        System.out.println("heap.forEachObject");
+        String query = "select heap.forEachObject(function(xxx) { println(xxx.id); }, \"java.net.InetAddress\")";
+
+        instance.executeQuery(query, null);
+    }
+
+    @Test
+    public void testHeapFindObject() throws Exception {
+        System.out.println("heap.findObject");
+        final int[] counter = new int[1];
+        String query = "select heap.findObject(2834622440)";
+
+        instance.executeQuery(query, new ObjectVisitor() {
 
             public boolean visit(Object o) {
-                if (o instanceof Iterator) {
-                    Iterator e = (Iterator)o;
-                    while (e.hasNext()) {
-                        Object ob = instance.unwrapJavaObject(e.next());
-                        if (ob != null) {
-                            System.out.println(((JavaClass)ob).getName());
-                        }
-                    }
-//                    while (e.hasMoreElements()) {
-//                        System.out.println("kurva");
-//                    }
-                }
                 counter[0]++;
-                return false;
+                return true;
             }
-        };
-
-        instance.executeQuery(query, visitor);
-        
-        assertTrue(counter[0] != 0);
+        });
+        assertTrue(counter[0] > 0);
     }
 
-    /**
-     * Test of evalScript method, of class OQLEngine.
-     */
     @Test
-    public void testEvalScript() throws Exception {
-        System.out.println("evalScript");
-        String script = "select s from java.lang.String s where s.count >= 100";
+    public void testHeapRoots() throws Exception {
+        System.out.println("heap.roots");
+        final int[] counter = new int[1];
 
-        Object expResult = null;
-        Object result = instance.evalScript(script);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String query = "select heap.roots";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                counter[0]++;
+                return true;
+            }
+        });
+        assertTrue(counter[0] > 0);
     }
 
-    
-
-    /**
-     * Test of call method, of class OQLEngine.
-     */
     @Test
-    public void testCall() throws Exception {
-        System.out.println("call");
-        String func = "";
-        Object[] args = null;
-        OQLEngine instance = null;
-        Object expResult = null;
-        Object result = instance.call(func, args);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testHeapClasses() throws Exception {
+        System.out.println("heap.classes");
+        final int[] counter = new int[1];
+
+        String query = "select heap.classes";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                counter[0]++;
+                return true;
+            }
+        });
+        assertTrue(counter[0] > 0);
     }
 
+    @Test
+    public void testHeapFinalizables() throws Exception {
+        System.out.println("heap.finalizables");
+        final int[] counter = new int[1];
+
+        String query = "select heap.finalizables";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                counter[0]++;
+                return true;
+            }
+        });
+        assertTrue(counter[0] > 0);
+    }
+
+    @Test
+    public void testHeapLivePaths() throws Exception {
+        System.out.println("heap.livepaths");
+        final int[] counter = new int[1];
+
+        String query = "select heap.livepaths(s) from java.lang.String s";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                counter[0]++;
+                return true;
+            }
+        });
+        assertTrue(counter[0] > 0);
+    }
+
+//    @Test
+//    public void testClassof() throws Exception {
+//        System.out.println("classof");
+//        final int[] counter = new int[1];
+//
+//        String query = "select classof(o).name from instanceof java.util.Collection o";
+//
+//        instance.executeQuery(query, new ObjectVisitor() {
+//
+//            public boolean visit(Object o) {
+//                System.out.println(instance.unwrapJavaObject(o));
+//                counter[0]++;
+//                return true;
+//            }
+//        });
+//        assertTrue(counter[0] > 0);
+//    }
+
+    @Test
+    public void testSubclasses() throws Exception {
+        System.out.println("subclasses");
+        final int[] counter = new int[1];
+
+        String query = "select heap.findClass(\"java.io.InputStream\").subclasses()";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(instance.unwrapJavaObject(o));
+                counter[0]++;
+                return true;
+            }
+        });
+        assertTrue(counter[0] > 0);
+    }
+
+    @Test
+    public void testSuperlasses() throws Exception {
+        System.out.println("superclasses");
+        final int[] counter = new int[1];
+
+        String query = "select heap.findClass(\"java.io.BufferedInputStream\").superclasses()";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(instance.unwrapJavaObject(o));
+                counter[0]++;
+                return true;
+            }
+        });
+        assertTrue(counter[0] > 0);
+    }
 }

@@ -166,6 +166,11 @@ function JavaClassProto() {
         }
         return res;
     }
+
+    this.instances = function() {
+        return jclass(this).instances.iterator;
+    }
+
     this.toString = function() { 
         return jclass(this).toString();
     }
@@ -221,8 +226,9 @@ function wrapJavaObject(thing) {
         //            }
         //        }
 
+//        print(jobject.getClass());
         if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
-            //            println("wrapping as Class");
+//            println("wrapping as Class");
             return new JavaClassWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.ObjectArrayInstance) {
             //            println("wrapping as ObjectArray");
@@ -234,7 +240,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as Instance");
             return new JavaObjectWrapper(jobject);
         } else {
-            print("unknown heap object type: " + jobject.getClass());
+            println("unknown heap object type: " + jobject.getClass());
             return jobject;
         }
     }
@@ -264,6 +270,8 @@ function wrapJavaObject(thing) {
             __get__ : function(name) {
                 if (name == 'class') {
                     return wrapJavaValue(instance.javaClass);
+                } else if (name == 'id') {
+                    return instance.instanceId;
                 } else if (name == 'toString') {
                     return function() {
                         return instance.toString();
@@ -287,7 +295,7 @@ function wrapJavaObject(thing) {
 
 
     // return wrapper for Java Class objects
-    function JavaClassWrapper(jclass) {	
+    function JavaClassWrapper(jclass) {
         var fields = jclass.staticFieldValues.toArray();
     
         // to access static fields of given Class cl, use 
@@ -310,7 +318,6 @@ function wrapJavaObject(thing) {
                 return theJavaClassProto[name] != undefined;
             },
             __get__ : function(name) {
-//                println("getting field " + name);
                 for (var i in fields) {
                     if (name == fields[i].field.name) {
                         return wrapJavaValue(fields[i].value);	
@@ -333,7 +340,7 @@ function wrapJavaObject(thing) {
         this.name = jclass.name; 
         this.fields = jclass.fields.toArray();
         this['wrapped-object'] = jclass;
-        this.__proto__ = this.staticFieldValues;
+        this.__proto__ = this.statics;
     }
     
     // returns wrapper for Java object arrays
@@ -423,6 +430,7 @@ function wrapJavaObject(thing) {
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
+        println(typeof(jobject));
         try {
             jobject = jobject["wrapped-object"];
         } catch (e) {
@@ -483,7 +491,7 @@ function wrapHeapSnapshot(heap) {
         if (clazz == undefined) clazz = "java.lang.Object";
         var type = typeof(clazz);
         if (type == "string") {
-            clazz = heap.findClass(clazz);		
+            clazz = heap.findClass(clazz);
         } else if (type == "object") {
             clazz = unwrapJavaObject(clazz);
         } else {
@@ -507,8 +515,10 @@ function wrapHeapSnapshot(heap) {
         forEachClass: function(callback) {
             if (callback == undefined) callback = print;
             var classes = this.snapshot.classes;
-            while (classes.hasMoreElements()) {
-                if (callback(wrapJavaValue(classes.nextElement())))
+            while (classes.hasNext()) {
+                var wrapped = wrapJavaObject(classes.next());
+
+                if (wrapped != null && callback(wrapped))
                     return;
             }
         },
@@ -517,15 +527,7 @@ function wrapHeapSnapshot(heap) {
          * Returns an Enumeration of all roots.
          */
         roots: function() {
-            var e = this.snapshot.roots;
-            return new java.util.Enumeration() {
-                hasMoreElements: function() {
-                    return e.hasMoreElements();
-                },
-                nextElement: function() {
-                    return wrapRoot(e.nextElement());
-                }
-            };
+            return wrapIterator(this.snapshot.roots);
         },
 
         /**
@@ -553,9 +555,10 @@ function wrapHeapSnapshot(heap) {
             clazz = getClazz(clazz);
 
             if (clazz) {
-                var instances = clazz.getInstances(includeSubtypes);
-                while (instances.hasNextElements()) {
-                    if (callback(wrapJavaValue(instances.nextElement())))
+//                var instances = clazz.getInstances(includeSubtypes); // TODO
+                var instances = clazz.getInstances().iterator();
+                while (instances.hasNext()) {
+                    if (callback(wrapJavaObject(instances.next())))
                         return;
                 }
             }
@@ -601,7 +604,7 @@ function wrapHeapSnapshot(heap) {
          */
         findClass: function(name) {
             var clazz = this.snapshot.findClass(name + '');
-            return wrapJavaValue(clazz);
+            return wrapJavaObject(clazz);
         },
 
         /**
@@ -619,7 +622,7 @@ function wrapHeapSnapshot(heap) {
          */
         finalizables: function() {
             var tmp = this.snapshot.getFinalizerObjects();
-            return wrapperEnumeration(tmp);
+            return wrapperIterator(tmp);
         },
  
         /**
