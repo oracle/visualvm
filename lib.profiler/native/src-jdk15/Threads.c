@@ -75,7 +75,7 @@
 #define THREAD_STATUS_MONITOR   3
 #define THREAD_STATUS_WAIT      4
 
-/* These masks essentially map tJVMTI thread states into the above states */
+/* These masks essentially map JVMTI thread states into the above states */
 static jint JF_THREAD_STATE_MASK       = JVMTI_THREAD_STATE_TERMINATED |
                                          JVMTI_THREAD_STATE_ALIVE |
                              JVMTI_THREAD_STATE_RUNNABLE |
