@@ -356,7 +356,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                 assertTrue("Results do not exist - issue 65185.", runner.getProfilerClient().cpuResultsExist());
 
                 boolean gotResults = false;
-                int retryCounter = 10; // was 4
+                int retryCounter = 4;
 
                 do {
                     // just wait for the results to appear - forceObtainedResultsDump() has been alread called by ProfilerClient on shutdown
@@ -467,7 +467,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                     //                    runner.getProfilerClient().forceObtainedResultsDump();
                     //                    assertTrue("Results do not exist on the server - issue 65185.", runner.getProfilerClient().cpuResultsExist());
                     boolean gotResults = false;
-                    int retryCounter = 2;
+                    int retryCounter = 4;
 
                     do {
                         runner.getProfilerClient().forceObtainedResultsDump();
