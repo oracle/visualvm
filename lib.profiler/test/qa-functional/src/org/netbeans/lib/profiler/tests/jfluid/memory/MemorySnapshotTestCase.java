@@ -121,7 +121,10 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (!emtpy) {
+                cctEstablished(appRootNode);
+            }
+            //throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -392,7 +395,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             bindStreams(p);
 
             runner.connectToStartedVMAndStartTA();
-
+            
             runner.getProfilerClient().initiateMemoryProfInstrumentation(instrMode);
 
             waitForStatus(STATUS_RUNNING);
@@ -403,7 +406,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             if (!isStatus(STATUS_APP_FINISHED)) {
                 waitForStatus(STATUS_APP_FINISHED);
             }
-
+            Thread.sleep(6000);
             checkMemoryResults(runner, classPrefixes, stacktraceClass);
             setStatus(STATUS_MEASURED);
         } catch (Exception ex) {
