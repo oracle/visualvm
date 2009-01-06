@@ -642,9 +642,9 @@ public class Monitors implements CommonConstants {
 
         long time1 = (stMonitor.getTime() * 1000000) / cnts;
         System.out.println("!!! time = " + time + ", time1 = " + time1 + ", sum = " + (time + time1)); // NOI18N
-                                                                                                       // Originally (with no thread state information) time returned above would be 60..80 + 600..700 microsec
-                                                                                                       // If getMonitoredNumbers() is called roughly once a second, this translates into 750/1000000*100 = 0.075 per cent overhead
-                                                                                                       // With thread state information, overhead grows to about 60..80 + 1000 microsec. Still just 0.1 per cent overhead.
-                                                                                                       // Transport, and, more importantly, client-side processing, likely take much more time.
+        // Originally (with no thread state information) time returned above would be 60..80 + 600..700 microsec
+        // If getMonitoredNumbers() is called roughly once a second, this translates into 750/1000000*100 = 0.075 per cent overhead
+        // With thread state information, overhead grows to about 60..80 + 1000 microsec. Still just 0.1 per cent overhead.
+        // Transport, and, more importantly, client-side processing, likely take much more time.
     }
 }
