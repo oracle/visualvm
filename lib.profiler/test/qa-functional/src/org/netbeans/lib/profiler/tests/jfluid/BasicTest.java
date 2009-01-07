@@ -68,7 +68,6 @@ public class BasicTest extends CommonProfilerTestCase {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testCalibrate() {
-        System.out.println(">>>dvt");
         ProfilerEngineSettings settings;
         settings = new ProfilerEngineSettings();
         setTargetVM(settings);
@@ -81,7 +80,6 @@ public class BasicTest extends CommonProfilerTestCase {
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
         runner.addProfilingEventListener(Utils.createProfilingListener(this));
-        System.out.println(">>>dvt");
 
         try {
             assertTrue("Error in calibration", runner.calibrateInstrumentationCode());
