@@ -97,7 +97,7 @@ public class GlassFishModelProvider implements DataChangeListener<Application>, 
                     app.getRepository().addDataSource(gfm);
                     app.notifyWhenRemoved(removalListener);
                 }
-            }, 500);
+            }, 1500);
         }
     }
 }
