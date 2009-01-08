@@ -110,7 +110,7 @@ class HprofHeap implements Heap {
     NearestGCRoot nearestGCRoot;
     private ComputedSummary computedSummary;
     private Map gcRoots;
-    private Object gcRootLock = new Object();
+    final private Object gcRootLock = new Object();
     private TagBounds allInstanceDumpBounds;
     private TagBounds heapDumpSegment;
     private TagBounds[] heapTagBounds;
