@@ -194,15 +194,16 @@ public class OQLEngine {
             if (q.className != null) {
 //                Enumeration objects = clazz.getInstances(q.isInstanceOf);
 
-                Deque toInspect = new ArrayDeque();
+                Stack toInspect = new Stack();
                 toInspect.push(clazz);
 
                 Object inspecting = null;
-                while((inspecting = toInspect.poll()) != null) {
+                while(!toInspect.isEmpty()) {
+                    inspecting = toInspect.pop();
                     JavaClass clz = (JavaClass)inspecting;
                     if (q.isInstanceOf) {
                         for(Object subclass : clz.getSubClasses()) {
-                            toInspect.offer(subclass);
+                            toInspect.push(subclass);
                         }
                     }
                     List objects = clz.getInstances();

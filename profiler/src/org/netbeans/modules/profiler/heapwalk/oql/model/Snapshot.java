@@ -140,7 +140,7 @@ public class Snapshot {
     public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {
         return new Iterator() {
 
-            private Deque<JavaClass> toInspect = new ArrayDeque<JavaClass>();
+            private Stack<JavaClass> toInspect = new Stack<JavaClass>();
             private JavaClass popped = null;
             private Iterator inspecting = null;
 
@@ -168,13 +168,13 @@ public class Snapshot {
 
             private void setupIterator() {
                 while (!toInspect.isEmpty() && (inspecting == null || !inspecting.hasNext())) {
-                    popped = toInspect.poll();
+                    popped = toInspect.pop();
                     if (popped != null) {
                         inspecting = popped.getInstances().iterator();
                         if (includeSubclasses) {
                             for (Object subclass : popped.getSubClasses()) {
                                 if (!toInspect.contains(subclass)) {
-                                    toInspect.offer(((JavaClass) subclass));
+                                    toInspect.push(((JavaClass) subclass));
                                 }
                             }
                         }
