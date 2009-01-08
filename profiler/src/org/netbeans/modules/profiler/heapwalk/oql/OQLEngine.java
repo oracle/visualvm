@@ -15,16 +15,15 @@
  * change the history or donations files without permission.
  * 
  */
- 
 package org.netbeans.modules.profiler.heapwalk.oql;
- 
+
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
- 
+
 /**
  * This is Object Query Language Interpreter
  *
@@ -32,6 +31,7 @@ import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
  * @authoe J. Bachorik [NB Profiler]
  */
 public class OQLEngine {
+
     static {
         try {
             // Do we have javax.script support?
@@ -46,29 +46,29 @@ public class OQLEngine {
     public static boolean isOQLSupported() {
         return oqlSupported;
     }
- 
+
     public OQLEngine(Snapshot snapshot) {
         if (!isOQLSupported()) {
             throw new UnsupportedOperationException("OQL not supported");
         }
         init(snapshot);
     }
- 
+
     /**
-       Query is of the form
- 
-          select &lt;java script code to select&gt;
-          [ from [instanceof] &lt;class name&gt; [&lt;identifier&gt;]
-            [ where &lt;java script boolean expression&gt; ]
-          ]
-    */
-    public synchronized void executeQuery(String query, ObjectVisitor visitor) 
-                                          throws OQLException {
+    Query is of the form
+
+    select &lt;java script code to select&gt;
+    [ from [instanceof] &lt;class name&gt; [&lt;identifier&gt;]
+    [ where &lt;java script boolean expression&gt; ]
+    ]
+     */
+    public synchronized void executeQuery(String query, ObjectVisitor visitor)
+            throws OQLException {
         debugPrint("query : " + query);
         StringTokenizer st = new StringTokenizer(query);
         if (st.hasMoreTokens()) {
             String first = st.nextToken();
-            if (! first.equals("select") ) {
+            if (!first.equals("select")) {
                 // Query does not start with 'select' keyword.
                 // Just treat it as plain JavaScript and eval it.
                 try {
@@ -82,8 +82,8 @@ public class OQLEngine {
         } else {
             throw new OQLException("query syntax error: no 'select' clause");
         }
- 
-        String selectExpr = ""; 
+
+        String selectExpr = "";
         boolean seenFrom = false;
         while (st.hasMoreTokens()) {
             String tok = st.nextToken();
@@ -93,22 +93,22 @@ public class OQLEngine {
             }
             selectExpr += " " + tok;
         }
- 
+
         if (selectExpr.equals("")) {
             throw new OQLException("query syntax error: 'select' expression can not be empty");
         }
-             
+
         String className = null;
         boolean isInstanceOf = false;
-        String whereExpr =  null;
+        String whereExpr = null;
         String identifier = null;
- 
+
         if (seenFrom) {
             if (st.hasMoreTokens()) {
                 String tmp = st.nextToken();
                 if (tmp.equals("instanceof")) {
                     isInstanceOf = true;
-                    if (! st.hasMoreTokens()) {
+                    if (!st.hasMoreTokens()) {
                         throw new OQLException("no class name after 'instanceof'");
                     }
                     className = st.nextToken();
@@ -118,7 +118,7 @@ public class OQLEngine {
             } else {
                 throw new OQLException("query syntax error: class name must follow 'from'");
             }
-     
+
             if (st.hasMoreTokens()) {
                 identifier = st.nextToken();
                 if (identifier.equals("where")) {
@@ -126,10 +126,10 @@ public class OQLEngine {
                 }
                 if (st.hasMoreTokens()) {
                     String tmp = st.nextToken();
-                    if (! tmp.equals("where")) {
+                    if (!tmp.equals("where")) {
                         throw new OQLException("query syntax error: 'where' clause expected after 'from' clause");
                     }
- 
+
                     whereExpr = "";
                     while (st.hasMoreTokens()) {
                         whereExpr += " " + st.nextToken();
@@ -141,24 +141,26 @@ public class OQLEngine {
             } else {
                 throw new OQLException("query syntax error: identifier should follow class name");
             }
-        } 
- 
-        executeQuery(new OQLQuery(selectExpr, isInstanceOf, className, 
-                                  identifier, whereExpr), visitor);
+        }
+
+        executeQuery(new OQLQuery(selectExpr, isInstanceOf, className,
+                identifier, whereExpr), visitor);
     }
- 
-    private void executeQuery(OQLQuery q, ObjectVisitor visitor) 
-                              throws OQLException {
+
+    private void executeQuery(OQLQuery q, ObjectVisitor visitor)
+            throws OQLException {
         visitor = visitor != null ? visitor : ObjectVisitor.DEFAULT;
-        
+
         JavaClass clazz = null;
         if (q.className != null) {
-            clazz = snapshot.findClass(q.className);
+            String className = q.className;
+
+            clazz = snapshot.findClass(className);
             if (clazz == null) {
-                throw new OQLException(q.className + " is not found!");
+                throw new OQLException(className + " is not found!");
             }
         }
- 
+
         StringBuffer buf = new StringBuffer();
         buf.append("function __select__(");
         if (q.identifier != null) {
@@ -167,7 +169,7 @@ public class OQLEngine {
         buf.append(") { return ");
         buf.append(q.selectExpr.replace('\n', ' '));
         buf.append("; }");
- 
+
         String selectCode = buf.toString();
 //        debugPrint(selectCode);
         String whereCode = null;
@@ -181,74 +183,120 @@ public class OQLEngine {
             whereCode = buf.toString();
         }
 //        debugPrint(whereCode);
- 
+
         // compile select expression and where condition 
         try {
-            evalMethod.invoke(engine, new Object[] { selectCode });
+            evalMethod.invoke(engine, new Object[]{selectCode});
             if (whereCode != null) {
-                evalMethod.invoke(engine, new Object[] { whereCode });
+                evalMethod.invoke(engine, new Object[]{whereCode});
             }
- 
+
             if (q.className != null) {
 //                Enumeration objects = clazz.getInstances(q.isInstanceOf);
-                List objects = clazz.getInstances();
-                for(Object obj : objects) {
-                    Object[] args = new Object[] { wrapJavaObject((Instance)obj) };
-                    boolean b = (whereCode == null);
-                    if (!b) {
-                        Object res = call("__where__", args);
-                        if (res instanceof Boolean) {
-                            b = ((Boolean)res).booleanValue();
-                        } else if (res instanceof Number) {
-                            b = ((Number)res).intValue() != 0;
-                        } else {
-                            b = (res != null);
+
+                Deque toInspect = new ArrayDeque();
+                toInspect.push(clazz);
+
+                Object inspecting = null;
+                while((inspecting = toInspect.poll()) != null) {
+                    JavaClass clz = (JavaClass)inspecting;
+                    if (q.isInstanceOf) {
+                        for(Object subclass : clz.getSubClasses()) {
+                            toInspect.offer(subclass);
                         }
                     }
- 
-                    if (b) {
-                        Object select = call("__select__", args);
-                        if (select instanceof Iterator) {
-                            Iterator iter = (Iterator)select;
-                            while(iter.hasNext()) {
-                                if (visitor.visit(iter.next())) return;
+                    List objects = clz.getInstances();
+
+                    for (Object obj : objects) {
+                        Object[] args = new Object[]{wrapJavaObject((Instance) obj)};
+                        boolean b = (whereCode == null);
+                        if (!b) {
+                            Object res = call("__where__", args);
+                            if (res instanceof Boolean) {
+                                b = ((Boolean) res).booleanValue();
+                            } else if (res instanceof Number) {
+                                b = ((Number) res).intValue() != 0;
+                            } else {
+                                b = (res != null);
                             }
-                        } else {
-                            if (visitor.visit(select)) return;
+                        }
+
+                        if (b) {
+                            Object select = call("__select__", args);
+                            if (dispatchValue(select, visitor)) {
+                                return;
+                            }
                         }
                     }
                 }
-                // http://www.mozilla.org/rhino/ScriptingJava.html
-
             } else {
                 // simple "select <expr>" query
-                Object select = call("__select__", new Object[] {});
-                visitor.visit(select);
+                Object select = call("__select__", new Object[]{});
+                if (dispatchValue(select, visitor)) {
+                    return;
+                }
             }
         } catch (Exception e) {
             throw new OQLException(e);
         }
     }
 
+    private boolean dispatchValue(Object jsObject, ObjectVisitor visitor) {
+        if (jsObject == null) {
+            return false;
+        }
+
+        if (jsObject instanceof Iterator) {
+            Iterator iter = (Iterator) jsObject;
+            while (iter.hasNext()) {
+                if (visitor.visit(unwrapJavaObject(iter.next()))) return true;
+            }
+            return false;
+        } else if (jsObject instanceof Enumeration) {
+            Enumeration enm = (Enumeration) jsObject;
+            while (enm.hasMoreElements()) {
+                if (visitor.visit(unwrapJavaObject(enm.nextElement()))) return true;
+            }
+            return false;
+        } else {
+
+            Object object = unwrapJavaObject(jsObject);
+            if (object instanceof Object[]) {
+                for (Object obj1 : (Object[]) object) {
+                    if (visitor.visit(unwrapJavaObject(obj1))) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            if (visitor.visit(object)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Object evalScript(String script) throws Exception {
-        return evalMethod.invoke(engine, new Object[] { script });
+        return evalMethod.invoke(engine, new Object[]{script});
     }
 
     public Object wrapJavaObject(Instance obj) throws Exception {
-        return call("wrapJavaObject", new Object[] { obj });
+        return call("wrapJavaObject", new Object[]{obj});
     }
- 
+
     public Object toHtml(Object obj) throws Exception {
-        return call("toHtml", new Object[] { obj });
+        return call("toHtml", new Object[]{obj});
     }
- 
+
     public Object call(String func, Object[] args) throws Exception {
-        return invokeMethod.invoke(engine, new Object[] { func, args });
+        return invokeMethod.invoke(engine, new Object[]{func, args});
     }
 
     public Object unwrapJavaObject(Object object) {
+        if (!object.getClass().getName().contains(".javascript.")) return object;
+        
         try {
-            return invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[] {object}});
+            return invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[]{object}});
         } catch (Exception ex) {
             if (debug) {
                 ex.printStackTrace(System.err);
@@ -256,60 +304,63 @@ public class OQLEngine {
         }
         return null;
     }
- 
+
     private static void debugPrint(String msg) {
-        if (debug) System.out.println(msg);
+        if (debug) {
+            System.out.println(msg);
+        }
     }
- 
+
     private void init(Snapshot snapshot) throws RuntimeException {
         this.snapshot = snapshot;
         try {
             // create ScriptEngineManager
             Class managerClass = Class.forName("javax.script.ScriptEngineManager");
             Object manager = managerClass.newInstance();
- 
+
             // create JavaScript engine
             Method getEngineMethod = managerClass.getMethod("getEngineByName",
-                                new Class[] { String.class });
-            engine = getEngineMethod.invoke(manager, new Object[] {"js"});
- 
+                    new Class[]{String.class});
+            engine = getEngineMethod.invoke(manager, new Object[]{"js"});
+
             // initialize engine with init file (hat.js)
             InputStream strm = getInitStream();
-            Class engineClass = Class.forName("javax.script.ScriptEngine");   
+            Class engineClass = Class.forName("javax.script.ScriptEngine");
             evalMethod = engineClass.getMethod("eval",
-                                new Class[] { Reader.class });
-            evalMethod.invoke(engine, new Object[] {new InputStreamReader(strm)});
- 
+                    new Class[]{Reader.class});
+            evalMethod.invoke(engine, new Object[]{new InputStreamReader(strm)});
+
             // initialize ScriptEngine.eval(String) and
             // Invocable.invokeFunction(String, Object[]) methods.
             Class invocableClass = Class.forName("javax.script.Invocable");
- 
+
             evalMethod = engineClass.getMethod("eval",
-                                  new Class[] { String.class });
+                    new Class[]{String.class});
             invokeMethod = invocableClass.getMethod("invokeFunction",
-                                  new Class[] { String.class, Object[].class });
- 
+                    new Class[]{String.class, Object[].class});
+
             // initialize ScriptEngine.put(String, Object) method
             Method putMethod = engineClass.getMethod("put",
-                                  new Class[] { String.class, Object.class });
- 
+                    new Class[]{String.class, Object.class});
+
             // call ScriptEngine.put to initialize built-in heap object
-            putMethod.invoke(engine, new Object[] {
-                        "heap", call("wrapHeapSnapshot", new Object[] { snapshot })
+            putMethod.invoke(engine, new Object[]{
+                        "heap", call("wrapHeapSnapshot", new Object[]{snapshot})
                     });
         } catch (Exception e) {
-            if (debug) e.printStackTrace();
+            if (debug) {
+                e.printStackTrace();
+            }
             throw new RuntimeException(e);
         }
     }
- 
+
     private InputStream getInitStream() {
         return getClass().getResourceAsStream("/org/netbeans/modules/profiler/heapwalk/oql/resources/hat.js");
     }
- 
     private Object engine;
-    private Method evalMethod; 
-    private Method invokeMethod; 
+    private Method evalMethod;
+    private Method invokeMethod;
     private Snapshot snapshot;
     private static boolean debug = true;
     private static boolean oqlSupported;

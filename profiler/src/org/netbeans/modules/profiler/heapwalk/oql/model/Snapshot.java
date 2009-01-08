@@ -17,8 +17,8 @@
  */
 package org.netbeans.modules.profiler.heapwalk.oql.model;
 
-import java.lang.ref.SoftReference;
 import java.util.*;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
@@ -75,11 +75,59 @@ public class Snapshot {
     }
 
     public JavaClass findClass(String name) {
-        return delegate.getJavaClassByName(name);
+        return delegate.getJavaClassByName(preprocessClassName(name));
+    }
+
+    private String preprocessClassName(String className) {
+        int arrDim = 0;
+        if (className.startsWith("[")) {
+            arrDim = className.lastIndexOf("[") + 1;
+
+            className = className.substring(arrDim);
+        }
+        if (className.length() == 1) {
+            if (className.equals("I")) {
+                className = "int";
+            } else if (className.equals("J")) {
+                className = "long";
+            } else if (className.equals("D")) {
+                className = "double";
+            } else if (className.equals("F")) {
+                className = "float";
+            } else if (className.equals("B")) {
+                className = "byte";
+            } else if (className.equals("S")) {
+                className = "short";
+            } else if (className.equals("C")) {
+                className = "char";
+            } else if (className.equals("Z")) {
+                className = "boolean";
+            }
+        }
+        if (arrDim > 0 && className.startsWith("L")) {
+            className = className.substring(1);
+        }
+        StringBuilder sb = new StringBuilder(className);
+        for (int i = 0; i < arrDim; i++) {
+            sb.append("[]");
+        }
+
+        return sb.toString();
     }
 
     public Instance findThing(long objectId) {
         return delegate.getInstanceByID(objectId);
+    }
+
+    public GCRoot findRoot(Instance object) {
+        Instance gcInstance = object;
+        do {
+            gcInstance = gcInstance.getNearestGCRootPointer();
+        } while (!gcInstance.isGCRoot());
+        if (gcInstance != null) {
+            return delegate.getGCRoot(gcInstance);
+        }
+        return null;
     }
 
     /**
@@ -87,6 +135,78 @@ public class Snapshot {
      **/
     public Iterator getClasses() {
         return delegate.getAllClasses().iterator();
+    }
+
+    public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {
+        return new Iterator() {
+
+            private Deque<JavaClass> toInspect = new ArrayDeque<JavaClass>();
+            private JavaClass popped = null;
+            private Iterator inspecting = null;
+
+
+            {
+                toInspect.push(clazz);
+            }
+
+            public boolean hasNext() {
+                setupIterator();
+
+                return inspecting != null && inspecting.hasNext();
+            }
+
+            public Object next() {
+                setupIterator();
+
+                if (inspecting == null || !inspecting.hasNext()) {
+                    throw new NoSuchElementException();
+                }
+
+                Object retVal = inspecting.next();
+                return retVal;
+            }
+
+            private void setupIterator() {
+                while (!toInspect.isEmpty() && (inspecting == null || !inspecting.hasNext())) {
+                    popped = toInspect.poll();
+                    if (popped != null) {
+                        inspecting = popped.getInstances().iterator();
+                        if (includeSubclasses) {
+                            for (Object subclass : popped.getSubClasses()) {
+                                if (!toInspect.contains(subclass)) {
+                                    toInspect.offer(((JavaClass) subclass));
+                                }
+                            }
+                        }
+                    } else {
+                        inspecting = null;
+                    }
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    public Iterator getReferrers(Instance obj) {
+        List instances = new ArrayList();
+        for (Iterator iter = obj.getReferences().iterator(); iter.hasNext();) {
+            Value val = (Value) iter.next();
+            instances.add(val.getDefiningInstance());
+        }
+        return instances.iterator();
+    }
+
+    public Iterator getReferees(Instance obj) {
+        List instances = new ArrayList();
+        for (Object value : obj.getFieldValues()) {
+            if (value instanceof ObjectFieldValue) {
+                instances.add(((ObjectFieldValue) value).getInstance());
+            }
+        }
+        return instances.iterator();
     }
 
     public JavaClass[] getClassesArray() {
@@ -174,9 +294,9 @@ public class Snapshot {
     private List<Instance> getReferers(Instance instance) {
         List<Instance> referers = new ArrayList<Instance>();
 
-        for(Object fldObj : instance.getReferences()) {
+        for (Object fldObj : instance.getReferences()) {
             if (fldObj instanceof Value) {
-                referers.add(((Value)fldObj).getDefiningInstance());
+                referers.add(((Value) fldObj).getDefiningInstance());
             }
         }
         return referers;
@@ -188,11 +308,11 @@ public class Snapshot {
                 //
                 // REMIND:  This introduces a dependency on the JDK
                 // 	implementation that is undesirable.
-                FieldValue[] flds = (FieldValue[])from.getFieldValues().toArray();
+                FieldValue[] flds = (FieldValue[]) from.getFieldValues().toArray();
                 for (int i = 0; i < flds.length; i++) {
                     if (i != referentFieldIndex) {
                         if (flds[i] instanceof ObjectFieldValue) {
-                            if (((ObjectFieldValue)flds[i]).getInstance() == to) {
+                            if (((ObjectFieldValue) flds[i]).getInstance() == to) {
                                 return false;
                             }
                         }

@@ -17,6 +17,7 @@
  */
 
 var hatPkg = Packages.org.netbeans.modules.profiler.heapwalk.oql;
+var snapshot;
 
 /**
  * This is JavaScript interface for heap analysis using HAT
@@ -106,7 +107,8 @@ function wrapRoot(root) {
             id: root.kind,
             description: "Reference " + root.kind,
             referrer: wrapJavaValue(root.instance),
-            type: root.kind
+            type: root.kind,
+            wrapped: root
         };
     } else {
         return null;
@@ -143,7 +145,8 @@ function JavaClassProto() {
         while (tmp != null) {
             res[res.length] = tmp;
             tmp = tmp.superclass;
-        } 
+        }
+        println;
         return res;
     }
 
@@ -183,12 +186,14 @@ var theJavaClassProto = new JavaClassProto();
 function wrapJavaValue(thing) {
     if (thing == null || thing == undefined) {
         return null;
-    } 
+    }
 
 //    printStackTrace();
 //    println(thing);
+
     if (thing instanceof Packages.org.netbeans.lib.profiler.heap.FieldValue) {
         var type = thing.field.type;
+
         // map primitive values to closest JavaScript primitives
         if (type.name == "boolean") {
             return thing.value == "true";
@@ -203,7 +208,7 @@ function wrapJavaValue(thing) {
             return java.lang.Double.parseDouble(thing.value);
         } else {
             // wrap Java object as script object
-            return wrapJavaObject(thing);
+            return wrapJavaObject(thing.instance);
         }
     } else {
         return wrapJavaObject(thing);
@@ -212,7 +217,8 @@ function wrapJavaValue(thing) {
 
 // wrap Java object with appropriate script object
 function wrapJavaObject(thing) {
-
+    if (thing == null) return null;
+    
     // HAT Java model object wrapper. Handles all cases 
     // (instance, object/primitive array and Class objects)	
     function javaObject(jobject) {		
@@ -248,21 +254,26 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java instances
     function JavaObjectWrapper(instance) {
         var things = instance.fieldValues.toArray();
-        var fields = instance.staticFieldValues.toArray();
+//        var fields = instance.staticFieldValues.toArray();
               
         // instance fields can be accessed in natural syntax
         return new JSAdapter() {
             __getIds__ : function() {
-                var res = new Array(fields.length);
-                for (var i in fields) {
-                    res[i] = fields[i].field.name;
-//                    println(res[i]);
+                var res = new Array(things.length);
+//                for (var i in fields) {
+//                    res[i] = fields[i].field.name;
+//                }
+                for(var j in things) {
+                    res[j] = things[j].field.name;
                 }
                 return res;
             },
             __has__ : function(name) {
-                for (var i in fields) {
-                    if (name == fields[i].field.name) return true;
+//                for (var i in fields) {
+//                    if (name == fields[i].field.name) return true;
+//                }
+                for (var i in things) {
+                    if (name == things[i].field.name) return true;
                 }
                 return name == 'class' || name == 'toString' ||
                 name == 'wrapped-object';
@@ -320,14 +331,14 @@ function wrapJavaObject(thing) {
             __get__ : function(name) {
                 for (var i in fields) {
                     if (name == fields[i].field.name) {
-                        return wrapJavaValue(fields[i].value);	
+                        return wrapJavaValue(fields[i]);	
                     }					
                 }
                 return theJavaClassProto[name];
             }
         }
-    		
-        if (jclass.superclass != null) {
+
+        if (jclass.superClass != null) {
             this.superclass = wrapJavaValue(jclass.superClass);
         } else {
             this.superclass = null;
@@ -366,6 +377,8 @@ function wrapJavaObject(thing) {
                 if (typeof(name) == 'number' &&
                     name >= 0 && name < elements.length) {
                     return wrapJavaValue(elements[name]);
+                } else if (name == 'id') {
+                  return array.instanceId;
                 } else if (name == 'length') {
                     return elements.length;
                 } else if (name == 'class') {
@@ -429,15 +442,31 @@ function wrapJavaObject(thing) {
 
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
+//    println("Unwrapping object");
+    
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
-        println(typeof(jobject));
+        if (jobject instanceof Array) {
+//            println("Object is array");
+            var arr = new java.util.ArrayList(jobject.length);
+
+            for (var index in jobject) {
+                arr.add(jobject[index]);
+            }
+            return arr.toArray();
+        }
+        
         try {
-            jobject = jobject["wrapped-object"];
+//            println(typeof(jobject));
+            var orig = jobject;
+            jobject = orig["wrapped-object"];
+            if (jobject == undefined) {
+                jobject = orig.wrapped;
+            }
         } catch (e) {
-            print("unwrapJavaObject: " + jobject + ", " + e);
+            println("unwrapJavaObject: " + jobject + ", " + e);
             jobject = undefined;
         }
-    }
+    } 
     return jobject;
 }
 
@@ -500,6 +529,8 @@ function wrapHeapSnapshot(heap) {
         return clazz;
     }
 
+    snapshot = heap;
+
     // return heap as a script object with useful methods.
     return {
         snapshot: heap,
@@ -556,7 +587,7 @@ function wrapHeapSnapshot(heap) {
 
             if (clazz) {
 //                var instances = clazz.getInstances(includeSubtypes); // TODO
-                var instances = clazz.getInstances().iterator();
+                var instances = snapshot.getInstances(clazz, includeSubtypes);
                 while (instances.hasNext()) {
                     if (callback(wrapJavaObject(instances.next())))
                         return;
@@ -586,7 +617,7 @@ function wrapHeapSnapshot(heap) {
             }
             clazz = getClazz(clazz);
             if (clazz) {
-                var instances = clazz.getInstances(includeSubtypes);
+                var instances = wrapIterator(snapshot.getInstances(clazz, includeSubtypes));
                 if (where) {
                     return filterEnumeration(instances, where, true);
                 } else {
@@ -742,6 +773,7 @@ function wrapHeapSnapshot(heap) {
             to = unwrapJavaObject(to);
             return from.describeReferenceTo(to, this.snapshot);
         }
+
     };
 }
 
@@ -770,7 +802,7 @@ function allocTrace(jobject) {
  */
 function classof(jobject) {
     jobject = unwrapJavaObject(jobject);
-    return wrapJavaValue(jobject.clazz);
+    return wrapJavaValue(jobject.javaClass);
 }
 
 /**
@@ -782,10 +814,21 @@ function classof(jobject) {
  * @param jobject object whose referers are retrieved
  */
 function forEachReferrer(callback, jobject) {
-    jobject = unwrapJavaObject(jobject);
-    var refs = jobject.referers;
+//    jobject = unwrapJavaObject(jobject);
+    var refs = referrers(jobject);
     while (refs.hasMoreElements()) {
-        if (callback(wrapJavaValue(refs.nextElement()))) {
+        var referrer = refs.nextElement();
+        if (callback(wrapJavaValue(referrer))) {
+            return;
+        }
+    }
+}
+
+function forEachReferee(callback, jobject) {
+    var refs = referees(jobject);
+    while (refs.hasMoreElements()) {
+        var referrer = refs.nextElement();
+        if (callback(wrapJavaValue(referrer))) {
             return;
         }
     }
@@ -850,9 +893,9 @@ function printAllocTrace(jobject) {
 function referrers(jobject) {
     try {
         jobject = unwrapJavaObject(jobject);
-        return wrapperEnumeration(jobject.referers);
+        return wrapIterator(this.snapshot.getReferrers(jobject));
     } catch (e) {
-        print("referrers: " + jobject + ", " + e);
+        println("referrers: " + jobject + ", " + e);
         return emptyEnumeration;
     }
 }
@@ -864,27 +907,13 @@ function referrers(jobject) {
  * @param jobject Java object whose referees are returned.
  */
 function referees(jobject) {
-    var res = new Array();
-    jobject = unwrapJavaObject(jobject);
-    if (jobject != undefined) {
-        try {
-            jobject.visitReferencedObjects(
-                new hatPkg.model.JavaHeapObjectVisitor() {
-                    visit: function(other) { 
-                        res[res.length] = wrapJavaValue(other);
-                    },
-                    exclude: function(clazz, field) { 
-                        return false; 
-                    },
-                    mightExclude: function() { 
-                        return false; 
-                    }
-                });
-        } catch (e) {
-            print("referees: " + jobject + ", " + e);
-        }
+    try {
+        jobject = unwrapJavaObject(jobject);
+        return wrapIterator(this.snapshot.getReferees(jobject));
+    } catch (e) {
+        println("referees: " + jobject + ", " + e);
+        return emptyEnumeration;
     }
-    return res;
 }
 
 /**
@@ -945,9 +974,9 @@ function reachables(jobject, excludes) {
 function refers(from, to) {
     try {
         var tmp = unwrapJavaObject(from);
-        if (tmp instanceof hatPkg.model.JavaClass) {
+        if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
             from = from.statics;
-        } else if (tmp instanceof hatPkg.model.JavaValueArray) {
+        } else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
             return false;
         }
         for (var i in from) {
@@ -956,7 +985,7 @@ function refers(from, to) {
             }
         }
     } catch (e) {
-        print("refers: " + from + ", " + e);
+        println("refers: " + from + ", " + e);
     }
     return false;
 }
@@ -970,7 +999,8 @@ function refers(from, to) {
 function root(jobject) {
     try {
         jobject = unwrapJavaObject(jobject);
-        return wrapRoot(jobject.root);
+        var root = wrapRoot(snapshot.findRoot(jobject));
+        return root;
     } catch (e) {
         return null;
     }
@@ -1023,7 +1053,7 @@ function toHtml(obj) {
             return "<a href='/class/" + id + "'>class " + name + "</a>";
         } else {
             var id = tmp.instanceId;
-            var name = tmp.clazz.name;
+            var name = tmp.javaClass.name;
             return "<a href='/object/" + id + "'>" +
             name + "@" + id + "</a>";
         }
@@ -1418,7 +1448,7 @@ function min(array, code) {
 function sort(array, code) {
     // we need an array to sort, so convert non-arrays
     array = toArray(array);
-
+    
     // by default use numerical comparison
     var func = code;
     if (code == undefined) {
