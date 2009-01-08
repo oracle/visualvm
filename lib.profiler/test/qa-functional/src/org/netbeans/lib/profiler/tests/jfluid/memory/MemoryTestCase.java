@@ -265,7 +265,7 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
             if (!isStatus(STATUS_APP_FINISHED)) {
                 waitForStatus(STATUS_APP_FINISHED);
             }
-
+            Thread.sleep(6000);
             checkMemoryResults(runner, classPrefixes, resultListener, instrMode);
             setStatus(STATUS_MEASURED);
         } catch (Exception ex) {
