@@ -62,7 +62,6 @@ import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.filesystems.Repository;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -366,7 +365,7 @@ public final class IDEUtils {
     public static FileObject getSettingsFolder(final boolean create)
                                         throws IOException {
         return SettingsFolderQuery.getDefault().getSettingsFolder(create);
-//        final FileObject folder = Repository.getDefault().getDefaultFileSystem().findResource("Services"); //NOI18N
+//        final FileObject folder = FileUtil.getConfigFile("Services"); //NOI18N
 //        FileObject settingsFolder = folder.getFileObject(SettingsFolderQuery.getDefault().getSettingsFolder(), null);
 //
 //        if ((settingsFolder == null) && create) {
