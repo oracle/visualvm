@@ -42,11 +42,25 @@ import java.util.regex.Pattern;
 public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFactory {
 
   private static final String NETBEANS_DIRS = "-Dnetbeans.dirs="; // NOI18N
+  private static final String NB_PLATFORM_HOME = "-Dnetbeans.home="; // NOI18N
   private static final String BRANDING_ID = "--branding "; // NOI18N
   private static final String VISUALVM_ID = "visualvm"; // NOI18N
   private static final String MAIN_CLASS = "org.netbeans.Main"; // NOI18N
   private static final Pattern nbcluster_pattern = Pattern.compile("nb[0-9]+\\.[0-9]+");    // NOI18N
 
+  private boolean isNetBeans(Jvm jvm, String mainClass) {
+      if (MAIN_CLASS.equals(mainClass)) {
+          return true;
+      }
+      if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect new NB 7.0 windows launcher
+          String args = jvm.getJvmArgs();
+          if (args != null && args.contains(NB_PLATFORM_HOME)) {
+              return true;
+          }
+      }
+      return false;
+  }
+  
   protected Set<String> computeClusters(Jvm jvm) {
     String args = jvm.getJvmArgs();
     int clusterIndex = args.indexOf(NETBEANS_DIRS);
@@ -100,7 +114,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
    * this application is not NetBeans 
    */ 
   public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
-    if (MAIN_CLASS.equals(mainClass)) {
+    if (isNetBeans(jvm,mainClass)) {
       String branding = getBranding(jvm);
       if (VISUALVM_ID.equals(branding)) {
         return new VisualVMApplicationType(app);
