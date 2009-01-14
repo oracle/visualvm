@@ -129,6 +129,9 @@ class ClassDumpSegment extends TagBounds {
     }
 
     JavaClass getJavaClassByName(String fqn) {
+        if (classes == null) {
+            createClassCollection();
+        }
         Iterator classIt = classes.iterator();
 
         while (classIt.hasNext()) {
