@@ -46,13 +46,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.categories.definitions.CustomCategoryDefinition;
 import org.netbeans.modules.profiler.categories.definitions.PackageCategoryDefinition;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
-import org.openide.filesystems.FileSystem;
-import org.openide.filesystems.Repository;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -85,8 +83,7 @@ public class CategoryBuilder {
         if (rootCategory == null) {
             rootCategory = new CategoryContainer("ROOT", NbBundle.getMessage(CategoryBuilder.class, "ROOT_CATEGORY_NAME"), Mark.DEFAULT); // NOI18N
 
-            FileSystem fs = Repository.getDefault().getDefaultFileSystem();
-            FileObject aoi = fs.findResource("Projects/" + projectType + "/NBProfiler/Categories"); //NOI18N
+            FileObject aoi = FileUtil.getConfigFile("Projects/" + projectType + "/NBProfiler/Categories"); //NOI18N
             if (aoi != null) {
                 Enumeration<? extends FileObject> folders = aoi.getChildren(false);
                 while (folders.hasMoreElements()) {
