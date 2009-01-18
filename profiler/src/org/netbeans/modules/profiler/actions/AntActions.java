@@ -66,7 +66,6 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
@@ -239,7 +238,6 @@ public final class AntActions {
                             return ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                         }
                     } else {
-                        System.out.println("ProfilSingle::Lightweight -> " + ptp.isProfilingSupported(project) + ", " + ProjectUtilities.hasAction(project, "profile-single"));
                         return ptp.isProfilingSupported(project) || ProjectUtilities.hasAction(project, "profile-single"); //NOI18N
                     }
                     
