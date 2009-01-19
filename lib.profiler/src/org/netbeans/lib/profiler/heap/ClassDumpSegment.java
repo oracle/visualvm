@@ -115,7 +115,7 @@ class ClassDumpSegment extends TagBounds {
 
         if (entry != null) {
             try {
-                return (ClassDump) classes.get(entry.getIndex() - 1);
+                return (ClassDump) createClassCollection().get(entry.getIndex() - 1);
             } catch (ArrayIndexOutOfBoundsException ex) { // classObjectID do not reffer to ClassDump, its instance number is > classes.size()
 
                 return null;
@@ -129,10 +129,7 @@ class ClassDumpSegment extends TagBounds {
     }
 
     JavaClass getJavaClassByName(String fqn) {
-        if (classes == null) {
-            createClassCollection();
-        }
-        Iterator classIt = classes.iterator();
+        Iterator classIt = createClassCollection().iterator();
 
         while (classIt.hasNext()) {
             ClassDump cls = (ClassDump) classIt.next();
@@ -160,8 +157,9 @@ class ClassDumpSegment extends TagBounds {
     }
 
     Map getClassIdToClassMap() {
-        Map map = new HashMap(classes.size()*4/3);
-        Iterator classIt = classes.iterator();
+        Collection allClasses = createClassCollection();
+        Map map = new HashMap(allClasses.size()*4/3);
+        Iterator classIt = allClasses.iterator();
         
         while(classIt.hasNext()) {
             ClassDump cls = (ClassDump) classIt.next();
@@ -197,7 +195,7 @@ class ClassDumpSegment extends TagBounds {
         }
     }
 
-    List /*<JavaClass>*/ createClassCollection() {
+    synchronized List /*<JavaClass>*/ createClassCollection() {
         if (classes != null) {
             return classes;
         }
