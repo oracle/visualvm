@@ -909,29 +909,6 @@ class HprofHeap implements Heap {
         return null;
     }
 
-    private boolean contains(byte[] idArray, byte[] fields) {
-        int fieldIndex;
-        byte firstIndexByte = idArray[0];
-
-        for (fieldIndex = 0; fieldIndex < (fields.length - idArray.length + 1); fieldIndex++) {
-            if (fields[fieldIndex] == firstIndexByte) {
-                int idIndex;
-
-                for (idIndex = 1; idIndex < idArray.length; idIndex++) {
-                    if (idArray[idIndex] != fields[fieldIndex + idIndex]) {
-                        break;
-                    }
-                }
-
-                if (idIndex == idArray.length) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     private void fillHeapTagBounds() {
         if (heapTagBounds != null) {
             return;
