@@ -18,7 +18,6 @@
 package org.netbeans.modules.profiler.heapwalk.oql.model;
 
 import java.util.*;
-import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
@@ -141,12 +140,15 @@ public class Snapshot {
         return new Iterator() {
 
             private Stack<JavaClass> toInspect = new Stack<JavaClass>();
+            private Set<JavaClass> inspected = new HashSet<JavaClass>();
+
             private JavaClass popped = null;
             private Iterator inspecting = null;
 
 
             {
                 toInspect.push(clazz);
+                inspected.add(clazz);
             }
 
             public boolean hasNext() {
@@ -173,8 +175,9 @@ public class Snapshot {
                         inspecting = popped.getInstances().iterator();
                         if (includeSubclasses) {
                             for (Object subclass : popped.getSubClasses()) {
-                                if (!toInspect.contains(subclass)) {
+                                if (!inspected.contains(subclass)) {
                                     toInspect.push(((JavaClass) subclass));
+                                    inspected.add(((JavaClass) subclass));
                                 }
                             }
                         }
@@ -268,7 +271,7 @@ public class Snapshot {
             }
 
             Instance curr = chain.getObj();
-            if (curr.getNearestGCRootPointer() != null) {
+            if (curr.isGCRoot()) {
                 result.add(chain);
             // Even though curr is in the rootset, we want to explore its
             // referers, because they might be more interesting.
