@@ -42,7 +42,7 @@ package org.netbeans.modules.profiler.utilities.queries.impl;
 import java.io.IOException;
 import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.Repository;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
@@ -54,7 +54,7 @@ public class SettingsFolderQueryImpl extends SettingsFolderQuery {
     
     @Override
     public FileObject getSettingsFolder(boolean create) throws IOException {
-        final FileObject folder = Repository.getDefault().getDefaultFileSystem().findResource("Services"); //NOI18N
+        final FileObject folder = FileUtil.getConfigFile("Services"); //NOI18N
         FileObject settingsFolder = folder.getFileObject(PROFILER_FOLDER, null);
 
         if ((settingsFolder == null) && create) {
