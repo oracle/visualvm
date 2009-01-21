@@ -409,7 +409,7 @@ public class OQLControllerUI extends JPanel {
         if (oqlController.isAnalysisRunning()) {
             performButton.setEnabled(false);
         } else {
-            performButton.setEnabled(!queryEditor.getText().isEmpty());
+            performButton.setEnabled(!(queryEditor.getText().length() > 0));
         }
     }
 }
