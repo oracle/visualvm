@@ -217,4 +217,141 @@ public class SchedulerTest {
             fail(e.getMessage());
         }
     }
+
+    @Test
+    public void dynamicRescheduleSuspended() {
+        System.out.println("dynamicReschedule suspended");
+        final CountDownLatch barrier1 = new CountDownLatch(1);
+        final CountDownLatch barrier2 = new CountDownLatch(5);
+
+        SchedulerTask task = new SchedulerTask() {
+
+            public void onSchedule(long timeStamp) {
+                System.out.println("dynamicReschedule; executing periodic task");
+                barrier1.countDown();
+                barrier2.countDown();
+            }
+        };
+
+        final ScheduledTask scheduled = Scheduler.sharedInstance().schedule(task, Quantum.SUSPENDED, false);
+        stasks.add(scheduled);
+        try {
+            if (barrier1.await(5, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.resume();
+            if (barrier2.await(2, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.setInterval(Quantum.seconds(1));
+            if (!barrier2.await(8, TimeUnit.SECONDS)) {
+                fail();
+            }
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void suspendResume() {
+        System.out.println("suspend-resume");
+        final CountDownLatch barrier1 = new CountDownLatch(1);
+        final CountDownLatch barrier2 = new CountDownLatch(5);
+
+        SchedulerTask task = new SchedulerTask() {
+
+            public void onSchedule(long timeStamp) {
+                barrier1.countDown();
+                barrier2.countDown();
+            }
+        };
+
+        final ScheduledTask scheduled = Scheduler.sharedInstance().schedule(task, Quantum.seconds(2), false);
+        stasks.add(scheduled);
+        try {
+            if (!barrier1.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.suspend();
+            if (barrier2.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.resume();
+            if (!barrier2.await(10, TimeUnit.SECONDS)) {
+                fail();
+            }
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void suspendSuspend() {
+        System.out.println("suspend-suspend");
+        final CountDownLatch barrier1 = new CountDownLatch(1);
+        final CountDownLatch barrier2 = new CountDownLatch(2);
+
+        SchedulerTask task = new SchedulerTask() {
+
+            public void onSchedule(long timeStamp) {
+                barrier1.countDown();
+                barrier2.countDown();
+            }
+        };
+
+        final ScheduledTask scheduled = Scheduler.sharedInstance().schedule(task, Quantum.seconds(2), false);
+        stasks.add(scheduled);
+        try {
+            if (!barrier1.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.suspend();
+            if (barrier2.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.suspend();
+            if (barrier2.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void suspendSuspendResume() {
+        System.out.println("suspend-suspend-resume");
+        final CountDownLatch barrier1 = new CountDownLatch(1);
+        final CountDownLatch barrier2 = new CountDownLatch(2);
+
+        SchedulerTask task = new SchedulerTask() {
+
+            public void onSchedule(long timeStamp) {
+                barrier1.countDown();
+                barrier2.countDown();
+            }
+        };
+
+        final ScheduledTask scheduled = Scheduler.sharedInstance().schedule(task, Quantum.seconds(2), false);
+        stasks.add(scheduled);
+        try {
+            if (!barrier1.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.suspend();
+            if (barrier2.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.suspend();
+            if (barrier2.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+            scheduled.resume();
+            if (!barrier2.await(3, TimeUnit.SECONDS)) {
+                fail();
+            }
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+    }
 }

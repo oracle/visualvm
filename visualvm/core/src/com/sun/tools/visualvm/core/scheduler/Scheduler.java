@@ -236,9 +236,14 @@ public class Scheduler implements PropertyChangeListener {
                     }
 
                     if (rcv.equals(task)) {
-                        rcv.suspend();
+                        boolean taskAlive = !rcv.isSuspended();
+                        if (taskAlive) {
+                            rcv.suspend();
+                        }
                         receivers.remove(rcv);
-                        rcv.resume();
+                        if (taskAlive) {
+                            rcv.resume();
+                        }
                         break;
                     }
                 }
