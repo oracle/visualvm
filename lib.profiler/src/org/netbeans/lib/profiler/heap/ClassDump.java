@@ -42,6 +42,7 @@ package org.netbeans.lib.profiler.heap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +54,10 @@ import java.util.Map;
  * @author Tomas Hurka
  */
 class ClassDump extends HprofObject implements JavaClass {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    
+    private static final boolean DEBUG = false;
+
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     final ClassDumpSegment classDumpSegment;
@@ -125,7 +130,64 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public List /*<Instance>*/ getInstances() {
-        return getHprof().computeInstances(this);
+        int instancesCount = getInstancesCount();
+
+        if (instancesCount == 0) {
+            return Collections.EMPTY_LIST;
+        }
+
+        long classId = getJavaClassId();
+        HprofHeap heap = getHprof();
+        HprofByteBuffer dumpBuffer = getHprofBuffer();
+        int idSize = dumpBuffer.getIDSize();
+        List instances = new ArrayList(instancesCount);
+        TagBounds allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
+        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+
+        while (offset[0] < allInstanceDumpBounds.endOffset) {
+            long start = offset[0];
+            int classIdOffset = 0;
+            long instanceClassId = 0L;
+            int tag = heap.readDumpTag(offset);
+            Instance instance;
+
+            if (tag == HprofHeap.INSTANCE_DUMP) {
+                classIdOffset = idSize + 4;
+            } else if (tag == HprofHeap.OBJECT_ARRAY_DUMP) {
+                classIdOffset = idSize + 4 + 4;
+            } else if (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP) {
+                byte type = dumpBuffer.get(start + 1 + idSize + 4 + 4);
+                instanceClassId = classDumpSegment.getPrimitiveArrayClass(type).getJavaClassId();
+            }
+
+            if (classIdOffset != 0) {
+                instanceClassId = dumpBuffer.getID(start + 1 + classIdOffset);
+            }
+
+            if (instanceClassId == classId) {
+                if (tag == HprofHeap.INSTANCE_DUMP) {
+                    instance = new InstanceDump(this, start);
+                } else if (tag == HprofHeap.OBJECT_ARRAY_DUMP) {
+                    instance = new ObjectArrayDump(this, start);
+                } else if (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP) {
+                    instance = new PrimitiveArrayDump(this, start);
+                } else {
+                    throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
+                }
+
+                instances.add(instance);
+
+                if (--instancesCount == 0) {
+                    return instances;
+                }
+            }
+        }
+
+        if (DEBUG) {
+            System.out.println("Class " + getName() + " Col " + instances.size() + " instances " + getInstancesCount()); // NOI18N
+        }
+
+        return instances;
     }
 
     public int getInstancesCount() {

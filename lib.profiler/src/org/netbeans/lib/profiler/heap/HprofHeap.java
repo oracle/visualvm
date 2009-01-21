@@ -87,7 +87,7 @@ class HprofHeap implements Heap {
     static final int ROOT_MONITOR_USED = 7;
     static final int ROOT_THREAD_OBJECT = 8;
     static final int CLASS_DUMP = 0x20;
-    private static final int INSTANCE_DUMP = 0x21;
+    static final int INSTANCE_DUMP = 0x21;
     static final int OBJECT_ARRAY_DUMP = 0x22;
     static final int PRIMITIVE_ARRAY_DUMP = 0x23;
 
@@ -296,6 +296,10 @@ class HprofHeap implements Heap {
         return (StackFrameSegment) tagBounds[STACK_FRAME];
     }
     
+    TagBounds getAllInstanceDumpBounds() {
+        return allInstanceDumpBounds;
+    }
+    
     int getValueSize(final byte type) {
         switch (type) {
             case HprofHeap.OBJECT:
@@ -319,65 +323,6 @@ class HprofHeap implements Heap {
             default:
                 throw new IllegalArgumentException("Invalid type " + type); // NOI18N
         }
-    }
-
-    List /*<Instance>*/ computeInstances(ClassDump cls) {
-        int instancesCount = cls.getInstancesCount();
-
-        if (instancesCount == 0) {
-            return Collections.EMPTY_LIST;
-        }
-
-        long classId = cls.getJavaClassId();
-        int idSize = dumpBuffer.getIDSize();
-        List instances = new ArrayList(instancesCount);
-        ClassDumpSegment classDumpBounds = getClassDumpSegment();
-        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
-
-        while (offset[0] < allInstanceDumpBounds.endOffset) {
-            long start = offset[0];
-            int classIdOffset = 0;
-            long instanceClassId = 0L;
-            int tag = readDumpTag(offset);
-            Instance instance;
-
-            if (tag == INSTANCE_DUMP) {
-                classIdOffset = idSize + 4;
-            } else if (tag == OBJECT_ARRAY_DUMP) {
-                classIdOffset = idSize + 4 + 4;
-            } else if (tag == PRIMITIVE_ARRAY_DUMP) {
-                byte type = dumpBuffer.get(start + 1 + idSize + 4 + 4);
-                instanceClassId = classDumpBounds.getPrimitiveArrayClass(type).getJavaClassId();
-            }
-
-            if (classIdOffset != 0) {
-                instanceClassId = dumpBuffer.getID(start + 1 + classIdOffset);
-            }
-
-            if (instanceClassId == classId) {
-                if (tag == INSTANCE_DUMP) {
-                    instance = new InstanceDump(cls, start);
-                } else if (tag == OBJECT_ARRAY_DUMP) {
-                    instance = new ObjectArrayDump(cls, start);
-                } else if (tag == PRIMITIVE_ARRAY_DUMP) {
-                    instance = new PrimitiveArrayDump(cls, start);
-                } else {
-                    throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
-                }
-
-                instances.add(instance);
-
-                if (--instancesCount == 0) {
-                    return instances;
-                }
-            }
-        }
-
-        if (DEBUG) {
-            System.out.println("Class " + cls.getName() + " Col " + instances.size() + " instances " + cls.getInstancesCount()); // NOI18N
-        }
-
-        return instances;
     }
 
     synchronized void computeInstances() {
