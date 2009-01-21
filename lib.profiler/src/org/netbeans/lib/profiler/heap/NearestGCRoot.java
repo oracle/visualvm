@@ -83,18 +83,13 @@ class NearestGCRoot {
         if (nextGCPathId == 0L) {
             nextGCPathId = computeGCRootsFor(instance);
         }
-
-        if (nextGCPathId != 0L) {
-            return heap.getInstanceByID(nextGCPathId);
-        }
-
-        return null;
+        return heap.getInstanceByID(nextGCPathId);
     }
 
     private boolean isWeakOrSoftReference(FieldValue value, Instance instance) {
         Field f = value.getField();
 
-        return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass()); // NOI18N
+        return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass());
     }
 
     private long computeGCRootsFor(Instance instance) {
