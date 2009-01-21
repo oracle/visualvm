@@ -55,6 +55,7 @@ public class HeapFragmentWalker {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AnalysisController analysisController;
+    private OQLController oqlController;
     private ClassesController classesController;
     private Heap heapFragment; // TODO: Should be HeapFragment
     private HeapFragmentWalkerUI walkerUI;
@@ -78,6 +79,7 @@ public class HeapFragmentWalker {
         threadsController = new ThreadsController(this);
 
         navigationHistoryManager = new NavigationHistoryManager(this);
+        oqlController = new OQLController(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -99,9 +101,15 @@ public class HeapFragmentWalker {
             return threadsController;
         } else if (ui.isAnalysisViewActive()) {
             return analysisController;
+        } else if (ui.isOQLViewActive()) {
+            return oqlController;
         }
 
         return null;
+    }
+
+    public OQLController getOQLController() {
+        return oqlController;
     }
 
     public AnalysisController getAnalysisController() {
@@ -200,12 +208,20 @@ public class HeapFragmentWalker {
         instancesController.setClass(jClass);
     }
 
+    public void switchToOQLView() {
+        ((HeapFragmentWalkerUI) getPanel()).showOQLView();
+    }
+
     public void switchToAnalysisView() {
         ((HeapFragmentWalkerUI) getPanel()).showAnalysisView();
     }
 
     public void switchToClassesView() {
         ((HeapFragmentWalkerUI) getPanel()).showClassesView();
+    }
+
+    public void switchToHistoryOQLView() {
+        ((HeapFragmentWalkerUI) getPanel()).showHistoryOQLView();
     }
 
     public void switchToHistoryAnalysisView() {

@@ -45,7 +45,6 @@ import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -59,6 +58,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 
 
 /**
@@ -88,6 +88,7 @@ public class HeapFragmentWalkerUI extends JPanel {
 
     private AbstractAction backAction;
     private AbstractAction forwardAction;
+    private AbstractButton oqlControllerPresenter;
     private AbstractButton analysisControllerPresenter;
     private AbstractButton classesControllerPresenter;
     private AbstractButton instancesControllerPresenter;
@@ -95,6 +96,7 @@ public class HeapFragmentWalkerUI extends JPanel {
     private AbstractButton threadsControllerPresenter;
     private CardLayout controllerUIsLayout;
     private HeapFragmentWalker heapFragmentWalker;
+    private JPanel oqlControllerPanel;
     private JPanel analysisControllerPanel;
     private JPanel classesControllerPanel;
     private JPanel controllerUIsPanel;
@@ -103,6 +105,7 @@ public class HeapFragmentWalkerUI extends JPanel {
     private JPanel threadsControllerPanel;
     private JToolBar toolBar;
     private boolean analysisEnabled;
+    private boolean oqlEnabled;
     private int subControllersIndex;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -113,12 +116,18 @@ public class HeapFragmentWalkerUI extends JPanel {
 
         ProfilerIDESettings pis = ProfilerIDESettings.getInstance();
         analysisEnabled = pis.getHeapWalkerAnalysisEnabled();
+        oqlEnabled = OQLEngine.isOQLSupported();
 
         initComponents();
         updateNavigationActions();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public boolean isOQLViewActive() {
+        if (oqlControllerPanel == null) return false;
+        return oqlControllerPanel.isShowing();
+    }
 
     public boolean isAnalysisViewActive() {
         if (analysisControllerPanel == null) return false;
@@ -142,12 +151,20 @@ public class HeapFragmentWalkerUI extends JPanel {
         return summaryControllerPanel.isShowing();
     }
 
+    public void showOQLView() {
+        showOQLView(true);
+    }
+
     public void showAnalysisView() {
         showAnalysisView(true);
     }
 
     public void showClassesView() {
         showClassesView(true);
+    }
+
+    public void showHistoryOQLView() {
+        showOQLView(false);
     }
 
     public void showHistoryAnalysisView() {
@@ -215,6 +232,9 @@ public class HeapFragmentWalkerUI extends JPanel {
         summaryControllerPanel = heapFragmentWalker.getSummaryController().getPanel();
         classesControllerPanel = heapFragmentWalker.getClassesController().getPanel();
         instancesControllerPanel = heapFragmentWalker.getInstancesController().getPanel();
+        if (oqlEnabled) {
+            oqlControllerPanel = heapFragmentWalker.getOQLController().getPanel();
+        }
 
         if (analysisEnabled) {
             analysisControllerPanel = heapFragmentWalker.getAnalysisController().getPanel();
@@ -224,6 +244,10 @@ public class HeapFragmentWalkerUI extends JPanel {
         summaryControllerPresenter = heapFragmentWalker.getSummaryController().getPresenter();
         classesControllerPresenter = heapFragmentWalker.getClassesController().getPresenter();
         instancesControllerPresenter = heapFragmentWalker.getInstancesController().getPresenter();
+
+        if (oqlEnabled) {
+            oqlControllerPresenter = heapFragmentWalker.getOQLController().getPresenter();
+        }
 
         if (analysisEnabled) {
             analysisControllerPresenter = heapFragmentWalker.getAnalysisController().getPresenter();
@@ -259,6 +283,10 @@ public class HeapFragmentWalkerUI extends JPanel {
             toolBar.add(analysisControllerPresenter);
         }
 
+        if (oqlEnabled) {
+            toolBar.add(oqlControllerPresenter);
+        }
+
         JPanel toolBarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
             public Dimension getPreferredSize() {
                 if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
@@ -287,6 +315,10 @@ public class HeapFragmentWalkerUI extends JPanel {
             controllerUIsPanel.add(analysisControllerPanel, analysisControllerPresenter.getText());
         }
 
+        if (oqlEnabled) {
+            controllerUIsPanel.add(oqlControllerPanel, oqlControllerPresenter.getText());
+        }
+
         add(toolBar, BorderLayout.NORTH);
         add(controllerUIsPanel, BorderLayout.CENTER);
 
@@ -297,6 +329,10 @@ public class HeapFragmentWalkerUI extends JPanel {
 
         if (analysisEnabled) {
             analysisControllerPresenter.setSelected(false);
+        }
+
+        if (oqlEnabled) {
+            oqlControllerPresenter.setSelected(false);
         }
 
         summaryControllerPresenter.addActionListener(new ActionListener() {
@@ -327,6 +363,17 @@ public class HeapFragmentWalkerUI extends JPanel {
                 });
 
         }
+
+        if (oqlEnabled) {
+            oqlControllerPresenter.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        showOQLView();
+                    }
+                    ;
+                });
+
+        }
+
         threadsControllerPresenter.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     showThreadsView();
@@ -363,16 +410,32 @@ public class HeapFragmentWalkerUI extends JPanel {
         } else if (isThreadsViewActive()) {
             if (analysisEnabled) {
                 showAnalysisView();
+            } else if (oqlEnabled) {
+                showOQLView();
             } else {
                 showSummaryView();
             }
         } else if (isAnalysisViewActive()) {
+            if (oqlEnabled) {
+                showOQLView();
+            } else {
+                showSummaryView();
+            }
+        } else if (isOQLViewActive()) {
             showSummaryView();
         }
     }
 
     private void moveToPreviousView() {
         if (isSummaryViewActive()) {
+            if (oqlEnabled) {
+                showOQLView();
+            } else if (analysisEnabled) {
+                showAnalysisView();
+            } else {
+                showThreadsView();
+            }
+        } else if (isOQLViewActive()) {
             if (analysisEnabled) {
                 showAnalysisView();
             } else {
@@ -387,6 +450,19 @@ public class HeapFragmentWalkerUI extends JPanel {
         } else if (isAnalysisViewActive()) {
             showThreadsView();
         }
+    }
+
+    private void showOQLView(boolean addToHistory) {
+        if (!isOQLViewActive()) {
+            if (addToHistory) {
+                heapFragmentWalker.createNavigationHistoryPoint();
+            }
+
+            controllerUIsLayout.show(controllerUIsPanel, oqlControllerPresenter.getText());
+            updateClientPresenters(heapFragmentWalker.getOQLController().getClientPresenters());
+        }
+
+        updatePresenters();
     }
 
     private void showAnalysisView(boolean addToHistory) {
@@ -482,6 +558,9 @@ public class HeapFragmentWalkerUI extends JPanel {
 
         if (analysisEnabled) {
             analysisControllerPresenter.setSelected(analysisControllerPanel.isShowing());
+        }
+        if (oqlEnabled) {
+            oqlControllerPresenter.setSelected(oqlControllerPanel.isShowing());
         }
     }
 }
