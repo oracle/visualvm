@@ -74,12 +74,12 @@ class ClassDump extends HprofObject implements JavaClass {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public int getAllInstancesSize() {
+    public long getAllInstancesSize() {
         if (isArray()) {
-            return ((Integer) classDumpSegment.arrayMap.get(this)).intValue();
+            return ((Long) classDumpSegment.arrayMap.get(this)).longValue();
         }
 
-        return getInstancesCount() * getInstanceSize();
+        return ((long)getInstancesCount()) * getInstanceSize();
     }
 
     public boolean isArray() {

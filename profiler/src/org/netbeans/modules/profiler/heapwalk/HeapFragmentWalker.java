@@ -153,11 +153,11 @@ public class HeapFragmentWalker {
         return summaryController;
     }
 
-    public int getTotalLiveBytes() {
+    public long getTotalLiveBytes() {
         return heapFragment.getSummary().getTotalLiveBytes();
     }
 
-    public int getTotalLiveInstances() {
+    public long getTotalLiveInstances() {
         return heapFragment.getSummary().getTotalLiveInstances();
     }
 
