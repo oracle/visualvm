@@ -77,7 +77,9 @@ public class OQLController extends AbstractTopLevelController implements Navigat
 
     public OQLController(HeapFragmentWalker heapFragmentWalker) {
         this.heapFragmentWalker = heapFragmentWalker;
-        engine = new OQLEngine(new Snapshot(heapFragmentWalker.getHeapFragment()));
+        if (OQLEngine.isOQLSupported()) {
+            engine = new OQLEngine(new Snapshot(heapFragmentWalker.getHeapFragment()));
+        }
     }
 
     public boolean isAnalysisRunning() {
