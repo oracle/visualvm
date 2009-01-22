@@ -763,8 +763,8 @@ public class ClassesListControllerUI extends JTitledPanel {
     private void initData() {
         saveSelection();
 
-        int totalLiveInstances = classesListController.getClassesController().getHeapFragmentWalker().getTotalLiveInstances();
-        int totalLiveBytes = classesListController.getClassesController().getHeapFragmentWalker().getTotalLiveBytes();
+        long totalLiveInstances = classesListController.getClassesController().getHeapFragmentWalker().getTotalLiveInstances();
+        long totalLiveBytes = classesListController.getClassesController().getHeapFragmentWalker().getTotalLiveBytes();
 
         if (classesCount == -1) {
             classesCount = classesListController.getClassesController().getHeapFragmentWalker().getHeapFragment().getAllClasses()
@@ -780,15 +780,15 @@ public class ClassesListControllerUI extends JTitledPanel {
 
             int instancesCount = jClass.getInstancesCount();
             int instanceSize = jClass.getInstanceSize();
-            int allInstancesSize = jClass.getAllInstancesSize();
+            long allInstancesSize = jClass.getAllInstancesSize();
 
             displayCache[i][0] = jClass.getName();
-            displayCache[i][1] = new Float((float) instancesCount / (float) totalLiveInstances * 100);
+            displayCache[i][1] = new Double((double) instancesCount / (double) totalLiveInstances * 100);
             displayCache[i][2] = Integer.toString(instancesCount) + " (" // NOI18N
-                                 + percentFormat.format((float) instancesCount / (float) totalLiveInstances) + ")"; // NOI18N
+                                 + percentFormat.format((double) instancesCount / (double) totalLiveInstances) + ")"; // NOI18N
             displayCache[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
-                                                    : (Integer.toString(allInstancesSize) + " (" // NOI18N
-                                                    + percentFormat.format((float) allInstancesSize / (float) totalLiveBytes)
+                                                    : (Long.toString(allInstancesSize) + " (" // NOI18N
+                                                    + percentFormat.format((double) allInstancesSize / (double) totalLiveBytes)
                                                     + ")"); // NOI18N
             displayCache[i][4] = jClass;
         }
