@@ -40,6 +40,9 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * This class is simply a container for instrumentation timing data that needs to be passed around between
@@ -47,8 +50,8 @@ package org.netbeans.lib.profiler.results.cpu;
  *
  * @author Misha Dmitriev
  */
-public class InstrTimingData {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+public class InstrTimingData implements Cloneable {
+    final public static InstrTimingData DEFAULT = new InstrTimingData();
 
     // Of these variables, the xxx0 ones are used when either only absolute or only thread CPU timer is used.
     // xxx0 and xxx1 together are used only when both timers are used.
@@ -58,10 +61,24 @@ public class InstrTimingData {
     double methodEntryExitInnerTime1 = 0;
     double methodEntryExitOuterTime0 = 0;
     double methodEntryExitOuterTime1 = 0;
-    long timerCountsInSecond0 = 0;
-    long timerCountsInSecond1 = 0;
+    long timerCountsInSecond0 = 1000; // default is a millisecond timer granularity; will get replaced from the calibration data
+    long timerCountsInSecond1 = 1000; // default is a millisecond timer granularity; will get replaced from the calibration data
+
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            Logger.getLogger(InstrTimingData.class.getName()).log(Level.SEVERE, "Unable to clone " + InstrTimingData.class.getName(), e);
+            return null;
+        }
+    }
+
+    public InstrTimingData() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+
 
     public String toString() {
         String s1 = "callTime0 = " + methodEntryExitCallTime0 + ", innerTime0 = " + methodEntryExitInnerTime0

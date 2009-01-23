@@ -291,15 +291,6 @@ function wrapJavaObject(thing) {
                     return instance;
                 }
                 return instance.getValueOfField(name);
-
-            //                for (var i in things) {
-            //                    println(things[i].field.name);
-            //                    if(things[i].field.name == name) {
-            //                        return wrapJavaValue(things[i]);
-            //                    }
-            //                }
-    
-            //                return undefined;
             }
         }				
     }
@@ -443,6 +434,7 @@ function wrapJavaObject(thing) {
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
 //    println("Unwrapping object");
+//    println(typeof(jobject));
     
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
         if (jobject instanceof Array) {
@@ -729,7 +721,7 @@ function wrapHeapSnapshot(heap) {
                         return (typeof(name) == 'number' &&
                             name >= 0 && name < path.length) ||
                         name == 'length' || name == 'toHtml' ||
-                        name == 'toString';
+                        name == 'toString' || name == 'wrapped-object';
                     },
                     __get__ : function(name) {
                         if (typeof(name) == 'number' &&
@@ -745,6 +737,8 @@ function wrapHeapSnapshot(heap) {
                             return function() {
                                 return computeDescription(false);
                             }
+                        } else if (name == 'wrapped-object') {
+                            return refChain;
                         } else {
                             return undefined;
                         }
@@ -1050,11 +1044,11 @@ function toHtml(obj) {
         if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
             var id = tmp.javaClassId;
             var name = tmp.name;
-            return "<a href='/class/" + id + "'>class " + name + "</a>";
+            return "<a href='file://class/" + name + "'>class " + name + "</a>";
         } else {
             var id = tmp.instanceId;
             var name = tmp.javaClass.name;
-            return "<a href='/object/" + id + "'>" +
+            return "<a href='file://instance/" + name +"@" + id + "'>" +
             name + "@" + id + "</a>";
         }
     } else if ((typeof(obj) == 'object') || (obj instanceof JSAdapter)) {

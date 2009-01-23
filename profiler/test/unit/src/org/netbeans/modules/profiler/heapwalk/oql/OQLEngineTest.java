@@ -113,6 +113,23 @@ public class OQLEngineTest {
     }
 
     @Test
+    public void testIntResult() throws Exception {
+        final boolean[] rslt = new boolean[]{true};
+        instance.executeQuery("select a.count from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                if (!(o instanceof Integer)) {
+                    rslt[0] = false;
+                    return true;
+                }
+                System.out.println("xxx");
+                return false;
+            }
+        });
+        assertTrue(rslt[0]);
+    }
+
+    @Test
     public void testHeapForEachClass() throws Exception {
         System.out.println("heap.forEachClass");
         String query = "select heap.forEachClass(function(xxx) { println(xxx.name); })";
@@ -205,8 +222,12 @@ public class OQLEngineTest {
         instance.executeQuery(query, new ObjectVisitor() {
 
             public boolean visit(Object o) {
-                counter[0]++;
-                return true;
+                if (o != null) {
+                    counter[0]++;
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
         assertTrue(counter[0] > 0);
@@ -216,7 +237,7 @@ public class OQLEngineTest {
     public void testHeapObjects() throws Exception {
         System.out.println("heap.objects");
 
-        final int[] count = new int[2];
+        final int[] count = new int[]{0,0};
 
         instance.executeQuery("select heap.objects(\"java.io.InputStream\", true)", new ObjectVisitor() {
 
@@ -455,7 +476,7 @@ public class OQLEngineTest {
     public void testMap() throws Exception {
         System.out.println("map");
 
-        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181600\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='/object/1684106928'>java.lang.Object@1684106928</a>\npathSeparator=<a href='/object/1684106888'>java.lang.String@1684106888</a>\npathSeparatorChar=:\nseparator=<a href='/object/1684106848'>java.lang.String@1684106848</a>\nseparatorChar=/\nfs=<a href='/object/1684106408'>java.io.UnixFileSystem@1684106408</a>\n"};
+        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181600\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object@1684106928</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String@1684106888</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String@1684106848</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem@1684106408</a>\n"};
 
         instance.executeQuery("select map(heap.findClass(\"java.io.File\").statics, \"index + '=' + toHtml(it)\")", new ObjectVisitor() {
 
