@@ -71,235 +71,6 @@ import java.util.logging.Level;
  */
 @org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener.class)})
 public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProfilingResultListener, CPUCCTProvider {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    // -------------------------------------- Thread representation class -------------------------------------------
-    static class ThreadInfo {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
-
-        // The following variable is used to record the "compensation" value, a difference between the timestamp at the
-        // moment user hits "get results" and the timestamp for the method entry into the top stack method. To present
-        // results consistenly, we add this value to the TimedCPUCCTNode for the top-stack method. However, when
-        // processing of data is resumed, we need to subtract this value back from that node.
-        // this is effectively the self time for the last invocation of the top method on stack - if we would not keep
-        // it separately, it would not be reported
-        // private long diffAtGetResultsMoment; // diff between last methodEntry and current moment timestamp -
-        //  we will have to compensate for the processing time
-        static ThreadInfo[] threadInfos;
-        static String[] threadNames;
-        static String[] threadClassNames; // Used just for user presentation
-        static int threadInfosLastIdx;
-        private static TransactionalSupport transaction = new TransactionalSupport();
-
-        static {
-            reset();
-        }
-
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        TimedCPUCCTNode[] stack; // Simulated stack for this thread - stack starting at root method
-                                 // (or a pseudo node if multiple root methods are called within the thread)
-        int inRoot; // flag indicating this thread is in a root method initiated code
-        int stackTopIdx; // Index of the stack top element
-        final int threadId;
-        TimedCPUCCTNode comboNodeDst;
-        TimedCPUCCTNode comboNodeSrc;
-        int totalNNodes; // total number of call tree nodes for this thread
-        long rootGrossTimeAbs;
-        long rootGrossTimeThreadCPU; // Accumulated absolute and thread CPU gross time for the root method
-                                     // - blackout data subtracted, calibration data not
-        long rootMethodEntryTimeAbs;
-        long rootMethodEntryTimeThreadCPU; // Absoute and thread CPU entry timestamps for the root method.
-
-        // The xxx0 part is used when only absolute or thread CPU time data is collected.
-        // Both xxx0 and xx1 parts are used when both timestamps are collected.
-        long topMethodEntryTime0;
-        long topMethodEntryTime1; // Entry (or "re-entry" upon return from the callee) time for the topmost method
-        long totalNInv; // total number of invocations within the entire call tree for this thread
-
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        /**
-         * See the comment to diffAtGetResultsMoment field
-         */
-
-        //    private void applyDiffAtGetResultsMoment() {
-        // commented out - see issue http://www.netbeans.org/issues/show_bug.cgi?id=67197
-
-        /*    if (stackTopIdx == -1 || (stack[0].methodId == 0 && stackTopIdx == 0)) {
-           return;
-           }
-           // We are executing the top-stack method, possibly for long time.
-           // Add a time and +1 invocation??? for it to the call graph
-           long time0 = status.dumpAbsTimeStamp;
-           System.err.println("Apply diff at get results time0: "+time0);
-           System.err.println("Apply diff at get results last methodEntry: "+stack[stackTopIdx].netTime0);
-           if (time0 > topMethodEntryTime0) {
-             long diffInCounts = time0 - topMethodEntryTime0;
-             if (stack[stackTopIdx].lastSleepOrWaitTimeStamp == 0) {
-               // the top method on stack was running at the get results time, add the diff to the real time
-               stack[stackTopIdx].netTime0 += diffInCounts;
-               System.err.println("Apply diff netTime0");
-             } else {
-               // the top method on stack was waiting at the get results time, add the diff to the wait time
-               stack[stackTopIdx].waitTime0 += diffInCounts;
-               System.err.println("Apply diff waitTime0");
-             }
-             diffAtGetResultsMoment = diffInCounts;
-             System.err.println("Apply diff at get results diffInCounts: "+diffInCounts);
-           } */
-
-        //    }
-
-        /**
-         * See the comment to diffAtGetResultsMoment field. When we resume data processing for the given thread,
-         * we need to undo the effect of diffAtGetResultsMoment.
-         */
-
-        //    private static synchronized void undoDiffAtGetResultsMomentForAllThreads() {
-        // commented out - see issue http://www.netbeans.org/issues/show_bug.cgi?id=67197
-
-        /*      if (threadInfos == null) {
-           return;
-           }
-           for (int i = 0; i < threadInfos.length; i++) {
-             ThreadInfo ti = threadInfos[i];
-             if (ti == null || ti.stackTopIdx == -1) {
-               continue;
-             }
-             if (ti.stack[ti.stackTopIdx].lastSleepOrWaitTimeStamp == 0) {
-               ti.stack[ti.stackTopIdx].netTime0 -= ti.diffAtGetResultsMoment;
-             } else {
-               ti.stack[ti.stackTopIdx].waitTime0 -= ti.diffAtGetResultsMoment;
-             }
-             ti.diffAtGetResultsMoment = 0;
-           }*/
-
-        //    }
-        private ThreadInfo(int threadId) {
-            stack = new TimedCPUCCTNode[40];
-            stackTopIdx = -1;
-            inRoot = 0;
-            this.threadId = threadId;
-        }
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        static boolean isEmpty() {
-            if ((threadInfos == null) || (threadInfos.length == 0)) {
-                return true;
-            }
-
-            for (int i = 0; i < threadInfos.length; i++) {
-                if ((threadInfos[i] != null) && (threadInfos[i].stack != null) && (threadInfos[i].stack[0] != null)
-                        && (threadInfos[i].stack[0].getChildren() != null) && (threadInfos[i].stack[0].getChildren().size() > 0)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /**
-         * Synchronization in this and previous method is to avoid counting semi-initialized threads when the user
-         * clicks "Get results" and the summary info about all tracked threads is calculated.
-         */
-        static synchronized String[] getThreadNames() {
-            return threadNames;
-        }
-
-        static void beginTrans(boolean mutable) {
-            transaction.beginTrans(mutable);
-        }
-
-        static boolean beginTrans(boolean mutable, boolean failEarly) {
-            return transaction.beginTrans(mutable, failEarly);
-        }
-
-        static void endTrans() {
-            transaction.endTrans();
-        }
-
-        static synchronized void newThreadInfo(int threadId, String threadName, String threadClassName) {
-            if ((threadId > threadInfosLastIdx) || (threadInfos == null)) {
-                int newLen = threadId + 1;
-                ThreadInfo[] newInfos = new ThreadInfo[newLen];
-                String[] newNames = new String[newLen];
-                String[] newClassNames = new String[newLen];
-
-                if (threadInfos != null) {
-                    System.arraycopy(threadInfos, 0, newInfos, 0, threadInfos.length);
-                    System.arraycopy(threadNames, 0, newNames, 0, threadNames.length);
-                    System.arraycopy(threadClassNames, 0, newClassNames, 0, threadNames.length);
-                }
-
-                threadInfos = newInfos;
-                threadNames = newNames;
-                threadClassNames = newClassNames;
-                threadInfosLastIdx = threadId;
-            }
-
-            threadInfos[threadId] = new ThreadInfo(threadId);
-            threadNames[threadId] = threadName;
-            threadClassNames[threadId] = threadClassName;
-        }
-
-        static void reset() {
-            beginTrans(true);
-
-            try {
-                threadInfos = null;
-                threadNames = null;
-                threadInfosLastIdx = -1;
-            } finally {
-                endTrans();
-            }
-        }
-
-        boolean isInRoot() {
-            return inRoot > 0;
-        }
-
-        TimedCPUCCTNode peek() {
-            synchronized (stack) {
-                return (stackTopIdx > -1) ? stack[stackTopIdx] : null;
-            }
-        }
-
-        TimedCPUCCTNode pop() {
-            TimedCPUCCTNode node = null;
-
-            synchronized (stack) {
-                if (stackTopIdx >= 0) {
-                    node = stack[stackTopIdx];
-                    stack[stackTopIdx] = null;
-                    stackTopIdx--;
-                }
-
-                return node;
-            }
-        }
-
-        void push(TimedCPUCCTNode node) {
-            synchronized (stack) {
-                stackTopIdx++;
-
-                if (stackTopIdx >= stack.length) {
-                    increaseStack();
-                }
-
-                stack[stackTopIdx] = node;
-                node.addNCalls(1);
-                totalNInv++;
-            }
-        }
-
-        private void increaseStack() {
-            TimedCPUCCTNode[] newStack = new TimedCPUCCTNode[stack.length * 2];
-            System.arraycopy(stack, 0, newStack, 0, stack.length);
-            stack = newStack;
-        }
-    }
 
     private class DebugInfoCollector extends RuntimeCPUCCTNodeVisitorAdaptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
@@ -352,14 +123,18 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     private boolean stackIntegrityViolationReported;
     private long delta;
 
+    private MethodInfoMapper methodInfoMapper = MethodInfoMapper.DEFAULT;
+    private TimingAdjusterOld timingAdjuster = TimingAdjusterOld.getDefault();
+    private ThreadInfos threadInfos = new ThreadInfos();
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public CPUCCTContainer[] createPresentationCCTs(CPUResultsSnapshot cpuSnapshot) {
-        ThreadInfo.beginTrans(false);
+        threadInfos.beginTrans(false);
 
         try {
             // process the ThreadInfo data structure to create a CCT presentation
-            String[] threadNames = ThreadInfo.getThreadNames();
+            String[] threadNames = threadInfos.getThreadNames();
 
             // There is a chance that the data has not been initialized yet
             if (threadNames == null) {
@@ -377,7 +152,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             int threadId = 0;
 
             for (int i = 0; i < len; i++) {
-                ThreadInfo ti = ThreadInfo.threadInfos[i];
+                ThreadInfo ti = threadInfos.threadInfos[i];
 
                 if ((ti == null) || (ti.stack[0] == null)) {
                     continue; // Can happen if thread just created, but nothing has been executed on its behalf yet
@@ -392,8 +167,8 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
                 TimedCPUCCTNode rootNode = ti.stack[0];
 
-                CPUCCTContainer cct = new CPUCCTContainer(rootNode, cpuSnapshot, status, instrFilter, ti.totalNNodes,
-                                                          activeTimes, threadId++, threadNames[i]);
+                CPUCCTContainer cct = new CPUCCTContainer(rootNode, cpuSnapshot, methodInfoMapper, timingAdjuster, 
+                                                          instrFilter, ti.totalNNodes, activeTimes, threadId++, threadNames[i]);
 
                 if ((cct.rootNode != null) && (cct.rootNode.getNChildren() > 0)) {
                     ccts.add(cct);
@@ -402,17 +177,29 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
             return (CPUCCTContainer[]) ccts.toArray(new CPUCCTContainer[ccts.size()]);
         } finally {
-            ThreadInfo.endTrans();
+            threadInfos.endTrans();
         }
+    }
+
+    public void setMethodInfoMapper(MethodInfoMapper mapper) {
+        this.methodInfoMapper = mapper != null ? mapper : MethodInfoMapper.DEFAULT;
+    }
+
+    protected boolean isCollectingTwoTimeStamps() {
+        return status.collectingTwoTimeStamps();
+    }
+
+    protected long getDumpAbsTimeStamp() {
+        return status.dumpAbsTimeStamp;
     }
 
     public void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
                             final long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         if (ti == null) {
             return;
@@ -440,11 +227,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void methodEntryUnstamped(final int methodId, final int threadId, final int methodType) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         if (ti == null) {
             return;
@@ -468,11 +255,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     public void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0,
                            final long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         if (ti == null) {
             return;
@@ -522,11 +309,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void methodExitUnstamped(final int methodId, final int threadId, final int methodType) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         if (ti == null) {
             return;
@@ -589,12 +376,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                       + ", name = " + threadName // NOI18N
                       );
 
-        ThreadInfo.newThreadInfo(threadId, threadName, threadClassName);
+        threadInfos.newThreadInfo(threadId, threadName, threadClassName);
         batchNotEmpty = true;
     }
 
     public void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId) {
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         if (ti == null) {
             return;
@@ -621,11 +408,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void sleepEntry(final int threadId, long timeStamp0, long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
         TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
 
         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -652,11 +439,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void sleepExit(final int threadId, final long timeStamp0, final long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
         TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
 
         long lastSleep = timeStamp0 - curNode.getLastWaitOrSleepStamp();
@@ -684,11 +471,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void threadsResume(final long timeStamp0, final long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo[] tis = ThreadInfo.threadInfos;
+        ThreadInfo[] tis = threadInfos.threadInfos;
 
         for (int i = 0; i < tis.length; i++) {
             ThreadInfo ti = tis[i];
@@ -699,11 +486,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
             ti.topMethodEntryTime0 = timeStamp0;
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 ti.topMethodEntryTime1 = timeStamp1;
             }
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 ti.rootMethodEntryTimeAbs = timeStamp0;
                 ti.rootMethodEntryTimeThreadCPU = timeStamp1;
             } else {
@@ -717,11 +504,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void threadsSuspend(final long timeStamp0, final long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo[] tis = ThreadInfo.threadInfos;
+        ThreadInfo[] tis = threadInfos.threadInfos;
 
         for (int i = 0; i < tis.length; i++) {
             ThreadInfo ti = tis[i];
@@ -738,7 +525,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 curNode.addNetTime0(diff);
             }
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 ti.rootGrossTimeAbs += (timeStamp0 - ti.rootMethodEntryTimeAbs);
                 diff = timeStamp1 - ti.topMethodEntryTime1;
 
@@ -762,12 +549,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
      * Called when the TA is suspended waiting for the tool to process the buffer
      */
     public void timeAdjust(final int threadId, final long timeDiff0, final long timeDiff1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
         final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         // In this case, time stamps are actually time adjustments.
         // timeStamp0 is always abosolute and timeStamp1 is always thread CPU.
@@ -775,7 +562,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         ti.rootMethodEntryTimeThreadCPU += timeDiff1;
         ti.topMethodEntryTime0 += timeDiff0;
 
-        if (status.collectingTwoTimeStamps()) {
+        if (isCollectingTwoTimeStamps()) {
             ti.topMethodEntryTime1 += timeDiff1;
         }
 
@@ -788,11 +575,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void waitEntry(final int threadId, long timeStamp0, long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
         TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
 
         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -820,11 +607,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void waitExit(final int threadId, final long timeStamp0, final long timeStamp1) {
-        if (!isReady() || (ThreadInfo.threadInfos == null)) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
 
-        ThreadInfo ti = ThreadInfo.threadInfos[threadId];
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
         TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
 
         long lastWait = timeStamp0 - curNode.getLastWaitOrSleepStamp();
@@ -855,36 +642,36 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
      * may be just -1, indicating that it can't be reliably calculated for the given thread (at this moment or at all).
      */
     protected long[][] getAllThreadsActiveTimes() {
-        int len = ThreadInfo.getThreadNames().length;
+        int len = threadInfos.getThreadNames().length;
         long[][] res = new long[2][len];
 
         for (int i = 0; i < len; i++) {
-            ThreadInfo ti = ThreadInfo.threadInfos[i];
+            ThreadInfo ti = threadInfos.threadInfos[i];
             double[] times = calculateThreadActiveTimes(ti);
 
-            res[0][i] = (long) (((times[0] - times[2]) * 1000) / status.timerCountsInSecond[0]);
-            res[1][i] = (times[1] != -1) ? (long) (((times[1] - times[3]) * 1000) / status.timerCountsInSecond[1]) : (-1);
+            res[0][i] = (long) (((times[0] - times[2]) * 1000) / timingAdjuster.getInstrTimingData().timerCountsInSecond0);
+            res[1][i] = (times[1] != -1) ? (long) (((times[1] - times[3]) * 1000) / timingAdjuster.getInstrTimingData().timerCountsInSecond1) : (-1);
         }
 
         return res;
     }
 
     protected RuntimeCCTNode getAppRootNode() {
-        if (ThreadInfo.isEmpty()) {
+        if (threadInfos.isEmpty()) {
             return null;
         }
 
         RuntimeCPUCCTNode appNode = null;
 
-        ThreadInfo.beginTrans(false);
+        threadInfos.beginTrans(false);
 
         try {
             appNode = new SimpleCPUCCTNode(true);
 
-            int len = (ThreadInfo.getThreadNames() != null) ? ThreadInfo.getThreadNames().length : 0;
+            int len = (threadInfos.getThreadNames() != null) ? threadInfos.getThreadNames().length : 0;
 
             for (int i = 0; i < len; i++) {
-                ThreadInfo ti = ThreadInfo.threadInfos[i];
+                ThreadInfo ti = threadInfos.threadInfos[i];
 
                 if ((ti == null) || (ti.stack[0] == null)) {
                     continue;
@@ -893,7 +680,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 appNode.attachNodeAsChild(ti.stack[0]);
             }
         } finally {
-            ThreadInfo.endTrans();
+            threadInfos.endTrans();
         }
 
         return appNode;
@@ -930,7 +717,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         // System.err.println("\n*** CPUCallGraphBuilder: rootGrossTimeAbs = "
         // + rootGrossTimeAbs + ", totalNInv = " + ti.totalNInv);  // NOI18N
         if (ti.stackTopIdx != -1) {
-            long time0 = status.dumpAbsTimeStamp;
+            long time0 = getDumpAbsTimeStamp();
 
             if (ti.topMethodEntryTime0 > time0) {
                 time0 = ti.topMethodEntryTime0;
@@ -950,7 +737,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         //System.err.println("*** ti.rootGrossTimeThreadCPU = "
         // + ti.rootGrossTimeThreadCPU + ", totalNInv = " + ti.totalNInv); // NOI18N
         if (ti.stackTopIdx != -1) {
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 rootGrossTimeCPU += (ti.topMethodEntryTime1 - ti.rootMethodEntryTimeThreadCPU);
 
                 //System.err.println("*** ti.topMethodEntryTime1 = " + ti.topMethodEntryTime1
@@ -968,20 +755,17 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         double timeInInjectedCodeInAbsCounts;
         double timeInInjectedCodeInThreadCPUCounts = 0;
         // Calculate timeInInjectedCodeInAbsCounts.
-        timeInInjectedCodeInAbsCounts = TimingAdjusterOld.getDefault(status)
-                                                         .delta(nRootInv, (int) (ti.totalNInv - nRootInv), false);
+        timeInInjectedCodeInAbsCounts = timingAdjuster.delta(nRootInv, (int) (ti.totalNInv - nRootInv), false);
 
         //System.err.println("*** timeInInjectedCodeInAbsCounts = " + timeInInjectedCodeInAbsCounts + ", in ms = "
         // + ((double) timeInInjectedCodeInAbsCounts) * 1000 / status.timerCountsInSecond[0]); // NOI18N
 
         // Now calculate timeInInjectedCodeInThreadCPUCounts
-        if (status.collectingTwoTimeStamps()) {
-            timeInInjectedCodeInThreadCPUCounts = TimingAdjusterOld.getDefault(status)
-                                                                   .delta(nRootInv, (int) (ti.totalNInv - nRootInv), true);
+        if (isCollectingTwoTimeStamps()) {
+            timeInInjectedCodeInThreadCPUCounts = timingAdjuster.delta(nRootInv, (int) (ti.totalNInv - nRootInv), true);
         } else { // Same calculation whether we have absoluteTimerOn == true or not
                  // Just convert the known time into thread CPU time units
-            timeInInjectedCodeInThreadCPUCounts = (timeInInjectedCodeInAbsCounts * status.timerCountsInSecond[1]) / status.timerCountsInSecond[0];
-            ;
+            timeInInjectedCodeInThreadCPUCounts = (timeInInjectedCodeInAbsCounts * timingAdjuster.getInstrTimingData().timerCountsInSecond1) / timingAdjuster.getInstrTimingData().timerCountsInSecond0;
         }
 
         //System.err.println("*** timeInInjectedCodeInThreadCPUCounts = " + timeInInjectedCodeInThreadCPUCounts); // NOI18N
@@ -992,37 +776,93 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     protected void doBatchStart() {
-        ThreadInfo.beginTrans(true);
+        /****************************************************************************/
+        /* Timing adjuster must be initialized here as in doStartup() it may happen */
+        /* that the instrumentation type has not been set yet                       */
+        /****************************************************************************/
+        ProfilerClient client = getClient();
+        if (client != null) {
+            timingAdjuster = TimingAdjusterOld.getInstance(client.getStatus());
+        }
+        threadInfos.beginTrans(true);
     }
 
     protected void doBatchStop() {
-        ThreadInfo.endTrans();
+        threadInfos.endTrans();
     }
 
     protected void doReset() {
-        boolean threadLocked = ThreadInfo.beginTrans(true, true);
+        boolean threadLocked = threadInfos.beginTrans(true, true);
 
         if (threadLocked) { // ignore request for reset received durin an ongoing active transaction
 
             try {
-                ThreadInfo.reset();
+                threadInfos.reset();
             } finally {
-                ThreadInfo.endTrans();
+                threadInfos.endTrans();
             }
         }
     }
 
     protected void doShutdown() {
-        ThreadInfo.reset();
+        threadInfos.reset();
         factory = null;
         instrFilter = null;
     }
 
-    protected void doStartup(ProfilerClient profilerClient) {
+    protected void doStartup(final ProfilerClient profilerClient) {
         instrFilter = profilerClient.getSettings().getInstrumentationFilter();
-        factory = new CPUCCTNodeFactory(status.collectingTwoTimeStamps());
+        factory = new CPUCCTNodeFactory(isCollectingTwoTimeStamps());
+        
+        setMethodInfoMapper(new MethodInfoMapper() {
+
+            @Override
+            public String getInstrMethodClass(int methodId) {
+                return profilerClient.getStatus().getInstrMethodClasses()[methodId];
+            }
+
+            @Override
+            public String getInstrMethodName(int methodId) {
+                return profilerClient.getStatus().getInstrMethodNames()[methodId];
+            }
+
+            @Override
+            public String getInstrMethodSignature(int methodId) {
+                return profilerClient.getStatus().getInstrMethodSignatures()[methodId];
+            }
+
+            @Override
+            public int getMinMethodId() {
+                return profilerClient.getStatus().getStartingMethodId();
+            }
+
+            @Override
+            public int getMaxMethodId() {
+                return profilerClient.getStatus().getNInstrMethods() + profilerClient.getStatus().getStartingMethodId() - 1;
+            }
+
+            @Override
+            public void lock(boolean mutable) {
+                profilerClient.getStatus().beginTrans(mutable);
+            }
+
+            @Override
+            public void unlock() {
+                profilerClient.getStatus().endTrans();
+            }
+
+
+        });
 
         profilerClient.registerCPUCCTProvider(this);
+    }
+
+    protected void setFactory(CPUCCTNodeFactory factory) {
+        this.factory = factory;
+    }
+
+    protected void setFilter(InstrumentationFilter filter) {
+        this.instrFilter = filter;
     }
 
     private synchronized DebugInfoCollector getDebugCollector() {
@@ -1033,19 +873,19 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         return debugCollector;
     }
 
-    private boolean isReady() {
+    protected boolean isReady() {
         return (status != null) && (factory != null) && (instrFilter != null);
     }
 
     private String debugMethod(int methodId) {
         StringBuffer buffer = new StringBuffer();
-        status.beginTrans(false);
-
         try {
-            buffer.append(status.getInstrMethodClasses()[methodId]).append('.').append(status.getInstrMethodNames()[methodId]); // NOI18N
-            buffer.append(status.getInstrMethodSignatures()[methodId]).append(" (methodId = ").append(methodId).append(')'); // NOI18N
+            methodInfoMapper.lock(false);
+
+            buffer.append(methodInfoMapper.getInstrMethodClass(methodId)).append('.').append(methodInfoMapper.getInstrMethodName(methodId)); // NOI18N
+            buffer.append(methodInfoMapper.getInstrMethodSignature(methodId)).append(" (methodId = ").append(methodId).append(')'); // NOI18N
         } finally {
-            status.endTrans();
+            methodInfoMapper.unlock();
         }
 
         return buffer.toString();
@@ -1104,7 +944,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
             ti.topMethodEntryTime0 = timeStamp0;
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 ti.topMethodEntryTime1 = timeStamp1;
             }
         } else {
@@ -1119,7 +959,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
                 ti.topMethodEntryTime0 = timeStamp0;
 
-                if (status.collectingTwoTimeStamps()) {
+                if (isCollectingTwoTimeStamps()) {
                     diff = timeStamp1 - ti.topMethodEntryTime1;
 
                     if (diff > 0) {
@@ -1172,20 +1012,25 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 ti.rootMethodEntryTimeThreadCPU = timeStamp1;
                 ti.topMethodEntryTime0 = timeStamp0;
 
-                if (status.collectingTwoTimeStamps()) {
+                if (isCollectingTwoTimeStamps()) {
                     ti.topMethodEntryTime1 = timeStamp1;
                 }
             }
         } else {
-            String jvmClassName = status.getInstrMethodClasses()[((MethodCPUCCTNode) curNode).getMethodId()].replace('.', '/'); // NOI18N
-            ProfilerClient client = getClient();
+            try {
+                methodInfoMapper.lock(false);
+                String jvmClassName = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) curNode).getMethodId()).replace('.', '/'); // NOI18N
+                ProfilerClient client = getClient();
 
-            if (client != null) {
-                if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
+                if (client != null) {
+                    if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
+                        curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
+                    }
+                } else {
                     curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
                 }
-            } else {
-                curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
+            } finally {
+                methodInfoMapper.unlock();
             }
         }
 
@@ -1225,7 +1070,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
             ti.topMethodEntryTime0 = timeStamp0;
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 diff = timeStamp1 - ti.topMethodEntryTime1;
 
                 if (diff > 0) {
@@ -1257,15 +1102,20 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         ti.push(curNode);
 
         if (!ti.isInRoot()) {
-            String jvmClassName = status.getInstrMethodClasses()[((MethodCPUCCTNode) curNode).getMethodId()].replace('.', '/');
-            ProfilerClient client = getClient();
+            try {
+                methodInfoMapper.lock(false);
+                String jvmClassName = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) curNode).getMethodId()).replace('.', '/');
+                ProfilerClient client = getClient();
 
-            if (client != null) {
-                if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
+                if (client != null) {
+                    if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
+                        curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
+                    }
+                } else {
                     curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
                 }
-            } else {
-                curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
+            } finally {
+                methodInfoMapper.unlock();
             }
         }
 
@@ -1317,7 +1167,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             message.append("received method debug: ").append(debugMethod(methodId)).append('\n'); // NOI18N
             message.append(CommonConstants.PLEASE_REPORT_PROBLEM);
 
-            if ((status != null) && (status.getInstrMethodClasses() != null) && !stackIntegrityViolationReported) {
+            if (!stackIntegrityViolationReported) {
                 message.append(dumpStack(ti));
                 stackIntegrityViolationReported = true;
             }
@@ -1339,7 +1189,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 timeStamp0 = ti.topMethodEntryTime0;
             }
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 diff = timeStamp1 - ti.topMethodEntryTime1;
 
                 if (diff > 0) {
@@ -1360,7 +1210,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         if (stamped) {
             ti.topMethodEntryTime0 = timeStamp0;
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 ti.topMethodEntryTime1 = timeStamp1;
             }
         }
@@ -1392,7 +1242,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             StringBuffer buffer = new StringBuffer();
             buffer.append(CommonConstants.ENGINE_WARNING)
                   .append("critical: at root method entry thread stack is not at 0 - should not happen!\n"); // NOI18N
-            buffer.append("*** thread = ").append(ThreadInfo.threadNames[ti.threadId]); // NOI18N
+            buffer.append("*** thread = ").append(threadInfos.threadNames[ti.threadId]); // NOI18N
             buffer.append(", ti.stackTopIdx = ").append(ti.stackTopIdx); // NOI18N
 
             if (curNode != null) {
@@ -1458,21 +1308,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         ti.rootMethodEntryTimeThreadCPU = timeStamp1;
         ti.topMethodEntryTime0 = timeStamp0;
 
-        if (status.collectingTwoTimeStamps()) {
+        if (isCollectingTwoTimeStamps()) {
             ti.topMethodEntryTime1 = timeStamp1;
         }
 
         ti.inRoot++;
 
-        //    String jvmClassName = status.getInstrMethodClasses()[((MethodCPUCCTNode)curNode).getMethodId()].replace('.', '/');
-        //    ProfilerClient client = getClient();
-        //    if (client != null) {
-        //      if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
-        //        curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
-        //      }
-        //    } else {
-        //      curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
-        //    }
         return curNode;
     }
 
@@ -1533,7 +1374,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             timeStamp0 = ti.topMethodEntryTime0;
         }
 
-        if (status.collectingTwoTimeStamps()) {
+        if (isCollectingTwoTimeStamps()) {
             diff = timeStamp1 - ti.topMethodEntryTime1;
 
             if (diff > 0) {
@@ -1550,7 +1391,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         if (ti.isInRoot()) { // We are actually exiting a non-root invocation of the root method
             ti.topMethodEntryTime0 = timeStamp0;
 
-            if (status.collectingTwoTimeStamps()) {
+            if (isCollectingTwoTimeStamps()) {
                 ti.topMethodEntryTime1 = timeStamp1;
             }
         } else {

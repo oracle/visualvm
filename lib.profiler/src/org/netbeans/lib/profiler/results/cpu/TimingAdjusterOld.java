@@ -70,13 +70,13 @@ public class TimingAdjusterOld {
 
     public static synchronized TimingAdjusterOld getDefault() {
         if (instance == null) {
-            instance = new TimingAdjusterOld(null);
+            instance = new TimingAdjusterOld(InstrTimingData.DEFAULT);
         }
 
         return instance;
     }
 
-    public static synchronized TimingAdjusterOld getDefault(final ProfilingSessionStatus status) {
+    public static synchronized TimingAdjusterOld getInstance(final ProfilingSessionStatus status) {
         if (instance != null) {
             ProfilingSessionStatus lastStatus = (lastStatusRef != null) ? (ProfilingSessionStatus) lastStatusRef.get() : null;
 
@@ -121,6 +121,14 @@ public class TimingAdjusterOld {
             return (double) time;
         }
 
+        if (timingData.methodEntryExitCallTime0 == 0) {
+            if (secondTimestamp) {
+                return (double) time / timingData.timerCountsInSecond1;
+            } else {
+                return (double) time / timingData.timerCountsInSecond0;
+            }
+        }
+
         if (secondTimestamp) {
             return (((double) time - (incommingInv * timingData.methodEntryExitInnerTime1)
                     - (outgoingInv * timingData.methodEntryExitOuterTime1)) * 1000000) / timingData.timerCountsInSecond1;
@@ -131,7 +139,7 @@ public class TimingAdjusterOld {
     }
 
     public final double delta(int incommingInv, int outgoingInv, boolean secondTimestamp) {
-        if (timingData == null) {
+        if (timingData == null  || timingData.methodEntryExitCallTime0 == 0) {
             return 0d;
         }
 
@@ -152,7 +160,15 @@ public class TimingAdjusterOld {
         return adjusted;
     }
 
+    public InstrTimingData getInstrTimingData() {
+        InstrTimingData data = getFullInstrTimingData(lastStatusRef != null ? (ProfilingSessionStatus)lastStatusRef.get() : null);
+        return data != null ? (InstrTimingData)data.clone() : (InstrTimingData)InstrTimingData.DEFAULT.clone();
+    }
+
     private static InstrTimingData getFullInstrTimingData(ProfilingSessionStatus status) {
+        if (status == null) {
+            return null;
+        }
         InstrTimingData timingData = new InstrTimingData();
 
         // We use the following "safety margins" to artificially decrease the time spent in instrumentation.
@@ -210,6 +226,10 @@ public class TimingAdjusterOld {
     }
 
     private static InstrTimingData getSampledInstrTimingData(ProfilingSessionStatus status) {
+        if (status == null) {
+            return null;
+        }
+        
         InstrTimingData timingData = new InstrTimingData();
 
         double entryExitTimeInAbsCounts = status.methodEntryExitCallTime[4];
