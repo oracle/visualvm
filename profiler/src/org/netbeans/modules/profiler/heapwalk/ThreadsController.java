@@ -95,40 +95,44 @@ public class ThreadsController extends AbstractTopLevelController implements Nav
                 if(root.getKind().equals(GCRoot.THREAD_OBJECT)) {
                     ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
                     Instance threadInstance = threadRoot.getInstance();
-                    PrimitiveArrayInstance chars = (PrimitiveArrayInstance)threadInstance.getValueOfField("name");  // NOI18N
-                    List<String> charsList = chars.getValues();
-                    char charArr[] = new char[charsList.size()];
-                    int j = 0;
-                    for(String ch: charsList) {
-                        charArr[j++] = ch.charAt(0);
-                    }                    
-                    String threadName = new String(charArr);
-                    Boolean daemon = (Boolean)threadInstance.getValueOfField("daemon"); // NOI18N
-                    Integer priority = (Integer)threadInstance.getValueOfField("priority"); // NOI18N
-                    Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
-                    Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
-                    State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
-                    StackTraceElement stack[] = threadRoot.getStackTrace();
-                    sw.append("<span style=\"color: #0033CC\">");   // NOI18N
-                    sw.append("\""+threadName+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority+" tid="+threadId+" "+tState);    // NOI18N
-                    sw.append("</span><br>");   // NOI18N
-                    if(stack != null) {
-                        for(int i = 0; i < stack.length; i++) {
-                            String stackElHref;
-                            StackTraceElement stackElement = stack[i];
+                    if (threadInstance != null) {
+                        PrimitiveArrayInstance chars = (PrimitiveArrayInstance)threadInstance.getValueOfField("name");  // NOI18N
+                        List<String> charsList = chars.getValues();
+                        char charArr[] = new char[charsList.size()];
+                        int j = 0;
+                        for(String ch: charsList) {
+                            charArr[j++] = ch.charAt(0);
+                        }                    
+                        String threadName = new String(charArr);
+                        Boolean daemon = (Boolean)threadInstance.getValueOfField("daemon"); // NOI18N
+                        Integer priority = (Integer)threadInstance.getValueOfField("priority"); // NOI18N
+                        Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
+                        Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
+                        State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
+                        StackTraceElement stack[] = threadRoot.getStackTrace();
+                        sw.append("<span style=\"color: #0033CC\">");   // NOI18N
+                        sw.append("\""+threadName+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority+" tid="+threadId+" "+tState);    // NOI18N
+                        sw.append("</span><br>");   // NOI18N
+                        if(stack != null) {
+                            for(int i = 0; i < stack.length; i++) {
+                                String stackElHref;
+                                StackTraceElement stackElement = stack[i];
 
-                            if (project != null) {
-                                String className = stackElement.getClassName();
-                                String method = stackElement.getMethodName();
-                                int lineNo = stackElement.getLineNumber();
-                                String stackUrl = THREADS_URL_PREFIX+className+"|"+method+"|"+lineNo;
+                                if (project != null) {
+                                    String className = stackElement.getClassName();
+                                    String method = stackElement.getMethodName();
+                                    int lineNo = stackElement.getLineNumber();
+                                    String stackUrl = THREADS_URL_PREFIX+className+"|"+method+"|"+lineNo;
 
-                                stackElHref = "<a style=\"color: #CC3300;\" href=\""+stackUrl+"\">"+stackElement+"</a>";    // NOI18N
-                            } else {
-                                stackElHref = stackElement.toString();
+                                    stackElHref = "<a style=\"color: #CC3300;\" href=\""+stackUrl+"\">"+stackElement+"</a>";    // NOI18N
+                                } else {
+                                    stackElHref = stackElement.toString();
+                                }
+                                sw.append("\tat "+stackElHref+"<br>");  // NOI18N
                             }
-                            sw.append("\tat "+stackElHref+"<br>");  // NOI18N
                         }
+                    } else {
+                        sw.append("Unknown thread");
                     }
                     sw.append("<br>");  // NOI18N
                 }

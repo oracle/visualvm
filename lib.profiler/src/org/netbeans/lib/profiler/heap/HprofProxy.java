@@ -71,7 +71,6 @@ class HprofProxy {
             Instance entry = (Instance) enIt.next();
 
             for (; entry != null; entry = (Instance) entry.getValueOfField("next")) { // NOI18N
-
                 Instance key = (Instance) entry.getValueOfField("key"); // NOI18N
                 Instance val = (Instance) entry.getValueOfField("value"); // NOI18N
 
