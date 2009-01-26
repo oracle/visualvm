@@ -121,7 +121,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected ArrayList instrClasses = new ArrayList();
-    protected MethodScanerForNewOpcodes msfno;
+    MethodScanerForNewOpcodes msfno;
     protected String[] instantiatableClasses;
     protected int injType;
     protected int instrClassId;
