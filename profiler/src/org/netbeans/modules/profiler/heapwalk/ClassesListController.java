@@ -92,7 +92,7 @@ public class ClassesListController extends AbstractController {
                 case 2:
                     return new Integer(jClass1.getInstancesCount()).compareTo(new Integer(jClass2.getInstancesCount()));
                 case 3:
-                    return new Integer(jClass1.getAllInstancesSize()).compareTo(jClass2.getAllInstancesSize());
+                    return new Long(jClass1.getAllInstancesSize()).compareTo(jClass2.getAllInstancesSize());
                 default:
                     throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
             }
