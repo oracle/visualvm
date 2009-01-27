@@ -125,10 +125,7 @@ public class JmxApplicationProvider {
             if (hostname.isEmpty() || isLocalHost(hostname)) {
                 return Host.LOCALHOST;
             } else {
-                InetAddress addr = InetAddress.getByName(hostname);
-                Host host = HostsSupport.getInstance().getHostByAddress(addr);
-                if (host == null) host = HostsSupport.getInstance().createHost(hostname);
-                return host;
+                return HostsSupport.getInstance().getOrCreateHost(hostname, false);
             }
         }
 

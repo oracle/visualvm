@@ -68,24 +68,37 @@ public final class HostsSupport {
     
 
     /**
-     * Creates new host from provided hostname.
+     * Creates new host from provided hostname. Displays a popup dialog if wrong
+     * hostname is provided or the host has already been defined.
      * 
      * @param hostname hostname of the host to be created.
      * @return new host from provided hostname or null if the hostname could not be resolved.
      */
     public Host createHost(String hostname) {
-        return hostProvider.createHost(new HostProperties(hostname, hostname), true);
+        return hostProvider.createHost(new HostProperties(hostname, hostname), true, true);
     }
     
     /**
-     * Creates new host from provided hostname and display name.
+     * Creates new host from provided hostname and display name. Displays a popup
+     * dialog if wrong hostname is provided or the host has already been defined.
      * 
      * @param hostname hostname of the host to be created.
      * @param displayname displayname of the host to be created.
      * @return new host from provided hostname or null if the hostname could not be resolved.
      */
     public Host createHost(String hostname, String displayname) {
-        return hostProvider.createHost(new HostProperties(hostname, displayname), true);
+        return hostProvider.createHost(new HostProperties(hostname, displayname), true, true);
+    }
+
+    /**
+     * Returns an existing Host instance or creates a new Host if needed.
+     *
+     * @param hostname hostname of the host to be created
+     * @param interactive true if any failure should be visually presented to the user, false otherwise.
+     * @return an existing or a newly created Host
+     */
+    public Host getOrCreateHost(String hostname, boolean interactive) {
+        return hostProvider.createHost(new HostProperties(hostname, hostname), false, interactive);
     }
     
     /**

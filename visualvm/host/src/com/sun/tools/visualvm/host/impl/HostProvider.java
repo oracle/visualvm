@@ -79,104 +79,130 @@ public class HostProvider {
     
     private static InetAddress localhostAddress2;
     
-    private boolean initializingHosts = true;
-    private Semaphore initializingHostsSemaphore = new Semaphore(1);
+    private Semaphore hostsLockedSemaphore = new Semaphore(1);
 
-
-    public Host createHost(final HostProperties hostDescriptor, final boolean interactive) {
-        waitForInitialization();
-        
-        final String hostName = hostDescriptor.getHostName();
-        InetAddress inetAddress = null;
-        ProgressHandle pHandle = null;
+    
+    public Host createHost(final HostProperties hostDescriptor, final boolean createOnly, final boolean interactive) {
 
         try {
-            pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HostProvider.class, "LBL_Searching_for_host") + hostName); // NOI18N
-            pHandle.setInitialDelay(0);
-            pHandle.start();
-            try {
-                inetAddress = InetAddress.getByName(hostName);
-            } catch (UnknownHostException e) {
-                if (interactive) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            String error = NbBundle.getMessage(HostProvider.class, "MSG_Wrong_Host", hostName); // NOI18N
-                            NetBeansProfiler.getDefaultNB().displayError(error);
-                        }
-                    });
-                }
-            }
-        } finally {
-            final ProgressHandle pHandleF = pHandle;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() { if (pHandleF != null) pHandleF.finish(); }
-            });
-        }
 
-        if (inetAddress != null) {
-            final Host knownHost = getHostByAddress(inetAddress);
-            if (knownHost != null) {
-                if (interactive) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            ExplorerSupport.sharedInstance().selectDataSource(knownHost);
-                            String warning = NbBundle.getMessage(HostProvider.class, "MSG_Already_Monitored",new Object[] {hostName,DataSourceDescriptorFactory.getDescriptor(knownHost).getName()});    // NOI18N
-                            NetBeansProfiler.getDefaultNB().displayWarning(warning);
-                        }
-                    });
-                }
-                return knownHost;
-            } else {
-                String ipString = inetAddress.getHostAddress();
-                
-                String[] propNames = new String[] {
-                    SNAPSHOT_VERSION,
-                    PROPERTY_HOSTNAME,
-                    DataSourceDescriptor.PROPERTY_NAME };
-                String[] propValues = new String[] {
-                    CURRENT_SNAPSHOT_VERSION,
-                    hostName,
-                    hostDescriptor.getDisplayName() };
-                
-                File customPropertiesStorage = Utils.getUniqueFile(HostsSupport.getStorageDirectory(), ipString, Storage.DEFAULT_PROPERTIES_EXT);
-                Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
-                storage.setCustomProperties(propNames, propValues);
-                
-                HostImpl newHost = null;
+            lockHosts();
+
+            final String hostName = hostDescriptor.getHostName();
+            InetAddress inetAddress = null;
+            ProgressHandle pHandle = null;
+
+            try {
+                pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HostProvider.class, "LBL_Searching_for_host") + hostName); // NOI18N
+                pHandle.setInitialDelay(0);
+                pHandle.start();
                 try {
-                    newHost = new HostImpl(hostName, storage);
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error creating host", e); // Should never happen  // NOI18N
+                    inetAddress = InetAddress.getByName(hostName);
+                } catch (UnknownHostException e) {
+                    if (interactive) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                String error = NbBundle.getMessage(HostProvider.class, "MSG_Wrong_Host", hostName); // NOI18N
+                                NetBeansProfiler.getDefaultNB().displayError(error);
+                            }
+                        });
+                    }
                 }
-                
-                if (newHost != null) {
-                    RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
-                }
-                return newHost;
+            } finally {
+                final ProgressHandle pHandleF = pHandle;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { if (pHandleF != null) pHandleF.finish(); }
+                });
             }
+
+            if (inetAddress != null) {
+                final Host knownHost = getHostByAddressImpl(inetAddress);
+                if (knownHost != null) {
+                    if (interactive && createOnly) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                ExplorerSupport.sharedInstance().selectDataSource(knownHost);
+                                String warning = NbBundle.getMessage(HostProvider.class, "MSG_Already_Monitored",new Object[] {hostName,DataSourceDescriptorFactory.getDescriptor(knownHost).getName()});    // NOI18N
+                                NetBeansProfiler.getDefaultNB().displayWarning(warning);
+                            }
+                        });
+                    }
+                    return knownHost;
+                } else {
+                    String ipString = inetAddress.getHostAddress();
+
+                    String[] propNames = new String[] {
+                        SNAPSHOT_VERSION,
+                        PROPERTY_HOSTNAME,
+                        DataSourceDescriptor.PROPERTY_NAME };
+                    String[] propValues = new String[] {
+                        CURRENT_SNAPSHOT_VERSION,
+                        hostName,
+                        hostDescriptor.getDisplayName() };
+
+                    File customPropertiesStorage = Utils.getUniqueFile(HostsSupport.getStorageDirectory(), ipString, Storage.DEFAULT_PROPERTIES_EXT);
+                    Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
+                    storage.setCustomProperties(propNames, propValues);
+
+                    HostImpl newHost = null;
+                    try {
+                        newHost = new HostImpl(hostName, storage);
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Error creating host", e); // Should never happen  // NOI18N
+                    }
+
+                    if (newHost != null) {
+                        RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
+                    }
+                    return newHost;
+                }
+            }
+            return null;
+
+        } catch (InterruptedException ex) {
+            LOGGER.throwing(HostProvider.class.getName(), "createHost", ex);    // NOI18N
+            return null;
+        } finally {
+            unlockHosts();
         }
-        return null;
     }
     
     void removeHost(HostImpl host, boolean interactive) {
-        waitForInitialization();
+        try {
+            lockHosts();
         
-        // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
-        DataSource owner = host.getOwner();
-        if (owner != null) owner.getRepository().removeDataSource(host);
+            // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
+            DataSource owner = host.getOwner();
+            if (owner != null) owner.getRepository().removeDataSource(host);
+
+        } catch (InterruptedException ex) {
+            LOGGER.throwing(HostProvider.class.getName(), "removeHost", ex);    // NOI18N
+        } finally {
+            unlockHosts();
+        }
     }
     
     public Host getHostByAddress(InetAddress inetAddress) {
-        waitForInitialization();
-        
+        try {
+            lockHosts();
+            return getHostByAddressImpl(inetAddress);
+        } catch (InterruptedException ex) {
+            LOGGER.throwing(HostProvider.class.getName(), "getHostByAddress", ex);    // NOI18N
+            return null;
+        } finally {
+            unlockHosts();
+        }
+    }
+
+    private Host getHostByAddressImpl(InetAddress inetAddress) {
         Set<HostImpl> knownHosts = DataSourceRepository.sharedInstance().getDataSources(HostImpl.class);
         for (HostImpl knownHost : knownHosts)
             if (knownHost.getInetAddress().equals(inetAddress)) return knownHost;
-        
+
         if (inetAddress.equals(Host.LOCALHOST.getInetAddress())) return Host.LOCALHOST;
         if (inetAddress.equals(localhostAddress2)) return Host.LOCALHOST;
         if (inetAddress.isLoopbackAddress()) return Host.LOCALHOST;
-        
+
         return null;
     }
     
@@ -250,13 +276,6 @@ public class HostProvider {
             
             RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);     
         }
-        
-        DataSource.EVENT_QUEUE.post(new Runnable() {
-            public void run() {
-                initializingHostsSemaphore.release();
-                initializingHosts = false;
-            }
-        });
     }
     
     private static void notifyUnresolvedHosts(final Set<File> unresolvedHostsF, final Set<String> unresolvedHostsS) {
@@ -279,14 +298,18 @@ public class HostProvider {
             }
         }, 1000);
     }
-    
-    
-    private void waitForInitialization() {
-        if (initializingHosts) try {
-            initializingHostsSemaphore.acquire();
-        } catch (InterruptedException ex) {
-            LOGGER.throwing(HostProvider.class.getName(), "waitForInitialization", ex); // NOI18N
-        }
+
+
+    private void lockHosts() throws InterruptedException {
+        hostsLockedSemaphore.acquire();
+    }
+
+    private void unlockHosts() {
+        DataSource.EVENT_QUEUE.post(new Runnable() {
+            public void run() {
+                hostsLockedSemaphore.release();
+            }
+        });
     }
     
     
@@ -298,6 +321,7 @@ public class HostProvider {
                         initLocalHost();
                         initUnknownHost();
                         initPersistedHosts();
+                        unlockHosts();
                     }
                 });
             }
@@ -306,7 +330,7 @@ public class HostProvider {
     
     public HostProvider() {
         try {
-            initializingHostsSemaphore.acquire();
+            lockHosts(); // Immediately lock the hosts, will be released after initialize()
         } catch (InterruptedException ex) {
             LOGGER.throwing(HostProvider.class.getName(), "<init>", ex);    // NOI18N
         }
