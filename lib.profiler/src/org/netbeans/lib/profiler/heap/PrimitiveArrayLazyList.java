@@ -50,11 +50,11 @@ import java.util.AbstractList;
 class PrimitiveArrayLazyList extends AbstractList {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    HprofByteBuffer dumpBuffer;
-    byte type;
-    int elSize;
-    int length;
-    long offset;
+    private final HprofByteBuffer dumpBuffer;
+    private final byte type;
+    private final int elSize;
+    private final int length;
+    private final long offset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

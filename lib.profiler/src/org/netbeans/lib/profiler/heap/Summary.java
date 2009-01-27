@@ -83,11 +83,11 @@ final class Summary implements HeapSummary {
         return totalAllocatedInstances;
     }
 
-    public int getTotalLiveBytes() {
+    public long getTotalLiveBytes() {
         return totalLiveBytes;
     }
 
-    public int getTotalLiveInstances() {
+    public long getTotalLiveInstances() {
         return totalLiveInstances;
     }
 }

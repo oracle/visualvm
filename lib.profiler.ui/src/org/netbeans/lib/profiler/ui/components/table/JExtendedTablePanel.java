@@ -43,8 +43,6 @@ package org.netbeans.lib.profiler.ui.components.table;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.components.JExtendedTable;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.JTableHeader;
@@ -78,6 +76,7 @@ public class JExtendedTablePanel extends JPanel {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public void paint(Graphics g) {
             super.paint(g);
 
@@ -119,7 +118,7 @@ public class JExtendedTablePanel extends JPanel {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected CustomExtendedTableViewport extendedTableViewport;
+    CustomExtendedTableViewport extendedTableViewport;
     protected JExtendedTable extendedTable;
     protected JScrollPane extendedTableScrollPane;
 
@@ -140,6 +139,7 @@ public class JExtendedTablePanel extends JPanel {
         extendedTableScrollPane.setCorner(key, corner);
     }
 
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         updateVerticalScrollbar();
