@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.datasource;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -91,7 +92,7 @@ public class DataSourceProvider {
      * @return DataSources managed by this provider.
      */
     public final Set<DataSource> getDataSources() {
-        return new HashSet(dataSources);
+        return new HashSet(Arrays.asList(dataSources.toArray()));
     }
 
     /**
@@ -102,7 +103,7 @@ public class DataSourceProvider {
      * @return DataSources of a certain type managed by this provider.
      */
     public final <Y extends DataSource> Set<Y> getDataSources(Class<Y> scope) {
-        return Utils.getFilteredSet(dataSources, scope);
+        return Utils.getFilteredSet(getDataSources(), scope);
     }
     
     
