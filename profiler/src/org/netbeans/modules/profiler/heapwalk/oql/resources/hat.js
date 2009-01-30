@@ -240,7 +240,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as ObjectArray");
             return new JavaObjectArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
-            //            println("wrapping as ValueArray");
+            // println("wrapping as ValueArray");
             return new JavaValueArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             //            println("wrapping as Instance");
@@ -1296,9 +1296,11 @@ function filter(array, code) {
  */
 function length(array) {
     array = wrapIterator(array);
-    if (array instanceof Array) {
-        return array.length;
-    } else if (array instanceof java.util.Enumeration) {
+    var length = array.length;
+
+    if (length != undefined) return length;
+    
+    if (array instanceof java.util.Enumeration) {
         var cnt = 0;
         while (array.hasMoreElements()) {
             array.nextElement(); 
