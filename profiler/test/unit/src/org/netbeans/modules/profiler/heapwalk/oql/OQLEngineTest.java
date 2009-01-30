@@ -122,7 +122,6 @@ public class OQLEngineTest {
                     rslt[0] = false;
                     return true;
                 }
-                System.out.println("xxx");
                 return false;
             }
         });
@@ -490,6 +489,30 @@ public class OQLEngineTest {
     }
 
     @Test
+    public void testFilter() throws Exception {
+        System.out.println("filter");
+
+        final int[] size = new int[]{0};
+        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select map(sort(filter(heap.objects('[C'), 'it.length > 0'), 'sizeof(lhs) - sizeof(rhs)'), \"sizeof(it)\")", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                int aSize = ((Number)o).intValue();
+                if (aSize < size[0]) {
+                    sorted[0] = false;
+                    return true;
+                }
+                size[0] = aSize;
+                return false;
+            }
+        });
+
+        assertTrue(sorted[0]);
+    }
+
+    @Test
     public void testSort() throws Exception {
         System.out.println("sort");
 
@@ -511,5 +534,62 @@ public class OQLEngineTest {
         });
 
         assertTrue(sorted[0]);
+    }
+
+    @Test
+    public void testLength() throws Exception {
+        System.out.println("length");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select length(a.value) from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertEquals(Integer.class, rsltClass[0]);
+    }
+
+    @Test
+    public void testCountNoClosure() throws Exception {
+        System.out.println("count - no closure");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select count(a.value) from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertEquals(Integer.class, rsltClass[0]);
+    }
+
+    @Test
+    public void testCount() throws Exception {
+        System.out.println("count");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select count(a.value, 'true') from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertEquals(Double.class, rsltClass[0]);
     }
 }
