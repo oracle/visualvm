@@ -49,6 +49,7 @@ made subject to such option by the copyright holder.
 	<mapID target="custom_filtersets" url="helppages/custom_filtersets.html"/>
         <mapID target="heap_taking" url="helppages/heap_taking.html"/>
         <mapID target="heapwalking" url="helppages/heapwalker.html"/>
+        <mapID target="heapoql" url="helppages/oqlhelp.html"/>
         <mapID target="profile_attach" url="helppages/profile_attach.html"/>
 	<mapID target="profile_analyze_short" url="helppages/profile_analyze_short.html"/>
         <mapID target="profile_freeform" url="helppages/profile_freeform.html"/>
@@ -127,5 +128,5 @@ made subject to such option by the copyright holder.
         <!--CSH ID for active profiling points dialog -->
         <mapID target="ProfilingPointsDisplayer.HelpCtx" url="helppages/profile_profilepoints.html"/>
 
-        
+        <mapID target="text.x-oql" url="helppages/oqlhelp.html"/>
     </map>
