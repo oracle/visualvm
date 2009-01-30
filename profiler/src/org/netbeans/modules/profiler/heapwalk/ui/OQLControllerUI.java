@@ -41,7 +41,6 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -57,8 +56,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -67,11 +64,8 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import org.netbeans.editor.Utilities;
 import org.netbeans.modules.profiler.heapwalk.OQLController;
-import org.openide.text.CloneableEditorSupport;
+import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -82,7 +76,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  * @author Jaroslav Bachorik
  */
-public class OQLControllerUI extends JPanel {
+public class OQLControllerUI extends JPanel implements PropertyChangeListener{
     // --- Presenter -------------------------------------------------------------
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
@@ -120,8 +114,7 @@ public class OQLControllerUI extends JPanel {
     private AbstractButton presenter;
     private OQLController oqlController;
     private HTMLTextArea resultsArea;
-    private JPanel queryContainer;
-    private JEditorPane queryEditor;
+    private OQLEditor queryContainer;
     private JButton performButton;
     private JPanel resultsContainer;
 
@@ -203,49 +196,52 @@ public class OQLControllerUI extends JPanel {
         add(separator, constraints);
 
         // settingsArea
-        queryContainer = new JPanel(new BorderLayout());
-        HTMLTextArea queryHeaderArea = new HTMLTextArea();
-        queryHeaderArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
-                             + "OQL Query:" + "</b><br><hr>"); // NOI18N
+        queryContainer = new OQLEditor();
 
-        queryContainer.add(queryHeaderArea, BorderLayout.NORTH);
+        queryContainer.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, this);
+//        new JPanel(new BorderLayout());
+//        HTMLTextArea queryHeaderArea = new HTMLTextArea();
+//
+//        queryHeaderArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
+//                             + "OQL Query:" + "</b><br><hr>"); // NOI18N
+//
+//        queryContainer.add(queryHeaderArea, BorderLayout.NORTH);
+//
+//        queryEditor = new JEditorPane("text/x-oql", "");
+//
+//        queryEditor.setBackground(queryHeaderArea.getBackground());
+//        queryEditor.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
+//        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
+//
+//            public void insertUpdate(DocumentEvent e) {
+//                updatePerformButton();
+//            }
+//
+//            public void removeUpdate(DocumentEvent e) {
+//                updatePerformButton();
+//            }
+//
+//            public void changedUpdate(DocumentEvent e) {
+//                //
+//            }
+//        });
+//
+//        JComponent jc = Utilities.getEditorUI(queryEditor).getExtComponent();
+//
+//        queryContainer.add(jc, BorderLayout.CENTER); //NOI18N
+//
+//        queryContainer.setBackground(queryHeaderArea.getBackground());
 
-        queryEditor = new JEditorPane();
-        queryEditor.setEditorKit(CloneableEditorSupport.getEditorKit("text/x-oql"));
-
-        queryEditor.setBackground(queryHeaderArea.getBackground());
-        queryEditor.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
-        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void insertUpdate(DocumentEvent e) {
-                updatePerformButton();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                updatePerformButton();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                //
-            }
-        });
-
-        JComponent jc = Utilities.getEditorUI(queryEditor).getExtComponent();
-        
-        queryContainer.add(jc, BorderLayout.CENTER); //NOI18N
-
-        queryContainer.setBackground(queryHeaderArea.getBackground());
-
-//        constraints = new GridBagConstraints();
-//        constraints.gridx = 0;
-//        constraints.gridy = 1;
-//        constraints.weightx = 1;
-//        constraints.weighty = 1;
-//        constraints.gridwidth = GridBagConstraints.REMAINDER;
-//        constraints.fill = GridBagConstraints.BOTH;
-//        constraints.anchor = GridBagConstraints.NORTHWEST;
-//        constraints.insets = new Insets(5, 5, 0, 5);
-//        add(queryContainer, constraints);
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.insets = new Insets(5, 5, 0, 5);
+        add(queryContainer, constraints);
 
         // performButton
         performButton = new JButton(PERFORM_BUTTON_TEXT);
@@ -268,7 +264,7 @@ public class OQLControllerUI extends JPanel {
 
         // queryContainer
 //        queryContainer = new JPanel(new GridBagLayout());
-        queryContainer.setOpaque(true);
+//        queryContainer.setOpaque(true);
 
         JScrollPane queryContainerScrollPane = new JScrollPane(queryContainer, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
@@ -353,7 +349,7 @@ public class OQLControllerUI extends JPanel {
     }
 
     private String getQuery() {
-        return queryEditor.getText();
+        return queryContainer.getScript();
     }
 
     private void performAnalysis() {
@@ -409,7 +405,14 @@ public class OQLControllerUI extends JPanel {
         if (oqlController.isAnalysisRunning()) {
             performButton.setEnabled(false);
         } else {
-            performButton.setEnabled(!(queryEditor.getText().length() > 0));
+            performButton.setEnabled(queryContainer.isValidScript());
+//            performButton.setEnabled(queryEditor.getText().length() > 0);
+        }
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(OQLEditor.VALIDITY_PROPERTY)) {
+            updatePerformButton();
         }
     }
 }
