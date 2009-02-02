@@ -107,7 +107,7 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
         long totalNInv = 0;
 
         for (int i = 0; i < nMethods; i++) {
-            double time = TimingAdjusterOld.getDefault(status)
+            double time = TimingAdjusterOld.getInstance(status)
                                            .adjustTime(timePM0[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
                                                        false);
 
@@ -126,7 +126,7 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
             }
 
             if (status.collectingTwoTimeStamps()) {
-                time = TimingAdjusterOld.getDefault(status)
+                time = TimingAdjusterOld.getInstance(status)
                                         .adjustTime(timePM1[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
                                                     true);
                 timePM1[i] = (long) time;

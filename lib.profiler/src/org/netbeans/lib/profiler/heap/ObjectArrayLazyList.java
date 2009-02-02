@@ -50,11 +50,11 @@ import java.util.AbstractList;
 class ObjectArrayLazyList extends AbstractList {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    HprofByteBuffer dumpBuffer;
-    HprofHeap heap;
-    int idSize;
-    int length;
-    long offset;
+    private final HprofByteBuffer dumpBuffer;
+    private final HprofHeap heap;
+    private final int idSize;
+    private final int length;
+    private final long offset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

@@ -467,8 +467,24 @@ public class ProfilerClient implements CommonConstants {
                 return null;
             }
         }
+        int len = 0;
+        boolean twoTimeStamps = false;
+        String[] instrClassNames, instrMethodNames, instrMethodSigs;
+        try {
+            status.beginTrans(false);
+            twoTimeStamps = status.collectingTwoTimeStamps();
+            len = status.getNInstrMethods();
+            instrClassNames = new String[len];
+            System.arraycopy(status.getInstrMethodClasses(), 0, instrClassNames, 0, len);
+            instrMethodNames = new String[len];
+            System.arraycopy(status.getInstrMethodNames(), 0, instrMethodNames, 0, len);
+            instrMethodSigs = new String[len];
+            System.arraycopy(status.getInstrMethodSignatures(), 0, instrMethodSigs, 0, len);
+        } finally {
+            status.endTrans();
+        }
 
-        return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, status);
+        return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
     }
 
     /**
