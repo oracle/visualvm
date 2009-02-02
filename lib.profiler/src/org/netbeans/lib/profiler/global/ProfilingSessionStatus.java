@@ -40,7 +40,6 @@
 
 package org.netbeans.lib.profiler.global;
 
-import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.wireprotocol.InternalStatsResponse;
 
 

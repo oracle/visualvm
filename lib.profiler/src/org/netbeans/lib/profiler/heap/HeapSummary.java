@@ -77,7 +77,7 @@ public interface HeapSummary {
      * from the dump.
      * @return number of total allocated bytes in the heap
      */
-    int getTotalLiveBytes();
+    long getTotalLiveBytes();
 
     /**
      * total number of instances allocated on the heap at the time of the heap dump.
@@ -85,5 +85,5 @@ public interface HeapSummary {
      * from the dump.
      * @return number of total live instances in the heap
      */
-    int getTotalLiveInstances();
+    long getTotalLiveInstances();
 }
