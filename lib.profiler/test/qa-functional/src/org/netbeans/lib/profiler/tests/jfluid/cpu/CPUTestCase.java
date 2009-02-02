@@ -351,12 +351,14 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
             waitForStatus(STATUS_APP_FINISHED);
 
+            Thread.sleep(6000);
+
             if (runner.targetJVMIsAlive()) {
                 log("Get results: " + System.currentTimeMillis());
                 assertTrue("Results do not exist - issue 65185.", runner.getProfilerClient().cpuResultsExist());
 
                 boolean gotResults = false;
-                int retryCounter = 4;
+                int retryCounter = 8; // was - 4
 
                 do {
                     // just wait for the results to appear - forceObtainedResultsDump() has been alread called by ProfilerClient on shutdown
@@ -364,7 +366,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                     gotResults = resultListener.wait4results(2500);
                 } while (!gotResults && (--retryCounter > 0));
 
-                assertTrue("Results are not available after 10 seconds.", gotResults);
+                assertTrue("Results are not available after 20 seconds.", gotResults); // was - 10 seconds
                 log("obtaining results " + String.valueOf(System.currentTimeMillis()));
 
                 //logInstrumented(runner);
