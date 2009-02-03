@@ -41,7 +41,6 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.results.CCTProvider;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 
 
 /**
@@ -49,12 +48,8 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
  * @author Jaroslav Bachorik
  */
 public interface CPUCCTProvider extends CCTProvider {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
     public static interface Listener extends CCTProvider.Listener {
     }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
      * Generate the presentation CCTs for all threads that are currently profiled. Returns an array of all generated CPUCCTContainers
