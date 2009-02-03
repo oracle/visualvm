@@ -64,7 +64,7 @@ public class OQLEngine {
      */
     public synchronized void executeQuery(String query, ObjectVisitor visitor)
             throws OQLException {
-        debugPrint("query : " + query);
+//        debugPrint("query : " + query);
         StringTokenizer st = new StringTokenizer(query);
         if (st.hasMoreTokens()) {
             String first = st.nextToken();

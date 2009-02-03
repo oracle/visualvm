@@ -147,12 +147,20 @@ public class OQLController extends AbstractTopLevelController implements Navigat
                     analysisRunning.compareAndSet(true, false);
                     ui.setResult(sb.toString());
                 } catch (OQLException oQLException) {
+                    StringBuilder errorMessage = new StringBuilder();
+                    errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>");
+                    errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK"));
+                    ui.setResult(errorMessage.toString());
                     cancelAnalysis();
                 }
             }
         });
 
         return progressModel;
+    }
+
+    public OQLEngine getEngine() {
+        return engine;
     }
 
     public void showURL(URL url) {

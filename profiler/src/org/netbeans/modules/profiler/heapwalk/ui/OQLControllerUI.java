@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
@@ -69,22 +68,21 @@ import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
-
 /**
  *
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  * @author Jaroslav Bachorik
  */
-public class OQLControllerUI extends JPanel implements PropertyChangeListener{
+public class OQLControllerUI extends JPanel implements PropertyChangeListener {
     // --- Presenter -------------------------------------------------------------
+
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
         private static ImageIcon ICON_INFO = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/oql.png")); // NOI18N
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
-
         public Presenter() {
             super();
             setText(CONTROLLER_NAME);
@@ -99,18 +97,17 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
     // -----
     // I18N String constants
     private static final String CANCEL_BUTTON_TEXT = NbBundle.getMessage(OQLControllerUI.class,
-                                                                         "AnalysisControllerUI_CancelButtonText"); // NOI18N
+            "AnalysisControllerUI_CancelButtonText"); // NOI18N
     private static final String PERFORM_BUTTON_TEXT = "Run Query";
     private static final String ANALYSIS_RESULTS_TEXT = NbBundle.getMessage(OQLControllerUI.class,
-                                                                            "AnalysisControllerUI_AnalysisResultsText"); // NOI18N
+            "AnalysisControllerUI_AnalysisResultsText"); // NOI18N
     private static final String CONTROLLER_NAME = NbBundle.getMessage(OQLControllerUI.class,
-                                                                      "OQLControllerUI_ControllerName"); // NOI18N
+            "OQLControllerUI_ControllerName"); // NOI18N
     private static final String CONTROLLER_DESCR = NbBundle.getMessage(OQLControllerUI.class,
-                                                                       "OQLControllerUI_ControllerDescr"); // NOI18N
-                                                                                                                // -----
+            "OQLControllerUI_ControllerDescr"); // NOI18N
+    // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     private AbstractButton presenter;
     private OQLController oqlController;
     private HTMLTextArea resultsArea;
@@ -136,36 +133,42 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
 
         return presenter;
     }
-    
+
     public void setResult(final String result) {
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    resultsContainer.removeAll();
-                    HTMLTextArea resultDisplayer = new HTMLTextArea(result) {
-                        protected void showURL(URL url) {
-                            oqlController.showURL(url);
-                        }
-                    };
-                    try { resultDisplayer.setCaretPosition(0); } catch (Exception e) {}
-                    resultsContainer.add(resultDisplayer, BorderLayout.CENTER);
-                    resultsContainer.invalidate();
-                    updatePerformButton();
-                    revalidate();
-                    repaint();
+
+            public void run() {
+                resultsContainer.removeAll();
+                HTMLTextArea resultDisplayer = new HTMLTextArea(result) {
+
+                    protected void showURL(URL url) {
+                        oqlController.showURL(url);
+                    }
+                };
+                try {
+                    resultDisplayer.setCaretPosition(0);
+                } catch (Exception e) {
                 }
-            });
+                resultsContainer.add(resultDisplayer, BorderLayout.CENTER);
+                resultsContainer.invalidate();
+                updatePerformButton();
+                revalidate();
+                repaint();
+            }
+        });
     }
 
     private void cancelAnalysis() {
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    resultsContainer.removeAll();
-                    resultsContainer.invalidate();
-                    revalidate();
-                    repaint();
-                    performButton.setEnabled(true);
-                }
-            });
+
+            public void run() {
+                resultsContainer.removeAll();
+                resultsContainer.invalidate();
+                revalidate();
+                repaint();
+                performButton.setEnabled(true);
+            }
+        });
         oqlController.cancelAnalysis();
     }
 
@@ -176,6 +179,7 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
 
         // Top separator
         JSeparator separator = new JSeparator() {
+
             public Dimension getMaximumSize() {
                 return new Dimension(super.getMaximumSize().width, 1);
             }
@@ -196,7 +200,7 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
         add(separator, constraints);
 
         // settingsArea
-        queryContainer = new OQLEditor();
+        queryContainer = new OQLEditor(oqlController.getEngine());
 
         queryContainer.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, this);
 //        new JPanel(new BorderLayout());
@@ -248,10 +252,11 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
         performButton.setMnemonic('R');
         performButton.setEnabled(false);
         performButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    performAnalysis();
-                }
-            });
+
+            public void actionPerformed(ActionEvent e) {
+                performAnalysis();
+            }
+        });
 
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -267,7 +272,8 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
 //        queryContainer.setOpaque(true);
 
         JScrollPane queryContainerScrollPane = new JScrollPane(queryContainer, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                               JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+
             public Dimension getPreferredSize() {
                 Dimension pref = super.getPreferredSize();
                 int height = Math.min(pref.height, 160);
@@ -297,8 +303,7 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
 
         // resultsArea
         resultsArea = new HTMLTextArea();
-        resultsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;"
-                            + ANALYSIS_RESULTS_TEXT + "</b><br><hr>"); // NOI18N
+        resultsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;" + ANALYSIS_RESULTS_TEXT + "</b><br><hr>"); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
@@ -313,7 +318,8 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
         resultsContainer.setOpaque(true);
 
         JScrollPane resultsContainerScrollPane = new JScrollPane(resultsContainer, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+
             public Dimension getPreferredSize() {
                 Dimension pref = super.getPreferredSize();
                 int height = Math.min(pref.height, 160);
@@ -383,10 +389,11 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener{
 
         JButton cancelAnalysis = new JButton(CANCEL_BUTTON_TEXT);
         cancelAnalysis.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    cancelAnalysis();
-                }
-            });
+
+            public void actionPerformed(ActionEvent e) {
+                cancelAnalysis();
+            }
+        });
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 0;

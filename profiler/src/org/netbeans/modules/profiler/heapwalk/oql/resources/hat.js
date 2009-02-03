@@ -1047,9 +1047,10 @@ function toHtml(obj) {
             return "<a href='file://class/" + name + "'>class " + name + "</a>";
         } else {
             var id = tmp.instanceId;
+            var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
             return "<a href='file://instance/" + name +"@" + id + "'>" +
-            name + "@" + id + "</a>";
+            name + "#" + number + "</a>";
         }
     } else if ((typeof(obj) == 'object') || (obj instanceof JSAdapter)) {
         if (obj instanceof java.lang.Object) {
