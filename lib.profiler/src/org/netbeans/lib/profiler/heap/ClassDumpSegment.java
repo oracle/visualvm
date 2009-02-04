@@ -115,7 +115,7 @@ class ClassDumpSegment extends TagBounds {
 
         if (entry != null) {
             try {
-                return (ClassDump) classes.get(entry.getIndex() - 1);
+                return (ClassDump) createClassCollection().get(entry.getIndex() - 1);
             } catch (ArrayIndexOutOfBoundsException ex) { // classObjectID do not reffer to ClassDump, its instance number is > classes.size()
 
                 return null;
@@ -129,7 +129,7 @@ class ClassDumpSegment extends TagBounds {
     }
 
     JavaClass getJavaClassByName(String fqn) {
-        Iterator classIt = classes.iterator();
+        Iterator classIt = createClassCollection().iterator();
 
         while (classIt.hasNext()) {
             ClassDump cls = (ClassDump) classIt.next();
@@ -157,8 +157,9 @@ class ClassDumpSegment extends TagBounds {
     }
 
     Map getClassIdToClassMap() {
-        Map map = new HashMap(classes.size()*4/3);
-        Iterator classIt = classes.iterator();
+        Collection allClasses = createClassCollection();
+        Map map = new HashMap(allClasses.size()*4/3);
+        Iterator classIt = allClasses.iterator();
         
         while(classIt.hasNext()) {
             ClassDump cls = (ClassDump) classIt.next();
@@ -170,8 +171,8 @@ class ClassDumpSegment extends TagBounds {
     
     void addInstanceSize(ClassDump cls, int tag, long instanceOffset) {
         if ((tag == HprofHeap.OBJECT_ARRAY_DUMP) || (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP)) {
-            Integer sizeInt = (Integer) arrayMap.get(cls);
-            int size = 0;
+            Long sizeInt = (Long) arrayMap.get(cls);
+            long size = 0;
             HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
             int idSize = dumpBuffer.getIDSize();
             long elementsOffset = instanceOffset + 1 + idSize + 4;
@@ -189,12 +190,12 @@ class ClassDumpSegment extends TagBounds {
                 elSize = idSize;
             }
 
-            size += (getMinimumInstanceSize() + (elements * elSize));
-            arrayMap.put(cls, Integer.valueOf(size));
+            size += (getMinimumInstanceSize() + (((long)elements) * elSize));
+            arrayMap.put(cls, Long.valueOf(size));
         }
     }
 
-    List /*<JavaClass>*/ createClassCollection() {
+    synchronized List /*<JavaClass>*/ createClassCollection() {
         if (classes != null) {
             return classes;
         }

@@ -347,6 +347,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private LoadedSnapshot loadedSnapshot;
     private ReverseCallGraphPanel backtraceView;
     private SaveSnapshotAction saveAction;
+    private SaveViewAction saveViewAction;
     private SnapshotFlatProfilePanel combinedFlat;
     private SnapshotFlatProfilePanel flatPanel;
     private SnapshotInfoPanel infoPanel;
@@ -474,7 +475,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         toolBar.add(saveAction = new SaveSnapshotAction(loadedSnapshot));
         toolBar.add(new ExportSnapshotAction(loadedSnapshot));
-        toolBar.add(new SaveViewAction(this));
+        toolBar.add(saveViewAction = new SaveViewAction(this));
 
         toolBar.addSeparator();
 
@@ -1083,6 +1084,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         // update the toolbar if selected tab changed
         boolean findEnabled = tabs.getSelectedComponent() != infoPanel;
+        saveViewAction.setEnabled(findEnabled);
         findActionPresenter.setEnabled(findEnabled);
         findPreviousPresenter.setEnabled(findEnabled);
         findNextPresenter.setEnabled(findEnabled);
