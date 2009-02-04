@@ -456,7 +456,7 @@ public class StackTraceSnapshotBuilder {
             currentDumpTimeStamp.set(-1);
             stackTraceCount = 0;
             lastThreadStates.clear();
-            lastStackTrace.set(null);
+            lastStackTrace.set(Collections.EMPTY_MAP);
         } finally {
             lock.writeLock().unlock();
         }
