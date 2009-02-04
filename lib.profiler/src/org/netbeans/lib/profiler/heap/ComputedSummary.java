@@ -50,22 +50,25 @@ import java.util.Iterator;
 class ComputedSummary implements HeapSummary {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private int bytes;
-    private int instances;
-    private long time;
+    private final long bytes;
+    private final long instances;
+    private final long time;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     ComputedSummary(HprofHeap heap) {
+        long bytesCount = 0;
+        long instancesCount = 0;
         Iterator classIt = heap.getAllClasses().iterator();
 
         while (classIt.hasNext()) {
             JavaClass jcls = (JavaClass) classIt.next();
 
-            instances += jcls.getInstancesCount();
-            bytes += jcls.getAllInstancesSize();
+            instancesCount += jcls.getInstancesCount();
+            bytesCount += jcls.getAllInstancesSize();
         }
-
+        bytes = bytesCount;
+        instances = instancesCount;
         time = heap.dumpBuffer.getTime();
     }
 
@@ -83,11 +86,11 @@ class ComputedSummary implements HeapSummary {
         return -1;
     }
 
-    public int getTotalLiveBytes() {
+    public long getTotalLiveBytes() {
         return bytes;
     }
 
-    public int getTotalLiveInstances() {
+    public long getTotalLiveInstances() {
         return instances;
     }
 }
