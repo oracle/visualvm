@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.extensions;
 
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
 
@@ -36,7 +37,9 @@ public class Installer extends ModuleInstall {
     public void restored() {
         JvmJvmstatModelFactory factory = JvmJvmstatModelFactory.getDefault();
         
+        factory.registerProvider(new ExtendedJvmJvmstatModelProvider());
         factory.registerProvider(new SapJvmJvmstatModelProvider());
         factory.registerProvider(new DiabloJvmJvmstatModelProvider());
+        JvmFactory.getDefault().registerProvider(new ExtendedJvmProvider());
     }
 }
