@@ -40,6 +40,10 @@
 
 package org.netbeans.modules.profiler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -52,11 +56,14 @@ import org.netbeans.spi.project.support.ant.GeneratedFilesHelper;
 import org.openide.filesystems.FileObject;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.spi.ProjectProfilingSupport;
+import org.openide.util.Lookup;
 
 
 /**
@@ -90,21 +97,38 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
             // No root method should be specified, first executed method will be treated as root method
             return new ClientUtils.SourceCodeSelection[0];
         } else {
-            // Profile Project or Profile Single
-            if (profiledClassFile == null) {
-                // Profile Project, extract root methods from the project
-                return ProjectUtilities.getProjectDefaultRoots(project, projectPackagesDescr);
-            } else {
-                // Profile Single, provide correct root methods
-                String profiledClass = SourceUtils.getToplevelClassName(profiledClassFile);
-
-                return new ClientUtils.SourceCodeSelection[] { new ClientUtils.SourceCodeSelection(profiledClass, "<all>", "") }; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
+            Collection<? extends ProjectProfilingSupport> supports = project.getLookup().lookupAll(ProjectProfilingSupport.class);
+            Set<ClientUtils.SourceCodeSelection> allRoots = new HashSet<ClientUtils.SourceCodeSelection>();
+            for(ProjectProfilingSupport support : supports) {
+                ClientUtils.SourceCodeSelection[] roots = support.getRootMethods(profiledClassFile);
+                allRoots.addAll(Arrays.asList(roots));
             }
+            return allRoots.toArray(new ClientUtils.SourceCodeSelection[allRoots.size()]);
+//            // Profile Project or Profile Single
+//            if (profiledClassFile == null) {
+//                // Profile Project, extract root methods from the project
+//                Collection<? extends ProjectProfilingSupport> supports = project.getLookup().lookupAll(ProjectProfilingSupport.class);
+//                Set<ClientUtils.SourceCodeSelection> allRoots = new HashSet<ClientUtils.SourceCodeSelection>();
+//                for(ProjectProfilingSupport support : supports) {
+//                    ClientUtils.SourceCodeSelection[] roots = support.getRootMethods(profiledClassFile);
+//                    allRoots.addAll(Arrays.asList(roots));
+//                }
+//                allRoots.toArray(new ClientUtils.SourceCodeSelection[allRoots.size()]);
+//            } else {
+//                // Profile Single, provide correct root methods
+//                String profiledClass = SourceUtils.getToplevelClassName(profiledClassFile);
+//
+//                return new ClientUtils.SourceCodeSelection[] { new ClientUtils.SourceCodeSelection(profiledClass, "<all>", "") }; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
+//            }
         }
     }
 
     public boolean isFileObjectSupported(Project project, FileObject fo) {
-        return true;
+        Collection<? extends ProjectProfilingSupport> supports = project.getLookup().lookupAll(ProjectProfilingSupport.class);
+        for(ProjectProfilingSupport support : supports) {
+            if (support.canProfileFile(fo)) return true;
+        }
+        return false;
     }
 
     public abstract boolean checkProjectCanBeProfiled(Project project, FileObject profiledClassFile);
@@ -159,7 +183,17 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
 
     public SimpleFilter computePredefinedInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
                                                                String[][] projectPackagesDescr) {
-        return ProjectUtilities.computeProjectOnlyInstrumentationFilter(project, predefinedInstrFilter, projectPackagesDescr);
+        Collection<? extends ProjectProfilingSupport> supports = project.getLookup().lookupAll(ProjectProfilingSupport.class);
+
+        StringBuilder filterValue = new StringBuilder();
+        for(ProjectProfilingSupport support : supports) {
+            String partialFilter = support.getFilter(ProjectUtilities.isIncludeSubprojects(predefinedInstrFilter));
+            filterValue.append(" ").append(partialFilter);
+        }
+
+        return new SimpleFilter(predefinedInstrFilter.getFilterName(), predefinedInstrFilter.getFilterType(), filterValue.toString().trim());
+//
+//        return ProjectUtilities.computeProjectOnlyInstrumentationFilter(project, predefinedInstrFilter, projectPackagesDescr);
     }
 
     public void computeProjectPackages(Project project, boolean subprojects, String[][] storage) {
