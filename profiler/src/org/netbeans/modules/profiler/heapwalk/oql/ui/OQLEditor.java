@@ -46,6 +46,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.modules.profiler.heapwalk.OQLController;
+import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
 import org.openide.util.Lookup;
 /**
@@ -57,9 +59,11 @@ public class OQLEditor extends JPanel {
 
     private boolean validityFlag = false;
     private JEditorPane queryEditor = null;
+    final private OQLEngine engine;
 
-    public OQLEditor() {
+    public OQLEditor(OQLEngine engine) {
         super(new BorderLayout());
+        this.engine = engine;
         init();
     }
 
@@ -74,6 +78,7 @@ public class OQLEditor extends JPanel {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
             queryEditor = impl.getEditorPane();
+            queryEditor.getDocument().putProperty(OQLEngine.class, engine);
             queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY, new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
@@ -81,7 +86,7 @@ public class OQLEditor extends JPanel {
                 }
             });
         } else {
-            queryEditor = new JEditorPane("text/x-oql", "");
+            queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
             setValidScript(true);
         }
         
