@@ -18,6 +18,7 @@
 package org.netbeans.modules.profiler.heapwalk.oql.model;
 
 import java.util.*;
+import java.util.ArrayList;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
