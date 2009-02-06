@@ -333,8 +333,8 @@ public class OQLEngineTest {
     }
 
     @Test
-    public void testReferrers() throws Exception {
-        System.out.println("referrers");
+    public void testReferrersInstance() throws Exception {
+        System.out.println("referrers-instance");
 
         String query = "select referrers(heap.findObject(1684166976))";
         long[] referrersTest = new long[] {1684166952};
@@ -355,11 +355,33 @@ public class OQLEngineTest {
     }
 
     @Test
-    public void testReferees() throws Exception {
-        System.out.println("referees");
+    public void testRefereesInstance() throws Exception {
+        System.out.println("referees-instance");
 
         String query = "select referees(heap.findObject(1684166976))";
         long[] refereesTest = new long[] {1684166992};
+        final List<Long> referees = new ArrayList<Long>();
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                referees.add(((Instance)o).getInstanceId());
+                return false;
+            }
+        });
+
+        assertEquals(refereesTest.length, referees.size());
+        for(long referee : refereesTest) {
+            if (!referees.contains(referee)) fail();
+        }
+    }
+
+    @Test
+    public void testRefereesClass() throws Exception {
+        System.out.println("referees-class");
+
+        String query = "select referees(heap.findClass(\"java.io.File\"))";
+        long[] refereesTest = new long[] {1684106928, 1684106888, 1684106848, 1684106408};
         final List<Long> referees = new ArrayList<Long>();
 
         instance.executeQuery(query, new ObjectVisitor() {

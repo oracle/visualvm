@@ -256,7 +256,10 @@ public class OQLEngine {
         } else if (jsObject instanceof Enumeration) {
             Enumeration enm = (Enumeration) jsObject;
             while (enm.hasMoreElements()) {
-                if (visitor.visit(unwrapJavaObject(enm.nextElement()))) return true;
+                Object elem = enm.nextElement();
+                if (elem != null) {
+                    if (visitor.visit(unwrapJavaObject(elem))) return true;
+                }
             }
             return false;
         } else {
