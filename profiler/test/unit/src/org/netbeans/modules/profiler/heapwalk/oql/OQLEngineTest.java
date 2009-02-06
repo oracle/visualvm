@@ -45,6 +45,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -484,7 +485,6 @@ public class OQLEngineTest {
                 return false;
             }
         });
-
         assertEquals(output[1], output[0]);
     }
 
@@ -609,6 +609,6 @@ public class OQLEngineTest {
             }
         });
 
-        assertEquals(Double.class, rsltClass[0]);
+        assertTrue(Map.class.isAssignableFrom(rsltClass[0]));
     }
 }
