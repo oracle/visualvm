@@ -36,6 +36,8 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     @Override
     public void restored() {
+        JvmFactory.getDefault().registerProvider(new ExtendedJvmProvider());
+        JvmJvmstatModelFactory.getDefault().registerProvider(new ExtendedJvmJvmstatModelProvider());
         JvmJvmstatModelFactory.getDefault().registerProvider(new SapJvmJvmstatModelProvider());
     }
 }
