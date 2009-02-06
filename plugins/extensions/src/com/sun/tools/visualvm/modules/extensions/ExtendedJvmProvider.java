@@ -40,15 +40,16 @@ import java.lang.management.RuntimeMXBean;
  * Support additional JVMs.
  *
  * @author Luis-Miguel Alventosa
+ * @author Tomas Hurka
  */
 public class ExtendedJvmProvider extends AbstractModelProvider<Jvm, Application> {
-
+    
     public Jvm createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         ExtendedJVMImpl jvm = null;
         if (jvmstat != null) {
-            String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
-            if (vmVersion != null && (vmVersion.startsWith("13.0") || vmVersion.startsWith("14.0"))) { // NOI18N
+            String ver = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
+            if (ver != null && (ver.startsWith("10.") || ver.startsWith("11.") || ver.startsWith("12.") || ver.startsWith("13.") || ver.startsWith("14."))) { // NOI18N
                 jvm = new ExtendedJVMImpl(app, jvmstat);
             }
         } else {
@@ -57,7 +58,8 @@ public class ExtendedJvmProvider extends AbstractModelProvider<Jvm, Application>
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                 if (mxbeans != null) {
                     RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
-                    if (runtime != null && (runtime.getVmVersion().startsWith("13.0") || runtime.getVmVersion().startsWith("14.0"))) { // NOI18N
+                    String ver = runtime.getVmVersion();
+                    if (ver != null && (ver.startsWith("10.") || ver.startsWith("11.") || ver.startsWith("12.") || ver.startsWith("13.") || ver.startsWith("14."))) { // NOI18N
                         jvm = new ExtendedJVMImpl(app);
                     }
                 }
@@ -65,7 +67,7 @@ public class ExtendedJvmProvider extends AbstractModelProvider<Jvm, Application>
         }
         return jvm;
     }
-
+    
     @Override
     public int priority() {
         return 3; // one more than JvmProvider

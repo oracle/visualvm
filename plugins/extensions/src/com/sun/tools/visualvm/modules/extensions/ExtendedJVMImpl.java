@@ -73,6 +73,7 @@ public class ExtendedJVMImpl extends Jvm implements JvmstatListener {
     private String mainArgs;
     private String mainClass;
     private String vmVersion;
+    private String javaVersion;
     private String javaHome;
     private String vmInfo;
     private String vmName;
@@ -171,16 +172,24 @@ public class ExtendedJVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean is16() {
-        String ver = getVmVersion();
-        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.0") || ver.startsWith("11.0"))) {    // NOI18N
+        String ver = getJavaVersion();
+        
+        if (ver == null) {
+            ver = getVmVersion();
+        }
+        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.") || ver.startsWith("11.") || ver.startsWith("12."))) {    // NOI18N
             return true;
         }
         return false;
     }
     
     public boolean is17() {
-        String ver = getVmVersion();
-        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("12.0") || ver.startsWith("13.0") || ver.startsWith("14.0"))) {  // NOI18N
+        String ver = getJavaVersion();
+        
+        if (ver == null) {
+            ver = getVmVersion();
+        }
+        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("13.") || ver.startsWith("14."))) {  // NOI18N
             return true;
         }
         return false;
@@ -390,6 +399,7 @@ public class ExtendedJVMImpl extends Jvm implements JvmstatListener {
                 mainArgs = jvmstatModel.getMainArgs();
                 mainClass = jvmstatModel.getMainClass();
                 vmVersion = jvmstatModel.getVmVersion();
+                javaVersion = monitoredVm.findByName("java.property.java.version");  // NOI18N
                 javaHome = jvmstatModel.getJavaHome();
                 vmInfo = jvmstatModel.getVmInfo();
                 vmName = jvmstatModel.getVmName();
@@ -399,6 +409,7 @@ public class ExtendedJVMImpl extends Jvm implements JvmstatListener {
                 Properties prop = jmxSupport.getSystemProperties();
                 if (prop != null) {
                     vmVersion = prop.getProperty("java.vm.version");    // NOI18N
+                    javaVersion = prop.getProperty("java.version");    // NOI18N
                     javaHome = prop.getProperty("java.home");   // NOI18N
                     vmInfo = prop.getProperty("java.vm.info");  // NOI18N
                     vmName = prop.getProperty("java.vm.name");  // NOI18N
@@ -426,6 +437,11 @@ public class ExtendedJVMImpl extends Jvm implements JvmstatListener {
         return args;
     }
 
+    private String getJavaVersion() {
+        initStaticData();
+        return javaVersion;
+    }
+    
     public void dataChanged(JvmstatModel stat) {
         assert stat == monitoredVm;
         MonitoredData data = new ExtendedMonitoredDataImpl(this,jvmstatModel);
