@@ -256,12 +256,15 @@ public class OQLEngine {
         } else if (jsObject instanceof Enumeration) {
             Enumeration enm = (Enumeration) jsObject;
             while (enm.hasMoreElements()) {
-                if (visitor.visit(unwrapJavaObject(enm.nextElement()))) return true;
+                Object elem = enm.nextElement();
+                if (elem != null) {
+                    if (visitor.visit(unwrapJavaObject(elem))) return true;
+                }
             }
             return false;
         } else {
 
-            Object object = unwrapJavaObject(jsObject);
+            Object object = unwrapJavaObject(jsObject, true);
             if (object instanceof Object[]) {
                 for (Object obj1 : (Object[]) object) {
                     if (visitor.visit(unwrapJavaObject(obj1))) {
@@ -294,10 +297,18 @@ public class OQLEngine {
     }
 
     public Object unwrapJavaObject(Object object) {
+        return unwrapJavaObject(object, false);
+    }
+
+    public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
         if (!object.getClass().getName().contains(".javascript.")) return object;
-        
+
         try {
-            return invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[]{object}});
+            Object ret = invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[]{object}});
+            if ((ret == null || ret == object) && tryAssociativeArray) {
+                ret = invokeMethod.invoke(engine, new Object[]{"unwrapMap", new Object[]{object}});
+            }
+            return ret;
         } catch (Exception ex) {
             if (debug) {
                 ex.printStackTrace(System.err);
