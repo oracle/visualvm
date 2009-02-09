@@ -418,7 +418,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 Properties prop = jmxSupport.getSystemProperties();
                 if (prop != null) {
                     vmVersion = prop.getProperty("java.vm.version");    // NOI18N
-                    javaVersion = prop.getProperty("java.version");
+                    javaVersion = prop.getProperty("java.version");    // NOI18N
                     javaHome = prop.getProperty("java.home");   // NOI18N
                     vmInfo = prop.getProperty("java.vm.info");  // NOI18N
                     vmName = prop.getProperty("java.vm.name");  // NOI18N
