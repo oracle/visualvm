@@ -196,16 +196,38 @@ public class Snapshot {
 
     public Iterator getReferrers(Instance obj) {
         List instances = new ArrayList();
-        for (Iterator iter = obj.getReferences().iterator(); iter.hasNext();) {
-            Value val = (Value) iter.next();
-            instances.add(val.getDefiningInstance());
+        List references = null;
+        references = obj.getReferences();
+        if (references != null) {
+            for (Iterator iter = references.iterator(); iter.hasNext();) {
+                Value val = (Value) iter.next();
+                instances.add(val.getDefiningInstance());
+            }
         }
         return instances.iterator();
     }
 
-    public Iterator getReferees(Instance obj) {
+    public Iterator getReferees(Object obj) {
         List instances = new ArrayList();
-        for (Object value : obj.getFieldValues()) {
+        List values = null;
+        if (obj instanceof Instance) {
+            values = ((Instance)obj).getFieldValues();
+        } else if (obj instanceof JavaClass) {
+            values = ((JavaClass)obj).getStaticFieldValues();
+        }
+        if (values != null) {
+            for (Object value : values) {
+                if (value instanceof ObjectFieldValue) {
+                    instances.add(((ObjectFieldValue) value).getInstance());
+                }
+            }
+        }
+        return instances.iterator();
+    }
+
+    public Iterator getReferees(JavaClass clz) {
+        List instances = new ArrayList();
+        for (Object value : clz.getStaticFieldValues()) {
             if (value instanceof ObjectFieldValue) {
                 instances.add(((ObjectFieldValue) value).getInstance());
             }
