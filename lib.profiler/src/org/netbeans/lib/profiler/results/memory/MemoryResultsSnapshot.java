@@ -58,7 +58,33 @@ import java.util.logging.Level;
  * @author Ian Formanek
  */
 public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    /***************************************************************************
+    +------------------------------------------------------------------------------+
+    | Profiler memory snapshot format description                                  |
+    +------------------------------------------------------------------------------+
+    int         version
+    long        timestamp
+    long        duration
+    int         # profiled classes
+    ===> for(# profiled classes)
+    string      class name
+    long        object size per class
+    <===
+    boolean     contains stacktraces
+    int         # stacktraces
+    ===> for(# stacktraces)
+    :::> load node
+    int         type (RuntimeMemoryCCTNode.TYPE_RuntimeMemoryCCTNode,
+                      RuntimeMemoryCCTNode.TYPE_RuntimeObjAllocTermCCTNode,
+                      RuntimeMemoryCCTNode.RuntimeObjLivenessTermCCTNode)
+    int         methodId
+    int         # children
+    ======> for(# children)
+    >load node<
+    <=====
+    <::: load node
+    <===
+    ***************************************************************************/
 
     private JMethodIdTable table;
     private String[] classNames;

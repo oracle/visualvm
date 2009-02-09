@@ -73,16 +73,15 @@ import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.w3c.dom.Element;
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -103,7 +102,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.loaders.DataObject;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 
 
 /**
@@ -855,7 +858,18 @@ public final class ProjectUtilities {
             return; // fail early
         }
 
-        ap.invokeAction(s, Lookup.getDefault());
+        Lookup lkp = null;
+        if (NetBeansProfiler.getDefaultNB().getProfiledSingleFile() != null) {
+            try {
+                lkp = new ProxyLookup(Lookup.getDefault(), Lookups.fixed(DataObject.find(NetBeansProfiler.getDefaultNB().getProfiledSingleFile())));
+            } catch (DataObjectNotFoundException ex) {
+                lkp = Lookup.getDefault();
+            }
+        } else {
+            lkp = Lookup.getDefault();
+        }
+
+        ap.invokeAction(s, lkp);
     }
 
     /**

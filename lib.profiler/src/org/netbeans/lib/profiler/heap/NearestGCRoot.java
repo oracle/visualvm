@@ -73,33 +73,24 @@ class NearestGCRoot {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    synchronized Instance getNearestGCRootPointer(Instance instance) {
+    Instance getNearestGCRootPointer(Instance instance) {
         if (heap.getGCRoot(instance) != null) {
             return instance;
         }
-
+        computeGCRoots();
         long nextGCPathId = heap.idToOffsetMap.get(instance.getInstanceId()).getNearestGCRootPointer();
-
-        if (nextGCPathId == 0L) {
-            nextGCPathId = computeGCRootsFor(instance);
-        }
-
-        if (nextGCPathId != 0L) {
-            return heap.getInstanceByID(nextGCPathId);
-        }
-
-        return null;
+        return heap.getInstanceByID(nextGCPathId);
     }
 
     private boolean isWeakOrSoftReference(FieldValue value, Instance instance) {
         Field f = value.getField();
 
-        return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass()); // NOI18N
+        return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass());
     }
 
-    private long computeGCRootsFor(Instance instance) {
+    private synchronized void computeGCRoots() {
         if (gcRootsComputed) {
-            return 0L;
+            return;
         }
 
         JavaClass weakRef = heap.getJavaClassByName("java.lang.ref.WeakReference"); // NOI18N
@@ -126,8 +117,6 @@ class NearestGCRoot {
 
         deleteBuffers();
         gcRootsComputed = true;
-
-        return heap.idToOffsetMap.get(instance.getInstanceId()).getNearestGCRootPointer();
     }
 
     private void computeOneLevel() throws IOException {

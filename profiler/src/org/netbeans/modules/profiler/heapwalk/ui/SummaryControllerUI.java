@@ -44,6 +44,7 @@ import java.util.Enumeration;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.heapwalk.SummaryController;
 import org.openide.util.ImageUtilities;
@@ -131,6 +132,8 @@ public class SummaryControllerUI extends JPanel {
                                                                                "SummaryControllerUI_ClassloadersItemString"); // NOI18N
     private static final String GCROOTS_ITEM_STRING = NbBundle.getMessage(SummaryControllerUI.class,
                                                                           "SummaryControllerUI_GcRootsItemString"); // NOI18N
+    private static final String FINALIZERS_ITEM_STRING = NbBundle.getMessage(SummaryControllerUI.class,
+                                                                          "SummaryControllerUI_FinalizersItemString"); // NOI18N
     private static final String OS_ITEM_STRING = NbBundle.getMessage(SummaryControllerUI.class, "SummaryControllerUI_OsItemString"); // NOI18N
     private static final String ARCHITECTURE_ITEM_STRING = NbBundle.getMessage(SummaryControllerUI.class,
                                                                                "SummaryControllerUI_ArchitectureItemString"); // NOI18N
@@ -228,7 +231,7 @@ public class SummaryControllerUI extends JPanel {
         File file = summaryController.getHeapFragmentWalker().getHeapDumpFile();
         Heap heap = summaryController.getHeapFragmentWalker().getHeapFragment();
         HeapSummary hsummary = heap.getSummary();
-
+        long finalizers = computeFinalizers(heap);
         int nclassloaders = 0;
         JavaClass cl = heap.getJavaClassByName("java.lang.ClassLoader"); // NOI18N
 
@@ -283,11 +286,29 @@ public class SummaryControllerUI extends JPanel {
                          + MessageFormat.format(GCROOTS_ITEM_STRING,
                                                 new Object[] { numberFormat.format(heap.getGCRoots().size()) }); // NOI18N
 
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;"
+        String finalizersInfo = "&nbsp;&nbsp;&nbsp;&nbsp;"
+                         + MessageFormat.format(FINALIZERS_ITEM_STRING,
+                                                new Object[] { numberFormat.format(finalizers) }); // NOI18N
+
+          return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;"
                + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes
-               + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots; // NOI18N
+               + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo; // NOI18N
     }
 
+    private long computeFinalizers(Heap heap) {
+        JavaClass finalizerClass = heap.getJavaClassByName("java.lang.ref.Finalizer");
+        if (finalizerClass != null) {
+            Instance queue = (Instance) finalizerClass.getValueOfStaticField("queue");
+            if (queue != null) {
+                Long len = (Long) queue.getValueOfField("queueLength");
+                if (len != null) {
+                    return len.longValue();
+                }
+            }
+        }
+        return -1;
+    }
+    
     private String computeSystemProperties(boolean showSystemProperties) {
         Properties systemProperties = getSystemProperties();
 
