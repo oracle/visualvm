@@ -78,6 +78,7 @@ public class JTreeTablePanel extends JPanel {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public void paint(Graphics g) {
             super.paint(g);
 
@@ -111,7 +112,7 @@ public class JTreeTablePanel extends JPanel {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected CustomTreeTableViewport treeTableViewport;
+    CustomTreeTableViewport treeTableViewport;
     protected JPanel scrollBarPanel;
     protected JScrollBar scrollBar;
     protected JScrollPane treeTableScrollPane;
@@ -142,6 +143,7 @@ public class JTreeTablePanel extends JPanel {
         return treeTableScrollPane;
     }
 
+    @Override
     public void paint(java.awt.Graphics g) {
         super.paint(g);
         updateScrollBarMaximum();

@@ -58,6 +58,8 @@ import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 
 
 public class LoadedSnapshot {
@@ -214,6 +216,12 @@ public class LoadedSnapshot {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    static void writeToStream(CPUResultsSnapshot snapshot, DataOutputStream dos) throws IOException {
+        LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot,
+                ProfilingSettingsPresets.createCPUPreset(), null, null);
+        loadedSnapshot.save(dos);
     }
 
     public void save(DataOutputStream dos) throws IOException, OutOfMemoryError {
