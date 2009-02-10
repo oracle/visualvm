@@ -63,6 +63,10 @@ public class MarkMapper implements MarkingEngine.StateObserver {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Mark getMark(int methodId, ProfilingSessionStatus status) {
+        if (status == null) {
+            return Mark.DEFAULT;
+        }
+        
         synchronized (marksGuard) {
             Mark mark = (Mark) markMap.get(Integer.valueOf(methodId));
 

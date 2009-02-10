@@ -53,13 +53,11 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDisplayer;
@@ -68,7 +66,6 @@ import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
@@ -593,10 +590,14 @@ public final class ResultsManager {
         openSnapshot(ls, CommonConstants.SORTING_COLUMN_DEFAULT, false); // target component decides which column will be used for sorting
     }
 
-    public void openSnapshot(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
-        SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
-        srw.open();
-        srw.requestActive();
+    public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
+        IDEUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
+                srw.open();
+                srw.requestActive();
+            }
+        });
     }
 
     public void openSnapshots(LoadedSnapshot[] loaded) {

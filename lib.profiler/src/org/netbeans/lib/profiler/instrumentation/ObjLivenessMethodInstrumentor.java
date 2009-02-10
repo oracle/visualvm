@@ -125,7 +125,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected MethodScanerForBannedInstantiations msbi;
+    MethodScanerForBannedInstantiations msbi;
     protected boolean[] allUnprofiledClassStatusArray;
     protected int operationCode; // Depending on this value, use different methods to mark/determine if a method needs rewriting
     private final ProfilerEngineSettings engineSettings;
@@ -241,6 +241,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
         return ni || (getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(), clazz, methodIdx).length > 0);
     }
 
+    @Override
     protected boolean methodNeedsRewriting(DynamicClassInfo clazz, int methodIdx) {
         if (operationCode == STANDARD_INSTRUMENTATION) {
             return clazz.isMethodInstrumented(methodIdx);

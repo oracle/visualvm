@@ -145,6 +145,15 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.modules.editor.mimelookup</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.11</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.java.kit</code-name-base>
                     <run-dependency>
                         <specification-version>1.0</specification-version>
@@ -183,6 +192,15 @@ made subject to such option by the copyright holder.
                     <run-dependency>
                         <release-version>1</release-version>
                         <specification-version>1.3</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.lexer</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>2</release-version>
+                        <specification-version>1.30</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -362,10 +380,42 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
             </module-dependencies>
+            <test-dependencies>
+                <test-type>
+                    <name>qa-functional</name>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.libs.junit4</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.java.kit</code-name-base>
+                        <compile-dependency/>
+                        <test/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.jellytools</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.jellytools.platform</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.jemmy</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.nbjunit</code-name-base>
+                        <recursive/>
+                        <compile-dependency/>
+                    </test-dependency>
+                </test-type>
+            </test-dependencies>
             <friend-packages>
                 <friend>org.netbeans.modules.autoproject.profiler</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
+                <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
@@ -376,11 +426,12 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
-                <friend>org.netbeans.modules.javame.profiler</friend>
+                <friend>org.netbeans.modules.profiler.oql.language</friend>
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.categories</package>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
+                <package>org.netbeans.modules.profiler.heapwalk.oql</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.ui</package>
                 <package>org.netbeans.modules.profiler.ui.stats</package>

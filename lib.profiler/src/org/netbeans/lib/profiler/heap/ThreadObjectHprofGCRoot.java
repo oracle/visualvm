@@ -61,24 +61,26 @@ class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot 
         
         if (stackTraceSerialNumber != 0) {
             StackTrace stackTrace = heap.getStackTraceSegment().getStackTraceBySerialNumber(stackTraceSerialNumber);
-            StackFrame[] frames = stackTrace.getStackFrames();
-            StackTraceElement[] stackElements = new StackTraceElement[frames.length];
+            if (stackTrace != null) {
+                StackFrame[] frames = stackTrace.getStackFrames();
+                StackTraceElement[] stackElements = new StackTraceElement[frames.length];
 
-            for (int i=0;i<frames.length;i++) {
-                StackFrame f = frames[i];
-                String className = f.getClassName();
-                String method = f.getMethodName();
-                String source = f.getSourceFile();
-                int number = f.getLineNumber();
-                
-                if (number == StackFrame.NATIVE_METHOD) {
-                    number = -2;
-                } else if (number == StackFrame.NO_LINE_INFO || number == StackFrame.UNKNOWN_LOCATION) {
-                    number = -1;
+                for (int i=0;i<frames.length;i++) {
+                    StackFrame f = frames[i];
+                    String className = f.getClassName();
+                    String method = f.getMethodName();
+                    String source = f.getSourceFile();
+                    int number = f.getLineNumber();
+
+                    if (number == StackFrame.NATIVE_METHOD) {
+                        number = -2;
+                    } else if (number == StackFrame.NO_LINE_INFO || number == StackFrame.UNKNOWN_LOCATION) {
+                        number = -1;
+                    }
+                    stackElements[i] = new StackTraceElement(className,method,source,number);
                 }
-                stackElements[i] = new StackTraceElement(className,method,source,number);
+                return stackElements;
             }
-            return stackElements;
         }
         return null;
     }

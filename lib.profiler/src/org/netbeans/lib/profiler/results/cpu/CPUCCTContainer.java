@@ -42,7 +42,6 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
@@ -135,7 +134,7 @@ public class CPUCCTContainer {
     protected long wholeGraphPureTimeThreadCPU;
     private InstrumentationFilter filter;
     private PrestimeCPUCCTNodeFree reverseCCTRootNode;
-    private ProfilingSessionStatus status;
+//    private ProfilingSessionStatus status;
     private int[] nodeStack;
     private int childTotalNCalls;
     private int currentNodeStackSize;
@@ -149,24 +148,29 @@ public class CPUCCTContainer {
     private long childTotalTime1InTimerUnits;
     private long totalInvNo;
 
+    private TimingAdjusterOld timingAdjuster;
+
+    private MethodInfoMapper methodInfoMapper = MethodInfoMapper.DEFAULT;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CPUCCTContainer(TimedCPUCCTNode rtRootNode, CPUResultsSnapshot cpuResSnapshot, ProfilingSessionStatus status,
-                           InstrumentationFilter usedFilter, int nNodes, double[] threadActiveTimesInCounts, int threadId,
-                           String threadName) {
+    public CPUCCTContainer(TimedCPUCCTNode rtRootNode, CPUResultsSnapshot cpuResSnapshot, MethodInfoMapper methodInfoMapper, TimingAdjusterOld timingAdjuster,
+                           InstrumentationFilter usedFilter, int nNodes,
+                           double[] threadActiveTimesInCounts, int threadId, String threadName) {
         this(cpuResSnapshot);
 
         this.threadId = threadId;
         this.threadName = threadName;
 
-        this.status = status;
+        this.methodInfoMapper = methodInfoMapper;
+        this.timingAdjuster = timingAdjuster;
         this.filter = usedFilter;
 
         collectingTwoTimeStamps = cpuResSnapshot.isCollectingTwoTimeStamps();
 
         generateCompactData(rtRootNode, nNodes);
 
-        calculateThreadActiveTimesInMS(threadActiveTimesInCounts, status);
+        calculateThreadActiveTimesInMS(threadActiveTimesInCounts);
 
         rootNode = new PrestimeCPUCCTNodeBacked(this, null, 0);
 
@@ -574,12 +578,9 @@ public class CPUCCTContainer {
             }
             case TimedCPUCCTNode.FILTERED_MAYBE: {
                 if (node instanceof MethodCPUCCTNode) {
-                    status.beginTrans(false);
-
+                    methodInfoMapper.lock(false);
                     try {
-                        String className = status.getInstrMethodClasses()[((MethodCPUCCTNode) node).getMethodId()].replace('.',
-                                                                                                                           '/'); // NOI18N
-
+                        String className = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) node).getMethodId()).replace('.', '/'); // NOI18N
                         if (!filter.passesFilter(className)) {
                             compParent = parent;
                         } else {
@@ -587,7 +588,7 @@ public class CPUCCTContainer {
                             compParent = newChild;
                         }
                     } finally {
-                        status.endTrans();
+                        methodInfoMapper.unlock();
                     }
                 } else {
                     compParent = parent;
@@ -738,7 +739,7 @@ public class CPUCCTContainer {
     /**
      * After presentation-time CCT is generated, calculate various special time values stored in this instance
      */
-    private void calculateThreadActiveTimesInMS(double[] threadActiveTimesInCounts, ProfilingSessionStatus status) {
+    private void calculateThreadActiveTimesInMS(double[] threadActiveTimesInCounts) {
         //!!! Delete this comment after deciding what to do with the whole issue.
         // In the code below, '+=' is caused by the fact that this method may be called multiple times when in getRootNode() we
         // generate CCTs for all threads. In the default single-thread case the real value is just added to the initial zero value.
@@ -747,16 +748,16 @@ public class CPUCCTContainer {
         timeInInjectedCodeInAbsCounts = threadActiveTimesInCounts[2];
         timeInInjectedCodeInThreadCPUCounts = threadActiveTimesInCounts[3];
 
-        wholeGraphGrossTimeAbsInMS += ((wholeGraphGrossTimeAbs * 1000.0) / status.timerCountsInSecond[0]);
-        timeInInjectedCodeInMS += ((timeInInjectedCodeInAbsCounts * 1000.0) / status.timerCountsInSecond[0]);
+        wholeGraphGrossTimeAbsInMS += ((wholeGraphGrossTimeAbs * 1000.0) / timingAdjuster.getInstrTimingData().timerCountsInSecond0);
+        timeInInjectedCodeInMS += ((timeInInjectedCodeInAbsCounts * 1000.0) / timingAdjuster.getInstrTimingData().timerCountsInSecond0);
 
         // Note that here we have to use status.timerCountsInSecond[x] explicitly instead of timerCountsInSecond0/1 (which may correspond to wrong time type)
-        wholeGraphPureTimeAbs += (int) ((((double) wholeGraphGrossTimeAbs - timeInInjectedCodeInAbsCounts) * 1000000) / status.timerCountsInSecond[0]);
+        wholeGraphPureTimeAbs += (int) ((((double) wholeGraphGrossTimeAbs - timeInInjectedCodeInAbsCounts) * 1000000) / timingAdjuster.getInstrTimingData().timerCountsInSecond1);
 
         //System.err.println("*** wholeGraphTimeAbs gross (cnts) = " + wholeGraphGrossTimeAbs + ", pure (mcs) = " + wholeGraphPureTimeAbs);
         if (wholeGraphGrossTimeThreadCPU > 0) { // Otherwise it means we couldn't calculate it and it shouldn't be displayed
             displayWholeThreadCPUTime = true;
-            wholeGraphPureTimeThreadCPU += (int) ((((double) wholeGraphGrossTimeThreadCPU - timeInInjectedCodeInThreadCPUCounts) * 1000000) / status.timerCountsInSecond[1]);
+            wholeGraphPureTimeThreadCPU += (int) ((((double) wholeGraphGrossTimeThreadCPU - timeInInjectedCodeInThreadCPUCounts) * 1000000) / timingAdjuster.getInstrTimingData().timerCountsInSecond1);
 
             //System.err.println("*** wholeGraphTimeThreadCPU gross (cnts) = " + wholeGraphGrossTimeThreadCPU + ", pure (mcs) = " + wholeGraphPureTimeThreadCPU);
             //System.err.println("*** timeInInjectedCode (mcs) = " + (timeInInjectedCodeInAbsCounts * 1000000 / status.timerCountsInSecond[0]));
@@ -887,8 +888,7 @@ public class CPUCCTContainer {
         /* PROTOTYPE [wait]
            long time = (long) (((double) rtNode.netTime0 - rtNode.waitTime0 - rtNode.nCalls * timingData.methodEntryExitInnerTime0 - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0);
          */
-        long time = (long) TimingAdjusterOld.getDefault(status)
-                                            .adjustTime(rtNode.getNetTime0(), rtNode.getNCalls(), nCallsFromThisNode, false);
+        long time = (long) timingAdjuster.adjustTime(rtNode.getNetTime0(), rtNode.getNCalls(), nCallsFromThisNode, false);
 
         //    (long) (((double) rtNode.getNetTime0() - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0
         //      - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData
@@ -916,8 +916,7 @@ public class CPUCCTContainer {
         childTotalTime0InTimerUnits = thisNodeTotalTime0InTimerUnits; // It will be effectively returned by this method
                                                                       // Calculate cleansed total time
 
-        time = (long) TimingAdjusterOld.getDefault(status)
-                                       .adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls(), totalNCallsFromThisNode,
+        time = (long) timingAdjuster.adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls(), totalNCallsFromThisNode,
                                                    false);
 
         //    time = (long) (((double) thisNodeTotalTime0InTimerUnits - rtNode.getNCalls()* timingData.methodEntryExitInnerTime0
@@ -932,8 +931,7 @@ public class CPUCCTContainer {
 
         if (collectingTwoTimeStamps) {
             // Calculate cleansed self time
-            time = (long) TimingAdjusterOld.getDefault(status)
-                                           .adjustTime(rtNode.getNetTime1(), rtNode.getNCalls(), nCallsFromThisNode, true);
+            time = (long) timingAdjuster.adjustTime(rtNode.getNetTime1(), rtNode.getNCalls(), nCallsFromThisNode, true);
 
             //      time = (long) (((double) rtNode.getNetTime1()
             //        - rtNode.getNCalls() * timingData.methodEntryExitInnerTime1
@@ -948,8 +946,7 @@ public class CPUCCTContainer {
             childTotalTime1InTimerUnits = thisNodeTotalTime1InTimerUnits; // It will be effectively returned by this method
                                                                           // Calculate cleansed total time
 
-            time = (long) TimingAdjusterOld.getDefault(status)
-                                           .adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls(),
+            time = (long) timingAdjuster.adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls(),
                                                        totalNCallsFromThisNode, true);
 
             //      time = (long) (((double) thisNodeTotalTime1InTimerUnits - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0

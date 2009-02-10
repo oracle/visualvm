@@ -73,7 +73,7 @@ public interface JavaClass extends Type {
      * Speed: normal
      * @return the size of all instances in bytes
      */
-    int getAllInstancesSize();
+    long getAllInstancesSize();
 
     /**
      * returns true if this JavaClass represents array (for examle: java.lang.String[]).
