@@ -70,7 +70,7 @@ public class TriggeredTakeSnapshotProfilingPointFactory extends CodeProfilingPoi
     private static final String PP_DEFAULT_NAME = NbBundle.getMessage(TriggeredTakeSnapshotProfilingPointFactory.class,
                                                                       "TriggeredTakeSnapshotProfilingPointFactory_PpDefaultName"); // NOI18N
                                                                                                                                    // -----
-    public static final Icon TAKE_SNAPSHOT_PP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/triggeredTakeSnapshotProfilingPoint.png")); // NOI18N
+    public static final Icon TAKE_SNAPSHOT_PP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ppoints/ui/resources/triggeredTakeSnapshotProfilingPoint.png", false); // NOI18N
     public static final String TAKE_SNAPSHOT_PP_TYPE = PP_TYPE;
     public static final String TAKE_SNAPSHOT_PP_DESCR = PP_DESCR;
     

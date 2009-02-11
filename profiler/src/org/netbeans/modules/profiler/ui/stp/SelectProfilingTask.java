@@ -220,11 +220,11 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
 
     // --- UI components declaration ---------------------------------------------
     private static final Image BACKGROUND_IMAGE = UIUtils.isNimbus() ? null : ImageUtilities.loadImage("org/netbeans/modules/profiler/ui/stp/resources/sptBar.png"); // NOI18N
-    private static final Icon MONITOR_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ui/resources/monitoring.png")); // NOI18N
-    private static final Icon CPU_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ui/resources/cpu.png")); // NOI18N
-    private static final Icon MEMORY_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ui/resources/memory.png")); // NOI18N
-    private static final Icon RUN_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/runButton.gif")); // NOI18N
-    private static final Icon ATTACH_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/attachButton.gif")); // NOI18N
+    private static final Icon MONITOR_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/monitoring.png", false); // NOI18N
+    private static final Icon CPU_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/cpu.png", false); // NOI18N
+    private static final Icon MEMORY_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/memory.png", false); // NOI18N
+    private static final Icon RUN_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/runButton.gif", false); // NOI18N
+    private static final Icon ATTACH_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/attachButton.gif", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

@@ -86,9 +86,9 @@ public class SelfSamplerAction extends AbstractAction {
         putValue(Action.NAME, ACTION_NAME_START);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
-            ImageUtilities.image2Icon(
-                ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png") //NOI18N
-            )
+            ImageUtilities.loadImageIcon(
+                "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
+        , false)
         );
 
         builder.setIgnoredThreads(Collections.singleton(THREAD_NAME));
@@ -107,9 +107,9 @@ public class SelfSamplerAction extends AbstractAction {
         if (isRunning.compareAndSet(false, true)) {
             putValue(Action.NAME, ACTION_NAME_STOP);
             putValue(Action.SMALL_ICON,
-                ImageUtilities.image2Icon(
-                    ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/modifyProfiling.png") //NOI18N
-                )
+                ImageUtilities.loadImageIcon(
+                    "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png" //NOI18N
+            , false)
             );
             executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
             startTime = System.currentTimeMillis();
@@ -122,9 +122,9 @@ public class SelfSamplerAction extends AbstractAction {
         } else if (isRunning.compareAndSet(true, false)) {
             putValue(Action.NAME, ACTION_NAME_START);
             putValue(Action.SMALL_ICON,
-                    ImageUtilities.image2Icon(
-                    ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png") //NOI18N
-                )
+                    ImageUtilities.loadImageIcon(
+                    "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
+            , false)
             );
             try {
                 executor.shutdown();
