@@ -38,9 +38,12 @@
  */
 package org.netbeans.modules.profiler.actions;
 
+import java.awt.AWTEvent;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -48,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
@@ -60,8 +62,10 @@ import org.openide.util.ImageUtilities;
  *
  * @author Jaroslav Bachorik
  */
-public class SelfSamplerAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public class SelfSamplerAction extends AbstractAction implements AWTEventListener {
+    final private static class Singleton {
+        static final SelfSamplerAction INSTANCE = new SelfSamplerAction();
+    }
 
     // -----
     // I18N String constants
@@ -82,7 +86,7 @@ public class SelfSamplerAction extends AbstractAction {
     private long startTime;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-    public SelfSamplerAction() {
+    private SelfSamplerAction() {
         putValue(Action.NAME, ACTION_NAME_START);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
@@ -90,8 +94,14 @@ public class SelfSamplerAction extends AbstractAction {
                 "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
         , false)
         );
-
+        if (System.getProperty(SelfSamplerAction.class.getName() + ".sniff") != null) {
+            Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
+        }
         builder.setIgnoredThreads(Collections.singleton(THREAD_NAME));
+    }
+
+    public static final SelfSamplerAction getInstance() {
+        return Singleton.INSTANCE;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -132,6 +142,7 @@ public class SelfSamplerAction extends AbstractAction {
                 CPUResultsSnapshot snapshot = builder.createSnapshot(startTime, System.nanoTime());
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                 ResultsManager.getDefault().openSnapshot(loadedSnapshot);
+                builder.reset();
 
             } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
                 ex.printStackTrace();
@@ -141,4 +152,14 @@ public class SelfSamplerAction extends AbstractAction {
         }
 
     }
+
+    public void eventDispatched(AWTEvent event) {
+        KeyEvent kevent = (KeyEvent)event;
+        if (kevent.getID() == KeyEvent.KEY_RELEASED && kevent.getKeyCode() == KeyEvent.VK_ALT_GRAPH) { // AltGr
+            actionPerformed(new ActionEvent(this, event.getID(), "shortcut"));
+            kevent.consume();
+        }
+    }
+
+
 }

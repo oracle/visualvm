@@ -41,6 +41,8 @@ package org.netbeans.modules.profiler.heapwalk;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
@@ -119,23 +121,9 @@ public class OQLController extends AbstractTopLevelController implements Navigat
                     engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                         public boolean visit(Object o) {
-                            if (o instanceof Instance) {
-                                Instance i = (Instance) o;
-                                sb.append("<div>").append(printInstance(i)).append("</div>");
-                            } else if (o instanceof JavaClass) {
-                                JavaClass c = (JavaClass)o;
-                                sb.append("<div>").append(printClass(c)).append("</div>");
-                            } else if (o instanceof ReferenceChain) {
-                                ReferenceChain rc = (ReferenceChain) o;
-                                sb.append("<p><h4>Reference Chain</h4>");
-                                while (rc != null) {
-                                    sb.append("<div>").append(printInstance(rc.getObj())).append("</div>");
-                                    rc = rc.getNext();
-                                }
-                                sb.append("</p>");
-                            } else {
-                                sb.append("<div>").append(o.toString()).append("</div>");
-                            }
+                            sb.append("<div>");
+                            dump(o, sb);
+                            sb.append("</div>");
                             int value = progressModel.getValue() + 1;
                             if (value > progressModel.getMaximum()) {
                                 value = progressModel.getMinimum() + 1;
@@ -147,12 +135,51 @@ public class OQLController extends AbstractTopLevelController implements Navigat
                     analysisRunning.compareAndSet(true, false);
                     ui.setResult(sb.toString());
                 } catch (OQLException oQLException) {
+                    StringBuilder errorMessage = new StringBuilder();
+                    errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>");
+                    errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK"));
+                    ui.setResult(errorMessage.toString());
                     cancelAnalysis();
                 }
             }
         });
 
         return progressModel;
+    }
+
+    private void dump(Object o, StringBuilder sb) {
+        if (o instanceof Instance) {
+            Instance i = (Instance) o;
+            sb.append(printInstance(i));
+        } else if (o instanceof JavaClass) {
+            JavaClass c = (JavaClass)o;
+            sb.append(printClass(c));
+        } else if (o instanceof ReferenceChain) {
+            ReferenceChain rc = (ReferenceChain) o;
+            sb.append("<h4>Reference Chain</h4>");
+            while (rc != null) {
+                sb.append(printInstance(rc.getObj())).append("&gt;");
+                rc = rc.getNext();
+            }
+            sb.delete(sb.length() - 5, sb.length());
+        } else if (o instanceof Map) {
+            Set<Map.Entry> entries = ((Map)o).entrySet();
+            sb.append("<span>{");
+            for(Map.Entry entry : entries) {
+                dump(entry.getKey(), sb);
+                sb.append(" = ");
+                dump(entry.getValue(), sb);
+                sb.append(", ");
+            }
+            sb.delete(sb.length() - 2, sb.length());
+            sb.append("}</span>");
+        } else {
+            sb.append(o.toString());
+        }
+    }
+
+    public OQLEngine getEngine() {
+        return engine;
     }
 
     public void showURL(URL url) {
