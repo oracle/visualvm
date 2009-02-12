@@ -28,8 +28,8 @@
 #define VER "0.0.0.0"
 #define FVER 0,0,0,0
 #define BUILD_ID "0"
-#define INTERNAL_NAME "visualvm.exe"
-#define COPYRIGHT "Sun Microsystems, Inc."
+#define INTERNAL_NAME "visualvm"
+#define COPYRIGHT "\xA9 2007-2009 Sun Microsystems, Inc."
 #define FNAME "visualvm.exe"
 #define NAME "VisualVM Dev. build"
 
