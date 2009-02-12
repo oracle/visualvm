@@ -462,6 +462,7 @@ class ApplicationMonitorView extends DataSourceView {
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -577,6 +578,7 @@ class ApplicationMonitorView extends DataSourceView {
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -696,6 +698,7 @@ class ApplicationMonitorView extends DataSourceView {
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
@@ -823,6 +826,7 @@ class ApplicationMonitorView extends DataSourceView {
         
         private void initComponents() {
             setLayout(new BorderLayout());
+            setOpaque(false);
             
             JComponent contents;
             
