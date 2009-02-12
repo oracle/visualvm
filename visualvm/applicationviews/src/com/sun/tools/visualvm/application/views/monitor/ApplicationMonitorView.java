@@ -112,7 +112,7 @@ class ApplicationMonitorView extends DataSourceView {
                 masterViewSupport.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        final CpuViewSupport cpuViewSupport = new CpuViewSupport(jvm);
+        final CpuViewSupport cpuViewSupport = new CpuViewSupport(application, jvm);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu"), true), DataViewComponent.TOP_LEFT);  // NOI18N
         dvc.addDetailsView(cpuViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
@@ -289,10 +289,16 @@ class ApplicationMonitorView extends DataSourceView {
         private long lastUpTime = -1;
         private long lastProcessCpuTime = -1;
         private long lastProcessGcTime = -1;
-
-        public CpuViewSupport(Jvm jvm) {
+        private int processors = 1;
+        
+        public CpuViewSupport(Application app, Jvm jvm) {
             cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
             gcMonitoringSupported = jvm.isCollectionTimeSupported();
+            if (cpuMonitoringSupported || gcMonitoringSupported) {
+                // HostOverviewFactory.getSystemOverviewFor(app.getHost()).getAvailableProcessors();
+                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(app));
+                processors = mxbeans.getOperatingSystemMXBean().getAvailableProcessors();
+            }
             initComponents();
         }        
         
@@ -304,8 +310,8 @@ class ApplicationMonitorView extends DataSourceView {
             if (cpuMonitoringSupported || gcMonitoringSupported) {
                 
                 long upTime = data.getUpTime() * 1000000;
-                long processCpuTime = cpuMonitoringSupported ? data.getProcessCpuTime() : -1;
-                long processGcTime  = gcMonitoringSupported  ? data.getCollectionTime() * 1000000 : -1;
+                long processCpuTime = cpuMonitoringSupported ? data.getProcessCpuTime() / processors : -1;
+                long processGcTime  = gcMonitoringSupported  ? data.getCollectionTime() * 1000000 / processors : -1;
                 
                 boolean tracksProcessCpuTime = lastProcessCpuTime != -1;
                 boolean tracksProcessGcTime  = lastProcessGcTime != -1;
