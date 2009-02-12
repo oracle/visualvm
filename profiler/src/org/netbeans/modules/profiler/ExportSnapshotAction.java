@@ -57,7 +57,7 @@ class ExportSnapshotAction extends AbstractAction {
     private static final String EXPORT_SNAPSHOT_ACTION_DESCR = NbBundle.getMessage(ExportSnapshotAction.class,
                                                                                    "ExportSnapshotAction_ExportSnapshotActionDescr"); //NOI18N
                                                                                                                                       // -----
-    private static final ImageIcon ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/export.png")); // NOI18N
+    private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/export.png", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
