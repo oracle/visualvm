@@ -23,14 +23,13 @@
  * have any questions.
  */
 
-#include <winuser.h>
-
-#include "version.rc"
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-
-100 ICON DISCARDABLE "visualvm.ico"
-
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "visualvm.exe.manifest"
+#define COMPANY "Sun Microsystems, Inc."
+#define COMPONENT "VisualVM"
+#define VER "0.0.0.0"
+#define FVER 0,0,0,0
+#define BUILD_ID "0"
+#define INTERNAL_NAME "visualvm.exe"
+#define COPYRIGHT "Sun Microsystems, Inc."
+#define FNAME "visualvm.exe"
+#define NAME "VisualVM Dev. build"
 

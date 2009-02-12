@@ -24,13 +24,46 @@
  */
 
 #include <winuser.h>
+#include <winver.h>
+#include "version.h"
 
-#include "version.rc"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
 
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-
-100 ICON DISCARDABLE "visualvm.ico"
-
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "visualvm.exe.manifest"
-
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    FVER
+ PRODUCTVERSION FVER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ // FILEOS 0x4 is Win32, 0x40004 is Win32 NT only
+ FILEOS 0x4L
+ // FILETYPE should be 0x1 for .exe and 0x2 for .dll
+ FILETYPE 0x1L 
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName",      COMPANY       "\0"
+            VALUE "FileDescription",  COMPONENT     "\0"
+            VALUE "FileVersion",      VER           "\0"
+            VALUE "Full Version",     BUILD_ID      "\0"
+            VALUE "InternalName",     INTERNAL_NAME "\0"
+            VALUE "LegalCopyright",   COPYRIGHT     "\0"
+            VALUE "OriginalFilename", FNAME         "\0"
+            VALUE "ProductName",      NAME          "\0"
+            VALUE "ProductVersion",   VER           "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END

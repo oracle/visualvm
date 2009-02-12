@@ -42,7 +42,7 @@ visualvm_w.exe : visualvm.cpp
 	gcc $(CFLAGS) $(LIBS) visualvm.cpp -o visualvm_w.exe
 	mv visualvm_w.exe ../
 
-visualvm.res : visualvm.rc
+visualvm.res : visualvm.rc version.rc version.h visualvm.exe.manifest
 	windres -o$@ -Ocoff visualvm.rc
 
 clean :
