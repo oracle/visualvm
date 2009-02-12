@@ -196,11 +196,11 @@ public abstract class MonitoredData {
     
     /**
      * Returns the approximate accumulated process CPU elapsed time
-     * in milliseconds.  This method returns <tt>-1</tt> if the collection
+     * in nanoseconds.  This method returns <tt>-1</tt> if the collection
      * elapsed time is undefined for this collector.
      *
      * @return the approximate accumulated process CPU elapsed time
-     * in milliseconds.
+     * in nanoseconds.
      */
     public long getProcessCpuTime() {
         return processCpuTime;
