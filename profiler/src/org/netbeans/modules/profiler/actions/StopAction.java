@@ -158,9 +158,7 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
             ));
             putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(StopAction.class, "HINT_StopAction" // NOI18N
             ));
-            putValue(Action.SMALL_ICON,
-                     new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/stop.png")) //NOI18N
-            );
+            putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/stop.png", false));
             putValue("iconBase", // NOI18N
                      "org/netbeans/modules/profiler/actions/resources/stop.png" // NOI18N
             );
@@ -169,9 +167,7 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
             ));
             putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(StopAction.class, "HINT_DetachAction" // NOI18N
             ));
-            putValue(Action.SMALL_ICON,
-                     new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/detach.png")) //NOI18N
-            );
+            putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/detach.png", false));
             putValue("iconBase", // NOI18N
                      "org/netbeans/modules/profiler/actions/resources/detach.png" // NOI18N
             );

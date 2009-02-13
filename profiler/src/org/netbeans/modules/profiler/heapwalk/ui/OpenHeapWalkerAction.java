@@ -75,7 +75,7 @@ public class OpenHeapWalkerAction extends SystemAction {
 
     public OpenHeapWalkerAction() {
         putValue("noIconInMenu", null); // NOI18N        
-        setIcon(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png", true))); // NOI18N
+        setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memory.png", true)); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
