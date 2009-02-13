@@ -591,11 +591,10 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
 
     private void configureMarkerEngine(ProfilingSettings settings) {
         boolean isMarksEnabled = (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) || (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
-        Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
-
-        isMarksEnabled &= (ctg != null);
+        isMarksEnabled &= Categorization.isAvailable(project);
 
         if (isMarksEnabled) {
+            Categorization ctg = new Categorization(project);
             ctg.reset();
             MarkingEngine.getDefault().configure(ctg.getMappings(), Lookup.getDefault().lookupAll(MarkingEngine.StateObserver.class));
         } else {
