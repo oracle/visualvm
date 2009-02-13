@@ -419,6 +419,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
