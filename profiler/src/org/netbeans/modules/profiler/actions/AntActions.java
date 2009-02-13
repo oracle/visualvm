@@ -147,9 +147,7 @@ public final class AntActions {
         a.putValue("iconBase", // NOI18N
                    "org/netbeans/modules/profiler/actions/resources/profile.png" // NOI18N
         );
-        a.putValue(Action.SMALL_ICON,
-                   new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/profile.png")) //NOI18N
-        );
+        a.putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/profile.png", false));
 
         return a;
     }

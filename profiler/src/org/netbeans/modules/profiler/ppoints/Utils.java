@@ -337,7 +337,7 @@ public class Utils {
     private static final String PROJECT_DIRECTORY_MARK = "{$projectDirectory}"; // NOI18N
 
     // TODO: Move to more "universal" location
-    public static final ImageIcon EMPTY_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/empty16.gif")); // NOI18N
+    public static final ImageIcon EMPTY_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/empty16.gif", false); // NOI18N
     private static final ProjectPresenterRenderer projectRenderer = new ProjectPresenterRenderer();
     private static final ProjectPresenterListRenderer projectListRenderer = new ProjectPresenterListRenderer();
     private static final EnhancedTableCellRenderer scopeRenderer = new ProfilingPointScopeRenderer();

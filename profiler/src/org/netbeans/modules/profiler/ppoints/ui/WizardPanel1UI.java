@@ -132,9 +132,9 @@ public class WizardPanel1UI extends ValidityAwarePanel implements HelpCtx.Provid
                                                                                                                           // -----
     private static final String HELP_CTX_KEY = "PPointsWizardPanel1UI.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
-    private static final Icon MONITOR_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png")); // NOI18N
-    private static final Icon CPU_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png")); // NOI18N
-    private static final Icon MEMORY_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N
+    private static final Icon MONITOR_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/telemetryWindow.png", false); // NOI18N
+    private static final Icon CPU_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/cpu.png", false); // NOI18N
+    private static final Icon MEMORY_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memory.png", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
