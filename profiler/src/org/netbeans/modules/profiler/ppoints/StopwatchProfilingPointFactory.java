@@ -71,7 +71,7 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
     private static final String PP_DEFAULT_NAME = NbBundle.getMessage(StopwatchProfilingPointFactory.class,
                                                                       "StopwatchProfilingPointFactory_PpDefaultName"); // NOI18N
                                                                                                                        // -----
-    public static final Icon RESET_RESULTS_PP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/stopwatchProfilingPoint.png"));
+    public static final Icon RESET_RESULTS_PP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ppoints/ui/resources/stopwatchProfilingPoint.png", false);
     public static final String RESET_RESULTS_PP_TYPE = PP_TYPE;
     public static final String RESET_RESULTS_PP_DESCR = PP_DESCR;
     private static final String START_LOCATION_PREFIX = "start_"; // NOI18N

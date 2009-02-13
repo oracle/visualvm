@@ -62,61 +62,61 @@ public class Utils {
     //public static ImageIcon EMPRY_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/profiler/resources/ide/empty.gif")); // NOI18N
 
     // error
-    public static ImageIcon ERROR_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/error.png")); // NOI18N
+    public static ImageIcon ERROR_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/error.png", false); // NOI18N
 
     // projects
     //public static ImageIcon PROJECTS_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/project/ui/resources/projectTab.png")); // NOI18N
 
     // package
-    public static ImageIcon PACKAGE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/package.png")); // NOI18N
+    public static ImageIcon PACKAGE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/package.png", false); // NOI18N
                                                                                                                                           //public static ImageIcon PACKAGE_PUBLIC_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/spi/java/project/support/ui/packagePublic.png")); // NOI18N
                                                                                                                                           //public static ImageIcon PACKAGE_PRIVATE_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/spi/java/project/support/ui/packagePrivate.png")); // NOI18N
                                                                                                                                           //public static ImageIcon PACKAGE_EMPTY_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/spi/java/project/support/ui/packageEmpty.png")); // NOI18N
 
     // libraries
-    public static ImageIcon LIBRARIES_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/libraries.png")); // NOI18N
+    public static ImageIcon LIBRARIES_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/libraries.png", false); // NOI18N
 
     // class
-    public static ImageIcon CLASS_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/class.png")); // NOI18N
+    public static ImageIcon CLASS_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/class.png", false); // NOI18N
                                                                                                                                       //public static ImageIcon CLASS_MAIN_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/java/resources/main-class.png")); // NOI18N
 
     // interface
-    public static ImageIcon INTERFACE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/interface.png")); // NOI18N
+    public static ImageIcon INTERFACE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/interface.png", false); // NOI18N
 
     // initializer
-    public static ImageIcon INITIALIZER_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/initializer.png")); // NOI18N
-    public static ImageIcon INITIALIZER_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/initializerSt.png")); // NOI18N
+    public static ImageIcon INITIALIZER_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/initializer.png", false); // NOI18N
+    public static ImageIcon INITIALIZER_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/initializerSt.png", false); // NOI18N
 
     // constructor
-    public static ImageIcon CONSTRUCTORS_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/constructors.png")); // NOI18N
-    public static ImageIcon CONSTRUCTOR_PUBLIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/constructorPublic.png")); // NOI18N
-    public static ImageIcon CONSTRUCTOR_PROTECTED_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/constructorProtected.png")); // NOI18N
-    public static ImageIcon CONSTRUCTOR_PRIVATE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/constructorPrivate.png")); // NOI18N
-    public static ImageIcon CONSTRUCTOR_PACKAGE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/constructorPackage.png")); // NOI18N
+    public static ImageIcon CONSTRUCTORS_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/constructors.png", false); // NOI18N
+    public static ImageIcon CONSTRUCTOR_PUBLIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/constructorPublic.png", false); // NOI18N
+    public static ImageIcon CONSTRUCTOR_PROTECTED_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/constructorProtected.png", false); // NOI18N
+    public static ImageIcon CONSTRUCTOR_PRIVATE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/constructorPrivate.png", false); // NOI18N
+    public static ImageIcon CONSTRUCTOR_PACKAGE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/constructorPackage.png", false); // NOI18N
 
     // method
-    public static ImageIcon METHODS_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methods.png")); // NOI18N
-    public static ImageIcon METHOD_PUBLIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodPublic.png")); // NOI18N
-    public static ImageIcon METHOD_PROTECTED_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodProtected.png")); // NOI18N
-    public static ImageIcon METHOD_PRIVATE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodPrivate.png")); // NOI18N
-    public static ImageIcon METHOD_PACKAGE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodPackage.png")); // NOI18N
-    public static ImageIcon METHOD_PUBLIC_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodStPublic.png")); // NOI18N
-    public static ImageIcon METHOD_PROTECTED_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodStProtected.png")); // NOI18N
-    public static ImageIcon METHOD_PRIVATE_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodStPrivate.png")); // NOI18N
-    public static ImageIcon METHOD_PACKAGE_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/methodStPackage.png")); // NOI18N
+    public static ImageIcon METHODS_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methods.png", false); // NOI18N
+    public static ImageIcon METHOD_PUBLIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodPublic.png", false); // NOI18N
+    public static ImageIcon METHOD_PROTECTED_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodProtected.png", false); // NOI18N
+    public static ImageIcon METHOD_PRIVATE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodPrivate.png", false); // NOI18N
+    public static ImageIcon METHOD_PACKAGE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodPackage.png", false); // NOI18N
+    public static ImageIcon METHOD_PUBLIC_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodStPublic.png", false); // NOI18N
+    public static ImageIcon METHOD_PROTECTED_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodStProtected.png", false); // NOI18N
+    public static ImageIcon METHOD_PRIVATE_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodStPrivate.png", false); // NOI18N
+    public static ImageIcon METHOD_PACKAGE_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/methodStPackage.png", false); // NOI18N
 
     // variable
-    public static ImageIcon VARIABLES_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variables.png")); // NOI18N
-    public static ImageIcon VARIABLE_PUBLIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variablePublic.png")); // NOI18N
-    public static ImageIcon VARIABLE_PROTECTED_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableProtected.png")); // NOI18N
-    public static ImageIcon VARIABLE_PRIVATE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variablePrivate.png")); // NOI18N
-    public static ImageIcon VARIABLE_PACKAGE_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variablePackage.png")); // NOI18N
-    public static ImageIcon VARIABLE_PUBLIC_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStPublic.png")); // NOI18N
-    public static ImageIcon VARIABLE_PROTECTED_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStProtected.png")); // NOI18N
-    public static ImageIcon VARIABLE_PRIVATE_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStPrivate.png")); // NOI18N
-    public static ImageIcon VARIABLE_PACKAGE_STATIC_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/variableStPackage.png")); // NOI18N
+    public static ImageIcon VARIABLES_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variables.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PUBLIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variablePublic.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PROTECTED_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variableProtected.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PRIVATE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variablePrivate.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PACKAGE_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variablePackage.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PUBLIC_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variableStPublic.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PROTECTED_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variableStProtected.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PRIVATE_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variableStPrivate.png", false); // NOI18N
+    public static ImageIcon VARIABLE_PACKAGE_STATIC_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/variableStPackage.png", false); // NOI18N
     
     
     // find
-    public static ImageIcon FIND_ACTION_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/ide/find.gif")); // NOI18N
+    public static ImageIcon FIND_ACTION_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/ide/find.gif", false); // NOI18N
 }

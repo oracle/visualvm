@@ -130,9 +130,9 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
     private static NewCustomConfiguration defaultInstance;
 
     // --- UI components declaration ---------------------------------------------
-    private static final Icon ICON_MONITOR = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png")); // NOI18N
-    private static final Icon ICON_CPU = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png")); // NOI18N
-    private static final Icon ICON_MEMORY = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N
+    private static final Icon ICON_MONITOR = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/telemetryWindow.png", false); // NOI18N
+    private static final Icon ICON_CPU = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/cpu.png", false); // NOI18N
+    private static final Icon ICON_MEMORY = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memory.png", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
