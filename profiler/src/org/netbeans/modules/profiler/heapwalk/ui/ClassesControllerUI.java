@@ -70,7 +70,7 @@ public class ClassesControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_CLASS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png")); // NOI18N
+        private static ImageIcon ICON_CLASS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png", false); // NOI18N
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

@@ -79,10 +79,10 @@ public final class TelemetryWindow extends TopComponent {
                                                                   SaveViewAction.ViewProvider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final ImageIcon zoomInIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomIn.png")); //NOI18N
-        private static final ImageIcon zoomOutIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomOut.png")); //NOI18N
-        private static final ImageIcon zoomIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoom.png")); //NOI18N
-        private static final ImageIcon scaleToFitIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); //NOI18N
+        private static final ImageIcon zoomInIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomIn.png", false); //NOI18N
+        private static final ImageIcon zoomOutIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomOut.png", false); //NOI18N
+        private static final ImageIcon zoomIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoom.png", false); //NOI18N
+        private static final ImageIcon scaleToFitIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/scaleToFit.png", false); //NOI18N
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
