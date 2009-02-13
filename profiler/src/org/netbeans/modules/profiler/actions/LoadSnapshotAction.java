@@ -89,9 +89,7 @@ public final class LoadSnapshotAction extends AbstractAction {
     public LoadSnapshotAction() {
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON,
-                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png")) //NOI18N
-        );
+        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/openSnapshot.png", false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
