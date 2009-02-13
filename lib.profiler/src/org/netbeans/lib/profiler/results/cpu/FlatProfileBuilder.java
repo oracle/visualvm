@@ -42,7 +42,6 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUCallGraphBuilder.ThreadInfo;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTFlattener;
 import org.netbeans.lib.profiler.results.cpu.cct.CompositeCPUCCTWalker;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
@@ -117,27 +116,22 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
         client.getStatus().beginTrans(false);
 
         try {
-            if (ThreadInfo.beginTrans(false, true)) {
-                try {
-                    CompositeCPUCCTWalker walker = new CompositeCPUCCTWalker();
-                    int index = 0;
-                    
-                    if (filter != null) {
-                        walker.add(index++, filter);
-                    }
-                    walker.add(index++, flattener);
-                    
-                    if (collector != null) {
-                        walker.add(index++ , collector);
-                    }
+            CompositeCPUCCTWalker walker = new CompositeCPUCCTWalker();
+            int index = 0;
 
-                    walker.walk(appNode);
-
-                    lastFlatProfile = flattener.getFlatProfile();
-                } finally {
-                    ThreadInfo.endTrans();
-                }
+            if (filter != null) {
+                walker.add(index++, filter);
             }
+            walker.add(index++, flattener);
+
+            if (collector != null) {
+                walker.add(index++ , collector);
+            }
+
+            walker.walk(appNode);
+
+            lastFlatProfile = flattener.getFlatProfile();
+
         } finally {
             client.getStatus().endTrans();
         }

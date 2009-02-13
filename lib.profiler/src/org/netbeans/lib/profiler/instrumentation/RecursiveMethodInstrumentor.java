@@ -116,7 +116,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    protected RecursiveMethodInstrumentor(ProfilingSessionStatus status, ProfilerEngineSettings settings) {
+    RecursiveMethodInstrumentor(ProfilingSessionStatus status, ProfilerEngineSettings settings) {
         super(status);
 
         switch (status.currentInstrType) {

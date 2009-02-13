@@ -146,7 +146,6 @@ function JavaClassProto() {
             res[res.length] = tmp;
             tmp = tmp.superclass;
         }
-        println;
         return res;
     }
 
@@ -240,7 +239,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as ObjectArray");
             return new JavaObjectArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
-            //            println("wrapping as ValueArray");
+            // println("wrapping as ValueArray");
             return new JavaValueArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             //            println("wrapping as Instance");
@@ -291,15 +290,6 @@ function wrapJavaObject(thing) {
                     return instance;
                 }
                 return instance.getValueOfField(name);
-
-            //                for (var i in things) {
-            //                    println(things[i].field.name);
-            //                    if(things[i].field.name == name) {
-            //                        return wrapJavaValue(things[i]);
-            //                    }
-            //                }
-    
-            //                return undefined;
             }
         }				
     }
@@ -443,6 +433,7 @@ function wrapJavaObject(thing) {
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
 //    println("Unwrapping object");
+//    println(typeof(jobject));
     
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
         if (jobject instanceof Array) {
@@ -462,12 +453,24 @@ function unwrapJavaObject(jobject) {
             if (jobject == undefined) {
                 jobject = orig.wrapped;
             }
+            if (jobject == undefined) {
+                jobject = orig;
+            }
         } catch (e) {
             println("unwrapJavaObject: " + jobject + ", " + e);
             jobject = undefined;
         }
     } 
     return jobject;
+}
+
+function unwrapMap(jobject) {
+    var map = new java.util.HashMap();
+    for(var prop in jobject) {
+//        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
+        map.put(prop, unwrapJavaObject(jobject[prop]));
+    }
+    return map;
 }
 
 /**
@@ -729,7 +732,7 @@ function wrapHeapSnapshot(heap) {
                         return (typeof(name) == 'number' &&
                             name >= 0 && name < path.length) ||
                         name == 'length' || name == 'toHtml' ||
-                        name == 'toString';
+                        name == 'toString' || name == 'wrapped-object';
                     },
                     __get__ : function(name) {
                         if (typeof(name) == 'number' &&
@@ -745,6 +748,8 @@ function wrapHeapSnapshot(heap) {
                             return function() {
                                 return computeDescription(false);
                             }
+                        } else if (name == 'wrapped-object') {
+                            return refChain;
                         } else {
                             return undefined;
                         }
@@ -1050,14 +1055,16 @@ function toHtml(obj) {
         if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
             var id = tmp.javaClassId;
             var name = tmp.name;
-            return "<a href='/class/" + id + "'>class " + name + "</a>";
-        } else {
+            return "<a href='file://class/" + name + "'>class " + name + "</a>";
+        } else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             var id = tmp.instanceId;
+            var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
-            return "<a href='/object/" + id + "'>" +
-            name + "@" + id + "</a>";
+            return "<a href='file://instance/" + name +"@" + id + "'>" +
+            name + "#" + number + "</a>";
         }
-    } else if ((typeof(obj) == 'object') || (obj instanceof JSAdapter)) {
+    }
+    if ((typeof(obj) == 'object') || (obj instanceof JSAdapter)) {
         if (obj instanceof java.lang.Object) {
             // script wrapped Java object
             obj = wrapIterator(obj);
@@ -1302,9 +1309,11 @@ function filter(array, code) {
  */
 function length(array) {
     array = wrapIterator(array);
-    if (array instanceof Array) {
-        return array.length;
-    } else if (array instanceof java.util.Enumeration) {
+    var length = array.length;
+
+    if (length != undefined) return length;
+    
+    if (array instanceof java.util.Enumeration) {
         var cnt = 0;
         while (array.hasMoreElements()) {
             array.nextElement(); 
