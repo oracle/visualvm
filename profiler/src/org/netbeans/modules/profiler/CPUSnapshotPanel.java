@@ -311,22 +311,14 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final ImageIcon CLASSES_ICON = Utils.CLASS_ICON;
     private static final ImageIcon METHODS_ICON = Utils.METHODS_ICON;
     private static final ImageIcon PACKAGES_ICON = Utils.PACKAGE_ICON;
-    private static final ImageIcon CALL_TREE_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/callTreeTab.png") // NOI18N
-    );
-    private static final ImageIcon HOTSPOTS_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/hotspotsTab.png") // NOI18N
-    );
-    private static final ImageIcon COMBINED_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/combinedTab.png") // NOI18N
-    );
-    private static final ImageIcon INFO_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/infoTab.png") // NOI18N
-    );
-    private static final ImageIcon BACK_TRACES_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/backTracesTab.png") // NOI18N
-    );
-    private static final ImageIcon SUBTREE_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/subtree.png") // NOI18N
-    );
-    private static final ImageIcon SLAVE_DOWN_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/slaveDown.png") // NOI18N
-    );
-    private static final ImageIcon SLAVE_UP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/slaveUp.png") // NOI18N
-    );
+    private static final ImageIcon CALL_TREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/callTreeTab.png", false);
+    private static final ImageIcon HOTSPOTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/hotspotsTab.png", false);
+    private static final ImageIcon COMBINED_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/combinedTab.png", false);
+    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false);
+    private static final ImageIcon BACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/backTracesTab.png", false);
+    private static final ImageIcon SUBTREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/subtree.png", false);
+    private static final ImageIcon SLAVE_DOWN_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/slaveDown.png", false);
+    private static final ImageIcon SLAVE_UP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/slaveUp.png", false);
     private static final double SPLIT_HALF = 0.5d;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

@@ -243,7 +243,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
                                                                          "ReferencesBrowserControllerUI_ValueColumnDescr"); // NOI18N
                                                                                                                             // -----
-    private static ImageIcon ICON_FIELDS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png")); // NOI18N
+    private static ImageIcon ICON_FIELDS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png", false); // NOI18N
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
@@ -389,7 +389,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/hideColumn.png", false)); // NOI18N
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
