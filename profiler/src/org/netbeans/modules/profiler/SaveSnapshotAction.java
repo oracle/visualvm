@@ -55,7 +55,7 @@ class SaveSnapshotAction extends AbstractAction {
     private static final String ACTION_NAME = NbBundle.getMessage(SaveSnapshotAction.class, "SaveSnapshotAction_ActionName"); // NOI18N
     private static final String ACTION_DESCR = NbBundle.getMessage(SaveSnapshotAction.class, "SaveSnapshotAction_ActionDescr"); // NOI18N
                                                                                                                                 // -----
-    private static final ImageIcon ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/save.png")); // NOI18N
+    private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/save.png", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

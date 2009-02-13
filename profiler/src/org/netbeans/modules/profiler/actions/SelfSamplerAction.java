@@ -90,9 +90,9 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         putValue(Action.NAME, ACTION_NAME_START);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
-            ImageUtilities.image2Icon(
-                ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png") //NOI18N
-            )
+            ImageUtilities.loadImageIcon(
+                "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
+        , false)
         );
         if (System.getProperty(SelfSamplerAction.class.getName() + ".sniff") != null) {
             Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
@@ -117,9 +117,9 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         if (isRunning.compareAndSet(false, true)) {
             putValue(Action.NAME, ACTION_NAME_STOP);
             putValue(Action.SMALL_ICON,
-                ImageUtilities.image2Icon(
-                    ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/modifyProfiling.png") //NOI18N
-                )
+                ImageUtilities.loadImageIcon(
+                    "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png" //NOI18N
+            , false)
             );
             executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
             startTime = System.currentTimeMillis();
@@ -132,9 +132,9 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         } else if (isRunning.compareAndSet(true, false)) {
             putValue(Action.NAME, ACTION_NAME_START);
             putValue(Action.SMALL_ICON,
-                    ImageUtilities.image2Icon(
-                    ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/openSnapshot.png") //NOI18N
-                )
+                    ImageUtilities.loadImageIcon(
+                    "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
+            , false)
             );
             try {
                 executor.shutdown();

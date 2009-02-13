@@ -67,9 +67,7 @@ public final class ResetResultsAction extends AbstractAction {
         ));
         putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ResetResultsAction.class, "HINT_ResetResultsAction" // NOI18N
         ));
-        putValue(Action.SMALL_ICON,
-                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/resetResults.png")) //NOI18N
-        );
+        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/resetResults.png", false));
         putValue("iconBase", // NOI18N
                  "org/netbeans/modules/profiler/actions/resources/resetResults.png" // NOI18N
         );
