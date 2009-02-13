@@ -67,9 +67,7 @@ public final class AttachAction extends AbstractAction {
         putValue("iconBase", // NOI18N
                  "org/netbeans/modules/profiler/actions/resources/attach.png" // NOI18N
         );
-        putValue(Action.SMALL_ICON,
-                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/attach.png")) //NOI18N
-        );
+        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/attach.png", false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

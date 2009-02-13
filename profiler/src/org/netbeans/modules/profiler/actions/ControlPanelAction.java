@@ -64,9 +64,7 @@ public final class ControlPanelAction extends AbstractAction {
     public ControlPanelAction() {
         putValue(Action.NAME, NAME_STRING);
         putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
-        putValue(Action.SMALL_ICON,
-                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/controlPanel.gif")) //NOI18N
-        );
+        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/controlPanel.gif", false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

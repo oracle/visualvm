@@ -256,7 +256,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private static final String CLASSES_TABLE_ACCESS_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                                   "ClassesListControllerUI_ClassesTableAccessDescr"); // NOI18N
                                                                                                                                        // -----
-    private static ImageIcon ICON_CLASSES = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png")); // NOI18N
+    private static ImageIcon ICON_CLASSES = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png", false); // NOI18N
     private static String filterValue = ""; // NOI18N
     private static int filterType = CommonConstants.FILTER_CONTAINS;
 
@@ -487,7 +487,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/hideColumn.png", false)); // NOI18N
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
