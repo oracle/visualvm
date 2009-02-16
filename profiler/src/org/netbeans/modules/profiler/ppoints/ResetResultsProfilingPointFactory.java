@@ -71,7 +71,7 @@ public class ResetResultsProfilingPointFactory extends CodeProfilingPointFactory
     private static final String PP_DEFAULT_NAME = NbBundle.getMessage(ResetResultsProfilingPointFactory.class,
                                                                       "ResetResultsProfilingPointFactory_PpDefaultName"); // NOI18N
                                                                                                                           // -----
-    public static final Icon RESET_RESULTS_PP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/resetResultsProfilingPoint.png")); // NOI18N
+    public static final Icon RESET_RESULTS_PP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ppoints/ui/resources/resetResultsProfilingPoint.png", false); // NOI18N
     public static final String RESET_RESULTS_PP_TYPE = PP_TYPE;
     public static final String RESET_RESULTS_PP_DESCR = PP_DESCR;
 

@@ -79,13 +79,13 @@ public class BrowserUtils {
     // I18N String constants
     private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_OutOfMemoryMsg"); // NOI18N
                                                                                                                             // -----
-    public static ImageIcon ICON_INSTANCE = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png")); // NOI18N
-    public static ImageIcon ICON_PRIMITIVE = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png")); // NOI18N
-    public static ImageIcon ICON_ARRAY = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/array.png")); // NOI18N
-    public static ImageIcon ICON_PROGRESS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/progress.png")); // NOI18N
-    public static ImageIcon ICON_STATIC = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/static.png")); // NOI18N
-    public static ImageIcon ICON_LOOP = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/loop.png")); // NOI18N
-    public static ImageIcon ICON_GCROOT = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png")); // NOI18N
+    public static ImageIcon ICON_INSTANCE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png", false); // NOI18N
+    public static ImageIcon ICON_PRIMITIVE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png", false); // NOI18N
+    public static ImageIcon ICON_ARRAY = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/array.png", false); // NOI18N
+    public static ImageIcon ICON_PROGRESS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/progress.png", false); // NOI18N
+    public static ImageIcon ICON_STATIC = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/static.png", false); // NOI18N
+    public static ImageIcon ICON_LOOP = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/loop.png", false); // NOI18N
+    public static ImageIcon ICON_GCROOT = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png", false); // NOI18N
     private static RequestProcessor requestProcessor = new RequestProcessor("HeapWalker Processor", 3); // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
