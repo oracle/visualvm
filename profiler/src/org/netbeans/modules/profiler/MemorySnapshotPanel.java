@@ -122,12 +122,9 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemorySnapshotPanel.class,
                                                                            "MemorySnapshotPanel_FindActionTooltip"); // NOI18N
                                                                                                                      // -----
-    private static final ImageIcon MEMORY_RESULTS_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memoryResultsTab.png") // NOI18N
-    );
-    private static final ImageIcon INFO_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/infoTab.png") // NOI18N
-    );
-    private static final ImageIcon STACK_TRACES_TAB_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/stackTracesTab.png") // NOI18N
-    );
+    private static final ImageIcon MEMORY_RESULTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memoryResultsTab.png", false);
+    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false);
+    private static final ImageIcon STACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/stackTracesTab.png", false);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

@@ -78,7 +78,7 @@ public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
     private static final String PP_DEFAULT_NAME = NbBundle.getMessage(LoadGenProfilingPointFactory.class,
                                                                       "LoadGenProfilingPointFactory_PpDefaultName"); // NOI18N
                                                                                                                      // -----
-    private static final Icon LOADGEN_PP_ICON = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/loadgenProfilingPoint.png")); // NOI18N
+    private static final Icon LOADGEN_PP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ppoints/ui/resources/loadgenProfilingPoint.png", false); // NOI18N
     private static final String LOADGEN_PP_TYPE = PP_TYPE;
     private static final String LOADGEN_PP_DESCR = PP_DESCR;
     private static final String START_LOCATION_PREFIX = "start_"; // NOI18N
