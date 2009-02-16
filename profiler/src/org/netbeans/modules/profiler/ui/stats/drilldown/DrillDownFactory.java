@@ -81,10 +81,8 @@ public class DrillDownFactory implements CCTResultsFilter.EvaluatorProvider {
             return null;
         }
         
-        Categorization cat = project.getLookup().lookup(Categorization.class);
-
-        if (cat != null) {
-            DrillDown dd = new DrillDown(cat, client);
+        if (Categorization.isAvailable(project)) {
+            DrillDown dd = new DrillDown(new Categorization(project), client);
             drillDownEvaluators.add(new WeakEvaluator(dd));
             return dd;
         } else {

@@ -66,8 +66,7 @@ public class OpenProfilingPointsWindowAction extends SystemAction {
 
     public OpenProfilingPointsWindowAction() {
         putValue("noIconInMenu", null); // NOI18N
-        setIcon(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ppoints/ui/resources/ppoint.png",
-                                                                   true))); // NOI18N
+        setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ppoints/ui/resources/ppoint.png", true)); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
