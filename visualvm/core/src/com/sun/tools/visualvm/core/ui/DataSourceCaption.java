@@ -49,9 +49,11 @@ import javax.swing.UIManager;
  * @author Jiri Sedlacek
  */
 final class DataSourceCaption<X extends DataSource> extends JComponent implements PropertyChangeListener, DataRemovedListener<DataSource> {
-    
+
     private static final boolean ANIMATE = Boolean.getBoolean("com.sun.tools.visualvm.core.ui.DataSourceCaption.animate");  // NOI18N
     private static final int ANIMATION_RATE = Integer.getInteger("com.sun.tools.visualvm.core.ui.DataSourceCaption.animationRate", 80); // NOI18N
+
+    private static final Color DISABLED_CAPTION = new Color(128, 128, 128);
     
     private static final String APPLICATION_PID_PREFIX = "(pid";    // NOI18N
     private static final String APPLICATION_PID_SUFFIX = ")";   // NOI18N
@@ -143,8 +145,8 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         // TODO: mask all html-specific characters
         name = name.replace(">", "&gt;");   // NOI18N
         name = name.replace("<", "&lt;");   // NOI18N
-        
-        Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : UIManager.getColor("Label.disabledForeground");    // NOI18N
+
+        Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : DISABLED_CAPTION;    // NOI18N
         String textColorString = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; // NOI18N
         
         if (name.contains(APPLICATION_PID_PREFIX) && name.contains(APPLICATION_PID_SUFFIX)) {
