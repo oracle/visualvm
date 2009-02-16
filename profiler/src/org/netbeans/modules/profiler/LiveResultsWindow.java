@@ -282,10 +282,10 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     private static final class GraphTab extends JPanel implements ActionListener, ChartActionListener {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final ImageIcon zoomInIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomIn.png")); //NOI18N
-        private static final ImageIcon zoomOutIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoomOut.png")); //NOI18N
-        private static final ImageIcon zoomIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/zoom.png")); //NOI18N
-        private static final ImageIcon scaleToFitIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); //NOI18N
+        private static final ImageIcon zoomInIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomIn.png", false); //NOI18N
+        private static final ImageIcon zoomOutIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomOut.png", false); //NOI18N
+        private static final ImageIcon zoomIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoom.png", false); //NOI18N
+        private static final ImageIcon scaleToFitIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/scaleToFit.png", false); //NOI18N
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -560,8 +560,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         final JLabel noResultsLabel = new JLabel(NO_PROFILING_RESULTS_LABEL_TEXT);
 
         noResultsLabel.setFont(noResultsLabel.getFont().deriveFont(14));
-        noResultsLabel.setIcon(new javax.swing.ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/ui/resources/monitoring.png")) //NOI18N
-        );
+        noResultsLabel.setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/monitoring.png", false));
         noResultsLabel.setIconTextGap(10);
         noResultsLabel.setEnabled(false);
         noResultsPanel.add(noResultsLabel, BorderLayout.NORTH);
@@ -980,8 +979,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
         toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         
-        autoToggle = new JToggleButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/autoRefresh.png") // NOI18N
-        ));
+        autoToggle = new JToggleButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/autoRefresh.png", false));
         autoToggle.setSelected(true);
         autoToggle.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -991,8 +989,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         autoToggle.setToolTipText(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
         autoToggle.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
 
-        updateNowButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/updateNow.png") // NOI18N
-        ));
+        updateNowButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/updateNow.png", false));
         updateNowButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     requestProfilingDataUpdate(true);
@@ -1001,8 +998,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         updateNowButton.setToolTipText(UPDATE_RESULTS_NOW_TOOLTIP);
         updateNowButton.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_NOW_TOOLTIP);
 
-        runGCButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/runGC.png") // NOI18N
-        ));
+        runGCButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/runGC.png", false));
         runGCButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     try {
