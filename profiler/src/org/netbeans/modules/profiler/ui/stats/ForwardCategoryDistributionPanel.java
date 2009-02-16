@@ -347,7 +347,9 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
 
                 uiUpdater = new Runnable() {
                         public void run() {
-                            final Categorization categorization = getProject().getLookup().lookup(Categorization.class);
+                            if (!Categorization.isAvailable(getProject())) return;
+
+                            final Categorization categorization = new Categorization(getProject());
                             
                             removeAll();
 

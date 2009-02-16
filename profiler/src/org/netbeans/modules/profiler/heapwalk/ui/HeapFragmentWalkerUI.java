@@ -81,8 +81,8 @@ public class HeapFragmentWalkerUI extends JPanel {
                                                                                                                            // -----
 
     // --- UI definition ---------------------------------------------------------
-    private static ImageIcon ICON_BACK = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/back.png")); // NOI18N
-    private static ImageIcon ICON_FORWARD = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/forward.png")); // NOI18N
+    private static ImageIcon ICON_BACK = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/back.png", false); // NOI18N
+    private static ImageIcon ICON_FORWARD = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/forward.png", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
