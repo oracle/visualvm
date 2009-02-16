@@ -95,7 +95,7 @@ class MemorySamplerView extends DataSourceView implements PropertyChangeListener
 
     
     public MemorySamplerView(Application application) {
-        super(application, "Memory Sampler", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false); // NOI18N
+        super(application, "Memory Sampler", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 42, false); // NOI18N
 
         histogramAvailable = histogramAvailable(application);
 
