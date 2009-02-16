@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.ErrorManager;
 import sun.tools.attach.HotSpotVirtualMachine;
 
 /**
@@ -41,12 +40,12 @@ import sun.tools.attach.HotSpotVirtualMachine;
  * @author Tomas Hurka
  */
 public class AttachModelImpl extends AttachModel {
-    private static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
-    String pid;
-    HotSpotVirtualMachine vm;
     private static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
     private static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
-    
+    private static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
+
+    String pid;
+    HotSpotVirtualMachine vm;
     
     AttachModelImpl(Application app) {
         pid = Integer.toString(app.getPid());
@@ -105,6 +104,18 @@ public class AttachModelImpl extends AttachModel {
         } catch (IOException ex) {
             LOGGER.log(Level.INFO,"setFlag",ex);
         }
+    }
+
+    public synchronized HeapHistogramImpl takeHeapHistogram() {
+        try {
+            InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION);
+            HeapHistogramImpl h = new HeapHistogramImpl(in);
+            in.close();
+            return h;
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO,"setFlag",ex);
+        }
+        return null;
     }
     
     private HotSpotVirtualMachine getVirtualMachine() throws IOException {
