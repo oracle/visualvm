@@ -37,7 +37,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 class MemorySamplerViewProvider extends DataSourceViewProvider<Application> {
 
     protected boolean supportsViewFor(Application application) {
-        return true;
+        return application.isLocalApplication();
     }
 
     protected DataSourceView createView(Application application) {
