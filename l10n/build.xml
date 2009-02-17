@@ -166,7 +166,7 @@ made subject to such option by the copyright holder.
                 </fileset>
             </classpath>
     </package-build>
-    <zip destfile="dist/visualvm_ml.xip">
+    <zip destfile="dist/visualvm_ml.zip">
       <zipfileset src="../visualvm/dist/visualvm.zip"/>
       <zipfileset dir="build" prefix="visualvm">
         <include name="visualvm/**"/>
