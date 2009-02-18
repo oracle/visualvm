@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.application.views.threads;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -41,6 +42,8 @@ import java.util.Set;
 public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvider<Application> {
 
     protected boolean supportsViewFor(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
             JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
