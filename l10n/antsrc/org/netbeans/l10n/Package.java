@@ -316,7 +316,7 @@ public class Package extends Task {
             String subPath = dir.substring((cluster + File.separator + nbm + File.separator).length() - 1, dir.lastIndexOf(File.separator));
             if (!subPath.startsWith(File.separator + "netbeans")) {
                 subPath = File.separator + "modules" + subPath;
-                if (!name.startsWith("org-") && !(subPath.endsWith(File.separator + "ext") || subPath.endsWith(File.separator + "ext" + File.separator + "locale"))) {
+                if (!name.startsWith("org-") && !name.startsWith("com-") && !(subPath.endsWith(File.separator + "ext") || subPath.endsWith(File.separator + "ext" + File.separator + "locale"))) {
                     name = "org-netbeans-modules-" + name;
                 } else {
                     // Handle exception from ext/
