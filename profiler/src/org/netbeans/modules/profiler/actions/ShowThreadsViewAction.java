@@ -68,9 +68,7 @@ public final class ShowThreadsViewAction extends AbstractAction {
     public ShowThreadsViewAction() {
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON,
-                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/threadsWindow.png")) // NOI18N
-        );
+        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/threadsWindow.png", false));
         putValue("iconBase", "org/netbeans/modules/profiler/resources/threadsWindow.png"); // NOI18N
     }
 
