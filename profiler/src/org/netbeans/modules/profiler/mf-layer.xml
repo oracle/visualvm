@@ -318,6 +318,8 @@ made subject to such option by the copyright holder.
             </file>
        <!-- Merge before 3rd party help: -->
         </folder>
+        <file name="filters-default.xml" url="filters-default.xml"/>
+        <file name="filtersets-default.xml" url="filtersets-default.xml"/>
     </folder>
 
     <folder name="Editors">
