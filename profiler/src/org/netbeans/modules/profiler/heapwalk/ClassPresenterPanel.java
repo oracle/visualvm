@@ -97,7 +97,7 @@ public class ClassPresenterPanel extends JPanel {
     private static final String TOTAL_SIZE_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
                                                                         "ClassPresenterPanel_TotalSizeString"); // NOI18N
                                                                                                                 // -----
-    private static ImageIcon ICON_CLASS = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png")); // NOI18N
+    private static ImageIcon ICON_CLASS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png", false); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

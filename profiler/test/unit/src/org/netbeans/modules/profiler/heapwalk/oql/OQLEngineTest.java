@@ -45,6 +45,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -122,7 +123,6 @@ public class OQLEngineTest {
                     rslt[0] = false;
                     return true;
                 }
-                System.out.println("xxx");
                 return false;
             }
         });
@@ -333,8 +333,8 @@ public class OQLEngineTest {
     }
 
     @Test
-    public void testReferrers() throws Exception {
-        System.out.println("referrers");
+    public void testReferrersInstance() throws Exception {
+        System.out.println("referrers-instance");
 
         String query = "select referrers(heap.findObject(1684166976))";
         long[] referrersTest = new long[] {1684166952};
@@ -355,11 +355,33 @@ public class OQLEngineTest {
     }
 
     @Test
-    public void testReferees() throws Exception {
-        System.out.println("referees");
+    public void testRefereesInstance() throws Exception {
+        System.out.println("referees-instance");
 
         String query = "select referees(heap.findObject(1684166976))";
         long[] refereesTest = new long[] {1684166992};
+        final List<Long> referees = new ArrayList<Long>();
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                referees.add(((Instance)o).getInstanceId());
+                return false;
+            }
+        });
+
+        assertEquals(refereesTest.length, referees.size());
+        for(long referee : refereesTest) {
+            if (!referees.contains(referee)) fail();
+        }
+    }
+
+    @Test
+    public void testRefereesClass() throws Exception {
+        System.out.println("referees-class");
+
+        String query = "select referees(heap.findClass(\"java.io.File\"))";
+        long[] refereesTest = new long[] {1684106928, 1684106888, 1684106848, 1684106408};
         final List<Long> referees = new ArrayList<Long>();
 
         instance.executeQuery(query, new ObjectVisitor() {
@@ -476,7 +498,7 @@ public class OQLEngineTest {
     public void testMap() throws Exception {
         System.out.println("map");
 
-        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181600\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object@1684106928</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String@1684106888</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String@1684106848</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem@1684106408</a>\n"};
+        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181600\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem#1</a>\n"};
 
         instance.executeQuery("select map(heap.findClass(\"java.io.File\").statics, \"index + '=' + toHtml(it)\")", new ObjectVisitor() {
 
@@ -485,8 +507,31 @@ public class OQLEngineTest {
                 return false;
             }
         });
-
         assertEquals(output[1], output[0]);
+    }
+
+    @Test
+    public void testFilter() throws Exception {
+        System.out.println("filter");
+
+        final int[] size = new int[]{0};
+        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select map(sort(filter(heap.objects('[C'), 'it.length > 0'), 'sizeof(lhs) - sizeof(rhs)'), \"sizeof(it)\")", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                int aSize = ((Number)o).intValue();
+                if (aSize < size[0]) {
+                    sorted[0] = false;
+                    return true;
+                }
+                size[0] = aSize;
+                return false;
+            }
+        });
+
+        assertTrue(sorted[0]);
     }
 
     @Test
@@ -511,5 +556,81 @@ public class OQLEngineTest {
         });
 
         assertTrue(sorted[0]);
+    }
+
+    @Test
+    public void testLength() throws Exception {
+        System.out.println("length");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select length(a.value) from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertEquals(Integer.class, rsltClass[0]);
+    }
+
+    @Test
+    public void testCountNoClosure() throws Exception {
+        System.out.println("count - no closure");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select count(a.value) from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertEquals(Integer.class, rsltClass[0]);
+    }
+
+    @Test
+    public void testCount() throws Exception {
+        System.out.println("count");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select count(a.value, 'true') from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertEquals(Double.class, rsltClass[0]);
+    }
+
+    @Test
+    public void testMultivalue() throws Exception {
+        System.out.println("multi-value");
+
+        final Class[] rsltClass = new Class[1];
+//        final boolean sorted[] = new boolean[] {true};
+
+
+        instance.executeQuery("select { name: t.name? t.name.toString() : \"null\", thread: t }  from instanceof java.lang.Thread t", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                rsltClass[0] = o.getClass();
+                return true;
+            }
+        });
+
+        assertTrue(Map.class.isAssignableFrom(rsltClass[0]));
     }
 }

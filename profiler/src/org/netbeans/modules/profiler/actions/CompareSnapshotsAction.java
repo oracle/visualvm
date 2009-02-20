@@ -782,9 +782,9 @@ public class CompareSnapshotsAction extends AbstractAction {
     private static final String SNAPSHOTS_LIST_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                                   "CompareSnapshotsAction_SnapshotsListAccessDescr"); // NOI18N
                                                                                                                                       // -----
-    private static final ImageIcon cpuIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png")); // NOI18N
-    private static final ImageIcon fragmentIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/fragmentSmall.png")); // NOI18N
-    private static final ImageIcon memoryIcon = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png")); // NOI18N
+    private static final ImageIcon cpuIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/cpuSmall.png", false); // NOI18N
+    private static final ImageIcon fragmentIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/fragmentSmall.png", false); // NOI18N
+    private static final ImageIcon memoryIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memorySmall.png", false); // NOI18N
     private static JFileChooser snapshotFileChooser;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -799,8 +799,7 @@ public class CompareSnapshotsAction extends AbstractAction {
         snapshot = null;
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON,
-                 new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"))); // NOI18N
+        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png", false)); // NOI18N
     }
 
     public CompareSnapshotsAction(LoadedSnapshot snapshot) {
