@@ -365,14 +365,6 @@ public final class IDEUtils {
     public static FileObject getSettingsFolder(final boolean create)
                                         throws IOException {
         return SettingsFolderQuery.getDefault().getSettingsFolder(create);
-//        final FileObject folder = FileUtil.getConfigFile("Services"); //NOI18N
-//        FileObject settingsFolder = folder.getFileObject(SettingsFolderQuery.getDefault().getSettingsFolder(), null);
-//
-//        if ((settingsFolder == null) && create) {
-//            settingsFolder = folder.createFolder(SettingsFolderQuery.getDefault().getSettingsFolder());
-//        }
-//
-//        return settingsFolder;
     }
 
     /**
