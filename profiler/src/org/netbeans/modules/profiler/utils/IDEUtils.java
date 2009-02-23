@@ -350,18 +350,6 @@ public final class IDEUtils {
         }
     }
 
-    public static String getServicesDir() {
-        // Need to search also for localized filters-default, there is a possibility that default en filters-default.xml won't be in Services directory.
-        final File dir = InstalledFileLocator.getDefault()
-                                             .locate("config/Services/filters-default.xml", "org.netbeans.modules.profiler", true); //NOI18N
-
-        if (dir == null) {
-            return null;
-        } else {
-            return dir.getParentFile().getPath();
-        }
-    }
-
     public static FileObject getSettingsFolder(final boolean create)
                                         throws IOException {
         return SettingsFolderQuery.getDefault().getSettingsFolder(create);
