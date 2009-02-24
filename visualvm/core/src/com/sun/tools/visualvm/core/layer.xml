@@ -114,6 +114,7 @@
         
         <folder name="Snapshot">
             <attr name="position" intvalue="200"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
             <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="100"/>
