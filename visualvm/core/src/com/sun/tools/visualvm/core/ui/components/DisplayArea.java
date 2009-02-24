@@ -99,14 +99,17 @@ class DisplayArea extends JComponent {
     }
 
     public void addTab(Tab tab) {
-        DisplayAreaSupport.TabButton tabButton = tabsContainer.addTab(tab);
+        final DisplayAreaSupport.TabButton tabButton = tabsContainer.addTab(tab);
         if (tabButton != null) {
             optionsContainer.addOptions(tab);
             updateTabbed();
             if (tabsContainer.indexOfTab(tab) == 0) setSelectedTab(tab);
             final Tab tabF = tab;
             tabButton.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) { if (SwingUtilities.isLeftMouseButton(e)) setSelectedTab(tabF); }
+                public void mousePressed(MouseEvent e) {
+                    if (tabButton.isEnabled() && SwingUtilities.isLeftMouseButton(e))
+                        setSelectedTab(tabF);
+                }
             });
             tabButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { setSelectedTab(tabF); }
