@@ -224,22 +224,32 @@ public final class DataSourceWindowManager {
         
         // Blocking notification that the view will be added
         for (DataSourceView view : newViews) {
-            DataSource dataSource = view.getDataSource();
-            Set<DataSourceView> cachedViews = openedViews.get(dataSource);
-            if (cachedViews == null) {
-                cachedViews = new HashSet();
-                openedViews.put(dataSource, cachedViews);
+            try {
+                DataSource dataSource = view.getDataSource();
+                Set<DataSourceView> cachedViews = openedViews.get(dataSource);
+                if (cachedViews == null) {
+                    cachedViews = new HashSet();
+                    openedViews.put(dataSource, cachedViews);
+                }
+                cachedViews.add(view);
+
+                view.viewWillBeAdded();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Failed to pre-initialize view " + view, e);    // NOI18N
             }
-            cachedViews.add(view);
-            
-            view.viewWillBeAdded();
         }
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     // Blocking adding of views to the window
-                    for (DataSourceView view : newViews) window.addView(view);
+                    for (DataSourceView view : newViews) {
+                        try {
+                            window.addView(view);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.SEVERE, "Failed to initialize view " + view, e);    // NOI18N
+                        }
+                    }
                 }
             });
         } catch (Exception e) {
@@ -247,7 +257,13 @@ public final class DataSourceWindowManager {
         }
 
         // Blocking notification that the view has been added
-        for (DataSourceView view : newViews) view.viewAdded();
+        for (DataSourceView view : newViews) {
+            try {
+                view.viewAdded();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Failed to post-initialize view " + view, e);    // NOI18N
+            }
+        }
     }
     
     void unregisterClosedWindow(DataSourceWindow window) {
