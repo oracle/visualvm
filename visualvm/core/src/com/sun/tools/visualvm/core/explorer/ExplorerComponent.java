@@ -94,6 +94,10 @@ class ExplorerComponent extends JPanel {
                 }
                 super.processMouseEvent(e);
             }
+            public void updateUI() {
+                super.updateUI();
+                setCellRenderer(new ExplorerNodeRenderer());
+            }
         };
         explorerTree.setRootVisible(false);
         explorerTree.setShowsRootHandles(true);
