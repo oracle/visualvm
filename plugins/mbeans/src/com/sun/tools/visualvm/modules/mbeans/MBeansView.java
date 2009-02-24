@@ -46,6 +46,7 @@ class MBeansView extends DataSourceView {
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans.png"; // NOI18N
     private Application application;
     private MBeansTab mbeansTab;
+    private MBeansTreeView mbeansTreeView;
     
     public MBeansView(Application application) {
         super(application, Resources.getText("LBL_MBeans"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 50, false); // NOI18N
@@ -54,6 +55,9 @@ class MBeansView extends DataSourceView {
 
     @Override
     protected void removed() {
+        if (mbeansTreeView != null) {
+            mbeansTreeView.dispose();
+        }
         if (mbeansTab != null) {
             mbeansTab.dispose();
         }
@@ -74,7 +78,8 @@ class MBeansView extends DataSourceView {
             jmx.addPropertyChangeListener(WeakListeners.propertyChange(mbeansTab, jmx));
 
             // MBeansTreeView
-            MBeansTreeView mbeansTreeView = new MBeansTreeView(mbeansTab);
+            mbeansTreeView = new MBeansTreeView(mbeansTab);
+            jmx.addPropertyChangeListener(WeakListeners.propertyChange(mbeansTreeView, jmx));
 
             // MBeansAttributesView
             MBeansAttributesView mbeansAttributesView = new MBeansAttributesView(mbeansTab);

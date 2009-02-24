@@ -25,8 +25,12 @@
 
 package com.sun.tools.visualvm.modules.mbeans;
 
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,7 +40,7 @@ import javax.swing.JTree;
  *
  * @author Jiri Sedlacek
  */
-class MBeansTreeView extends JPanel {
+class MBeansTreeView extends JPanel implements PropertyChangeListener {
 
     private MBeansTab mbeansTab;
 
@@ -44,6 +48,25 @@ class MBeansTreeView extends JPanel {
         this.mbeansTab = mbeansTab;
         initComponents();
     }
+
+    public void dispose() {
+        removePropertyChangeListener(this);
+        mbeansTab.getTree().clearSelection();
+        mbeansTab.getTree().setEnabled(false);
+    }
+
+    /* property change listener:  propertyChange */
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (JmxModel.CONNECTION_STATE_PROPERTY.equals(evt.getPropertyName())) {
+            ConnectionState newState = (ConnectionState) evt.getNewValue();
+            switch (newState) {
+                case DISCONNECTED:
+                    dispose();
+                    break;
+            }
+        }
+    }
+
 
     private void initComponents() {
         setLayout(new BorderLayout());
