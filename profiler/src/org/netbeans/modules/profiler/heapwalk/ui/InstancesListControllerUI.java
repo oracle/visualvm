@@ -221,7 +221,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     private static final String REACHABLE_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
                                                                                   "InstancesListControllerUI_ReachableSizeColumnDescr"); // NOI18N
                                                                                                                                          // -----
-    private static ImageIcon ICON_INSTANCES = new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png")); // NOI18N
+    private static ImageIcon ICON_INSTANCES = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png", false); // NOI18N
     private static final int columnCount = 2; // TODO: restore back to 4 once retained & reachable size implemented
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -397,7 +397,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(ImageUtilities.loadImage("org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/hideColumn.png", false)); // NOI18N
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 

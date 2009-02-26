@@ -146,7 +146,6 @@ function JavaClassProto() {
             res[res.length] = tmp;
             tmp = tmp.superclass;
         }
-        println;
         return res;
     }
 
@@ -240,7 +239,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as ObjectArray");
             return new JavaObjectArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
-            //            println("wrapping as ValueArray");
+            // println("wrapping as ValueArray");
             return new JavaValueArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             //            println("wrapping as Instance");
@@ -454,12 +453,24 @@ function unwrapJavaObject(jobject) {
             if (jobject == undefined) {
                 jobject = orig.wrapped;
             }
+            if (jobject == undefined) {
+                jobject = orig;
+            }
         } catch (e) {
             println("unwrapJavaObject: " + jobject + ", " + e);
             jobject = undefined;
         }
     } 
     return jobject;
+}
+
+function unwrapMap(jobject) {
+    var map = new java.util.HashMap();
+    for(var prop in jobject) {
+//        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
+        map.put(prop, unwrapJavaObject(jobject[prop]));
+    }
+    return map;
 }
 
 /**
@@ -1045,13 +1056,15 @@ function toHtml(obj) {
             var id = tmp.javaClassId;
             var name = tmp.name;
             return "<a href='file://class/" + name + "'>class " + name + "</a>";
-        } else {
+        } else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             var id = tmp.instanceId;
+            var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
             return "<a href='file://instance/" + name +"@" + id + "'>" +
-            name + "@" + id + "</a>";
+            name + "#" + number + "</a>";
         }
-    } else if ((typeof(obj) == 'object') || (obj instanceof JSAdapter)) {
+    }
+    if ((typeof(obj) == 'object') || (obj instanceof JSAdapter)) {
         if (obj instanceof java.lang.Object) {
             // script wrapped Java object
             obj = wrapIterator(obj);
@@ -1296,9 +1309,11 @@ function filter(array, code) {
  */
 function length(array) {
     array = wrapIterator(array);
-    if (array instanceof Array) {
-        return array.length;
-    } else if (array instanceof java.util.Enumeration) {
+    var length = array.length;
+
+    if (length != undefined) return length;
+    
+    if (array instanceof java.util.Enumeration) {
         var cnt = 0;
         while (array.hasMoreElements()) {
             array.nextElement(); 

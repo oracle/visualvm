@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -21,11 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -36,42 +31,34 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.netbeans.modules.profiler.spi;
 
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.openide.util.ImageUtilities;
-import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-
+import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.openide.filesystems.FileObject;
 
 /**
- * Action to display the Control Panel window.
  *
- * @author Ian Formanek
+ * @author Jaroslav Bachorik
  */
-public final class ControlPanelAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+abstract public class ProjectProfilingSupport {
+    private Project project;
 
-    private static final String NAME_STRING = NbBundle.getMessage(ControlPanelAction.class, "LBL_ControlPanelAction"); // NOI18N
-    private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(ControlPanelAction.class, "HINT_ControlPanelAction"); // NOI18N
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public ControlPanelAction() {
-        putValue(Action.NAME, NAME_STRING);
-        putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
-        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/controlPanel.gif", false));
+    protected ProjectProfilingSupport(Project project) {
+        this.project = project;
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void actionPerformed(final ActionEvent e) {
-        final ProfilerControlPanel2 pcp = ProfilerControlPanel2.getDefault();
-        pcp.open();
-        pcp.requestActive();
+    protected Project getProject() {
+        return project;
     }
+
+    abstract public String getFilter(boolean useSubprojects);
+    abstract public ClientUtils.SourceCodeSelection[] getRootMethods(FileObject profiledClassFile);
+    abstract public boolean canProfileFile(FileObject file);
 }

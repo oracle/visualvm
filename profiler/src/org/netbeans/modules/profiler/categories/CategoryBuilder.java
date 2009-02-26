@@ -79,7 +79,7 @@ public class CategoryBuilder {
         projectType = projectTypeId;
     }
 
-    public synchronized Category getRootCategory() {
+    final public synchronized Category getRootCategory() {
         if (rootCategory == null) {
             rootCategory = new CategoryContainer("ROOT", NbBundle.getMessage(CategoryBuilder.class, "ROOT_CATEGORY_NAME"), Mark.DEFAULT); // NOI18N
 
@@ -93,6 +93,10 @@ public class CategoryBuilder {
             }
         }
         return rootCategory;
+    }
+    
+    final protected Project getProject() {
+        return project;
     }
 
     private void processCategories(CategoryContainer container, FileObject node) {

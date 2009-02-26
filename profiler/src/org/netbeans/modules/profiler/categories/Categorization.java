@@ -38,7 +38,6 @@
  */
 package org.netbeans.modules.profiler.categories;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,20 +57,13 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik
  */
-public class Categorization implements Marker {
-
-    private Set<CategoryBuilder> builders;
+final public class Categorization implements Marker {
     private Project project;
     private Map<Category, Set<Mark>> inheritedMarkMap;
     private Map<Mark, Category> reverseMap;
     private CategoryContainer root = null;
 
-    public Categorization(Project project, CategoryBuilder builder) {
-        this(project, Collections.singleton(builder));
-    }
-
-    public Categorization(Project project, Collection<CategoryBuilder> builders) {
-        this.builders = new HashSet<CategoryBuilder>(builders);
+    public Categorization(Project project) {
         this.project = project;
         this.inheritedMarkMap = null;
     }
@@ -128,7 +120,7 @@ public class Categorization implements Marker {
     public Category getRoot() {
         if (root == null) {
             root = new CategoryContainer("ROOT", NbBundle.getMessage(CategoryBuilder.class, "ROOT_CATEGORY_NAME"), Mark.DEFAULT); // NOI18N
-            for (CategoryBuilder builder : builders) {
+            for (CategoryBuilder builder : project.getLookup().lookupAll(CategoryBuilder.class)) {
                 root.addAll(builder.getRootCategory().getSubcategories());
             }
         }
@@ -142,6 +134,29 @@ public class Categorization implements Marker {
     public Set<Mark> getAllMarks(Category category) {
         Set<Mark> marks = getInheritedMap().get(category);
         return marks != null ? Collections.unmodifiableSet(marks) : Collections.EMPTY_SET;
+    }
+
+    /**
+     * A categorization is only available if there is a {@linkplain CategoryBuilder}
+     * associated with it
+     * @return Returns TRUE only if there is a {@linkplain CategoryBuilder} registered
+     *         in the project lookup
+     */
+    public boolean isAvailable() {
+        return isAvailable(this.project);
+    }
+
+    /**
+     * A categorization is only available if there is a {@linkplain CategoryBuilder}
+     * associated with it.
+     * The static method is defined here so the availability can be checked without
+     * unnecessary creation of the {@linkplain Categorization} instance
+     * @return Returns TRUE only if there is a {@linkplain CategoryBuilder} registered
+     *         in the project lookup
+     */
+    public static boolean isAvailable(Project project) {
+        if (project == null) return false;
+        return project.getLookup().lookup(CategoryBuilder.class) != null;
     }
 
     public MarkMapping[] getMappings() {
