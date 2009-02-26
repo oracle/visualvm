@@ -51,7 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
+import org.netbeans.lib.profiler.heap.LongMap.Entry;
 
 /**
  *
@@ -117,6 +117,7 @@ class HprofHeap implements Heap {
     private TagBounds[] tagBounds = new TagBounds[0xff];
     private boolean instancesCountComputed;
     private boolean referencesComputed;
+    private boolean retainedSizeComputed;
     private int idMapSize;
     private int segment;
 
@@ -155,15 +156,8 @@ class HprofHeap implements Heap {
     }
 
     public GCRoot getGCRoot(Instance instance) {
-        synchronized (gcRootLock) {
-            Long instanceId = Long.valueOf(instance.getInstanceId());
-
-            if (gcRoots == null) {
-                getGCRoots();
-            }
-
-            return (GCRoot) gcRoots.get(instanceId);
-        }
+       Long instanceId = Long.valueOf(instance.getInstanceId());
+       return getGCRoot(instanceId);
     }
 
     public Collection getGCRoots() {
@@ -300,6 +294,21 @@ class HprofHeap implements Heap {
         return allInstanceDumpBounds;
     }
     
+    int getRetainedSize(Instance instance) {
+        computeRetainedSize(instance);
+        return idToOffsetMap.get(instance.getInstanceId()).getRetainedSize();
+    }
+    
+    GCRoot getGCRoot(Long instanceId) {
+        synchronized (gcRootLock) {
+            if (gcRoots == null) {
+                getGCRoots();
+            }
+
+            return (GCRoot) gcRoots.get(instanceId);
+        }
+    }
+
     int getValueSize(final byte type) {
         switch (type) {
             case HprofHeap.OBJECT:
@@ -523,6 +532,87 @@ class HprofHeap implements Heap {
         return;
     }
     
+    synchronized void computeRetainedSize(Instance in) {
+        if (retainedSizeComputed) {
+            return;
+        }
+        new TreeObject(this,nearestGCRoot.getLeaves()).computeTrees();
+        DominatorTree domTree = new DominatorTree(this,nearestGCRoot.getMultipleParents());
+        domTree.computeDominators();
+        int idSize = dumpBuffer.getIDSize();
+        Map domTreeMap = new HashMap(1000);
+        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+
+        while (offset[0] < allInstanceDumpBounds.endOffset) {
+            int instanceIdOffset = 0;
+            long start = offset[0];
+            int tag = readDumpTag(offset);
+
+            if (tag == INSTANCE_DUMP) {
+                instanceIdOffset = 1;
+            } else if (tag == OBJECT_ARRAY_DUMP) {
+                instanceIdOffset = 1;
+            } else if (tag == PRIMITIVE_ARRAY_DUMP) {
+                instanceIdOffset = 1;
+            } else {
+                continue;
+            }
+            long instanceId = dumpBuffer.getID(start + instanceIdOffset);
+//Instance iiii = getInstanceByID(instanceId);
+//if (iiii.getJavaClass().getName().equals("java.nio.HeapCharBuffer") && iiii.getInstanceNumber() == 1) {
+//    System.out.println(iiii.getJavaClass().getName()+"#"+iiii.getInstanceNumber());
+//}
+            LongMap.Entry instanceEntry = idToOffsetMap.get(instanceId);
+            long idom = domTree.getIdomId(instanceId,instanceEntry);
+
+            if (!instanceEntry.isTreeObj() && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(instanceId) != null)) {
+                int origSize = instanceEntry.getRetainedSize();
+                instanceEntry.setRetainedSize(origSize + getInstanceByID(instanceId).getSize());
+            }
+            if (idom != 0) {
+                int size;
+                LongMap.Entry entry;
+                Object[] domPath = null;
+                
+                if (instanceEntry.isTreeObj()) {
+                    size = instanceEntry.getRetainedSize();
+                } else {
+                    size = getInstanceByID(instanceId).getSize();
+                }
+                for (;idom!=0;idom=domTree.getIdomId(idom,entry)) {
+                    Object[] cachedDomPath = (Object[]) domTreeMap.get(new Long(idom));
+                    
+                    if (cachedDomPath != null) {
+                        if (domPath != null) {
+                            domPath[1] = cachedDomPath;
+                        }
+                        for(;cachedDomPath!=null;cachedDomPath=(Object[]) cachedDomPath[1]) {
+                            entry = (Entry) cachedDomPath[0];
+                            entry.setRetainedSize(entry.getRetainedSize()+size);
+                        }
+                        break;
+                    } else {
+                        Object[] newDomPath;
+                        
+                        entry = idToOffsetMap.get(idom);
+                        if (entry.isTreeObj()) {
+                            break;
+                        }
+                        entry.setRetainedSize(entry.getRetainedSize()+size);
+                        newDomPath = new Object[]{entry,null};
+                        if (domPath != null) {
+                            domPath[1] = newDomPath;
+                        }
+                        domTreeMap.put(new Long(idom),newDomPath);
+                        domPath = newDomPath;
+                    }
+                }
+            }
+        }
+        retainedSizeComputed = true;
+        return;
+    }
+
     int readDumpTag(long[] offset) {
         long position = offset[0];
         int dumpTag = dumpBuffer.get(position++);

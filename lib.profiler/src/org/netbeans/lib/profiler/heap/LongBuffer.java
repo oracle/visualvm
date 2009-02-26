@@ -50,6 +50,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 
 /**
@@ -62,12 +63,12 @@ class LongBuffer {
 
     private DataInputStream readStream;
     private DataOutputStream writeStream;
-    private File backedFile;
+    private File backingFile;
     private long[] buffer;
-    private boolean hasData;
     private boolean useBackingFile;
     private int bufferSize;
     private int readOffset;
+    private int longs;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -78,13 +79,13 @@ class LongBuffer {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     void delete() {
-        if (backedFile != null) {
-            backedFile.delete();
+        if (backingFile != null) {
+            backingFile.delete();
         }
     }
 
     boolean hasData() {
-        return hasData;
+        return longs > 0;
     }
 
     long readLong() throws IOException {
@@ -107,7 +108,7 @@ class LongBuffer {
         bufferSize = 0;
         writeStream = null;
         readStream = null;
-        hasData = false;
+        longs = 0;
         useBackingFile = false;
         readOffset = 0;
     }
@@ -122,32 +123,37 @@ class LongBuffer {
         }
 
         writeStream = null;
+        rewind();
+    }
+
+    void rewind() {
         readOffset = 0;
 
         if (useBackingFile) {
             try {
-                readStream = new DataInputStream(new BufferedInputStream(new FileInputStream(backedFile), buffer.length * 8));
-            } catch (FileNotFoundException ex) {
+                if (readStream != null) {
+                    readStream.close();
+                }
+                readStream = new DataInputStream(new BufferedInputStream(new FileInputStream(backingFile), buffer.length * 8));
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
     }
 
     void writeLong(long data) throws IOException {
-        hasData = true;
-
+        longs++;
         if (bufferSize < buffer.length) {
             buffer[bufferSize++] = data;
-
             return;
         }
 
-        if (backedFile == null) {
-            backedFile = File.createTempFile("NBProfiler", ".gc"); // NOI18N
+        if (backingFile == null) {
+            backingFile = File.createTempFile("NBProfiler", ".gc"); // NOI18N
         }
 
         if (writeStream == null) {
-            writeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(backedFile), buffer.length * 8));
+            writeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(backingFile), buffer.length * 8));
 
             for (int i = 0; i < buffer.length; i++) {
                 writeStream.writeLong(buffer[i]);
@@ -158,4 +164,29 @@ class LongBuffer {
 
         writeStream.writeLong(data);
     }
+    
+    LongBuffer revertBuffer() throws IOException {
+        LongBuffer reverted = new LongBuffer(buffer.length);
+        
+        if (bufferSize < buffer.length) {
+            for (int i=0;i<bufferSize;i++) {
+                reverted.buffer[i] = buffer[bufferSize - 1 - i];
+            }
+        } else {
+            RandomAccessFile raf = new RandomAccessFile(backingFile,"r");
+            long offset = raf.length();
+            while(offset > 0) {
+                offset-=8;
+                raf.seek(offset);
+                reverted.writeLong(raf.readLong());
+            }
+        }
+        reverted.startReading();
+        return reverted;
+    }
+    
+    int getSize() {
+        return longs;
+    }
+    
 }
