@@ -528,6 +528,7 @@ class HprofHeap implements Heap {
                 }
             }
         }
+        idToOffsetMap.flush();
         referencesComputed = true;
         return;
     }

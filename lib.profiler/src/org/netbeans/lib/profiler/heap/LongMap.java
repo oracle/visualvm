@@ -232,4 +232,8 @@ class LongMap extends AbstractLongMap {
     Entry put(long key, long value) {
         return (Entry)super.put(key,value);
     }
+
+    void flush() {
+        referenceList.flush();
+    }
 }

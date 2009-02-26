@@ -121,6 +121,7 @@ class NearestGCRoot {
         }
 
         deleteBuffers();
+        heap.idToOffsetMap.flush();
         gcRootsComputed = true;
     }
 
