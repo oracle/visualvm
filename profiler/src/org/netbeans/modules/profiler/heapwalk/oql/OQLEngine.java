@@ -23,6 +23,7 @@ import java.util.*;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
+import org.openide.util.Exceptions;
 
 /**
  * This is Object Query Language Interpreter
@@ -35,9 +36,19 @@ public class OQLEngine {
     static {
         try {
             // Do we have javax.script support?
-            Class.forName("javax.script.ScriptEngineManager");
-            oqlSupported = true;
-        } catch (ClassNotFoundException cnfe) {
+            Class managerClass = Class.forName("javax.script.ScriptEngineManager");
+            Object manager = managerClass.newInstance();
+            
+            // check that we have JavaScript engine
+            Method getEngineMethod = managerClass.getMethod("getEngineByName",
+                    new Class[]{String.class});
+            Object engine =  getEngineMethod.invoke(manager, new Object[]{"JavaScript"});
+
+            oqlSupported = engine != null;
+        } catch (Exception ex) {
+            if (!(ex instanceof ClassNotFoundException)) {
+                Exceptions.printStackTrace(ex);
+            }
             oqlSupported = false;
         }
     }
@@ -333,7 +344,7 @@ public class OQLEngine {
             // create JavaScript engine
             Method getEngineMethod = managerClass.getMethod("getEngineByName",
                     new Class[]{String.class});
-            engine = getEngineMethod.invoke(manager, new Object[]{"js"});
+            engine = getEngineMethod.invoke(manager, new Object[]{"JavaScript"});
 
             // initialize engine with init file (hat.js)
             InputStream strm = getInitStream();
