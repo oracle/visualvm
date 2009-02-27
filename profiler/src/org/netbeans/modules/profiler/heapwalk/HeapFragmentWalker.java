@@ -143,7 +143,6 @@ public class HeapFragmentWalker {
                 List<JavaClass> classes = heapFragment.getAllClasses();
                 for (JavaClass jclass : classes) {
                     List<Instance> instances = jclass.getInstances();
-                    Thread.dumpStack();
                     if (instances.size() > 0) {
                         Dialog progress = showProgress(COMPUTING_RETAINED_CAPTION,
                                                    COMPUTING_RETAINED_MSG);
