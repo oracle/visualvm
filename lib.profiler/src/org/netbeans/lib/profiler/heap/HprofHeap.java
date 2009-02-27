@@ -378,6 +378,7 @@ class HprofHeap implements Heap {
             if (classDump != null) {
                 classDump.incrementInstance();
                 instanceEntry.setIndex(classDump.getInstancesCount());
+                classDumpBounds.addInstanceSize(classDump, tag, start);
             }
         }
 
