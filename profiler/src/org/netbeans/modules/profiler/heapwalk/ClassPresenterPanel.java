@@ -218,6 +218,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         actionsRenderer.setVisible(false);
 
         JPanel detailsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        detailsContainer.setOpaque(false);
         detailsContainer.add(detailsRenderer);
         detailsContainer.add(actionsRenderer);
 
