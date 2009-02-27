@@ -40,11 +40,26 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.HeapFragmentWalkerUI;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.EmptyBorder;
+import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.openide.DialogDescriptor;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -52,6 +67,25 @@ import javax.swing.JPanel;
  * @author Jiri Sedlacek
  */
 public class HeapFragmentWalker {
+
+    // -----
+    // I18N String constants
+    private static final String COMPUTE_RETAINED_MSG = NbBundle.getMessage(HeapFragmentWalker.class,
+                                                                         "HeapFragmentWalker_ComputeRetainedMsg"); // NOI18N
+    private static final String COMPUTE_RETAINED_CAPTION = NbBundle.getMessage(HeapFragmentWalker.class,
+                                                                          "HeapFragmentWalker_ComputeRetainedCaption"); // NOI18N
+    private static final String COMPUTING_RETAINED_MSG = NbBundle.getMessage(HeapFragmentWalker.class,
+                                                                         "HeapFragmentWalker_ComputingRetainedMsg"); // NOI18N
+    private static final String COMPUTING_RETAINED_CAPTION = NbBundle.getMessage(HeapFragmentWalker.class,
+                                                                          "HeapFragmentWalker_ComputingRetainedCaption"); // NOI18N
+    // -----
+
+    public static final int RETAINED_SIZES_UNSUPPORTED = -1;
+    public static final int RETAINED_SIZES_UNKNOWN = 0;
+    public static final int RETAINED_SIZES_CANCELLED = 1;
+    public static final int RETAINED_SIZES_COMPUTING = 2;
+    public static final int RETAINED_SIZES_COMPUTED = 3;
+
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AnalysisController analysisController;
@@ -64,12 +98,22 @@ public class HeapFragmentWalker {
     private NavigationHistoryManager navigationHistoryManager;
     private SummaryController summaryController;
 
+    private List<StateListener> stateListeners;
+    private int retainedSizesStatus;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     // --- Constructors ----------------------------------------------------------
     public HeapFragmentWalker(Heap heapFragment, HeapWalker heapWalker) {
+        this(heapFragment, heapWalker, false);
+    }
+
+    public HeapFragmentWalker(Heap heapFragment, HeapWalker heapWalker, boolean supportsRetainedSizes) {
         this.heapFragment = heapFragment;
         this.heapWalker = heapWalker;
+
+        this.retainedSizesStatus = supportsRetainedSizes ? RETAINED_SIZES_UNKNOWN :
+                                                        RETAINED_SIZES_UNSUPPORTED;
 
         summaryController = new SummaryController(this);
         classesController = new ClassesController(this);
@@ -81,6 +125,113 @@ public class HeapFragmentWalker {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public synchronized final int computeRetainedSizes(boolean masterAction) {
+
+        if (retainedSizesStatus != RETAINED_SIZES_UNSUPPORTED &&
+            retainedSizesStatus != RETAINED_SIZES_COMPUTED) {
+
+            ProfilerDialogs.DNSAConfirmationChecked dnsa =
+                new ProfilerDialogs.DNSAConfirmationChecked("HeapFragmentWalker.computeRetainedSizes", //NOI18N
+                                                            COMPUTE_RETAINED_MSG, COMPUTE_RETAINED_CAPTION,
+                                                            ProfilerDialogs.DNSAConfirmationChecked.YES_NO_OPTION);
+
+            if (!ProfilerDialogs.notify(dnsa).equals(ProfilerDialogs.DNSAConfirmationChecked.YES_OPTION)) {
+                changeState(RETAINED_SIZES_CANCELLED, masterAction);
+            } else {
+                changeState(RETAINED_SIZES_COMPUTING, masterAction);
+                List<JavaClass> classes = heapFragment.getAllClasses();
+                for (JavaClass jclass : classes) {
+                    List<Instance> instances = jclass.getInstances();
+                    Thread.dumpStack();
+                    if (instances.size() > 0) {
+                        Dialog progress = showProgress(COMPUTING_RETAINED_CAPTION,
+                                                   COMPUTING_RETAINED_MSG);
+                        instances.get(0).getRetainedSize();
+                        if (progress != null) {
+                            progress.setVisible(false);
+                            progress.dispose();
+                        }
+                        break;
+                    }
+                }
+                changeState(RETAINED_SIZES_COMPUTED, masterAction);
+            }
+        }
+
+        return retainedSizesStatus;
+    }
+    
+    private static Dialog showProgress(String caption, String message) {
+        final CountDownLatch latch = new CountDownLatch(1); // create a latch to prevent race condition while displaying the progress
+
+        final Dialog progress = createProgressPanel(caption, message);
+        progress.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) > 0) {
+                    latch.countDown(); // window has changed the state to "SHOWING" - can leave the "nonResponding()" method"
+                }
+            }
+        });
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                progress.setVisible(true);
+            }
+        });
+
+        try {
+            latch.await(); // wait till the progress dialog has been displayed
+        } catch (InterruptedException e) {
+            // TODO move to SwingWorker
+        }
+            
+        return progress;
+    }
+
+    private static Dialog createProgressPanel(String caption, String message) {
+        Dialog dialog;
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        panel.add(new JLabel(message), BorderLayout.NORTH);
+
+        JProgressBar progress = new JProgressBar();
+        progress.setIndeterminate(true);
+        panel.add(progress, BorderLayout.SOUTH);
+
+        Dimension ps = panel.getPreferredSize();
+        ps.setSize(Math.max(ps.getWidth(), 350), Math.max(ps.getHeight(), 50));
+        panel.setPreferredSize(ps);
+
+        dialog = ProfilerDialogs.createDialog(new DialogDescriptor(panel, caption, true, new Object[] {  },
+                                                                   DialogDescriptor.CANCEL_OPTION, DialogDescriptor.RIGHT_ALIGN,
+                                                                   null, null));
+
+        return dialog;
+    }
+
+    public synchronized final int getRetainedSizesStatus() {
+        return retainedSizesStatus;
+    }
+
+    public final void addStateListener(StateListener listener) {
+        if (stateListeners == null) stateListeners = new ArrayList();
+        if (!stateListeners.contains(listener)) stateListeners.add(listener);
+    }
+
+    public final void removeStateListener(StateListener listener) {
+        if (stateListeners == null || !stateListeners.contains(listener)) return;
+        stateListeners.remove(listener);
+        if (stateListeners.size() == 0) stateListeners = null;
+    }
+
+    private void changeState(int newState, boolean masterChange) {
+        retainedSizesStatus = newState;
+        if (stateListeners == null) return;
+        StateEvent e = new StateEvent(getRetainedSizesStatus(), masterChange);
+        for (StateListener listener : stateListeners) listener.stateChanged(e);
+    }
+
 
     public AbstractTopLevelController getActiveController() {
         HeapFragmentWalkerUI ui = (HeapFragmentWalkerUI) getPanel();
@@ -252,4 +403,33 @@ public class HeapFragmentWalker {
 
         return null;
     }
+
+
+    public static interface StateListener {
+
+        public void stateChanged(StateEvent e);
+
+    }
+
+    public static final class StateEvent {
+
+        private int retainedSizesStatus;
+        private boolean masterChange;
+
+
+        StateEvent(int retainedSizesStatus) {
+            this(retainedSizesStatus, false);
+        }
+
+        StateEvent(int retainedSizesStatus, boolean masterChange) {
+            this.retainedSizesStatus = retainedSizesStatus;
+            this.masterChange = masterChange;
+        }
+
+        public int getRetainedSizesStatus() { return retainedSizesStatus; }
+
+        public boolean isMasterChange() { return masterChange; }
+
+    }
+
 }
