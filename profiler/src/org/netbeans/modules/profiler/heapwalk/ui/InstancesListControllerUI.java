@@ -51,6 +51,7 @@ import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.InstancesListController;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.openide.util.ImageUtilities;
@@ -275,6 +276,26 @@ public class InstancesListControllerUI extends JTitledPanel {
         initColumnsData();
         initData();
         initComponents();
+
+        instancesListController.getInstancesController().
+            getHeapFragmentWalker().addStateListener(
+                new HeapFragmentWalker.StateListener() {
+                    public void stateChanged(StateEvent e) {
+                        if (e.getRetainedSizesStatus() == HeapFragmentWalker.
+                            RETAINED_SIZES_COMPUTED && e.isMasterChange()) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        instancesListTableModel.
+                                                setRealColumnVisibility(2, true);
+                                        instancesListTable.createDefaultColumnsFromModel();
+                                        instancesListTable.updateTreeTableHeader();
+                                        setColumnsData();
+                                    }
+                                });
+                        }
+                    }
+                }
+            );
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -540,7 +561,10 @@ public class InstancesListControllerUI extends JTitledPanel {
         treeCellRenderer.setOpenIcon(null);
 
         if (retainedSizeSupported)
-            instancesListTableModel.setRealColumnVisibility(2, false);
+            instancesListTableModel.setRealColumnVisibility(2, instancesListController.
+                getInstancesController().getHeapFragmentWalker().getRetainedSizesStatus()
+                                          == HeapFragmentWalker.RETAINED_SIZES_COMPUTED);
+        
         // TODO: uncomment once retained & reachable size implemented
         //    instancesListTableModel.setRealColumnVisibility(3, false);
         instancesListTable = new JTreeTable(instancesListTableModel) {
