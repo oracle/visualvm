@@ -40,12 +40,16 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import org.openide.util.NbBundle;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.lib.profiler.heap.GCRoot;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.Value;
 
 
 /**

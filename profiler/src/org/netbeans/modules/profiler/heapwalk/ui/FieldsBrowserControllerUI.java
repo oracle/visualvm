@@ -40,7 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -58,7 +58,6 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Font;
@@ -90,8 +89,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -198,6 +202,10 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                     return fieldNode.getType();
                 case 3:
                     return fieldNode.getValue();
+                case 4:
+                    return fieldNode.getSize();
+                case 5:
+                    return fieldNode.getRetainedSize();
                 default:
                     return null;
             }
@@ -246,13 +254,21 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                                                                         "FieldsBrowserControllerUI_ValueColumnName"); // NOI18N
     private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
                                                                          "FieldsBrowserControllerUI_ValueColumnDescr"); // NOI18N
-                                                                                                                        // -----
+    private static final String SIZE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+                                                                        "FieldsBrowserControllerUI_SizeColumnName"); // NOI18N
+    private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+                                                                         "FieldsBrowserControllerUI_SizeColumnDescr"); // NOI18N
+    private static final String RETAINED_SIZE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
+                                                                                "InstancesListControllerUI_RetainedSizeColumnName"); // NOI18N
+    private static final String RETAINED_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
+                                                                                 "InstancesListControllerUI_RetainedSizeColumnDescr"); // NOI18N
+    // -----
     private static ImageIcon ICON_FIELDS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/data.png", false); // NOI18N
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
     private static final String NO_DATA = "No data"; // NOI18N
-    private static final int columnCount = 4;
+    private int columnCount;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -280,6 +296,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     private boolean sortingOrder = true;
     private int sortingColumn = 0;
 
+    private boolean retainedSizeSupported;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     // --- Constructors ----------------------------------------------------------
@@ -289,6 +307,11 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
               ICON_FIELDS, true);
 
         this.fieldsBrowserController = fieldsBrowserController;
+
+        retainedSizeSupported = fieldsBrowserController.getInstancesControllerHandler().
+                                getHeapFragmentWalker().getRetainedSizesStatus() !=
+                                HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED;
+        columnCount = retainedSizeSupported ? 6 : 5;
 
         realFieldsListTableModel = new FieldsListTreeTableModel();
         fieldsListTableModel = new ExtendedTreeTableModel(realFieldsListTableModel);
@@ -304,6 +327,26 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         initColumnsData();
         initData();
         initComponents();
+
+        fieldsBrowserController.getInstancesControllerHandler().
+            getHeapFragmentWalker().addStateListener(
+                new HeapFragmentWalker.StateListener() {
+                    public void stateChanged(StateEvent e) {
+                        if (e.getRetainedSizesStatus() == HeapFragmentWalker.
+                            RETAINED_SIZES_COMPUTED && e.isMasterChange()) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        fieldsListTableModel.
+                                                setRealColumnVisibility(5, true);
+                                        fieldsListTable.createDefaultColumnsFromModel();
+                                        fieldsListTable.updateTreeTableHeader();
+                                        setColumnsData();
+                                    }
+                                });
+                        }
+                    }
+                }
+            );
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -385,16 +428,44 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         }
     }
 
-    private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
+    private void addMenuItemListener(final JCheckBoxMenuItem menuItem) {
+        final boolean[] internalChange = new boolean[1];
         menuItem.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int column = Integer.parseInt(e.getActionCommand());
-                    fieldsListTableModel.setRealColumnVisibility(column, !fieldsListTableModel.isRealColumnVisible(column));
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (internalChange[0]) return;
+                final int column = Integer.parseInt(e.getActionCommand());
+                if (column == 5 && !fieldsListTableModel.isRealColumnVisible(column)) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            final int retainedSizesState = fieldsBrowserController.getInstancesControllerHandler().
+                                    getHeapFragmentWalker().computeRetainedSizes(false);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
+                                        internalChange[0] = true;
+                                        menuItem.setSelected(!menuItem.isSelected());
+                                        internalChange[0] = false;
+                                    } else {
+                                        fieldsListTableModel.setRealColumnVisibility(column,
+                                                !fieldsListTableModel.isRealColumnVisible(column));
+                                        fieldsListTable.createDefaultColumnsFromModel();
+                                        fieldsListTable.updateTreeTableHeader();
+                                        setColumnsData();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    fieldsListTableModel.setRealColumnVisibility(column,
+                            !fieldsListTableModel.isRealColumnVisible(column));
                     fieldsListTable.createDefaultColumnsFromModel();
                     fieldsListTable.updateTreeTableHeader();
                     setColumnsData();
                 }
-            });
+            }
+        });
+
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
@@ -502,8 +573,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                         HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
                         String className = node.getType();
 
-                        while (className.endsWith("[]")) {
-                            className = className.substring(0, className.length() - 2); // NOI18N
+                        while (className.endsWith("[]")) { // NOI18N
+                            className = className.substring(0, className.length() - 2);
                         }
 
                         NetBeansProfiler.getDefaultNB().openJavaSource(null, className, null, null);
@@ -538,6 +609,14 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         columnNames[3] = VALUE_COLUMN_NAME;
         columnToolTips[3] = VALUE_COLUMN_DESCR;
 
+        columnNames[4] = SIZE_COLUMN_NAME;
+        columnToolTips[4] = SIZE_COLUMN_DESCR;
+
+        if (retainedSizeSupported) {
+            columnNames[5] = RETAINED_SIZE_COLUMN_NAME;
+            columnToolTips[5] = RETAINED_SIZE_COLUMN_DESCR;
+        }
+
         int unitWidth = getFontMetrics(getFont()).charWidth('W'); // NOI18N // initial width of data columns
 
         FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
@@ -558,6 +637,14 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
         columnWidths[3 - 1] = unitWidth * 14;
         columnRenderers[3] = dataCellRenderer;
+
+        columnWidths[4 - 1] = unitWidth * 7;
+        columnRenderers[4] = dataCellRenderer;
+
+        if (retainedSizeSupported) {
+            columnWidths[5 - 1] = unitWidth * 7;
+            columnRenderers[5] = dataCellRenderer;
+        }
     }
 
     private void initComponents() {
@@ -566,6 +653,12 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         treeCellRenderer.setOpenIcon(null);
 
         fieldsListTableModel.setRealColumnVisibility(2, false);
+        fieldsListTableModel.setRealColumnVisibility(4, false);
+
+        if (retainedSizeSupported)
+            fieldsListTableModel.setRealColumnVisibility(5, fieldsBrowserController.
+                getInstancesControllerHandler().getHeapFragmentWalker().getRetainedSizesStatus()
+                                          == HeapFragmentWalker.RETAINED_SIZES_COMPUTED);
 
         fieldsListTable = new JTreeTable(fieldsListTableModel) {
                 public void doLayout() {
@@ -601,12 +694,12 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         fieldsListTable.getColumnModel().getColumn(0).setMinWidth(150);
         fieldsListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
-        fieldsListTable.getActionMap().put("DEFAULT_ACTION",
+        fieldsListTable.getActionMap().put("DEFAULT_ACTION", // NOI18N
                                            new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     performDefaultAction();
                 }
-            }); // NOI18N
+            });
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(fieldsListTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
@@ -638,13 +731,13 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         String hintText = (fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE)
                           ? MessageFormat.format(NO_INSTANCE_SELECTED_MSG,
                                                  new Object[] {
-                                                     "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png'>"
+                                                     "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png'>" // NOI18N
                                                  })
-                          : // NOI18N
+                          :
         MessageFormat.format(NO_CLASS_SELECTED_MSG,
                              new Object[] {
-                                 "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png'>"
-                             }); // NOI18N
+                                 "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png'>" // NOI18N
+                             });
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 

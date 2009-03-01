@@ -58,9 +58,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.AbstractButton;
@@ -68,7 +65,6 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 
@@ -147,19 +143,27 @@ public class ReferencesBrowserController extends AbstractController {
         protected String computeName() {
             return NO_INSTANCE_SELECTED_STRING;
         }
-        ;
+
         protected String computeType() {
             return NONE_STRING;
         }
-        ;
+
         protected String computeValue() {
             return NONE_STRING;
         }
-        ;
+        
+        protected String computeSize() {
+            return ""; // NOI18N
+        }
+        
+        protected String computeRetainedSize() {
+            return ""; // NOI18N
+        }
+
         protected Icon computeIcon() {
             return null;
         }
-        ;
+
         public boolean isLeaf() {
             return true;
         }
@@ -304,8 +308,8 @@ public class ReferencesBrowserController extends AbstractController {
     }
 
     private HeapWalkerNode getFields(final Instance instance) {
-        return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this",
-                                                            new Runnable() { // NOI18N
+        return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this", // NOI18N
+                                                            new Runnable() {
                 public void run() {
                     ((ReferencesBrowserControllerUI) getPanel()).refreshView();
                 }
