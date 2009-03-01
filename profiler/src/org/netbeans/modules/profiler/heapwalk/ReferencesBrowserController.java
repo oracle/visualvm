@@ -186,6 +186,11 @@ public class ReferencesBrowserController extends AbstractController {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     // --- Internal interface ----------------------------------------------------
+
+    public Handler getReferencesControllerHandler() {
+        return referencesControllerHandler;
+    }
+
     public HeapWalkerNode getFilteredSortedFields(String filterValue, int sortingColumn, boolean sortingOrder) {
         if (instance == null) {
             return EMPTY_INSTANCE_NODE;

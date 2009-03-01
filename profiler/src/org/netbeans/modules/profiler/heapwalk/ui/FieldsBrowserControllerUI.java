@@ -465,7 +465,6 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                 }
             }
         });
-
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
