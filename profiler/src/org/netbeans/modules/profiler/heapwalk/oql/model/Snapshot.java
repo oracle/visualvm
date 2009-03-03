@@ -17,6 +17,7 @@
  */
 package org.netbeans.modules.profiler.heapwalk.oql.model;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.ArrayList;
 import org.netbeans.lib.profiler.heap.Field;
@@ -39,9 +40,6 @@ import org.netbeans.lib.profiler.heap.Value;
  * file.
  */
 public class Snapshot {
-
-    public static long SMALL_ID_MASK = 0x0FFFFFFFFL;
-    public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
     private final Heap delegate;
     private JavaClass weakReferenceClass;
     private int referentFieldIndex;
@@ -138,58 +136,16 @@ public class Snapshot {
     }
 
     public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {
-        return new Iterator() {
+        return new TreeIterator<Instance, JavaClass>(clazz) {
 
-            private Stack<JavaClass> toInspect = new Stack<JavaClass>();
-            private Set<JavaClass> inspected = new HashSet<JavaClass>();
-
-            private JavaClass popped = null;
-            private Iterator inspecting = null;
-
-
-            {
-                toInspect.push(clazz);
-                inspected.add(clazz);
+            @Override
+            protected Iterator<Instance> getSameLevelIterator(JavaClass popped) {
+                return popped.getInstances().iterator();
             }
 
-            public boolean hasNext() {
-                setupIterator();
-
-                return inspecting != null && inspecting.hasNext();
-            }
-
-            public Object next() {
-                setupIterator();
-
-                if (inspecting == null || !inspecting.hasNext()) {
-                    throw new NoSuchElementException();
-                }
-
-                Object retVal = inspecting.next();
-                return retVal;
-            }
-
-            private void setupIterator() {
-                while (!toInspect.isEmpty() && (inspecting == null || !inspecting.hasNext())) {
-                    popped = toInspect.pop();
-                    if (popped != null) {
-                        inspecting = popped.getInstances().iterator();
-                        if (includeSubclasses) {
-                            for (Object subclass : popped.getSubClasses()) {
-                                if (!inspected.contains(subclass)) {
-                                    toInspect.push(((JavaClass) subclass));
-                                    inspected.add(((JavaClass) subclass));
-                                }
-                            }
-                        }
-                    } else {
-                        inspecting = null;
-                    }
-                }
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
+            @Override
+            protected Iterator<JavaClass> getTraversingIterator(JavaClass popped) {
+                return includeSubclasses ? popped.getSubClasses().iterator() : Collections.EMPTY_LIST.iterator();
             }
         };
     }
@@ -240,12 +196,6 @@ public class Snapshot {
     }
 
     public Iterator getFinalizerObjects() {
-//        Vector obj;
-//        if (finalizablesCache != null &&
-//            (obj = finalizablesCache.get()) != null) {
-//            return obj.elements();
-//        }
-
         JavaClass clazz = findClass("java.lang.ref.Finalizer");
         Instance queue = ((ObjectFieldValue) clazz.getValueOfStaticField("queue")).getInstance();
         ObjectFieldValue headFld = (ObjectFieldValue) queue.getValueOfField("head");
@@ -310,10 +260,6 @@ public class Snapshot {
             }
         } while (chain != null);
 
-//        ReferenceChain[] realResult = new ReferenceChain[result.size()];
-//        for (int i = 0; i < result.size(); i++) {
-//            realResult[i] = (ReferenceChain) result.elementAt(i);
-//        }
         return result.toArray(new ReferenceChain[result.size()]);
     }
 
@@ -360,14 +306,6 @@ public class Snapshot {
         // Trivial tail recursion:  I have faith in javac.
         }
     }
-//
-//    public boolean getUnresolvedObjectsOK() {
-//        return unresolvedObjectsOK;
-//    }
-//
-//    public void setUnresolvedObjectsOK(boolean v) {
-//        unresolvedObjectsOK = v;
-//    }
 
     public JavaClass getWeakReferenceClass() {
         return weakReferenceClass;
@@ -385,6 +323,18 @@ public class Snapshot {
         return reachableExcludes;
     }
 
+    public String valueString(Instance arrayDump) {
+        if (arrayDump == null) return null;
+        try {
+            Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy");
+            Method method = proxy.getDeclaredMethod("getString", Instance.class);
+            method.setAccessible(true);
+            return (String) method.invoke(proxy, arrayDump);
+        } catch (Exception ex) {
+            // ignore
+        }
+        return arrayDump.toString();
+    }
 //    // package privates
 //    void addReferenceFromRoot(Root r, JavaHeapObject obj) {
 //        Root root = rootsMap.get(obj);

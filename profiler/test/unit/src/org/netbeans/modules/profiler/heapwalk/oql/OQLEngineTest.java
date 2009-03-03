@@ -51,10 +51,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.HeapFactory;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.modules.profiler.heapwalk.OQLController;
 import static org.junit.Assert.*;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
 
@@ -260,24 +260,6 @@ public class OQLEngineTest {
         assertEquals(0, count[1]);
     }
 
-//    @Test
-//    public void testClassof() throws Exception {
-//        System.out.println("classof");
-//        final int[] counter = new int[1];
-//
-//        String query = "select classof(o).name from instanceof java.util.Collection o";
-//
-//        instance.executeQuery(query, new ObjectVisitor() {
-//
-//            public boolean visit(Object o) {
-//                System.out.println(instance.unwrapJavaObject(o));
-//                counter[0]++;
-//                return true;
-//            }
-//        });
-//        assertTrue(counter[0] > 0);
-//    }
-
     @Test
     public void testSubclasses() throws Exception {
         System.out.println("subclasses");
@@ -424,6 +406,23 @@ public class OQLEngineTest {
             }
         });
         assertFalse(result[0]);
+    }
+
+    @Test
+    public void testReachables() throws Exception {
+        System.out.println("reachables");
+        final int count[] = new int[1];
+
+        String query = "select reachables(p) from java.util.Properties p";
+
+        instance.executeQuery(query, new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                count[0]++;
+                return false;
+            }
+        });
+        assertEquals(352, count[0]);
     }
 
     @Test
@@ -574,7 +573,7 @@ public class OQLEngineTest {
             }
         });
 
-        assertEquals(Integer.class, rsltClass[0]);
+        assertTrue(Number.class.isAssignableFrom(rsltClass[0]));
     }
 
     @Test
@@ -593,7 +592,7 @@ public class OQLEngineTest {
             }
         });
 
-        assertEquals(Integer.class, rsltClass[0]);
+        assertTrue(Number.class.isAssignableFrom(rsltClass[0]));
     }
 
     @Test
@@ -632,5 +631,47 @@ public class OQLEngineTest {
         });
 
         assertTrue(Map.class.isAssignableFrom(rsltClass[0]));
+    }
+
+    @Test
+    public void testComplexStatement1() throws Exception {
+        System.out.println("complex statement 1");
+
+        final String[] rslt = new String[1];
+
+        instance.executeQuery(
+            "select map(filter(heap.findClass('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),  " +
+                "function (it) { " +
+                    "return 'MapEntry{' + it.key.toString() + ' = ' + it.value.toString() + '}' ;" +
+                "}" +
+            ")", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(o);
+                rslt[0] = o.toString();
+                return true;
+            }
+        });
+
+        assertEquals("MapEntry{sun.cpu.isalist = }", rslt[0]);
+    }
+
+    @Test
+    public void testComplexStatement2() throws Exception {
+        System.out.println("complex statement 2");
+
+        final String[] rslt = new String[1];
+
+        instance.executeQuery(
+            "select map(filter(heap.findClass('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'), " +
+            "'{ key: it.key.toString(), value: it.value.toString() }')", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(o);
+                rslt[0] = o.toString();
+                return true;
+            }
+        });
+        assertEquals("{value=, key=sun.cpu.isalist}", rslt[0]);
     }
 }
