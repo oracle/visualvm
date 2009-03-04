@@ -38,121 +38,89 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.netbeans.lib.profiler.heap;
 
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.heap.FieldValue;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Collections;
+import java.util.List;
+import sun.tools.tree.SuperExpression;
 
 
 /**
+ * key - ID (long/int) of heap object
+ * value (8/4) + 4 + 1 + (8/4)
+ *  - offset (long/int) to dump file
+ *  - instance index (int) - unique number of this {@link Instance} among all instances of the same Java Class
+ *  - references flags (byte) - bit 0 set - has zero or one reference, 
+ *                            - bit 1 set - has GC root
+ *                            - bit 2 set - tree object
+ *  - ID/offset (long/int) - ID if reference flag bit 0 is set, otherwise offset to reference list file
+ *  - retained size
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class PrimitiveFieldNode extends AbstractHeapWalkerNode implements HeapWalkerFieldNode {
+class DomMap extends AbstractLongMap {
+
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class ArrayItem extends PrimitiveFieldNode implements org.netbeans.modules.profiler.heapwalk.model.ArrayItem {
+    class Entry extends AbstractLongMap.Entry {
+        
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private String type;
-        private String value;
-        private int itemIndex;
+        private long offset;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ArrayItem(int itemIndex, String type, String value, HeapWalkerNode parent) {
-            this(itemIndex, type, value, parent, (parent == null) ? HeapWalkerNode.MODE_FIELDS : parent.getMode());
+        private Entry(long off) {
+            offset = off;
         }
-
-        public ArrayItem(int itemIndex, String type, String value, HeapWalkerNode parent, int mode) {
-            super(null, parent, mode);
-
-            this.itemIndex = itemIndex;
-            this.type = type;
-            this.value = value;
+        
+        private Entry(long off,long value) {
+            offset = off;
+            setIdom(value);
         }
-
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public int getItemIndex() {
-            return itemIndex;
+        void setIdom(long instanceId) {
+            putID(offset + KEY_SIZE, instanceId);
         }
 
-        public boolean isStatic() {
-            return false;
-        }
-
-        protected String computeName() {
-            return "[" + itemIndex + "]"; // NOI18N
-        }
-
-        protected String computeType() {
-            return type;
-        }
-
-        protected String computeValue() {
-            return value;
+        long getIdom() {
+            return getID(offset + KEY_SIZE);
         }
     }
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private FieldValue fieldValue;
-
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public PrimitiveFieldNode(FieldValue fieldValue, HeapWalkerNode parent) {
-        this(fieldValue, parent, (parent == null) ? HeapWalkerNode.MODE_FIELDS : parent.getMode());
-    }
-
-    public PrimitiveFieldNode(FieldValue fieldValue, HeapWalkerNode parent, int mode) {
-        super(parent, mode);
-        this.fieldValue = fieldValue;
+    DomMap(int size,int idSize,int foffsetSize) throws FileNotFoundException, IOException {
+        super(size,idSize,foffsetSize,idSize);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public FieldValue getFieldValue() {
-        return fieldValue;
+    Entry createEntry(long index) {
+        return new Entry(index);
     }
 
-    public boolean isLeaf() {
-        return true;
+    Entry createEntry(long index, long value) {
+        return new Entry(index,value);
+    }
+    
+    Entry get(long key) {
+        return (Entry)super.get(key);
     }
 
-    public boolean isStatic() {
-        return fieldValue.getField().isStatic();
+    Entry put(long key, long value) {
+        return (Entry)super.put(key,value);
     }
 
-    protected Icon computeIcon() {
-        ImageIcon icon = BrowserUtils.ICON_PRIMITIVE;
 
-        if (isStatic()) {
-            icon = BrowserUtils.createStaticIcon(icon);
-        }
-
-        return icon;
-    }
-
-    protected String computeName() {
-        return fieldValue.getField().getName();
-    }
-
-    protected String computeType() {
-        return fieldValue.getField().getType().getName();
-    }
-
-    protected String computeValue() {
-        return fieldValue.getValue();
-    }
-
-    protected String computeSize() {
-        return "-"; // NOI18N
-    }
-
-    protected String computeRetainedSize() {
-        return "-"; // NOI18N
-    }
 }
