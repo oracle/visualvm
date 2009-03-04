@@ -278,7 +278,7 @@ public class OQLEngine {
             Object object = unwrapJavaObject(jsObject, true);
             if (object instanceof Object[]) {
                 for (Object obj1 : (Object[]) object) {
-                    if (visitor.visit(unwrapJavaObject(obj1))) {
+                    if (visitor.visit(unwrapJavaObject(obj1, true))) {
                         return true;
                     }
                 }
@@ -312,6 +312,7 @@ public class OQLEngine {
     }
 
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
+        if (object == null) return null;
         if (!object.getClass().getName().contains(".javascript.")) return object;
 
         try {
