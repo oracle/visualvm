@@ -320,19 +320,16 @@ public class HeapFragmentWalkerUI extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     showSummaryView();
                 }
-                ;
             });
         classesControllerPresenter.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     showClassesView();
                 }
-                ;
             });
         instancesControllerPresenter.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     showInstancesView();
                 }
-                ;
             });
 
         if (analysisEnabled) {
@@ -340,9 +337,7 @@ public class HeapFragmentWalkerUI extends JPanel {
                     public void actionPerformed(ActionEvent e) {
                         showAnalysisView();
                     }
-                    ;
                 });
-
         }
 
         if (oqlEnabled) {
@@ -350,9 +345,7 @@ public class HeapFragmentWalkerUI extends JPanel {
                     public void actionPerformed(ActionEvent e) {
                         showOQLView();
                     }
-                    ;
                 });
-
         }
 
         // Classes view shown by default
@@ -360,18 +353,20 @@ public class HeapFragmentWalkerUI extends JPanel {
         summaryControllerPresenter.setSelected(true);
 
         // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
-        getActionMap().put("PreviousViewAction",
+        getActionMap().put("PreviousViewAction", // NOI18N
                            new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     moveToPreviousView();
+                    updatePresentersFocus();
                 }
-            }); // NOI18N
-        getActionMap().put("NextViewAction",
+            });
+        getActionMap().put("NextViewAction", // NOI18N
                            new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     moveToNextView();
+                    updatePresentersFocus();
                 }
-            }); // NOI18N
+            });
     }
 
     private void moveToNextView() {
@@ -518,5 +513,18 @@ public class HeapFragmentWalkerUI extends JPanel {
         if (oqlEnabled) {
             oqlControllerPresenter.setSelected(oqlControllerPanel.isShowing());
         }
+    }
+
+    private void updatePresentersFocus() {
+        if (summaryControllerPresenter.isSelected())
+            summaryControllerPresenter.requestFocus();
+        else if (classesControllerPresenter.isSelected())
+            classesControllerPresenter.requestFocus();
+        else if (instancesControllerPresenter.isSelected())
+            instancesControllerPresenter.requestFocus();
+        else if (analysisEnabled && analysisControllerPresenter.isSelected())
+            analysisControllerPresenter.requestFocus();
+        else if (oqlEnabled && oqlControllerPresenter.isSelected())
+            oqlControllerPresenter.requestFocus();
     }
 }
