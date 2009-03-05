@@ -320,6 +320,13 @@ made subject to such option by the copyright holder.
         </folder>
     </folder>
 
+    <folder name="NBProfiler">
+        <folder name="Config">
+            <file name="filters-default.xml" url="filters-default.xml"/>
+            <file name="filtersets-default.xml" url="filtersets-default.xml"/>            
+        </folder> 
+    </folder>
+    
     <folder name="Editors">
         <folder name="text">
             <folder name="x-java">

@@ -245,7 +245,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as Instance");
             return new JavaObjectWrapper(jobject);
         } else {
-            println("unknown heap object type: " + jobject.getClass());
+//            println("unknown heap object type: " + jobject.getClass());
             return jobject;
         }
     }
@@ -284,12 +284,15 @@ function wrapJavaObject(thing) {
                     return instance.instanceId;
                 } else if (name == 'toString') {
                     return function() {
+                        if (instance.javaClass.name == "java.lang.String") {
+                            return snapshot.valueString(instance);
+                        }
                         return instance.toString();
                     }
                 } else if (name == 'wrapped-object') {
                     return instance;
                 }
-                return instance.getValueOfField(name);
+                return wrapJavaObject(instance.getValueOfField(name));
             }
         }				
     }
@@ -415,7 +418,7 @@ function wrapJavaObject(thing) {
                     return array.length;
                 } else if (name == 'toString') {
                     return function() { 
-                        return array.valueString(true);
+                        return array.toString();
                     }
                 } else if (name == 'wrapped-object') {
                     return array;
@@ -961,12 +964,7 @@ function reachables(jobject, excludes) {
 
     jobject = unwrapJavaObject(jobject);
     var ro = new hatPkg.model.ReachableObjects(jobject, excludes);  
-    var tmp = ro.reachables;
-    var res = new Array(tmp.length);
-    for (var i in tmp) {
-        res[i] = wrapJavaValue(tmp[i]);
-    }
-    return res;
+    return wrapIterator(ro.reachables);
 }
 
 
@@ -1120,7 +1118,9 @@ function toHtml(obj) {
 
 // private function to wrap an Iterator as an Enumeration
 function wrapIterator(itr, wrap) {
-    if (itr instanceof java.util.Iterator) {
+    if (isJsArray(itr)) {
+        return itr;
+    } else if (itr instanceof java.util.Iterator) {
         return new java.util.Enumeration() {
             hasMoreElements: function() {
                 return itr.hasNext();
@@ -1129,6 +1129,10 @@ function wrapIterator(itr, wrap) {
                 return wrap? wrapJavaValue(itr.next()) : itr.next();
             }
         };
+    } else if (itr instanceof java.util.Enumeration) {
+        return itr; // already wrapped
+    } else if (itr instanceof org.netbeans.lib.profiler.heap.ArrayDump) {
+        return wrapJavaObject(itr);
     } else {
         return itr;
     }
@@ -1293,11 +1297,10 @@ function filter(array, code) {
         var result = new Array();
         for (var index in array) {
             var it = array[index];
-            if (func(it, index, array, result)) {
+            if (func(wrapJavaObject(it), index, array, result)) {
                 result[result.length] = it;
             }
         }
-
         return result;
     }
 }
@@ -1369,7 +1372,7 @@ function map(array, code) {
         var result = new Array();
         for (var index in array) {
             var it = array[index];
-            result[result.length] = func(it, index, array, result);
+            result[result.length] = func(wrapJavaObject(it), index, array, result);
         }
         return result;
     }
@@ -1537,4 +1540,14 @@ function printStackTrace() {
     } catch (e) {
         e.rhinoException.printStackTrace();
     }
+}
+
+function isJsArray(obj) {
+    if (obj.constructor == undefined) {
+        return false;
+    }
+    if (obj.constructor.toString().indexOf("Array") == -1)
+        return false;
+    else
+        return true;
 }

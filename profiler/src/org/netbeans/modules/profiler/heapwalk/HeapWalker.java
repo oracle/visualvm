@@ -165,7 +165,7 @@ public class HeapWalker {
     }
 
     void createMainFragment(Heap heap) {
-        mainHeapWalker = new HeapFragmentWalker(heap, this);
+        mainHeapWalker = new HeapFragmentWalker(heap, this, true);
     }
 
     void createReachableFragment(Instance instance) {

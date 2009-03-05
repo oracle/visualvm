@@ -74,20 +74,20 @@ bound to a JavaScript variable of the identifier name specified in <span class="
 <li>select all int arrays of length 256 or more
 <pre>
 <code>
-    select a from [I a where a.length >= 256
+    select a from int[] a where a.length >= 256
 </code>
 </pre>
 <li>show content of Strings that match a regular expression
 <pre>
 <code>
-    select s.value.toString() from java.lang.String s 
-    where /java/(s.value.toString())
+    select {instance: s, content: s.toString()} from java.lang.String s
+    where /java/(s.toString())
 </code>
 </pre>
 <li>show path value of all File objects
 <pre>
 <code>
-    select file.path.value.toString() from java.io.File file
+    select file.path.toString() from java.io.File file
 </code>
 </pre>
 <li>show names of all ClassLoader classes
@@ -766,14 +766,9 @@ and walk until parent is null using the callback function to map call.
 
 <pre>
 <code>
-   select <a href="#map">map</a>(<a href="#filter">filter(<a href="#findClass">heap.findClass</a>('java.lang.System').props.table, 'it != null'), 
+   select <a href="#map">map</a>(<a href="#filter">filter(<a href="#findClass">heap.findClass</a>('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),
             function (it) {
-                var res = "";
-                while (it != null) {
-                    res += it.key.value.toString() + '=' +
-                           it.value.value.toString() + '&lt;br&gt;';
-                    it = it.next;
-                }
+                var res = it.key.toString() + ' = ' + it.value.toString();
                 return res;
             });
 </code>
