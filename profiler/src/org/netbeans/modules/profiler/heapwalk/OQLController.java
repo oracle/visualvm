@@ -48,6 +48,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -109,7 +110,6 @@ public class OQLController extends AbstractTopLevelController
 
     public void cancelQuery() {
         analysisRunning.compareAndSet(true, false);
-        queryController.queryFinished();
     }
 
     public boolean isQueryRunning() {
@@ -170,41 +170,46 @@ public class OQLController extends AbstractTopLevelController
 
     private void executeQueryImpl(final String oqlQuery, String queryName) {
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
-        
-        BrowserUtils.performTask(new Runnable() {
-            public void run() {
-                final StringBuilder sb = new StringBuilder();
-
-                try {
-                    analysisRunning.compareAndSet(false, true);
-                    engine.executeQuery(oqlQuery, new ObjectVisitor() {
-
-                        public boolean visit(Object o) {
-                            sb.append("<div>"); // NOI18N
-                            dump(o, sb);
-                            sb.append("</div>"); // NOI18N
-                            int value = progressModel.getValue() + 1;
-                            if (value > progressModel.getMaximum()) {
-                                value = progressModel.getMinimum() + 1;
-                            }
-                            progressModel.setValue(value);
-                            return !analysisRunning.get(); // process all hits while the analysis is running
-                        }
-                    });
-                    analysisRunning.compareAndSet(true, false);
-                    queryController.queryFinished();
-                    resultsController.setResult(sb.toString());
-                } catch (OQLException oQLException) {
-                    StringBuilder errorMessage = new StringBuilder();
-                    errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
-                    errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
-                    resultsController.setResult(errorMessage.toString());
-                    cancelQuery();
-                }
-            }
-        });
 
         queryController.queryStarted(progressModel, queryName);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                BrowserUtils.performTask(new Runnable() {
+                    public void run() {
+                        final StringBuilder sb = new StringBuilder();
+
+                        try {
+                            analysisRunning.compareAndSet(false, true);
+                            engine.executeQuery(oqlQuery, new ObjectVisitor() {
+
+                                public boolean visit(Object o) {
+                                    sb.append("<div>"); // NOI18N
+                                    dump(o, sb);
+                                    sb.append("</div>"); // NOI18N
+                                    int value = progressModel.getValue() + 1;
+                                    if (value > progressModel.getMaximum()) {
+                                        value = progressModel.getMinimum() + 1;
+                                    }
+                                    progressModel.setValue(value);
+                                    return !analysisRunning.get(); // process all hits while the analysis is running
+                                }
+                            });
+                            analysisRunning.compareAndSet(true, false);
+                            queryController.queryFinished();
+                            resultsController.setResult(sb.toString());
+                        } catch (OQLException oQLException) {
+                            StringBuilder errorMessage = new StringBuilder();
+                            errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
+                            errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
+                            resultsController.setResult(errorMessage.toString());
+                            queryController.queryFinished();
+                            cancelQuery();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void dump(Object o, StringBuilder sb) {
