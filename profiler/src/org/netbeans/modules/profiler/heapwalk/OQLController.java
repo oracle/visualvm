@@ -215,6 +215,9 @@ public class OQLController extends AbstractTopLevelController
                                 }
                             });
 
+                            if (counter.get() == 0) {
+                                sb.append("<tr><td><h4>Too many results. Please, refine your query.</h4></td></tr>" );
+                            }
                             sb.append("</table>"); // NOI18N
 
                             analysisRunning.compareAndSet(true, false);
