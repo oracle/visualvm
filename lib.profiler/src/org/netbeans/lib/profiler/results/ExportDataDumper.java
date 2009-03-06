@@ -40,6 +40,8 @@
 
 package org.netbeans.lib.profiler.results;
 
+import org.netbeans.lib.profiler.ProfilerLogger;
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -53,21 +55,23 @@ import java.io.IOException;
  * using the getCaughtException() method.
  *
  * @author Misha Dmitriev
+ * @author cyhelsky
  */
 public class ExportDataDumper {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    public static final int MAX_BUF_LEN = 20000;
+    public static final int BUFFER_SIZE = 32000; //roughly 32 kB buffer
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    FileOutputStream fw;
+    BufferedOutputStream bos;
     IOException caughtEx;
+    int numExceptions=0;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ExportDataDumper(FileOutputStream fw) {
-        this.fw = fw;
+        bos = new BufferedOutputStream(fw, BUFFER_SIZE);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -76,25 +80,40 @@ public class ExportDataDumper {
         return caughtEx;
     }
 
+    public int getNumExceptions() {
+        return numExceptions;
+    }
+
     public void dumpData(StringBuffer s) {
         if (caughtEx != null) {
             return;
         }
 
         try {
-            fw.write(s.toString().getBytes());
+            if (s!=null) bos.write(s.toString().getBytes());
         } catch (IOException ex) {
             caughtEx = ex;
+            System.out.println(s);
+            numExceptions++;
+            ProfilerLogger.log(ex);
+        }
+    }
+
+    public void close() {
+        try {
+            bos.close();
+        } catch (IOException ex) {
+            caughtEx = ex;
+            ProfilerLogger.log(ex);
         }
     }
 
     public void dumpDataAndClose(StringBuffer s) {
         dumpData(s);
+        close();
+    }
 
-        try {
-            fw.close();
-        } catch (IOException ex) {
-            caughtEx = ex;
-        }
+    public BufferedOutputStream getOutputStream() {
+        return bos;
     }
 }

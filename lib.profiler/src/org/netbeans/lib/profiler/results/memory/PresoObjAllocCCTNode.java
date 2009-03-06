@@ -45,6 +45,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import java.util.ResourceBundle;
 
 
@@ -441,6 +442,77 @@ public class PresoObjAllocCCTNode implements CCTNode {
                 PresoObjAllocCCTNode tmpCh = children[j];
                 children[j] = children[j - 1];
                 children[j - 1] = tmpCh;
+            }
+        }
+    }
+
+    public void exportXMLData(ExportDataDumper eDD,String indent) {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer(indent+"<node name=\""+replaceHTMLCharacters(getNodeName())+"\" parent=\""+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"\">"+newline); //NOI18N
+        result.append(indent+" <Method_Name>"+replaceHTMLCharacters(getNodeName())+"</Method_Name>"+newline); //NOI18N
+        result.append(indent+" <Bytes_Allocated>"+totalObjSize+"</Bytes_Allocated>"+newline); //NOI18N
+        result.append(indent+" <Objects_Allocated>"+nCalls+"</Objects_Allocated>"+newline); //NOI18N
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < children.length; i++) {
+                children[i].exportXMLData(eDD, indent+" "); //NOI18N
+            }
+        }
+        result=new StringBuffer(indent+"</node>"); //NOI18N
+        eDD.dumpData(result);
+    }
+
+    public void exportHTMLData(ExportDataDumper eDD, int depth) {
+        StringBuffer result = new StringBuffer("<tr><td>."); //NOI18N
+        for (int i=0; i<depth; i++) {
+            result.append("."); //NOI18N
+        }
+        result.append(replaceHTMLCharacters((nodeName==null)?(className):(nodeName))+"</td><td>"+totalObjSize+"</td><td>"+nCalls+"</td></tr>"); //NOI18N
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < children.length; i++) {
+                children[i].exportHTMLData(eDD, depth+1);
+            }
+        }
+    }
+
+    private String replaceHTMLCharacters(String s) {
+        StringBuffer sb = new StringBuffer();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+          char c = s.charAt(i);
+          switch (c) {
+              case '<': sb.append("&lt;"); break; // NOI18N
+              case '>': sb.append("&gt;"); break; // NOI18N
+              case '&': sb.append("&amp;"); break; // NOI18N
+              case '"': sb.append("&quot;"); break; // NOI18N
+              default: sb.append(c); break;
+          }
+        }
+        return sb.toString();
+    }
+
+    public void exportCSVData(String separator, int depth, ExportDataDumper eDD) {
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        String indent = " "; // NOI18N
+
+        // this node
+        result.append(quote);
+        for (int i=0; i<depth; i++) {
+            result.append(indent); // to simulate the tree structure in CSV
+        }
+        result.append(((nodeName==null)?(className):(nodeName)) + quote + separator);
+        result.append(quote+totalObjSize+quote+separator);
+        result.append(quote+nCalls+quote+separator+newLine);
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < children.length; i++) {
+                children[i].exportCSVData(separator, depth+1, eDD);
             }
         }
     }

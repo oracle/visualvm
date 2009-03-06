@@ -41,10 +41,10 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.PresoObjLivenessCCTNode;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.*;
 import org.netbeans.lib.profiler.ui.components.JExtendedTable;
 import org.netbeans.lib.profiler.ui.components.table.ClassNameTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
@@ -58,6 +58,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -96,7 +98,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
     private static final String AVG_AGE_COLUMN_TOOLTIP = messages.getString("LivenessResultsPanel_AvgAgeColumnToolTip"); // NOI18N
     private static final String SURVGEN_COLUMN_TOOLTIP = messages.getString("LivenessResultsPanel_SurvGenColumnToolTip"); // NOI18N
     private static final String TOTAL_ALLOC_OBJECTS_COLUMN_TOOLTIP = messages.getString("LivenessResultsPanel_TotalAllocObjectsColumnToolTip"); // NOI18N
-    private static final String TABLE_ACCESS_NAME = messages.getString("LivenessResultsPanel_TableAccessName"); // NOI18N
+    private static final String TABLE_ACCESS_NAME = messages.getString("LivenessResultsPanel_TableAccessName"); // NOI18N    
                                                                                                                 // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -470,13 +472,13 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
                 return new Long(trackedLiveObjectsSize[index]);
             case 2:
                 return intFormat.format(trackedLiveObjectsSize[index]) + " B (" // NOI18N
-                       + ((nTotalTrackedBytes == 0) ? "-%"
-                                                    : // NOI18N
+                       + ((nTotalTrackedBytes == 0) ? "-%" //NOI18N
+                                                    : 
                 percentFormat.format((float) trackedLiveObjectsSize[index] / (float) nTotalTrackedBytes)) + ")"; // NOI18N
             case 3:
                 return intFormat.format(nTrackedLiveObjects[index]) + " (" // NOI18N
-                       + ((nTotalTracked == 0) ? "-%"
-                                               : // NOI18N
+                       + ((nTotalTracked == 0) ? "-%"  //NOI18N
+                                               : 
                 percentFormat.format((float) nTrackedLiveObjects[index] / (float) nTotalTracked)) + ")"; // NOI18N
             case 4:
                 return intFormat.format(nTrackedAllocObjects[index]);
@@ -714,5 +716,120 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
         }
 
         createFilteredIndexes();
+    }
+
+    public void exportData(int typeOfFile, ExportDataDumper eDD) {
+        switch (typeOfFile) {
+            case 1: exportCSV(",", eDD); break; // normal CSV
+            case 2: exportCSV(";", eDD); break; // Excel CSV
+            case 3: exportXML(eDD); break;
+            case 4: exportHTML(eDD); break;
+        }        
+    }
+
+    private void exportHTML(ExportDataDumper eDD) {
+         // Header
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+((this instanceof LiveLivenessResultsPanel)?("Live Profiling Results"):("Memory Snapshot"))+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        for (int i = 0; i < (columnNames.length-1); i++) {
+            if (!(columnRenderers[i]==null)) {
+                result.append("<th>"+columnNames[i]+"</th>");
+            }
+        }
+        result.append("</tr>");
+        eDD.dumpData(result);
+
+        for (int i=0; i < (nTrackedItems-1); i++) {
+
+            result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(sortedClassNames[i])+"</td>");
+            result.append("<td align=\"right\">"+trackedLiveObjectsSize[i]+"</td>");
+            result.append("<td align=\"right\">"+nTrackedLiveObjects[i]+"</td>");
+            result.append("<td align=\"right\">"+nTrackedAllocObjects[i]+"</td>");
+            result.append("<td align=\"char\" char=\".\">"+avgObjectAge[i]+"</td>");
+            result.append("<td align=\"right\">"+maxSurvGen[i]+"</td></tr>");
+            eDD.dumpData(result);
+        }
+        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));
+    }
+
+    private void exportXML(ExportDataDumper eDD) {
+         // Header
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline); // NOI18N
+        result.append("<ExportedView Name=\""+((this instanceof LiveLivenessResultsPanel)?("Live Profiling Results"):("Memory Snapshot"))+"\">"+newline);
+        result.append(" <TableData NumRows=\""+nTrackedItems+"\" NumColumns=\"6\">"+newline);
+        result.append("<TableHeader>");
+        for (int i = 0; i < (columnNames.length-1); i++) {
+            if (!(columnRenderers[i]==null)) {
+                result.append("  <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline);
+            }
+        }
+        result.append("</TableHeader>");
+        eDD.dumpData(result);
+
+        // Data
+        NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+        nf.setMaximumFractionDigits(3);
+        nf.setMinimumFractionDigits(3);
+
+        for (int i=0; i < (nTrackedItems-1); i++) {
+            result = new StringBuffer("  <TableRow>"+newline);
+            result.append("   <TableColumn><![CDATA["+sortedClassNames[i]+"]]></TableColumn>"+newline);
+            result.append("   <TableColumn><![CDATA["+trackedLiveObjectsSize[i]+"]]></TableColumn>"+newline);
+            result.append("   <TableColumn><![CDATA["+nTrackedLiveObjects[i]+"]]></TableColumn>"+newline);
+            result.append("   <TableColumn><![CDATA["+nTrackedAllocObjects[i]+"]]></TableColumn>"+newline);
+            result.append("   <TableColumn><![CDATA["+nf.format(avgObjectAge[i])+"]]></TableColumn>"+newline);
+            result.append("   <TableColumn><![CDATA["+maxSurvGen[i]+"]]></TableColumn>"+newline+"  </TableRow>"+newline);
+            eDD.dumpData(result);
+        }
+        eDD.dumpDataAndClose(new StringBuffer(" </Table>"+newline+"</ExportedView>"));
+    }
+
+    private void exportCSV(String separator, ExportDataDumper eDD) {
+        // Header
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+
+        for (int i = 0; i < (columnNames.length-1); i++) {
+            if (!(columnRenderers[i]==null)) {
+                result.append(quote+columnNames[i]+quote+separator);
+            }
+        }
+        result.deleteCharAt(result.length()-1);
+        result.append(newLine);
+        eDD.dumpData(result);
+
+        // Data
+        NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+        nf.setMaximumFractionDigits(3);
+        nf.setMinimumFractionDigits(3);
+
+        for (int i=0; i < (nTrackedItems-1); i++) {
+            result = new StringBuffer();
+            result.append(quote+sortedClassNames[i]+quote+separator);
+            result.append(quote+trackedLiveObjectsSize[i]+quote+separator);
+            result.append(quote+nTrackedLiveObjects[i]+quote+separator);
+            result.append(quote+nTrackedAllocObjects[i]+quote+separator);
+            result.append(quote+nf.format(avgObjectAge[i])+quote+separator);
+            result.append(quote+maxSurvGen[i]+quote+newLine);
+            eDD.dumpData(result);
+        }
+        eDD.close();
+    }
+
+    private String replaceHTMLCharacters(String s) {
+        StringBuffer sb = new StringBuffer();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+          char c = s.charAt(i);
+          switch (c) {
+              case '<': sb.append("&lt;"); break;
+              case '>': sb.append("&gt;"); break;
+              case '&': sb.append("&amp;"); break;
+              case '"': sb.append("&quot;"); break;
+              default: sb.append(c); break;
+          }
+        }
+        return sb.toString();
     }
 }

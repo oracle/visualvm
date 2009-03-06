@@ -41,10 +41,10 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.*;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.*;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
@@ -153,6 +153,60 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         }
     }
 
+    private StringBuffer getCSVHeader(String separator) {
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        StringBuffer result = new StringBuffer(quote+columnNames[0]+quote+separator);
+        for (int i = 2; i < (columnNames.length); i++) {
+            result.append(quote+columnNames[i]+quote+separator);
+        }
+        result.deleteCharAt(result.length()-1);
+        result.append(newLine);
+        return result;
+    }
+
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        switch (exportedFileType) {
+            case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
+                    callGraphManager.getRootNode().exportCSVData(",", 0, eDD); //NOI18N
+                    break;
+            case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
+                    callGraphManager.getRootNode().exportCSVData(";", 0, eDD); //NOI18N
+                    break;
+            case 3: eDD.dumpData(getXMLHeader());
+                    callGraphManager.getRootNode().exportXMLData(eDD, " "); //NOI18N
+                    eDD.dumpDataAndClose(getXMLFooter());
+                    break;
+            case 4: eDD.dumpData(getHTMLHeader());
+                    callGraphManager.getRootNode().exportHTMLData(eDD,0);
+                    eDD.dumpDataAndClose(getHTMLFooter());
+                    break;
+        }
+
+    }
+
+    private StringBuffer getHTMLHeader() {
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>Memory Allocation Stack Traces</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th></tr>"); //NOI18N
+        return result;
+    }
+
+    private StringBuffer getHTMLFooter() {        
+        return new StringBuffer("</TABLE></BODY></HTML>"); //NOI18N
+    }
+
+    private StringBuffer getXMLHeader() {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\"Memory allocation stack trace\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
+        return result;
+    }
+
+    private StringBuffer getXMLFooter() {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer("</tree>"+newline+"</ExportedView>"); // NOI18N
+        return result;
+    }
+    
     // NOTE: this method only sets initialSortingColumn and initialSortingOrder, it doesn't refresh UI!
     public void setDefaultSorting() {
         setSorting(1, SortableTableModel.SORT_ORDER_DESC);
@@ -217,14 +271,14 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                                 case 2:
                                     value = ((PresoObjLivenessCCTNode) root).totalObjSize;
 
-                                    return intFormat.format(pNode.totalObjSize) + " B ("
-                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.totalObjSize / (float) value))
+                                    return intFormat.format(pNode.totalObjSize) + " B ("  //NOI18N
+                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.totalObjSize / (float) value)) //NOI18N
                                            + ")"; // NOI18N
                                 case 3:
                                     value = ((PresoObjLivenessCCTNode) root).nLiveObjects;
 
-                                    return intFormat.format(pNode.nLiveObjects) + " ("
-                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.nLiveObjects / (float) value))
+                                    return intFormat.format(pNode.nLiveObjects) + " (" //NOI18N
+                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.nLiveObjects / (float) value)) //NOI18N
                                            + ")"; // NOI18N
                                 case 4:
                                     return intFormat.format(pNode.nCalls);
@@ -244,14 +298,14 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                                 case 2:
                                     value = ((PresoObjAllocCCTNode) root).totalObjSize;
 
-                                    return intFormat.format(pNode.totalObjSize) + " B ("
-                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.totalObjSize / (float) value))
+                                    return intFormat.format(pNode.totalObjSize) + " B (" //NOI18N
+                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.totalObjSize / (float) value)) //NOI18N
                                            + ")"; // NOI18N
                                 case 3:
                                     value = ((PresoObjAllocCCTNode) root).nCalls;
 
-                                    return intFormat.format(pNode.nCalls) + " ("
-                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.nCalls / (float) value))
+                                    return intFormat.format(pNode.nCalls) + " (" //NOI18N
+                                           + ((value == 0) ? "-%" : percentFormat.format((float) pNode.nCalls / (float) value)) //NOI18N
                                            + ")"; // NOI18N
                             }
                         }
@@ -366,8 +420,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
             treeTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
             treeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
-            treeTable.getActionMap().put("DEFAULT_ACTION",
-                                         new AbstractAction() {
+            treeTable.getActionMap().put("DEFAULT_ACTION", new AbstractAction() { //NOI18N
                     public void actionPerformed(ActionEvent e) {
                         performDefaultAction(treePath);
                     }
