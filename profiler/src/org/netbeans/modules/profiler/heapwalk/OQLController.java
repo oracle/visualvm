@@ -213,6 +213,9 @@ public class OQLController extends AbstractTopLevelController
     }
 
     private void dump(Object o, StringBuilder sb) {
+        if (o == null) {
+            return;
+        }
         if (o instanceof Instance) {
             Instance i = (Instance) o;
             sb.append(printInstance(i));

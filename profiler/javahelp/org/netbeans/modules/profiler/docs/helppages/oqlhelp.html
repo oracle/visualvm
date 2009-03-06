@@ -145,8 +145,8 @@ object has following properties:
 <li>fields - array of field objects. field object has name, signature
 properties.
 <li>loader - ClassLoader object that loaded this class.
-<li>signers - signers that signed this class.
-<li>protectionDomain - protection domain to which this class belongs.
+<li><i>signers - signers that signed this class. (Not implemented in 6.7M2)</i>
+<li><i>protectionDomain - protection domain to which this class belongs. (Not implemented in 6.7M2)</i>
 </ul>
 Class objects have the following methods:
 <ul>
@@ -245,6 +245,7 @@ Examples:
 <li><a href="#refers">refers(jobject)</a>
 <li><a href="#root">root(jobject)</a>
 <li><a href="#sizeof">sizeof(jobject)</a>
+<li><a href="#retainedsize">retainedsize(jobject)</a>
 <li><a href="#toHtml">toHtml(obj)</a>
 </ul>
 
@@ -429,6 +430,19 @@ Example:
 <pre>
 <code>
     select sizeof(o) from [I o
+</code>
+</pre>
+
+<a name="rsizeof"></a>
+<h5>retainedsize function</h5>
+
+Returns size of the retained set of the given Java object in bytes
+<b>Warning! Using this function for the first time on a heap dump may take
+significant amount of time</b>
+Example:
+<pre>
+<code>
+    select rsizeo(o) from instanceof java.lang.HashMap o
 </code>
 </pre>
 

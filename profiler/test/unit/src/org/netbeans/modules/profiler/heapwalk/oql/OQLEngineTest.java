@@ -130,6 +130,35 @@ public class OQLEngineTest {
     }
 
     @Test
+    public void testClassFields() throws Exception {
+        System.out.println("test class fields");
+
+        final String[] values = new String[] {"", "$assertionsDisabled = true"};
+
+        instance.executeQuery("select map(heap.findClass(\"java.io.File\").fields, 'toHtml(it.field.name) + \" = \" + toHtml(it.value)')", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                values[0] = o.toString();
+                return true;
+            }
+        });
+
+        assertEquals(values[1], values[0]);
+    }
+
+    @Test
+    public void testObjectClass() throws Exception {
+        System.out.println("test object class accessor");
+
+        instance.executeQuery("select map(a.clazz.statics, 'toHtml(it)') from java.lang.String a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                return true;
+            }
+        });
+    }
+
+    @Test
     public void testHeapForEachClass() throws Exception {
         System.out.println("heap.forEachClass");
         String query = "select heap.forEachClass(function(xxx) { println(xxx.name); })";
@@ -497,7 +526,7 @@ public class OQLEngineTest {
     public void testMap() throws Exception {
         System.out.println("map");
 
-        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181600\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem#1</a>\n"};
+        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181567\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem#1</a>\n"};
 
         instance.executeQuery("select map(heap.findClass(\"java.io.File\").statics, \"index + '=' + toHtml(it)\")", new ObjectVisitor() {
 
@@ -673,5 +702,48 @@ public class OQLEngineTest {
             }
         });
         assertEquals("{value=, key=sun.cpu.isalist}", rslt[0]);
+    }
+
+    @Test
+    public void testMapWrapping() throws Exception {
+        System.out.println("map wrapping");
+
+        final String[] result = new String[] {"", "<a href='file://class/java.util.HashMap$Entry[]'>class java.util.HashMap$Entry[]</a>"};
+
+        instance.executeQuery("select unique(map(filter(reachables(a), 'it != null'), 'toHtml(it.clazz)')) from instanceof java.util.HashMap a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                result[0] = o.toString();
+                return true;
+            }
+        });
+
+        assertEquals(result[1], result[0]);
+    }
+
+    @Test
+    public void testUnwrapIterator() throws Exception {
+        System.out.println("unwrap iterator");
+
+        instance.executeQuery("select map(filter(a.table, 'it != null'), 'reachables(it)') from instanceof java.util.HashMap a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(o);
+                return true;
+            }
+        });
+    }
+
+    @Test
+    public void testUnwrapIteratorComplex() throws Exception {
+        System.out.println("unwrap iterator complex");
+
+        instance.executeQuery("select map(map(filter(a.table, 'it != null'), 'reachables(it)'), 'it.clazz.statics') from instanceof java.util.HashMap a", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(o);
+                return true;
+            }
+        });
     }
 }
