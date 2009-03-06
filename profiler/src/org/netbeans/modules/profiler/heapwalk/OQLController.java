@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -97,7 +98,7 @@ public class OQLController extends AbstractTopLevelController
 
             resultsController = new ResultsController(this);
             queryController = new QueryController(this);
-            savedController = new SavedController();
+            savedController = new SavedController(this);
         }
     }
 
@@ -105,7 +106,7 @@ public class OQLController extends AbstractTopLevelController
     // --- Public interface ----------------------------------------------------
 
     public void executeQuery(String query) {
-        executeQueryImpl(query, null);
+        executeQueryImpl(query);
     }
 
     public void cancelQuery() {
@@ -168,10 +169,10 @@ public class OQLController extends AbstractTopLevelController
 
     // --- Private implementation ----------------------------------------------
 
-    private void executeQueryImpl(final String oqlQuery, String queryName) {
+    private void executeQueryImpl(final String oqlQuery) {
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
 
-        queryController.queryStarted(progressModel, queryName);
+        queryController.queryStarted(progressModel);
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -385,27 +386,20 @@ public class OQLController extends AbstractTopLevelController
             return oqlController;
         }
 
-        public void executeQuery(String oqlQuery) {
-            oqlController.executeQueryImpl(oqlQuery, null);
-        }
-
-        public void cancelQuery() {
-            oqlController.cancelQuery();
-        }
-
-        public void saveQuery(String oqlQuery, String name) {
-
+        public void setQuery(String query) {
+            ((OQLControllerUI.QueryUI)getPanel()).setQuery(query);
         }
 
         
-        private void queryStarted(BoundedRangeModel model, String queryName) {
-            ((OQLControllerUI.QueryUI)getPanel()).queryStarted(model, queryName);
+        private void queryStarted(BoundedRangeModel model) {
+            ((OQLControllerUI.QueryUI)getPanel()).queryStarted(model);
         }
 
         private void queryFinished() {
             ((OQLControllerUI.QueryUI)getPanel()).queryFinished();
         }
 
+        
         protected AbstractButton createControllerPresenter() {
             return ((OQLControllerUI.QueryUI)getPanel()).getPresenter();
         }
@@ -419,14 +413,105 @@ public class OQLController extends AbstractTopLevelController
 
     public static class SavedController extends AbstractController {
 
+        private OQLController oqlController;
+
+
+        public SavedController(OQLController oqlController) {
+            this.oqlController = oqlController;
+        }
+
+
+        public OQLController getOQLController() {
+            return oqlController;
+        }
+
+        public void saveQuery(String query) {
+            ((OQLControllerUI.SavedUI)getPanel()).saveQuery(query);
+        }
+
+
+        public static void loadData(DefaultListModel model) {
+            // TBD
+        }
+
+        public static void saveData(DefaultListModel model) {
+            // TBD
+        }
+        
+
         protected AbstractButton createControllerPresenter() {
             return ((OQLControllerUI.SavedUI)getPanel()).getPresenter();
         }
 
         protected JPanel createControllerUI() {
-            JPanel ui = new OQLControllerUI.SavedUI();
-            ui.setVisible(false);
+            JPanel ui = new OQLControllerUI.SavedUI(this);
             return ui;
+        }
+
+    }
+
+
+    // --- Query container -----------------------------------------------------
+
+    public static final class Query {
+
+        private String query;
+        private String name;
+        private String description;
+
+        public Query(String query) {
+            this(query, null);
+        }
+
+        public Query(String query, String name) {
+            this(query, name, null);
+        }
+
+        public Query(String query, String name, String description) {
+            setQuery(query);
+            setName(name);
+            setDescription(description);
+        }
+
+        public void setQuery(String query) {
+            if (query == null)
+                throw new IllegalArgumentException("Query cannot be null"); // NOI18N
+            this.query = query;
+        }
+        
+        public String getQuery() {
+            return query;
+        }
+
+        public void setName(String name) {
+            this.name = normalizeString(name);
+            if (this.name == null)
+                throw new IllegalArgumentException("Name cannot be null"); // NOI18N
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setDescription(String description) {
+            this.description = normalizeString(description);
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String toString() {
+            return name;
+        }
+
+        private static String normalizeString(String string) {
+            String normalizedString = null;
+            if (string != null) {
+                normalizedString = string.trim();
+                if (normalizedString.length() == 0) normalizedString = null;
+            }
+            return normalizedString;
         }
 
     }

@@ -41,20 +41,23 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
-import java.text.MessageFormat;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -63,9 +66,14 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -79,6 +87,7 @@ import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -151,6 +160,18 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             OQLControllerUI.class, "OQLControllerUI_SaveButtonText"); // NOI18N
     private static final String SAVE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
             OQLControllerUI.class, "OQLControllerUI_SaveButtonAccessDescr"); // NOI18N
+    private static final String PROPERTIES_BUTTON_TEXT = NbBundle.getMessage(
+            OQLControllerUI.class, "OQLControllerUI_PropertiesButtonText"); // NOI18N
+    private static final String PROPERTIES_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
+            OQLControllerUI.class, "OQLControllerUI_PropertiesButtonAccessDescr"); // NOI18N
+    private static final String DELETE_BUTTON_TEXT = NbBundle.getMessage(
+            OQLControllerUI.class, "OQLControllerUI_DeleteButtonText"); // NOI18N
+    private static final String DELETE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
+            OQLControllerUI.class, "OQLControllerUI_DeleteButtonAccessDescr"); // NOI18N
+    private static final String OPEN_BUTTON_TEXT = NbBundle.getMessage(
+            OQLControllerUI.class, "OQLControllerUI_OpenButtonText"); // NOI18N
+    private static final String OPEN_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
+            OQLControllerUI.class, "OQLControllerUI_OpenButtonAccessDescr"); // NOI18N
     // -----
 
     private static final String HELP_CTX_KEY = "OQLControllerUI.HelpCtx"; // NOI18N
@@ -292,15 +313,19 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
             initComponents(engine);
             queryValid = editor.isValidScript();
-            updateRunButton();
+            updateButtons();
         }
-        
 
-        public void queryStarted(final BoundedRangeModel model, final String queryName) {
+
+        public void setQuery(String query) {
+            setVisible(true);
+            editor.setScript(query);
+        }
+
+        public void queryStarted(final BoundedRangeModel model) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    progressLabel.setText(MessageFormat.format(EXECUTING_QUERY_MSG,
-                            new Object[] { queryName != null ? " " + queryName : ""})); // NOI18N
+                    progressLabel.setText(EXECUTING_QUERY_MSG); // NOI18N
                     progressBar.setModel(model);
                     progressBar.setMaximumSize(new Dimension(progressBar.getMaximumSize().width,
                                                              progressBar.getPreferredSize().height));
@@ -309,7 +334,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     progressPanel.invalidate();
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
-                    updateRunButton();
+                    updateButtons();
                 }
             });
         }
@@ -317,7 +342,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void queryFinished() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    updateRunButton();
+                    updateButtons();
                     contentsPanel.remove(progressPanel);
                     contentsPanel.add(controlPanel, BorderLayout.SOUTH);
                     controlPanel.invalidate();
@@ -341,24 +366,25 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(OQLEditor.VALIDITY_PROPERTY)) {
                 queryValid = ((Boolean)evt.getNewValue());
-                updateRunButton();
+                updateButtons();
             }
         }
 
 
-        private void updateRunButton() {
+        private void updateButtons() {
             if (queryController.getOQLController().isQueryRunning()) {
                 runButton.setEnabled(false);
             } else {
                 runButton.setEnabled(queryValid);
             }
+            saveButton.setEnabled(queryValid);
         }
 
         private void executeQuery() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     requestFocus();
-                    queryController.executeQuery(editor.getScript());
+                    queryController.getOQLController().executeQuery(editor.getScript());
                 }
             });
         }
@@ -366,7 +392,9 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private void saveQuery() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    queryController.saveQuery(editor.getScript(), editor.getScript());
+                    queryController.getOQLController().getSavedController().
+                                                    saveQuery(editor.getScript());
+                    editor.requestFocus();
                 }
             });
         }
@@ -374,7 +402,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private void cancelQuery() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    queryController.cancelQuery();
+                    queryController.getOQLController().cancelQuery();
                 }
             });
         }
@@ -462,34 +490,185 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     cancelQuery();
                 }
             });
+
+            editorScroll.setPreferredSize(new Dimension(1, 200));
         }
 
     }
 
     public static class SavedUI extends JTitledPanel {
 
+        private OQLController.SavedController savedController;
+
+        private JList savedList;
+        private JButton openButton;
+        private JButton editButton;
+        private JButton deleteButton;
+        private JTextArea descriptionArea;
+
+        private DefaultListModel listModel;
+
+
         private static ImageIcon ICON = ImageUtilities.loadImageIcon(
                 "org/netbeans/modules/profiler/heapwalk/ui/resources/savedOQL.png", false); // NOI18N
 
-        public SavedUI() {
+        public SavedUI(OQLController.SavedController savedController) {
             super(SAVED_QUERIES_CAPTION, ICON, true);
+
+            this.savedController = savedController;
+
+            listModel = new DefaultListModel();
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    OQLController.SavedController.loadData(listModel);
+                }
+            });
+
             initComponents();
+        }
+
+
+        public void saveQuery(final String query) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (OQLQueryCustomizer.saveQuery(query, listModel)) {
+                        setVisible(true);
+                        RequestProcessor.getDefault().post(new Runnable() {
+                            public void run() {
+                                OQLController.SavedController.saveData(listModel);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+
+        private void openQuery() {
+            OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
+            if (q != null)
+                savedController.getOQLController().getQueryController().setQuery(q.getQuery());
+        }
+
+        private void editQuery() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
+                    if (q != null) {
+                        if (OQLQueryCustomizer.editQuery(q, listModel, savedList)) {
+                            refreshDescription();
+                            RequestProcessor.getDefault().post(new Runnable() {
+                                public void run() {
+                                    OQLController.SavedController.saveData(listModel);
+                                }
+                            });
+                        }
+                        editButton.requestFocus();
+                    }
+                }
+            });
+        }
+
+        private void deleteQuery() {
+            OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
+            if (q != null) {
+                int selectedIndex = listModel.indexOf(q);
+                if (selectedIndex > 0)
+                    savedList.setSelectedIndex(selectedIndex - 1);
+                listModel.removeElement(q);
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        OQLController.SavedController.saveData(listModel);
+                    }
+                });
+            }
+        }
+
+
+        private void refreshButtons() {
+            boolean selected = savedList.getSelectedValue() != null;
+            openButton.setEnabled(selected);
+            editButton.setEnabled(selected);
+            deleteButton.setEnabled(selected);
+        }
+
+        private void refreshDescription() {
+            OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
+            if (q != null && q.getDescription() != null) {
+                descriptionArea.setText(q.getDescription());
+                descriptionArea.setVisible(true);
+            } else {
+                descriptionArea.setVisible(false);
+            }
         }
 
 
         private void initComponents() {
             setLayout(new BorderLayout());
 
-            JList savedList = new JList();
+            savedList = new JList(listModel);
+            savedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            savedList.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    refreshButtons();
+                    refreshDescription();
+                }
+            });
             
             JScrollPane savedListScroll = new JScrollPane(savedList,
                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            savedListScroll.setBorder(BorderFactory.createEmptyBorder());
+            savedListScroll.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
+                                            UIUtils.getProfilerResultsBackground()));
             savedListScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-            savedListScroll.getVerticalScrollBar().setUnitIncrement(10);
-            savedListScroll.getHorizontalScrollBar().setUnitIncrement(10);
-            savedListScroll.setPreferredSize(new Dimension(200, 200));
+            
+            openButton = new JButton() {
+                 protected void fireActionPerformed(ActionEvent e) { openQuery(); }
+            };
+            Mnemonics.setLocalizedText(openButton, OPEN_BUTTON_TEXT);
+            openButton.getAccessibleContext().
+                            setAccessibleDescription(OPEN_BUTTON_ACCESS_DESCR);
+            editButton = new JButton() {
+                 protected void fireActionPerformed(ActionEvent e) { editQuery(); }
+            };
+            Mnemonics.setLocalizedText(editButton, PROPERTIES_BUTTON_TEXT);
+            editButton.getAccessibleContext().
+                            setAccessibleDescription(PROPERTIES_BUTTON_ACCESS_DESCR);
+            deleteButton = new JButton() {
+                 protected void fireActionPerformed(ActionEvent e) { deleteQuery(); }
+            };
+            Mnemonics.setLocalizedText(deleteButton, DELETE_BUTTON_TEXT);
+            deleteButton.getAccessibleContext().
+                            setAccessibleDescription(DELETE_BUTTON_ACCESS_DESCR);
+
+            JPanel editContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+            editContainer.setOpaque(false);
+            editContainer.add(editButton);
+            editContainer.add(deleteButton);
+
+            JPanel controlPanel = new JPanel(new BorderLayout(5, 5));
+            controlPanel.setBorder(BorderFactory.createMatteBorder(5, 0, 5, 5,
+                                        UIUtils.getProfilerResultsBackground()));
+            controlPanel.setOpaque(false);
+            controlPanel.add(editContainer, BorderLayout.WEST);
+            controlPanel.add(openButton, BorderLayout.EAST);
+
+            descriptionArea = new JTextArea();
+            descriptionArea.setEnabled(false);
+            descriptionArea.setLineWrap(true);
+            descriptionArea.setWrapStyleWord(true);
+            descriptionArea.setDisabledTextColor(UIManager.getColor("ToolTip.foreground")); // NOI18N
+            descriptionArea.setBackground(UIManager.getColor("ToolTip.background")); // NOI18N
+            descriptionArea.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 5, 0, 5,
+                                        UIUtils.getProfilerResultsBackground()),
+                    BorderFactory.createMatteBorder(5, 5, 5, 5,
+                                        descriptionArea.getBackground())));
+
+            JPanel bottomPanel = new JPanel(new BorderLayout());
+            bottomPanel.setOpaque(false);
+            bottomPanel.add(descriptionArea, BorderLayout.CENTER);
+            bottomPanel.add(controlPanel, BorderLayout.SOUTH);
 
             JPanel contentsPanel = new JPanel();
             contentsPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, getTitleBorderColor()));
@@ -497,9 +676,39 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             contentsPanel.setOpaque(true);
             contentsPanel.setBackground(UIUtils.getProfilerResultsBackground());
             contentsPanel.add(savedListScroll, BorderLayout.CENTER);
+            contentsPanel.add(bottomPanel, BorderLayout.SOUTH);
 
             setLayout(new BorderLayout());
             add(contentsPanel, BorderLayout.CENTER);
+
+            refreshButtons();
+            refreshDescription();
+
+            savedList.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "OPEN_QUERY_ACTION"); // NOI18N
+            savedList.getActionMap().put("OPEN_QUERY_ACTION", new AbstractAction() {// NOI18N
+                public void actionPerformed(ActionEvent e) {
+                    openQuery();
+                }
+            });
+            savedList.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_QUERY_ACTION"); // NOI18N
+            savedList.getActionMap().put("DELETE_QUERY_ACTION", new AbstractAction() {// NOI18N
+                public void actionPerformed(ActionEvent e) {
+                    deleteQuery();
+                }
+            });
+            savedList.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+                        openQuery();
+                }
+            });
+
+            savedListScroll.setPreferredSize(new Dimension(
+                    openButton.getPreferredSize().width +
+                    editButton.getPreferredSize().width +
+                    deleteButton.getPreferredSize().width + 75, 200));
         }
 
     }
