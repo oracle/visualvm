@@ -261,16 +261,20 @@ public class OQLEngine {
         if (jsObject instanceof Iterator) {
             Iterator iter = (Iterator) jsObject;
             while (iter.hasNext()) {
-                if (visitor.visit(unwrapJavaObject(iter.next()))) return true;
+                if (dispatchValue(iter.next(), visitor)) return true;
+//                if (visitor.visit(unwrapJavaObject(iter.next()))) return true;
             }
             return false;
         } else if (jsObject instanceof Enumeration) {
             Enumeration enm = (Enumeration) jsObject;
             while (enm.hasMoreElements()) {
                 Object elem = enm.nextElement();
-                if (elem != null) {
-                    if (visitor.visit(unwrapJavaObject(elem))) return true;
-                }
+                if (dispatchValue(elem, visitor)) return true;
+//                if (elem != null) {
+//                    elem = unwrapJavaObject(elem);
+//
+//                    if (visitor.visit(unwrapJavaObject(elem))) return true;
+//                }
             }
             return false;
         } else {
@@ -278,9 +282,10 @@ public class OQLEngine {
             Object object = unwrapJavaObject(jsObject, true);
             if (object instanceof Object[]) {
                 for (Object obj1 : (Object[]) object) {
-                    if (visitor.visit(unwrapJavaObject(obj1, true))) {
-                        return true;
-                    }
+                    if (dispatchValue(obj1, visitor)) return true;
+//                    if (visitor.visit(unwrapJavaObject(obj1, true))) {
+//                        return true;
+//                    }
                 }
                 return false;
             }
@@ -313,11 +318,11 @@ public class OQLEngine {
 
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
         if (object == null) return null;
-        if (!object.getClass().getName().contains(".javascript.")) return object;
+        boolean isNativeJS = object.getClass().getName().contains(".javascript.");
 
         try {
             Object ret = invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[]{object}});
-            if ((ret == null || ret == object) && tryAssociativeArray) {
+            if (isNativeJS && (ret == null || ret == object) && tryAssociativeArray) {
                 ret = invokeMethod.invoke(engine, new Object[]{"unwrapMap", new Object[]{object}});
             }
             return ret;

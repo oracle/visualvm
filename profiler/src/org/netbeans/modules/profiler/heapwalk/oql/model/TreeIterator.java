@@ -92,6 +92,7 @@ abstract public class TreeIterator<I, T> implements Iterator<I> {
                 Iterator<T> recurseIter = getTraversingIterator(popped);
                 while (recurseIter.hasNext()) {
                     T inspectNext = recurseIter.next();
+                    if (inspectNext == null) continue;
                     if (!inspected.contains(inspectNext)) {
                         toInspect.push(inspectNext);
                         inspected.add(inspectNext);

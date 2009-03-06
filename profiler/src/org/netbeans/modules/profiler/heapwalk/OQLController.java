@@ -195,6 +195,7 @@ public class OQLController extends AbstractTopLevelController
                     queryController.queryFinished();
                     resultsController.setResult(sb.toString());
                 } catch (OQLException oQLException) {
+                    oQLException.printStackTrace();
                     StringBuilder errorMessage = new StringBuilder();
                     errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
                     errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
@@ -208,6 +209,9 @@ public class OQLController extends AbstractTopLevelController
     }
 
     private void dump(Object o, StringBuilder sb) {
+        if (o == null) {
+            return;
+        }
         if (o instanceof Instance) {
             Instance i = (Instance) o;
             sb.append(printInstance(i));
