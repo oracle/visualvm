@@ -40,7 +40,6 @@
 
 package org.netbeans.lib.profiler.results;
 
-import org.netbeans.lib.profiler.ProfilerLogger;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -95,7 +94,7 @@ public class ExportDataDumper {
             caughtEx = ex;
             System.out.println(s);
             numExceptions++;
-            ProfilerLogger.log(ex);
+            System.err.println(ex.getMessage());
         }
     }
 
@@ -104,7 +103,7 @@ public class ExportDataDumper {
             bos.close();
         } catch (IOException ex) {
             caughtEx = ex;
-            ProfilerLogger.log(ex);
+            System.err.println(ex.getMessage());
         }
     }
 

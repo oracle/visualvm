@@ -159,9 +159,8 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         StringBuffer result = new StringBuffer(quote+columnNames[0]+quote+separator);
         for (int i = 2; i < (columnNames.length); i++) {
             result.append(quote+columnNames[i]+quote+separator);
-        }
-        result.deleteCharAt(result.length()-1);
-        result.append(newLine);
+        }        
+        result.append(messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+newLine);// NOI18N
         return result;
     }
 
@@ -169,9 +168,11 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         switch (exportedFileType) {
             case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
                     callGraphManager.getRootNode().exportCSVData(",", 0, eDD); //NOI18N
+                    eDD.close();
                     break;
             case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
                     callGraphManager.getRootNode().exportCSVData(";", 0, eDD); //NOI18N
+                    eDD.close();
                     break;
             case 3: eDD.dumpData(getXMLHeader());
                     callGraphManager.getRootNode().exportXMLData(eDD, " "); //NOI18N
@@ -187,7 +188,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
     private StringBuffer getHTMLHeader() {
         StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>Memory Allocation Stack Traces</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
-        result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th></tr>"); //NOI18N
+        result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th><th>"+messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+"</th></tr>"); //NOI18N
         return result;
     }
 

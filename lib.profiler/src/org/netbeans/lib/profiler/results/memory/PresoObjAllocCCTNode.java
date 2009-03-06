@@ -448,27 +448,28 @@ public class PresoObjAllocCCTNode implements CCTNode {
 
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N
-        StringBuffer result = new StringBuffer(indent+"<node name=\""+replaceHTMLCharacters(getNodeName())+"\" parent=\""+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"\">"+newline); //NOI18N
-        result.append(indent+" <Method_Name>"+replaceHTMLCharacters(getNodeName())+"</Method_Name>"+newline); //NOI18N
+        StringBuffer result = new StringBuffer(indent+"<Node>"+newline); //NOI18N
+        result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"<Name>"+newline); //NOI18N
+        result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"<Parent>"+newline); //NOI18N
         result.append(indent+" <Bytes_Allocated>"+totalObjSize+"</Bytes_Allocated>"+newline); //NOI18N
         result.append(indent+" <Objects_Allocated>"+nCalls+"</Objects_Allocated>"+newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
-            for (int i = 0; i < children.length; i++) {
+            for (int i = 0; i < getNChildren(); i++) {
                 children[i].exportXMLData(eDD, indent+" "); //NOI18N
             }
         }
-        result=new StringBuffer(indent+"</node>"); //NOI18N
+        result=new StringBuffer(indent+"</Node>"); //NOI18N
         eDD.dumpData(result);
     }
 
     public void exportHTMLData(ExportDataDumper eDD, int depth) {
         StringBuffer result = new StringBuffer("<tr><td>."); //NOI18N
         for (int i=0; i<depth; i++) {
-            result.append("."); //NOI18N
+            result.append(".."); //NOI18N
         }
-        result.append(replaceHTMLCharacters((nodeName==null)?(className):(nodeName))+"</td><td>"+totalObjSize+"</td><td>"+nCalls+"</td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())+"</td><td>"+totalObjSize+"</td><td>"+nCalls+"</td><td>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"</td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -507,7 +508,8 @@ public class PresoObjAllocCCTNode implements CCTNode {
         }
         result.append(((nodeName==null)?(className):(nodeName)) + quote + separator);
         result.append(quote+totalObjSize+quote+separator);
-        result.append(quote+nCalls+quote+separator+newLine);
+        result.append(quote+nCalls+quote+separator);
+        result.append(quote+((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+newLine); // NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
