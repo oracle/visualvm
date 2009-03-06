@@ -1173,6 +1173,60 @@ function toArray(obj) {
     }
 }
 
+function top(array, code, num) {
+    if (array == undefined) {
+        return array;
+    }
+    var func;
+    if (code == undefined) {
+        func = function(lhs, rhs) {
+            return lhs < rhs;
+        }
+    } else if (typeof(code) == 'string') {
+        func = new Function("lhs", "rhs", "return " + code);
+    }
+
+    if (num == undefined) {
+        num = 10;
+    }
+
+    var modCount = 0;
+    var mergesize = 4;
+
+    if (array instanceof java.util.Enumeration) {
+        var arrays = [new Array(), new Array()];
+        var lastSorted = undefined;
+        var firstSorted = undefined;
+        var needsSorting = true;
+
+        while(array.hasMoreElements()) {
+            var element = array.nextElement();
+            arrays[0].push(element);
+            if (lastSorted != undefined) needsSorting |= func(element, lastSorted) < 0 || func(element, firstSorted) > 0;
+
+            if (arrays[0].length == mergesize) {
+                if (needsSorting) {
+                    arrays[1] = arrays[1].concat(arrays[0]).sort(func);
+                    lastSorted = arrays[1][arrays[1].length -1];
+                    firstSorted = arrays[1][0];
+                }
+                arrays[0].length = 0;
+                needsSorting = false;
+            }
+        }
+        if (arrays[1].length == 0) {
+            arrays[1] = arrays[0].sort(func);
+        }
+        arrays[1].length = Math.min(arrays[1].length, num);
+        return arrays[1];
+    } else if (array instanceof Array) {
+        var result = array.sort(func);
+        result.length = Math.min(result.length, num);
+        return result;
+    }
+    return array;
+}
+
 /**
  * Returns whether the given array/iterator/enumeration contains 
  * an element that satisfies the given boolean expression specified 

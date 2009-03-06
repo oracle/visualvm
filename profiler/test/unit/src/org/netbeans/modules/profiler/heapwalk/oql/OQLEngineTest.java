@@ -746,4 +746,17 @@ public class OQLEngineTest {
             }
         });
     }
+
+    @Test
+    public void testTop() throws Exception {
+        System.out.println("top 5");
+
+        instance.executeQuery("select map(top(heap.objects('java.lang.String'), 'lhs.count < rhs.count', 5), 'it.count')", new ObjectVisitor() {
+
+            public boolean visit(Object o) {
+                System.out.println(o);
+                return false;
+            }
+        });
+    }
 }

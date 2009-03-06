@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
@@ -177,6 +178,9 @@ public class OQLController extends AbstractTopLevelController
             public void run() {
                 BrowserUtils.performTask(new Runnable() {
                     public void run() {
+                        final AtomicInteger counter = new AtomicInteger(100);
+                        progressModel.setMaximum(100);
+
                         final StringBuilder sb = new StringBuilder();
 
                         try {
@@ -192,7 +196,7 @@ public class OQLController extends AbstractTopLevelController
                                         value = progressModel.getMinimum() + 1;
                                     }
                                     progressModel.setValue(value);
-                                    return !analysisRunning.get(); // process all hits while the analysis is running
+                                    return counter.decrementAndGet() == 0 || !analysisRunning.get(); // process all hits while the analysis is running
                                 }
                             });
                             analysisRunning.compareAndSet(true, false);
