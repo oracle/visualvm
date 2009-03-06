@@ -150,6 +150,7 @@ class LongBuffer {
 
         if (backingFile == null) {
             backingFile = File.createTempFile("NBProfiler", ".gc"); // NOI18N
+            backingFile.deleteOnExit();
         }
 
         if (writeStream == null) {
