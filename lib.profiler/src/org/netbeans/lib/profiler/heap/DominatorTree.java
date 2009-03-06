@@ -41,9 +41,13 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,8 +65,9 @@ class DominatorTree {
     private LongBuffer multipleParents;
     private LongBuffer revertedMultipleParents;
     private LongBuffer currentMultipleParents;
-    private DomMap map;
-boolean print;
+    private Map map;
+    private Set dirtySet = Collections.EMPTY_SET;
+    private Map nearestGCRootCache = new NearestGCRootCache(400000);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     
@@ -70,8 +75,8 @@ boolean print;
         heap = h;
         multipleParents = multiParents;
         currentMultipleParents = multipleParents;
+        map = new HashMap(multiParents.getSize());
         try {
-            map = new DomMap(multiParents.getSize(),heap.idToOffsetMap.ID_SIZE,4);
             revertedMultipleParents = multiParents.revertBuffer();
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex.getLocalizedMessage(),ex);
@@ -81,72 +86,64 @@ boolean print;
     //~ Methods ------------------------------------------------------------------------------------------------------------------    
     
     synchronized void computeDominators() {
-        boolean changed;
+        boolean changed = true;
+        boolean igonoreDirty;
         try {
             do {
                 currentMultipleParents.rewind();
-                changed = computeOneLevel();
+                igonoreDirty = !changed;
+                changed = computeOneLevel(igonoreDirty);
                 switchParents();
-            } while (changed);
+            } while (changed || !igonoreDirty);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         deleteBuffers();
     }
     
-    private boolean computeOneLevel() throws IOException {
+    private boolean computeOneLevel(boolean ignoreDirty) throws IOException {
         boolean changed = false;
- //long changedL = 0;
- //long processed = 0;
- //long index = 0;
+        Set newDirtySet = new HashSet(map.size()/10);
+//long processedId = 0;
+//long changedId = 0;
         for (;;) {
             long instanceId = readLong();
-//index++;
             if (instanceId == 0) {  // end of level
                 break;
             }
-            DomMap.Entry idomEntry = map.get(instanceId);
+            Long instanceIdObj = new Long(instanceId);
+            Long oldIdomObj = (Long) map.get(instanceIdObj);
             
-            if (idomEntry == null || idomEntry.getIdom() != 0) {
-//processed++;
+            if (oldIdomObj == null || (oldIdomObj.longValue() != 0 && (ignoreDirty || dirtySet.contains(oldIdomObj)))) {            
+//processedId++;
                 LongMap.Entry entry = heap.idToOffsetMap.get(instanceId);
-//Instance iiii = heap.getInstanceByID(instanceId);
-//if (iiii.getJavaClass().getName().equals("java.util.LinkedHashMap$Entry") && iiii.getInstanceNumber() == 666) {
-//    System.out.println(iiii.getJavaClass().getName()+"#"+iiii.getInstanceNumber());
-//}
                 List refs = entry.getReferences();
                 Iterator refIt = refs.iterator();
-                long idomId = ((Long)refIt.next()).longValue();
-
-                while(refIt.hasNext() && idomId != 0) {
-                    long refId = ((Long)refIt.next()).longValue();
-                    idomId = intersect(idomId,refId);
+                Long newIdomIdObj = (Long)refIt.next();
+                boolean dirty = false;
+                
+                while(refIt.hasNext() && newIdomIdObj.longValue() != 0) {
+                    Long refIdObj = (Long)refIt.next();
+                    newIdomIdObj = intersect(newIdomIdObj,refIdObj);
                 }
-                if (idomEntry == null) {
-                    map.put(instanceId,idomId);
-//changedL++;
+                if (oldIdomObj == null) {
+                    map.put(instanceIdObj, newIdomIdObj);
+                    newDirtySet.add(newIdomIdObj);
                     changed = true;
-                } else if (idomEntry.getIdom() != idomId) {
-//                    if (print) {
-//                        Instance iii = heap.getInstanceByID(instanceId);
-//                        Instance idomII = heap.getInstanceByID(idomId);
-//                        Instance oldIdom = heap.getInstanceByID(idomEntry.getIdom());
-//                        System.out.println("Index:"+index);
-//                        System.out.println("ID:   "+Long.toHexString(instanceId)+" "+iii.getJavaClass().getName()+"#"+iii.getInstanceNumber());
-//                        System.out.println("Idom: "+Long.toHexString(idomId)+" "+idomII.getJavaClass().getName()+"#"+idomII.getInstanceNumber());
-//                        System.out.println("OldIdm"+Long.toHexString(idomEntry.getIdom())+" "+oldIdom.getJavaClass().getName()+"#"+oldIdom.getInstanceNumber());
-//                        System.out.println("---------------------------");
-//                    }
-                    idomEntry.setIdom(idomId);
-//changedL++;
+//changedId++;
+                } else if (oldIdomObj.longValue() != newIdomIdObj.longValue()) {
+                    newDirtySet.add(oldIdomObj);
+                    newDirtySet.add(newIdomIdObj);
+                    map.put(instanceIdObj,newIdomIdObj);
                     changed = true;
+//changedId++;
                 }
             }
         }
-//System.out.println("Changed:    "+changedL);
-//System.out.println("Processed:  "+processed);
-//print = changedL < 5;
- 
+        dirtySet = newDirtySet;
+//System.out.println("Processed: "+processedId);
+//System.out.println("Changed:   "+changedId);
+//System.out.println("-------------------");
         return changed;
     }
         
@@ -160,9 +157,9 @@ boolean print;
     }
     
     long getIdomId(long instanceId, LongMap.Entry entry) {
-        DomMap.Entry domEntry = map.get(instanceId);
-        if (domEntry != null) {
-            return domEntry.getIdom();
+        Long idomEntry = (Long) map.get(new Long(instanceId));
+        if (idomEntry != null) {
+            return idomEntry.longValue();
         }
         if (entry == null) {
             entry = heap.idToOffsetMap.get(instanceId);
@@ -170,40 +167,55 @@ boolean print;
         return entry.getNearestGCRootPointer();
     }
 
-    private long getIdomId(long instanceId) {
-        return getIdomId(instanceId,null);
+    private Long getNearestGCRootPointer(Long instanceIdLong) {
+        LongMap.Entry entry;
+        Long nearestGCLong = (Long) nearestGCRootCache.get(instanceIdLong);
+        Long nearestGC;
+        if (nearestGCLong != null) {
+            return nearestGCLong;
+        }
+        entry = heap.idToOffsetMap.get(instanceIdLong.longValue());
+        nearestGC = new Long(entry.getNearestGCRootPointer());
+        nearestGCRootCache.put(instanceIdLong,nearestGC);
+        return nearestGC;
     }
     
-    private long intersect(long idomId, long refId) {
-        if (idomId == refId) {
-            return idomId;
+    private Long getIdomId(Long instanceIdLong) {
+        Long idomObj = (Long) map.get(instanceIdLong);
+        
+        if (idomObj != null) {
+            return idomObj;
         }
-        if (idomId == 0 || refId == 0) {
-            return 0;
+        return getNearestGCRootPointer(instanceIdLong.longValue());
+    }
+    
+    private Long intersect(Long idomIdObj, Long refIdObj) {
+        if (idomIdObj.longValue() == refIdObj.longValue()) {
+            return idomIdObj;
+        }
+        if (idomIdObj.longValue() == 0 || refIdObj.longValue() == 0) {
+            return Long.valueOf(0);
         }
         Set leftIdoms = new HashSet(200);
         Set rightIdoms = new HashSet(200);
-        long leftIdom = idomId;
-        long rightIdom = refId;
-        Long leftIdomObj = new Long(leftIdom);
-        Long rightIdomObj = new Long(rightIdom);
+        Long leftIdomObj = idomIdObj;
+        Long rightIdomObj = refIdObj;
+
         
         leftIdoms.add(leftIdomObj);
         rightIdoms.add(rightIdomObj);
         while(true) {
-            if (leftIdom != 0) {
-                leftIdom = getIdomId(leftIdom);
-                leftIdomObj = new Long(leftIdom);
+            if (leftIdomObj.longValue() != 0) {
+                leftIdomObj = getIdomId(leftIdomObj);
                 if (rightIdoms.contains(leftIdomObj)) {
-                    return leftIdom;
+                    return leftIdomObj;
                 }
                 leftIdoms.add(leftIdomObj);
             }
-            if (rightIdom != 0) {
-                rightIdom = getIdomId(rightIdom);
-                rightIdomObj = new Long(rightIdom);
+            if (rightIdomObj.longValue() != 0) {
+                rightIdomObj = getIdomId(rightIdomObj);
                 if (leftIdoms.contains(rightIdomObj)) {
-                    return rightIdom;
+                    return rightIdomObj;
                 }
                 rightIdoms.add(rightIdomObj);
             }
@@ -216,5 +228,19 @@ boolean print;
         } else {
             currentMultipleParents = revertedMultipleParents;
         }
+    }
+    
+    private static final class NearestGCRootCache extends LinkedHashMap {
+        private final int maxSize;
+        
+        private NearestGCRootCache(int size) {
+            super(size,0.75F,true);
+            maxSize = size;
+        }
+
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > maxSize;
+        }
+
     }
 }
