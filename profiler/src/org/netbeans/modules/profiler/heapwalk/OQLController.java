@@ -38,6 +38,7 @@
  */
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.awt.Color;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
@@ -52,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Utils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -179,15 +181,27 @@ public class OQLController extends AbstractTopLevelController
                 BrowserUtils.performTask(new Runnable() {
                     public void run() {
                         final StringBuilder sb = new StringBuilder();
+                        final boolean[] oddRow = new boolean[1];
+                        Color oddRowBackground = UIUtils.getDarker(
+                                        UIUtils.getProfilerResultsBackground());
+                        final String oddRowBackgroundString =
+                                "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                                         oddRowBackground.getGreen() + "," + //NOI18N
+                                         oddRowBackground.getBlue() + ")"; //NOI18N
+
+                        sb.append("<table border='0' width='100%'>"); // NOI18N
 
                         try {
                             analysisRunning.compareAndSet(false, true);
                             engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                                 public boolean visit(Object o) {
-                                    sb.append("<div>"); // NOI18N
+                                    sb.append(oddRow[0] ?
+                                        "<tr><td style='background-color: " + // NOI18N
+                                        oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+                                    oddRow[0] = !oddRow[0];
                                     dump(o, sb);
-                                    sb.append("</div>"); // NOI18N
+                                    sb.append("</td></tr>"); // NOI18N
                                     int value = progressModel.getValue() + 1;
                                     if (value > progressModel.getMaximum()) {
                                         value = progressModel.getMinimum() + 1;
@@ -196,6 +210,9 @@ public class OQLController extends AbstractTopLevelController
                                     return !analysisRunning.get(); // process all hits while the analysis is running
                                 }
                             });
+
+                            sb.append("</table>"); // NOI18N
+
                             analysisRunning.compareAndSet(true, false);
                             queryController.queryFinished();
                             resultsController.setResult(sb.toString());
