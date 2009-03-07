@@ -547,7 +547,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private void openQuery() {
             OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
             if (q != null)
-                savedController.getOQLController().getQueryController().setQuery(q.getQuery());
+                savedController.getOQLController().getQueryController().setQuery(q.getScript());
         }
 
         private void editQuery() {
