@@ -44,7 +44,6 @@ import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;

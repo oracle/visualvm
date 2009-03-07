@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.ui.cpu;
 
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -69,6 +70,109 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         super(actionsHandler, selectionHandler);
     }
 
+    public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine) {
+        switch (exportedFileType) {
+            case 1: exportCSV(",", eDD,combine); break; // normal CSV
+            case 2: exportCSV(";", eDD,combine); break; // Excel CSV
+            case 3: exportXML(eDD, combine); break;
+            case 4: exportHTML(eDD, combine); break;
+        }
+    }
+
+    private void exportHTML(ExportDataDumper eDD, boolean combine) {
+         // Header
+        StringBuffer result;
+        if (!combine) {
+            result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getDefaultViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>");
+        } else {
+            result = new StringBuffer("<br><br><table border=\"1\"><tr>"); // NOI18N
+        }
+
+         // NOI18N
+        for (int i = 0; i < (columnCount); i++) {
+            result.append("<th>"+columnNames[i]+"</th>");
+        }
+        result.append("</tr>");
+        eDD.dumpData(result);
+
+        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+            result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>");
+            result.append("<td align=\"char\">"+flatProfileContainer.getPercentAtRow(i)+" %</td>");
+            result.append("<td align=char>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>");
+            result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>");
+            eDD.dumpData(result);
+        }
+        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));
+    }
+
+    private void exportXML(ExportDataDumper eDD, boolean combine) {
+         // Header
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result;
+        if (!combine) {
+            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+this.getDefaultViewName()+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
+        } else {
+            result = new StringBuffer(newline+"<TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
+        }
+        for (int i = 0; i < ( columnCount); i++) {
+            result.append("   <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline);
+        }
+        result.append("  </TableHeader>"+newline+"  <TableBody>"+newline);
+        eDD.dumpData(result);
+
+        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+            result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
+            result.append("    <TableColumn><![CDATA["+flatProfileContainer.getPercentAtRow(i)+" %]]></TableColumn>"+newline);
+            result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline);
+            result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline);
+            eDD.dumpData(result);
+        }
+        eDD.dumpDataAndClose(new StringBuffer("  </TableBody>"+" </TableData>"+newline+"</ExportedView>"));
+    }
+
+    private void exportCSV(String separator, ExportDataDumper eDD, boolean combine) {
+        // Header
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+
+        if (combine) {
+            result.append(quote+quote+separator+quote+quote+separator+quote+quote+separator+quote+quote+newLine);
+        }
+        for (int i = 0; i < (columnCount); i++) {
+            result.append(quote+columnNames[i]+quote+separator);
+        }
+        result.deleteCharAt(result.length()-1);
+        result.append(newLine);
+        eDD.dumpData(result);
+
+        // Data
+        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+            result = new StringBuffer();
+            result.append(quote+flatProfileContainer.getMethodNameAtRow(i)+quote+separator);
+            result.append(quote+flatProfileContainer.getPercentAtRow(i)+quote+separator);
+            result.append(quote+((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms"+quote+separator);
+            result.append(quote+flatProfileContainer.getNInvocationsAtRow(i)+quote+newLine);
+            eDD.dumpData(result);
+        }
+        eDD.close();
+    }
+
+    private String replaceHTMLCharacters(String s) {
+        StringBuffer sb = new StringBuffer();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+          char c = s.charAt(i);
+          switch (c) {
+              case '<': sb.append("&lt;"); break;
+              case '>': sb.append("&gt;"); break;
+              case '&': sb.append("&amp;"); break;
+              case '"': sb.append("&quot;"); break;
+              default: sb.append(c); break;
+          }
+        }
+        return sb.toString();
+    }
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {

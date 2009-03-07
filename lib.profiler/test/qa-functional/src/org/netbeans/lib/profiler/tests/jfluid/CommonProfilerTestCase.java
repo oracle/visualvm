@@ -60,7 +60,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import org.openide.util.Exceptions;
 
 
 public abstract class CommonProfilerTestCase extends NbTestCase {
@@ -541,7 +540,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         try {
             Thread.sleep(15000);
         } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace(System.err);
         }
     }
 
