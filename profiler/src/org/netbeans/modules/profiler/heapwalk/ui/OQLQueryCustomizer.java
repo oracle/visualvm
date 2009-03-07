@@ -33,6 +33,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -46,6 +49,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -78,6 +82,10 @@ public class OQLQueryCustomizer {
             OQLQueryCustomizer.class, "OQLQueryCustomizer_UpButtonToolTip"); // NOI18N
     private static final String DOWN_BUTTON_TOOLTIP = NbBundle.getMessage(
             OQLQueryCustomizer.class, "OQLQueryCustomizer_DownButtonToolTip"); // NOI18N
+    private static final String UP_BUTTON_ACCESS_NAME = NbBundle.getMessage(
+            OQLQueryCustomizer.class, "OQLQueryCustomizer_UpButtonAccessName"); // NOI18N
+    private static final String DOWN_BUTTON_ACCESS_NAME = NbBundle.getMessage(
+            OQLQueryCustomizer.class, "OQLQueryCustomizer_DownButtonAccessName"); // NOI18N
     private static final String NEW_QUERY_RADIO_TEXT = NbBundle.getMessage(
             OQLQueryCustomizer.class, "OQLQueryCustomizer_NewQueryRadioText"); // NOI18N
     private static final String EXISTING_QUERY_RADIO_TEXT = NbBundle.getMessage(
@@ -147,6 +155,8 @@ public class OQLQueryCustomizer {
             }
         };
         upDownButtons[0].setToolTipText(UP_BUTTON_TOOLTIP);
+        upDownButtons[0].getAccessibleContext().
+                                        setAccessibleName(UP_BUTTON_ACCESS_NAME);
         upDownButtons[1] = new JButton(ICON_DOWN) {
             protected void fireActionPerformed(ActionEvent e) {
                 int queryIndex = lModel.indexOf(query);
@@ -157,10 +167,28 @@ public class OQLQueryCustomizer {
             }
         };
         upDownButtons[1].setToolTipText(DOWN_BUTTON_TOOLTIP);
+        upDownButtons[1].getAccessibleContext().
+                                      setAccessibleName(DOWN_BUTTON_ACCESS_NAME);
 
         final CustomizerPanel customizer = new CustomizerPanel(okButton,
                                                 query.getName(),
                                                 query.getDescription());
+
+        customizer.getInputMap(CustomizerPanel.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_MASK), "MOVE_UP"); // NOI18N
+        customizer.getActionMap().put("MOVE_UP", new AbstractAction() {// NOI18N
+            public void actionPerformed(ActionEvent e) {
+                if (upDownButtons[0].isEnabled()) upDownButtons[0].doClick();
+            }
+        });
+        customizer.getInputMap(CustomizerPanel.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_MASK), "MOVE_DOWN"); // NOI18N
+        customizer.getActionMap().put("MOVE_DOWN", new AbstractAction() {// NOI18N
+            public void actionPerformed(ActionEvent e) {
+                if (upDownButtons[1].isEnabled()) upDownButtons[1].doClick();
+            }
+        });
+
 
         final DialogDescriptor dd = new DialogDescriptor(customizer,
                                             QUERY_PROPERTIES_CAPTION, true,
@@ -172,6 +200,7 @@ public class OQLQueryCustomizer {
         updateButtons(upDownButtons, query, lModel);
 
         final Dialog d = ProfilerDialogs.createDialog(dd);
+
         d.pack();
         d.setVisible(true);
 
