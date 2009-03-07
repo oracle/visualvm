@@ -959,21 +959,6 @@ public final class ResultsManager {
             });
     }
 
-    void exportSnapshot(LoadedSnapshot snapshot) {
-        ResultsManager.SelectedFile targetFile = selectSnapshotTargetFile(getDefaultSnapshotFileName(snapshot), false);
-
-        if ((targetFile != null) && checkFileExists(targetFile)) {
-            try {
-                FileObject fo = targetFile.folder.createData(targetFile.fileName, targetFile.fileExt);
-                ResultsManager.getDefault().saveSnapshot(snapshot, fo);
-            } catch (IOException e1) {
-                ErrorManager.getDefault()
-                            .annotate(e1, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }));
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e1);
-            }
-        }
-    }
-
     void resultsBecameAvailable() {
         if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
         resultsAvailable = true;

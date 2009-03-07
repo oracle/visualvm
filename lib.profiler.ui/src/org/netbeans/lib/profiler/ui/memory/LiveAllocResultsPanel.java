@@ -55,6 +55,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 
 
 /**
@@ -122,8 +123,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         } else if (e.getSource() == popupShowSource) {
             showSourceForClass(selectedClassId);
         } else if ((e.getSource() == startHisto) && (handler != null)) {
-            handler.performAction("history logging",
-                                  new Object[] { new Integer(selectedClassId), getClassName(selectedClassId), Boolean.FALSE }); // NOI18N
+            handler.performAction("history logging",new Object[] { new Integer(selectedClassId), getClassName(selectedClassId), Boolean.FALSE }); // NOI18N
         }
     }
 
@@ -308,5 +308,99 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             });
 
         return memoryResPopupMenu;
+    }
+
+    public void exportData(int typeOfFile, ExportDataDumper eDD) {
+        percentFormat.setMinimumFractionDigits(2);
+        switch (typeOfFile) {
+            case 1: exportCSV(",", eDD); break; // normal CSV   // NOI18N
+            case 2: exportCSV(";", eDD); break; // Excel CSV  // NOI18N
+            case 3: exportXML(eDD); break;
+            case 4: exportHTML(eDD); break;
+        }
+        percentFormat.setMinimumFractionDigits(0);
+    }
+
+    private void exportHTML(ExportDataDumper eDD) {
+         // Header
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        for (int i = 0; i < (columnNames.length); i++) {
+            result.append("<th>"+columnNames[i]+"</th>");  // NOI18N
+        }
+        result.append("</tr>");  // NOI18N
+        eDD.dumpData(result);
+
+        for (int i=0; i < (nTrackedItems); i++) {
+
+            result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(sortedClassNames[i])+"</td>");  // NOI18N
+            result.append("<td align=\"right\">"+percentFormat.format(((double) totalAllocObjectsSize[i])/nTotalBytes)+"</td>");  // NOI18N
+            result.append("<td align=\"right\">"+totalAllocObjectsSize[i]+" B</td>");  // NOI18N
+            result.append("<td align=\"right\">"+nTotalAllocObjects[i]+"</td></tr>");  // NOI18N
+            eDD.dumpData(result);
+        }
+        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));  // NOI18N
+    }
+
+    private void exportXML(ExportDataDumper eDD) {
+         // Header
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+getViewName()+"\">"+newline); // NOI18N
+        result.append(" <TableData NumRows=\""+nTrackedItems+"\" NumColumns=\"4\">"+newline+"<TableHeader>");  // NOI18N
+        for (int i = 0; i < (columnNames.length); i++) {
+            result.append("  <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline);  // NOI18N
+        }
+        result.append("</TableHeader>");  // NOI18N
+        eDD.dumpData(result);
+
+        // Data
+        for (int i=0; i < (nTrackedItems); i++) {
+            result = new StringBuffer("  <TableRow>"+newline+"   <TableColumn><![CDATA["+sortedClassNames[i]+"]]></TableColumn>"+newline);  // NOI18N
+            result.append("   <TableColumn><![CDATA["+percentFormat.format(((double) totalAllocObjectsSize[i])/nTotalBytes)+"]]></TableColumn>"+newline);  // NOI18N
+            result.append("   <TableColumn><![CDATA["+totalAllocObjectsSize[i]+"]]></TableColumn>"+newline);  // NOI18N
+            result.append("   <TableColumn><![CDATA["+nTotalAllocObjects[i]+"]]></TableColumn>"+newline+"  </TableRow>"+newline);  // NOI18N
+            eDD.dumpData(result);
+        }
+        eDD.dumpDataAndClose(new StringBuffer(" </Table>"+newline+"</ExportedView>"));  // NOI18N
+    }
+
+    private void exportCSV(String separator, ExportDataDumper eDD) {
+        // Header
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+
+        for (int i = 0; i < (columnNames.length); i++) {
+            result.append(quote+columnNames[i]+quote+separator);
+        }
+        result.deleteCharAt(result.length()-1);
+        result.append(newLine);
+        eDD.dumpData(result);
+
+        // Data
+        for (int i=0; i < (nTrackedItems); i++) {
+            result = new StringBuffer();
+            result.append(quote+sortedClassNames[i]+quote+separator);
+            result.append(quote+percentFormat.format(((double) totalAllocObjectsSize[i])/nTotalBytes)+quote+separator);
+            result.append(quote+totalAllocObjectsSize[i]+quote+separator);
+            result.append(quote+nTotalAllocObjects[i]+quote+newLine);
+            eDD.dumpData(result);
+        }
+        eDD.close();
+    }
+
+    private String replaceHTMLCharacters(String s) {
+        StringBuffer sb = new StringBuffer();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+          char c = s.charAt(i);
+          switch (c) {
+              case '<': sb.append("&lt;"); break;  // NOI18N
+              case '>': sb.append("&gt;"); break;  // NOI18N
+              case '&': sb.append("&amp;"); break;  // NOI18N
+              case '"': sb.append("&quot;"); break;  // NOI18N
+              default: sb.append(c); break;
+          }
+        }
+        return sb.toString();
     }
 }

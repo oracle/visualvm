@@ -46,7 +46,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,6 +193,15 @@ class NumberList {
         }
     }
     
+    void flush() {
+        try {
+            flushDirtyBlocks();
+            blockCache.clear();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     private long getOffsetToNextBlock(byte[] block) {
         return readNumber(block,NUMBERS_IN_BLOCK);
     }
@@ -300,12 +308,16 @@ class NumberList {
         private static final int MAX_CAPACITY = 10000;
         
         private BlockLRUCache() {
-            super(10000,0.75f,true);
+            super(MAX_CAPACITY,0.75f,true);
         }
 
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            if (size()>MAX_CAPACITY && !dirtyBlocks.contains(eldest.getKey())) {
-                return true;
+            if (size()>MAX_CAPACITY) {
+                Object key = eldest.getKey();
+                if (!dirtyBlocks.contains(key)) {
+                    return true;
+                }
+                get(key);
             }
             return false;
         }
