@@ -59,7 +59,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.filters.GlobalFilters;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -515,8 +514,6 @@ public class OQLController extends AbstractTopLevelController
         }
 
         public static void saveData(DefaultListModel model) {
-            if (model.isEmpty()) return;
-
             FileLock lock = null;
 
             try {
