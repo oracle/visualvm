@@ -79,7 +79,6 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import org.openide.util.actions.Presenter;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
@@ -115,6 +114,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
@@ -127,7 +127,8 @@ import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
  * @author Ian Formanek
  */
 public final class LiveResultsWindow extends TopComponent implements ResultsListener, ProfilingStateListener, HistoryListener,
-                                                                     SaveViewAction.ViewProvider {
+                                                                     SaveViewAction.ViewProvider, ExportAction.ExportProvider {
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static final class EmptyLiveResultsPanel extends JPanel implements LiveResultsPanel {
@@ -560,7 +561,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         final JLabel noResultsLabel = new JLabel(NO_PROFILING_RESULTS_LABEL_TEXT);
 
         noResultsLabel.setFont(noResultsLabel.getFont().deriveFont(14));
-        noResultsLabel.setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/monitoring.png", false));
+        noResultsLabel.setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/monitoring.png", false)); //NOI18N
         noResultsLabel.setIconTextGap(10);
         noResultsLabel.setEnabled(false);
         noResultsPanel.add(noResultsLabel, BorderLayout.NORTH);
@@ -794,7 +795,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         if (currentDisplay instanceof LiveAllocResultsPanel || currentDisplay instanceof LiveLivenessResultsPanel) {
             tabs.setEnabledAt(1, true);
             tabs.setTitleAt(1,
-                            NbBundle.getMessage(LiveResultsWindow.class, "LiveResultsWindow_ClassHistoryTabName",
+                            NbBundle.getMessage(LiveResultsWindow.class, "LiveResultsWindow_ClassHistoryTabName", //NOI18N
                                                 new Object[] { History.getInstance().getClassName() })); // NOI18N
             tabs.setSelectedIndex(1);
         }
@@ -858,6 +859,28 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         // ignore
     }
 
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        if (currentDisplayComponent == memoryTabPanel) {
+            if (tabs.getSelectedComponent() instanceof LiveAllocResultsPanel) {
+                ((LiveAllocResultsPanel) currentDisplay).exportData(exportedFileType, eDD);
+            }
+        } else if (currentDisplayComponent instanceof LiveFlatProfilePanel) {
+            ((LiveFlatProfilePanel) currentDisplay).exportData(exportedFileType, eDD);
+        }
+    }
+
+    public boolean hasLoadedSnapshot() {
+        return false;
+    }
+
+    public boolean hasExportableView() {
+        if ((currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == currentDisplay)) {
+            return true;
+        }
+
+        return !noResultsPanel.isShowing() && (currentDisplay != null) && currentDisplay.hasView();
+    }
+
     protected void componentClosed() {
         super.componentClosed();
 
@@ -913,6 +936,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         if (currentDisplay != null) {
             currentDisplay.reset();
             resetResultsDisplay();
+            updateGraphButtons();
         }
 
         resetDrillDown();
@@ -922,7 +946,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
     private static boolean callForceObtainedResultsDump(final ProfilerClient client) {
         return callForceObtainedResultsDump(client, true);
     }
-    
+
     private static boolean callForceObtainedResultsDump(final ProfilerClient client, final boolean refreshDisplay) {
         if (refreshDisplay) {
             resultsDumpForced.set(true);
@@ -978,8 +1002,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.setFloatable(false);
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
         toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        
-        autoToggle = new JToggleButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/autoRefresh.png", false));
+
+        autoToggle = new JToggleButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/autoRefresh.png", false)); //NOI18N
         autoToggle.setSelected(true);
         autoToggle.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -989,7 +1013,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         autoToggle.setToolTipText(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
         autoToggle.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
 
-        updateNowButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/updateNow.png", false));
+        updateNowButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/updateNow.png", false)); //NOI18N
         updateNowButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     requestProfilingDataUpdate(true);
@@ -998,7 +1022,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         updateNowButton.setToolTipText(UPDATE_RESULTS_NOW_TOOLTIP);
         updateNowButton.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_NOW_TOOLTIP);
 
-        runGCButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/runGC.png", false));
+        runGCButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/runGC.png", false)); //NOI18N
         runGCButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     try {
@@ -1022,6 +1046,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         toolBar.addSeparator();
         toolBar.add(((Presenter.Toolbar) SystemAction.get(TakeSnapshotAction.class)).getToolbarPresenter());
         toolBar.addSeparator();
+        toolBar.add(new ExportAction(this, null));
         toolBar.add(new SaveViewAction(this));
 
         return toolBar;
@@ -1226,6 +1251,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
     private void updateGraphButtons() {
         boolean graphVisible = (currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == graphTab);
+        toolBar.getComponentAtIndex(7).setEnabled(!(((currentDisplayComponent==memoryTabPanel)&&(tabs.getSelectedComponent()==currentDisplay)&&(currentDisplay==null))||((currentDisplayComponent==memoryTabPanel)&&(tabs.getSelectedComponent()!=currentDisplay))||(currentDisplayComponent==noResultsPanel)));
         graphButtonsSeparator.setVisible(graphVisible);
         graphTab.zoomInButton.setVisible(graphVisible);
         graphTab.zoomOutButton.setVisible(graphVisible);
@@ -1234,7 +1260,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
     private void updateResultsDisplay() {
         if (!isOpened()) {
-            return; // do nothing if i'm closed 
+            return; // do nothing if i'm closed
         }
 
         if (!resultsDumpForced.getAndSet(false) && !isAutoRefresh()) {

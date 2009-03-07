@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -48,8 +49,6 @@ import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.*;
@@ -63,7 +62,7 @@ import javax.swing.event.ChangeListener;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListener {
+public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListener, ExportAction.ExportProvider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -120,7 +119,7 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
         toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 
         toolBar.add(saveAction = new SaveSnapshotAction(ls));
-        toolBar.add(new ExportSnapshotAction(ls));
+        toolBar.add(new ExportAction(this,ls));
 
         add(toolBar, BorderLayout.NORTH);
 
@@ -168,5 +167,20 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
 
     private void updateToolbar() {
         // update the toolbar if selected tab changed
+    }
+
+    public String getViewName() {
+        return PANEL_TITLE;
+    }
+
+    public boolean hasLoadedSnapshot() {
+        return true;
+    }
+
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {        
+    }
+
+    public boolean hasExportableView() {
+        return false;
     }
 }

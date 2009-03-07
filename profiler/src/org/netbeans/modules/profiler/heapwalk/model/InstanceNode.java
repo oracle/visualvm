@@ -40,10 +40,12 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import org.openide.util.NbBundle;
 import java.text.MessageFormat;
 import javax.swing.ImageIcon;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.JavaClass;
 
 
 /**
@@ -163,6 +165,16 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         }
 
         return "#" + instance.getInstanceNumber(); // NOI18N
+    }
+
+    protected String computeSize() {
+        if (hasInstance()) return String.valueOf(instance.getSize());
+        else return "-"; // NOI18N
+    }
+
+    protected String computeRetainedSize() {
+        if (hasInstance()) return String.valueOf(instance.getRetainedSize());
+        else return "-"; // NOI18N
     }
 
     protected ImageIcon processLoopIcon(ImageIcon icon) {

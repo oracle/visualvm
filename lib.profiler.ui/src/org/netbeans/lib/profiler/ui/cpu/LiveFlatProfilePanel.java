@@ -52,7 +52,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 
 
 /**
@@ -154,9 +154,9 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     //  private DrillDownPanel createDrilldownPanel() {
     ////    if (drilldownContext.isValid()) {
     ////      drillDown = new DrillDown(drilldownContext);
-    //    
+    //
     //    if (!drillDown.isValid()) return null;
-    //    
+    //
     //    drillDown.addListener(new DrillDownListener() {
     //      public void dataChanged() {
     //      }
@@ -165,7 +165,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     //      }
     //    });
     //    DrillDownPanel ddPanel = new DrillDownPanel(this.drillDown);
-    //    
+    //
     ////    if (statModules != null) {
     ////      for (Iterator it = statModules.iterator(); it.hasNext();) {
     ////        StatisticalModule module = (StatisticalModule)it.next();
@@ -174,8 +174,8 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     ////        }
     ////      }
     ////    }
-    //    
-    //    
+    //
+    //
     //    return ddPanel;
     //  }
     public boolean hasValidDrillDown() {
@@ -205,6 +205,10 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
         //    }
     }
 
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        fpCollectorPanel.exportData(exportedFileType, eDD);
+    }
+
     private void initComponents() {
         setLayout(new BorderLayout());
 
@@ -226,7 +230,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
 
     private void setupFlatCollector() {
         //    fpCollector = new FlatProfileCollector();
-        //    
+        //
         //    fpCollector.addDataChangeListener(new PropertyChangeListener() {
         //      public void propertyChange(final PropertyChangeEvent evt) {
         //        Runnable runner = new Runnable() {
@@ -236,7 +240,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
         //              String selectedRowString = fpCollectorPanel.getSelectedRowString();
         //              fpCollectorPanel.setDataToDisplay(fpc);
         //              fpCollectorPanel.prepareResults(true);
-        //              
+        //
         //              fpCollectorPanel.setSelectedRowString(selectedRowString);
         //              ((CardLayout)resultsTable.getLayout()).show(resultsTable, "RESULTS");
         //            } else {
