@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.ui.cpu;
 
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
@@ -55,6 +56,11 @@ public class CombinedPanel extends JSplitPane implements ScreenshotProvider {
 
     public CombinedPanel(int splitOrientation, Component component1, Component component2) {
         super(splitOrientation, component1, component2);
+    }
+
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        ((CCTDisplay)leftComponent).exportData(exportedFileType, eDD, true);
+        ((SnapshotFlatProfilePanel)rightComponent).exportData(exportedFileType, eDD, true);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
