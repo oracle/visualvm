@@ -50,15 +50,16 @@ import org.openide.filesystems.FileUtil;
  */
 @org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery.class)
 public class SettingsFolderQueryImpl extends SettingsFolderQuery {
-    private static final String PROFILER_FOLDER = "org-netbeans-modules-profiler";
+    private static final String PROFILER_FOLDER = "NBProfiler/Config";  // NOI18N
+    private static final String SETTINGS_FOLDER = "Settings";   // NOI18N
     
     @Override
     public FileObject getSettingsFolder(boolean create) throws IOException {
-        final FileObject folder = FileUtil.getConfigFile("Services"); //NOI18N
-        FileObject settingsFolder = folder.getFileObject(PROFILER_FOLDER, null);
+        final FileObject folder = FileUtil.getConfigFile(PROFILER_FOLDER);
+        FileObject settingsFolder = folder.getFileObject(SETTINGS_FOLDER, null);
 
         if ((settingsFolder == null) && create) {
-            settingsFolder = folder.createFolder(PROFILER_FOLDER);
+            settingsFolder = folder.createFolder(SETTINGS_FOLDER);
         }
 
         return settingsFolder;

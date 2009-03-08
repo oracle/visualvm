@@ -40,26 +40,32 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.heap.*;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.net.URL;
 import java.text.MessageFormat;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.ui.components.HTMLLabel;
+import org.openide.util.RequestProcessor;
 
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ClassPresenterPanel extends JPanel {
+public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.StateListener {
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class HeaderRenderer extends JLabel {
@@ -96,6 +102,8 @@ public class ClassPresenterPanel extends JPanel {
                                                                            "ClassPresenterPanel_InstanceSizeString"); // NOI18N
     private static final String TOTAL_SIZE_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
                                                                         "ClassPresenterPanel_TotalSizeString"); // NOI18N
+    private static final String RETAINED_SIZES_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
+                                                                        "ClassPresenterPanel_RetainedSizesString"); // NOI18N
                                                                                                                 // -----
     private static ImageIcon ICON_CLASS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png", false); // NOI18N
 
@@ -103,6 +111,9 @@ public class ClassPresenterPanel extends JPanel {
 
     private HeaderRenderer headerRenderer;
     private JLabel detailsRenderer;
+    private HTMLLabel actionsRenderer;
+
+    private HeapFragmentWalker heapFragmentWalker;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -117,27 +128,62 @@ public class ClassPresenterPanel extends JPanel {
             String className = javaClass.getName();
             String instancesCount = MessageFormat.format(INSTANCES_COUNT_STRING, new Object[] { javaClass.getInstancesCount() });
             String instanceSize = (javaClass.getInstanceSize() != -1)
-                                  ? ("  |  "
+                                  ? ("  |  " // NOI18N
                                   + MessageFormat.format(INSTANCE_SIZE_STRING, new Object[] { javaClass.getInstanceSize() })) : ""; // NOI18N
             String allInstancesSize = (javaClass.getAllInstancesSize() != -1)
-                                      ? ("  |  "
+                                      ? ("  |  " // NOI18N
                                       + MessageFormat.format(TOTAL_SIZE_STRING, new Object[] { javaClass.getAllInstancesSize() }))
                                       : ""; // NOI18N
             String classDetails = javaClass.isArray() ? (instancesCount + allInstancesSize)
                                                       : (instancesCount + instanceSize + allInstancesSize);
             headerRenderer.setText(className);
             detailsRenderer.setText(classDetails);
+            actionsRenderer.setPreferredSize(new Dimension(actionsRenderer.getPreferredSize().width,
+                                                           detailsRenderer.getPreferredSize().height));
         }
     }
 
+
+    public void setHeapFragmentWalker(HeapFragmentWalker heapFragmentWalker) {
+        if (this.heapFragmentWalker != null) this.heapFragmentWalker.removeStateListener(this);
+        this.heapFragmentWalker = heapFragmentWalker;
+        if (this.heapFragmentWalker != null) {
+            this.heapFragmentWalker.addStateListener(this);
+            updateActions(heapFragmentWalker.getRetainedSizesStatus());
+        } else {
+            updateActions(HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED);
+        }
+    }
+
+    public void stateChanged(StateEvent e) {
+        updateActions(e.getRetainedSizesStatus());
+    }
+
+    public void updateActions(int retainedSizesStatus) {
+        switch (retainedSizesStatus) {
+            case HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED:
+            case HeapFragmentWalker.RETAINED_SIZES_COMPUTED:
+                actionsRenderer.setVisible(false);
+                break;
+            case HeapFragmentWalker.RETAINED_SIZES_UNKNOWN:
+            case HeapFragmentWalker.RETAINED_SIZES_CANCELLED:
+                actionsRenderer.setVisible(true);
+                actionsRenderer.setEnabled(true);
+                break;
+            case HeapFragmentWalker.RETAINED_SIZES_COMPUTING:
+                actionsRenderer.setVisible(true);
+                actionsRenderer.setEnabled(false);
+                break;
+        }
+    }
+
+
     private void initComponents() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(UIManager.getLookAndFeel().getID()
-                                                                                             .equals("Metal")
-                                                                                    ? // NOI18N
-        UIManager.getColor("Button.darkShadow") : // NOI18N
-        UIManager.getColor("Button.shadow")), // NOI18N
-                                                     BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+        Color borderColor = UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
+            UIManager.getColor("Button.darkShadow") : UIManager.getColor("Button.shadow"); // NOI18N
+        setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
         setOpaque(true);
         //    titlePanel.setBackground(UIManager.getColor("ToolTip.background"));
         setBackground(new Color(245, 245, 245));
@@ -153,7 +199,30 @@ public class ClassPresenterPanel extends JPanel {
         detailsRenderer.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
         detailsRenderer.setOpaque(false);
 
+        actionsRenderer = new HTMLLabel() {
+            protected void showURL(URL url) {
+                if (heapFragmentWalker != null) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            heapFragmentWalker.computeRetainedSizes(true);
+                        }
+                    });
+                }
+            }
+        };
+        actionsRenderer.setBorder(BorderFactory.createEmptyBorder());
+        actionsRenderer.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
+        actionsRenderer.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
+        actionsRenderer.setText("&nbsp;&nbsp;|&nbsp;&nbsp;<a href='#'>" + RETAINED_SIZES_STRING + "</a>"); // NOI18N
+        actionsRenderer.setOpaque(false);
+        actionsRenderer.setVisible(false);
+
+        JPanel detailsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        detailsContainer.setOpaque(false);
+        detailsContainer.add(detailsRenderer);
+        detailsContainer.add(actionsRenderer);
+
         add(headerRenderer, BorderLayout.WEST);
-        add(detailsRenderer, BorderLayout.EAST);
+        add(detailsContainer, BorderLayout.EAST);
     }
 }
