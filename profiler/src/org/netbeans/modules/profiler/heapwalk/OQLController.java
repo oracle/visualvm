@@ -38,18 +38,23 @@
  */
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.awt.Color;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Utils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -64,8 +69,10 @@ import org.openide.util.NbBundle;
 /**
  *
  * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public class OQLController extends AbstractTopLevelController implements NavigationHistoryManager.NavigationHistoryCapable {
+public class OQLController extends AbstractTopLevelController
+                implements NavigationHistoryManager.NavigationHistoryCapable {
     // -----
     // I18N String constants
 
@@ -73,81 +80,167 @@ public class OQLController extends AbstractTopLevelController implements Navigat
             "AnalysisController_CannotResolveClassMsg"); // NOI18N
     private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
             "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
+
     private HeapFragmentWalker heapFragmentWalker;
+
+    private ResultsController resultsController;
+    private QueryController queryController;
+    private SavedController savedController;
+
     final private AtomicBoolean analysisRunning = new AtomicBoolean(false);
     private OQLEngine engine = null;
 
+
+    // --- Constructor ---------------------------------------------------------
+
     public OQLController(HeapFragmentWalker heapFragmentWalker) {
         this.heapFragmentWalker = heapFragmentWalker;
+
         if (OQLEngine.isOQLSupported()) {
             engine = new OQLEngine(new Snapshot(heapFragmentWalker.getHeapFragment()));
+
+            resultsController = new ResultsController(this);
+            queryController = new QueryController(this);
+            savedController = new SavedController(this);
         }
     }
 
-    public boolean isAnalysisRunning() {
+
+    // --- Public interface ----------------------------------------------------
+
+    public void executeQuery(String query) {
+        executeQueryImpl(query);
+    }
+
+    public void cancelQuery() {
+        analysisRunning.compareAndSet(true, false);
+    }
+
+    public boolean isQueryRunning() {
         return analysisRunning.get();
     }
 
-    // --- NavigationHistoryManager.NavigationHistoryCapable implementation ------
-    public NavigationHistoryManager.Configuration getCurrentConfiguration() {
-        return new NavigationHistoryManager.Configuration();
-    }
 
-    // --- Public interface ------------------------------------------------------
+    // --- Internal interface --------------------------------------------------
+    
     public HeapFragmentWalker getHeapFragmentWalker() {
         return heapFragmentWalker;
     }
 
-    public void cancelAnalysis() {
-        analysisRunning.compareAndSet(true, false);
+    public ResultsController getResultsController() {
+        return resultsController;
+    }
+
+    public QueryController getQueryController() {
+        return queryController;
+    }
+
+    public SavedController getSavedController() {
+        return savedController;
+    }
+
+
+    // --- AbstractTopLevelController implementation ---------------------------
+
+    protected AbstractButton[] createClientPresenters() {
+        return new AbstractButton[] {
+            resultsController.getPresenter(),
+            queryController.getPresenter(),
+            savedController.getPresenter()
+        };
+    }
+
+    protected AbstractButton createControllerPresenter() {
+        return ((OQLControllerUI) getPanel()).getPresenter();
+    }
+
+    protected JPanel createControllerUI() {
+        return new OQLControllerUI(this);
+    }
+
+
+    // --- NavigationHistoryManager.NavigationHistoryCapable implementation ----
+
+    public NavigationHistoryManager.Configuration getCurrentConfiguration() {
+        return new NavigationHistoryManager.Configuration();
     }
 
     public void configure(NavigationHistoryManager.Configuration configuration) {
         heapFragmentWalker.switchToHistoryOQLView();
     }
 
-    public BoundedRangeModel executeQuery(final String oqlQuery) {
-        final OQLControllerUI ui = (OQLControllerUI) getPanel();
 
+    // --- Private implementation ----------------------------------------------
+
+    private void executeQueryImpl(final String oqlQuery) {
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
 
-        BrowserUtils.performTask(new Runnable() {
+        queryController.queryStarted(progressModel);
 
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                final StringBuilder sb = new StringBuilder();
+                BrowserUtils.performTask(new Runnable() {
+                    public void run() {
+                        final AtomicInteger counter = new AtomicInteger(100);
+                        progressModel.setMaximum(100);
 
-                try {
-                    analysisRunning.compareAndSet(false, true);
-                    engine.executeQuery(oqlQuery, new ObjectVisitor() {
+                        final StringBuilder sb = new StringBuilder();
+                        final boolean[] oddRow = new boolean[1];
+                        Color oddRowBackground = UIUtils.getDarker(
+                                        UIUtils.getProfilerResultsBackground());
+                        final String oddRowBackgroundString =
+                                "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                                         oddRowBackground.getGreen() + "," + //NOI18N
+                                         oddRowBackground.getBlue() + ")"; //NOI18N
 
-                        public boolean visit(Object o) {
-                            sb.append("<div>");
-                            dump(o, sb);
-                            sb.append("</div>");
-                            int value = progressModel.getValue() + 1;
-                            if (value > progressModel.getMaximum()) {
-                                value = progressModel.getMinimum() + 1;
+                        sb.append("<table border='0' width='100%'>"); // NOI18N
+
+                        try {
+                            analysisRunning.compareAndSet(false, true);
+                            engine.executeQuery(oqlQuery, new ObjectVisitor() {
+
+                                public boolean visit(Object o) {
+                                    sb.append(oddRow[0] ?
+                                        "<tr><td style='background-color: " + // NOI18N
+                                        oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+                                    oddRow[0] = !oddRow[0];
+                                    dump(o, sb);
+                                    sb.append("</td></tr>"); // NOI18N
+                                    int value = progressModel.getValue() + 1;
+                                    if (value > progressModel.getMaximum()) {
+                                        value = progressModel.getMinimum() + 1;
+                                    }
+                                    progressModel.setValue(value);
+                                    return counter.decrementAndGet() == 0 || !analysisRunning.get(); // process all hits while the analysis is running
+                                }
+                            });
+
+                            if (counter.get() == 0) {
+                                sb.append("<tr><td><h4>Too many results. Please, refine your query.</h4></td></tr>" );
                             }
-                            progressModel.setValue(value);
-                            return !analysisRunning.get(); // process all hits while the analysis is running
+                            sb.append("</table>"); // NOI18N
+
+                            analysisRunning.compareAndSet(true, false);
+                            queryController.queryFinished();
+                            resultsController.setResult(sb.toString());
+                        } catch (OQLException oQLException) {
+                            StringBuilder errorMessage = new StringBuilder();
+                            errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
+                            errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
+                            resultsController.setResult(errorMessage.toString());
+                            queryController.queryFinished();
+                            cancelQuery();
                         }
-                    });
-                    analysisRunning.compareAndSet(true, false);
-                    ui.setResult(sb.toString());
-                } catch (OQLException oQLException) {
-                    StringBuilder errorMessage = new StringBuilder();
-                    errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>");
-                    errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK"));
-                    ui.setResult(errorMessage.toString());
-                    cancelAnalysis();
-                }
+                    }
+                });
             }
         });
-
-        return progressModel;
     }
 
     private void dump(Object o, StringBuilder sb) {
+        if (o == null) {
+            return;
+        }
         if (o instanceof Instance) {
             Instance i = (Instance) o;
             sb.append(printInstance(i));
@@ -158,31 +251,31 @@ public class OQLController extends AbstractTopLevelController implements Navigat
             ReferenceChain rc = (ReferenceChain) o;
             sb.append("<h4>Reference Chain</h4>");
             while (rc != null) {
-                sb.append(printInstance(rc.getObj())).append("&gt;");
+                sb.append(printInstance(rc.getObj())).append("&gt;"); // NOI18N
                 rc = rc.getNext();
             }
             sb.delete(sb.length() - 5, sb.length());
         } else if (o instanceof Map) {
             Set<Map.Entry> entries = ((Map)o).entrySet();
-            sb.append("<span>{");
+            sb.append("<span>{"); // NOI18N
             for(Map.Entry entry : entries) {
                 dump(entry.getKey(), sb);
-                sb.append(" = ");
+                sb.append(" = "); // NOI18N
                 dump(entry.getValue(), sb);
-                sb.append(", ");
+                sb.append(", "); // NOI18N
             }
             sb.delete(sb.length() - 2, sb.length());
-            sb.append("}</span>");
+            sb.append("}</span>"); // NOI18N
         } else {
             sb.append(o.toString());
         }
     }
 
-    public OQLEngine getEngine() {
+    private OQLEngine getEngine() {
         return engine;
     }
 
-    public void showURL(URL url) {
+    private void showURL(URL url) {
         String urls = url.toString();
 
         if (urls.startsWith("file://instance/")) { // NOI18N
@@ -236,22 +329,9 @@ public class OQLController extends AbstractTopLevelController implements Navigat
         }
     }
 
-    protected AbstractButton[] createClientPresenters() {
-        return new AbstractButton[0];
-    }
-
-    protected AbstractButton createControllerPresenter() {
-        return ((OQLControllerUI) getPanel()).getPresenter();
-    }
-
-    // --- Protected implementation ----------------------------------------------
-    protected JPanel createControllerUI() {
-        return new OQLControllerUI(this);
-    }
-
-    public static String printClass(JavaClass cls) {
-        if (cls == null) { // NOI18N
-            return NbBundle.getMessage(Utils.class, "LBL_UnknownClass");
+    private static String printClass(JavaClass cls) {
+        if (cls == null) {
+            return NbBundle.getMessage(Utils.class, "LBL_UnknownClass"); // NOI18N
         }
 
         String clsName = cls.getName();
@@ -259,16 +339,16 @@ public class OQLController extends AbstractTopLevelController implements Navigat
         String field = ""; // NOI18N
 
         // now you can wrap it with a/href to given class
-        int dotIdx = clsName.lastIndexOf('.');
-        int colonIdx = clsName.lastIndexOf(':');
+        int dotIdx = clsName.lastIndexOf('.'); // NOI18N
+        int colonIdx = clsName.lastIndexOf(':'); // NOI18N
 
         if (colonIdx == -1) {
-            colonIdx = clsName.lastIndexOf(';');
+            colonIdx = clsName.lastIndexOf(';'); // NOI18N
         }
 
         if (colonIdx > 0) {
             fullName = clsName.substring(0, colonIdx);
-            field = "." + clsName.substring(colonIdx + 1);
+            field = "." + clsName.substring(colonIdx + 1); // NOI18N
         }
 
         String dispName = clsName.substring(dotIdx + 1);
@@ -276,11 +356,191 @@ public class OQLController extends AbstractTopLevelController implements Navigat
         return "<a href='file://class/" + cls.getJavaClassId() + "'>" + fullName + "</a>" + field; // NOI18N
     }
 
-    public static String printInstance(Instance in) {
+    private static String printInstance(Instance in) {
         String className = in.getJavaClass().getName();
 
         return "<a href='file://instance/" + className + "@" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
 //        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
 //        return in.getJavaClass().getName() + '@' + Long.toHexString(in.getInstanceId()) + '#' + in.getInstanceNumber();
     }
+
+
+    // --- Controllers ---------------------------------------------------------
+
+    public static class ResultsController extends AbstractController {
+
+        private OQLController oqlController;
+
+
+        public ResultsController(OQLController oqlController) {
+            this.oqlController = oqlController;
+        }
+
+        public void setResult(String result) {
+            ((OQLControllerUI.ResultsUI)getPanel()).setResult(result);
+        }
+
+        public void showURL(URL url) {
+            oqlController.showURL(url);
+        }
+
+        public OQLController getOQLController() {
+            return oqlController;
+        }
+
+        protected AbstractButton createControllerPresenter() {
+            return ((OQLControllerUI.ResultsUI)getPanel()).getPresenter();
+        }
+
+        protected JPanel createControllerUI() {
+            return new OQLControllerUI.ResultsUI(this);
+        }
+
+    }
+
+    
+    public static class QueryController extends AbstractController {
+
+        private OQLController oqlController;
+
+
+        public QueryController(OQLController oqlController) {
+            this.oqlController = oqlController;
+        }
+
+
+        public OQLController getOQLController() {
+            return oqlController;
+        }
+
+        public void setQuery(String query) {
+            ((OQLControllerUI.QueryUI)getPanel()).setQuery(query);
+        }
+
+        
+        private void queryStarted(BoundedRangeModel model) {
+            ((OQLControllerUI.QueryUI)getPanel()).queryStarted(model);
+        }
+
+        private void queryFinished() {
+            ((OQLControllerUI.QueryUI)getPanel()).queryFinished();
+        }
+
+        
+        protected AbstractButton createControllerPresenter() {
+            return ((OQLControllerUI.QueryUI)getPanel()).getPresenter();
+        }
+
+        protected JPanel createControllerUI() {
+            return new OQLControllerUI.QueryUI(this, oqlController.getEngine());
+        }
+
+    }
+
+
+    public static class SavedController extends AbstractController {
+
+        private OQLController oqlController;
+
+
+        public SavedController(OQLController oqlController) {
+            this.oqlController = oqlController;
+        }
+
+
+        public OQLController getOQLController() {
+            return oqlController;
+        }
+
+        public void saveQuery(String query) {
+            ((OQLControllerUI.SavedUI)getPanel()).saveQuery(query);
+        }
+
+
+        public static void loadData(DefaultListModel model) {
+            // TBD
+        }
+
+        public static void saveData(DefaultListModel model) {
+            // TBD
+        }
+        
+
+        protected AbstractButton createControllerPresenter() {
+            return ((OQLControllerUI.SavedUI)getPanel()).getPresenter();
+        }
+
+        protected JPanel createControllerUI() {
+            JPanel ui = new OQLControllerUI.SavedUI(this);
+            return ui;
+        }
+
+    }
+
+
+    // --- Query container -----------------------------------------------------
+
+    public static final class Query {
+
+        private String query;
+        private String name;
+        private String description;
+
+        public Query(String query) {
+            this(query, null);
+        }
+
+        public Query(String query, String name) {
+            this(query, name, null);
+        }
+
+        public Query(String query, String name, String description) {
+            setQuery(query);
+            setName(name);
+            setDescription(description);
+        }
+
+        public void setQuery(String query) {
+            if (query == null)
+                throw new IllegalArgumentException("Query cannot be null"); // NOI18N
+            this.query = query;
+        }
+        
+        public String getQuery() {
+            return query;
+        }
+
+        public void setName(String name) {
+            this.name = normalizeString(name);
+            if (this.name == null)
+                throw new IllegalArgumentException("Name cannot be null"); // NOI18N
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setDescription(String description) {
+            this.description = normalizeString(description);
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String toString() {
+            return name;
+        }
+
+        private static String normalizeString(String string) {
+            String normalizedString = null;
+            if (string != null) {
+                normalizedString = string.trim();
+                if (normalizedString.length() == 0) normalizedString = null;
+            }
+            return normalizedString;
+        }
+
+    }
+
 }

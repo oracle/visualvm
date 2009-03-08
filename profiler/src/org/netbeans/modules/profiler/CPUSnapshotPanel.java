@@ -43,6 +43,7 @@ package org.netbeans.modules.profiler;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.CCTNode;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
@@ -60,7 +61,6 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.actions.FindAction;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -89,7 +89,7 @@ import javax.swing.event.ChangeListener;
  */
 public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListener, ChangeListener,
                                                                      SnapshotResultsWindow.FindPerformer,
-                                                                     SaveViewAction.ViewProvider {
+                                                                     SaveViewAction.ViewProvider, ExportAction.ExportProvider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private final class CPUActionsHandler extends CPUResUserActionsHandler.Adapter {
@@ -466,7 +466,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 
         toolBar.add(saveAction = new SaveSnapshotAction(loadedSnapshot));
-        toolBar.add(new ExportSnapshotAction(loadedSnapshot));
+        toolBar.add(new ExportAction(this, loadedSnapshot));
         toolBar.add(saveViewAction = new SaveViewAction(this));
 
         toolBar.addSeparator();
@@ -720,7 +720,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     // --- Save Current View action support --------------------------------------
     public boolean hasView() {
-        return ((tabs.getSelectedComponent() != null) && tabs.getSelectedComponent() instanceof ScreenshotProvider);
+        return ((tabs.getSelectedComponent() != null) && (tabs.getSelectedComponent() instanceof ScreenshotProvider) && (tabs.getSelectedComponent()!=infoPanel));
     }
 
     // TODO use polymorphism instead of "if-else" dispatchig; curreant approach doesn't scale well
@@ -1109,5 +1109,27 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         flatPanel.prepareResults();
         combinedCCT.prepareResults();
         combinedFlat.prepareResults();
+    }
+
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
+            cctPanel.exportData(exportedFileType,eDD,false);
+        } else if (tabs.getSelectedComponent() instanceof SnapshotFlatProfilePanel) { // Hot Spots
+            flatPanel.exportData(exportedFileType,eDD,false);
+        } else if (tabs.getSelectedComponent() instanceof SubtreeCallGraphPanel) { //Subtree
+            subtreeView.exportData(exportedFileType,eDD);
+        } else if (tabs.getSelectedComponent() instanceof ReverseCallGraphPanel) { //Back Trace
+            backtraceView.exportData(exportedFileType,eDD);
+        } else if (tabs.getSelectedComponent()==combined) { // Combined
+            combined.exportData(exportedFileType,eDD);
+        }
+    }
+
+    public boolean hasLoadedSnapshot() {
+        return true;
+    }
+
+    public boolean hasExportableView() {
+        return ((tabs.getSelectedComponent() != null) && (tabs.getSelectedComponent()!=infoPanel));
     }
 }

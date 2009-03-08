@@ -41,6 +41,7 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.UIConstants;
@@ -75,6 +76,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNodeBacked;
 
 
 /**
@@ -144,6 +146,93 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         cornerButton = createHeaderPopupCornerButton(cornerPopup);
 
         setDefaultSorting();
+    }
+
+    public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine) {
+        switch (exportedFileType) {
+            case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
+                    ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportCSVData(",",exportedFileType, eDD);
+                    if (!combine) {
+                        eDD.close();
+                    }
+                    break;
+            case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
+                    ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportCSVData(";", exportedFileType, eDD);
+                    if (!combine) {
+                        eDD.close();
+                    }
+                    break;
+            case 3: eDD.dumpData(getXMLHeader(combine));
+                    ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportXMLData(eDD, "  ");
+                    if (!combine) {
+                        eDD.dumpDataAndClose(getXMLFooter(combine));
+                    } else {
+                        eDD.dumpData(getXMLFooter(combine));
+                    }
+                    break;
+            case 4: eDD.dumpData(getHTMLHeader(combine));
+                    ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportHTMLData(eDD, 0);
+                    if (!combine) {
+                        eDD.dumpDataAndClose(getHTMLFooter(combine));
+                    } else {
+                        eDD.dumpData(getHTMLFooter(combine));
+                    }
+
+                    break;
+        }
+    }
+
+    private StringBuffer getCSVHeader(String separator) {
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < (columnCount); i++) {
+            result.append(quote+columnNames[i]+quote+separator);
+        }
+        result.append(newLine);
+        return result;
+    }
+
+    private StringBuffer getHTMLHeader(boolean combine) {
+        StringBuffer result;
+        if (combine) {
+            result=new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+((CombinedPanel)getParent()).getDefaultViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        } else {
+            result= new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getDefaultViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        }
+        result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[1]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th></tr>"); //NOI18N
+        return result;
+    }
+
+    private StringBuffer getHTMLFooter(boolean combine) {
+        if (combine) {
+            return new StringBuffer("</TABLE>"); //NOI18N
+        } else {
+            return new StringBuffer("</TABLE></BODY></HTML>"); //NOI18N
+        }
+    }
+
+    private StringBuffer getXMLHeader(boolean combine) {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result;
+        if (combine) {
+            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+((CombinedPanel)getParent()).getDefaultViewName()+"\" type=\"combined\">"+newline+"<tree>"+newline); // NOI18N
+        } else {
+            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+getDefaultViewName()+"\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
+        }
+        return result;
+    }
+
+    private StringBuffer getXMLFooter(boolean combine) {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result;
+        if (!combine) {
+            result = new StringBuffer("</tree>"+newline+"</ExportedView>"); // NOI18N
+        } else {
+            result = new StringBuffer("</tree>"+newline+newline); // NOI18N
+        }
+        
+        return result;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
