@@ -81,8 +81,8 @@ public class PrimitiveArrayNode extends ArrayNode {
             String name = "[" + itemIndex + "]"; // NOI18N
 
             if (isLoop()) {
-                return name + " "
-                       + MessageFormat.format(LOOP_TO_STRING, new Object[] { BrowserUtils.getFullNodeName(getLoopTo()) }); // NOI18N
+                return name + " " // NOI18N
+                       + MessageFormat.format(LOOP_TO_STRING, new Object[] { BrowserUtils.getFullNodeName(getLoopTo()) });
             }
 
             return name;
