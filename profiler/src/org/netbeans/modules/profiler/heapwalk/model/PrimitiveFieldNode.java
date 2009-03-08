@@ -40,9 +40,10 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import org.netbeans.lib.profiler.heap.FieldValue;
 
 
 /**
@@ -145,5 +146,13 @@ public class PrimitiveFieldNode extends AbstractHeapWalkerNode implements HeapWa
 
     protected String computeValue() {
         return fieldValue.getValue();
+    }
+
+    protected String computeSize() {
+        return "-"; // NOI18N
+    }
+
+    protected String computeRetainedSize() {
+        return "-"; // NOI18N
     }
 }

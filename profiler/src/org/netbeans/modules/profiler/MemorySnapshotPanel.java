@@ -42,6 +42,7 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
@@ -56,7 +57,6 @@ import org.netbeans.modules.profiler.ui.FindDialog;
 import org.openide.actions.FindAction;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -80,7 +80,7 @@ import org.netbeans.modules.profiler.ui.Utils;
  * @author Ian Formanek
  */
 public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener, SnapshotResultsWindow.FindPerformer,
-                                                                  SaveViewAction.ViewProvider {
+                                                                  SaveViewAction.ViewProvider, ExportAction.ExportProvider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class SnapshotActionsHandler implements MemoryResUserActionsHandler {
@@ -122,9 +122,9 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemorySnapshotPanel.class,
                                                                            "MemorySnapshotPanel_FindActionTooltip"); // NOI18N
                                                                                                                      // -----
-    private static final ImageIcon MEMORY_RESULTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memoryResultsTab.png", false);
-    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false);
-    private static final ImageIcon STACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/stackTracesTab.png", false);
+    private static final ImageIcon MEMORY_RESULTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memoryResultsTab.png", false); //NOI18N
+    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false); //NOI18N
+    private static final ImageIcon STACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/stackTracesTab.png", false); //NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -197,7 +197,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 
         toolBar.add(saveAction = new SaveSnapshotAction(ls));
-        toolBar.add(new ExportSnapshotAction(ls));
+        toolBar.add(new ExportAction(this,ls));
         toolBar.add(new SaveViewAction(this));
 
         toolBar.addSeparator();
@@ -319,10 +319,8 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             return true;
         } else if (tabs.getSelectedComponent() == reversePanel) {
             return reversePanel.hasView();
-        } else if (tabs.getSelectedComponent() == infoPanel) {
-            return true;
         }
-
+        
         return false;
     }
 
@@ -476,5 +474,28 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         findActionPresenter.setEnabled(findEnabled);
         findPreviousPresenter.setEnabled(findEnabled);
         findNextPresenter.setEnabled(findEnabled);
+    }
+
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        if (tabs.getSelectedComponent() == memoryPanel) {
+            if (memoryPanel instanceof SnapshotAllocResultsPanel) {
+                ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD);
+            }
+        } else if (tabs.getSelectedComponent() == reversePanel) {
+            reversePanel.exportData(exportedFileType, eDD);
+        }
+    }
+
+    public boolean hasLoadedSnapshot() {
+        return !(snapshot==null);
+    }
+
+    public boolean hasExportableView() {
+        if (tabs.getSelectedComponent() == memoryPanel) {
+            return true;
+        } else if (tabs.getSelectedComponent() == reversePanel) {
+            return reversePanel.hasView();
+        }
+        return false;
     }
 }

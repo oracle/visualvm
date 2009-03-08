@@ -40,11 +40,21 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import org.openide.util.NbBundle;
 import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
+import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.lib.profiler.heap.GCRoot;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.netbeans.lib.profiler.heap.Value;
 
 
 /**
@@ -90,6 +100,14 @@ public class HeapWalkerNodeFactory {
 
                 protected String computeValue() {
                     return MessageFormat.format(ARRAY_CONTAINER_VALUE_STRING, new Object[] { (endIndex - startIndex + 1) });
+                }
+
+                protected String computeSize() {
+                    return "-"; // NOI18N
+                }
+
+                protected String computeRetainedSize() {
+                    return "-"; // NOI18N
                 }
 
                 protected Icon computeIcon() {
@@ -177,6 +195,14 @@ public class HeapWalkerNodeFactory {
                     return NONE_STRING;
                 }
 
+                protected String computeSize() {
+                    return "-"; // NOI18N
+                }
+
+                protected String computeRetainedSize() {
+                    return "-"; // NOI18N
+                }
+
                 protected Icon computeIcon() {
                     return null;
                 }
@@ -199,6 +225,14 @@ public class HeapWalkerNodeFactory {
 
                 protected String computeValue() {
                     return NONE_STRING;
+                }
+                
+                protected String computeSize() {
+                    return "-"; // NOI18N
+                }
+
+                protected String computeRetainedSize() {
+                    return "-"; // NOI18N
                 }
 
                 protected Icon computeIcon() {
@@ -224,6 +258,14 @@ public class HeapWalkerNodeFactory {
                 protected String computeValue() {
                     return NONE_STRING;
                 }
+                
+                protected String computeSize() {
+                    return "-"; // NOI18N
+                }
+
+                protected String computeRetainedSize() {
+                    return "-"; // NOI18N
+                }
 
                 protected Icon computeIcon() {
                     return null;
@@ -242,12 +284,20 @@ public class HeapWalkerNodeFactory {
                 }
 
                 protected String computeType() {
-                    return "";
-                } // NOI18N
+                    return ""; // NOI18N
+                }
 
                 protected String computeValue() {
-                    return "";
-                } // NOI18N
+                    return ""; // NOI18N
+                }
+                
+                protected String computeSize() {
+                    return ""; // NOI18N
+                }
+
+                protected String computeRetainedSize() {
+                    return ""; // NOI18N
+                }
 
                 protected Icon computeIcon() {
                     return org.netbeans.modules.profiler.ui.Utils.ERROR_ICON;
@@ -280,12 +330,20 @@ public class HeapWalkerNodeFactory {
                 }
 
                 protected String computeType() {
-                    return "";
-                } // NOI18N
+                    return ""; // NOI18N
+                }
 
                 protected String computeValue() {
-                    return "";
-                } // NOI18N
+                    return ""; // NOI18N
+                }
+
+                protected String computeSize() {
+                    return ""; // NOI18N
+                }
+
+                protected String computeRetainedSize() {
+                    return ""; // NOI18N
+                }
 
                 protected Icon computeIcon() {
                     return BrowserUtils.ICON_PROGRESS;
@@ -320,11 +378,11 @@ public class HeapWalkerNodeFactory {
                 public GCRoot getGCRoot(Instance inst) {
                     return heap.getGCRoot(inst);
                 }
-                ;
+
                 public JavaClass getJavaClassByID(long javaclassId) {
                     return heap.getJavaClassByID(javaclassId);
                 }
-                ;
+
             };
     }
 
