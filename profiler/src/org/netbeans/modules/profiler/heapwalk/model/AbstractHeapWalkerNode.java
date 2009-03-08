@@ -56,6 +56,8 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
     private String name;
     private String type;
     private String value;
+    private String size;
+    private String retainedSize;
     private HeapWalkerNode[] children;
     private int mode = HeapWalkerNode.MODE_FIELDS;
 
@@ -155,6 +157,22 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
         return value;
     }
 
+    public String getSize() {
+        if (size == null) {
+            size = computeSize();
+        }
+
+        return size;
+    }
+
+    public String getRetainedSize() {
+        if (retainedSize == null) {
+            retainedSize = computeRetainedSize();
+        }
+
+        return retainedSize;
+    }
+
     // used for testing children for null without lazy-populating invocation
     // note that if false, it means that chilren are not yet computed OR this node is leaf!
     public boolean currentlyHasChildren() {
@@ -172,6 +190,10 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
     protected abstract String computeType();
 
     protected abstract String computeValue();
+
+    protected abstract String computeSize();
+
+    protected abstract String computeRetainedSize();
 
     // Used for explicit setting children, shouldn't be used!
     protected void setChildren(HeapWalkerNode[] children) {
