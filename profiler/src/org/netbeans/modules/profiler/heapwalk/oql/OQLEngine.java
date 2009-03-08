@@ -23,6 +23,7 @@ import java.util.*;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
+import org.openide.util.Exceptions;
 
 /**
  * This is Object Query Language Interpreter
@@ -35,9 +36,19 @@ public class OQLEngine {
     static {
         try {
             // Do we have javax.script support?
-            Class.forName("javax.script.ScriptEngineManager");
-            oqlSupported = true;
-        } catch (ClassNotFoundException cnfe) {
+            Class managerClass = Class.forName("javax.script.ScriptEngineManager");
+            Object manager = managerClass.newInstance();
+            
+            // check that we have JavaScript engine
+            Method getEngineMethod = managerClass.getMethod("getEngineByName",
+                    new Class[]{String.class});
+            Object engine =  getEngineMethod.invoke(manager, new Object[]{"JavaScript"});
+
+            oqlSupported = engine != null;
+        } catch (Exception ex) {
+            if (!(ex instanceof ClassNotFoundException)) {
+                Exceptions.printStackTrace(ex);
+            }
             oqlSupported = false;
         }
     }
@@ -250,16 +261,20 @@ public class OQLEngine {
         if (jsObject instanceof Iterator) {
             Iterator iter = (Iterator) jsObject;
             while (iter.hasNext()) {
-                if (visitor.visit(unwrapJavaObject(iter.next()))) return true;
+                if (dispatchValue(iter.next(), visitor)) return true;
+//                if (visitor.visit(unwrapJavaObject(iter.next()))) return true;
             }
             return false;
         } else if (jsObject instanceof Enumeration) {
             Enumeration enm = (Enumeration) jsObject;
             while (enm.hasMoreElements()) {
                 Object elem = enm.nextElement();
-                if (elem != null) {
-                    if (visitor.visit(unwrapJavaObject(elem))) return true;
-                }
+                if (dispatchValue(elem, visitor)) return true;
+//                if (elem != null) {
+//                    elem = unwrapJavaObject(elem);
+//
+//                    if (visitor.visit(unwrapJavaObject(elem))) return true;
+//                }
             }
             return false;
         } else {
@@ -267,9 +282,10 @@ public class OQLEngine {
             Object object = unwrapJavaObject(jsObject, true);
             if (object instanceof Object[]) {
                 for (Object obj1 : (Object[]) object) {
-                    if (visitor.visit(unwrapJavaObject(obj1))) {
-                        return true;
-                    }
+                    if (dispatchValue(obj1, visitor)) return true;
+//                    if (visitor.visit(unwrapJavaObject(obj1, true))) {
+//                        return true;
+//                    }
                 }
                 return false;
             }
@@ -301,11 +317,12 @@ public class OQLEngine {
     }
 
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
-        if (!object.getClass().getName().contains(".javascript.")) return object;
+        if (object == null) return null;
+        boolean isNativeJS = object.getClass().getName().contains(".javascript.");
 
         try {
             Object ret = invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[]{object}});
-            if ((ret == null || ret == object) && tryAssociativeArray) {
+            if (isNativeJS && (ret == null || ret == object) && tryAssociativeArray) {
                 ret = invokeMethod.invoke(engine, new Object[]{"unwrapMap", new Object[]{object}});
             }
             return ret;
@@ -333,7 +350,7 @@ public class OQLEngine {
             // create JavaScript engine
             Method getEngineMethod = managerClass.getMethod("getEngineByName",
                     new Class[]{String.class});
-            engine = getEngineMethod.invoke(manager, new Object[]{"js"});
+            engine = getEngineMethod.invoke(manager, new Object[]{"JavaScript"});
 
             // initialize engine with init file (hat.js)
             InputStream strm = getInitStream();

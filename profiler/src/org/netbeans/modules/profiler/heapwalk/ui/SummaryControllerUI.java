@@ -50,12 +50,13 @@ import org.netbeans.modules.profiler.heapwalk.SummaryController;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
+import java.io.StringWriter;
+import java.lang.Thread.State;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -72,9 +73,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.heap.GCRoot;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
+import org.netbeans.modules.profiler.utils.GoToSourceHelper;
+import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 
 /**
  *
@@ -101,6 +106,11 @@ public class SummaryControllerUI extends JPanel {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+
+    private static final String SHOW_SYSPROPS_URL = "file:/sysprops"; // NOI18N
+    private static final String SHOW_THREADS_URL = "file:/threads"; // NOI18N
+    private static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
+
 
     // -----
     // I18N String constants
@@ -143,6 +153,10 @@ public class SummaryControllerUI extends JPanel {
                                                                       "SummaryControllerUI_JvmItemString"); // NOI18N
     private static final String SHOW_SYSPROPS_LINK_STRING = NbBundle.getMessage(SummaryControllerUI.class,
                                                                                 "SummaryControllerUI_ShowSysPropsLinkString"); // NOI18N
+    private static final String THREADS_STRING = NbBundle.getMessage(SummaryControllerUI.class,
+                                                                               "SummaryControllerUI_ThreadsString"); // NOI18N
+    private static final String SHOW_THREADS_LINK_STRING = NbBundle.getMessage(SummaryControllerUI.class,
+                                                                                "SummaryControllerUI_ShowThreadsLinkString"); // NOI18N
                                                                                                                                // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -151,12 +165,14 @@ public class SummaryControllerUI extends JPanel {
     private HTMLTextArea dataArea;
 
     // --- UI definition ---------------------------------------------------------
-    private JSplitPane contentsSplit;
     private Properties systemProperties;
     private SummaryController summaryController;
 
     // --- Private implementation ------------------------------------------------
     private boolean systemPropertiesComputed = false;
+    private boolean showSysprops = false;
+    private boolean showThreads = false;
+    private String stackTrace;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +181,7 @@ public class SummaryControllerUI extends JPanel {
         this.summaryController = summaryController;
 
         initComponents();
-        createData(false);
+        refreshSummary();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -189,41 +205,41 @@ public class SummaryControllerUI extends JPanel {
     }
 
     private String computeEnvironment() {
-        Properties systemProperties = getSystemProperties();
+        Properties sysprops = getSystemProperties();
 
-        if (systemProperties == null) {
+        if (sysprops == null) {
             return NOT_AVAILABLE_MSG;
         }
 
-        String patchLevel = systemProperties.getProperty("sun.os.patch.level", "");
-        String os = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String patchLevel = sysprops.getProperty("sun.os.patch.level", ""); // NOI18N
+        String os = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                     + MessageFormat.format(OS_ITEM_STRING,
                                            new Object[] {
-                                               systemProperties.getProperty("os.name", NOT_AVAILABLE_MSG),
-                                               systemProperties.getProperty("os.version", ""),
-                                               ("unknown".equals(patchLevel) ? "" : patchLevel)
-                                           }); // NOI18N
+                                               sysprops.getProperty("os.name", NOT_AVAILABLE_MSG), // NOI18N
+                                               sysprops.getProperty("os.version", ""), // NOI18N
+                                               ("unknown".equals(patchLevel) ? "" : patchLevel) // NOI18N
+                                           });
 
-        String arch = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String arch = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                       + MessageFormat.format(ARCHITECTURE_ITEM_STRING,
                                              new Object[] {
-                                                 systemProperties.getProperty("os.arch", NOT_AVAILABLE_MSG),
-                                                 systemProperties.getProperty("sun.arch.data.model", "?") + "bit"
-                                             }); // NOI18N
+                                                 sysprops.getProperty("os.arch", NOT_AVAILABLE_MSG), // NOI18N
+                                                 sysprops.getProperty("sun.arch.data.model", "?") + "bit" // NOI18N
+                                             });
 
-        String jdk = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String jdk = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                      + MessageFormat.format(JAVA_HOME_ITEM_STRING,
-                                            new Object[] { systemProperties.getProperty("java.home", NOT_AVAILABLE_MSG) }); // NOI18N
+                                            new Object[] { sysprops.getProperty("java.home", NOT_AVAILABLE_MSG) }); // NOI18N
 
-        String jvm = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String jvm = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                      + MessageFormat.format(JVM_ITEM_STRING,
                                             new Object[] {
-                                                systemProperties.getProperty("java.vm.name", NOT_AVAILABLE_MSG),
-                                                systemProperties.getProperty("java.vm.version", ""),
-                                                systemProperties.getProperty("java.vm.info", "")
-                                            }); // NOI18N
+                                                sysprops.getProperty("java.vm.name", NOT_AVAILABLE_MSG), // NOI18N
+                                                sysprops.getProperty("java.vm.version", ""), // NOI18N
+                                                sysprops.getProperty("java.vm.info", "") // NOI18N
+                                            });
 
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/sysinfo.png'>&nbsp;&nbsp;"
+        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/sysinfo.png'>&nbsp;&nbsp;" // NOI18N
                + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + jvm; // NOI18N
     }
 
@@ -247,60 +263,60 @@ public class SummaryControllerUI extends JPanel {
         NumberFormat numberFormat = (NumberFormat)NumberFormat.getInstance().clone();
         numberFormat.setMaximumFractionDigits(1);
         
-        String filename = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String filename = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                           + MessageFormat.format(FILE_ITEM_STRING,
                                                  new Object[] {
                                                      file != null && file.exists() ? file.getAbsolutePath() : NOT_AVAILABLE_MSG
-                                                 }); // NOI18N
+                                                 });
 
-        String filesize = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String filesize = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                           + MessageFormat.format(FILE_SIZE_ITEM_STRING,
                                                  new Object[] {
                                                      file != null && file.exists() ? 
-                                                         numberFormat.format(file.length()/(1024 * 1024.0)) + " MB" :
+                                                         numberFormat.format(file.length()/(1024 * 1024.0)) + " MB" : // NOI18N
                                                          NOT_AVAILABLE_MSG
-                                                 }); // NOI18N
+                                                 });
 
-        String dateTaken = "&nbsp;&nbsp;&nbsp;&nbsp;"
-                           + MessageFormat.format(DATE_TAKEN_ITEM_STRING, new Object[] { new Date(hsummary.getTime()).toString() }); // NOI18N
+        String dateTaken = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                           + MessageFormat.format(DATE_TAKEN_ITEM_STRING, new Object[] { new Date(hsummary.getTime()).toString() });
 
-        String liveBytes = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String liveBytes = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                            + MessageFormat.format(TOTAL_BYTES_ITEM_STRING,
-                                                  new Object[] { numberFormat.format(hsummary.getTotalLiveBytes()) }); // NOI18N
+                                                  new Object[] { numberFormat.format(hsummary.getTotalLiveBytes()) });
 
-        String liveClasses = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String liveClasses = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                              + MessageFormat.format(TOTAL_CLASSES_ITEM_STRING,
-                                                    new Object[] { numberFormat.format(heap.getAllClasses().size()) }); // NOI18N
+                                                    new Object[] { numberFormat.format(heap.getAllClasses().size()) });
 
-        String liveInstances = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String liveInstances = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                                + MessageFormat.format(TOTAL_INSTANCES_ITEM_STRING,
                                                       new Object[] {
                                                           numberFormat.format(hsummary.getTotalLiveInstances())
-                                                      }); // NOI18N
+                                                      });
 
-        String classloaders = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String classloaders = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                               + MessageFormat.format(CLASSLOADERS_ITEM_STRING,
-                                                     new Object[] { numberFormat.format(nclassloaders) }); // NOI18N
+                                                     new Object[] { numberFormat.format(nclassloaders) });
 
-        String gcroots = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String gcroots = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                          + MessageFormat.format(GCROOTS_ITEM_STRING,
-                                                new Object[] { numberFormat.format(heap.getGCRoots().size()) }); // NOI18N
+                                                new Object[] { numberFormat.format(heap.getGCRoots().size()) });
 
-        String finalizersInfo = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        String finalizersInfo = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                          + MessageFormat.format(FINALIZERS_ITEM_STRING,
-                                                new Object[] { numberFormat.format(finalizers) }); // NOI18N
+                                                new Object[] { numberFormat.format(finalizers) });
 
-          return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;"
-               + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes
+          return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;" // NOI18N
+               + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes // NOI18N
                + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo; // NOI18N
     }
 
     private long computeFinalizers(Heap heap) {
-        JavaClass finalizerClass = heap.getJavaClassByName("java.lang.ref.Finalizer");
+        JavaClass finalizerClass = heap.getJavaClassByName("java.lang.ref.Finalizer"); // NOI18N
         if (finalizerClass != null) {
-            Instance queue = (Instance) finalizerClass.getValueOfStaticField("queue");
+            Instance queue = (Instance) finalizerClass.getValueOfStaticField("queue"); // NOI18N
             if (queue != null) {
-                Long len = (Long) queue.getValueOfField("queueLength");
+                Long len = (Long) queue.getValueOfField("queueLength"); // NOI18N
                 if (len != null) {
                     return len.longValue();
                 }
@@ -310,21 +326,97 @@ public class SummaryControllerUI extends JPanel {
     }
     
     private String computeSystemProperties(boolean showSystemProperties) {
-        Properties systemProperties = getSystemProperties();
+        Properties sysprops = getSystemProperties();
 
-        if (systemProperties == null) {
+        if (sysprops == null) {
             return NOT_AVAILABLE_MSG;
         }
 
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;"
-               + SYSTEM_PROPERTIES_STRING + "</b><br><hr>"
-               + (showSystemProperties ? formatSystemProperties(systemProperties)
-                                       : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='#'>" + SHOW_SYSPROPS_LINK_STRING + "</a><br>&nbsp;")); // NOI18N
+        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;" // NOI18N
+               + SYSTEM_PROPERTIES_STRING + "</b><br><hr>" // NOI18N
+               + (showSystemProperties ? formatSystemProperties(sysprops)
+                                       : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_SYSPROPS_URL + "'>" + SHOW_SYSPROPS_LINK_STRING + "</a>")); // NOI18N
+    }
+
+    private String computeThreads(boolean showThreads) {
+        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/threadsWindow.png'>&nbsp;&nbsp;" // NOI18N
+               + THREADS_STRING + "</b><br><hr>" // NOI18N
+               + (showThreads ? getStackTrace()
+                                       : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_THREADS_URL + "'>" + SHOW_THREADS_LINK_STRING + "</a><br>&nbsp;")); // NOI18N
         // NOTE: the above HTML string should be terminated by newline to workaround HTML rendering bug in JDK 5, see Issue 120157
     }
 
-    private void createData(final boolean showSystemProperties) {
-        if (!showSystemProperties) {
+    private synchronized String getStackTrace() {
+        if(stackTrace == null) {
+            StringWriter sw = new StringWriter();
+            Heap h = summaryController.getHeapFragmentWalker().getHeapFragment();
+            Collection<GCRoot> roots = h.getGCRoots();
+            // Use this to enable VisualVM color scheme for threads dumps:
+            // sw.append("<pre style='color: #cc3300;'>"); // NOI18N
+            sw.append("<pre>"); // NOI18N
+            for (GCRoot root : roots) {
+                if(root.getKind().equals(GCRoot.THREAD_OBJECT)) {
+                    ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
+                    Instance threadInstance = threadRoot.getInstance();
+                    if (threadInstance != null) {
+                        PrimitiveArrayInstance chars = (PrimitiveArrayInstance)threadInstance.getValueOfField("name");  // NOI18N
+                        List<String> charsList = chars.getValues();
+                        char charArr[] = new char[charsList.size()];
+                        int j = 0;
+                        for(String ch: charsList) {
+                            charArr[j++] = ch.charAt(0);
+                        }
+                        String threadName = new String(charArr);
+                        Boolean daemon = (Boolean)threadInstance.getValueOfField("daemon"); // NOI18N
+                        Integer priority = (Integer)threadInstance.getValueOfField("priority"); // NOI18N
+                        Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
+                        Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
+                        State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
+                        StackTraceElement stack[] = threadRoot.getStackTrace();
+                        // --- Use this to enable VisualVM color scheme for threads dumps: ---
+                        // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
+                        sw.append("&nbsp;&nbsp;<b>");   // NOI18N
+                        // -------------------------------------------------------------------
+                        sw.append("\""+threadName+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority+" tid="+threadId+" "+tState);    // NOI18N
+                        // --- Use this to enable VisualVM color scheme for threads dumps: ---
+                        // sw.append("</span><br>"); // NOI18N
+                        sw.append("</b><br>");   // NOI18N
+                        // -------------------------------------------------------------------
+                        if(stack != null) {
+                            for(int i = 0; i < stack.length; i++) {
+                                String stackElHref;
+                                StackTraceElement stackElement = stack[i];
+
+                                if (summaryController.getHeapFragmentWalker().getHeapDumpProject() != null) {
+                                    String className = stackElement.getClassName();
+                                    String method = stackElement.getMethodName();
+                                    int lineNo = stackElement.getLineNumber();
+                                    String stackUrl = OPEN_THREADS_URL+className+"|"+method+"|"+lineNo; // NOI18N
+
+                                    // --- Use this to enable VisualVM color scheme for threads dumps: ---
+                                    // stackElHref = "&nbsp;&nbsp;<a style=\"color: #CC3300;\" href=\""+stackUrl+"\">"+stackElement+"</a>"; // NOI18N
+                                    stackElHref = "<a href=\""+stackUrl+"\">"+stackElement+"</a>";    // NOI18N
+                                    // -------------------------------------------------------------------
+                                } else {
+                                    stackElHref = stackElement.toString();
+                                }
+                                sw.append("\tat "+stackElHref+"<br>");  // NOI18N
+                            }
+                        }
+                    } else {
+                        sw.append("&nbsp;&nbsp;Unknown thread"); // NOI18N
+                    }
+                    sw.append("<br>");  // NOI18N
+                }
+            }
+            sw.append("</pre>"); // NOI18N
+            stackTrace = sw.toString();
+        }
+        return stackTrace;
+    }
+
+    private void refreshSummary() {
+        if (!showSysprops) {
             dataArea.setText(IN_PROGRESS_MSG);
         }
 
@@ -332,10 +424,12 @@ public class SummaryControllerUI extends JPanel {
                 public void run() {
                     String summary = "<nobr>" + computeSummary() + "</nobr>"; // NOI18N
                     String environment = "<nobr>" + computeEnvironment() + "</nobr>"; // NOI18N
-                    String properties = "<nobr>" + computeSystemProperties(showSystemProperties) + "</nobr>"; // NOI18N
+                    String properties = "<nobr>" + computeSystemProperties(showSysprops) + "</nobr>"; // NOI18N
+                    String threads = "<nobr>" + computeThreads(showThreads) + "</nobr>"; // NOI18N
                     final String dataAreaText = summary + "<br><br>" // NOI18N
                                                 + environment + "<br><br>" // NOI18N
-                                                + properties;
+                                                + properties + "<br><br>" // NOI18N
+                                                + threads;
 
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -407,7 +501,22 @@ public class SummaryControllerUI extends JPanel {
         // dataArea
         dataArea = new HTMLTextArea() {
                 protected void showURL(URL url) {
-                    createData(true);
+                    if (url == null) return;
+                    String urls = url.toString();
+                    if (urls.equals(SHOW_SYSPROPS_URL)) {
+                        showSysprops = true;
+                    } else if (urls.equals(SHOW_THREADS_URL)) {
+                        showThreads = true;
+                    } else if (urls.startsWith(OPEN_THREADS_URL)) {
+                        urls = urls.substring(OPEN_THREADS_URL.length());
+                        String parts[] = urls.split("\\|"); // NOI18N
+                        String className = parts[0];
+                        String method = parts[1];
+                        int linenumber = Integer.parseInt(parts[2]);
+                        GoToSourceHelper.openSource(summaryController.getHeapFragmentWalker().getHeapDumpProject(),
+                                                    new JavaSourceLocation(className, method, linenumber));
+        }
+                    refreshSummary();
                 }
             };
 
