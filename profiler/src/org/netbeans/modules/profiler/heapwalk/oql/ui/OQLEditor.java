@@ -40,10 +40,25 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/oql/ui/OQLEditor.java.orig.70905313
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+||||||| /tmp/OQLEditor.java~base.fkQOvu
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.BorderFactory;
+=======
+import javax.swing.BorderFactory;
+>>>>>>> /tmp/OQLEditor.java~other.SPfNkT
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/oql/ui/OQLEditor.java.orig.70905313
+||||||| /tmp/OQLEditor.java~base.fkQOvu
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.modules.profiler.heapwalk.OQLController;
+=======
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+>>>>>>> /tmp/OQLEditor.java~other.SPfNkT
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
 import org.openide.util.Lookup;
@@ -52,10 +67,14 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 public class OQLEditor extends JPanel {
+<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/oql/ui/OQLEditor.java.orig.70905313
 
     public static final String VALIDITY_PROPERTY = "validity"; // NOI18N
+||||||| /tmp/OQLEditor.java~base.fkQOvu
+    public static final String VALIDITY_PROPERTY = "validity"; // NOI18N
+=======
+>>>>>>> /tmp/OQLEditor.java~other.SPfNkT
 
-    private boolean validityFlag = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
@@ -71,15 +90,24 @@ public class OQLEditor extends JPanel {
         if (impl != null) {
             queryEditor = impl.getEditorPane();
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
+<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/oql/ui/OQLEditor.java.orig.70905313
             queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY,
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
                         setValidScript((Boolean)evt.getNewValue());
                     }
                 });
+||||||| /tmp/OQLEditor.java~base.fkQOvu
+            queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY, new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    setValidScript((Boolean)evt.getNewValue());
+                }
+            });
+=======
+>>>>>>> /tmp/OQLEditor.java~other.SPfNkT
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
-            setValidScript(true);
         }
 
         queryEditor.setOpaque(isOpaque());
@@ -89,6 +117,7 @@ public class OQLEditor extends JPanel {
         add(queryEditor, BorderLayout.CENTER);
     }
 
+<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/oql/ui/OQLEditor.java.orig.70905313
     
     public boolean isValidScript() {
         return validityFlag;
@@ -98,9 +127,17 @@ public class OQLEditor extends JPanel {
         queryEditor.setText(script);
     }
 
+||||||| /tmp/OQLEditor.java~base.fkQOvu
+    public boolean isValidScript() {
+        return validityFlag;
+    }
+
+=======
+>>>>>>> /tmp/OQLEditor.java~other.SPfNkT
     public String getScript() {
         return queryEditor.getText();
     }
+<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/oql/ui/OQLEditor.java.orig.70905313
 
     private void setValidScript(boolean value) {
         boolean oldValue = validityFlag;
@@ -125,4 +162,13 @@ public class OQLEditor extends JPanel {
         queryEditor.requestFocus();
     }
 
+||||||| /tmp/OQLEditor.java~base.fkQOvu
+
+    private void setValidScript(boolean value) {
+        boolean oldValue = validityFlag;
+        validityFlag = value;
+        firePropertyChange(OQLEditor.VALIDITY_PROPERTY, oldValue, value);
+    }
+=======
+>>>>>>> /tmp/OQLEditor.java~other.SPfNkT
 }
