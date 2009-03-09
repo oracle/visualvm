@@ -46,7 +46,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -74,7 +73,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  * @author Jaroslav Bachorik
  */
-public class OQLControllerUI extends JPanel implements PropertyChangeListener {
+public class OQLControllerUI extends JPanel {
     // --- Presenter -------------------------------------------------------------
 
     private static class Presenter extends JToggleButton {
@@ -122,7 +121,6 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener {
         this.oqlController = controller;
 
         initComponents();
-        updatePerformButton();
     }
 
     // --- Public interface ------------------------------------------------------
@@ -151,7 +149,6 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener {
                 }
                 resultsContainer.add(resultDisplayer, BorderLayout.CENTER);
                 resultsContainer.invalidate();
-                updatePerformButton();
                 revalidate();
                 repaint();
             }
@@ -202,7 +199,6 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener {
         // settingsArea
         queryContainer = new OQLEditor(oqlController.getEngine());
 
-        queryContainer.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, this);
 //        new JPanel(new BorderLayout());
 //        HTMLTextArea queryHeaderArea = new HTMLTextArea();
 //
@@ -250,7 +246,6 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener {
         // performButton
         performButton = new JButton(PERFORM_BUTTON_TEXT);
         performButton.setMnemonic('R');
-        performButton.setEnabled(false);
         performButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -359,8 +354,6 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener {
     }
 
     private void performAnalysis() {
-        performButton.setEnabled(false);
-
         BoundedRangeModel progressModel = oqlController.executeQuery(getQuery());
         resultsContainer.removeAll();
 
@@ -406,20 +399,5 @@ public class OQLControllerUI extends JPanel implements PropertyChangeListener {
         resultsContainer.invalidate();
         revalidate();
         repaint();
-    }
-
-    private void updatePerformButton() {
-        if (oqlController.isAnalysisRunning()) {
-            performButton.setEnabled(false);
-        } else {
-            performButton.setEnabled(queryContainer.isValidScript());
-//            performButton.setEnabled(queryEditor.getText().length() > 0);
-        }
-    }
-
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(OQLEditor.VALIDITY_PROPERTY)) {
-            updatePerformButton();
-        }
     }
 }

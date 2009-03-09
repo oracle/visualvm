@@ -40,13 +40,10 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.heapwalk.OQLController;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
 import org.openide.util.Lookup;
@@ -55,9 +52,7 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 public class OQLEditor extends JPanel {
-    public static final String VALIDITY_PROPERTY = "validity"; // NOI18N
 
-    private boolean validityFlag = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
@@ -79,15 +74,8 @@ public class OQLEditor extends JPanel {
         if (impl != null) {
             queryEditor = impl.getEditorPane();
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
-            queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY, new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    setValidScript((Boolean)evt.getNewValue());
-                }
-            });
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
-            setValidScript(true);
         }
         
         queryEditor.setBackground(queryHeaderArea.getBackground());
@@ -99,17 +87,7 @@ public class OQLEditor extends JPanel {
         setOpaque(false);
     }
 
-    public boolean isValidScript() {
-        return validityFlag;
-    }
-
     public String getScript() {
         return queryEditor.getText();
-    }
-
-    private void setValidScript(boolean value) {
-        boolean oldValue = validityFlag;
-        validityFlag = value;
-        firePropertyChange(OQLEditor.VALIDITY_PROPERTY, oldValue, value);
     }
 }
