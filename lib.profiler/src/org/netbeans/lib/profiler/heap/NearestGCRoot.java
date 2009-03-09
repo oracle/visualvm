@@ -62,8 +62,13 @@ class NearestGCRoot {
     private HprofHeap heap;
     private LongBuffer readBuffer;
     private LongBuffer writeBuffer;
+    private LongBuffer leaves;
+    private LongBuffer multipleParents;
     private Set referenceClasses;
     private boolean gcRootsComputed;
+//private long leavesCount;
+//private long firstLevel;
+//private long multiParentsCount;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -116,6 +121,7 @@ class NearestGCRoot {
         }
 
         deleteBuffers();
+        heap.idToOffsetMap.flush();
         gcRootsComputed = true;
     }
 
@@ -125,24 +131,28 @@ class NearestGCRoot {
             Instance instance;
             List fieldValues;
             Iterator valuesIt;
-
+            boolean hasValues = false;
+            
             if (instanceId == 0L) { // end of level
-
                 break;
             }
-
             instance = heap.getInstanceByID(instanceId);
-
             if (instance instanceof ObjectArrayInstance) {
                 Iterator instanceIt = ((ObjectArrayInstance) instance).getValues().iterator();
 
                 while (instanceIt.hasNext()) {
                     Instance refInstance = (Instance) instanceIt.next();
                     writeConnection(instanceId, refInstance);
+                    if (refInstance != null) {
+                        hasValues = true;
+                    }
                 }
-
+                if (!hasValues) {
+                    writeLeaf(instanceId,instance.getSize());
+                }
                 continue;
             } else if (instance instanceof PrimitiveArrayInstance) {
+                writeLeaf(instanceId,instance.getSize());
                 continue;
             } else if (instance instanceof ClassDumpInstance) {
                 ClassDump javaClass = ((ClassDumpInstance) instance).classDump;
@@ -153,15 +163,11 @@ class NearestGCRoot {
             } else {
                 if (instance == null) {
                     System.err.println("HeapWalker Warning - null instance for " + instanceId); // NOI18N
-
                     continue;
                 }
-
                 throw new IllegalArgumentException("Illegal type " + instance.getClass()); // NOI18N
             }
-
             valuesIt = fieldValues.iterator();
-
             while (valuesIt.hasNext()) {
                 FieldValue val = (FieldValue) valuesIt.next();
 
@@ -170,9 +176,16 @@ class NearestGCRoot {
 
                         Instance refInstance = ((ObjectFieldValue) val).getInstance();
                         writeConnection(instanceId, refInstance);
+                        if (refInstance != null) {
+                            hasValues = true;
+                        }
                     }
                 }
             }
+            if (!hasValues) {
+                writeLeaf(instanceId,instance.getSize());
+            }
+
         }
     }
 
@@ -195,6 +208,8 @@ class NearestGCRoot {
     private void createBuffers() {
         readBuffer = new LongBuffer(BUFFER_SIZE);
         writeBuffer = new LongBuffer(BUFFER_SIZE);
+        leaves = new LongBuffer(BUFFER_SIZE);
+        multipleParents = new LongBuffer(BUFFER_SIZE);
     }
 
     private void deleteBuffers() {
@@ -234,14 +249,52 @@ class NearestGCRoot {
             long refInstanceId = refInstance.getInstanceId();
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
-            if (entry.getNearestGCRootPointer() == 0L) {
+            if (entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstanceId) == null) {
                 writeLong(refInstanceId);
                 entry.setNearestGCRootPointer(instanceId);
+                if (!entry.hasOnlyOneReference()) {
+                    multipleParents.writeLong(refInstanceId);
+//multiParentsCount++;
+                }
             }
         }
     }
 
     private void writeLong(long instanceId) throws IOException {
         writeBuffer.writeLong(instanceId);
+    }
+
+    private void writeLeaf(long instanceId, int size) throws IOException {
+        LongMap.Entry entry = heap.idToOffsetMap.get(instanceId);
+        
+        entry.setTreeObj();
+        entry.setRetainedSize(size);
+//leavesCount++;
+        if (entry.hasOnlyOneReference()) {
+            long gcRootPointer = entry.getNearestGCRootPointer();
+            if (gcRootPointer != 0) {
+                LongMap.Entry gcRootPointerEntry = heap.idToOffsetMap.get(gcRootPointer);
+                
+                if (gcRootPointerEntry.getRetainedSize() == 0) {
+                    gcRootPointerEntry.setRetainedSize(-1);
+                    leaves.writeLong(gcRootPointer);
+//firstLevel++;
+                }
+            }
+        }
+    }
+
+    LongBuffer getLeaves() {
+        computeGCRoots();
+//System.out.println("Multi par.  "+multiParentsCount);
+//System.out.println("Leaves      "+leavesCount);
+//System.out.println("Tree obj.   "+heap.idToOffsetMap.treeObj);
+//System.out.println("First level "+firstLevel);
+        return leaves;
+    }
+    
+    LongBuffer getMultipleParents() {
+        computeGCRoots();
+        return multipleParents;
     }
 }

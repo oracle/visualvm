@@ -122,19 +122,27 @@ public class FieldsBrowserController extends AbstractController {
         protected String computeName() {
             return NO_INSTANCE_SELECTED_STRING;
         }
-        ;
+
         protected String computeType() {
             return NONE_STRING;
         }
-        ;
+
         protected String computeValue() {
             return NONE_STRING;
         }
-        ;
+
+        protected String computeSize() {
+            return ""; // NOI18N
+        }
+
+        protected String computeRetainedSize() {
+            return ""; // NOI18N
+        }
+
         protected Icon computeIcon() {
             return null;
         }
-        ;
+
         public boolean isLeaf() {
             return true;
         }
@@ -144,19 +152,27 @@ public class FieldsBrowserController extends AbstractController {
         protected String computeName() {
             return NO_CLASS_SELECTED_STRING;
         }
-        ;
+
         protected String computeType() {
             return NONE_STRING;
         }
-        ;
+
         protected String computeValue() {
             return NONE_STRING;
         }
-        ;
+        
+        protected String computeSize() {
+            return ""; // NOI18N
+        }
+        
+        protected String computeRetainedSize() {
+            return ""; // NOI18N
+        }
+
         protected Icon computeIcon() {
             return null;
         }
-        ;
+
         public boolean isLeaf() {
             return true;
         }
@@ -180,6 +196,10 @@ public class FieldsBrowserController extends AbstractController {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     // --- Internal interface ----------------------------------------------------
+    public Handler getInstancesControllerHandler() {
+        return instancesControllerHandler;
+    }
+
     public HeapWalkerNode getFilteredSortedFields(String filterValue, int sortingColumn, boolean sortingOrder) {
         if (rootMode == ROOT_INSTANCE) {
             if (instance == null) {

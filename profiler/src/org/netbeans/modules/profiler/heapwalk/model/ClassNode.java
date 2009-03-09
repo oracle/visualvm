@@ -40,10 +40,12 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import org.openide.util.NbBundle;
 import java.util.List;
 import javax.swing.ImageIcon;
+import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.lib.profiler.heap.JavaClass;
 
 
 /**
@@ -146,5 +148,13 @@ public class ClassNode extends AbstractHeapWalkerNode {
 
     protected String computeValue() {
         return NONE_STRING;
+    }
+
+    protected String computeSize() {
+        return "-"; // NOI18N
+    }
+
+    protected String computeRetainedSize() {
+        return "-"; // NOI18N
     }
 }

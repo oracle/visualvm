@@ -42,11 +42,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.heapwalk.OQLController;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
 import org.openide.util.Lookup;
@@ -55,52 +52,50 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 public class OQLEditor extends JPanel {
+
     public static final String VALIDITY_PROPERTY = "validity"; // NOI18N
 
     private boolean validityFlag = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
+
     public OQLEditor(OQLEngine engine) {
-        super(new BorderLayout());
         this.engine = engine;
         init();
     }
 
+    
     private void init() {
-        HTMLTextArea queryHeaderArea = new HTMLTextArea();
-
-        queryHeaderArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;" + "OQL Query:" + "</b><br><hr>"); // NOI18N
-
-        add(queryHeaderArea, BorderLayout.NORTH);
-
-        queryEditor = null;
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
             queryEditor = impl.getEditorPane();
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
-            queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY, new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    setValidScript((Boolean)evt.getNewValue());
-                }
-            });
+            queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY,
+                new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        setValidScript((Boolean)evt.getNewValue());
+                    }
+                });
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
             setValidScript(true);
         }
-        
-        queryEditor.setBackground(queryHeaderArea.getBackground());
-        queryEditor.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
 
+        queryEditor.setOpaque(isOpaque());
+        queryEditor.setBackground(getBackground());
+
+        setLayout(new BorderLayout());
         add(queryEditor, BorderLayout.CENTER);
-        
-        setBackground(queryHeaderArea.getBackground());
-        setOpaque(false);
     }
 
+    
     public boolean isValidScript() {
         return validityFlag;
+    }
+
+    public void setScript(String script) {
+        queryEditor.setText(script);
     }
 
     public String getScript() {
@@ -112,4 +107,22 @@ public class OQLEditor extends JPanel {
         validityFlag = value;
         firePropertyChange(OQLEditor.VALIDITY_PROPERTY, oldValue, value);
     }
+
+
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        if (queryEditor != null)
+            queryEditor.setBackground(bg);
+    }
+
+    public void setOpaque(boolean isOpaque) {
+        super.setOpaque(isOpaque);
+        if (queryEditor != null)
+            queryEditor.setOpaque(isOpaque);
+    }
+
+    public void requestFocus() {
+        queryEditor.requestFocus();
+    }
+
 }
