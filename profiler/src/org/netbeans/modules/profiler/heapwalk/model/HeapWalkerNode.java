@@ -82,6 +82,10 @@ public interface HeapWalkerNode extends CCTNode {
 
     public String getValue();
 
+    public String getSize();
+
+    public String getRetainedSize();
+
     // used for testing children for null without lazy-populating invocation
     // note that if false, it means that chilren are not yet computed OR this node is leaf!
     public boolean currentlyHasChildren();
