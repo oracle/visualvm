@@ -47,18 +47,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/ui/OQLControllerUI.java.orig.1890222852
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-||||||| /tmp/OQLControllerUI.java~base.vYoIX3
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-=======
-import java.awt.event.ActionListener;
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import javax.swing.AbstractAction;
@@ -104,15 +97,9 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Jaroslav Bachorik
  */
-<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/ui/OQLControllerUI.java.orig.1890222852
 public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
 
-||||||| /tmp/OQLControllerUI.java~base.vYoIX3
-public class OQLControllerUI extends JPanel implements PropertyChangeListener {
-=======
-public class OQLControllerUI extends JPanel {
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
     // --- Presenter -------------------------------------------------------------
 
     private static class Presenter extends JToggleButton implements HelpCtx.Provider {
@@ -128,7 +115,7 @@ public class OQLControllerUI extends JPanel {
             setToolTipText(CONTROLLER_DESCR);
             setIcon(ICON_INFO);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
-            
+
             addKeyListener(new KeyAdapter() {
                 public void keyTyped(final KeyEvent e) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -203,10 +190,6 @@ public class OQLControllerUI extends JPanel {
     public OQLControllerUI(OQLController controller) {
         this.oqlController = controller;
         initComponents();
-<<<<<<< /tmp/OQLControllerUI.java~base.vYoIX3
-        updatePerformButton();
-=======
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
     }
 
     // --- Public interface ------------------------------------------------------
@@ -250,42 +233,9 @@ public class OQLControllerUI extends JPanel {
 
         BasicSplitPaneDivider divider = ((BasicSplitPaneUI) splitPane.getUI()).getDivider();
 
-<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/ui/OQLControllerUI.java.orig.1890222852
         if (divider != null) {
             divider.setBorder(null);
         }
-||||||| /tmp/OQLControllerUI.java~base.vYoIX3
-                    protected void showURL(URL url) {
-                        oqlController.showURL(url);
-                    }
-                };
-                try {
-                    resultDisplayer.setCaretPosition(0);
-                } catch (Exception e) {
-                }
-                resultsContainer.add(resultDisplayer, BorderLayout.CENTER);
-                resultsContainer.invalidate();
-                updatePerformButton();
-                revalidate();
-                repaint();
-            }
-        });
-=======
-                    protected void showURL(URL url) {
-                        oqlController.showURL(url);
-                    }
-                };
-                try {
-                    resultDisplayer.setCaretPosition(0);
-                } catch (Exception e) {
-                }
-                resultsContainer.add(resultDisplayer, BorderLayout.CENTER);
-                resultsContainer.invalidate();
-                revalidate();
-                repaint();
-            }
-        });
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
     }
 
 
@@ -342,12 +292,11 @@ public class OQLControllerUI extends JPanel {
 
     }
 
-    public static class QueryUI extends JTitledPanel implements PropertyChangeListener {
+    public static class QueryUI extends JTitledPanel {
 
         private OQLController.QueryController queryController;
         private OQLEditor editor;
-        private boolean queryValid;
-        
+
         private JButton runButton;
         private JButton saveButton;
         private JButton cancelButton;
@@ -367,7 +316,6 @@ public class OQLControllerUI extends JPanel {
             this.queryController = queryController;
 
             initComponents(engine);
-            queryValid = editor.isValidScript();
             updateButtons();
         }
 
@@ -418,150 +366,12 @@ public class OQLControllerUI extends JPanel {
             editor.requestFocus();
         }
 
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(OQLEditor.VALIDITY_PROPERTY)) {
-                queryValid = ((Boolean)evt.getNewValue());
-                updateButtons();
-            }
-        }
-
-<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/ui/OQLControllerUI.java.orig.1890222852
-||||||| /tmp/OQLControllerUI.java~base.vYoIX3
-        separator.setBackground(getBackground());
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        add(separator, constraints);
-
-        // settingsArea
-        queryContainer = new OQLEditor(oqlController.getEngine());
-
-        queryContainer.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, this);
-//        new JPanel(new BorderLayout());
-//        HTMLTextArea queryHeaderArea = new HTMLTextArea();
-//
-//        queryHeaderArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
-//                             + "OQL Query:" + "</b><br><hr>"); // NOI18N
-//
-//        queryContainer.add(queryHeaderArea, BorderLayout.NORTH);
-//
-//        queryEditor = new JEditorPane("text/x-oql", "");
-//
-//        queryEditor.setBackground(queryHeaderArea.getBackground());
-//        queryEditor.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
-//        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
-//
-//            public void insertUpdate(DocumentEvent e) {
-//                updatePerformButton();
-//            }
-//
-//            public void removeUpdate(DocumentEvent e) {
-//                updatePerformButton();
-//            }
-//
-//            public void changedUpdate(DocumentEvent e) {
-//                //
-//            }
-//        });
-//
-//        JComponent jc = Utilities.getEditorUI(queryEditor).getExtComponent();
-//
-//        queryContainer.add(jc, BorderLayout.CENTER); //NOI18N
-//
-//        queryContainer.setBackground(queryHeaderArea.getBackground());
-
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(5, 5, 0, 5);
-        add(queryContainer, constraints);
-
-        // performButton
-        performButton = new JButton(PERFORM_BUTTON_TEXT);
-        performButton.setMnemonic('R');
-        performButton.setEnabled(false);
-        performButton.addActionListener(new ActionListener() {
-=======
-        separator.setBackground(getBackground());
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        add(separator, constraints);
-
-        // settingsArea
-        queryContainer = new OQLEditor(oqlController.getEngine());
-
-//        new JPanel(new BorderLayout());
-//        HTMLTextArea queryHeaderArea = new HTMLTextArea();
-//
-//        queryHeaderArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
-//                             + "OQL Query:" + "</b><br><hr>"); // NOI18N
-//
-//        queryContainer.add(queryHeaderArea, BorderLayout.NORTH);
-//
-//        queryEditor = new JEditorPane("text/x-oql", "");
-//
-//        queryEditor.setBackground(queryHeaderArea.getBackground());
-//        queryEditor.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
-//        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
-//
-//            public void insertUpdate(DocumentEvent e) {
-//                updatePerformButton();
-//            }
-//
-//            public void removeUpdate(DocumentEvent e) {
-//                updatePerformButton();
-//            }
-//
-//            public void changedUpdate(DocumentEvent e) {
-//                //
-//            }
-//        });
-//
-//        JComponent jc = Utilities.getEditorUI(queryEditor).getExtComponent();
-//
-//        queryContainer.add(jc, BorderLayout.CENTER); //NOI18N
-//
-//        queryContainer.setBackground(queryHeaderArea.getBackground());
-
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(5, 5, 0, 5);
-        add(queryContainer, constraints);
-
-        // performButton
-        performButton = new JButton(PERFORM_BUTTON_TEXT);
-        performButton.setMnemonic('R');
-        performButton.addActionListener(new ActionListener() {
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
-
         private void updateButtons() {
             if (queryController.getOQLController().isQueryRunning()) {
                 runButton.setEnabled(false);
             } else {
-                runButton.setEnabled(queryValid);
+                runButton.setEnabled(true);
             }
-            saveButton.setEnabled(queryValid);
         }
 
         private void executeQuery() {
@@ -595,7 +405,6 @@ public class OQLControllerUI extends JPanel {
         private void initComponents(OQLEngine engine) {
             editor = new OQLEditor(engine);
             editor.setBackground(UIUtils.getProfilerResultsBackground());
-            editor.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, this);
 
             JScrollPane editorScroll = new JScrollPane(editor,
                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -616,14 +425,14 @@ public class OQLControllerUI extends JPanel {
             };
             Mnemonics.setLocalizedText(saveButton, SAVE_BUTTON_TEXT);
             saveButton.getAccessibleContext().setAccessibleDescription(SAVE_BUTTON_ACCESS_DESCR);
-            
+
             controlPanel = new JPanel(new BorderLayout(5, 5));
             controlPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
                                         UIUtils.getProfilerResultsBackground()));
             controlPanel.setOpaque(false);
             controlPanel.add(saveButton, BorderLayout.WEST);
             controlPanel.add(runButton, BorderLayout.EAST);
-            
+
             progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
             progressLabel = new JLabel();
             progressLabel.setLabelFor(progressBar);
@@ -666,7 +475,7 @@ public class OQLControllerUI extends JPanel {
 
             setLayout(new BorderLayout());
             add(contentsPanel, BorderLayout.CENTER);
-            
+
             getInputMap(QueryUI.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CANCEL_ACTION"); // NOI18N
             getActionMap().put("CANCEL_ACTION", new AbstractAction() {// NOI18N
@@ -682,7 +491,6 @@ public class OQLControllerUI extends JPanel {
 
     public static class SavedUI extends JTitledPanel {
 
-<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/ui/OQLControllerUI.java.orig.1890222852
         private OQLController.SavedController savedController;
 
         private JList savedList;
@@ -712,7 +520,7 @@ public class OQLControllerUI extends JPanel {
 
             initComponents();
             refreshQueries();
-            
+
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     OQLController.SavedController.loadData(listModel);
@@ -725,17 +533,6 @@ public class OQLControllerUI extends JPanel {
                 }
             });
         }
-||||||| /tmp/OQLControllerUI.java~base.vYoIX3
-    private void performAnalysis() {
-        performButton.setEnabled(false);
-
-        BoundedRangeModel progressModel = oqlController.executeQuery(getQuery());
-        resultsContainer.removeAll();
-=======
-    private void performAnalysis() {
-        BoundedRangeModel progressModel = oqlController.executeQuery(getQuery());
-        resultsContainer.removeAll();
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
 
 
         public void saveQuery(final String query) {
@@ -794,7 +591,6 @@ public class OQLControllerUI extends JPanel {
                     }
                 });
             }
-<<<<<<< /home/hanz/Hanz/Dev/trunk/profiler/src/org/netbeans/modules/profiler/heapwalk/ui/OQLControllerUI.java.orig.1890222852
         }
 
 
@@ -858,14 +654,14 @@ public class OQLControllerUI extends JPanel {
                     refreshDescription();
                 }
             });
-            
+
             savedListScroll = new JScrollPane(savedList,
                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             savedListScroll.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
                                             UIUtils.getProfilerResultsBackground()));
             savedListScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-            
+
             loadingMsgPanel = new JPanel(new BorderLayout());
             loadingMsgPanel.setOpaque(false);
             JLabel loadingMsgLabel = new JLabel(LOADING_QUERIES_MSG, JLabel.CENTER);
@@ -877,7 +673,7 @@ public class OQLControllerUI extends JPanel {
             JLabel noQueriesMsgLabel = new JLabel(NO_SAVED_QUERIES_MSG, JLabel.CENTER);
             noQueriesMsgLabel.setEnabled(false);
             noQueriesMsgPanel.add(noQueriesMsgLabel, BorderLayout.CENTER);
-            
+
             openButton = new JButton() {
                  protected void fireActionPerformed(ActionEvent e) { openQuery(); }
             };
@@ -968,50 +764,4 @@ public class OQLControllerUI extends JPanel {
 
     }
 
-||||||| /tmp/OQLControllerUI.java~base.vYoIX3
-        });
-        constraints = new GridBagConstraints();
-        constraints.gridx = 2;
-        constraints.gridy = 0;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.insets = new Insets(0, 0, 0, 8);
-        progressContainer.add(cancelAnalysis, constraints);
-
-        resultsContainer.add(progressContainer, BorderLayout.NORTH);
-        resultsContainer.invalidate();
-        revalidate();
-        repaint();
-    }
-
-    private void updatePerformButton() {
-        if (oqlController.isAnalysisRunning()) {
-            performButton.setEnabled(false);
-        } else {
-            performButton.setEnabled(queryContainer.isValidScript());
-//            performButton.setEnabled(queryEditor.getText().length() > 0);
-        }
-    }
-
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(OQLEditor.VALIDITY_PROPERTY)) {
-            updatePerformButton();
-        }
-    }
-=======
-        });
-        constraints = new GridBagConstraints();
-        constraints.gridx = 2;
-        constraints.gridy = 0;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.insets = new Insets(0, 0, 0, 8);
-        progressContainer.add(cancelAnalysis, constraints);
-
-        resultsContainer.add(progressContainer, BorderLayout.NORTH);
-        resultsContainer.invalidate();
-        revalidate();
-        repaint();
-    }
->>>>>>> /tmp/OQLControllerUI.java~other.iKS9Lz
 }
