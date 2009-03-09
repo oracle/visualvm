@@ -41,6 +41,7 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.results.CCTNode;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 
 
 /**
@@ -182,6 +183,80 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
     public void sortChildren(int sortBy, boolean sortOrder) {
         if (children != null) {
             doSortChildren(sortBy, sortOrder);
+        }
+    }
+
+    public void exportXMLData(ExportDataDumper eDD,String indent) {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer(indent+"<node>"+newline); //NOI18N
+        result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"</Name>"+newline); //NOI18N
+        result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PrestimeCPUCCTNodeFree)getParent()).getNodeName()))+"</Parent>"+newline); //NOI18N
+        result.append(indent+" <Time_Relative>"+getTotalTime0InPerCent()+"</Time_Relative>"+newline); //NOI18N
+        result.append(indent+" <Time>"+getTotalTime0()+"</Time>"+newline); //NOI18N
+        result.append(indent+" <Invocations>"+getNCalls()+"</Invocations>"+newline); //NOI18N
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < getNChildren(); i++) {
+                ((PrestimeCPUCCTNodeFree)children[i]).exportXMLData(eDD, indent+"  "); //NOI18N
+            }
+        }
+        result=new StringBuffer(indent+"</node>"); //NOI18N
+        eDD.dumpData(result);
+    }
+
+    public void exportHTMLData(ExportDataDumper eDD, int depth) {
+        StringBuffer result = new StringBuffer("<tr><td>."); //NOI18N
+        for (int i=0; i<depth; i++) {
+            result.append("."); //NOI18N
+        }
+        result.append(replaceHTMLCharacters(getNodeName())+"</td><td>"+getTotalTime0InPerCent()+"</td><td>"+getTotalTime0()+"</td><td>"+getNCalls()+"</td></tr>"); //NOI18N
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < getNChildren(); i++) {
+                ((PrestimeCPUCCTNodeFree)children[i]).exportHTMLData(eDD, depth+1);
+            }
+        }
+    }
+
+    private String replaceHTMLCharacters(String s) {
+        StringBuffer sb = new StringBuffer();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+          char c = s.charAt(i);
+          switch (c) {
+              case '<': sb.append("&lt;"); break; // NOI18N
+              case '>': sb.append("&gt;"); break; // NOI18N
+              case '&': sb.append("&amp;"); break; // NOI18N
+              case '"': sb.append("&quot;"); break; // NOI18N
+              default: sb.append(c); break;
+          }
+        }
+        return sb.toString();
+    }
+
+    public void exportCSVData(String separator, int depth, ExportDataDumper eDD) {
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        String indent = " "; // NOI18N
+
+        // this node
+        result.append(quote);
+        for (int i=0; i<depth; i++) {
+            result.append(indent); // to simulate the tree structure in CSV
+        }
+        result.append(getNodeName() + quote + separator);
+        result.append(quote+getTotalTime0InPerCent()+quote+separator);
+        result.append(quote+getTotalTime0()+quote+separator);
+        result.append(quote+getNCalls()+quote+newLine);
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < getNChildren(); i++) {
+                ((PrestimeCPUCCTNodeFree)children[i]).exportCSVData(separator, depth+1, eDD);
+            }
         }
     }
 }

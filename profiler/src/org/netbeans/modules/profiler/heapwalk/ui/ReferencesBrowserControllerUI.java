@@ -40,7 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import org.netbeans.lib.profiler.heap.*;
+
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -59,7 +59,6 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.InstanceNode;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Font;
@@ -91,9 +90,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -200,6 +204,10 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                     return fieldNode.getType();
                 case 3:
                     return fieldNode.getValue();
+                case 4:
+                    return fieldNode.getSize();
+                case 5:
+                    return fieldNode.getRetainedSize();
                 default:
                     return null;
             }
@@ -226,36 +234,44 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                                                                              "ReferencesBrowserControllerUI_GoToSourceItemText"); // NOI18N
     private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                                "ReferencesBrowserControllerUI_ShowHideColumnsString"); // NOI18N
-    private static final String FIELD_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String FIELD_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                         "ReferencesBrowserControllerUI_FieldColumnName"); // NOI18N
-    private static final String FIELD_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String FIELD_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                          "ReferencesBrowserControllerUI_FieldColumnDescr"); // NOI18N
-    private static final String TYPE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String TYPE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                        "ReferencesBrowserControllerUI_TypeColumnName"); // NOI18N
-    private static final String TYPE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String TYPE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                         "ReferencesBrowserControllerUI_TypeColumnDescr"); // NOI18N
-    private static final String FULL_TYPE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String FULL_TYPE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                             "ReferencesBrowserControllerUI_FullTypeColumnName"); // NOI18N
-    private static final String FULL_TYPE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String FULL_TYPE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                              "ReferencesBrowserControllerUI_FullTypeColumnDescr"); // NOI18N
-    private static final String VALUE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String VALUE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                         "ReferencesBrowserControllerUI_ValueColumnName"); // NOI18N
-    private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
+    private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                          "ReferencesBrowserControllerUI_ValueColumnDescr"); // NOI18N
-                                                                                                                            // -----
+    private static final String SIZE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
+                                                                       "ReferencesBrowserControllerUI_SizeColumnName"); // NOI18N
+    private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
+                                                                        "ReferencesBrowserControllerUI_SizeColumnDescr"); // NOI18N
+    private static final String RETAINED_SIZE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
+                                                                                "ReferencesBrowserControllerUI_RetainedSizeColumnName"); // NOI18N
+    private static final String RETAINED_SIZE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
+                                                                                 "ReferencesBrowserControllerUI_RetainedSizeColumnDescr"); // NOI18N
+    // -----
     private static ImageIcon ICON_FIELDS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/incomingRef.png", false); // NOI18N
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
     private static final String NO_DATA = "No data"; // NOI18N
-    private static final int columnCount = 4;
+    private int columnCount;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CardLayout contents;
     private FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
-    private FieldsListTreeTableModel realFieldsListTableModel = new FieldsListTreeTableModel();
-    private ExtendedTreeTableModel fieldsListTableModel = new ExtendedTreeTableModel(realFieldsListTableModel);
+    private FieldsListTreeTableModel realFieldsListTableModel;
+    private ExtendedTreeTableModel fieldsListTableModel;
 //    private JMenuItem showClassItem;
     private JMenuItem showGcRootItem;
     private JMenuItem showInstanceItem;
@@ -277,6 +293,9 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private boolean sortingOrder = true;
     private int sortingColumn = 0;
 
+    private boolean retainedSizeSupported;
+
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     // --- Constructors ----------------------------------------------------------
@@ -284,6 +303,14 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         super(VIEW_TITLE_REFERENCES, ICON_FIELDS, true);
 
         this.referencesBrowserController = referencesBrowserController;
+
+        retainedSizeSupported = referencesBrowserController.getReferencesControllerHandler().
+                                getHeapFragmentWalker().getRetainedSizesStatus() !=
+                                HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED;
+        columnCount = retainedSizeSupported ? 6 : 5;
+
+        realFieldsListTableModel = new FieldsListTreeTableModel();
+        fieldsListTableModel = new ExtendedTreeTableModel(realFieldsListTableModel);
 
         addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
@@ -296,6 +323,27 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         initColumnsData();
         initData();
         initComponents();
+
+        referencesBrowserController.getReferencesControllerHandler().
+            getHeapFragmentWalker().addStateListener(
+                new HeapFragmentWalker.StateListener() {
+                    public void stateChanged(StateEvent e) {
+                        if (e.getRetainedSizesStatus() == HeapFragmentWalker.
+                            RETAINED_SIZES_COMPUTED && e.isMasterChange()) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        fieldsListTableModel.
+                                                setRealColumnVisibility(5, true);
+                                        fieldsListTable.createDefaultColumnsFromModel();
+                                        fieldsListTable.updateTreeTableHeader();
+                                        setColumnsData();
+                                    }
+                                });
+                        }
+                    }
+                }
+            );
+
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -376,16 +424,43 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         }
     }
 
-    private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
+    private void addMenuItemListener(final JCheckBoxMenuItem menuItem) {
+        final boolean[] internalChange = new boolean[1];
         menuItem.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int column = Integer.parseInt(e.getActionCommand());
-                    fieldsListTableModel.setRealColumnVisibility(column, !fieldsListTableModel.isRealColumnVisible(column));
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (internalChange[0]) return;
+                final int column = Integer.parseInt(e.getActionCommand());
+                if (column == 5 && !fieldsListTableModel.isRealColumnVisible(column)) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            final int retainedSizesState = referencesBrowserController.getReferencesControllerHandler().
+                                    getHeapFragmentWalker().computeRetainedSizes(false);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
+                                        internalChange[0] = true;
+                                        menuItem.setSelected(!menuItem.isSelected());
+                                        internalChange[0] = false;
+                                    } else {
+                                        fieldsListTableModel.setRealColumnVisibility(column,
+                                                !fieldsListTableModel.isRealColumnVisible(column));
+                                        fieldsListTable.createDefaultColumnsFromModel();
+                                        fieldsListTable.updateTreeTableHeader();
+                                        setColumnsData();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    fieldsListTableModel.setRealColumnVisibility(column,
+                            !fieldsListTableModel.isRealColumnVisible(column));
                     fieldsListTable.createDefaultColumnsFromModel();
                     fieldsListTable.updateTreeTableHeader();
                     setColumnsData();
                 }
-            });
+            }
+        });
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
@@ -546,6 +621,14 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         columnNames[3] = VALUE_COLUMN_NAME;
         columnToolTips[3] = VALUE_COLUMN_DESCR;
 
+        columnNames[4] = SIZE_COLUMN_NAME;
+        columnToolTips[4] = SIZE_COLUMN_DESCR;
+
+        if (retainedSizeSupported) {
+            columnNames[5] = RETAINED_SIZE_COLUMN_NAME;
+            columnToolTips[5] = RETAINED_SIZE_COLUMN_DESCR;
+        }
+
         int unitWidth = getFontMetrics(getFont()).charWidth('W'); // NOI18N // initial width of data columns
 
         FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
@@ -566,6 +649,14 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         columnWidths[3 - 1] = unitWidth * 14;
         columnRenderers[3] = dataCellRenderer;
+
+        columnWidths[4 - 1] = unitWidth * 7;
+        columnRenderers[4] = dataCellRenderer;
+
+        if (retainedSizeSupported) {
+            columnWidths[5 - 1] = unitWidth * 7;
+            columnRenderers[5] = dataCellRenderer;
+        }
     }
 
     private void initComponents() {
@@ -574,6 +665,12 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         treeCellRenderer.setOpenIcon(null);
 
         fieldsListTableModel.setRealColumnVisibility(2, false);
+        fieldsListTableModel.setRealColumnVisibility(4, false);
+
+        if (retainedSizeSupported)
+            fieldsListTableModel.setRealColumnVisibility(5, referencesBrowserController.
+                getReferencesControllerHandler().getHeapFragmentWalker().getRetainedSizesStatus()
+                                          == HeapFragmentWalker.RETAINED_SIZES_COMPUTED);
 
         fieldsListTable = new JTreeTable(fieldsListTableModel) {
                 public void doLayout() {
@@ -596,7 +693,6 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
                     super.doLayout();
                 }
-                ;
             };
         fieldsListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fieldsListTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
@@ -609,12 +705,12 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         fieldsListTable.getColumnModel().getColumn(0).setMinWidth(150);
         fieldsListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
-        fieldsListTable.getActionMap().put("DEFAULT_ACTION",
+        fieldsListTable.getActionMap().put("DEFAULT_ACTION", // NOI18N
                                            new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     performDefaultAction();
                 }
-            }); // NOI18N
+            });
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(fieldsListTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
@@ -645,8 +741,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         String hintText = MessageFormat.format(NO_INSTANCE_SELECTED_MSG,
                                                new Object[] {
-                                                   "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png'>"
-                                               }); // NOI18N
+                                                   "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png'>" // NOI18N
+                                               });
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 

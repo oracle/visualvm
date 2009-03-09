@@ -86,7 +86,7 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public boolean isGCRoot() {
-        return dumpClass.getHprof().getGCRoot(this) != null;
+        return getHprof().getGCRoot(this) != null;
     }
 
     public long getInstanceId() {
@@ -94,7 +94,7 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public int getInstanceNumber() {
-        return dumpClass.getHprof().idToOffsetMap.get(getInstanceId()).getIndex();
+        return getHprof().idToOffsetMap.get(getInstanceId()).getIndex();
     }
 
     public JavaClass getJavaClass() {
@@ -102,7 +102,7 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public Instance getNearestGCRootPointer() {
-        return dumpClass.getHprof().nearestGCRoot.getNearestGCRootPointer(this);
+        return getHprof().nearestGCRoot.getNearestGCRootPointer(this);
     }
 
     public int getReachableSize() {
@@ -110,11 +110,11 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public List getReferences() {
-        return dumpClass.getHprof().findReferencesFor(getInstanceId());
+        return getHprof().findReferencesFor(getInstanceId());
     }
 
     public int getRetainedSize() {
-        return 0;
+        return getHprof().getRetainedSize(this);
     }
 
     public int getSize() {
@@ -152,5 +152,9 @@ class InstanceDump extends HprofObject implements Instance {
         int idSize = dumpClass.getHprofBuffer().getIDSize();
 
         return 1 + idSize + 4 + idSize + 4;
+    }
+    
+    private HprofHeap getHprof() {
+        return dumpClass.getHprof();
     }
 }

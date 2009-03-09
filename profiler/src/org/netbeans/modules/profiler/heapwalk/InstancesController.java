@@ -92,6 +92,8 @@ public class InstancesController extends AbstractTopLevelController implements F
         instancesListController = new InstancesListController(this);
         fieldsBrowserController = new FieldsBrowserController(this, FieldsBrowserController.ROOT_INSTANCE);
         referencesBrowserController = new ReferencesBrowserController(this);
+
+        classPresenter.setHeapFragmentWalker(heapFragmentWalker);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
