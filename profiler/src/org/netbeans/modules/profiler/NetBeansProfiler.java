@@ -1892,13 +1892,7 @@ public final class NetBeansProfiler extends Profiler {
     private void loadGlobalFilters() {
         try {
             FileObject folder = IDEUtils.getSettingsFolder(false);
-            FileObject servicesFolder = null;
-
-            String servicesDir = IDEUtils.getServicesDir();
-
-            if (servicesDir != null) { // can be null when the Profiler is "installed" using Reload
-                servicesFolder = FileUtil.toFileObject(FileUtil.normalizeFile(new File(servicesDir)));
-            }
+            FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config");
 
             // 1. Deal with global filters
             FileObject filtersFO = null;
@@ -1907,11 +1901,11 @@ public final class NetBeansProfiler extends Profiler {
                 filtersFO = folder.getFileObject(GLOBAL_FILTERS_FILENAME, "xml"); //NOI18N
             }
 
-            if ((filtersFO == null) && (servicesFolder != null) && servicesFolder.isValid()) {
+            if ((filtersFO == null) && (configFolder != null) && configFolder.isValid()) {
                 Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
 
                 while (suffixesIterator.hasNext() && (filtersFO == null)) {
-                    filtersFO = servicesFolder.getFileObject(GLOBAL_FILTERS_FILENAME + DEFAULT_FILE_SUFFIX
+                    filtersFO = configFolder.getFileObject(GLOBAL_FILTERS_FILENAME + DEFAULT_FILE_SUFFIX
                                                              + suffixesIterator.next(), "xml"); //NOI18N // find and use localized bundled filters definition
                 }
             }
@@ -1933,11 +1927,11 @@ public final class NetBeansProfiler extends Profiler {
                 filterSetsFO = folder.getFileObject(DEFINED_FILTERSETS_FILENAME, "xml"); //NOI18N
             }
 
-            if ((filterSetsFO == null) && (servicesFolder != null) && servicesFolder.isValid()) {
+            if ((filterSetsFO == null) && (configFolder != null) && configFolder.isValid()) {
                 Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
 
                 while (suffixesIterator.hasNext() && (filterSetsFO == null)) {
-                    filterSetsFO = servicesFolder.getFileObject(DEFINED_FILTERSETS_FILENAME + DEFAULT_FILE_SUFFIX
+                    filterSetsFO = configFolder.getFileObject(DEFINED_FILTERSETS_FILENAME + DEFAULT_FILE_SUFFIX
                                                                 + suffixesIterator.next(), "xml"); //NOI18N // find and use localized bundled filtersets definition
                 }
             }

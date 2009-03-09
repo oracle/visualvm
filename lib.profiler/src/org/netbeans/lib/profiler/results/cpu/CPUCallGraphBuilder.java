@@ -69,7 +69,6 @@ import java.util.logging.Level;
  * @author Misha Dmitriev
  * @author Jaroslav Bachorik
  */
-@org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener.class)})
 public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProfilingResultListener, CPUCCTProvider {
 
     private class DebugInfoCollector extends RuntimeCPUCCTNodeVisitorAdaptor {

@@ -49,7 +49,6 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -109,29 +108,29 @@ class SaveViewAction extends AbstractAction {
 
     // -----
     // I18N String constants
-    private static final String SAVE_VIEW_ACTION_NAME = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_VIEW_ACTION_NAME = NbBundle.getMessage(SaveViewAction.class,
                                                                             "SaveViewAction_SaveViewActionName"); //NOI18N
-    private static final String SAVE_VIEW_ACTION_DESCR = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_VIEW_ACTION_DESCR = NbBundle.getMessage(SaveViewAction.class,
                                                                              "SaveViewAction_SaveViewActionDescr"); //NOI18N
-    private static final String NO_VIEW_MSG = NbBundle.getMessage(ExportSnapshotAction.class, "SaveViewAction_NoViewMsg"); //NOI18N
-    private static final String SAVING_VIEW_MSG = NbBundle.getMessage(ExportSnapshotAction.class, "SaveViewAction_SavingViewMsg"); //NOI18N
-    private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String NO_VIEW_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_NoViewMsg"); //NOI18N
+    private static final String SAVING_VIEW_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_SavingViewMsg"); //NOI18N
+    private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(SaveViewAction.class,
                                                                              "SaveViewAction_OverwriteFileCaption"); //NOI18N
-    private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(SaveViewAction.class,
                                                                          "SaveViewAction_OverwriteFileMsg"); //NOI18N
-    private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(SaveViewAction.class,
                                                                                 "SaveViewAction_CannotOverwriteFileMsg"); //NOI18N
-    private static final String SAVE_DIALOG_TITLE = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_DIALOG_TITLE = NbBundle.getMessage(SaveViewAction.class,
                                                                         "SaveViewAction_SaveDialogTitle"); //NOI18N
-    private static final String SAVE_DIALOG_BUTTON = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_DIALOG_BUTTON = NbBundle.getMessage(SaveViewAction.class,
                                                                          "SaveViewAction_SaveDialogButton"); //NOI18N
-    private static final String SAVE_DIALOG_FILTER = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_DIALOG_FILTER = NbBundle.getMessage(SaveViewAction.class,
                                                                          "SaveViewAction_SaveDialogFilter"); //NOI18N
-    private static final String SAVE_DIALOG_PREVIEW = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_DIALOG_PREVIEW = NbBundle.getMessage(SaveViewAction.class,
                                                                           "SaveViewAction_SaveDialogPreview"); //NOI18N
-    private static final String SAVE_DIALOG_VISIBLE = NbBundle.getMessage(ExportSnapshotAction.class,
+    private static final String SAVE_DIALOG_VISIBLE = NbBundle.getMessage(SaveViewAction.class,
                                                                           "SaveViewAction_SaveDialogVisible"); //NOI18N
-    private static final String OOME_SAVING_MSG = NbBundle.getMessage(ExportSnapshotAction.class, "SaveViewAction_OomeSavingMsg"); //NOI18N
+    private static final String OOME_SAVING_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_OomeSavingMsg"); //NOI18N
                                                                                                                                    // -----
     private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/saveView.png", false); // NOI18N
     private static File exportDir;

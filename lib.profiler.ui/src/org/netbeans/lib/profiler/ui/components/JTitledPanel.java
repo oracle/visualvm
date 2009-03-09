@@ -503,6 +503,12 @@ public class JTitledPanel extends JPanel {
         fireActionPerformed();
     }
 
+    protected Color getTitleBorderColor() {
+        return UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
+                          UIManager.getColor("Button.darkShadow") : // NOI18N
+                          UIManager.getColor("Button.shadow"); // NOI18N
+    }
+
     private void fireActionPerformed() {
         for (int i = 0; i < actionListeners.size(); i++) {
             ((ActionListener) actionListeners.get(i)).actionPerformed(new ActionEvent(this, getState(), ""));
@@ -582,12 +588,9 @@ public class JTitledPanel extends JPanel {
             titlePanel.add(buttonsPanel, BorderLayout.EAST);
         }
 
-        titlePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(UIManager.getLookAndFeel().getID()
-                                                                                                        .equals("Metal")
-                                                                                               ? // NOI18N
-        UIManager.getColor("Button.darkShadow") : // NOI18N
-        UIManager.getColor("Button.shadow")), // NOI18N
-                                                                BorderFactory.createEmptyBorder(2, 5, 2, 2)));
+        titlePanel.setBorder(BorderFactory.createCompoundBorder(
+                             BorderFactory.createLineBorder(getTitleBorderColor()),
+                             BorderFactory.createEmptyBorder(2, 5, 2, 2)));
         titlePanel.setOpaque(true);
         //    titlePanel.setBackground(UIManager.getColor("ToolTip.background"));
         titlePanel.setBackground(new Color(245, 245, 245));

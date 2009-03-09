@@ -40,8 +40,11 @@
 
 package org.netbeans.lib.profiler.results.memory;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 
 
 /**
@@ -274,5 +277,35 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         }
 
         sortInts(values, sortOrder);
+    }
+
+    public void exportCSVData(String separator, int depth, ExportDataDumper eDD) {
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        String indent = " "; // NOI18N
+
+        NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+        nf.setMaximumFractionDigits(3);
+        nf.setMinimumFractionDigits(3);
+
+        // this node
+        result.append(quote);
+        for (int i=0; i<depth; i++) {
+            result.append(indent); // to simulate the tree structure in CSV
+        }
+        result.append(((nodeName==null)?(className):(nodeName)) + quote + separator);
+        result.append(quote+totalObjSize+quote+separator);
+        result.append(quote+nLiveObjects+quote+separator);
+        result.append(quote+nCalls+quote+separator);
+        result.append(quote+nf.format(avgObjectAge)+quote+separator);
+        result.append(quote+survGen+quote+newLine);
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < children.length; i++) {
+                ((PresoObjLivenessCCTNode) children[i]).exportCSVData(separator, depth+1, eDD);
+            }
+        }
     }
 }
