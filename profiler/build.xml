@@ -95,6 +95,7 @@ made subject to such option by the copyright holder.
           <fileset dir="${nb_all}/translatedfiles/src/${module.name}/release">
               <include name="**/filters-default_${locale}.xml"/>
               <include name="**/filtersets-default_${locale}.xml"/>
+              <include name="**/oqlqueries-default_${locale}.xml"/>
           </fileset>
       </copy>
   </target>
