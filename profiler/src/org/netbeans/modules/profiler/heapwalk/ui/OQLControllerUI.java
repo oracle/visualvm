@@ -296,7 +296,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
         private OQLController.QueryController queryController;
         private OQLEditor editor;
-        private boolean queryValid;
+        private boolean queryValid = true;
         
         private JButton runButton;
         private JButton saveButton;
@@ -317,7 +317,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             this.queryController = queryController;
 
             initComponents(engine);
-            queryValid = editor.isValidScript();
+//            queryValid = editor.isValidScript();
             updateButtons();
         }
 
@@ -371,7 +371,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(OQLEditor.VALIDITY_PROPERTY)) {
-                queryValid = ((Boolean)evt.getNewValue());
+//                queryValid = ((Boolean)evt.getNewValue());
                 updateButtons();
             }
         }
