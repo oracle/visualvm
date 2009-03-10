@@ -91,6 +91,51 @@ function filterEnumeration(e, func, wrap) {
     };
 }
 
+function filterIterator(e, func, wrap) {
+    var next = undefined;
+    var index = 0;
+
+    function findNext() {
+        var tmp;
+        while (e.hasNext()) {
+            tmp = e.next();
+            index++;
+            if (wrap) {
+                tmp = wrapJavaObject(tmp);
+            }
+            if (func(tmp, index, e)) {
+                next = tmp;
+                return;
+            }
+        }
+    }
+
+    return new java.util.Iterator() {
+        hasNext: function() {
+            findNext();
+            return next != undefined;
+        },
+
+        next: function() {
+            if (next == undefined) {
+                // user may not have called hasMoreElements?
+                findNext();
+            }
+            if (next == undefined) {
+                throw "NoSuchElementException";
+            }
+            var res = next;
+            next = undefined;
+            return res;
+        },
+
+        remove: function() {
+            throw "NotSupportedOperation";
+        }
+
+    };
+}
+
 // enumeration that has no elements ..
 var emptyEnumeration = new java.util.Enumeration() {
     hasMoreElements: function() {
@@ -187,8 +232,8 @@ function wrapJavaValue(thing) {
         return null;
     }
 
-//    printStackTrace();
-//    println(thing);
+    //    printStackTrace();
+    //    println(thing);
 
     if (thing instanceof Packages.org.netbeans.lib.profiler.heap.FieldValue) {
         var type = thing.field.type;
@@ -231,9 +276,9 @@ function wrapJavaObject(thing) {
         //            }
         //        }
 
-//        print(jobject.getClass());
+        //        print(jobject.getClass());
         if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
-//            println("wrapping as Class");
+            //            println("wrapping as Class");
             return new JavaClassWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.ObjectArrayInstance) {
             //            println("wrapping as ObjectArray");
@@ -245,7 +290,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as Instance");
             return new JavaObjectWrapper(jobject);
         } else {
-//            println("unknown heap object type: " + jobject.getClass());
+            //            println("unknown heap object type: " + jobject.getClass());
             return jobject;
         }
     }
@@ -253,7 +298,8 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java instances
     function JavaObjectWrapper(instance) {
         var things = instance.fieldValues;
-              
+        var fldValueCache = new Array();
+
         // instance fields can be accessed in natural syntax
         return new JSAdapter() {
             __getIds__ : function() {
@@ -272,9 +318,15 @@ function wrapJavaObject(thing) {
             },
             __get__ : function(name) {
                 if (name == 'clazz') {
-                    return wrapJavaObject(instance.javaClass);
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(instance.javaClass);
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'id') {
-                    return instance.instanceId;
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = instance.instanceId;
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'toString') {
                     return function() {
                         if (instance.javaClass.name == "java.lang.String") {
@@ -284,8 +336,12 @@ function wrapJavaObject(thing) {
                     }
                 } else if (name == 'wrapped-object') {
                     return instance;
+                } else {
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(instance.getValueOfField(name));
+                    }
+                    return fldValueCache[name];
                 }
-                return wrapJavaObject(instance.getValueOfField(name));
             }
         }				
     }
@@ -293,7 +349,8 @@ function wrapJavaObject(thing) {
     // return wrapper for Java Class objects
     function JavaClassWrapper(jclass) {
         var fields = jclass.staticFieldValues;
-    
+        var fldValueCache = new Array();
+
         // to access static fields of given Class cl, use 
         // cl.statics.<static-field-name> syntax
         this.statics = new JSAdapter() {
@@ -315,13 +372,16 @@ function wrapJavaObject(thing) {
             },
             __get__ : function(name) {
                 if (name == "toString") {
-                    return jclass.toString();
-                }
-                var result = theJavaClassProto[name];
-                if (result == null) {
-                    return wrapJavaObject(jclass.getValueOfStaticField(name));
+                    result = jclass.toString();
                 } else {
-                    return result;
+                    if (fldValueCache[name] == undefined) {
+                        var result = theJavaClassProto[name];
+                        if (result == null) {
+                            result = wrapJavaObject(jclass.getValueOfStaticField(name));
+                        }
+                        fldValueCache[name] = result;
+                    }
+                    return fldValueCache[name];
                 }
             }
         }
@@ -345,6 +405,7 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java object arrays
     function JavaObjectArrayWrapper(array) {
         var elements = array.values;
+        var fldValueCache = new Array();
         // array elements can be accessed in natural syntax
         // also, 'length' property is supported.
         return new JSAdapter() {
@@ -366,11 +427,20 @@ function wrapJavaObject(thing) {
                     name >= 0 && name < elements.size()) {
                     return wrapJavaValue(elements.get(name));
                 } else if (name == 'id') {
-                  return array.instanceId;
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = array.instanceId;
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'length') {
-                    return elements.size();
+                    if (fldValueCache["len"] == undefined) {
+                        fldValueCache["len"] = elements.size();
+                    }
+                    return fldValueCache["len"];
                 } else if (name == 'clazz') {
-                    return wrapJavaValue(array.javaClass);
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(array.javaClass);
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'toString') {
                     return function() { 
                         return array.toString();
@@ -387,6 +457,7 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java primitive arrays
     function JavaValueArrayWrapper(array) {
         var elements = array.values;
+        var fldValueCache = new Array();
         // array elements can be accessed in natural syntax
         // also, 'length' property is supported.
         return new JSAdapter() {
@@ -410,7 +481,10 @@ function wrapJavaObject(thing) {
                 }
     
                 if (name == 'length') {
-                    return elements.size();
+                    if (fldValueCache["len"] == undefined) {
+                        fldValueCache["len"] = elements.size();
+                    }
+                    return fldValueCache["len"];
                 } else if (name == 'toString') {
                     return function() { 
                         return array.toString();
@@ -418,7 +492,10 @@ function wrapJavaObject(thing) {
                 } else if (name == 'wrapped-object') {
                     return array;
                 } else if (name == 'clazz') {
-                    return wrapJavaValue(array.javaClass);
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(array.javaClass);
+                    }
+                    return fldValueCache[name];
                 } else {
                     return undefined;
                 }
@@ -430,12 +507,12 @@ function wrapJavaObject(thing) {
 
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
-//    println("Unwrapping object");
-//    println(typeof(jobject));
+    //    println("Unwrapping object");
+    //    println(typeof(jobject));
     
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
         if (jobject instanceof Array) {
-//            println("Object is array");
+            //            println("Object is array");
             var arr = new java.util.ArrayList(jobject.length);
 
             for (var index in jobject) {
@@ -445,7 +522,7 @@ function unwrapJavaObject(jobject) {
         }
         
         try {
-//            println(typeof(jobject));
+            //            println(typeof(jobject));
             var orig = jobject;
             jobject = orig["wrapped-object"];
             if (jobject == undefined) {
@@ -465,7 +542,7 @@ function unwrapJavaObject(jobject) {
 function unwrapMap(jobject) {
     var map = new java.util.HashMap();
     for(var prop in jobject) {
-//        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
+        //        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
         map.put(prop, unwrapJavaObject(jobject[prop]));
     }
     return map;
@@ -597,7 +674,7 @@ function wrapHeapSnapshot(heap) {
             clazz = getClazz(clazz);
 
             if (clazz) {
-//                var instances = clazz.getInstances(includeSubtypes); // TODO
+                //                var instances = clazz.getInstances(includeSubtypes); // TODO
                 var instances = snapshot.getInstances(clazz, includeSubtypes);
                 while (instances.hasNext()) {
                     if (callback(wrapJavaObject(instances.next())))
@@ -628,11 +705,10 @@ function wrapHeapSnapshot(heap) {
             }
             clazz = getClazz(clazz);
             if (clazz) {
-                var instances = wrapIterator(snapshot.getInstances(clazz, includeSubtypes));
                 if (where) {
-                    return filterEnumeration(instances, where, true);
+                    return filterIterator(snapshot.getInstances(clazz, includeSubtypes), where, true);
                 } else {
-                    return wrapperEnumeration(instances);
+                    return wrapIterator(snapshot.getInstances(clazz, includeSubtypes), true);
                 }
             } else {
                 return emptyEnumeration;
@@ -827,7 +903,7 @@ function classof(jobject) {
  * @param jobject object whose referers are retrieved
  */
 function forEachReferrer(callback, jobject) {
-//    jobject = unwrapJavaObject(jobject);
+    //    jobject = unwrapJavaObject(jobject);
     var refs = referrers(jobject);
     while (refs.hasMoreElements()) {
         var referrer = refs.nextElement();
@@ -1174,13 +1250,14 @@ function toArray(obj) {
 }
 
 function top(array, code, num) {
+    var cutoff = 50;
     if (array == undefined) {
         return array;
     }
     var func;
     if (code == undefined) {
         func = function(lhs, rhs) {
-            return lhs < rhs;
+            return 1; // first-come order
         }
     } else if (typeof(code) == 'string') {
         func = new Function("lhs", "rhs", "return " + code);
@@ -1189,41 +1266,41 @@ function top(array, code, num) {
     if (num == undefined) {
         num = 10;
     }
-
-    var modCount = 0;
-    var mergesize = 4;
+    array = wrapIterator(array, true);
 
     if (array instanceof java.util.Enumeration) {
-        var arrays = [new Array(), new Array()];
-        var lastSorted = undefined;
-        var firstSorted = undefined;
-        var needsSorting = true;
-
+        var sorted = new Array();
+        
         while(array.hasMoreElements()) {
             var element = array.nextElement();
-            arrays[0].push(element);
-            if (lastSorted != undefined) needsSorting |= func(element, lastSorted) < 0 || func(element, firstSorted) > 0;
+            if (sorted.length > 0) {
+                if (sorted.length >= num && func(element, sorted[sorted.length -1]) >=0 ) continue;
+            }
 
-            if (arrays[0].length == mergesize) {
-                if (needsSorting) {
-                    arrays[1] = arrays[1].concat(arrays[0]).sort(func);
-                    lastSorted = arrays[1][arrays[1].length -1];
-                    firstSorted = arrays[1][0];
+            var index = search(sorted, element, true, func);
+            if (index < sorted.length - 1) {
+                if (index > 0) {
+                    var arrL = sorted.slice(0, index);
+                    var arrR = sorted.slice(index);
+                    sorted = arrL.concat(element, arrR);
+                } else {
+                    sorted = [element].concat(sorted);
                 }
-                arrays[0].length = 0;
-                needsSorting = false;
+            } else {
+                sorted.push(element)
+            }
+            if (sorted.length > cutoff) {
+                sorted.length = Math.min(sorted.length, cutoff);
             }
         }
-        if (arrays[1].length == 0) {
-            arrays[1] = arrays[0].sort(func);
-        }
-        arrays[1].length = Math.min(arrays[1].length, num);
-        return arrays[1];
+        sorted.length = Math.min(sorted.length, num);
+        return sorted;
     } else if (array instanceof Array) {
         var result = array.sort(func);
         result.length = Math.min(result.length, num);
         return result;
     }
+    println(array.constructor);
     return array;
 }
 
@@ -1357,6 +1434,8 @@ function filter(array, code) {
     }
     if (array instanceof java.util.Enumeration) {
         return filterEnumeration(array, func, true);
+    } else if (array instanceof java.util.Iterator) {
+        return filterIterator(array, func, true);
     } else {
         var result = new Array();
         for (var index in array) {
@@ -1618,4 +1697,12 @@ function isJsArray(obj) {
         return false;
     }
     return obj.constructor == Array;
+}
+
+function search(a, v, i, func){
+    var h = a.length, l = -1, m;
+    while(h - l > 1)
+        if(func(a[m = h + l >> 1], v) < 0) l = m;
+        else h = m;
+    return a[h] != v ? i ? h : -1 : h;
 }
