@@ -72,10 +72,9 @@ Computes overhead of Strings that have their backing char[] larger than necessar
     <entry key="query-script-1">
 <![CDATA[
 select map(
-    top(
-        filter(heap.objects("java.lang.String"), '(2 * it.offset) + (2 * (it.value.length - (it.count + it.offset))) > 0'),
+    top(heap.objects("java.lang.String", false, '(2 * it.offset) + (2 * (it.value.length - (it.count + it.offset))) > 0'),
         '((2 * rhs.offset) + (2 * (rhs.value.length - (rhs.count + rhs.offset)))) - ((2 * lhs.offset) + (2 * (lhs.value.length - (lhs.count + lhs.offset))))'),
-    'toHtml(it) + " wasting " + ((2 * it.offset) + (2 * (it.value.length - (it.count + it.offset)))) + "b"')
+    'toHtml(it) + " wasting " + ((2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset)))) + "b"')
 ]]>
     </entry>
 
