@@ -41,7 +41,9 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -52,13 +54,13 @@ import java.util.Map;
 class StringSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    final int UTF8CharsOffset;
-    final int lengthOffset;
-    final int stringIDOffset;
-    final int timeOffset;
-    Map stringIDMap;
+    private final int UTF8CharsOffset;
+    private final int lengthOffset;
+    private final int stringIDOffset;
+    private final int timeOffset;
+    private Map stringIDMap;
     private HprofHeap hprofHeap;
-
+    private Map stringCache = Collections.synchronizedMap(new StringCache());
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     StringSegment(HprofHeap heap, long start, long end) {
@@ -74,7 +76,21 @@ class StringSegment extends TagBounds {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    String getString(long start) {
+    String getStringByID(long stringID) {
+        Long stringIDObj = new Long(stringID);
+        String string = (String) stringCache.get(stringIDObj);
+        if (string == null) {
+            string = createStringByID(stringIDObj);
+            stringCache.put(stringIDObj,string);
+        }
+        return string;
+    }
+    
+    private String createStringByID(Long stringID) {
+        return getString(getStringOffsetByID(stringID));
+    }
+    
+    private String getString(long start) {
         HprofByteBuffer dumpBuffer = getDumpBuffer();
 
         if (start == -1) {
@@ -96,11 +112,7 @@ class StringSegment extends TagBounds {
         return s;
     }
 
-    String getStringByID(long stringID) {
-        return getString(getStringOffsetByID(stringID));
-    }
-
-    long getStringOffsetByID(long stringID) {
+    private synchronized long getStringOffsetByID(Long stringID) {
         Long startLong;
 
         if (stringIDMap == null) {
@@ -115,7 +127,7 @@ class StringSegment extends TagBounds {
             }
         }
 
-        startLong = (Long) stringIDMap.get(new Long(stringID));
+        startLong = (Long) stringIDMap.get(stringID);
 
         if (startLong == null) {
             return -1;
@@ -139,4 +151,20 @@ class StringSegment extends TagBounds {
 
         return getDumpBuffer().getID(start + stringIDOffset);
     }
+
+    private static class StringCache extends LinkedHashMap {
+        private static final int SIZE = 1000;
+        
+        StringCache() {
+            super(SIZE,0.75f,true);
+        }
+
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            if (size() > SIZE) {
+                return true;
+            }
+            return false;
+        }
+    }
+
 }
