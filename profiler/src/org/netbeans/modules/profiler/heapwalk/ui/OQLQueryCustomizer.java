@@ -128,7 +128,7 @@ public class OQLQueryCustomizer {
             } else {
                 OQLController.Query selectedQuery =
                         (OQLController.Query)customizer.getSelectedValue();
-                selectedQuery.setQuery(query);
+                selectedQuery.setScript(query);
             }
             return true;
         } else {
