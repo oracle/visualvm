@@ -1250,7 +1250,7 @@ function toArray(obj) {
 }
 
 function top(array, code, num) {
-    var cutoff = 50;
+    var cutoff = num * 100;
     if (array == undefined) {
         return array;
     }
@@ -1270,11 +1270,11 @@ function top(array, code, num) {
 
     if (array instanceof java.util.Enumeration) {
         var sorted = new Array();
-        
+
         while(array.hasMoreElements()) {
             var element = array.nextElement();
             if (sorted.length > 0) {
-                if (sorted.length >= num && func(element, sorted[sorted.length -1]) >=0 ) continue;
+                if (sorted.length >= num && func(element, sorted[num -1]) >=0 ) continue;
             }
 
             var index = search(sorted, element, true, func);
