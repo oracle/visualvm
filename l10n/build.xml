@@ -166,7 +166,11 @@ made subject to such option by the copyright holder.
                 </fileset>
             </classpath>
     </package-build>
-    <zip destfile="dist/visualvm_ml.zip">
+    <unzip src="../visualvm/nb_ml.zip" dest="build"/>
+    <zip destfile="dist/visualvm_ml.zip" duplicate="preserve">
+      <zipfileset dir="build/netbeans" prefix="visualvm">
+          <include name="p*/**"/>
+      </zipfileset>
       <zipfileset src="../visualvm/dist/visualvm.zip"/>
       <zipfileset dir="build" prefix="visualvm">
         <include name="visualvm/**"/>
