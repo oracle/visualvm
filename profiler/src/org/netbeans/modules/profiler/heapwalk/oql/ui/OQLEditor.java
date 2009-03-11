@@ -40,8 +40,6 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
@@ -53,9 +51,6 @@ import org.openide.util.Lookup;
  */
 public class OQLEditor extends JPanel {
 
-    public static final String VALIDITY_PROPERTY = "validity"; // NOI18N
-
-    private boolean validityFlag = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
@@ -65,21 +60,14 @@ public class OQLEditor extends JPanel {
         init();
     }
 
-    
+
     private void init() {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
             queryEditor = impl.getEditorPane();
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
-            queryEditor.addPropertyChangeListener(OQLEditorImpl.VALIDITY_PROPERTY,
-                new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        setValidScript((Boolean)evt.getNewValue());
-                    }
-                });
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
-            setValidScript(true);
         }
 
         queryEditor.setOpaque(isOpaque());
@@ -87,11 +75,6 @@ public class OQLEditor extends JPanel {
 
         setLayout(new BorderLayout());
         add(queryEditor, BorderLayout.CENTER);
-    }
-
-    
-    public boolean isValidScript() {
-        return validityFlag;
     }
 
     public void setScript(String script) {
@@ -102,25 +85,22 @@ public class OQLEditor extends JPanel {
         return queryEditor.getText();
     }
 
-    private void setValidScript(boolean value) {
-        boolean oldValue = validityFlag;
-        validityFlag = value;
-        firePropertyChange(OQLEditor.VALIDITY_PROPERTY, oldValue, value);
-    }
 
-
+    @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
         if (queryEditor != null)
             queryEditor.setBackground(bg);
     }
 
+    @Override
     public void setOpaque(boolean isOpaque) {
         super.setOpaque(isOpaque);
         if (queryEditor != null)
             queryEditor.setOpaque(isOpaque);
     }
 
+    @Override
     public void requestFocus() {
         queryEditor.requestFocus();
     }
