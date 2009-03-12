@@ -46,6 +46,5 @@ import javax.swing.JEditorPane;
  * @author Jaroslav Bachorik
  */
 abstract public class OQLEditorImpl {
-    public static final String VALIDITY_PROPERTY = "validity";
     public abstract JEditorPane getEditorPane();
 }
