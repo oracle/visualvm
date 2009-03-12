@@ -42,8 +42,10 @@ package org.netbeans.lib.profiler.heap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +75,7 @@ class ClassDumpSegment extends TagBounds {
     final int stackTraceSerialNumberOffset;
     final int superClassIDOffset;
     ClassDump java_lang_Class;
+    Map /*<JavaClass,List<Field>>*/ fieldsCache;
     private List /*<JavaClass>*/ classes;
     private Map /*<Byte,JavaClass>*/ primitiveArrayMap;
 
@@ -102,6 +105,8 @@ class ClassDumpSegment extends TagBounds {
         fieldSize = fieldTypeOffset + 1;
 
         minimumInstanceSize = 2 * idSize;
+        
+        fieldsCache = Collections.synchronizedMap(new FieldsCache());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -276,6 +281,21 @@ class ClassDumpSegment extends TagBounds {
             if (typeObj != null) {
                 primitiveArrayMap.put(typeObj, jcls);
             }
+        }
+    }
+    
+    private static class FieldsCache extends LinkedHashMap {
+        private static final int SIZE = 500;
+        
+        FieldsCache() {
+            super(SIZE,0.75f,true);
+        }
+
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            if (size() > SIZE) {
+                return true;
+            }
+            return false;
         }
     }
 }
