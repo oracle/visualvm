@@ -54,7 +54,8 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
  */
 public class ReachableObjects {
     private ReachableExcludes excludes;
-
+    private Instance root;
+    
     public ReachableObjects(Instance root, final ReachableExcludes excludes) {
         this.root = root;
         this.excludes = excludes;
@@ -114,6 +115,4 @@ public class ReachableObjects {
     private String getFQFieldName(Field fld) {
         return fld.getDeclaringClass().getName() + "." + fld.getName();
     }
-
-    private Instance root;
 }
