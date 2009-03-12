@@ -616,9 +616,9 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
     jvmtiEventMode mode;
 	
     if (value) {
-      mode = JVMTI_ENABLE;
-	  } else {
-      mode = JVMTI_DISABLE;
+        mode = JVMTI_ENABLE;
+    } else {
+        mode = JVMTI_DISABLE;
     }
     res = (*_jvmti)->SetEventNotificationMode(_jvmti, mode, JVMTI_EVENT_VM_OBJECT_ALLOC, NULL);
     assert(res == JVMTI_ERROR_NONE);
