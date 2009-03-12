@@ -186,7 +186,7 @@ class DominatorTree {
         if (idomObj != null) {
             return idomObj;
         }
-        return getNearestGCRootPointer(instanceIdLong.longValue());
+        return getNearestGCRootPointer(instanceIdLong);
     }
     
     private Long intersect(Long idomIdObj, Long refIdObj) {
