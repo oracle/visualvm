@@ -228,7 +228,12 @@ public class OQLController extends AbstractTopLevelController
 
                             if (counter.get() == 0) {
                                 sb.append("<tr><td><h4>Too many results. Please, refine your query.</h4></td></tr>" );
+                            } else if (counter.get() == 100) {
+                                sb.append("<tr><td><h4>"); // NOI18N
+                                sb.append(NbBundle.getMessage(OQLController.class, "OQL_NO_RESULTS_MSG")); // NOI18N
+                                sb.append("</h4></td></tr>" ); // NOI18N
                             }
+
                             sb.append("</table>"); // NOI18N
 
                             analysisRunning.compareAndSet(true, false);
@@ -543,11 +548,11 @@ public class OQLController extends AbstractTopLevelController
             int i = -1;
             while (properties.containsKey(PROP_QUERY_NAME_KEY + "-" + ++i)) { // NOI18N
                 String name =
-                    properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i); // NOI18N
+                    properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i).trim(); // NOI18N
                 String description =
-                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i); // NOI18N
+                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i).trim(); // NOI18N
                 String script =
-                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i); // NOI18N
+                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i).trim(); // NOI18N
                 if (name != null && script != null)
                     model.addElement(new Query(script, name, description));
             }
@@ -558,10 +563,10 @@ public class OQLController extends AbstractTopLevelController
 
             for (int i = 0; i < model.size(); i++) {
                 Query q = (Query)model.get(i);
-                properties.put(PROP_QUERY_NAME_KEY + "-" + i, q.getName()); // NOI18N
-                properties.put(PROP_QUERY_SCRIPT_KEY + "-" + i, q.getScript()); // NOI18N
+                properties.put(PROP_QUERY_NAME_KEY + "-" + i, q.getName().trim()); // NOI18N
+                properties.put(PROP_QUERY_SCRIPT_KEY + "-" + i, q.getScript().trim()); // NOI18N
                 if (q.getDescription() != null)
-                    properties.put(PROP_QUERY_DESCR_KEY + "-" + i, q.getDescription()); // NOI18N
+                    properties.put(PROP_QUERY_DESCR_KEY + "-" + i, q.getDescription().trim()); // NOI18N
             }
 
             return properties;

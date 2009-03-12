@@ -20,6 +20,13 @@ package org.netbeans.modules.profiler.heapwalk.oql;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.Invocable;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
@@ -36,6 +43,7 @@ public class OQLEngine {
     static {
         try {
             // Do we have javax.script support?
+
             Class managerClass = Class.forName("javax.script.ScriptEngineManager");
             Object manager = managerClass.newInstance();
             
@@ -179,27 +187,21 @@ public class OQLEngine {
         }
         buf.append(") { return ");
         buf.append(q.selectExpr.replace('\n', ' '));
-        buf.append("; }");
+        buf.append("; }\n");
+        buf.append("__select__(" + q.identifier + ")");
 
         String selectCode = buf.toString();
-//        debugPrint(selectCode);
-        String whereCode = null;
-        if (q.whereExpr != null) {
-            buf = new StringBuffer();
-            buf.append("function __where__(");
-            buf.append(q.identifier);
-            buf.append(") { return ");
-            buf.append(q.whereExpr.replace('\n', ' '));
-            buf.append("; }");
-            whereCode = buf.toString();
-        }
-//        debugPrint(whereCode);
 
         // compile select expression and where condition 
         try {
-            evalMethod.invoke(engine, new Object[]{selectCode});
-            if (whereCode != null) {
-                evalMethod.invoke(engine, new Object[]{whereCode});
+            Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+
+            CompiledScript whereCs = null;
+            CompiledScript selectCs = null;
+            selectCs = ((Compilable)engine).compile(selectCode);
+            
+            if (q.whereExpr != null) {
+                whereCs = ((Compilable)engine).compile(q.whereExpr.replace('\n', ' '));
             }
 
             if (q.className != null) {
@@ -220,10 +222,11 @@ public class OQLEngine {
                     List objects = clz.getInstances();
 
                     for (Object obj : objects) {
-                        Object[] args = new Object[]{wrapJavaObject((Instance) obj)};
-                        boolean b = (whereCode == null);
+                        Object wrapped = wrapJavaObject((Instance) obj);
+                        boolean b = (whereCs == null);
                         if (!b) {
-                            Object res = call("__where__", args);
+                            bindings.put(q.identifier, wrapped);
+                            Object res = whereCs.eval(bindings);
                             if (res instanceof Boolean) {
                                 b = ((Boolean) res).booleanValue();
                             } else if (res instanceof Number) {
@@ -234,7 +237,8 @@ public class OQLEngine {
                         }
 
                         if (b) {
-                            Object select = call("__select__", args);
+                            bindings.put(q.identifier, wrapped);
+                            Object select = selectCs.eval(bindings);
                             if (dispatchValue(select, visitor)) {
                                 return;
                             }
@@ -243,7 +247,7 @@ public class OQLEngine {
                 }
             } else {
                 // simple "select <expr>" query
-                Object select = call("__select__", new Object[]{});
+                Object select = selectCs.eval();
                 if (dispatchValue(select, visitor)) {
                     return;
                 }
@@ -297,7 +301,8 @@ public class OQLEngine {
     }
 
     public Object evalScript(String script) throws Exception {
-        return evalMethod.invoke(engine, new Object[]{script});
+        CompiledScript cs = ((Compilable)engine).compile(script);
+        return cs.eval();
     }
 
     public Object wrapJavaObject(Instance obj) throws Exception {
@@ -309,7 +314,8 @@ public class OQLEngine {
     }
 
     public Object call(String func, Object[] args) throws Exception {
-        return invokeMethod.invoke(engine, new Object[]{func, args});
+
+        return ((Invocable)engine).invokeFunction(func, args);
     }
 
     public Object unwrapJavaObject(Object object) {
@@ -321,9 +327,9 @@ public class OQLEngine {
         boolean isNativeJS = object.getClass().getName().contains(".javascript.");
 
         try {
-            Object ret = invokeMethod.invoke(engine, new Object[]{"unwrapJavaObject", new Object[]{object}});
+            Object ret = ((Invocable)engine).invokeFunction("unwrapJavaObject", object);
             if (isNativeJS && (ret == null || ret == object) && tryAssociativeArray) {
-                ret = invokeMethod.invoke(engine, new Object[]{"unwrapMap", new Object[]{object}});
+                ret = ((Invocable)engine).invokeFunction("unwrapMap", object);
             }
             return ret;
         } catch (Exception ex) {
@@ -343,39 +349,13 @@ public class OQLEngine {
     private void init(Snapshot snapshot) throws RuntimeException {
         this.snapshot = snapshot;
         try {
-            // create ScriptEngineManager
-            Class managerClass = Class.forName("javax.script.ScriptEngineManager");
-            Object manager = managerClass.newInstance();
-
-            // create JavaScript engine
-            Method getEngineMethod = managerClass.getMethod("getEngineByName",
-                    new Class[]{String.class});
-            engine = getEngineMethod.invoke(manager, new Object[]{"JavaScript"});
-
-            // initialize engine with init file (hat.js)
+            ScriptEngineManager manager = new ScriptEngineManager();
+            engine = manager.getEngineByName("JavaScript");
             InputStream strm = getInitStream();
-            Class engineClass = Class.forName("javax.script.ScriptEngine");
-            evalMethod = engineClass.getMethod("eval",
-                    new Class[]{Reader.class});
-            evalMethod.invoke(engine, new Object[]{new InputStreamReader(strm)});
-
-            // initialize ScriptEngine.eval(String) and
-            // Invocable.invokeFunction(String, Object[]) methods.
-            Class invocableClass = Class.forName("javax.script.Invocable");
-
-            evalMethod = engineClass.getMethod("eval",
-                    new Class[]{String.class});
-            invokeMethod = invocableClass.getMethod("invokeFunction",
-                    new Class[]{String.class, Object[].class});
-
-            // initialize ScriptEngine.put(String, Object) method
-            Method putMethod = engineClass.getMethod("put",
-                    new Class[]{String.class, Object.class});
-
-            // call ScriptEngine.put to initialize built-in heap object
-            putMethod.invoke(engine, new Object[]{
-                        "heap", call("wrapHeapSnapshot", new Object[]{snapshot})
-                    });
+            CompiledScript cs = ((Compilable)engine).compile(new InputStreamReader(strm));
+            cs.eval();
+            Object heap = ((Invocable)engine).invokeFunction("wrapHeapSnapshot", snapshot);
+            engine.put("heap", heap);
         } catch (Exception e) {
             if (debug) {
                 e.printStackTrace();
@@ -387,9 +367,7 @@ public class OQLEngine {
     private InputStream getInitStream() {
         return getClass().getResourceAsStream("/org/netbeans/modules/profiler/heapwalk/oql/resources/hat.js");
     }
-    private Object engine;
-    private Method evalMethod;
-    private Method invokeMethod;
+    private ScriptEngine engine;
     private Snapshot snapshot;
     private static boolean debug = true;
     private static boolean oqlSupported;
