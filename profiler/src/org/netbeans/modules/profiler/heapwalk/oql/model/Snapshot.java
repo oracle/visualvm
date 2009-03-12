@@ -1,31 +1,46 @@
-
 /*
- * The contents of this file are subject to the Sun Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. A copy of the License is available at
- * http://www.sun.com/, and in the file LICENSE.html in the
- * doc directory.
- * 
- * The Original Code is HAT. The Initial Developer of the
- * Original Code is Bill Foote, with contributions from others
- * at JavaSoft/Sun. Portions created by Bill Foote and others
- * at Javasoft/Sun are Copyright (C) 1997-2004. All Rights Reserved.
- * 
- * In addition to the formal license, I ask that you don't
- * change the history or donations files without permission.
- * 
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 package org.netbeans.modules.profiler.heapwalk.oql.model;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.ArrayList;
-import javax.script.Bindings;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
@@ -34,17 +49,14 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.Value;
-import org.openide.util.Exceptions;
 
 /**
  *
- * @version     1.26, 10/08/98 [jhat @(#)Snapshot.java	1.16 06/10/27]
- * @author      Bill Foote
+ * @author      Jaroslav Bachorik
  */
 /**
- * Represents a snapshot of the Java objects in the VM at one instant.
- * This is the top-level "model" object read out of a single .hprof or .bod
- * file.
+ * A helper class for OQL engine allowing easy access to the underlying
+ * heapwalker model
  */
 public class Snapshot {
     private final Heap delegate;
@@ -221,7 +233,6 @@ public class Snapshot {
                 finalizables.add(referentFld.getInstance());
             }
         }
-//        finalizablesCache = new SoftReference<List>(finalizables);
         return finalizables.iterator();
     }
 
@@ -342,129 +353,4 @@ public class Snapshot {
         }
         return arrayDump.toString();
     }
-//    // package privates
-//    void addReferenceFromRoot(Root r, JavaHeapObject obj) {
-//        Root root = rootsMap.get(obj);
-//        if (root == null) {
-//            rootsMap.put(obj, r);
-//        } else {
-//            rootsMap.put(obj, root.mostInteresting(r));
-//        }
-//    }
-//
-//    Root getRoot(JavaHeapObject obj) {
-//        return rootsMap.get(obj);
-//    }
-//
-//    JavaClass getJavaLangClass() {
-//        return javaLangClass;
-//    }
-//
-//    JavaClass getJavaLangString() {
-//        return javaLangString;
-//    }
-//
-//    JavaClass getJavaLangClassLoader() {
-//        return javaLangClassLoader;
-//    }
-//
-//    JavaClass getOtherArrayType() {
-//        if (otherArrayType == null) {
-//            synchronized (this) {
-//                if (otherArrayType == null) {
-//                    addFakeClass(new JavaClass("[<other>", 0, 0, 0, 0,
-//                            EMPTY_FIELD_ARRAY, EMPTY_STATIC_ARRAY,
-//                            0));
-//                    otherArrayType = findClass("[<other>");
-//                }
-//            }
-//        }
-//        return otherArrayType;
-//    }
-//
-//    JavaClass getArrayClass(String elementSignature) {
-//        JavaClass clazz;
-//        synchronized (classes) {
-//            clazz = findClass("[" + elementSignature);
-//            if (clazz == null) {
-//                clazz = new JavaClass("[" + elementSignature, 0, 0, 0, 0,
-//                        EMPTY_FIELD_ARRAY, EMPTY_STATIC_ARRAY, 0);
-//                addFakeClass(clazz);
-//            // This is needed because the JDK only creates Class structures
-//            // for array element types, not the arrays themselves.  For
-//            // analysis, though, we need to pretend that there's a
-//            // JavaClass for the array type, too.
-//            }
-//        }
-//        return clazz;
-//    }
-//
-//    ReadBuffer getReadBuffer() {
-//        return readBuf;
-//    }
-//
-//    void setNew(JavaHeapObject obj, boolean isNew) {
-//        initNewObjects();
-//        if (isNew) {
-//            newObjects.put(obj, Boolean.TRUE);
-//        }
-//    }
-//
-//    boolean isNew(JavaHeapObject obj) {
-//        if (newObjects != null) {
-//            return newObjects.get(obj) != null;
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    // Internals only below this point
-//    private Number makeId(long id) {
-//        if (identifierSize == 4) {
-//            return new Integer((int) id);
-//        } else {
-//            return new Long(id);
-//        }
-//    }
-//
-//    private void putInClassesMap(JavaClass c) {
-//        String name = c.getName();
-//        if (classes.containsKey(name)) {
-//            // more than one class can have the same name
-//            // if so, create a unique name by appending
-//            // - and id string to it.
-//            name += "-" + c.getIdString();
-//        }
-//        classes.put(c.getName(), c);
-//    }
-//
-//    private void addFakeClass(JavaClass c) {
-//        putInClassesMap(c);
-//        c.resolve(this);
-//    }
-//
-//    private void addFakeClass(Number id, JavaClass c) {
-//        fakeClasses.put(id, c);
-//        addFakeClass(c);
-//    }
-//
-//    private synchronized void initNewObjects() {
-//        if (newObjects == null) {
-//            synchronized (this) {
-//                if (newObjects == null) {
-//                    newObjects = new HashMap<JavaHeapObject, Boolean>();
-//                }
-//            }
-//        }
-//    }
-//
-//    private synchronized void initSiteTraces() {
-//        if (siteTraces == null) {
-//            synchronized (this) {
-//                if (siteTraces == null) {
-//                    siteTraces = new HashMap<JavaHeapObject, StackTrace>();
-//                }
-//            }
-//        }
-//    }
 }
