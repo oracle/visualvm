@@ -41,6 +41,8 @@ package org.netbeans.modules.profiler.heapwalk.oql.model;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
@@ -70,16 +72,16 @@ public class Snapshot {
     }
 
     private void init() {
-        weakReferenceClass = findClass("java.lang.ref.Reference");
+        weakReferenceClass = findClass("java.lang.ref.Reference"); // NOI18N
         if (weakReferenceClass == null) {	// JDK 1.1.x
-            weakReferenceClass = findClass("sun.misc.Ref");
+            weakReferenceClass = findClass("sun.misc.Ref"); // NOI18N
             referentFieldIndex = 0;
         } else {
             List flds = weakReferenceClass.getFields();
             int fldsCount = flds.size();
 
             for (int i = 0; i < fldsCount; i++) {
-                if ("referent".equals(((Field) flds.get(i)).getName())) {
+                if ("referent".equals(((Field) flds.get(i)).getName())) { // NOI18N
                     referentFieldIndex = i;
                     break;
                 }
@@ -97,36 +99,36 @@ public class Snapshot {
 
     private String preprocessClassName(String className) {
         int arrDim = 0;
-        if (className.startsWith("[")) {
-            arrDim = className.lastIndexOf("[") + 1;
+        if (className.startsWith("[")) { // NOI18N
+            arrDim = className.lastIndexOf("[") + 1; // NOI18N
 
             className = className.substring(arrDim);
         }
         if (className.length() == 1) {
-            if (className.equals("I")) {
-                className = "int";
-            } else if (className.equals("J")) {
-                className = "long";
-            } else if (className.equals("D")) {
-                className = "double";
-            } else if (className.equals("F")) {
-                className = "float";
-            } else if (className.equals("B")) {
-                className = "byte";
-            } else if (className.equals("S")) {
-                className = "short";
-            } else if (className.equals("C")) {
-                className = "char";
-            } else if (className.equals("Z")) {
-                className = "boolean";
+            if (className.equals("I")) { // NOI18N
+                className = "int"; // NOI18N
+            } else if (className.equals("J")) { // NOI18N
+                className = "long"; // NOI18N
+            } else if (className.equals("D")) { // NOI18N
+                className = "double"; // NOI18N
+            } else if (className.equals("F")) { // NOI18N
+                className = "float"; // NOI18N
+            } else if (className.equals("B")) { // NOI18N
+                className = "byte"; // NOI18N
+            } else if (className.equals("S")) { // NOI18N
+                className = "short"; // NOI18N
+            } else if (className.equals("C")) { // NOI18N
+                className = "char"; // NOI18N
+            } else if (className.equals("Z")) { // NOI18N
+                className = "boolean"; // NOI18N
             }
         }
-        if (arrDim > 0 && className.startsWith("L")) {
+        if (arrDim > 0 && className.startsWith("L")) { // NOI18N
             className = className.substring(1);
         }
         StringBuilder sb = new StringBuilder(className);
         for (int i = 0; i < arrDim; i++) {
-            sb.append("[]");
+            sb.append("[]"); // NOI18N
         }
 
         return sb.toString();
@@ -215,16 +217,16 @@ public class Snapshot {
     }
 
     public Iterator getFinalizerObjects() {
-        JavaClass clazz = findClass("java.lang.ref.Finalizer");
-        Instance queue = ((ObjectFieldValue) clazz.getValueOfStaticField("queue")).getInstance();
-        ObjectFieldValue headFld = (ObjectFieldValue) queue.getValueOfField("head");
+        JavaClass clazz = findClass("java.lang.ref.Finalizer"); // NOI18N
+        Instance queue = ((ObjectFieldValue) clazz.getValueOfStaticField("queue")).getInstance(); // NOI18N
+        ObjectFieldValue headFld = (ObjectFieldValue) queue.getValueOfField("head"); // NOI18N
 
         List finalizables = new ArrayList();
         if (headFld != null) {
             Instance head = (Instance) headFld.getInstance();
             while (true) {
-                ObjectFieldValue referentFld = (ObjectFieldValue) head.getValueOfField("referent");
-                ObjectFieldValue nextFld = (ObjectFieldValue) head.getValueOfField("next");
+                ObjectFieldValue referentFld = (ObjectFieldValue) head.getValueOfField("referent"); // NOI18N
+                ObjectFieldValue nextFld = (ObjectFieldValue) head.getValueOfField("next"); // NOI18N
 
                 if (nextFld == null || nextFld.getInstance().equals(head)) {
                     break;
@@ -344,12 +346,12 @@ public class Snapshot {
     public String valueString(Instance arrayDump) {
         if (arrayDump == null) return null;
         try {
-            Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy");
-            Method method = proxy.getDeclaredMethod("getString", Instance.class);
+            Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy"); // NOI18N
+            Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
             method.setAccessible(true);
             return (String) method.invoke(proxy, arrayDump);
         } catch (Exception ex) {
-            // ignore
+            Logger.getLogger(Snapshot.class.getName()).log(Level.WARNING, "Error getting toString() value of an instance dump", ex); // NO18N
         }
         return arrayDump.toString();
     }

@@ -1,25 +1,48 @@
-
 /*
- * The contents of this file are subject to the Sun Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. A copy of the License is available at
- * http://www.sun.com/, and in the file LICENSE.html in the
- * doc directory.
- * 
- * The Original Code is HAT. The Initial Developer of the
- * Original Code is Bill Foote, with contributions from others
- * at JavaSoft/Sun. Portions created by Bill Foote and others
- * at Javasoft/Sun are Copyright (C) 1997-2004. All Rights Reserved.
- * 
- * In addition to the formal license, I ask that you don't
- * change the history or donations files without permission.
- * 
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 package org.netbeans.modules.profiler.heapwalk.oql;
 
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -35,22 +58,25 @@ import org.openide.util.Exceptions;
 /**
  * This is Object Query Language Interpreter
  *
- * @author A. Sundararajan [jhat @(#)OQLEngine.java	1.9 06/06/20]
- * @authoe J. Bachorik [NB Profiler]
+ * @author A. Sundararajan
+ * @authoe J. Bachorik
  */
 public class OQLEngine {
+    final private static Logger LOGGER = Logger.getLogger(OQLEngine.class.getName());
+
+    private static boolean oqlSupported;
 
     static {
         try {
             // Do we have javax.script support?
 
-            Class managerClass = Class.forName("javax.script.ScriptEngineManager");
+            Class managerClass = Class.forName("javax.script.ScriptEngineManager"); // NOI18N
             Object manager = managerClass.newInstance();
             
             // check that we have JavaScript engine
-            Method getEngineMethod = managerClass.getMethod("getEngineByName",
+            Method getEngineMethod = managerClass.getMethod("getEngineByName", // NOI18N
                     new Class[]{String.class});
-            Object engine =  getEngineMethod.invoke(manager, new Object[]{"JavaScript"});
+            Object engine =  getEngineMethod.invoke(manager, new Object[]{"JavaScript"}); // NOI18N
 
             oqlSupported = engine != null;
         } catch (Exception ex) {
@@ -66,9 +92,12 @@ public class OQLEngine {
         return oqlSupported;
     }
 
+    private ScriptEngine engine;
+    private Snapshot snapshot;
+
     public OQLEngine(Snapshot snapshot) {
         if (!isOQLSupported()) {
-            throw new UnsupportedOperationException("OQL not supported");
+            throw new UnsupportedOperationException("OQL not supported"); // NOI18N
         }
         init(snapshot);
     }
@@ -83,11 +112,12 @@ public class OQLEngine {
      */
     public synchronized void executeQuery(String query, ObjectVisitor visitor)
             throws OQLException {
-//        debugPrint("query : " + query);
+        LOGGER.log(Level.FINE, query);
+
         StringTokenizer st = new StringTokenizer(query);
         if (st.hasMoreTokens()) {
             String first = st.nextToken();
-            if (!first.equals("select")) {
+            if (!first.equals("select")) { // NOI18N
                 // Query does not start with 'select' keyword.
                 // Just treat it as plain JavaScript and eval it.
                 try {
@@ -99,22 +129,22 @@ public class OQLEngine {
                 return;
             }
         } else {
-            throw new OQLException("query syntax error: no 'select' clause");
+            throw new OQLException("query syntax error: no 'select' clause"); // NOI18N
         }
 
-        String selectExpr = "";
+        String selectExpr = ""; // NOI18N
         boolean seenFrom = false;
         while (st.hasMoreTokens()) {
             String tok = st.nextToken();
-            if (tok.equals("from")) {
+            if (tok.equals("from")) { // NOI18N
                 seenFrom = true;
                 break;
             }
-            selectExpr += " " + tok;
+            selectExpr += " " + tok; // NOI18N
         }
 
-        if (selectExpr.equals("")) {
-            throw new OQLException("query syntax error: 'select' expression can not be empty");
+        if (selectExpr.equals("")) { // NOI18N
+            throw new OQLException("query syntax error: 'select' expression can not be empty"); // NOI18N
         }
 
         String className = null;
@@ -125,40 +155,40 @@ public class OQLEngine {
         if (seenFrom) {
             if (st.hasMoreTokens()) {
                 String tmp = st.nextToken();
-                if (tmp.equals("instanceof")) {
+                if (tmp.equals("instanceof")) { // NOI18N
                     isInstanceOf = true;
                     if (!st.hasMoreTokens()) {
-                        throw new OQLException("no class name after 'instanceof'");
+                        throw new OQLException("no class name after 'instanceof'"); // NOI18N
                     }
                     className = st.nextToken();
                 } else {
                     className = tmp;
                 }
             } else {
-                throw new OQLException("query syntax error: class name must follow 'from'");
+                throw new OQLException("query syntax error: class name must follow 'from'"); // NOI18N
             }
 
             if (st.hasMoreTokens()) {
                 identifier = st.nextToken();
-                if (identifier.equals("where")) {
-                    throw new OQLException("query syntax error: identifier should follow class name");
+                if (identifier.equals("where")) { // NOI18N
+                    throw new OQLException("query syntax error: identifier should follow class name"); // NOI18N
                 }
                 if (st.hasMoreTokens()) {
                     String tmp = st.nextToken();
-                    if (!tmp.equals("where")) {
-                        throw new OQLException("query syntax error: 'where' clause expected after 'from' clause");
+                    if (!tmp.equals("where")) { // NOI18N
+                        throw new OQLException("query syntax error: 'where' clause expected after 'from' clause"); // NOI18N
                     }
 
-                    whereExpr = "";
+                    whereExpr = "";  // NOI18N
                     while (st.hasMoreTokens()) {
-                        whereExpr += " " + st.nextToken();
+                        whereExpr += " " + st.nextToken(); // NOI18N
                     }
-                    if (whereExpr.equals("")) {
-                        throw new OQLException("query syntax error: 'where' clause cannot have empty expression");
+                    if (whereExpr.equals("")) { // NOI18N
+                        throw new OQLException("query syntax error: 'where' clause cannot have empty expression"); // NOI18N
                     }
                 }
             } else {
-                throw new OQLException("query syntax error: identifier should follow class name");
+                throw new OQLException("query syntax error: identifier should follow class name"); // NOI18N
             }
         }
 
@@ -176,19 +206,19 @@ public class OQLEngine {
 
             clazz = snapshot.findClass(className);
             if (clazz == null) {
-                throw new OQLException(className + " is not found!");
+                throw new OQLException(className + " is not found!"); // NOI18N
             }
         }
 
         StringBuffer buf = new StringBuffer();
-        buf.append("function __select__(");
+        buf.append("function __select__("); // NOI18N
         if (q.identifier != null) {
             buf.append(q.identifier);
         }
-        buf.append(") { return ");
-        buf.append(q.selectExpr.replace('\n', ' '));
-        buf.append("; }\n");
-        buf.append("__select__(" + q.identifier + ")");
+        buf.append(") { return "); // NOI18N
+        buf.append(q.selectExpr.replace('\n', ' ')); // NOI18N
+        buf.append("; }\n"); // NOI18N
+        buf.append("__select__(" + q.identifier + ")"); // NOI18N
 
         String selectCode = buf.toString();
 
@@ -201,12 +231,10 @@ public class OQLEngine {
             selectCs = ((Compilable)engine).compile(selectCode);
             
             if (q.whereExpr != null) {
-                whereCs = ((Compilable)engine).compile(q.whereExpr.replace('\n', ' '));
+                whereCs = ((Compilable)engine).compile(q.whereExpr.replace('\n', ' ')); // NOI18N
             }
 
             if (q.className != null) {
-//                Enumeration objects = clazz.getInstances(q.isInstanceOf);
-
                 Stack toInspect = new Stack();
                 toInspect.push(clazz);
 
@@ -266,7 +294,6 @@ public class OQLEngine {
             Iterator iter = (Iterator) jsObject;
             while (iter.hasNext()) {
                 if (dispatchValue(iter.next(), visitor)) return true;
-//                if (visitor.visit(unwrapJavaObject(iter.next()))) return true;
             }
             return false;
         } else if (jsObject instanceof Enumeration) {
@@ -274,11 +301,6 @@ public class OQLEngine {
             while (enm.hasMoreElements()) {
                 Object elem = enm.nextElement();
                 if (dispatchValue(elem, visitor)) return true;
-//                if (elem != null) {
-//                    elem = unwrapJavaObject(elem);
-//
-//                    if (visitor.visit(unwrapJavaObject(elem))) return true;
-//                }
             }
             return false;
         } else {
@@ -287,9 +309,6 @@ public class OQLEngine {
             if (object instanceof Object[]) {
                 for (Object obj1 : (Object[]) object) {
                     if (dispatchValue(obj1, visitor)) return true;
-//                    if (visitor.visit(unwrapJavaObject(obj1, true))) {
-//                        return true;
-//                    }
                 }
                 return false;
             }
@@ -306,11 +325,11 @@ public class OQLEngine {
     }
 
     public Object wrapJavaObject(Instance obj) throws Exception {
-        return call("wrapJavaObject", new Object[]{obj});
+        return call("wrapJavaObject", new Object[]{obj}); // NOI18N
     }
 
     public Object toHtml(Object obj) throws Exception {
-        return call("toHtml", new Object[]{obj});
+        return call("toHtml", new Object[]{obj}); // NOI18N
     }
 
     public Object call(String func, Object[] args) throws Exception {
@@ -324,51 +343,37 @@ public class OQLEngine {
 
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
         if (object == null) return null;
-        boolean isNativeJS = object.getClass().getName().contains(".javascript.");
+        boolean isNativeJS = object.getClass().getName().contains(".javascript."); // NOI18N
 
         try {
-            Object ret = ((Invocable)engine).invokeFunction("unwrapJavaObject", object);
+            Object ret = ((Invocable)engine).invokeFunction("unwrapJavaObject", object); // NOI18N
             if (isNativeJS && (ret == null || ret == object) && tryAssociativeArray) {
-                ret = ((Invocable)engine).invokeFunction("unwrapMap", object);
+                ret = ((Invocable)engine).invokeFunction("unwrapMap", object); // NOI18N
             }
             return ret;
         } catch (Exception ex) {
-            if (debug) {
-                ex.printStackTrace(System.err);
-            }
+            LOGGER.log(Level.WARNING, "Error unwrapping JS object", ex); // NOI18N
         }
         return null;
-    }
-
-    private static void debugPrint(String msg) {
-        if (debug) {
-            System.out.println(msg);
-        }
     }
 
     private void init(Snapshot snapshot) throws RuntimeException {
         this.snapshot = snapshot;
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
-            engine = manager.getEngineByName("JavaScript");
+            engine = manager.getEngineByName("JavaScript"); // NOI18N
             InputStream strm = getInitStream();
             CompiledScript cs = ((Compilable)engine).compile(new InputStreamReader(strm));
             cs.eval();
-            Object heap = ((Invocable)engine).invokeFunction("wrapHeapSnapshot", snapshot);
-            engine.put("heap", heap);
-        } catch (Exception e) {
-            if (debug) {
-                e.printStackTrace();
-            }
-            throw new RuntimeException(e);
+            Object heap = ((Invocable)engine).invokeFunction("wrapHeapSnapshot", snapshot); // NOI18N
+            engine.put("heap", heap); // NOI18N
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error initializing snapshot", ex); // NOI18N
+            throw new RuntimeException(ex);
         }
     }
 
     private InputStream getInitStream() {
-        return getClass().getResourceAsStream("/org/netbeans/modules/profiler/heapwalk/oql/resources/hat.js");
+        return getClass().getResourceAsStream("/org/netbeans/modules/profiler/heapwalk/oql/resources/hat.js"); // NOI18N
     }
-    private ScriptEngine engine;
-    private Snapshot snapshot;
-    private static boolean debug = true;
-    private static boolean oqlSupported;
 }
