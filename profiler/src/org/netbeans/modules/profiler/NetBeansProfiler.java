@@ -1457,7 +1457,7 @@ public final class NetBeansProfiler extends Profiler {
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     final Cursor cursor = mainWindow.getCursor();
-                    mainWindow.setCursor(org.openide.util.Utilities.createProgressCursor(mainWindow));
+                    mainWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
                     try {
                         if (!runCalibration(true, sessionSettings.getJavaExecutable(), sessionSettings.getJavaVersionString(),
