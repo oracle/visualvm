@@ -751,7 +751,7 @@ public class OQLEngineTest {
     public void testTop() throws Exception {
         System.out.println("top 5");
 
-        instance.executeQuery("select map(top(heap.objects('java.lang.String'), 'lhs.count < rhs.count', 5), 'it.count')", new ObjectVisitor() {
+        instance.executeQuery("select top(heap.objects('java.lang.String', false, '(2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset))) > 0'), '((2 * rhs.offset) + (2 * (rhs.value.length - (1*rhs.count + 1*rhs.offset)))) - ((2 * lhs.offset) + (2 * (lhs.value.length - (1*lhs.count + 1*lhs.offset))))')", new ObjectVisitor() {
 
             public boolean visit(Object o) {
                 System.out.println(o);
