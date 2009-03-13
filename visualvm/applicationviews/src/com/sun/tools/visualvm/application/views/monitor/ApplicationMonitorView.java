@@ -295,14 +295,9 @@ class ApplicationMonitorView extends DataSourceView {
             cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
             gcMonitoringSupported = jvm.isCollectionTimeSupported();
             if (cpuMonitoringSupported || gcMonitoringSupported) {
-                // TODO: use HostOverview once implemented to get processors count
                 // HostOverviewFactory.getSystemOverviewFor(app.getHost()).getAvailableProcessors();
-                JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
-                if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-                    JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-                    if (mxbeans != null)
-                        processors = mxbeans.getOperatingSystemMXBean().getAvailableProcessors();
-                }
+                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(JmxModelFactory.getJmxModelFor(app));
+                processors = mxbeans.getOperatingSystemMXBean().getAvailableProcessors();
             }
             initComponents();
         }        

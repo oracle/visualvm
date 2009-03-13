@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.killapp/1
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/killapp/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/killapp/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-

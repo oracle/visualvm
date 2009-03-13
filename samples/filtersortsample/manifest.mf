@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.visualvm.samples.filtersortsample
-OpenIDE-Module-Layer: org/visualvm/samples/filtersortsample/layer.xml
-OpenIDE-Module-Localizing-Bundle: org/visualvm/samples/filtersortsample/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-OpenIDE-Module-Install: org/visualvm/samples/filtersortsample/Install.class
-

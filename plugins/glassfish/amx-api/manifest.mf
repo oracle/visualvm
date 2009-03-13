@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.appserv.management
-OpenIDE-Module-Localizing-Bundle: com/sun/appserv/management/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-

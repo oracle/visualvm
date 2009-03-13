@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.application.views.monitor;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
@@ -40,8 +39,6 @@ import java.util.Set;
 public class ApplicationMonitorViewProvider extends PluggableDataSourceViewProvider<Application>{
     
     protected boolean supportsViewFor(Application application) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-
         Jvm jvm = JvmFactory.getJVMFor(application);
         return jvm.isMonitoringSupported();
     }
