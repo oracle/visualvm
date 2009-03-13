@@ -50,7 +50,10 @@ public class JavaPluginApplicationTypeFactory
         Jvm jvm = JvmFactory.getJVMFor(application);
         if (jvm.isBasicInfoSupported()) {
             String args = jvm.getJvmArgs();
-            int plugin_index = args.indexOf(JAVA_PLUGIN);
+            int plugin_index = -1;
+            if (args != null) {
+                plugin_index = args.indexOf(JAVA_PLUGIN);
+            }
             if (plugin_index != -1) {
                 String version;
                 int version_index = plugin_index + JAVA_PLUGIN.length();

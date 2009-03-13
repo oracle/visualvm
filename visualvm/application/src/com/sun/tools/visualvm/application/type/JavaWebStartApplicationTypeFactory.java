@@ -50,7 +50,10 @@ public class JavaWebStartApplicationTypeFactory
         Jvm jvm = JvmFactory.getJVMFor(application);
         if (jvm.isBasicInfoSupported()) {
             String args = jvm.getJvmArgs();
-            int jws_index = args.indexOf(JWS);
+            int jws_index = -1;
+            if (args != null) {
+                jws_index = args.indexOf(JWS);
+            }
             if (jws_index != -1) {
                 return new JavaWebStartApplicationType("");
             }

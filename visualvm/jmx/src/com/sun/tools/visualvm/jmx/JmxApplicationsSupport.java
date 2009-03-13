@@ -1,28 +1,27 @@
 /*
  *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  *  This code is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License version 2 only, as
  *  published by the Free Software Foundation.  Sun designates this
  *  particular file as subject to the "Classpath" exception as provided
  *  by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  *  This code is distributed in the hope that it will be useful, but WITHOUT
  *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  version 2 for more details (a copy is included in the LICENSE file that
  *  accompanied this code).
- * 
+ *
  *  You should have received a copy of the GNU General Public License version
  *  2 along with this work; if not, write to the Free Software Foundation,
  *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  *  Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
-
 package com.sun.tools.visualvm.jmx;
 
 import com.sun.tools.visualvm.application.Application;
@@ -31,7 +30,14 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.jmx.application.JmxApplicationDescriptorProvider;
 import com.sun.tools.visualvm.jmx.application.JmxApplicationProvider;
+import com.sun.tools.visualvm.jmx.PasswordAuthJmxEnvironmentFactory;
 import java.io.File;
+import java.io.IOException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -43,11 +49,12 @@ import org.openide.util.NbBundle;
  *
  * @since 1.1
  * @author Jiri Sedlacek
+ * @author Michal Bachorik
  */
 public final class JmxApplicationsSupport {
-    
+
     private static final String STORAGE_DIRNAME = "jmxapplications";    // NOI18N
-    
+
     private static final Object storageDirectoryLock = new Object();
     // @GuardedBy storageDirectoryLock
     private static File storageDirectory;
@@ -87,10 +94,39 @@ public final class JmxApplicationsSupport {
      * @throws JmxApplicationException if creating the application failed
      */
     public Application createJmxApplication(String connectionString, String displayName,
-                                            String username, String password) throws JmxApplicationException {
+            String username, String password) throws JmxApplicationException {
 
         return createJmxApplication(connectionString, displayName, username,
-                                    password, false, false);
+                password, false, false);
+    }
+
+    /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Throws a JmxApplicationException if the application
+     * cannot be created.
+     *
+     * Note that even if the created application isn't persistent for another
+     * VisualVM sessions, the host created for this application will be restored.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param jef jmx environment factory able to create a jmx environment
+     * @param cbh callbackhandler able to provide information to jmx environment factory
+     * @param saveCredentials if persistent, controls whether the jmx environment should be persisted for another VisualVM sessions
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @return created JMX application
+     * @throws JmxApplicationException if creating the application failed
+     */
+    public Application createJmxApplication(String connectionString,
+            String displayName, JmxEnvironmentFactory jef,
+            CallbackHandler cbh, boolean saveCredentials,
+            boolean persistent) throws JmxApplicationException {
+
+        if (displayName == null) {
+            displayName = connectionString; // NOI18N
+        }
+        return this.createJmxApplicationImpl(connectionString, displayName, jef,
+                cbh, saveCredentials, persistent);
     }
 
     /**
@@ -111,9 +147,9 @@ public final class JmxApplicationsSupport {
      * @throws JmxApplicationException if creating the application failed
      */
     public Application createJmxApplication(String connectionString,
-                                            String displayName, String username,
-                                            String password, boolean saveCredentials,
-                                            boolean persistent) throws JmxApplicationException {
+            String displayName, String username,
+            String password, boolean saveCredentials,
+            boolean persistent) throws JmxApplicationException {
 
         if (username == null) username = ""; // NOI18N
         if (password == null) password = ""; // NOI18N
@@ -121,7 +157,7 @@ public final class JmxApplicationsSupport {
             displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
 
         return this.createJmxApplicationImpl(connectionString, displayName, username,
-                                    password, saveCredentials, persistent);
+                password, saveCredentials, persistent);
     }
 
     /**
@@ -142,10 +178,10 @@ public final class JmxApplicationsSupport {
      * @throws JmxApplicationException if creating the application failed
      */
     public Application createJmxApplicationInteractive(String connectionString, String displayName,
-                                            String username, String password) {
+            String username, String password) {
 
         return createJmxApplicationInteractive(connectionString, displayName, username,
-                                    password, false, false);
+                password, false, false);
     }
 
     /**
@@ -165,29 +201,29 @@ public final class JmxApplicationsSupport {
      * @return created JMX application or null if creating the application failed
      */
     public Application createJmxApplicationInteractive(String connectionString,
-                                            String displayName, String username,
-                                            String password, boolean saveCredentials,
-                                            boolean persistent) {
+            String displayName, String username,
+            String password, boolean saveCredentials,
+            boolean persistent) {
 
         if (username == null) username = ""; // NOI18N
         if (password == null) password = ""; // NOI18N
         if (displayName == null)
             displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
-        
+
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         try {
             final String displayNameF = displayName;
             SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        pHandle[0] = ProgressHandleFactory.createHandle(
-                                NbBundle.getMessage(JmxApplicationsSupport.class,
-                                                    "LBL_Adding", displayNameF)); // NOI18N
-                        pHandle[0].setInitialDelay(0);
-                        pHandle[0].start();
-                    }
-                });
+                public void run() {
+                    pHandle[0] = ProgressHandleFactory.createHandle(
+                            NbBundle.getMessage(JmxApplicationsSupport.class,
+                            "LBL_Adding", displayNameF)); // NOI18N
+                    pHandle[0].setInitialDelay(0);
+                    pHandle[0].start();
+                }
+            });
             return createJmxApplicationImpl(connectionString, displayName,
-                            username, password, saveCredentials, persistent);
+                    username, password, saveCredentials, persistent);
         } catch (JmxApplicationException e) {
             NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
         } finally {
@@ -202,17 +238,85 @@ public final class JmxApplicationsSupport {
         return null;
     }
 
+     /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Displays progress during application creation and
+     * opens an error dialog if creating the application failed.
+     *
+     * Note that even if the created application isn't persistent for another
+     * VisualVM sessions, the host created for this application will be restored.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param jef jmx environment factory able to create a jmx environment
+     * @param cbh callbackhandler able to provide information to jmx environment factory
+     * @param saveCredentials if persistent, controls whether the jmx environment should be persisted for another VisualVM sessions
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @return created JMX application or null if creating the application failed
+     */
+    public Application createJmxApplicationInteractive(String connectionString,
+            String displayName, JmxEnvironmentFactory jef, CallbackHandler cbh, boolean saveCredentials,
+            boolean persistent) {
+
+
+        if (displayName == null) {
+            displayName = connectionString; // NOI18N
+        }
+        final ProgressHandle[] pHandle = new ProgressHandle[1];
+        try {
+            final String displayNameF = displayName;
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    pHandle[0] = ProgressHandleFactory.createHandle(
+                            NbBundle.getMessage(JmxApplicationsSupport.class,
+                            "LBL_Adding", displayNameF)); // NOI18N
+                    pHandle[0].setInitialDelay(0);
+                    pHandle[0].start();
+                }
+            });
+            if (jef ==null) {
+                return null;
+            }
+            return applicationProvider.createJmxApplication(connectionString,
+                displayName, jef.createJmxEnvironment(cbh), saveCredentials, persistent);
+        } catch (JmxApplicationException e) {
+            NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
+        } finally {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    if (pHandle[0] != null) {
+                        pHandle[0].finish();
+                    }
+                }
+            });
+        }
+        return null;
+    }
+
     private Application createJmxApplicationImpl(String connectionString,
                                             String displayName, String username,
                                             String password, boolean saveCredentials,
-                                            boolean persistent)
-                                            throws JmxApplicationException {
+            boolean persistent)
+            throws JmxApplicationException {
 
         return applicationProvider.createJmxApplication(connectionString,
                displayName, username, password, saveCredentials, persistent);
     }
-    
-    
+
+    private Application createJmxApplicationImpl(String connectionString,
+            String displayName, JmxEnvironmentFactory jef,
+            CallbackHandler cbh, boolean saveCredentials,
+            boolean persistent)
+            throws JmxApplicationException {
+        if (jef ==null) {
+            throw new JmxApplicationException("JmxEnvironmentFactory must not be null");
+        }
+        return applicationProvider.createJmxApplication(connectionString,
+                displayName, jef.createJmxEnvironment(cbh), saveCredentials, persistent);
+    }
+
     static String getStorageDirectoryString() {
         synchronized(storageDirectoryStringLock) {
             if (storageDirectoryString == null)
@@ -233,11 +337,11 @@ public final class JmxApplicationsSupport {
                 storageDirectory = new File(storageString);
                 if (storageDirectory.exists() && storageDirectory.isFile())
                     throw new IllegalStateException("Cannot create hosts storage directory " + storageString + ", file in the way");    // NOI18N
-                if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite())) 
+                if (storageDirectory.exists() && (!storageDirectory.canRead() || !storageDirectory.canWrite()))
                     throw new IllegalStateException("Cannot access hosts storage directory " + storageString + ", read&write permission required"); // NOI18N
                 if (!Utils.prepareDirectory(storageDirectory))
                     throw new IllegalStateException("Cannot create hosts storage directory " + storageString);  // NOI18N
-            }
+                }
             return storageDirectory;
         }
     }

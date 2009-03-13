@@ -63,7 +63,10 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
   
   protected Set<String> computeClusters(Jvm jvm) {
     String args = jvm.getJvmArgs();
-    int clusterIndex = args.indexOf(NETBEANS_DIRS);
+    int clusterIndex = -1;
+    if (args != null) {
+        clusterIndex = args.indexOf(NETBEANS_DIRS);
+    }
     String pathSeparator = jvm.getJavaHome().contains("\\")?";":":";    // NOI18N
     String separator = pathSeparator.equals(":")?"/":"\\";      // NOI18N
     Set<String> clusters = new HashSet();
