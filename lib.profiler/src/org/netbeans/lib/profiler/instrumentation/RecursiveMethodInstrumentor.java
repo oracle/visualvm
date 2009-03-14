@@ -446,6 +446,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     /** Create a multi-class packet of instrumented 1.5-style data */
     private Object[] createInstrumentedMethodPack15() {
+        DynamicClassInfo reflectMethodClass = null;
         int reflectMethodClassIdx = -1;
 
         if (!reflectInvokeInstrumented) {
@@ -457,13 +458,18 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
                 if (clazz.getName() == JAVA_LANG_REFLECT_METHOD_SLASHED_CLASS_NAME) {
                     reflectMethodClassIdx = idx;
-
+                    reflectMethodClass = clazz;
                     break;
                 }
             }
-
             if (reflectMethodClassIdx == -1) {
-                nInstrClasses++;
+                reflectMethodClass = javaClassForName(JAVA_LANG_REFLECT_METHOD_DOTTED_CLASS_NAME, 0);
+                if (reflectMethodClass != null) {
+                    nInstrClasses++;
+                }
+            }
+            if (reflectMethodClass == null) {
+                reflectInvokeInstrumented = true;
             }
         }
 
@@ -556,9 +562,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         }
 
         if (!reflectInvokeInstrumented) { // Special instrumentation of java.lang.reflect.Method.invoke()
-
-            DynamicClassInfo clazz = javaClassForName(JAVA_LANG_REFLECT_METHOD_DOTTED_CLASS_NAME, 0);
-            int nMethods = clazz.getMethodNames().length;
+            int nMethods = reflectMethodClass.getMethodNames().length;
             byte[][] replacementMethodInfos = new byte[nMethods][];
 
             if (reflectMethodClassIdx == -1) {
@@ -568,22 +572,22 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 classIdx = reflectMethodClassIdx;
 
                 for (int i = 0; i < nMethods; i++) {
-                    replacementMethodInfos[i] = clazz.getMethodInfo(i);
+                    replacementMethodInfos[i] = reflectMethodClass.getMethodInfo(i);
                 }
             }
 
-            int idx = clazz.getMethodIndex(INVOKE_METHOD_NAME, INVOKE_METHOD_SIGNATURE);
-            DynamicConstantPoolExtension.getCPFragment(clazz, INJ_REFLECT_METHOD_INVOKE);
+            int idx = reflectMethodClass.getMethodIndex(INVOKE_METHOD_NAME, INVOKE_METHOD_SIGNATURE);
+            DynamicConstantPoolExtension.getCPFragment(reflectMethodClass, INJ_REFLECT_METHOD_INVOKE);
 
-            replacementMethodInfos[idx] = InstrumentationFactory.instrumentAsReflectInvokeMethod(clazz, idx);
+            replacementMethodInfos[idx] = InstrumentationFactory.instrumentAsReflectInvokeMethod(reflectMethodClass, idx);
 
-            DynamicConstantPoolExtension wholeECP = DynamicConstantPoolExtension.getAllAddedCPFragments(clazz);
+            DynamicConstantPoolExtension wholeECP = DynamicConstantPoolExtension.getAllAddedCPFragments(reflectMethodClass);
             int nAddedCPEntries = wholeECP.getNEntries();
             byte[] addedCPContents = wholeECP.getContents();
-            replacementClassFileBytes[classIdx] = ClassRewriter.rewriteClassFile(clazz, replacementMethodInfos, nAddedCPEntries,
+            replacementClassFileBytes[classIdx] = ClassRewriter.rewriteClassFile(reflectMethodClass, replacementMethodInfos, nAddedCPEntries,
                                                                                  addedCPContents);
 
-            clazz.saveMethodInfo(idx, replacementMethodInfos[idx]);
+            reflectMethodClass.saveMethodInfo(idx, replacementMethodInfos[idx]);
             reflectInvokeInstrumented = true;
         }
 
@@ -666,7 +670,6 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     private void instrumentServletDoMethods(DynamicClassInfo clazz, byte[][] replacementMethodInfos) {
         if (!Boolean.getBoolean("org.netbeans.lib.profiler.servletTracking")) { // NOI18N
-
             return;
         }
 
