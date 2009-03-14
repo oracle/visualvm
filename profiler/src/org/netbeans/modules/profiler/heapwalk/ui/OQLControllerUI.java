@@ -306,6 +306,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private JPanel progressPanel;
         private JPanel contentsPanel;
 
+        private boolean queryValid = true;
 
         private static ImageIcon ICON = ImageUtilities.loadImageIcon(
                 "org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png", false); // NOI18N
@@ -370,7 +371,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             if (queryController.getOQLController().isQueryRunning()) {
                 runButton.setEnabled(false);
             } else {
-                runButton.setEnabled(true);
+                runButton.setEnabled(editor.getScript().length() > 0 && queryValid);
+                saveButton.setEnabled(editor.getScript().length() > 0 && queryValid);
             }
         }
 
@@ -404,6 +406,13 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
         private void initComponents(OQLEngine engine) {
             editor = new OQLEditor(engine);
+            editor.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    queryValid = (Boolean)evt.getNewValue();
+                    updateButtons();
+                }
+            });
             editor.setBackground(UIUtils.getProfilerResultsBackground());
 
             JScrollPane editorScroll = new JScrollPane(editor,
