@@ -279,67 +279,80 @@ public class Platform implements CommonConstants {
 
         return 0;
     }
+    
+    /**
+     * Returns the JFluid-internal JDK version number
+     */
+    private static int getJDKVersionNumber(String javaVersion) {
+        int jdkVersion;
 
+        if (javaVersion.startsWith("1.5")) { // NOI18N
+            jdkVersion = JDK_15;
+        } else if (javaVersion.startsWith("1.6")) { // NOI18N
+            jdkVersion = JDK_16;
+        } else if (javaVersion.startsWith("1.7")) { // NOI18N
+            jdkVersion = JDK_17;
+        } else if (javaVersion.equals("CVM")) { // NOI18N
+            jdkVersion = JDK_CVM;
+        } else {
+            jdkVersion = JDK_UNSUPPORTED;
+        }
+        return jdkVersion;
+    }
+
+    
     /**
      * Returns the JFluid-internal JDK version number
      */
     public static int getJDKVersionNumber() {
         if (jdkVersion == 0) {
-            String javaVersion = System.getProperty("java.version"); // NOI18N
-
-            if (javaVersion.startsWith("1.5")) { // NOI18N
-                jdkVersion = JDK_15;
-            } else if (javaVersion.startsWith("1.6")) { // NOI18N
-                jdkVersion = JDK_16;
-            } else if (javaVersion.startsWith("1.7")) { // NOI18N
-                jdkVersion = JDK_17;
-            } else if (javaVersion.startsWith("phoneme_advanced")) { // NOI18N
-                jdkVersion = JDK_CVM;
-            } else {
-                jdkVersion = JDK_UNSUPPORTED;
-            }
+            jdkVersion = getJDKVersionNumber(getJavaVersionString()); // NOI18N
         }
-
         return jdkVersion;
     }
 
     /**
      * Returns the string for, essentially, JFluid directory corresponding to a particular JDK version the TA runs on.
-     * Currently it's "jdk15" for JDK 1.5 version and "jdk16" for JDK 1.6 version.
+     * Currently it's "jdk15" for JDK 1.5 version and "jdk16" for JDK 1.6 version, "jdk17" for JDK 1.7 version
+     * and "cvm" for CVM
      */
     public static String getJDKVersionString(String javaVersionString) {
-        if (javaVersionString == null) {
-            return JDK_UNSUPPORTED_STRING;
+        int jdkVersionNumber = getJDKVersionNumber(javaVersionString);
+        
+        switch (jdkVersionNumber) {
+            case JDK_15: return JDK_15_STRING;
+            case JDK_16: return JDK_16_STRING;
+            case JDK_17: return JDK_17_STRING;
+            case JDK_CVM: return JDK_CVM_STRING;
+            case JDK_UNSUPPORTED: return JDK_UNSUPPORTED_STRING;
         }
-
-        if (javaVersionString.startsWith("1.5")) { // NOI18N
-
-            return JDK_15_STRING;
-        } else if (javaVersionString.startsWith("1.6")) { // NOI18N
-
-            return JDK_16_STRING;
-        } else if (javaVersionString.startsWith("1.7")) { // NOI18N
-
-            return JDK_17_STRING;
-         } else if (javaVersionString.startsWith("phoneme_advanced")) {// NOI18N
-	    return JDK_CVM_STRING;
-        } else {
-            return JDK_UNSUPPORTED_STRING;
-        }
+        System.err.println("Unsupported java "+javaVersionString);
+        return JDK_UNSUPPORTED_STRING;
     }
 
     /**
      * Returns the string for, essentially, JFluid directory corresponding to a particular JDK version the TA runs on.
-     * Currently it's "jdk15" for JDK 1.5 version, "jdk16" for JDK 1.6 version and jdk17 for JDK 1.7 version.
+     * Currently it's "jdk15" for JDK 1.5 version, "jdk16" for JDK 1.6 version, "jdk17" for JDK 1.7 version
+     * and "cvm" for CVM
      */
     public static String getJDKVersionString() {
         if (jdkDenoteString == null) {
-            jdkDenoteString = getJDKVersionString(System.getProperty("java.version")); // NOI18N
+            jdkDenoteString = getJDKVersionString(getJavaVersionString());
         }
-
         return jdkDenoteString;
     }
 
+    public static String getJavaVersionString() {
+        // This is ugly hack for CVM. CVM cannot be identified using java.version
+        // system property and we have to use java.vm.name which is hardcoded
+        // to "CVM"
+        String vmVersion = System.getProperty("java.vm.name");   // NOI18N
+        if ("CVM".equals(vmVersion)) {
+            return vmVersion;
+        }
+        return System.getProperty("java.version");  // NOI18N
+    }
+    
     public static String getJFluidNativeLibDirName(String fullJFluidPath, String jdkString, int architecture) {
         String jFluidNativeLibFullName = getAgentNativeLibFullName(fullJFluidPath, false, jdkString, architecture);
 

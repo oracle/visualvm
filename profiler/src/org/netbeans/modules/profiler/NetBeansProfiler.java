@@ -1848,10 +1848,14 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     private void cleanupBeforeProfiling(ProfilerEngineSettings sharedSettings) {
-        Profiler profiler = Profiler.getDefault();
+        final Profiler profiler = Profiler.getDefault();
 
-        profiler.getThreadsManager().reset();
-        profiler.getVMTelemetryManager().reset();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                profiler.getThreadsManager().reset();
+                profiler.getVMTelemetryManager().reset();
+            }
+        });
         ProfilingPointsManager.getDefault().reset();
         ResultsManager.getDefault().reset();
 
