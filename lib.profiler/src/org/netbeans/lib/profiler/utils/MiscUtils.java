@@ -358,12 +358,15 @@ public class MiscUtils implements CommonConstants {
         String jdkVersionString = (String) jdkProperties.get("java.version"); // NOI18N
         String vmNameString = (String) jdkProperties.get("java.vm.name"); // NOI18N
 
-        if ((jdkVersionString == null) || (vmNameString == null)) { // probably not a platform for JDK
-
+        if (jdkVersionString == null || vmNameString == null) { // probably not a platform for JDK
             return false;
         }
 
-        return isSupported15or16or17orCvm(jdkVersionString);
+        if (isSupported15or16or17orCvm(jdkVersionString)) {
+            return true;
+        }
+        // CVM is recognized via java.vm.name system property
+        return isSupported15or16or17orCvm(vmNameString);
     }
 
     // This method is used for checking running JVM if supported.
@@ -555,7 +558,7 @@ public class MiscUtils implements CommonConstants {
             } else {
                 return true;
             }
-        } else if (jdkVersionString.startsWith("phoneme_advanced")) {
+        } else if (jdkVersionString.equals("CVM")) {
             return true;
         }
         return false;
