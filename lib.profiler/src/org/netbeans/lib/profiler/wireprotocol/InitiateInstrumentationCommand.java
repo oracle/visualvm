@@ -40,12 +40,9 @@
 
 package org.netbeans.lib.profiler.wireprotocol;
 
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.*;
-
 
 /**
  * Request from the client to the back end to initiate TA instrumentation of the given type.
@@ -56,15 +53,6 @@ import java.util.*;
  * @author Ian Formanek
  */
 public class InitiateInstrumentationCommand extends Command {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    private static final class ByIdComparator implements Comparator {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public int compare(Object o1, Object o2) {
-            return ((RuntimeProfilingPoint) o1).getId() - ((RuntimeProfilingPoint) o2).getId();
-        }
-    }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -78,27 +66,10 @@ public class InitiateInstrumentationCommand extends Command {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Legacy support for single root instrumentation */
-    public InitiateInstrumentationCommand(int instrType, String className, boolean instrSpawnedThreads,
-                                          boolean startProfilingPointsActive) {
+    public InitiateInstrumentationCommand(int instrType, String[] classNames,
+                                          int[] ppIDs, String[] ppHandlers, String[] ppInfos,
+                                          boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
         super(INITIATE_INSTRUMENTATION);
-        this.instrType = instrType;
-
-        if (className == null) {
-            className = " "; // NOI18N
-                             // We can have root class equal to null if e.g. we instrument object allocations in an app to which we attach at run time
-        }
-
-        this.classNames = new String[1];
-        this.classNames[0] = className;
-        this.instrSpawnedThreads = instrSpawnedThreads;
-        this.startProfilingPointsActive = startProfilingPointsActive;
-    }
-
-    public InitiateInstrumentationCommand(int instrType, String[] classNames, boolean instrSpawnedThreads,
-                                          boolean startProfilingPointsActive) {
-        super(INITIATE_INSTRUMENTATION);
-
         if ((classNames == null)) {
             classNames = new String[] { " " }; // NOI18N
         } else if (classNames[0] == null) {
@@ -107,18 +78,26 @@ public class InitiateInstrumentationCommand extends Command {
 
         this.instrType = instrType;
         this.classNames = classNames;
+        profilingPointIDs = ppIDs;
+        profilingPointHandlers = ppHandlers;
+        profilingPointInfos = ppInfos;
         this.instrSpawnedThreads = instrSpawnedThreads;
         this.startProfilingPointsActive = startProfilingPointsActive;
     }
+    
+    /** Legacy support for single root instrumentation */
+    public InitiateInstrumentationCommand(int instrType, String className, boolean instrSpawnedThreads,
+                                          boolean startProfilingPointsActive) {
+        this(instrType,
+             className==null ? new String[]{" "} : new String[]{className},
+             null,null,null,
+             instrSpawnedThreads,startProfilingPointsActive);
+    }
+
 
     /** This is a special method only called to setup the connection in ProfilerClient.connectToServer() - see comments there */
-    public InitiateInstrumentationCommand(int instrType, String className, boolean startProfilingPointsActive) {
-        super(INITIATE_INSTRUMENTATION);
-        this.instrType = instrType;
-        this.classNames = new String[1]; //multiple roots, legacy support for one root
-        this.classNames[0] = className;
-        this.instrSpawnedThreads = false;
-        this.startProfilingPointsActive = startProfilingPointsActive;
+    public InitiateInstrumentationCommand(int instrType, String className) {
+        this(instrType,className,false,false);
     }
 
     // Custom serialzation support
@@ -150,20 +129,6 @@ public class InitiateInstrumentationCommand extends Command {
 
     public String[] getProfilingPointInfos() {
         return profilingPointInfos;
-    }
-
-    public void setProfilingPoints(RuntimeProfilingPoint[] points) {
-        profilingPointHandlers = new String[points.length];
-        profilingPointInfos = new String[points.length];
-        profilingPointIDs = new int[points.length];
-        Arrays.sort(points, new ByIdComparator()); // ProfilerRuntime uses Arrays.binarySearch
-
-        for (int i = 0; i < points.length; i++) {
-            RuntimeProfilingPoint point = points[i];
-            profilingPointIDs[i] = point.getId();
-            profilingPointHandlers[i] = point.getServerHandlerClass();
-            profilingPointInfos[i] = point.getServerInfo();
-        }
     }
 
     public String getRootClassName() {

@@ -40,6 +40,8 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
@@ -50,7 +52,8 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 public class OQLEditor extends JPanel {
-
+    final public static String VALIDITY_PROPERTY = OQLEditorImpl.VALIDITY_PROPERTY;
+    
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
@@ -65,7 +68,13 @@ public class OQLEditor extends JPanel {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
             queryEditor = impl.getEditorPane();
-            queryEditor.getDocument().putProperty(OQLEngine.class, engine);
+            impl.addPropertyChangeListener(VALIDITY_PROPERTY, new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    firePropertyChange(VALIDITY_PROPERTY, (Boolean)evt.getOldValue(), (Boolean)evt.getNewValue());
+                }
+            });
+//            queryEditor.getDocument().putProperty(OQLEngine.class, engine); // commented out; not necessery now when there is no code-completion
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
         }

@@ -153,7 +153,7 @@ public class ReviewSettingsPanel extends AttachWizardPanel {
     }
 
     public void onPanelShow() {
-        this.model.setSummary(buildSummary(((AttachWizardContext) getContext()).getAttachSettings()));
+        this.model.setSummary(buildSummary(getContext().getAttachSettings()));
         this.panel.refresh();
     }
 

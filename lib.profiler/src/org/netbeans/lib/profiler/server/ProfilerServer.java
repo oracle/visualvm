@@ -1583,7 +1583,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 status.jvmArguments = Threads.getJVMArguments();
                 status.javaCommand = Threads.getJavaCommand();
 
-                VMPropertiesResponse resp = new VMPropertiesResponse(System.getProperty("java.version"), // NOI18N
+                VMPropertiesResponse resp = new VMPropertiesResponse(Platform.getJavaVersionString(), 
                                                                      System.getProperty("java.class.path"), // NOI18N
                                                                      System.getProperty("java.ext.dirs"), // NOI18N
                                                                      System.getProperty("sun.boot.class.path"), // NOI18N
