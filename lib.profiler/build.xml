@@ -59,6 +59,14 @@ made subject to such option by the copyright holder.
              <include name="org/netbeans/lib/profiler/server/system/**"/>
              <compilerarg line="${javac.compilerargs}"/>
         </javac>
+        <mkdir dir="${build.classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="${build.compiler.debug}" debuglevel="${build.compiler.debuglevel}" encoding="UTF-8"
+                classpath="${build15.classes.dir}" deprecation="${build.compiler.deprecation}" optimize="${build.compiler.optimize}" source="1.4" target="1.4" includeantruntime="false">
+            <include name="org/netbeans/lib/profiler/server/**"/>
+            <include name="org/netbeans/lib/profiler/global/**"/>
+            <include name="org/netbeans/lib/profiler/wireprotocol/**"/>
+            <compilerarg line="${javac.compilerargs}"/>
+        </javac>
     </target>
 
     <target name="post-compile" depends="projectized-common.compile">

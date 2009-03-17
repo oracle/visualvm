@@ -51,7 +51,7 @@ import org.netbeans.lib.profiler.classfile.ClassRepository;
  * @author Tomas Hurka
  * @author Maros Sandor
  */
-public class RuntimeProfilingPoint {
+public class RuntimeProfilingPoint implements Comparable {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     /**
@@ -228,6 +228,10 @@ public class RuntimeProfilingPoint {
     public String toString() {
         return "RuntimeProfilingPoint [id=" + id + ", classname=" + className + ", line=" + line + ", offset=" + offset
                + ", server handler=" + serverHandlerClass + "]"; //NOI18N
+    }
+
+    public int compareTo(Object o) {
+       return getId() - ((RuntimeProfilingPoint)o).getId();
     }
 
     private boolean resolveLineNumber(ClassInfo classInfo) {
