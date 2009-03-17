@@ -42,7 +42,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
@@ -82,7 +81,7 @@ public class OQLEditor extends JPanel {
                     lexervalid = (Boolean) evt.getNewValue();
                 }
             });
-//            queryEditor.getDocument().putProperty(OQLEngine.class, engine); // commented out; not necessary now when there is no code-completion
+            queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
         }
