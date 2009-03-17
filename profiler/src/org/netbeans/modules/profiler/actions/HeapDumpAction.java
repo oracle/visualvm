@@ -46,6 +46,7 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
@@ -370,17 +371,12 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
         if (CommonConstants.JDK_15_STRING.equals(jdkVersion)) {
             String fullJDKString = targetApp.getProfilingSessionStatus().fullTargetJDKVersionString;
-            int minorIndex = fullJDKString.lastIndexOf('_'); // NOI18N
-
-            if ((minorIndex > 0) && (minorIndex < (fullJDKString.length() - 1))) {
-                String minorString = fullJDKString.substring(minorIndex + 1);
-
-                if (Integer.parseInt(minorString) >= 12) {
-                    return true;
-                }
+            int minorNumber = Platform.getJDKMinorNumber(fullJDKString);
+            
+            if (minorNumber >= 12) {
+                return true;
             }
         }
-
         return false;
     }
 
