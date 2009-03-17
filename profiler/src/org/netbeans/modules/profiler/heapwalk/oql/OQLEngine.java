@@ -50,7 +50,6 @@ import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
@@ -125,7 +124,7 @@ public class OQLEngine {
             // Just treat it as plain JavaScript and eval it.
             try {
                 Object res = evalScript(query);
-                visitor.visit(res);
+                dispatchValue(res, visitor);
             } catch (Exception e) {
                 throw new OQLException(e);
             }
