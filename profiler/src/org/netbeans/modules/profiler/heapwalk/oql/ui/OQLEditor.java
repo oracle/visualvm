@@ -44,25 +44,31 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
+import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
+import org.openide.awt.StatusDisplayer;
 import org.openide.util.Lookup;
+
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class OQLEditor extends JPanel {
+
     final public static String VALIDITY_PROPERTY = OQLEditorImpl.VALIDITY_PROPERTY;
-    
+    volatile private boolean lexervalid = false;
+    volatile private boolean parserValid = false;
+    volatile private boolean oldValidity = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
-
 
     public OQLEditor(OQLEngine engine) {
         this.engine = engine;
         init();
     }
-
 
     private void init() {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
@@ -71,13 +77,29 @@ public class OQLEditor extends JPanel {
             impl.addPropertyChangeListener(VALIDITY_PROPERTY, new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
-                    firePropertyChange(VALIDITY_PROPERTY, (Boolean)evt.getOldValue(), (Boolean)evt.getNewValue());
+                    // capturing the lexer state
+                    lexervalid = (Boolean) evt.getNewValue();
                 }
             });
-//            queryEditor.getDocument().putProperty(OQLEngine.class, engine); // commented out; not necessery now when there is no code-completion
+            queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
         }
+
+        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void insertUpdate(DocumentEvent e) {
+                validateScript();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                validateScript();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                validateScript();
+            }
+        });
 
         queryEditor.setOpaque(isOpaque());
         queryEditor.setBackground(getBackground());
@@ -94,19 +116,20 @@ public class OQLEditor extends JPanel {
         return queryEditor.getText();
     }
 
-
     @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
-        if (queryEditor != null)
+        if (queryEditor != null) {
             queryEditor.setBackground(bg);
+        }
     }
 
     @Override
     public void setOpaque(boolean isOpaque) {
         super.setOpaque(isOpaque);
-        if (queryEditor != null)
+        if (queryEditor != null) {
             queryEditor.setOpaque(isOpaque);
+        }
     }
 
     @Override
@@ -114,4 +137,19 @@ public class OQLEditor extends JPanel {
         queryEditor.requestFocus();
     }
 
+    final private void validateScript() {
+        if (lexervalid || !parserValid) {
+            // only parse the query if there are no errors from lexer
+            try {
+                engine.parseQuery(getScript());
+                parserValid = true;
+            } catch (OQLException e) {
+                StatusDisplayer.getDefault().setStatusText(e.getLocalizedMessage());
+                parserValid = false;
+            }
+        }
+
+        firePropertyChange(VALIDITY_PROPERTY, oldValidity, lexervalid && parserValid);
+        oldValidity = lexervalid && parserValid;
+    }
 }
