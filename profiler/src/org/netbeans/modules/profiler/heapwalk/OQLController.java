@@ -550,9 +550,9 @@ public class OQLController extends AbstractTopLevelController
                 String name =
                     properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i).trim(); // NOI18N
                 String description =
-                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i).trim(); // NOI18N
+                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i, "").trim(); // NOI18N
                 String script =
-                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i).trim(); // NOI18N
+                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i, "").trim(); // NOI18N
                 if (name != null && script != null)
                     model.addElement(new Query(script, name, description));
             }

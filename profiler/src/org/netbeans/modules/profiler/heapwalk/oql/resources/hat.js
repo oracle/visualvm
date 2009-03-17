@@ -1271,17 +1271,19 @@ function toArray(obj) {
 }
 
 function top(array, code, num) {
-    var cutoff = num * 100;
     if (array == undefined) {
         return array;
     }
     var func;
+    println(code);
     if (code == undefined) {
         func = function(lhs, rhs) {
             return 1; // first-come order
         }
     } else if (typeof(code) == 'string') {
         func = new Function("lhs", "rhs", "return " + code);
+    } else {
+        func = code;
     }
 
     if (num == undefined) {
