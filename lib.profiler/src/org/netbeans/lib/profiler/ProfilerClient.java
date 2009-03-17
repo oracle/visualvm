@@ -44,6 +44,7 @@ import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.MonitoredData;
+import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
@@ -896,10 +897,9 @@ public class ProfilerClient implements CommonConstants {
             // If the target app is already running, then instrumentation starts immediately and isn't triggered by a class
             // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
             // contain rootClassName.
-            String rootClassName = settings.getMainClassName();
-            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(instrType, rootClassName, false,
+            String[] rootClassNames = new String[]{settings.getMainClassName()};
+            InitiateInstrumentationCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames, false,
                                                                                     status.startProfilingPointsActive);
-            cmd.setProfilingPoints(settings.getRuntimeProfilingPoints());
             commandOnStartup = cmd;
 
             //      switch (instrType) {
@@ -955,10 +955,9 @@ public class ProfilerClient implements CommonConstants {
 
             String[] rootClassNames = instrumentor.getRootClassNames();
             int instrType = (settings.getCPUProfilingType() == CPU_INSTR_FULL) ? INSTR_RECURSIVE_FULL : INSTR_RECURSIVE_SAMPLED;
-            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(instrType, rootClassNames,
+            InitiateInstrumentationCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
                                                                                     instrSpawnedThreads,
                                                                                     status.startProfilingPointsActive);
-            cmd.setProfilingPoints(settings.getRuntimeProfilingPoints());
             commandOnStartup = cmd;
             status.setTimerTypes(settings.getAbsoluteTimerOn(), settings.getThreadCPUTimerOn());
 
@@ -1646,7 +1645,7 @@ public class ProfilerClient implements CommonConstants {
             // Note that here we can't use normal getCmd(), since this shared object could already have been initialized with
             // real data.
             error = sendCommandAndGetResponse(new InitiateInstrumentationCommand(INSTR_RECURSIVE_FULL,
-                                                                                 "*FAKE_CLASS_FOR_INTERNAL_TEST*", false) // NOI18N
+                                                                                 "*FAKE_CLASS_FOR_INTERNAL_TEST*") // NOI18N
             ); // NOI18N
 
             if (error != null) {
@@ -1971,5 +1970,24 @@ public class ProfilerClient implements CommonConstants {
             } catch (ClientUtils.TargetAppOrVMTerminated ex1) { /* All done already */
             }
         }
+    }
+    
+    private InitiateInstrumentationCommand createInitiateInstrumnetation(int instrType, String[] classNames,
+                                          boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
+        RuntimeProfilingPoint points[] = settings.getRuntimeProfilingPoints();
+        String[] profilingPointHandlers = new String[points.length];
+        String[] profilingPointInfos = new String[points.length];
+        int[] profilingPointIDs = new int[points.length];
+        Arrays.sort(points); // ProfilerRuntime uses Arrays.binarySearch
+
+        for (int i = 0; i < points.length; i++) {
+            RuntimeProfilingPoint point = points[i];
+            profilingPointIDs[i] = point.getId();
+            profilingPointHandlers[i] = point.getServerHandlerClass();
+            profilingPointInfos[i] = point.getServerInfo();
+        }
+        return new InitiateInstrumentationCommand(instrType,classNames,
+                        profilingPointIDs,profilingPointHandlers,profilingPointInfos,
+                        instrSpawnedThreads,startProfilingPointsActive);
     }
 }

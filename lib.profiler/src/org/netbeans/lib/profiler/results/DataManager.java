@@ -43,10 +43,6 @@ package org.netbeans.lib.profiler.results;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 
 /**
  * A common functionality for DataManagers
@@ -56,7 +52,6 @@ import java.util.concurrent.Executors;
 public abstract class DataManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private static Executor eventDispatcher = Executors.newCachedThreadPool();
     private final Set listeners = new HashSet();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -101,11 +96,7 @@ public abstract class DataManager {
 
         while (iterator.hasNext()) {
             final DataManagerListener listener = ((DataManagerListener) iterator.next());
-            eventDispatcher.execute(new Runnable() {
-                    public void run() {
-                        listener.dataChanged();
-                    }
-                });
+            listener.dataChanged();
         }
     }
 
@@ -129,11 +120,7 @@ public abstract class DataManager {
 
         while (iterator.hasNext()) {
             final DataManagerListener listener = ((DataManagerListener) iterator.next());
-            eventDispatcher.execute(new Runnable() {
-                    public void run() {
-                        listener.dataReset();
-                    }
-                });
+            listener.dataReset();
         }
     }
 }

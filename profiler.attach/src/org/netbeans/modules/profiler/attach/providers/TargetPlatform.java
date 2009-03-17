@@ -92,7 +92,7 @@ public class TargetPlatform {
             this.displayName = platform.getDisplayName();
             this.version = platform.getSpecification().getVersion();
 
-            FileObject folder = (FileObject) platform.getInstallFolders().iterator().next();
+            FileObject folder = platform.getInstallFolders().iterator().next();
             final String hostOS = System.getProperty("os.name"); // NOI18N
             this.javaHome = URLDecoder.decode(folder.getURL().getPath(), "utf8"); // NOI18N
 

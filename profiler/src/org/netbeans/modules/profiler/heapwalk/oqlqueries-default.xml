@@ -62,5 +62,30 @@ query-script-{x}: query script (not to be localized)
     <entry key="query-name-0">Sample: List java.io.File instances</entry>
     <entry key="query-descr-0">Sample OQL query to list all instances of java.io.File allocated on the heap.</entry>
     <entry key="query-script-0">select x from java.io.File x</entry>
+
+    <entry key="query-name-1">Sample: Overallocated Strings</entry>
+    <entry key="query-descr-1">
+<![CDATA[
+Computes overhead of Strings that have their backing char[] larger than necessary (for example result of String.substring()).
+]]>
+    </entry>
+    <entry key="query-script-1">
+<![CDATA[
+select map(
+    top(heap.objects("java.lang.String", false, '(2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset))) > 0'),
+        '((2 * rhs.offset) + (2 * (rhs.value.length - (1*rhs.count + 1*rhs.offset)))) - ((2 * lhs.offset) + (2 * (lhs.value.length - (1*lhs.count + 1*lhs.offset))))'),
+    'toHtml(it) + " wasting " + ((2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset)))) + "b"')
+]]>
+    </entry>
+
+    <entry key="query-name-2">Sample: Too many Booleans</entry>
+    <entry key="query-descr-2">Checks if there are more than two instances of Boolean on the heap (only Boolean.TRUE and Boolean.FALSE are necessary).</entry>
+    <entry key="query-script-2">
+<![CDATA[
+select toHtml(a) + " = " + a.value from java.lang.Boolean a
+    where objectid(a.clazz.statics.TRUE) != objectid(a) &&
+          objectid(a.clazz.statics.FALSE) != objectid(a)
+]]>
+    </entry>
     
 </properties>
