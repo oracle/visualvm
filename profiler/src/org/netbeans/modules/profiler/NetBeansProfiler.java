@@ -916,8 +916,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
-                            .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         .getTargetJDKVersionString()));
+                            .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
                         monitor.monitorVM(targetAppRunner);
 
                         if (threadsMonitoringEnabled) {
@@ -1118,8 +1117,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
-                            .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .getTargetJDKVersionString()));
+                            .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
                         IDEUtils.runInEventDispatchThread(new Runnable() {
                                 public void run() {
                                     monitor.monitorVM(targetAppRunner);
@@ -1457,7 +1455,7 @@ public final class NetBeansProfiler extends Profiler {
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     final Cursor cursor = mainWindow.getCursor();
-                    mainWindow.setCursor(org.openide.util.Utilities.createProgressCursor(mainWindow));
+                    mainWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
                     try {
                         if (!runCalibration(true, sessionSettings.getJavaExecutable(), sessionSettings.getJavaVersionString(),
@@ -1486,8 +1484,7 @@ public final class NetBeansProfiler extends Profiler {
                         // System.err.println("---------------------------- 7: "+ (System.currentTimeMillis() - time));
                         if (targetAppRunner.targetAppIsRunning()) {
                             getThreadsManager()
-                                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings
-                                                                                                                   .getTargetJDKVersionString()));
+                                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
                             IDEUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         // System.err.println("------------ 8: "+ (System.currentTimeMillis() - time));
@@ -1851,10 +1848,14 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     private void cleanupBeforeProfiling(ProfilerEngineSettings sharedSettings) {
-        Profiler profiler = Profiler.getDefault();
+        final Profiler profiler = Profiler.getDefault();
 
-        profiler.getThreadsManager().reset();
-        profiler.getVMTelemetryManager().reset();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                profiler.getThreadsManager().reset();
+                profiler.getVMTelemetryManager().reset();
+            }
+        });
         ProfilingPointsManager.getDefault().reset();
         ResultsManager.getDefault().reset();
 
