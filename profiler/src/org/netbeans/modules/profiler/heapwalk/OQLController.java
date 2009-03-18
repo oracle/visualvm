@@ -243,6 +243,8 @@ public class OQLController extends AbstractTopLevelController
                             StringBuilder errorMessage = new StringBuilder();
                             errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
                             errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
+                            errorMessage.append("<hr>"); // noi18n
+                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
                             resultsController.setResult(errorMessage.toString());
                             queryController.queryFinished();
                             cancelQuery();
