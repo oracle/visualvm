@@ -1275,7 +1275,6 @@ function top(array, code, num) {
         return array;
     }
     var func;
-    println(code);
     if (code == undefined) {
         func = function(lhs, rhs) {
             return 1; // first-come order
@@ -1313,7 +1312,6 @@ function top(array, code, num) {
         result.length = Math.min(result.length, num);
         return result;
     }
-    println(array.constructor);
     return array;
 }
 
