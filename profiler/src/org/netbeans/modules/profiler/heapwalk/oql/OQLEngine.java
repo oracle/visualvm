@@ -39,7 +39,6 @@
 package org.netbeans.modules.profiler.heapwalk.oql;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,21 +67,13 @@ public class OQLEngine {
 
     static {
         try {
-            // Do we have javax.script support?
-
-            Class managerClass = Class.forName("javax.script.ScriptEngineManager"); // NOI18N
-            Object manager = managerClass.newInstance();
-            
-            // check that we have JavaScript engine
-            Method getEngineMethod = managerClass.getMethod("getEngineByName", // NOI18N
-                    new Class[]{String.class});
-            Object engine =  getEngineMethod.invoke(manager, new Object[]{"JavaScript"}); // NOI18N
+            // Do we have JavaScript engine?
+            ScriptEngineManager manager = new ScriptEngineManager();
+            Object engine = manager.getEngineByName("JavaScript"); // NOI18N
 
             oqlSupported = engine != null;
         } catch (Exception ex) {
-            if (!(ex instanceof ClassNotFoundException)) {
-                Exceptions.printStackTrace(ex);
-            }
+            Exceptions.printStackTrace(ex);
             oqlSupported = false;
         }
     }
