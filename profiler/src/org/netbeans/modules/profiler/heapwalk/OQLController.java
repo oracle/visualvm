@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.AbstractButton;
@@ -97,6 +99,8 @@ public class OQLController extends AbstractTopLevelController
     private ResultsController resultsController;
     private QueryController queryController;
     private SavedController savedController;
+
+    final private ExecutorService progressUpdater = Executors.newSingleThreadExecutor();
 
     final private AtomicBoolean analysisRunning = new AtomicBoolean(false);
     private OQLEngine engine = null;
@@ -207,6 +211,23 @@ public class OQLController extends AbstractTopLevelController
                         try {
                             analysisRunning.compareAndSet(false, true);
                             queryController.queryStarted(progressModel);
+                            progressUpdater.submit(new Runnable() {
+
+                                public void run() {
+                                    while(analysisRunning.get()) {
+                                        int val = progressModel.getValue() + 10;
+                                        if (val > progressModel.getMaximum()) {
+                                            val = progressModel.getMinimum();
+                                        }
+                                        progressModel.setValue(val);
+                                        try {
+                                            Thread.sleep(200);
+                                        } catch (InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                        }
+                                    }
+                                }
+                            });
                             engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                                 public boolean visit(Object o) {
@@ -216,11 +237,6 @@ public class OQLController extends AbstractTopLevelController
                                     oddRow[0] = !oddRow[0];
                                     dump(o, sb);
                                     sb.append("</td></tr>"); // NOI18N
-                                    int value = progressModel.getValue() + 1;
-                                    if (value > progressModel.getMaximum()) {
-                                        value = progressModel.getMinimum() + 1;
-                                    }
-                                    progressModel.setValue(value);
                                     return counter.decrementAndGet() == 0 || !analysisRunning.get(); // process all hits while the analysis is running
                                 }
                             });
