@@ -186,8 +186,6 @@ public class OQLController extends AbstractTopLevelController
     private void executeQueryImpl(final String oqlQuery) {
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
 
-        queryController.queryStarted(progressModel);
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 BrowserUtils.performTask(new Runnable() {
@@ -208,6 +206,7 @@ public class OQLController extends AbstractTopLevelController
 
                         try {
                             analysisRunning.compareAndSet(false, true);
+                            queryController.queryStarted(progressModel);
                             engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                                 public boolean visit(Object o) {

@@ -40,12 +40,19 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Caret;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
@@ -64,6 +71,81 @@ public class OQLEditor extends JPanel {
     volatile private boolean oldValidity = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
+
+    final private Color disabledBgColor = UIManager.getLookAndFeel().getDefaults().getColor("desktop");
+    final private Caret nullCaret = new Caret() {
+
+        public void install(JTextComponent c) {
+            //
+        }
+
+        public void deinstall(JTextComponent c) {
+            //
+        }
+
+        public void paint(Graphics g) {
+            //
+        }
+
+        public void addChangeListener(ChangeListener l) {
+            //
+        }
+
+        public void removeChangeListener(ChangeListener l) {
+            //
+        }
+
+        public boolean isVisible() {
+            return false;
+        }
+
+        public void setVisible(boolean v) {
+            //
+        }
+
+        public boolean isSelectionVisible() {
+            return false;
+        }
+
+        public void setSelectionVisible(boolean v) {
+            //
+        }
+
+        public void setMagicCaretPosition(Point p) {
+            //
+        }
+
+        public Point getMagicCaretPosition() {
+            return new Point(0, 0);
+        }
+
+        public void setBlinkRate(int rate) {
+            //
+        }
+
+        public int getBlinkRate() {
+            return 1;
+        }
+
+        public int getDot() {
+            return 0;
+        }
+
+        public int getMark() {
+            return 0;
+        }
+
+        public void setDot(int dot) {
+            //
+        }
+
+        public void moveDot(int dot) {
+            //
+        }
+    };
+
+    private Color lastBgColor = null;
+    private Caret lastCaret = null;
 
     public OQLEditor(OQLEngine engine) {
         this.engine = engine;
@@ -151,5 +233,29 @@ public class OQLEditor extends JPanel {
 
         firePropertyChange(VALIDITY_PROPERTY, oldValidity, lexervalid && parserValid);
         oldValidity = lexervalid && parserValid;
+    }
+
+    public void setEditable(boolean b) {
+        if (queryEditor.isEditable() == b) return;
+        
+        queryEditor.setEditable(b);
+
+        if (b) {
+            if (lastBgColor != null) {
+                queryEditor.setBackground(lastBgColor);
+            }
+            if (lastCaret != null) {
+                queryEditor.setCaret(lastCaret);
+            }
+        } else {
+            lastBgColor = queryEditor.getBackground();
+            lastCaret = queryEditor.getCaret();
+            queryEditor.setBackground(disabledBgColor);
+            queryEditor.setCaret(nullCaret);
+        }
+    }
+
+    public boolean isEditable() {
+        return queryEditor.isEditable();
     }
 }
