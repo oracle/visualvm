@@ -244,6 +244,13 @@ class HprofHeap implements Heap {
         return getClassDumpSegment().getJavaClassByName(fqn);
     }
 
+    public Collection getJavaClassesByRegExp(String regexp) {
+        if (heapDumpSegment == null) {
+            return Collections.EMPTY_LIST;
+        }
+        return getClassDumpSegment().getJavaClassesByRegExp(regexp);
+    }
+    
     public synchronized HeapSummary getSummary() {
         TagBounds summaryBound = tagBounds[HEAP_SUMMARY];
 
