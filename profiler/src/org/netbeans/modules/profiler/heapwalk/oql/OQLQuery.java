@@ -44,7 +44,7 @@ package org.netbeans.modules.profiler.heapwalk.oql;
  *
  * @author A. Sundararajan
  */
-class OQLQuery {
+public class OQLQuery {
     OQLQuery(String selectExpr, boolean isInstanceOf, 
              String className, String identifier, String whereExpr) {
         this.selectExpr = selectExpr;
