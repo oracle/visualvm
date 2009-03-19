@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -145,6 +146,21 @@ class ClassDumpSegment extends TagBounds {
         }
 
         return null;
+    }
+
+    Collection getJavaClassesByRegExp(String regexp) {
+        Iterator classIt = createClassCollection().iterator();
+        Collection result = new ArrayList(256);
+        Pattern pattern = Pattern.compile(regexp);
+        
+        while (classIt.hasNext()) {
+            ClassDump cls = (ClassDump) classIt.next();
+
+            if (pattern.matcher(cls.getName()).matches()) {
+                result.add(cls);
+            }
+        }
+        return result;
     }
 
     int getMinimumInstanceSize() {

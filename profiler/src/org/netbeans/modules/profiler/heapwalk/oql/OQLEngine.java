@@ -39,7 +39,6 @@
 package org.netbeans.modules.profiler.heapwalk.oql;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,21 +67,13 @@ public class OQLEngine {
 
     static {
         try {
-            // Do we have javax.script support?
-
-            Class managerClass = Class.forName("javax.script.ScriptEngineManager"); // NOI18N
-            Object manager = managerClass.newInstance();
-            
-            // check that we have JavaScript engine
-            Method getEngineMethod = managerClass.getMethod("getEngineByName", // NOI18N
-                    new Class[]{String.class});
-            Object engine =  getEngineMethod.invoke(manager, new Object[]{"JavaScript"}); // NOI18N
+            // Do we have JavaScript engine?
+            ScriptEngineManager manager = new ScriptEngineManager();
+            Object engine = manager.getEngineByName("JavaScript"); // NOI18N
 
             oqlSupported = engine != null;
         } catch (Exception ex) {
-            if (!(ex instanceof ClassNotFoundException)) {
-                Exceptions.printStackTrace(ex);
-            }
+            Exceptions.printStackTrace(ex);
             oqlSupported = false;
         }
     }
@@ -102,6 +93,10 @@ public class OQLEngine {
         init(snapshot);
     }
 
+    public Snapshot getHeapHelper() {
+        return snapshot;
+    }
+
     /**
     Query is of the form
 
@@ -114,22 +109,33 @@ public class OQLEngine {
             throws OQLException {
         LOGGER.log(Level.FINE, query);
 
+        OQLQuery parsedQuery = parseQuery(query);
+        if (parsedQuery == null) {
+            // Query does not start with 'select' keyword.
+            // Just treat it as plain JavaScript and eval it.
+            try {
+                Object res = evalScript(query);
+                dispatchValue(res, visitor);
+            } catch (Exception e) {
+                throw new OQLException(e);
+            }
+            return;
+        }
+
+        executeQuery(parsedQuery, visitor);
+    }
+
+    public OQLQuery parseQuery(String query) throws OQLException {
         StringTokenizer st = new StringTokenizer(query);
         if (st.hasMoreTokens()) {
             String first = st.nextToken();
             if (!first.equals("select")) { // NOI18N
                 // Query does not start with 'select' keyword.
                 // Just treat it as plain JavaScript and eval it.
-                try {
-                    Object res = evalScript(query);
-                    visitor.visit(res);
-                } catch (Exception e) {
-                    throw new OQLException(e);
-                }
-                return;
+                return null;
             }
         } else {
-            throw new OQLException("query syntax error: no 'select' clause"); // NOI18N
+            throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_NO_SELECT_CLAUSE"));
         }
 
         String selectExpr = ""; // NOI18N
@@ -144,7 +150,7 @@ public class OQLEngine {
         }
 
         if (selectExpr.equals("")) { // NOI18N
-            throw new OQLException("query syntax error: 'select' expression can not be empty"); // NOI18N
+            throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_EMPTY_SELECT"));
         }
 
         String className = null;
@@ -158,25 +164,25 @@ public class OQLEngine {
                 if (tmp.equals("instanceof")) { // NOI18N
                     isInstanceOf = true;
                     if (!st.hasMoreTokens()) {
-                        throw new OQLException("no class name after 'instanceof'"); // NOI18N
+                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_INSTANCEOF_NO_CLASSNAME"));
                     }
                     className = st.nextToken();
                 } else {
                     className = tmp;
                 }
             } else {
-                throw new OQLException("query syntax error: class name must follow 'from'"); // NOI18N
+                throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_FROM_NO_CLASSNAME"));
             }
 
             if (st.hasMoreTokens()) {
                 identifier = st.nextToken();
                 if (identifier.equals("where")) { // NOI18N
-                    throw new OQLException("query syntax error: identifier should follow class name"); // NOI18N
+                    throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_NO_IDENTIFIER"));
                 }
                 if (st.hasMoreTokens()) {
                     String tmp = st.nextToken();
                     if (!tmp.equals("where")) { // NOI18N
-                        throw new OQLException("query syntax error: 'where' clause expected after 'from' clause"); // NOI18N
+                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_EXPECTING_WHERE"));
                     }
 
                     whereExpr = "";  // NOI18N
@@ -184,16 +190,14 @@ public class OQLEngine {
                         whereExpr += " " + st.nextToken(); // NOI18N
                     }
                     if (whereExpr.equals("")) { // NOI18N
-                        throw new OQLException("query syntax error: 'where' clause cannot have empty expression"); // NOI18N
+                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_EMPTY_WHERE"));
                     }
                 }
             } else {
-                throw new OQLException("query syntax error: identifier should follow class name"); // NOI18N
+                throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/heapwalk/oql/Bundle").getString("ERROR_NO_IDENTIFIER"));
             }
         }
-
-        executeQuery(new OQLQuery(selectExpr, isInstanceOf, className,
-                identifier, whereExpr), visitor);
+        return new OQLQuery(selectExpr, isInstanceOf, className, identifier, whereExpr);
     }
 
     private void executeQuery(OQLQuery q, ObjectVisitor visitor)
