@@ -1271,7 +1271,6 @@ function toArray(obj) {
 }
 
 function top(array, code, num) {
-    var cutoff = num * 100;
     if (array == undefined) {
         return array;
     }
@@ -1282,6 +1281,8 @@ function top(array, code, num) {
         }
     } else if (typeof(code) == 'string') {
         func = new Function("lhs", "rhs", "return " + code);
+    } else {
+        func = code;
     }
 
     if (num == undefined) {
@@ -1299,20 +1300,10 @@ function top(array, code, num) {
             }
 
             var index = search(sorted, element, true, func);
-            if (index < sorted.length - 1) {
-                if (index > 0) {
-                    var arrL = sorted.slice(0, index);
-                    var arrR = sorted.slice(index);
-                    sorted = arrL.concat(element, arrR);
-                } else {
-                    sorted = [element].concat(sorted);
-                }
-            } else {
-                sorted.push(element)
+            for(var counter=Math.min(sorted.length, num - 1);counter > index;counter--) {
+                sorted[counter] = sorted[counter - 1];
             }
-            if (sorted.length > cutoff) {
-                sorted.length = Math.min(sorted.length, cutoff);
-            }
+            sorted[index] = element;
         }
         sorted.length = Math.min(sorted.length, num);
         return sorted;
@@ -1321,7 +1312,6 @@ function top(array, code, num) {
         result.length = Math.min(result.length, num);
         return result;
     }
-    println(array.constructor);
     return array;
 }
 
