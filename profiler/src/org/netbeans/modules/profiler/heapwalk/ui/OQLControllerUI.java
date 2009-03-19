@@ -306,6 +306,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private JPanel progressPanel;
         private JPanel contentsPanel;
 
+        private boolean queryValid = true;
 
         private static ImageIcon ICON = ImageUtilities.loadImageIcon(
                 "org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png", false); // NOI18N
@@ -370,7 +371,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             if (queryController.getOQLController().isQueryRunning()) {
                 runButton.setEnabled(false);
             } else {
-                runButton.setEnabled(true);
+                runButton.setEnabled(editor.getScript().length() > 0 && queryValid);
+                saveButton.setEnabled(editor.getScript().length() > 0 && queryValid);
             }
         }
 
@@ -404,6 +406,13 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
         private void initComponents(OQLEngine engine) {
             editor = new OQLEditor(engine);
+            editor.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    queryValid = (Boolean)evt.getNewValue();
+                    updateButtons();
+                }
+            });
             editor.setBackground(UIUtils.getProfilerResultsBackground());
 
             JScrollPane editorScroll = new JScrollPane(editor,
@@ -577,20 +586,16 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             });
         }
 
-        private void deleteQuery() {
-            OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
-            if (q != null) {
-                int selectedIndex = listModel.indexOf(q);
-                if (selectedIndex > 0)
-                    savedList.setSelectedIndex(selectedIndex - 1);
-                listModel.removeElement(q);
-                refreshQueries();
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        OQLController.SavedController.saveData(listModel);
-                    }
-                });
-            }
+        private void deleteQueries() {
+            Object[] queries = savedList.getSelectedValues();
+            for (Object query : queries) listModel.removeElement(query);
+            refreshQueries();
+            savedList.requestFocus();
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    OQLController.SavedController.saveData(listModel);
+                }
+            });
         }
 
 
@@ -626,10 +631,10 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         }
 
         private void refreshButtons() {
-            boolean selected = savedList.getSelectedValue() != null;
-            openButton.setEnabled(selected);
-            editButton.setEnabled(selected);
-            deleteButton.setEnabled(selected);
+            int selectedCount = savedList.getSelectedValues().length;
+            openButton.setEnabled(selectedCount == 1);
+            editButton.setEnabled(selectedCount == 1);
+            deleteButton.setEnabled(selectedCount > 0);
         }
 
         private void refreshDescription() {
@@ -647,7 +652,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             setLayout(new BorderLayout());
 
             savedList = new JList(listModel);
-            savedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            savedList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             savedList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     refreshButtons();
@@ -687,7 +692,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             editButton.getAccessibleContext().
                             setAccessibleDescription(PROPERTIES_BUTTON_ACCESS_DESCR);
             deleteButton = new JButton() {
-                 protected void fireActionPerformed(ActionEvent e) { deleteQuery(); }
+                 protected void fireActionPerformed(ActionEvent e) { deleteQueries(); }
             };
             Mnemonics.setLocalizedText(deleteButton, DELETE_BUTTON_TEXT);
             deleteButton.getAccessibleContext().
@@ -746,7 +751,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_QUERY_ACTION"); // NOI18N
             savedList.getActionMap().put("DELETE_QUERY_ACTION", new AbstractAction() {// NOI18N
                 public void actionPerformed(ActionEvent e) {
-                    deleteQuery();
+                    deleteQueries();
                 }
             });
             savedList.addMouseListener(new MouseAdapter() {
