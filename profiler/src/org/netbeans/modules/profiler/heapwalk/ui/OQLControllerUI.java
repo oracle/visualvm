@@ -317,7 +317,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             this.queryController = queryController;
 
             initComponents(engine);
-            updateButtons();
+            updateUIState();
         }
 
 
@@ -339,7 +339,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     progressPanel.invalidate();
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
-                    updateButtons();
+                    updateUIState();
                 }
             });
         }
@@ -347,7 +347,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void queryFinished() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    updateButtons();
+                    updateUIState();
                     contentsPanel.remove(progressPanel);
                     contentsPanel.add(controlPanel, BorderLayout.SOUTH);
                     controlPanel.invalidate();
@@ -363,16 +363,21 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             editor.setScript(editor.getScript() + chs);
         }
 
+        @Override
         public void requestFocus() {
             editor.requestFocus();
         }
 
-        private void updateButtons() {
+        private void updateUIState() {
             if (queryController.getOQLController().isQueryRunning()) {
                 runButton.setEnabled(false);
+                editor.setEditable(false);
+                editor.setEnabled(false);
             } else {
                 runButton.setEnabled(editor.getScript().length() > 0 && queryValid);
                 saveButton.setEnabled(editor.getScript().length() > 0 && queryValid);
+                editor.setEditable(true);
+                editor.setEnabled(true);
             }
         }
 
@@ -410,7 +415,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
                 public void propertyChange(PropertyChangeEvent evt) {
                     queryValid = (Boolean)evt.getNewValue();
-                    updateButtons();
+                    updateUIState();
                 }
             });
             editor.setBackground(UIUtils.getProfilerResultsBackground());
