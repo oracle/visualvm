@@ -302,7 +302,7 @@ class HprofHeap implements Heap {
     }
     
     int getRetainedSize(Instance instance) {
-        computeRetainedSize(instance);
+        computeRetainedSize();
         return idToOffsetMap.get(instance.getInstanceId()).getRetainedSize();
     }
     
@@ -541,7 +541,7 @@ class HprofHeap implements Heap {
         return;
     }
     
-    synchronized void computeRetainedSize(Instance in) {
+    synchronized void computeRetainedSize() {
         if (retainedSizeComputed) {
             return;
         }
