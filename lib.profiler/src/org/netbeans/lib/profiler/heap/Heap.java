@@ -110,6 +110,16 @@ public interface Heap {
     JavaClass getJavaClassByName(String fqn);
 
     /**
+     * computes collection of {@link JavaClass} filtered by regular rexpression.
+     * <br>
+     * Speed: slow
+     * @param regexp regular expression for java class name.
+     * @return return collection of {@link JavaClass} instances, which names satisfy the regexp expression. This
+     * collection is empty if no class matches the regular expression
+     */
+    Collection getJavaClassesByRegExp(String regexp);
+
+    /**
      * returns optional summary information of the heap.
      * If this information is not available in the dump,
      * some data (like number of instances) are computed

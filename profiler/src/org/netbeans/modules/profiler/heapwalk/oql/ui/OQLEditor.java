@@ -40,29 +40,117 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Caret;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
+import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
+import org.openide.awt.StatusDisplayer;
 import org.openide.util.Lookup;
+
 /**
  *
  * @author Jaroslav Bachorik
  */
 public class OQLEditor extends JPanel {
+
     final public static String VALIDITY_PROPERTY = OQLEditorImpl.VALIDITY_PROPERTY;
-    
+    volatile private boolean lexervalid = false;
+    volatile private boolean parserValid = false;
+    volatile private boolean oldValidity = false;
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
+    final private Color disabledBgColor = UIManager.getLookAndFeel().getDefaults().getColor("desktop");
+    final private Caret nullCaret = new Caret() {
+
+        public void install(JTextComponent c) {
+            //
+        }
+
+        public void deinstall(JTextComponent c) {
+            //
+        }
+
+        public void paint(Graphics g) {
+            //
+        }
+
+        public void addChangeListener(ChangeListener l) {
+            //
+        }
+
+        public void removeChangeListener(ChangeListener l) {
+            //
+        }
+
+        public boolean isVisible() {
+            return false;
+        }
+
+        public void setVisible(boolean v) {
+            //
+        }
+
+        public boolean isSelectionVisible() {
+            return false;
+        }
+
+        public void setSelectionVisible(boolean v) {
+            //
+        }
+
+        public void setMagicCaretPosition(Point p) {
+            //
+        }
+
+        public Point getMagicCaretPosition() {
+            return new Point(0, 0);
+        }
+
+        public void setBlinkRate(int rate) {
+            //
+        }
+
+        public int getBlinkRate() {
+            return 1;
+        }
+
+        public int getDot() {
+            return 0;
+        }
+
+        public int getMark() {
+            return 0;
+        }
+
+        public void setDot(int dot) {
+            //
+        }
+
+        public void moveDot(int dot) {
+            //
+        }
+    };
+
+    private Color lastBgColor = null;
+    private Caret lastCaret = null;
 
     public OQLEditor(OQLEngine engine) {
         this.engine = engine;
         init();
     }
-
 
     private void init() {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
@@ -71,13 +159,29 @@ public class OQLEditor extends JPanel {
             impl.addPropertyChangeListener(VALIDITY_PROPERTY, new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
-                    firePropertyChange(VALIDITY_PROPERTY, (Boolean)evt.getOldValue(), (Boolean)evt.getNewValue());
+                    // capturing the lexer state
+                    lexervalid = (Boolean) evt.getNewValue();
                 }
             });
-//            queryEditor.getDocument().putProperty(OQLEngine.class, engine); // commented out; not necessery now when there is no code-completion
+            queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
         }
+
+        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void insertUpdate(DocumentEvent e) {
+                validateScript();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                validateScript();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                validateScript();
+            }
+        });
 
         queryEditor.setOpaque(isOpaque());
         queryEditor.setBackground(getBackground());
@@ -94,19 +198,20 @@ public class OQLEditor extends JPanel {
         return queryEditor.getText();
     }
 
-
     @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
-        if (queryEditor != null)
+        if (queryEditor != null) {
             queryEditor.setBackground(bg);
+        }
     }
 
     @Override
     public void setOpaque(boolean isOpaque) {
         super.setOpaque(isOpaque);
-        if (queryEditor != null)
+        if (queryEditor != null) {
             queryEditor.setOpaque(isOpaque);
+        }
     }
 
     @Override
@@ -114,4 +219,43 @@ public class OQLEditor extends JPanel {
         queryEditor.requestFocus();
     }
 
+    final private void validateScript() {
+        if (lexervalid || !parserValid) {
+            // only parse the query if there are no errors from lexer
+            try {
+                engine.parseQuery(getScript());
+                parserValid = true;
+            } catch (OQLException e) {
+                StatusDisplayer.getDefault().setStatusText(e.getLocalizedMessage());
+                parserValid = false;
+            }
+        }
+
+        firePropertyChange(VALIDITY_PROPERTY, oldValidity, lexervalid && parserValid);
+        oldValidity = lexervalid && parserValid;
+    }
+
+    public void setEditable(boolean b) {
+        if (queryEditor.isEditable() == b) return;
+        
+        queryEditor.setEditable(b);
+
+        if (b) {
+            if (lastBgColor != null) {
+                queryEditor.setBackground(lastBgColor);
+            }
+            if (lastCaret != null) {
+                queryEditor.setCaret(lastCaret);
+            }
+        } else {
+            lastBgColor = queryEditor.getBackground();
+            lastCaret = queryEditor.getCaret();
+            queryEditor.setBackground(disabledBgColor);
+            queryEditor.setCaret(nullCaret);
+        }
+    }
+
+    public boolean isEditable() {
+        return queryEditor.isEditable();
+    }
 }
