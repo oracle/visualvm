@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.AbstractButton;
@@ -97,6 +99,8 @@ public class OQLController extends AbstractTopLevelController
     private ResultsController resultsController;
     private QueryController queryController;
     private SavedController savedController;
+
+    final private ExecutorService progressUpdater = Executors.newSingleThreadExecutor();
 
     final private AtomicBoolean analysisRunning = new AtomicBoolean(false);
     private OQLEngine engine = null;
@@ -186,8 +190,6 @@ public class OQLController extends AbstractTopLevelController
     private void executeQueryImpl(final String oqlQuery) {
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
 
-        queryController.queryStarted(progressModel);
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 BrowserUtils.performTask(new Runnable() {
@@ -208,6 +210,24 @@ public class OQLController extends AbstractTopLevelController
 
                         try {
                             analysisRunning.compareAndSet(false, true);
+                            queryController.queryStarted(progressModel);
+                            progressUpdater.submit(new Runnable() {
+
+                                public void run() {
+                                    while(analysisRunning.get()) {
+                                        int val = progressModel.getValue() + 10;
+                                        if (val > progressModel.getMaximum()) {
+                                            val = progressModel.getMinimum();
+                                        }
+                                        progressModel.setValue(val);
+                                        try {
+                                            Thread.sleep(200);
+                                        } catch (InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                        }
+                                    }
+                                }
+                            });
                             engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                                 public boolean visit(Object o) {
@@ -217,11 +237,6 @@ public class OQLController extends AbstractTopLevelController
                                     oddRow[0] = !oddRow[0];
                                     dump(o, sb);
                                     sb.append("</td></tr>"); // NOI18N
-                                    int value = progressModel.getValue() + 1;
-                                    if (value > progressModel.getMaximum()) {
-                                        value = progressModel.getMinimum() + 1;
-                                    }
-                                    progressModel.setValue(value);
                                     return counter.decrementAndGet() == 0 || !analysisRunning.get(); // process all hits while the analysis is running
                                 }
                             });
@@ -243,6 +258,8 @@ public class OQLController extends AbstractTopLevelController
                             StringBuilder errorMessage = new StringBuilder();
                             errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
                             errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
+                            errorMessage.append("<hr>"); // noi18n
+                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
                             resultsController.setResult(errorMessage.toString());
                             queryController.queryFinished();
                             cancelQuery();
@@ -550,9 +567,9 @@ public class OQLController extends AbstractTopLevelController
                 String name =
                     properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i).trim(); // NOI18N
                 String description =
-                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i).trim(); // NOI18N
+                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i, "").trim(); // NOI18N
                 String script =
-                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i).trim(); // NOI18N
+                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i, "").trim(); // NOI18N
                 if (name != null && script != null)
                     model.addElement(new Query(script, name, description));
             }
