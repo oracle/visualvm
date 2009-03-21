@@ -40,13 +40,16 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.lib.profiler.common.Profiler;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import org.netbeans.lib.profiler.ui.graphs.MemoryGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 
 
 /** A panel containing three shall graphs for memory, threads and gc,
@@ -68,75 +71,73 @@ public final class MonitoringGraphsPanel extends javax.swing.JPanel {
 
     /** Creates new MonitoringGraphsPanel */
     public MonitoringGraphsPanel() {
-        heapGraph = new MemoryGraphPanel(false, Color.WHITE, ((NetBeansProfiler) Profiler.getDefault()).getMemoryXYChartModel(),
-                                         new AbstractAction() {
-                public void actionPerformed(final ActionEvent e) {
-                    TelemetryWindow.getDefault().showHeap();
-                }
-            });
-        threadsGraph = new ThreadsGraphPanel(false, Color.WHITE,
-                                             ((NetBeansProfiler) Profiler.getDefault()).getThreadsXYChartModel(),
-                                             new AbstractAction() {
-                public void actionPerformed(final ActionEvent e) {
-                    TelemetryWindow.getDefault().showThreads();
-                }
-            });
-        generationsGraph = new SurvivingGenerationsGraphPanel(false, Color.WHITE,
-                                                              ((NetBeansProfiler) Profiler.getDefault())
-                                                                                      .getSurvivingGenerationsXYChartModel(),
-                                                              new AbstractAction() {
-                public void actionPerformed(final ActionEvent e) {
-                    TelemetryWindow.getDefault().showGC();
-                }
-            });
+        heapGraph = MemoryGraphPanel.createSmallPanel(NetBeansProfiler.getDefaultNB().
+                    getVMTelemetryModels(), new AbstractAction() {
+                        public void actionPerformed(final ActionEvent e) {
+                            TelemetryWindow.getDefault().showHeap();
+                        }
+                    });
+        threadsGraph = ThreadsGraphPanel.createSmallPanel(NetBeansProfiler.getDefaultNB().
+                    getVMTelemetryModels(), new AbstractAction() {
+                        public void actionPerformed(final ActionEvent e) {
+                            TelemetryWindow.getDefault().showThreads();
+                        }
+                    });
+        generationsGraph = SurvivingGenerationsGraphPanel.createSmallPanel(NetBeansProfiler.getDefaultNB().
+                    getVMTelemetryModels(), new AbstractAction() {
+                        public void actionPerformed(final ActionEvent e) {
+                            TelemetryWindow.getDefault().showGC();
+                        }
+                    });
 
-        heapGraph.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-        threadsGraph.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 15));
-        generationsGraph.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+//        heapGraph.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+//        threadsGraph.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
+//        generationsGraph.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
 
         final JPanel graphsPanel = new JPanel();
         graphsPanel.setLayout(new java.awt.GridLayout(1, 3));
-        graphsPanel.setOpaque(false);
+//        graphsPanel.setOpaque(true);
+//        graphsPanel.setBackground(GraphPanel.CHART_BACKGROUND_COLOR);
         graphsPanel.add(heapGraph);
         graphsPanel.add(generationsGraph);
         graphsPanel.add(threadsGraph);
 
-        final JPanel legendPanel = new JPanel();
-        legendPanel.setLayout(new java.awt.GridLayout(1, 3));
-        legendPanel.setOpaque(false);
-
-        if (heapGraph.getSmallLegendPanel() != null) {
-            final JPanel heapGraphLegend = new JPanel();
-            heapGraphLegend.setOpaque(true);
-            heapGraphLegend.setBackground(Color.WHITE);
-            heapGraphLegend.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER));
-            heapGraphLegend.add(heapGraph.getSmallLegendPanel());
-            legendPanel.add(heapGraphLegend);
-        }
-
-        if (generationsGraph.getSmallLegendPanel() != null) {
-            final JPanel generationsGraphLegend = new JPanel();
-            generationsGraphLegend.setOpaque(true);
-            generationsGraphLegend.setBackground(Color.WHITE);
-            generationsGraphLegend.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER));
-            generationsGraphLegend.add(generationsGraph.getSmallLegendPanel());
-            legendPanel.add(generationsGraphLegend);
-        }
-
-        if (threadsGraph.getSmallLegendPanel() != null) {
-            final JPanel threadsGraphLegend = new JPanel();
-            threadsGraphLegend.setOpaque(true);
-            threadsGraphLegend.setBackground(Color.WHITE);
-            threadsGraphLegend.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER));
-            threadsGraphLegend.add(threadsGraph.getSmallLegendPanel());
-            legendPanel.add(threadsGraphLegend);
-        }
+//        final JPanel legendPanel = new JPanel();
+//        legendPanel.setLayout(new java.awt.GridLayout(1, 3));
+//        legendPanel.setOpaque(false);
+//
+//        if (heapGraph.getSmallLegendPanel() != null) {
+//            final JPanel heapGraphLegend = new JPanel();
+//            heapGraphLegend.setOpaque(true);
+//            heapGraphLegend.setBackground(Color.WHITE);
+//            heapGraphLegend.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER));
+//            heapGraphLegend.add(heapGraph.getSmallLegendPanel());
+//            legendPanel.add(heapGraphLegend);
+//        }
+//
+//        if (generationsGraph.getSmallLegendPanel() != null) {
+//            final JPanel generationsGraphLegend = new JPanel();
+//            generationsGraphLegend.setOpaque(true);
+//            generationsGraphLegend.setBackground(Color.WHITE);
+//            generationsGraphLegend.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER));
+//            generationsGraphLegend.add(generationsGraph.getSmallLegendPanel());
+//            legendPanel.add(generationsGraphLegend);
+//        }
+//
+//        if (threadsGraph.getSmallLegendPanel() != null) {
+//            final JPanel threadsGraphLegend = new JPanel();
+//            threadsGraphLegend.setOpaque(true);
+//            threadsGraphLegend.setBackground(Color.WHITE);
+//            threadsGraphLegend.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER));
+//            threadsGraphLegend.add(threadsGraph.getSmallLegendPanel());
+//            legendPanel.add(threadsGraphLegend);
+//        }
 
         setLayout(new BorderLayout());
         setOpaque(true);
         setBackground(Color.WHITE);
 
         add(graphsPanel, BorderLayout.CENTER);
-        add(legendPanel, BorderLayout.SOUTH);
+//        add(legendPanel, BorderLayout.SOUTH);
     }
 }

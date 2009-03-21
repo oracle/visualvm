@@ -40,39 +40,38 @@
 
 package org.netbeans.lib.profiler.ui.graphs;
 
-import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
+import java.awt.Color;
 import java.text.NumberFormat;
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JPanel;
 
 
 /**
- * @author Ian Formanek
  * @author Jiri Sedlacek
  */
 public abstract class GraphPanel extends JPanel {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    
+    protected static final NumberFormat INT_FORMATTER;
+    protected static final NumberFormat PERCENT_FORMATTER;
 
-    protected NumberFormat intFormat;
-    protected NumberFormat percentFormat;
+    protected static final double INITIAL_CHART_SCALEX = 0.1d;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    public static final Color CHART_BACKGROUND_COLOR = Color.WHITE;
+    protected static final Color SMALL_LEGEND_BACKGROUND_COLOR = Color.WHITE;
+    protected static final Color SMALL_LEGEND_BORDER_COLOR = new Color(235, 235, 235);
 
-    public GraphPanel() {
-        // --- ToolTips formats ----------------------------------------------------
-        intFormat = NumberFormat.getIntegerInstance();
-        intFormat.setGroupingUsed(true);
+    protected static final long SMALL_CHART_FIT_TO_WINDOW_PERIOD = 1000;
 
-        percentFormat = NumberFormat.getPercentInstance();
-        percentFormat.setMinimumFractionDigits(1);
-        percentFormat.setMaximumIntegerDigits(2);
+    
+    static {
+        INT_FORMATTER = NumberFormat.getIntegerInstance();
+        INT_FORMATTER.setGroupingUsed(true);
+
+        PERCENT_FORMATTER = NumberFormat.getPercentInstance();
+        PERCENT_FORMATTER.setMinimumFractionDigits(1);
+        PERCENT_FORMATTER.setMaximumIntegerDigits(2);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    //public abstract void resetChart();
-    public abstract JPanel getBigLegendPanel();
-
-    public abstract SynchronousXYChart getChart();
-
-    public abstract JPanel getSmallLegendPanel();
+    public abstract Action[] getActions();
 }
