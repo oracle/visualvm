@@ -40,30 +40,52 @@
 
 package org.netbeans.lib.profiler.ui.graphs;
 
-import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.MouseEvent;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.Action;
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
+import javax.swing.Timer;
+import javax.swing.ToolTipManager;
+import org.netbeans.lib.profiler.charts.ChartSelectionListener;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.ItemSelection;
+import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 
 
 /**
  * @author Jiri Sedlacek
  */
 public abstract class GraphPanel extends JPanel {
-    
+
+    protected static final DateFormat DATE_FORMATTER;
     protected static final NumberFormat INT_FORMATTER;
     protected static final NumberFormat PERCENT_FORMATTER;
 
-    protected static final double INITIAL_CHART_SCALEX = 0.1d;
+    protected static final double INITIAL_CHART_SCALEX = 0.02d;
 
-    public static final Color CHART_BACKGROUND_COLOR = Color.WHITE;
-    protected static final Color SMALL_LEGEND_BACKGROUND_COLOR = Color.WHITE;
-    protected static final Color SMALL_LEGEND_BORDER_COLOR = new Color(235, 235, 235);
+    // 3 minutes to switch from Scale To Fit to Fixed Scale
+    protected static final long SMALL_CHART_FIT_TO_WINDOW_PERIOD = 180000;
 
-    protected static final long SMALL_CHART_FIT_TO_WINDOW_PERIOD = 1000;
+    private static final String NO_DATA_TOOLTIP = "<No Data>";
 
     
     static {
+        DATE_FORMATTER = new SimpleDateFormat("h:mm:ss.SSS a, MMM d, yyyy");
+
         INT_FORMATTER = NumberFormat.getIntegerInstance();
         INT_FORMATTER.setGroupingUsed(true);
 
@@ -72,6 +94,194 @@ public abstract class GraphPanel extends JPanel {
         PERCENT_FORMATTER.setMaximumIntegerDigits(2);
     }
 
+    // --- Chart support -------------------------------------------------------
+
+    protected ProfilerXYChart createChart(ProfilerXYItemsModel itemsModel,
+                                          ProfilerXYPaintersModel paintersModel,
+                                          final boolean smallPanel) {
+
+        if (smallPanel) {
+            ProfilerXYChart chart = new ProfilerXYChart(itemsModel, paintersModel) {
+                public JToolTip createToolTip() {
+                    return getSmallTooltip(this);
+                }
+                public Point getToolTipLocation(MouseEvent e) {
+                    return getSmallTooltipLocation(e, getSmallTooltip(this));
+                }
+            };
+            chart.setToolTipText(NO_DATA_TOOLTIP); // Needed to enable the tooltip
+            ToolTipManager.sharedInstance().registerComponent(chart);
+            return chart;
+        } else {
+            return new ProfilerXYChart(itemsModel, paintersModel);
+        }
+
+    }
 
     public abstract Action[] getActions();
+
+
+    // --- General tooltip support ---------------------------------------------
+
+    private ProfilerXYTooltipModel tooltipModel;
+
+    protected ProfilerXYTooltipModel getTooltipModel() {
+        if (tooltipModel == null) tooltipModel = createTooltipModel();
+        return tooltipModel;
+    }
+
+    protected abstract ProfilerXYTooltipModel createTooltipModel();
+
+
+    // --- Small tooltip support -----------------------------------------------
+
+    private SmallToolTip smallTooltip;
+
+    private SmallToolTip getSmallTooltip(ProfilerXYChart chart) {
+        if (smallTooltip == null) smallTooltip = new SmallToolTip(chart);
+        return smallTooltip;
+    }
+
+
+    private static Point getSmallTooltipLocation(MouseEvent e, SmallToolTip tooltip) {
+        Point p = e.getPoint();
+        tooltip.setMousePosition(p);
+        p.y += 25;
+        return p;
+    }
+
+    private class SmallToolTip extends JToolTip implements ChartSelectionListener {
+
+        private boolean timerRunning = false;
+        private int mouseX;
+        private int mouseY;
+
+        public SmallToolTip(ProfilerXYChart chart) {
+            super();
+            setComponent(chart);
+
+            addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                        if (isShowing()) enableSelection();
+                        else disableSelection();
+                    }
+                }
+            });
+
+            chart.getSelectionModel().addSelectionListener(this);
+        }
+
+        public void setMousePosition(Point p) {
+            this.mouseX = p.x;
+            this.mouseY = p.y;
+        }
+
+        private ProfilerXYChart getChart() {
+            return (ProfilerXYChart)getComponent();
+        }
+
+        private void enableSelection() {
+            getChart().getSelectionModel().setHoverMode(ChartSelectionModel.
+                                                   HOVER_EACH_NEAREST);
+        }
+
+        private void disableSelection() {
+            // Another disableSelection() in progress?
+            if (timerRunning) return;
+            timerRunning = true;
+
+            // Tooltip is hidden when its location changes, let's wait for a while
+            Timer timer = new Timer(50, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (!isShowing()) {
+                        getChart().getSelectionModel().
+                                   setHoverMode(ChartSelectionModel.HOVER_NONE);
+                        getChart().setToolTipText(NO_DATA_TOOLTIP);
+                    }
+                    timerRunning = false;
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+        private void updateTooltipText(List<ItemSelection> selectedItems) {
+            if (!isShowing()) return;
+
+            if (selectedItems.isEmpty()) {
+                getChart().setToolTipText(NO_DATA_TOOLTIP);
+            } else {
+                getChart().setToolTipText(getTooltipText(selectedItems));
+            }
+
+            // A MouseEvent needs to be passed to the ToolTipManager to
+            // immediately update the displayed tooltip
+            MouseEvent e = new MouseEvent(getChart(), 0, 0, 0, mouseX, mouseY, 0, false);
+            ToolTipManager.sharedInstance().mouseMoved(e);
+        }
+
+        private String getTooltipText(List<ItemSelection> selectedItems) {
+            ProfilerXYTooltipModel model = getTooltipModel();
+
+            int rowsCount = model.getRowsCount();
+            if (selectedItems.size() != rowsCount)
+                 return "Rows and selected items don't match"; // NOI18N
+
+            StringBuilder builder = new StringBuilder();
+            builder.append("<html>"); // NOI18N
+
+
+            XYItemSelection selection = (XYItemSelection)selectedItems.get(0);
+            long timestamp = selection.getItem().getXValue(selection.getValueIndex());
+            builder.append("&nbsp;&nbsp;"); // NOI18N
+            builder.append(model.getTimeValue(timestamp));
+            builder.append("&nbsp;&nbsp;"); // NOI18N
+            builder.append("<hr>"); // NOI18N
+
+            for (int i = 0; i < rowsCount; i++) {
+                builder.append("<b>&nbsp;&nbsp;"); // NOI18N
+                builder.append(model.getRowName(i));
+                builder.append(":</b>&nbsp;&nbsp;"); // NOI18N
+                XYItemSelection sel = (XYItemSelection)selectedItems.get(i);
+                long itemValue = sel.getItem().getYValue(sel.getValueIndex());
+                builder.append(model.getRowValue(i, itemValue));
+                builder.append("&nbsp;"); // NOI18N
+                builder.append(model.getRowUnits(i, itemValue));
+                builder.append("&nbsp;&nbsp;<br>"); // NOI18N
+            }
+
+            int extraRowsCount = model.getExtraRowsCount();
+            if (extraRowsCount > 0) builder.append("<hr>"); // NOI18N
+            for (int i = 0; i < extraRowsCount; i++) {
+                builder.append("<b>&nbsp;&nbsp;"); // NOI18N
+                builder.append(model.getExtraRowName(i));
+                builder.append(":</b>&nbsp;&nbsp;"); // NOI18N
+                builder.append(model.getExtraRowValue(i));
+                builder.append("&nbsp;"); // NOI18N
+                builder.append(model.getExtraRowUnits(i));
+                builder.append("&nbsp;&nbsp;<br>"); // NOI18N
+            }
+
+            builder.append("</html>"); // NOI18N
+            return builder.toString();
+        }
+
+
+        public void selectionModeChanged(int newMode, int oldMode) {}
+
+        public void selectionBoundsChanged(Rectangle newBounds, Rectangle oldBounds) {}
+
+        public void highlightedItemsChanged(List<ItemSelection> currentItems,
+                                            List<ItemSelection> addedItems,
+                                            List<ItemSelection> removedItems) {
+
+            updateTooltipText(currentItems);
+        }
+
+        public void selectedItemsChanged(List<ItemSelection> currentItems,
+                                         List<ItemSelection> addedItems,
+                                         List<ItemSelection> removedItems) {}
+
+    }
 }

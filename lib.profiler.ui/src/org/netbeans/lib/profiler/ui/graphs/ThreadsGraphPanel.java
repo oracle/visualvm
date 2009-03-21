@@ -46,6 +46,7 @@ import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Date;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -55,10 +56,20 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
+import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 
@@ -68,18 +79,6 @@ import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
  * @author Jiri Sedlacek
  */
 public final class ThreadsGraphPanel extends GraphPanel {
-
-    // -----
-    // I18N String constants
-//    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.graphs.Bundle"); // NOI18N
-//    private static final String TOTAL_MEMORY_CURRENT_STRING = messages.getString("MemoryGraphPanel_TotalMemoryCurrentString"); // NOI18N
-//    private static final String USED_MEMORY_CURRENT_STRING = messages.getString("MemoryGraphPanel_UsedMemoryCurrentString"); // NOI18N
-//    private static final String USED_MEMORY_MAXIMUM_STRING = messages.getString("MemoryGraphPanel_UsedMemoryMaximumString"); // NOI18N
-//    private static final String TIME_AT_CURSOR_STRING = messages.getString("MemoryGraphPanel_TimeAtCursorString"); // NOI18N
-//    private static final String TOTAL_MEMORY_AT_CURSOR_STRING = messages.getString("MemoryGraphPanel_TotalMemoryAtCursorString"); // NOI18N
-//    private static final String USED_MEMORY_AT_CURSOR_STRING = messages.getString("MemoryGraphPanel_UsedMemoryAtCursorString"); // NOI18N
-//    private static final String CHART_ACCESS_NAME = messages.getString("MemoryGraphPanel_ChartAccessName"); // NOI18N
-                                                                                                            // -----
 
     private ProfilerXYChart chart;
     private Action[] chartActions;
@@ -133,11 +132,11 @@ public final class ThreadsGraphPanel extends GraphPanel {
     private void updateData() {
         if (smallPanel) {
             if (chart.fitsWidth()) {
-                long[] timestamps = models.getDataManager().timeStamps;
-                if (timestamps[timestamps.length - 1] - timestamps[0] >=
+                VMTelemetryDataManager manager = models.getDataManager();
+                long[] timestamps = manager.timeStamps;
+                if (timestamps[manager.getItemCount() - 1] - timestamps[0] >=
                     SMALL_CHART_FIT_TO_WINDOW_PERIOD)
                         chart.setFitsWidth(false);
-
             }
         } else {
         }
@@ -158,16 +157,16 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
     private void initComponents(final Action chartAction) {
         // Chart
-        chart = new ProfilerXYChart(models.threadsItemsModel(),
-                                    models.threadsPaintersModel());
-        chart.setBackground(CHART_BACKGROUND_COLOR);
+        chart = createChart(models.threadsItemsModel(),
+                            createThreadsPaintersModel(), smallPanel);
+        chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chart.setViewInsets(new Insets(10, 0, 0, 0));
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
-        chartPanel.setBackground(CHART_BACKGROUND_COLOR);
+        chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 10, 10, CHART_BACKGROUND_COLOR));
+                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
 
         // Small panel UI
@@ -175,19 +174,19 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
             // Customize chart
             chart.setMouseZoomingEnabled(false);
-            chart.setSelectionModel(null);
+            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
 
             // Heap Size
-            JLabel heapSizeSmall = new JLabel(VMTelemetryModels.THREADS_NAME,
-                                              new ColorIcon(VMTelemetryModels.
+            JLabel heapSizeSmall = new JLabel(GraphsUI.THREADS_NAME,
+                                              new ColorIcon(GraphsUI.
                                               THREADS_PAINTER_LINE_COLOR, null,
                                               8, 8), SwingConstants.LEADING);
             heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
             heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 
             // Used heap
-            JLabel usedHeapSmall = new JLabel(VMTelemetryModels.LOADED_CLASSES_NAME,
-                                              new ColorIcon(VMTelemetryModels.
+            JLabel usedHeapSmall = new JLabel(GraphsUI.LOADED_CLASSES_NAME,
+                                              new ColorIcon(GraphsUI.
                                               LOADED_CLASSES_PAINTER_LINE_COLOR, null,
                                               8, 8), SwingConstants.LEADING);
             usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
@@ -195,12 +194,12 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
             // Legend container
             JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
-            smallLegendPanel.setBackground(SMALL_LEGEND_BACKGROUND_COLOR);
-            smallLegendPanel.setBorder(new LineBorder(SMALL_LEGEND_BORDER_COLOR, 1));
+            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
             smallLegendPanel.add(heapSizeSmall);
             smallLegendPanel.add(usedHeapSmall);
             JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            smallLegendContainer.setBackground(SMALL_LEGEND_BACKGROUND_COLOR);
+            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
             smallLegendContainer.add(smallLegendPanel);
 
             // Master UI
@@ -224,8 +223,16 @@ public final class ThreadsGraphPanel extends GraphPanel {
         // Big panel UI
         } else {
 
+            // Setup tooltip painter
+            ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(
+                                                GraphsUI.TOOLTIP_OVERLAY_LINE_WIDTH,
+                                                GraphsUI.TOOLTIP_OVERLAY_LINE_COLOR,
+                                                GraphsUI.TOOLTIP_OVERLAY_FILL_COLOR,
+                                                getTooltipModel());
+
             // Customize chart
-            chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart));
+            chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart,
+                                                                   tooltipPainter));
 
             // Chart scrollbar
             JScrollBar hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
@@ -238,15 +245,15 @@ public final class ThreadsGraphPanel extends GraphPanel {
             chartContainer.add(hScrollBar, BorderLayout.SOUTH);
 
             // Heap Size
-            JLabel heapSizeBig = new JLabel(VMTelemetryModels.THREADS_NAME,
-                                            new ColorIcon(VMTelemetryModels.
+            JLabel heapSizeBig = new JLabel(GraphsUI.THREADS_NAME,
+                                            new ColorIcon(GraphsUI.
                                             THREADS_PAINTER_LINE_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
-            JLabel usedHeapBig = new JLabel(VMTelemetryModels.LOADED_CLASSES_NAME,
-                                            new ColorIcon(VMTelemetryModels.
+            JLabel usedHeapBig = new JLabel(GraphsUI.LOADED_CLASSES_NAME,
+                                            new ColorIcon(GraphsUI.
                                             LOADED_CLASSES_PAINTER_LINE_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -269,6 +276,111 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
         }
 
+    }
+
+    protected ProfilerXYTooltipModel createTooltipModel() {
+        return new ProfilerXYTooltipModel() {
+
+            public String getTimeValue(long timestamp) {
+                return DATE_FORMATTER.format(new Date(timestamp));
+            }
+
+            public int getRowsCount() {
+                return 2;
+            }
+
+            public String getRowName(int index) {
+                switch (index) {
+                    case 0:
+                        return GraphsUI.THREADS_NAME;
+                    case 1:
+                        return GraphsUI.LOADED_CLASSES_NAME;
+                    default:
+                        return null;
+                }
+            }
+
+            public Color getRowColor(int index) {
+                switch (index) {
+                    case 0:
+                        return GraphsUI.THREADS_PAINTER_LINE_COLOR;
+                    case 1:
+                        return GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR;
+                    default:
+                        return null;
+                }
+            }
+
+            public String getRowValue(int index, long itemValue) {
+                return INT_FORMATTER.format(itemValue);
+            }
+
+            public String getRowUnits(int index, long itemValue) {
+                return "";
+            }
+
+            public int getExtraRowsCount() {
+                return getRowsCount();
+            }
+
+            public String getExtraRowName(int index) {
+                return "Max " + getRowName(index);
+            }
+
+            public Color getExtraRowColor(int index) {
+                return getRowColor(index);
+            }
+
+            public String getExtraRowValue(int index) {
+                ProfilerXYItem item = models.threadsItemsModel().getItem(index);
+                return INT_FORMATTER.format(item.getMaxYValue());
+            }
+
+            public String getExtraRowUnits(int index) {
+                return getRowUnits(index, -1);
+            }
+
+        };
+    }
+
+    private ProfilerXYPaintersModel createThreadsPaintersModel() {
+        // Threads
+        ProfilerXYItemPainter threadsPainter =
+                ProfilerXYItemPainter.absolutePainter(GraphsUI.THREADS_PAINTER_LINE_WIDTH,
+                                                      GraphsUI.THREADS_PAINTER_LINE_COLOR,
+                                                      GraphsUI.THREADS_PAINTER_FILL_COLOR);
+        ProfilerXYItemMarker threadsMarker =
+                 ProfilerXYItemMarker.absolutePainter(GraphsUI.THREADS_MARKER_RADIUS,
+                                                      GraphsUI.THREADS_MARKER_LINE1_WIDTH,
+                                                      GraphsUI.THREADS_MARKER_LINE1_COLOR,
+                                                      GraphsUI.THREADS_MARKER_LINE2_WIDTH,
+                                                      GraphsUI.THREADS_MARKER_LINE2_COLOR,
+                                                      GraphsUI.THREADS_MARKER_FILL_COLOR);
+        XYItemPainter thp = new CompoundProfilerXYItemPainter(threadsPainter,
+                                                      threadsMarker);
+
+        // Loaded classes
+        ProfilerXYItemPainter loadedClassesPainter =
+                ProfilerXYItemPainter.relativePainter(GraphsUI.LOADED_CLASSES_PAINTER_LINE_WIDTH,
+                                                      GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR,
+                                                      GraphsUI.LOADED_CLASSES_PAINTER_FILL_COLOR,
+                                                      10);
+        ProfilerXYItemMarker loadedClassesMarker =
+                 ProfilerXYItemMarker.relativePainter(GraphsUI.LOADED_CLASSES_MARKER_RADIUS,
+                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE1_WIDTH,
+                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE1_COLOR,
+                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE2_WIDTH,
+                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE2_COLOR,
+                                                      GraphsUI.LOADED_CLASSES_MARKER_FILL_COLOR,
+                                                      10);
+        XYItemPainter lcp = new CompoundProfilerXYItemPainter(loadedClassesPainter,
+                                                      loadedClassesMarker);
+
+        // Model
+        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
+           new XYItemPainter[] { thp, lcp });
+
+        return model;
     }
 
 }

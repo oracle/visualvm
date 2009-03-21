@@ -25,12 +25,6 @@
 
 package org.netbeans.lib.profiler.charts;
 
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.LongRect;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;

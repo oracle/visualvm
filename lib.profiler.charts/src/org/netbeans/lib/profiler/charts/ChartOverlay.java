@@ -25,7 +25,6 @@
 
 package org.netbeans.lib.profiler.charts;
 
-import org.netbeans.lib.profiler.charts.ChartContext;
 import javax.swing.JComponent;
 
 /**

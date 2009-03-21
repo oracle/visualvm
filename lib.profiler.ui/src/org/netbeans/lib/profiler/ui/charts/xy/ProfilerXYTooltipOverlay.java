@@ -35,16 +35,15 @@ import org.netbeans.lib.profiler.charts.ChartSelectionListener;
 import org.netbeans.lib.profiler.charts.ItemPainter;
 import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 import javax.swing.Timer;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 
 /**
  *
@@ -60,11 +59,12 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
     private Timer timer;
     private int currentStep;
+    private Point mousePosition;
     private Point targetPosition;
 
 
-    public ProfilerXYTooltipOverlay(final ChartComponent chart/*,
-                                    String[] valueNames, Color[] valueColors*/) {
+    public ProfilerXYTooltipOverlay(final ChartComponent chart,
+                                    ProfilerXYTooltipPainter tooltipPainter) {
         if (chart.getSelectionModel() == null)
             throw new NullPointerException("No ChartSelectionModel set for " + chart);
         
@@ -75,8 +75,9 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
         setLayout(null);
 
-        setPainter(new ProfilerXYTooltipPainter(2.1f, Color.DARK_GRAY, new Color(250, 250, 255)/*,
-                                                valueNames, valueColors*/));
+        this.tooltipPainter = tooltipPainter;
+        add(tooltipPainter);
+        tooltipPainter.setVisible(false);
 
         chart.getSelectionModel().addSelectionListener(new ChartSelectionListener() {
 
@@ -86,27 +87,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
             public void highlightedItemsChanged(List<ItemSelection> currentItems,
                 List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-
-                updateTooltip(chart, true);
-//                if (currentItems.isEmpty()) {
-//                    setPosition(null);
-//                } else {
-//                    PaintersModel paintersModel = chart.getPaintersModel();
-//                    int tooltipX = -1;
-//                    int tooltipY = 0;
-//                    for (ItemSelection selection : currentItems) {
-//                        ChartItem item = selection.getItem();
-//                        ItemPainter painter = paintersModel.getPainter(item);
-//                        Rectangle bounds = ChartContext.getCheckedRectangle(
-//                                           painter.getSelectionBounds(selection,
-//                                           chart.getChartContext()));
-//                        if (tooltipX == -1) tooltipX += bounds.x + bounds.width / 2;
-//                        tooltipY += bounds.y + bounds.height / 2;
-//                    }
-//
-//                    setPosition(normalizePosition(new Point(tooltipX, tooltipY /
-//                                                             currentItems.size())));
-//                }
+                updateTooltip(chart);
             }
 
             public void selectedItemsChanged(List<ItemSelection> currentItems,
@@ -116,48 +97,35 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
         chart.addConfigurationListener(new ChartConfigurationListener() {
 
-            public void offsetChanged(long oldOffsetX, long oldOffsetY, long newOffsetX, long newOffsetY) {}
+            public void offsetChanged(long oldOffsetX, long oldOffsetY,
+                                      long newOffsetX, long newOffsetY) {}
 
-            public void scaleChanged(double oldScaleX, double oldScaleY, double newScaleX, double newScaleY) {}
+            public void scaleChanged(double oldScaleX, double oldScaleY,
+                                     double newScaleX, double newScaleY) {}
 
-            public void dataBoundsChanged(long dataOffsetX, long dataOffsetY, long dataWidth, long dataHeight, long oldDataOffsetX, long oldDataOffsetY, long oldDataWidth, long oldDataHeight) {}
+            public void dataBoundsChanged(long dataOffsetX, long dataOffsetY,
+                                          long dataWidth, long dataHeight,
+                                          long oldDataOffsetX, long oldDataOffsetY,
+                                          long oldDataWidth, long oldDataHeight) {
+                updateTooltip(chart);
+            }
 
-            public void viewChanged(long offsetX, long offsetY, double scaleX, double scaleY, long lastOffsetX, long lastOffsetY, double lastScaleX, double lastScaleY, int shiftX, int shiftY) {
-                updateTooltip(chart, false);
+            public void viewChanged(long offsetX, long offsetY,
+                                    double scaleX, double scaleY,
+                                    long lastOffsetX, long lastOffsetY,
+                                    double lastScaleX, double lastScaleY,
+                                    int shiftX, int shiftY) {
+                updateTooltip(chart);
             }
 
         });
 
-//        chart.addMouseListener(new MouseAdapter() {
-//            public void mousePressed(MouseEvent e) {
-//                setPosition(null);
-//            }
-//            public void mouseReleased(MouseEvent e) {
-//                setPosition(getPosition());
-//            }
-////            public void mouseExited(MouseEvent e) {
-////                // NOTE: if mouse hovers the Painter, things start to blink
-////                setPosition(null);
-////            }
-//        });
-//
-//        chart.addMouseMotionListener(new MouseMotionAdapter() {
-//            public void mouseMoved(MouseEvent e) {
-//                setPosition(getPainterPosition(e.getPoint()));
-//            }
-//        });
-    }
-
-
-    public final void setPainter(ProfilerXYTooltipPainter painter) {
-        if (this.tooltipPainter == painter) return;
-        if (this.tooltipPainter != null) remove(this.tooltipPainter);
-        this.tooltipPainter = painter;
-        if (this.tooltipPainter != null) {
-            add(this.tooltipPainter);
-            this.tooltipPainter.setSize(this.tooltipPainter.getPreferredSize());
-            this.tooltipPainter.setVisible(false);
-        }
+        chart.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseMoved(MouseEvent e) {
+                mousePosition = e.getPoint();
+                updateTooltip(chart);
+            }
+        });
     }
 
     public final void setPosition(Point p) {
@@ -196,59 +164,22 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
     }
 
 
-    private void updateTooltip(ChartComponent chart, boolean updateValues) {
+    private void updateTooltip(ChartComponent chart) {
         List<ItemSelection> highlightedItems =
                 chart.getSelectionModel().getHighlightedItems();
 
         if (highlightedItems.isEmpty()) {
             setPosition(null);
         } else {
-            if (updateValues) {
-                checkInitialized(chart, highlightedItems);
-                updateValues(highlightedItems);
-                tooltipPainter.setSize(tooltipPainter.getPreferredSize());
-            }
+            tooltipPainter.update(highlightedItems);
+            tooltipPainter.setSize(tooltipPainter.getPreferredSize());
             setPosition(highlightedItems, chart.getPaintersModel(), chart.getChartContext());
         }
     }
 
-    private void checkInitialized(ChartComponent chart, List<ItemSelection> highlightedItems) {
-        if (tooltipPainter.isInitialized()) return;
-
-        int itemsCount = highlightedItems.size();
-        String[] names = new String[itemsCount];
-        Color[] colors = new Color[itemsCount];
-
-        for (int i = 0; i < itemsCount; i++) {
-            ProfilerXYItem item = (ProfilerXYItem)highlightedItems.get(i).getItem();
-            XYItemPainter painter = (XYItemPainter)chart.getPaintersModel().getPainter(item);
-            names[i] = item.getName();
-            colors[i] = painter.getItemColor(item);
-        }
-
-        tooltipPainter.initialize(names, colors);
-    }
-
-    private void updateValues(List<ItemSelection> selectedItems) {
-        XYItemSelection selection = (XYItemSelection)selectedItems.get(0);
-        long time = selection.getItem().getXValue(selection.getValueIndex());
-        tooltipPainter.setTime(time);
-
-        int itemsCount = selectedItems.size();
-        long[] values = new long[itemsCount];
-        for (int i = 0; i < itemsCount; i++) {
-            XYItemSelection sel = (XYItemSelection) selectedItems.get(i);
-            values[i] = sel.getItem().getYValue(sel.getValueIndex());
-        }
-        tooltipPainter.setValues(values);
-//        tooltipPainter.invalidate();
-//        revalidate();
-//        repaint();
-    }
-
     private void setPosition(List<ItemSelection> selectedItems, PaintersModel paintersModel, ChartContext chartContext) {
         int tooltipX = -1;
-        int tooltipY = 0;
+        int tooltipY = mousePosition.y;
         for (ItemSelection selection : selectedItems) {
             ChartItem item = selection.getItem();
             ItemPainter painter = paintersModel.getPainter(item);
@@ -256,11 +187,12 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
                                painter.getSelectionBounds(selection,
                                chartContext));
             if (tooltipX == -1) tooltipX += bounds.x + bounds.width / 2;
-            tooltipY += bounds.y + bounds.height / 2;
+//            tooltipY += bounds.y + bounds.height / 2;
         }
 
-        setPosition(normalizePosition(new Point(tooltipX, tooltipY /
-                                                selectedItems.size())));
+//        tooltipY /= selectedItems.size();
+
+        setPosition(normalizePosition(new Point(tooltipX, tooltipY)));
     }
 
     private Point normalizePosition(Point basePoint) {
@@ -270,10 +202,13 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
         int ch = tooltipPainter.getHeight();
 
         basePoint.x -= cw + TOOLTIP_OFFSET;
-        basePoint.y -= ch / 2;
+//        basePoint.y -= ch / 2;
+        basePoint.y -= ch + TOOLTIP_OFFSET;
 
-        if (basePoint.x - TOOLTIP_OFFSET < 0)
-            basePoint.x = TOOLTIP_OFFSET;
+        if (basePoint.x < TOOLTIP_OFFSET)
+            basePoint.x += 2 * TOOLTIP_OFFSET + cw;
+        if (basePoint.x + cw + TOOLTIP_OFFSET > w)
+            basePoint.x = w - cw - TOOLTIP_OFFSET;
 
         if (basePoint.y < TOOLTIP_OFFSET)
             basePoint.y = TOOLTIP_OFFSET;

@@ -51,13 +51,15 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
     private static final int TYPE_ABSOLUTE = 0;
     private static final int TYPE_RELATIVE = 1;
 
-    private static final int ITEM_MARK_RADIUS = 7;
-
-    private final int lineWidth;
-    private final Color lineColor;
+    private final int markRadius;
+    private final int line1Width;
+    private final Color line1Color;
+    private final int line2Width;
+    private final Color line2Color;
     private final Color fillColor;
 
-    private final Stroke lineStroke;
+    private final Stroke line1Stroke;
+    private final Stroke line2Stroke;
 
     private final int decorationRadius;
 
@@ -67,38 +69,55 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 
     // --- Constructor ---------------------------------------------------------
 
-    public static ProfilerXYItemMarker absolutePainter(float lineWidth,
-                                                       Color lineColor,
+    public static ProfilerXYItemMarker absolutePainter(int markRadius,
+                                                       float line1Width,
+                                                       Color line1Color,
+                                                       float line2Width,
+                                                       Color line2Color,
                                                        Color fillColor) {
 
-        return new ProfilerXYItemMarker(lineWidth, lineColor, fillColor,
-                                         TYPE_ABSOLUTE, 0);
+        return new ProfilerXYItemMarker(markRadius, line1Width, line1Color,
+                                        line2Width, line2Color, fillColor,
+                                        TYPE_ABSOLUTE, 0);
     }
 
-    public static ProfilerXYItemMarker relativePainter(float lineWidth,
-                                                       Color lineColor,
+    public static ProfilerXYItemMarker relativePainter(int markRadius,
+                                                       float line1Width,
+                                                       Color line1Color,
+                                                       float line2Width,
+                                                       Color line2Color,
                                                        Color fillColor,
                                                        int maxOffset) {
 
-        return new ProfilerXYItemMarker(lineWidth, lineColor, fillColor,
-                                         TYPE_RELATIVE, maxOffset);
+        return new ProfilerXYItemMarker(markRadius, line1Width, line1Color,
+                                        line2Width, line2Color, fillColor,
+                                        TYPE_RELATIVE, maxOffset);
     }
 
 
-    private ProfilerXYItemMarker(float lineWidth, Color lineColor, Color fillColor,
+    private ProfilerXYItemMarker(int markRadius, float line1Width, Color line1Color,
+                                 float line2Width, Color line2Color, Color fillColor,
                                  int type, int maxOffset) {
 
-        if (lineColor == null && fillColor == null)
+        if (line1Color == null && line2Color == null && fillColor == null)
             throw new IllegalArgumentException("No parameters defined"); // NOI18N
 
-        this.lineWidth = (int)Math.ceil(lineWidth);
-        this.lineColor = Utils.checkedColor(lineColor);
+        this.markRadius = markRadius;
+        this.line1Width = (int)Math.ceil(line1Width);
+        this.line1Color = Utils.checkedColor(line1Color);
+        this.line2Width = (int)Math.ceil(line2Width);
+        this.line2Color = Utils.checkedColor(line2Color);
         this.fillColor = Utils.checkedColor(fillColor);
 
-        this.lineStroke = new BasicStroke(lineWidth, BasicStroke.CAP_ROUND,
-                                          BasicStroke.JOIN_ROUND);
+        this.line1Stroke = line1Color == null ? null :
+                           new BasicStroke(line1Width, BasicStroke.CAP_ROUND,
+                                           BasicStroke.JOIN_ROUND);
+        this.line2Stroke = line2Color == null ? null :
+                           new BasicStroke(line2Width, BasicStroke.CAP_ROUND,
+                                         BasicStroke.JOIN_ROUND);
 
-        decorationRadius = ITEM_MARK_RADIUS + this.lineWidth;
+
+        decorationRadius = markRadius + this.line1Width + this.line2Width;
 
         this.type = type;
         this.maxOffset = maxOffset;
@@ -106,10 +125,6 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 
 
     // --- ItemPainter implementation ------------------------------------------
-
-    public Color getItemColor(XYItem item) {
-        return lineColor != null ? lineColor : fillColor;
-    }
     
     public LongRect getItemBounds(ChartItem item) {
 //        if (!(item instanceof ProfilerXYItem))
@@ -290,15 +305,23 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 
             if (fillColor != null) {
                 g.setPaint(fillColor);
-                g.fillOval(itemX - ITEM_MARK_RADIUS, itemY - ITEM_MARK_RADIUS,
-                           ITEM_MARK_RADIUS * 2, ITEM_MARK_RADIUS * 2);
+                g.fillOval(itemX - markRadius, itemY - markRadius,
+                           markRadius * 2, markRadius * 2);
             }
 
-            if (lineColor != null) {
-                g.setPaint(lineColor);
-                g.setStroke(lineStroke);
-                g.drawOval(itemX - ITEM_MARK_RADIUS, itemY - ITEM_MARK_RADIUS,
-                           ITEM_MARK_RADIUS * 2, ITEM_MARK_RADIUS * 2);
+            if (line2Color != null) {
+                g.setPaint(line2Color);
+                g.setStroke(line2Stroke);
+                g.drawOval(itemX - markRadius, itemY - markRadius,
+                           markRadius * 2, markRadius * 2);
+            }
+
+            if (line1Color != null) {
+                int radius = markRadius + line2Width / 2;
+                g.setPaint(line1Color);
+                g.setStroke(line1Stroke);
+                g.drawOval(itemX - radius, itemY - radius,
+                           radius * 2, radius * 2);
             }
 
         }

@@ -26,9 +26,6 @@
 package org.netbeans.lib.profiler.charts;
 
 import org.netbeans.lib.profiler.charts.AxisMarksComputer.Mark;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartDecorator;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;

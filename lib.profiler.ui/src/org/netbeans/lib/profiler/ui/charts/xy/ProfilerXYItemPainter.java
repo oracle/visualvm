@@ -101,10 +101,6 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
 
     // --- ItemPainter implementation ------------------------------------------
-
-    public Color getItemColor(XYItem item) {
-        return lineColor != null ? lineColor : fillColor;
-    }
     
     public LongRect getItemBounds(ChartItem item) {
 //        if (!(item instanceof XYItem))

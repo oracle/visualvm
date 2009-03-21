@@ -26,20 +26,6 @@
 package org.netbeans.lib.profiler.charts;
 
 import org.netbeans.lib.profiler.charts.canvas.InteractiveCanvasComponent;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.ChartDecorator;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.ItemsListener;
-import org.netbeans.lib.profiler.charts.ItemsModel;
-import org.netbeans.lib.profiler.charts.LongRect;
-import org.netbeans.lib.profiler.charts.PaintersListener;
-import org.netbeans.lib.profiler.charts.PaintersModel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;

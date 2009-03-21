@@ -46,6 +46,9 @@ public abstract class ProfilerXYItem implements XYItem {
     private long initialMinY;
     private long initialMaxY;
 
+    private long minY;
+    private long maxY;
+
 
     // --- Constructor ---------------------------------------------------------
 
@@ -84,8 +87,11 @@ public abstract class ProfilerXYItem implements XYItem {
             LongRect oldBounds = new LongRect(bounds);
             LongRect dirtyBounds = new LongRect();
 
-            // Update bounds and dirtyBounds
+            // Update min & max values, bounds and dirtyBounds
             if (lastIndex == 0) {
+                minY = value;
+                maxY = value;
+
                 bounds.x = timestamp;
                 bounds.y = Math.min(value, initialMinY);
                 bounds.width = 0;
@@ -93,6 +99,9 @@ public abstract class ProfilerXYItem implements XYItem {
 
                 LongRect.set(dirtyBounds, timestamp, value, 0, 0);
             } else {
+                minY = Math.min(value, minY);
+                maxY = Math.max(value, maxY);
+
                 LongRect.add(bounds, timestamp, value);
                 long previousValue = getYValue(lastIndex - 1);
                 dirtyBounds.x = timeline.getTimestamp(timeline.getTimestampsCount() - 2);
@@ -123,6 +132,10 @@ public abstract class ProfilerXYItem implements XYItem {
     public long getXValue(int index) { return timeline.getTimestamp(index); }
 
     public abstract long getYValue(int index);
+
+    public long getMinYValue() { return minY; }
+
+    public long getMaxYValue() { return maxY; }
     
     public LongRect getBounds() { return bounds; }
 

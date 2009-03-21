@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -25,13 +25,6 @@
 
 package org.netbeans.lib.profiler.charts;
 
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.ItemsModel;
-import org.netbeans.lib.profiler.charts.PaintersModel;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -40,8 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
 
 /**
  *
@@ -63,6 +54,7 @@ class ChartSelectionManager implements ChartSelectionModel {
 
     private int mouseX;
     private int mouseY;
+    private boolean inChart;
 
     private Rectangle selectionBounds;
 
@@ -77,6 +69,7 @@ class ChartSelectionManager implements ChartSelectionModel {
     public ChartSelectionManager() {
         mouseX = -1;
         mouseY = -1;
+        inChart = false;
 
         chartListener = new ChartListener();
         mouseListener = new MouseListener();
@@ -128,8 +121,7 @@ class ChartSelectionManager implements ChartSelectionModel {
 
     public final void setHoverMode(int mode) {
         hoverMode = mode;
-        if (hoverMode == HOVER_NONE)
-            setHighlightedItems(Collections.EMPTY_LIST);
+        updateHighlightedItems();
     }
 
     public final int getHoverMode() {
@@ -270,11 +262,11 @@ class ChartSelectionManager implements ChartSelectionModel {
 
 
     private void updateHighlightedItems() {
-        if (hoverMode == HOVER_NONE || mouseX == -1 || mouseY == -1) {
+        if (hoverMode == HOVER_NONE || !inChart) {
             setHighlightedItems(Collections.EMPTY_LIST);
             return;
         }
-        
+
         final int x = mouseX;
         final int y = mouseY;
 
@@ -376,7 +368,7 @@ class ChartSelectionManager implements ChartSelectionModel {
 
         public void mousePressed(MouseEvent e) {
             mousePanningBackup = chart.isMousePanningEnabled();
-            
+
             if (selectionMode != SELECTION_NONE) {
                 chart.disableMousePanning();
                 setSelectionMode(dragMode);
@@ -398,9 +390,14 @@ class ChartSelectionManager implements ChartSelectionModel {
                 setSelectionBounds(e.getX(), e.getY(), 0, 0);
         }
 
+        public void mouseEntered(MouseEvent e) {
+            inChart = true;
+            mouseX = e.getX();
+            mouseY = e.getY();
+        }
+
         public void mouseExited(MouseEvent e) {
-            mouseX = -1;
-            mouseY = -1;
+            inChart = false;
 
             if (selectionMode == SELECTION_LINE_V ||
                 selectionMode == SELECTION_LINE_H ||

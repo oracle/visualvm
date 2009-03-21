@@ -47,9 +47,7 @@ import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 
 
 /** A panel containing three shall graphs for memory, threads and gc,

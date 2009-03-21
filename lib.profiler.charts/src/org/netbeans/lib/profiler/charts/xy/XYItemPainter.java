@@ -25,7 +25,6 @@
 
 package org.netbeans.lib.profiler.charts.xy;
 
-import java.awt.Color;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ItemPainter;
 
@@ -36,8 +35,6 @@ import org.netbeans.lib.profiler.charts.ItemPainter;
 public interface XYItemPainter extends ItemPainter {
 
     public long[] getDataValues(long[] viewValues, XYItem item, ChartContext context);
-
-    public Color getItemColor(XYItem item);
 
 
     public static abstract class Abstract implements XYItemPainter {

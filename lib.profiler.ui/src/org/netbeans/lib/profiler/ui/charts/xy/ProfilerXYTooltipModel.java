@@ -25,33 +25,26 @@
 
 package org.netbeans.lib.profiler.ui.charts.xy;
 
-import org.netbeans.lib.profiler.charts.CompoundItemPainter;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import java.awt.Color;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class CompoundProfilerXYItemPainter extends CompoundItemPainter implements XYItemPainter {
+public interface ProfilerXYTooltipModel {
 
-    public CompoundProfilerXYItemPainter(XYItemPainter painter1, XYItemPainter painter2) {
-        super(painter1, painter2);
-    }
+        public String getTimeValue      (long timestamp);
 
+        public int    getRowsCount      ();
+        public String getRowName        (int index);
+        public Color  getRowColor       (int index);
+        public String getRowValue       (int index, long itemValue);
+        public String getRowUnits       (int index, long itemValue);
 
-    public long[] getDataValues(long[] viewValues, XYItem item, ChartContext context) {
-        return getPainter1().getDataValues(viewValues, item, context);
-    }
-
-
-    protected XYItemPainter getPainter1() {
-        return (XYItemPainter)super.getPainter1();
-    }
-
-    protected XYItemPainter getPainter2() {
-        return (XYItemPainter)super.getPainter2();
-    }
+        public int    getExtraRowsCount ();
+        public String getExtraRowName   (int index);
+        public Color  getExtraRowColor  (int index);
+        public String getExtraRowValue  (int index);
+        public String getExtraRowUnits  (int index);
 
 }

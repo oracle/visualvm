@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 
 
 /**
@@ -133,6 +134,8 @@ public class HistoryPanel extends GraphPanel implements ChartModelListener, VMTe
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Action[] getActions() { return new Action[] {}; }
+
+    protected ProfilerXYTooltipModel createTooltipModel() { return null; }
 
     public JPanel getBigLegendPanel() {
         return bigLegendPanel;
