@@ -82,7 +82,7 @@ public abstract class GraphPanel extends JPanel {
 
     private static final String NO_DATA_TOOLTIP = "<No Data>";
 
-    
+
     static {
         DATE_FORMATTER = new SimpleDateFormat("h:mm:ss.SSS a, MMM d, yyyy");
 
@@ -94,6 +94,7 @@ public abstract class GraphPanel extends JPanel {
         PERCENT_FORMATTER.setMaximumIntegerDigits(2);
     }
 
+
     // --- Chart support -------------------------------------------------------
 
     protected ProfilerXYChart createChart(ProfilerXYItemsModel itemsModel,
@@ -103,12 +104,14 @@ public abstract class GraphPanel extends JPanel {
         if (smallPanel) {
             ProfilerXYChart chart = new ProfilerXYChart(itemsModel, paintersModel) {
                 public JToolTip createToolTip() {
-                    return getSmallTooltip(this);
+                    lastTooltip = new SmallTooltip(this);
+                    return lastTooltip;
                 }
                 public Point getToolTipLocation(MouseEvent e) {
-                    return getSmallTooltipLocation(e, getSmallTooltip(this));
+                    return getSmallTooltipLocation(e, smallTooltipManager);
                 }
             };
+            smallTooltipManager = new SmallTooltipManager(chart);
             chart.setToolTipText(NO_DATA_TOOLTIP); // Needed to enable the tooltip
             ToolTipManager.sharedInstance().registerComponent(chart);
             return chart;
@@ -135,40 +138,42 @@ public abstract class GraphPanel extends JPanel {
 
     // --- Small tooltip support -----------------------------------------------
 
-    private SmallToolTip smallTooltip;
-
-    private SmallToolTip getSmallTooltip(ProfilerXYChart chart) {
-        if (smallTooltip == null) smallTooltip = new SmallToolTip(chart);
-        return smallTooltip;
-    }
+    private SmallTooltip lastTooltip;
+    private SmallTooltipManager smallTooltipManager;
 
 
-    private static Point getSmallTooltipLocation(MouseEvent e, SmallToolTip tooltip) {
+    private static Point getSmallTooltipLocation(MouseEvent e, SmallTooltipManager tooltip) {
         Point p = e.getPoint();
         tooltip.setMousePosition(p);
         p.y += 25;
         return p;
     }
 
-    private class SmallToolTip extends JToolTip implements ChartSelectionListener {
-
-        private boolean timerRunning = false;
-        private int mouseX;
-        private int mouseY;
-
-        public SmallToolTip(ProfilerXYChart chart) {
+    private class SmallTooltip extends JToolTip {
+        public SmallTooltip(ProfilerXYChart chart) {
             super();
             setComponent(chart);
 
             addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
                     if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) enableSelection();
-                        else disableSelection();
+                        if (isShowing()) smallTooltipManager.enableSelection();
+                        else smallTooltipManager.disableSelection();
                     }
                 }
             });
+        }
+    }
 
+    private class SmallTooltipManager implements ChartSelectionListener {
+
+        private boolean timerRunning = false;
+        private int mouseX;
+        private int mouseY;
+        private ProfilerXYChart chart;
+
+        public SmallTooltipManager(ProfilerXYChart chart) {
+            this.chart = chart;
             chart.getSelectionModel().addSelectionListener(this);
         }
 
@@ -177,12 +182,8 @@ public abstract class GraphPanel extends JPanel {
             this.mouseY = p.y;
         }
 
-        private ProfilerXYChart getChart() {
-            return (ProfilerXYChart)getComponent();
-        }
-
         private void enableSelection() {
-            getChart().getSelectionModel().setHoverMode(ChartSelectionModel.
+            chart.getSelectionModel().setHoverMode(ChartSelectionModel.
                                                    HOVER_EACH_NEAREST);
         }
 
@@ -194,10 +195,10 @@ public abstract class GraphPanel extends JPanel {
             // Tooltip is hidden when its location changes, let's wait for a while
             Timer timer = new Timer(50, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (!isShowing()) {
-                        getChart().getSelectionModel().
+                    if (!isTooltipShowing()) {
+                        chart.getSelectionModel().
                                    setHoverMode(ChartSelectionModel.HOVER_NONE);
-                        getChart().setToolTipText(NO_DATA_TOOLTIP);
+                        chart.setToolTipText(NO_DATA_TOOLTIP);
                     }
                     timerRunning = false;
                 }
@@ -206,18 +207,22 @@ public abstract class GraphPanel extends JPanel {
             timer.start();
         }
 
+        private boolean isTooltipShowing() {
+            return lastTooltip != null && lastTooltip.isShowing();
+        }
+
         private void updateTooltipText(List<ItemSelection> selectedItems) {
-            if (!isShowing()) return;
+            if (!isTooltipShowing()) return;
 
             if (selectedItems.isEmpty()) {
-                getChart().setToolTipText(NO_DATA_TOOLTIP);
+                chart.setToolTipText(NO_DATA_TOOLTIP);
             } else {
-                getChart().setToolTipText(getTooltipText(selectedItems));
+                chart.setToolTipText(getTooltipText(selectedItems));
             }
 
             // A MouseEvent needs to be passed to the ToolTipManager to
             // immediately update the displayed tooltip
-            MouseEvent e = new MouseEvent(getChart(), 0, 0, 0, mouseX, mouseY, 0, false);
+            MouseEvent e = new MouseEvent(chart, 0, 0, 0, mouseX, mouseY, 0, false);
             ToolTipManager.sharedInstance().mouseMoved(e);
         }
 
