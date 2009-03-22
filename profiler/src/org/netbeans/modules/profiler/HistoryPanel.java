@@ -48,12 +48,14 @@ import org.netbeans.lib.profiler.ui.monitor.VMTelemetryXYChartModelDataResetList
 import org.openide.util.NbBundle;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 
 
 /**
@@ -131,6 +133,10 @@ public class HistoryPanel extends GraphPanel implements ChartModelListener, VMTe
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public Action[] getActions() { return new Action[] {}; }
+
+    protected ProfilerXYTooltipModel createTooltipModel() { return null; }
+
     public JPanel getBigLegendPanel() {
         return bigLegendPanel;
     }
@@ -150,28 +156,28 @@ public class HistoryPanel extends GraphPanel implements ChartModelListener, VMTe
         appendToolTipItem(toolTipBuffer, TOOLTIP_CLASS, History.getInstance().getClassName(), false);
 
         if (!history.isLiveness()) {
-            appendToolTipItem(toolTipBuffer, TOOLTIP_OBJECTS, intFormat.format(history.getYValue(history.getItemCount() - 1, 0)),
+            appendToolTipItem(toolTipBuffer, TOOLTIP_OBJECTS, INT_FORMATTER.format(history.getYValue(history.getItemCount() - 1, 0)),
                               false);
             appendToolTipItem(toolTipBuffer, TOOLTIP_SIZE,
-                              intFormat.format(history.getYValue(history.getItemCount() - 1, 1)) + " B", false);
+                              INT_FORMATTER.format(history.getYValue(history.getItemCount() - 1, 1)) + " B", false);
         } else {
-            appendToolTipItem(toolTipBuffer, TOOLTIP_LIVE, intFormat.format(history.getYValue(history.getItemCount() - 1, 0)),
+            appendToolTipItem(toolTipBuffer, TOOLTIP_LIVE, INT_FORMATTER.format(history.getYValue(history.getItemCount() - 1, 0)),
                               false);
             appendToolTipItem(toolTipBuffer, TOOLTIP_ALLOCATED,
-                              intFormat.format(history.getYValue(history.getItemCount() - 1, 1)), false);
+                              INT_FORMATTER.format(history.getYValue(history.getItemCount() - 1, 1)), false);
         }
 
         toolTipBuffer.append("</table><br><table cellspacing=\"1\" cellpadding=\"0\">"); // NOI18N
         toolTipBuffer.append("<tr><td colspan=\"2\">" + TOOLTIP_CURSOR + "</td></tr>"); // NOI18N
 
         if (history.isLiveness()) {
-            appendToolTipItem(toolTipBuffer, TOOLTIP_LIVE, intFormat.format(xyChart.getYValueAtPosition(event.getX(), 0)), false);
-            appendToolTipItem(toolTipBuffer, TOOLTIP_ALLOCATED, intFormat.format(xyChart.getYValueAtPosition(event.getX(), 1)),
+            appendToolTipItem(toolTipBuffer, TOOLTIP_LIVE, INT_FORMATTER.format(xyChart.getYValueAtPosition(event.getX(), 0)), false);
+            appendToolTipItem(toolTipBuffer, TOOLTIP_ALLOCATED, INT_FORMATTER.format(xyChart.getYValueAtPosition(event.getX(), 1)),
                               false);
         } else {
-            appendToolTipItem(toolTipBuffer, TOOLTIP_OBJECTS, intFormat.format(xyChart.getYValueAtPosition(event.getX(), 0)),
+            appendToolTipItem(toolTipBuffer, TOOLTIP_OBJECTS, INT_FORMATTER.format(xyChart.getYValueAtPosition(event.getX(), 0)),
                               false);
-            appendToolTipItem(toolTipBuffer, TOOLTIP_SIZE, intFormat.format(xyChart.getYValueAtPosition(event.getX(), 1)) + " B",
+            appendToolTipItem(toolTipBuffer, TOOLTIP_SIZE, INT_FORMATTER.format(xyChart.getYValueAtPosition(event.getX(), 1)) + " B",
                               false);
         }
 

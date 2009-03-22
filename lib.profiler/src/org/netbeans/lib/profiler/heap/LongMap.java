@@ -43,7 +43,10 @@ package org.netbeans.lib.profiler.heap;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * key - ID (long/int) of heap object
@@ -207,6 +210,25 @@ class LongMap extends AbstractLongMap {
         }
     }
 
+    private static class RetainedSizeEntry implements Comparable {
+        private final long instanceId;
+        private final int retainedSize;
+        
+        private RetainedSizeEntry(long id,int size) {
+            instanceId = id;
+            retainedSize = size;
+        }
+
+        public int compareTo(Object o) {
+            RetainedSizeEntry other = (RetainedSizeEntry) o;
+            return other.retainedSize - retainedSize;
+        }
+
+        public boolean equals(Object obj) {
+            RetainedSizeEntry other = (RetainedSizeEntry) obj;
+            return instanceId == other.instanceId;
+        }
+    }
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -235,5 +257,31 @@ class LongMap extends AbstractLongMap {
 
     void flush() {
         referenceList.flush();
+    }
+
+    long[] getBiggestObjectsByRetainedSize(int number) {
+        SortedSet bigObjects = new TreeSet();
+        long[] bigIds = new long[number];
+        int min = 0;
+        for (long index=0;index<fileSize;index+=ENTRY_SIZE) {
+            long id = getID(index);
+            if (id != 0) {
+                int retainedSize = createEntry(index).getRetainedSize();
+                if (bigObjects.size()<number) {
+                    bigObjects.add(new RetainedSizeEntry(id,retainedSize));
+                    min = ((RetainedSizeEntry)bigObjects.last()).retainedSize;
+                } else if (retainedSize>min) {
+                    bigObjects.remove(bigObjects.last());
+                    bigObjects.add(new RetainedSizeEntry(id,retainedSize));
+                    min = ((RetainedSizeEntry)bigObjects.last()).retainedSize;
+                }
+            }
+        }
+        int i = 0;
+        Iterator it = bigObjects.iterator();
+        while(it.hasNext()) {
+            bigIds[i++]=((RetainedSizeEntry)it.next()).instanceId;
+        }
+        return bigIds;
     }
 }
