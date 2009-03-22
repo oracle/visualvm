@@ -129,6 +129,8 @@ public abstract class BufferedCanvasComponent extends JComponent {
      * nothing.
      */
     protected void shown() {
+        invalidateImage();
+        repaintDirty();
     }
     
     /**

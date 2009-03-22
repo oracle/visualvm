@@ -58,7 +58,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         mousePanningCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
         enableMousePanning();
 
-        mouseZoomingFactor = 0.05d;
+        mouseZoomingFactor = 1.05d;
         enableMouseZooming();
     }
     
@@ -370,6 +370,62 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
     }
 
 
+    // --- Generic zooming support ---------------------------------------------
+
+    public final void zoom(int centerX, int centerY, double factor) {
+
+        // Cache current fitting
+        boolean fitsWidth = fitsWidth();
+        boolean fitsHeight = fitsHeight();
+
+        // Both fits, no zoom
+        if (fitsWidth && fitsHeight) return;
+
+        // Resolve current scale
+        double scaleX = getScaleX();
+        double scaleY = getScaleY();
+
+        // Bad scale, no zoom
+        if (scaleX * scaleY == 0) return;
+
+        // Compute new scale
+        double scaleRatio = fitsWidth || fitsHeight ? 1 : scaleY / scaleX;
+        double newScaleX = fitsWidth ? scaleX : scaleX * factor;
+        double newScaleY = fitsHeight ? scaleY : scaleY * factor * scaleRatio;
+
+        // Cache data at zoom center
+        long dataX = getDataX(centerX);
+        long dataY = getDataY(centerY);
+
+        // Set new scale
+        setScale(newScaleX, newScaleY);
+
+        // Cache current offset
+        long offsetX = getOffsetX();
+        long offsetY = getOffsetY();
+
+        // Update x-offset to centerX if needed
+        if (!fitsWidth) {
+            long dataWidth = dataX - getDataOffsetX();
+            long viewWidth = getViewWidth(dataWidth);
+            offsetX = isRightBased() ?
+                      viewWidth - getWidth() + centerX : viewWidth - centerX;
+        }
+
+        // Update y-offset to centerY if needed
+        if (!fitsHeight) {
+            long dataHeight = dataY - getDataOffsetY();
+            long viewHeight = getViewHeight(dataHeight);
+            offsetY = isBottomBased() ?
+                      viewHeight - getHeight() + centerY : viewHeight - centerY;
+        }
+
+        // Set new offset
+        setOffset(offsetX, offsetY);
+
+    }
+
+
     // --- Mouse zooming support -----------------------------------------------
 
     public final void setMouseZoomingEnabled(boolean enabled) {
@@ -382,14 +438,12 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
 
         mouseZoomHandler = new MouseZoomHandler();
         addMouseWheelListener(mouseZoomHandler);
-        addMouseMotionListener(mouseZoomHandler);
     }
 
     public final void disableMouseZooming() {
         if (mouseZoomHandler == null) return;
 
         removeMouseWheelListener(mouseZoomHandler);
-        removeMouseMotionListener(mouseZoomHandler);
         mouseZoomHandler = null;
     }
 
@@ -405,67 +459,12 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         this.mouseZoomingFactor = mouseZoomingFactor;
     }
 
-    private class MouseZoomHandler implements MouseWheelListener, MouseMotionListener {
-//        private double cachedScaleX;
-//        private double cachedScaleY;
-        private double cachedScaleRatio;
-        private long scrolledAmount;
-        private boolean cachedValuesValid;
-
-        private long cachedDataX;
-        private long cachedDataY;
-
-
-        public void mouseMoved(MouseEvent e) {
-            cachedValuesValid = false;
-        }
-
-        public void mouseDragged(MouseEvent e) {}
-
+    private class MouseZoomHandler implements MouseWheelListener {
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-
-                if (fitsWidth() && fitsHeight()) return;
-
-                int x = e.getX();
-                int y = e.getY();
-                double scaleX = getScaleX();
-                double scaleY = getScaleY();
-
-                if (!cachedValuesValid) {
-                    cachedDataX = getDataX(x);
-                    cachedDataY = getDataY(y);
-//                    cachedScaleX = scaleX;
-//                    cachedScaleY = scaleY;
-                    cachedScaleRatio = fitsWidth() || fitsHeight() ?
-                                       1 : scaleY / scaleX;
-//                    scrolledAmount = 0;
-                    cachedValuesValid = true;
-                }
-
-                int unitsToScroll = e.getUnitsToScroll();
-                if (unitsToScroll > 0 && scaleX * scaleY != 0 || unitsToScroll < 0) {
-                    scrolledAmount -= unitsToScroll;
-//                    double zoomChange = -(double)scrolledAmount * mouseZoomingFactor;
-//
-//                    double newScaleX = Math.max(cachedScaleX + zoomChange, 0);
-//                    double newScaleY = Math.max(cachedScaleY + zoomChange * cachedScaleRatio, 0);
-
-                    double newScaleX = fitsWidth() ? getScaleX() :
-                        Math.pow(1d + mouseZoomingFactor, scrolledAmount);
-                    double newScaleY = fitsHeight() ? getScaleY() :
-                        Math.pow((1d + mouseZoomingFactor) * cachedScaleRatio, scrolledAmount);
-
-                    setScale(newScaleX, newScaleY);
-
-                    long newX = getViewX(cachedDataX);
-                    long newY = getViewY(cachedDataY);
-                    long dx = isRightBased() ? x - newX : newX - x;
-                    long dy = isBottomBased() ? y - newY : newY - y;
-                    setOffset(getOffsetX() + dx, getOffsetY() + dy);
-
-                    repaint();
-                }
+                zoom(e.getX(), e.getY(), Math.pow(mouseZoomingFactor,
+                                                  -e.getUnitsToScroll()));
+                repaintDirty();
             }
         }
     }
