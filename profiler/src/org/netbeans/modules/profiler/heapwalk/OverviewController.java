@@ -38,75 +38,44 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.monitor;
+package org.netbeans.modules.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.ui.charts.AsyncMarksProvider;
-import java.awt.Color;
-import java.util.ResourceBundle;
-
+import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
+import javax.swing.AbstractButton;
+import javax.swing.JPanel;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class SurvivingGenerationsXYChartModel extends VMTelemetryXYChartModel implements AsyncMarksProvider {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public class OverviewController extends AbstractController {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.monitor.Bundle"); // NOI18N
-    private static final String SURVGEN_STRING = messages.getString("SurvivingGenerationsXYChartModel_SurvGenString"); // NOI18N
-    private static final String TIME_REL_STRING = messages.getString("SurvivingGenerationsXYChartModel_TimeRelString"); // NOI18N
-                                                                                                                        // -----
-    private static final Color GC_MARKS_COLOR = new Color(250, 230, 230);
+    private SummaryController summaryController;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SurvivingGenerationsXYChartModel(VMTelemetryDataManager vmTelemetryDataManager) {
-        super(vmTelemetryDataManager);
-        setupModel(new String[] { SURVGEN_STRING, TIME_REL_STRING },
-                   new Color[] { new Color(255, 127, 127), new Color(127, 63, 191) });
+    public OverviewController(SummaryController summaryController) {
+        this.summaryController = summaryController;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public Color getMarkColor() {
-        return GC_MARKS_COLOR;
+    // --- Public interface ------------------------------------------------------
+    public SummaryController getSummaryController() {
+        return summaryController;
     }
 
-    public long getMarkEnd(int index) {
-        return vmTelemetryDataManager.gcFinishs[index];
+    // --- Internal interface ----------------------------------------------------
+
+    protected AbstractButton createControllerPresenter() {
+        return ((OverviewControllerUI) getPanel()).getPresenter();
     }
 
-    public long getMarkStart(int index) {
-        return vmTelemetryDataManager.gcStarts[index];
+    // --- Protected implementation ----------------------------------------------
+    protected JPanel createControllerUI() {
+        return new OverviewControllerUI(this);
     }
 
-    public int getMarksCount() {
-        return vmTelemetryDataManager.getGCItemCount();
-    }
-
-    // TODO: will be moved to chart axis definition
-    public long getMaxDisplayYValue(int seriesIndex) {
-        switch (seriesIndex) {
-            case 0:
-                return getMaxYValue(0);
-            case 1:
-                return 1000;
-        }
-
-        return 0;
-    }
-
-    protected long[] getYValues(int seriesIndex) {
-        switch (seriesIndex) {
-            case 0:
-                return vmTelemetryDataManager.nSurvivingGenerations;
-            case 1:
-                return vmTelemetryDataManager.relativeGCTimeInPerMil;
-        }
-
-        return null;
-    }
 }
