@@ -68,11 +68,11 @@ public abstract class AxisMarksComputer {
 
         public Iterator<Mark> marksIterator(int start, int end) {
             final long dataStart = horizontal ?
-                                   (chartContext.getDataX(start) / step) * step :
-                                   (chartContext.getDataY(start) / step) * step;
+                                   ((long)chartContext.getDataX(start) / step) * step :
+                                   ((long)chartContext.getDataY(start) / step) * step;
             final long dataEnd = horizontal ?
-                                   (chartContext.getDataX(end) / step) * step :
-                                   (chartContext.getDataY(end) / step) * step;
+                                   ((long)chartContext.getDataX(end) / step) * step :
+                                   ((long)chartContext.getDataY(end) / step) * step;
             final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
             final long[] iterIndex = new long[] { 0 };
 
