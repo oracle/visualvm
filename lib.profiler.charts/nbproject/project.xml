@@ -48,7 +48,9 @@ made subject to such option by the copyright holder.
             <module-dependencies/>
             <friend-packages>
                 <friend>org.netbeans.lib.profiler.ui</friend>
+                <package>org.netbeans.lib.profiler.charts</package>
                 <package>org.netbeans.lib.profiler.charts.canvas</package>
+                <package>org.netbeans.lib.profiler.charts.xy</package>
             </friend-packages>
         </data>
     </configuration>
