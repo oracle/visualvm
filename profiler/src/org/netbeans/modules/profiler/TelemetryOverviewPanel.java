@@ -44,7 +44,6 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -95,6 +94,8 @@ public final class TelemetryOverviewPanel extends TopComponent {
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         graphsPanelScroll.setBorder(BorderFactory.createEmptyBorder());
         graphsPanelScroll.setViewportBorder(BorderFactory.createEmptyBorder());
+        graphsPanelScroll.getHorizontalScrollBar().setUnitIncrement(20);
+        graphsPanelScroll.getHorizontalScrollBar().setBlockIncrement(20);
         setLayout(new BorderLayout());
         add(graphsPanelScroll, BorderLayout.CENTER);
 
