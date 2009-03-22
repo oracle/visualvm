@@ -155,6 +155,18 @@ class HprofHeap implements Heap {
         return classDumpBounds.createClassCollection();
     }
 
+    public List getBiggestObjectsByRetainedSize(int number) {
+        long[] ids;
+        List bigObjects = new ArrayList(number);
+        
+        computeRetainedSize();
+        ids = idToOffsetMap.getBiggestObjectsByRetainedSize(number);
+        for (int i=0;i<ids.length;i++) {
+            bigObjects.add(getInstanceByID(ids[i]));
+        }
+        return bigObjects;
+    }
+    
     public GCRoot getGCRoot(Instance instance) {
        Long instanceId = Long.valueOf(instance.getInstanceId());
        return getGCRoot(instanceId);

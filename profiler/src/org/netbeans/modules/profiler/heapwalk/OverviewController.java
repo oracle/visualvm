@@ -40,66 +40,42 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
-import org.netbeans.modules.profiler.heapwalk.ui.SummaryControllerUI;
+import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
-
 
 /**
  *
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public class SummaryController extends AbstractTopLevelController implements NavigationHistoryManager.NavigationHistoryCapable {
+public class OverviewController extends AbstractController {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private HeapFragmentWalker heapFragmentWalker;
-    private HintsController hintsController;
-    private OverviewController overviewController;
+    private SummaryController summaryController;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    // --- Constructors ----------------------------------------------------------
-    public SummaryController(HeapFragmentWalker heapFragmentWalker) {
-        this.heapFragmentWalker = heapFragmentWalker;
-        hintsController = new HintsController(this);
-        overviewController = new OverviewController(this);
+    public OverviewController(SummaryController summaryController) {
+        this.summaryController = summaryController;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    // --- NavigationHistoryManager.NavigationHistoryCapable implementation ------
-    public NavigationHistoryManager.Configuration getCurrentConfiguration() {
-        return new NavigationHistoryManager.Configuration();
-    }
-
     // --- Public interface ------------------------------------------------------
-    public HeapFragmentWalker getHeapFragmentWalker() {
-        return heapFragmentWalker;
+    public SummaryController getSummaryController() {
+        return summaryController;
     }
 
-    public void configure(NavigationHistoryManager.Configuration configuration) {
-        heapFragmentWalker.switchToHistorySummaryView();
-    }
-
-    protected AbstractButton[] createClientPresenters() {
-        return new AbstractButton[] {overviewController.getPresenter(),hintsController.getPresenter()};
-    }
+    // --- Internal interface ----------------------------------------------------
 
     protected AbstractButton createControllerPresenter() {
-        return ((SummaryControllerUI) getPanel()).getPresenter();
+        return ((OverviewControllerUI) getPanel()).getPresenter();
     }
 
     // --- Protected implementation ----------------------------------------------
     protected JPanel createControllerUI() {
-        return new SummaryControllerUI(this);
+        return new OverviewControllerUI(this);
     }
-    
-    public HintsController getHintsController() {
-        return hintsController;
-    }
-    
-    public OverviewController getOverViewController() {
-        return overviewController;
-    }
+
 }
