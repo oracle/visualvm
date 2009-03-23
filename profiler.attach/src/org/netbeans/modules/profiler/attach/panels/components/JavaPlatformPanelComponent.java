@@ -395,7 +395,7 @@ public class JavaPlatformPanelComponent extends javax.swing.JPanel {
       return null;
     
     for (Iterator it = newItemList.iterator(); it.hasNext();) {
-      Object elem = (Object) it.next();
+      Object elem = it.next();
       if(!oldItemList.contains(elem)) {
         return (TargetPlatform)elem;
       }
