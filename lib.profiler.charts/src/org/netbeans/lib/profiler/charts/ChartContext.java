@@ -72,17 +72,17 @@ public abstract class ChartContext {
 
     // --- Data to View --------------------------------------------------------
 
-    public abstract long getViewX(long dataX);
+    public abstract double getViewX(double dataX);
 
-    public abstract long getReversedViewX(long dataX);
+    public abstract double getReversedViewX(double dataX);
 
-    public abstract long getViewY(long dataY);
+    public abstract double getViewY(double dataY);
 
-    public abstract long getReversedViewY(long dataY);
+    public abstract double getReversedViewY(double dataY);
 
-    public abstract long getViewWidth(long dataWidth);
+    public abstract double getViewWidth(double dataWidth);
 
-    public abstract long getViewHeight(long dataHeight);
+    public abstract double getViewHeight(double dataHeight);
 
     public abstract LongRect getViewRect(LongRect dataRect);
 
@@ -91,17 +91,17 @@ public abstract class ChartContext {
 
     // --- View to Data --------------------------------------------------------
 
-    public abstract long getDataX(int viewX);
+    public abstract double getDataX(double viewX);
 
-    public abstract long getReversedDataX(int viewX);
+    public abstract double getReversedDataX(double viewX);
 
-    public abstract long getDataY(int viewY);
+    public abstract double getDataY(double viewY);
 
-    public abstract long getReversedDataY(int viewY);
+    public abstract double getReversedDataY(double viewY);
 
-    public abstract long getDataWidth(int viewWidth);
+    public abstract double getDataWidth(double viewWidth);
 
-    public abstract long getDataHeight(int viewHeight);
+    public abstract double getDataHeight(double viewHeight);
 
 //    public abstract LongRect getDataRect(LongRect viewRect);
 //
@@ -110,7 +110,7 @@ public abstract class ChartContext {
 
     // --- Utils ---------------------------------------------------------------
 
-    public static final int getCheckedIntValue(long value) {
+    public static final int getCheckedIntValue(double value) {
         if (value < Integer.MIN_VALUE) return VALUE_OUT_OF_RANGE_NEG;
         if (value > Integer.MAX_VALUE) return VALUE_OUT_OF_RANGE_POS;
         else return (int)value;
@@ -127,12 +127,12 @@ public abstract class ChartContext {
     protected final LongRect getViewRectImpl(LongRect dataRect) {
         LongRect viewRect = new LongRect();
 
-        viewRect.x = getViewX(dataRect.x);
-        viewRect.width = getViewWidth(dataRect.width);
+        viewRect.x = (long)getViewX(dataRect.x);
+        viewRect.width = (long)getViewWidth(dataRect.width);
         if (isRightBased()) viewRect.x -= viewRect.width;
 
-        viewRect.y = getViewY(dataRect.y);
-        viewRect.height = getViewHeight(dataRect.height);
+        viewRect.y = (long)getViewY(dataRect.y);
+        viewRect.height = (long)getViewHeight(dataRect.height);
         if (isBottomBased()) viewRect.y -= viewRect.height;
 
         return viewRect;

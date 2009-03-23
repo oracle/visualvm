@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -104,7 +104,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         if (comp == null) return null;
         return map.get(comp);
     }
-    
+
     public Object getConstraints(int constraint) {
         Component comp = getLayoutComponent(constraint);
         if (comp == null) return null;
@@ -117,11 +117,11 @@ public class CrossBorderLayout implements LayoutManager2 {
             Dimension cen = center != null ? center.getPreferredSize() : null;
 
             if (north != null) dim.height += north.getPreferredSize().height;
-            if (center != null) dim.height += cen.height;
+            if (cen   != null) dim.height += cen.height;
             if (south != null) dim.height += south.getPreferredSize().height;
 
             if (west != null) dim.width += west.getPreferredSize().width;
-            if (center != null) dim.width += cen.width;
+            if (cen  != null) dim.width += cen.width;
             if (east != null) dim.width += east.getPreferredSize().width;
 
             Insets insets = parent.getInsets();
@@ -138,11 +138,11 @@ public class CrossBorderLayout implements LayoutManager2 {
             Dimension cen = center != null ? center.getMinimumSize() : null;
 
             if (north != null) dim.height += north.getMinimumSize().height;
-            if (center != null) dim.height += cen.height;
+            if (cen   != null) dim.height += cen.height;
             if (south != null) dim.height += south.getMinimumSize().height;
 
             if (west != null) dim.width += west.getMinimumSize().width;
-            if (center != null) dim.width += cen.width;
+            if (cen   != null) dim.width += cen.width;
             if (east != null) dim.width += east.getMinimumSize().width;
 
             Insets insets = parent.getInsets();
@@ -157,9 +157,12 @@ public class CrossBorderLayout implements LayoutManager2 {
         synchronized (parent.getTreeLock()) {
             Insets insets = parent.getInsets();
             int top = insets.top;
-            int bottom = parent.getHeight() - insets.bottom - insets.top;
+            int bottom = parent.getHeight() - insets.bottom;
+            int height = parent.getHeight() - insets.bottom - insets.top;
+
             int left = insets.left;
             int right = parent.getWidth() - insets.right - insets.left;
+            int width = parent.getWidth() - insets.right - insets.left;
 
             int northHeight = north != null ? north.getPreferredSize().height : 0;
             int southHeight = south != null ? south.getPreferredSize().height : 0;
@@ -168,7 +171,7 @@ public class CrossBorderLayout implements LayoutManager2 {
 
             if (center != null) {
                 center.setBounds(left + westWidth, top + northHeight,
-                right - eastWidth - westWidth, bottom - southHeight - northHeight);
+                right - eastWidth - westWidth, height - southHeight - northHeight);
             }
 
             if (north != null) {
@@ -176,7 +179,7 @@ public class CrossBorderLayout implements LayoutManager2 {
                 int leftOffset = constraints[0] != NONE ? westWidth : 0;
                 int rightOffset = constraints[2] != NONE ? eastWidth : 0;
                 north.setBounds(left + westWidth - leftOffset, top,
-                right - eastWidth - westWidth + leftOffset + rightOffset, northHeight);
+                width - eastWidth - westWidth + leftOffset + rightOffset, northHeight);
             }
 
             if (south != null) {
@@ -184,7 +187,7 @@ public class CrossBorderLayout implements LayoutManager2 {
                 int leftOffset = constraints[0] != NONE ? westWidth : 0;
                 int rightOffset = constraints[2] != NONE ? eastWidth : 0;
                 south.setBounds(left + westWidth - leftOffset, bottom - southHeight,
-                right - eastWidth - westWidth + leftOffset + rightOffset, southHeight);
+                width - eastWidth - westWidth + leftOffset + rightOffset, southHeight);
             }
 
             if (west != null) {
@@ -192,7 +195,7 @@ public class CrossBorderLayout implements LayoutManager2 {
                 int topOffset = constraints[0] != NONE ? northHeight : 0;
                 int bottomOffset = constraints[2] != NONE ? southHeight : 0;
                 west.setBounds(left, top + northHeight - topOffset, westWidth,
-                bottom - southHeight - northHeight + topOffset + bottomOffset);
+                height - southHeight - northHeight + topOffset + bottomOffset);
             }
 
             if (east != null) {
@@ -200,7 +203,7 @@ public class CrossBorderLayout implements LayoutManager2 {
                 int topOffset = constraints[0] != NONE ? northHeight : 0;
                 int bottomOffset = constraints[2] != NONE ? southHeight : 0;
                 east.setBounds(right - eastWidth, top + northHeight - topOffset,
-                eastWidth, bottom - southHeight - northHeight + topOffset + bottomOffset);
+                eastWidth, height - southHeight - northHeight + topOffset + bottomOffset);
             }
         }
     }
@@ -238,7 +241,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         }
     }
 
-    
+
     private static boolean isNorth(Integer[] constraints) {
         return constraints[1] == SwingConstants.NORTH;
     }
@@ -280,7 +283,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         if (constraint == SwingConstants.SOUTH_WEST) return;
         if (constraint == SwingConstants.SOUTH_EAST) return;
         if (constraint == SwingConstants.CENTER) return;
-        
+
         throw new IllegalArgumentException("Unsupported constraint: " + constraint); // NOI18N
     }
 
