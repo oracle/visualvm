@@ -1,19 +1,40 @@
-
 /*
- * The contents of this file are subject to the Sun Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. A copy of the License is available at
- * http://www.sun.com/, and in the file LICENSE.html in the
- * doc directory.
- * 
- * The Original Code is HAT. The Initial Developer of the
- * Original Code is Bill Foote, with contributions from others
- * at JavaSoft/Sun. Portions created by Bill Foote and others
- * at Javasoft/Sun are Copyright (C) 1997-2004. All Rights Reserved.
- * 
- * In addition to the formal license, I ask that you don't
- * change the history or donations files without permission.
- * 
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
 var hatPkg = Packages.org.netbeans.modules.profiler.heapwalk.oql;
@@ -84,6 +105,51 @@ function filterEnumeration(e, func, wrap) {
             return res;
         },
         
+        remove: function() {
+            throw "NotSupportedOperation";
+        }
+
+    };
+}
+
+function filterIterator(e, func, wrap) {
+    var next = undefined;
+    var index = 0;
+
+    function findNext() {
+        var tmp;
+        while (e.hasNext()) {
+            tmp = e.next();
+            index++;
+            if (wrap) {
+                tmp = wrapJavaObject(tmp);
+            }
+            if (func(tmp, index, e)) {
+                next = tmp;
+                return;
+            }
+        }
+    }
+
+    return new java.util.Iterator() {
+        hasNext: function() {
+            findNext();
+            return next != undefined;
+        },
+
+        next: function() {
+            if (next == undefined) {
+                // user may not have called hasMoreElements?
+                findNext();
+            }
+            if (next == undefined) {
+                throw "NoSuchElementException";
+            }
+            var res = next;
+            next = undefined;
+            return res;
+        },
+
         remove: function() {
             throw "NotSupportedOperation";
         }
@@ -187,8 +253,8 @@ function wrapJavaValue(thing) {
         return null;
     }
 
-//    printStackTrace();
-//    println(thing);
+    //    printStackTrace();
+    //    println(thing);
 
     if (thing instanceof Packages.org.netbeans.lib.profiler.heap.FieldValue) {
         var type = thing.field.type;
@@ -231,9 +297,9 @@ function wrapJavaObject(thing) {
         //            }
         //        }
 
-//        print(jobject.getClass());
+        //        print(jobject.getClass());
         if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
-//            println("wrapping as Class");
+            //            println("wrapping as Class");
             return new JavaClassWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.ObjectArrayInstance) {
             //            println("wrapping as ObjectArray");
@@ -245,7 +311,7 @@ function wrapJavaObject(thing) {
             //            println("wrapping as Instance");
             return new JavaObjectWrapper(jobject);
         } else {
-//            println("unknown heap object type: " + jobject.getClass());
+            //            println("unknown heap object type: " + jobject.getClass());
             return jobject;
         }
     }
@@ -253,7 +319,8 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java instances
     function JavaObjectWrapper(instance) {
         var things = instance.fieldValues;
-              
+        var fldValueCache = new Array();
+
         // instance fields can be accessed in natural syntax
         return new JSAdapter() {
             __getIds__ : function() {
@@ -272,9 +339,15 @@ function wrapJavaObject(thing) {
             },
             __get__ : function(name) {
                 if (name == 'clazz') {
-                    return wrapJavaObject(instance.javaClass);
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(instance.javaClass);
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'id') {
-                    return instance.instanceId;
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = instance.instanceId;
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'toString') {
                     return function() {
                         if (instance.javaClass.name == "java.lang.String") {
@@ -284,8 +357,12 @@ function wrapJavaObject(thing) {
                     }
                 } else if (name == 'wrapped-object') {
                     return instance;
+                } else {
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(instance.getValueOfField(name));
+                    }
+                    return fldValueCache[name];
                 }
-                return wrapJavaObject(instance.getValueOfField(name));
             }
         }				
     }
@@ -293,7 +370,8 @@ function wrapJavaObject(thing) {
     // return wrapper for Java Class objects
     function JavaClassWrapper(jclass) {
         var fields = jclass.staticFieldValues;
-    
+        var fldValueCache = new Array();
+
         // to access static fields of given Class cl, use 
         // cl.statics.<static-field-name> syntax
         this.statics = new JSAdapter() {
@@ -315,13 +393,16 @@ function wrapJavaObject(thing) {
             },
             __get__ : function(name) {
                 if (name == "toString") {
-                    return jclass.toString();
-                }
-                var result = theJavaClassProto[name];
-                if (result == null) {
-                    return wrapJavaObject(jclass.getValueOfStaticField(name));
+                    result = jclass.toString();
                 } else {
-                    return result;
+                    if (fldValueCache[name] == undefined) {
+                        var result = theJavaClassProto[name];
+                        if (result == null) {
+                            result = wrapJavaObject(jclass.getValueOfStaticField(name));
+                        }
+                        fldValueCache[name] = result;
+                    }
+                    return fldValueCache[name];
                 }
             }
         }
@@ -345,6 +426,7 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java object arrays
     function JavaObjectArrayWrapper(array) {
         var elements = array.values;
+        var fldValueCache = new Array();
         // array elements can be accessed in natural syntax
         // also, 'length' property is supported.
         return new JSAdapter() {
@@ -366,11 +448,20 @@ function wrapJavaObject(thing) {
                     name >= 0 && name < elements.size()) {
                     return wrapJavaValue(elements.get(name));
                 } else if (name == 'id') {
-                  return array.instanceId;
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = array.instanceId;
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'length') {
-                    return elements.size();
+                    if (fldValueCache["len"] == undefined) {
+                        fldValueCache["len"] = elements.size();
+                    }
+                    return fldValueCache["len"];
                 } else if (name == 'clazz') {
-                    return wrapJavaValue(array.javaClass);
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(array.javaClass);
+                    }
+                    return fldValueCache[name];
                 } else if (name == 'toString') {
                     return function() { 
                         return array.toString();
@@ -387,6 +478,7 @@ function wrapJavaObject(thing) {
     // returns wrapper for Java primitive arrays
     function JavaValueArrayWrapper(array) {
         var elements = array.values;
+        var fldValueCache = new Array();
         // array elements can be accessed in natural syntax
         // also, 'length' property is supported.
         return new JSAdapter() {
@@ -410,7 +502,10 @@ function wrapJavaObject(thing) {
                 }
     
                 if (name == 'length') {
-                    return elements.size();
+                    if (fldValueCache["len"] == undefined) {
+                        fldValueCache["len"] = elements.size();
+                    }
+                    return fldValueCache["len"];
                 } else if (name == 'toString') {
                     return function() { 
                         return array.toString();
@@ -418,7 +513,10 @@ function wrapJavaObject(thing) {
                 } else if (name == 'wrapped-object') {
                     return array;
                 } else if (name == 'clazz') {
-                    return wrapJavaValue(array.javaClass);
+                    if (fldValueCache[name] == undefined) {
+                        fldValueCache[name] = wrapJavaObject(array.javaClass);
+                    }
+                    return fldValueCache[name];
                 } else {
                     return undefined;
                 }
@@ -430,12 +528,12 @@ function wrapJavaObject(thing) {
 
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
-//    println("Unwrapping object");
-//    println(typeof(jobject));
+    //    println("Unwrapping object");
+    //    println(typeof(jobject));
     
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
         if (jobject instanceof Array) {
-//            println("Object is array");
+            //            println("Object is array");
             var arr = new java.util.ArrayList(jobject.length);
 
             for (var index in jobject) {
@@ -445,7 +543,7 @@ function unwrapJavaObject(jobject) {
         }
         
         try {
-//            println(typeof(jobject));
+            //            println(typeof(jobject));
             var orig = jobject;
             jobject = orig["wrapped-object"];
             if (jobject == undefined) {
@@ -465,7 +563,7 @@ function unwrapJavaObject(jobject) {
 function unwrapMap(jobject) {
     var map = new java.util.HashMap();
     for(var prop in jobject) {
-//        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
+        //        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
         map.put(prop, unwrapJavaObject(jobject[prop]));
     }
     return map;
@@ -597,7 +695,7 @@ function wrapHeapSnapshot(heap) {
             clazz = getClazz(clazz);
 
             if (clazz) {
-//                var instances = clazz.getInstances(includeSubtypes); // TODO
+                //                var instances = clazz.getInstances(includeSubtypes); // TODO
                 var instances = snapshot.getInstances(clazz, includeSubtypes);
                 while (instances.hasNext()) {
                     if (callback(wrapJavaObject(instances.next())))
@@ -628,11 +726,10 @@ function wrapHeapSnapshot(heap) {
             }
             clazz = getClazz(clazz);
             if (clazz) {
-                var instances = wrapIterator(snapshot.getInstances(clazz, includeSubtypes));
                 if (where) {
-                    return filterEnumeration(instances, where, true);
+                    return filterIterator(snapshot.getInstances(clazz, includeSubtypes), where, true);
                 } else {
-                    return wrapperEnumeration(instances);
+                    return wrapIterator(snapshot.getInstances(clazz, includeSubtypes), true);
                 }
             } else {
                 return emptyEnumeration;
@@ -827,7 +924,7 @@ function classof(jobject) {
  * @param jobject object whose referers are retrieved
  */
 function forEachReferrer(callback, jobject) {
-//    jobject = unwrapJavaObject(jobject);
+    //    jobject = unwrapJavaObject(jobject);
     var refs = referrers(jobject);
     while (refs.hasMoreElements()) {
         var referrer = refs.nextElement();
@@ -1180,45 +1277,36 @@ function top(array, code, num) {
     var func;
     if (code == undefined) {
         func = function(lhs, rhs) {
-            return lhs < rhs;
+            return 1; // first-come order
         }
     } else if (typeof(code) == 'string') {
         func = new Function("lhs", "rhs", "return " + code);
+    } else {
+        func = code;
     }
 
     if (num == undefined) {
         num = 10;
     }
-
-    var modCount = 0;
-    var mergesize = 4;
+    array = wrapIterator(array, true);
 
     if (array instanceof java.util.Enumeration) {
-        var arrays = [new Array(), new Array()];
-        var lastSorted = undefined;
-        var firstSorted = undefined;
-        var needsSorting = true;
+        var sorted = new Array();
 
         while(array.hasMoreElements()) {
             var element = array.nextElement();
-            arrays[0].push(element);
-            if (lastSorted != undefined) needsSorting |= func(element, lastSorted) < 0 || func(element, firstSorted) > 0;
-
-            if (arrays[0].length == mergesize) {
-                if (needsSorting) {
-                    arrays[1] = arrays[1].concat(arrays[0]).sort(func);
-                    lastSorted = arrays[1][arrays[1].length -1];
-                    firstSorted = arrays[1][0];
-                }
-                arrays[0].length = 0;
-                needsSorting = false;
+            if (sorted.length > 0) {
+                if (sorted.length >= num && func(element, sorted[num -1]) >=0 ) continue;
             }
+
+            var index = search(sorted, element, true, func);
+            for(var counter=Math.min(sorted.length, num - 1);counter > index;counter--) {
+                sorted[counter] = sorted[counter - 1];
+            }
+            sorted[index] = element;
         }
-        if (arrays[1].length == 0) {
-            arrays[1] = arrays[0].sort(func);
-        }
-        arrays[1].length = Math.min(arrays[1].length, num);
-        return arrays[1];
+        sorted.length = Math.min(sorted.length, num);
+        return sorted;
     } else if (array instanceof Array) {
         var result = array.sort(func);
         result.length = Math.min(result.length, num);
@@ -1357,6 +1445,8 @@ function filter(array, code) {
     }
     if (array instanceof java.util.Enumeration) {
         return filterEnumeration(array, func, true);
+    } else if (array instanceof java.util.Iterator) {
+        return filterIterator(array, func, true);
     } else {
         var result = new Array();
         for (var index in array) {
@@ -1618,4 +1708,12 @@ function isJsArray(obj) {
         return false;
     }
     return obj.constructor == Array;
+}
+
+function search(a, v, i, func){
+    var h = a.length, l = -1, m;
+    while(h - l > 1)
+        if(func(a[m = h + l >> 1], v) < 0) l = m;
+        else h = m;
+    return a[h] != v ? i ? h : -1 : h;
 }

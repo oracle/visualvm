@@ -2,4 +2,5 @@
 read global
 ${l10n-module}/src/org/netbeans/modules/profiler/filtersets-default.xml
 ${l10n-module}/src/org/netbeans/modules/profiler/filters-default.xml
+${l10n-module}/src/org/netbeans/modules/profiler/heapwalk/oqlqueries-default.xml
 

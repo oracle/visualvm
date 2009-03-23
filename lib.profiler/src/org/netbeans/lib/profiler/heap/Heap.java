@@ -60,7 +60,16 @@ public interface Heap {
      * @return list of all {@link JavaClass} in the heap.
      */
     List /*<JavaClass>*/ getAllClasses();
-
+    
+    /**
+     * computes List of N biggest {@link JavaClass} instances in this heap.
+     * The classes are ordered according to their retained size.
+     * <br>
+     * Speed: slow for the first time, subsequent invocations are normal.
+     * @return list of N biggest {@link JavaClass} instances.
+     */
+    List /*<JavaClass>*/ getBiggestObjectsByRetainedSize(int number);
+    
     /**
      * returns {@link GCRoot} for {@link Instance}.
      * <br>
@@ -108,6 +117,16 @@ public interface Heap {
      * is returned so that <CODE>heap.getJavaClassByName(fqn).getName().equals(fqn)</CODE>
      */
     JavaClass getJavaClassByName(String fqn);
+
+    /**
+     * computes collection of {@link JavaClass} filtered by regular rexpression.
+     * <br>
+     * Speed: slow
+     * @param regexp regular expression for java class name.
+     * @return return collection of {@link JavaClass} instances, which names satisfy the regexp expression. This
+     * collection is empty if no class matches the regular expression
+     */
+    Collection getJavaClassesByRegExp(String regexp);
 
     /**
      * returns optional summary information of the heap.

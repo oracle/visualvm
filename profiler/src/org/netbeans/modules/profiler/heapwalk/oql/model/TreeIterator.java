@@ -78,7 +78,7 @@ abstract public class TreeIterator<I, T> implements Iterator<I> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     abstract protected Iterator<I> getSameLevelIterator(T popped);

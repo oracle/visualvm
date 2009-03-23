@@ -39,6 +39,8 @@
 
 package org.netbeans.modules.profiler.spi;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import javax.swing.JEditorPane;
 
 /**
@@ -46,6 +48,25 @@ import javax.swing.JEditorPane;
  * @author Jaroslav Bachorik
  */
 abstract public class OQLEditorImpl {
-    public static final String VALIDITY_PROPERTY = "validity";
+    final protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    public final static String VALIDITY_PROPERTY = "document#valid";
     public abstract JEditorPane getEditorPane();
+
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    
 }

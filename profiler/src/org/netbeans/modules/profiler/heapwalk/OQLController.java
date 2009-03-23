@@ -39,11 +39,19 @@
 package org.netbeans.modules.profiler.heapwalk;
 
 import java.awt.Color;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.AbstractButton;
@@ -52,6 +60,7 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -64,6 +73,10 @@ import org.netbeans.modules.profiler.heapwalk.oql.ObjectVisitor;
 import org.netbeans.modules.profiler.heapwalk.oql.model.ReferenceChain;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
 import org.netbeans.modules.profiler.heapwalk.ui.OQLControllerUI;
+import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.filesystems.FileLock;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 
 /**
@@ -86,6 +99,8 @@ public class OQLController extends AbstractTopLevelController
     private ResultsController resultsController;
     private QueryController queryController;
     private SavedController savedController;
+
+    final private ExecutorService progressUpdater = Executors.newSingleThreadExecutor();
 
     final private AtomicBoolean analysisRunning = new AtomicBoolean(false);
     private OQLEngine engine = null;
@@ -175,8 +190,6 @@ public class OQLController extends AbstractTopLevelController
     private void executeQueryImpl(final String oqlQuery) {
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
 
-        queryController.queryStarted(progressModel);
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 BrowserUtils.performTask(new Runnable() {
@@ -197,6 +210,24 @@ public class OQLController extends AbstractTopLevelController
 
                         try {
                             analysisRunning.compareAndSet(false, true);
+                            queryController.queryStarted(progressModel);
+                            progressUpdater.submit(new Runnable() {
+
+                                public void run() {
+                                    while(analysisRunning.get()) {
+                                        int val = progressModel.getValue() + 10;
+                                        if (val > progressModel.getMaximum()) {
+                                            val = progressModel.getMinimum();
+                                        }
+                                        progressModel.setValue(val);
+                                        try {
+                                            Thread.sleep(200);
+                                        } catch (InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                        }
+                                    }
+                                }
+                            });
                             engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                                 public boolean visit(Object o) {
@@ -206,18 +237,18 @@ public class OQLController extends AbstractTopLevelController
                                     oddRow[0] = !oddRow[0];
                                     dump(o, sb);
                                     sb.append("</td></tr>"); // NOI18N
-                                    int value = progressModel.getValue() + 1;
-                                    if (value > progressModel.getMaximum()) {
-                                        value = progressModel.getMinimum() + 1;
-                                    }
-                                    progressModel.setValue(value);
                                     return counter.decrementAndGet() == 0 || !analysisRunning.get(); // process all hits while the analysis is running
                                 }
                             });
 
                             if (counter.get() == 0) {
                                 sb.append("<tr><td><h4>Too many results. Please, refine your query.</h4></td></tr>" );
+                            } else if (counter.get() == 100) {
+                                sb.append("<tr><td><h4>"); // NOI18N
+                                sb.append(NbBundle.getMessage(OQLController.class, "OQL_NO_RESULTS_MSG")); // NOI18N
+                                sb.append("</h4></td></tr>" ); // NOI18N
                             }
+
                             sb.append("</table>"); // NOI18N
 
                             analysisRunning.compareAndSet(true, false);
@@ -227,6 +258,8 @@ public class OQLController extends AbstractTopLevelController
                             StringBuilder errorMessage = new StringBuilder();
                             errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
                             errorMessage.append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_PLZ_CHECK")); // NOI18N
+                            errorMessage.append("<hr>"); // noi18n
+                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
                             resultsController.setResult(errorMessage.toString());
                             queryController.queryFinished();
                             cancelQuery();
@@ -440,6 +473,13 @@ public class OQLController extends AbstractTopLevelController
 
     public static class SavedController extends AbstractController {
 
+        private static final String SAVED_OQL_QUERIES_FILENAME = "oqlqueries"; // NOI18N
+        private static final String DEFAULT_FILE_SUFFIX = "-default"; // NOI18N
+        private static final String SNAPSHOT_VERSION = "oqlqueries_version_1"; // NOI18N
+        private static final String PROP_QUERY_NAME_KEY = "query-name"; // NOI18N
+        private static final String PROP_QUERY_DESCR_KEY = "query-descr"; // NOI18N
+        private static final String PROP_QUERY_SCRIPT_KEY = "query-script"; // NOI18N
+
         private OQLController oqlController;
 
 
@@ -458,11 +498,95 @@ public class OQLController extends AbstractTopLevelController
 
 
         public static void loadData(DefaultListModel model) {
-            // TBD
+            try {
+                FileObject folder = IDEUtils.getSettingsFolder(false);
+
+                FileObject filtersFO = null;
+
+                if ((folder != null) && folder.isValid()) {
+                    filtersFO = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME, "xml"); // NOI18N
+                }
+
+                if (filtersFO == null) {
+                    FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config"); // NOI18N
+                    if (configFolder != null && configFolder.isValid()) {
+                        Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
+
+                        while (suffixesIterator.hasNext() && (filtersFO == null)) {
+                            // find and use localized bundled filters definition
+                            filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
+                                                                   DEFAULT_FILE_SUFFIX +
+                                                                   suffixesIterator.next(),
+                                                                   "xml"); // NOI18N
+                        }
+                    }
+                }
+
+                if (filtersFO != null) {
+                    InputStream fis = filtersFO.getInputStream();
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    Properties properties = new Properties();
+                    properties.loadFromXML(bis);
+                    bis.close();
+                    if (!properties.isEmpty()) propertiesToModel(properties, model);
+                }
+            } catch (Exception e) {
+                ProfilerLogger.log(e);
+            }
         }
 
         public static void saveData(DefaultListModel model) {
-            // TBD
+            FileLock lock = null;
+
+            try {
+                FileObject folder = IDEUtils.getSettingsFolder(true);
+                FileObject fo = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME,
+                                                                "xml"); // NOI18N
+                if (fo == null) fo = folder.createData(SAVED_OQL_QUERIES_FILENAME,
+                                                                "xml"); // NOI18N
+
+                lock = fo.lock();
+
+                OutputStream os = fo.getOutputStream(lock);
+                BufferedOutputStream bos = new BufferedOutputStream(os);
+                Properties properties = modelToProperties(model);
+                properties.storeToXML(bos, SNAPSHOT_VERSION);
+                bos.close();
+            } catch (Exception e) {
+                ProfilerLogger.log(e);
+            } finally {
+                if (lock != null) lock.releaseLock();
+            }
+        }
+
+
+        private static void propertiesToModel(Properties properties,
+                                              DefaultListModel model) {
+            int i = -1;
+            while (properties.containsKey(PROP_QUERY_NAME_KEY + "-" + ++i)) { // NOI18N
+                String name =
+                    properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i).trim(); // NOI18N
+                String description =
+                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i, "").trim(); // NOI18N
+                String script =
+                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i, "").trim(); // NOI18N
+                if (name != null && script != null)
+                    model.addElement(new Query(script, name, description));
+            }
+        }
+
+        private static Properties modelToProperties(DefaultListModel model) {
+            Properties properties = new Properties();
+
+            for (int i = 0; i < model.size(); i++) {
+                Query q = (Query)model.get(i);
+                properties.put(PROP_QUERY_NAME_KEY + "-" + i, q.getName().trim()); // NOI18N
+                properties.put(PROP_QUERY_SCRIPT_KEY + "-" + i, q.getScript().trim()); // NOI18N
+                if (q.getDescription() != null)
+                    properties.put(PROP_QUERY_DESCR_KEY + "-" + i, q.getDescription().trim()); // NOI18N
+            }
+
+            return properties;
         }
         
 
@@ -482,32 +606,32 @@ public class OQLController extends AbstractTopLevelController
 
     public static final class Query {
 
-        private String query;
+        private String script;
         private String name;
         private String description;
 
-        public Query(String query) {
-            this(query, null);
+        public Query(String script) {
+            this(script, null);
         }
 
-        public Query(String query, String name) {
-            this(query, name, null);
+        public Query(String script, String name) {
+            this(script, name, null);
         }
 
-        public Query(String query, String name, String description) {
-            setQuery(query);
+        public Query(String script, String name, String description) {
+            setScript(script);
             setName(name);
             setDescription(description);
         }
 
-        public void setQuery(String query) {
-            if (query == null)
-                throw new IllegalArgumentException("Query cannot be null"); // NOI18N
-            this.query = query;
+        public void setScript(String script) {
+            if (script == null)
+                throw new IllegalArgumentException("Script cannot be null"); // NOI18N
+            this.script = script;
         }
         
-        public String getQuery() {
-            return query;
+        public String getScript() {
+            return script;
         }
 
         public void setName(String name) {

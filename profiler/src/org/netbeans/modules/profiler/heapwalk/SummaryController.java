@@ -40,7 +40,6 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.SummaryControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
@@ -49,17 +48,22 @@ import javax.swing.JPanel;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 public class SummaryController extends AbstractTopLevelController implements NavigationHistoryManager.NavigationHistoryCapable {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapFragmentWalker heapFragmentWalker;
+    private HintsController hintsController;
+    private OverviewController overviewController;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     // --- Constructors ----------------------------------------------------------
     public SummaryController(HeapFragmentWalker heapFragmentWalker) {
         this.heapFragmentWalker = heapFragmentWalker;
+        hintsController = new HintsController(this);
+        overviewController = new OverviewController(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -79,7 +83,7 @@ public class SummaryController extends AbstractTopLevelController implements Nav
     }
 
     protected AbstractButton[] createClientPresenters() {
-        return new AbstractButton[0];
+        return new AbstractButton[] {overviewController.getPresenter(),hintsController.getPresenter()};
     }
 
     protected AbstractButton createControllerPresenter() {
@@ -89,5 +93,13 @@ public class SummaryController extends AbstractTopLevelController implements Nav
     // --- Protected implementation ----------------------------------------------
     protected JPanel createControllerUI() {
         return new SummaryControllerUI(this);
+    }
+    
+    public HintsController getHintsController() {
+        return hintsController;
+    }
+    
+    public OverviewController getOverViewController() {
+        return overviewController;
     }
 }

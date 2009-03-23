@@ -195,33 +195,34 @@ public class StackTraceSnapshotBuilder {
                 timestamp = dumpTimeStamp;
 
                 for (Map.Entry<Thread, StackTraceElement[]> entry : stackTrace.entrySet()) {
-                    if (ignoredThreadNames.contains(entry.getKey().getName())) continue;
+                    Thread thread = entry.getKey();
+                    if (ignoredThreadNames.contains(thread.getName())) continue;
 
-                    long threadId = entry.getKey().getId();
+                    long threadId = thread.getId();
                     if (!threadIds.contains(threadId)) {
                         threadIds.add(threadId);
-                        threadNames.add(entry.getKey().getName());
-                        ccgb.newThread((int) threadId, entry.getKey().getName(), entry.getKey().getClass().getName());
+                        threadNames.add(thread.getName());
+                        ccgb.newThread((int) threadId, thread.getName(), thread.getClass().getName());
                     }
 
                     StackTraceElement[] newElements = entry.getValue();
-                    StackTraceElement[] oldElements = lastStackTrace.get().get(entry.getKey());
+                    StackTraceElement[] oldElements = lastStackTrace.get().get(thread);
 
-                    Thread.State oldState = lastThreadStates.get(entry.getKey());
-                    Thread.State newState = entry.getKey().getState();
-                    states.put(entry.getKey(), newState);
+                    Thread.State oldState = lastThreadStates.get(thread);
+                    Thread.State newState = thread.getState();
+                    states.put(thread, newState);
 
                     processDiffs((int) threadId, oldElements, newElements, timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
                 }
 
                 for (Map.Entry<Thread, StackTraceElement[]> entry : lastStackTrace.get().entrySet()) {
-                    if (ignoredThreadNames.contains(entry.getKey().getName())) continue;
-                    
                     Thread key = entry.getKey();
+                    if (ignoredThreadNames.contains(key.getName())) continue;
+                    
                     if (!stackTrace.containsKey(key)) {
                         Thread.State oldState = key.getState();
                         Thread.State newState = states.get(key);
-                        processDiffs((int) entry.getKey().getId(), entry.getValue(), new StackTraceElement[0], timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
+                        processDiffs((int) key.getId(), entry.getValue(), new StackTraceElement[0], timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
                     }
                 }
 
