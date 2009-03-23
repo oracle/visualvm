@@ -82,7 +82,7 @@ public abstract class GraphPanel extends JPanel {
 
     private static final String NO_DATA_TOOLTIP = "<No Data>";
 
-
+    
     static {
         DATE_FORMATTER = new SimpleDateFormat("h:mm:ss.SSS a, MMM d, yyyy");
 
