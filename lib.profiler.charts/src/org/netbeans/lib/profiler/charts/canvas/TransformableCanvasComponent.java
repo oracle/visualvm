@@ -184,6 +184,10 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
         return tracksDataWidth;
     }
 
+    public final boolean currentlyFollowingDataWidth() {
+        return tracksDataWidth && !fitsWidth && offsetX == maxOffsetX;
+    }
+
     public final void setTracksDataHeight(boolean tracksDataHeight) {
         this.tracksDataHeight = tracksDataHeight;
         // TODO: anything special for runtime change???
@@ -191,6 +195,10 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     public final boolean tracksDataHeight() {
         return tracksDataHeight;
+    }
+
+    public final boolean currentlyFollowingDataHeight() {
+        return tracksDataHeight && !fitsHeight && offsetY == maxOffsetY;
     }
 
 
@@ -293,7 +301,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
         updateMaxOffsets();
 
         // Fix offsets according to changed maxOffsets
-        setOffset(getOffsetX(), getOffsetY());
+        setOffset(offsetX, offsetY);
 
         scaleChanged(origScaleX, origScaleY, scaleX, scaleY);
 //        dataBoundsChanged();
@@ -360,8 +368,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             this.dataWidth = dataWidth;
             this.dataHeight = dataHeight;
 
-            contentsOffsetX = getViewWidth(dataOffsetX);
-            contentsOffsetY = getViewHeight(dataOffsetY);
+            contentsOffsetX = (long)getViewWidth(dataOffsetX);
+            contentsOffsetY = (long)getViewHeight(dataOffsetY);
 
             updateScale();
             updateContentsWidths();
@@ -440,93 +448,93 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     // --- Coordinate systems conversion support -------------------------------
 
-    protected final long getViewX(long dataX) {
+    protected final double getViewX(double dataX) {
         return getViewX(dataX, false);
     }
     
-    protected final long getReversedViewX(long dataX) {
+    protected final double getReversedViewX(double dataX) {
         return getViewX(dataX, true);
     }
 
-    private long getViewX(long dataX, boolean reverse) {
+    private double getViewX(double dataX, boolean reverse) {
         if ((rightBased && !reverse) || (!rightBased && reverse)) {
-            return (long)Math.ceil((double)(dataOffsetX - dataX) * scaleX) +
+            return Math.ceil((dataOffsetX - dataX) * scaleX) +
                     offsetX + getWidth() - viewInsets.right;
         } else {
-            return (long)Math.floor((double)(dataX - dataOffsetX) * scaleX) -
-                                    offsetX + viewInsets.left;
+            return Math.floor((dataX - dataOffsetX) * scaleX) -
+                               offsetX + viewInsets.left;
         }
     }
 
-    protected final long getViewY(long dataY) {
+    protected final double getViewY(double dataY) {
         return getViewY(dataY, false);
     }
     
-    protected final long getReversedViewY(long dataY) {
+    protected final double getReversedViewY(double dataY) {
         return getViewY(dataY, true);
     }
 
-    private long getViewY(long dataY, boolean reverse) {
+    private double getViewY(double dataY, boolean reverse) {
         if ((bottomBased && !reverse) || (!bottomBased && reverse)) {
-            return (long)Math.ceil((double)(dataOffsetY - dataY) * scaleY) +
+            return Math.ceil((dataOffsetY - dataY) * scaleY) +
                     offsetY + getHeight() - viewInsets.bottom;
         } else {
-            return (long)Math.floor((double)(dataY - dataOffsetY) * scaleY) -
-                                    offsetY + viewInsets.top;
+            return Math.floor((dataY - dataOffsetY) * scaleY) -
+                               offsetY + viewInsets.top;
         }
     }
 
-    protected final long getViewWidth(long dataWidth) {
-        return (long)Math.ceil((double)dataWidth * scaleX);
+    protected final double getViewWidth(double dataWidth) {
+        return Math.ceil(dataWidth * scaleX);
     }
 
-    protected final long getViewHeight(long dataHeight) {
-        return (long)Math.ceil((double)dataHeight * scaleY);
+    protected final double getViewHeight(double dataHeight) {
+        return Math.ceil(dataHeight * scaleY);
     }
 
 
-    protected final long getDataX(long viewX) {
+    protected final double getDataX(double viewX) {
         return getDataX(viewX, false);
     }
 
-    protected final long getReversedDataX(long viewX) {
+    protected final double getReversedDataX(double viewX) {
         return getDataX(viewX, true);
     }
 
-    private long getDataX(long viewX, boolean reverse) {
+    private double getDataX(double viewX, boolean reverse) {
         if ((rightBased && !reverse) || (!rightBased && reverse)) {
-            return dataOffsetX - (long)Math.ceil((double)(viewX + viewInsets.right -
-                                                  offsetX - getWidth()) / scaleX);
+            return dataOffsetX - Math.ceil((viewX + viewInsets.right -
+                                            offsetX - getWidth()) / scaleX);
         } else {
-            return (long)Math.floor((double)(viewX + offsetX - viewInsets.left) /
-                                     scaleX) + dataOffsetX;
+            return Math.floor((viewX + offsetX - viewInsets.left) /
+                               scaleX) + dataOffsetX;
         }
     }
 
-    protected final long getDataY(long viewY) {
+    protected final double getDataY(double viewY) {
         return getDataY(viewY, false);
     }
 
-    protected final long getReversedDataY(long viewY) {
+    protected final double getReversedDataY(double viewY) {
         return getDataY(viewY, true);
     }
 
-    private long getDataY(long viewY, boolean reverse) {
+    private double getDataY(double viewY, boolean reverse) {
         if ((bottomBased && !reverse) || (!bottomBased && reverse)) {
-            return dataOffsetY - (long)Math.ceil((double)(viewY + viewInsets.bottom -
-                                                  offsetY - getHeight()) / scaleY);
+            return dataOffsetY - Math.ceil((viewY + viewInsets.bottom -
+                                            offsetY - getHeight()) / scaleY);
         } else {
-            return (long)Math.floor((double)(viewY + offsetY - viewInsets.top) /
-                                     scaleY) + dataOffsetY;
+            return Math.floor((viewY + offsetY - viewInsets.top) /
+                               scaleY) + dataOffsetY;
         }
     }
 
-    protected final long getDataWidth(long viewWidth) {
-        return (long)Math.ceil((double)viewWidth / scaleX);
+    protected final double getDataWidth(double viewWidth) {
+        return Math.ceil(viewWidth / scaleX);
     }
 
-    protected final long getDataHeight(long viewHeight) {
-        return (long)Math.ceil((double)viewHeight / scaleY);
+    protected final double getDataHeight(double viewHeight) {
+        return Math.ceil(viewHeight / scaleY);
     }
 
 
@@ -545,12 +553,18 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     protected void reshaped(Rectangle oldBounds, Rectangle newBounds) {
         super.reshaped(oldBounds, newBounds);
 
+        // Save sticky sides
+        // TODO: implement also followsOffsetX, followsOffsetY!
+        boolean followsWidth = currentlyFollowingDataWidth();
+        boolean followsHeight = currentlyFollowingDataHeight();
+
         updateScale();
         updateContentsWidths();
         updateMaxOffsets();
 
         // Fix offsets according to changed maxOffsets
-        setOffset(getOffsetX(), getOffsetY());
+        setOffset(followsWidth ? maxOffsetX : offsetX,
+                  followsHeight ? maxOffsetY : offsetY);
     }
 
     protected final void paintComponent(Graphics g, Rectangle invalidArea) {
@@ -712,11 +726,11 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private void updateContentsWidths() {
         if (fitsWidth) contentsWidth = getWidth();
-        else contentsWidth = getViewWidth(dataWidth) + viewInsets.left +
+        else contentsWidth = (long)getViewWidth(dataWidth) + viewInsets.left +
                              viewInsets.right;
 
         if (fitsHeight) contentsHeight = getHeight();
-        else contentsHeight = getViewHeight(dataHeight) + viewInsets.top +
+        else contentsHeight = (long)getViewHeight(dataHeight) + viewInsets.top +
                               viewInsets.bottom;
     }
 

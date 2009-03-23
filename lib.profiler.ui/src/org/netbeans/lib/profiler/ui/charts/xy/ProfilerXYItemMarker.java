@@ -249,6 +249,36 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
         return relativeBounds;
     }
 
+    private LongRect getViewBoundsRelative(LongRect dataBounds, XYItem item,
+                                           ChartContext context) {
+        LongRect itemBounds = item.getBounds();
+
+        double itemValueFactor = ((double)context.getDataHeight() /*-
+                                 context.getDataHeight(maxOffset)*/) /
+                                 ((double)itemBounds.height);
+
+        // TODO: fix the math!!!
+        double value1 = context.getDataOffsetY() + itemValueFactor *
+                      (double)(dataBounds.y - itemBounds.y);
+        double value2 = context.getDataOffsetY() + itemValueFactor *
+                      (double)(dataBounds.y + dataBounds.height - itemBounds.y);
+
+        long viewX = (long)context.getViewX(dataBounds.x);
+        long viewWidth = (long)context.getViewWidth(dataBounds.width);
+        if (context.isRightBased()) viewX -= viewWidth;
+
+        long viewY1 = (long)context.getViewY(value1);
+        long viewY2 = (long)context.getViewY(value2);
+        long viewHeight = context.isBottomBased() ? viewY1 - viewY2 :
+                                                    viewY2 - viewY1;
+        if (!context.isBottomBased()) viewY2 -= viewHeight;
+
+        LongRect viewBounds =  new LongRect(viewX, viewY2, viewWidth, viewHeight);
+        LongRect.addBorder(viewBounds, decorationRadius);
+
+        return viewBounds;
+    }
+
     private LongRect getViewBounds(XYItem item, int[] valuesIndexes, ChartContext context) {
         
         LongRect dataBounds = new LongRect();
@@ -270,14 +300,21 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
             }
         }
 
-        if (type == TYPE_RELATIVE)
-            LongRect.set(dataBounds, getRelativeDataBounds(dataBounds, item,
-                                                           context, maxOffset));
+//        if (type == TYPE_RELATIVE)
+//            LongRect.set(dataBounds, getRelativeDataBounds(dataBounds, item,
+//                                                           context, maxOffset));
 
-        LongRect viewBounds = context.getViewRect(dataBounds);
-        LongRect.addBorder(viewBounds, decorationRadius);
+        if (type == TYPE_RELATIVE) {
 
-        return viewBounds;
+            return getViewBoundsRelative(dataBounds, item, context);
+
+        } else {
+
+            LongRect viewBounds = context.getViewRect(dataBounds);
+            LongRect.addBorder(viewBounds, decorationRadius);
+            return viewBounds;
+
+        }
     }
 
     
@@ -288,8 +325,8 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
         if (highlighted.isEmpty()) return;
 
         double itemValueFactor = type == TYPE_RELATIVE ?
-                                         (double)(context.getDataHeight() -
-                                          context.getDataHeight(maxOffset)) /
+                                         (double)(context.getDataHeight() /*-
+                                          context.getDataHeight(maxOffset)*/) /
                                          (double)(item.getBounds().height) : 0;
 
         for (ItemSelection selection : highlighted) {
@@ -330,13 +367,13 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
         
     }
 
-    private static long getYValue(XYItem item, int valueIndex,
+    private static double getYValue(XYItem item, int valueIndex,
                                   int type, ChartContext context, double itemValueFactor) {
         if (type == TYPE_ABSOLUTE) {
             return context.getViewY(item.getYValue(valueIndex));
         } else {
-            return context.getViewY(context.getDataOffsetY() + (long)(itemValueFactor *
-                        (double)(item.getYValue(valueIndex) - item.getBounds().y)));
+            return context.getViewY(context.getDataOffsetY() + (itemValueFactor *
+                        (item.getYValue(valueIndex) - item.getBounds().y)));
         }
     }
 
