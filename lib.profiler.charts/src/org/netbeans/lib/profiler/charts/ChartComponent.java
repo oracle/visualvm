@@ -680,31 +680,31 @@ public class ChartComponent extends InteractiveCanvasComponent {
 
         public int getViewportHeight() { return chart.getHeight(); }
 
-        public long getViewX(long dataX) { return chart.getViewX(dataX); }
+        public double getViewX(double dataX) { return chart.getViewX(dataX); }
 
-        public long getReversedViewX(long dataX) { return chart.getReversedViewX(dataX); }
+        public double getReversedViewX(double dataX) { return chart.getReversedViewX(dataX); }
 
-        public long getViewY(long dataY) { return chart.getViewY(dataY); }
+        public double getViewY(double dataY) { return chart.getViewY(dataY); }
 
-        public long getReversedViewY(long dataY) { return chart.getReversedViewY(dataY); }
+        public double getReversedViewY(double dataY) { return chart.getReversedViewY(dataY); }
 
-        public long getViewWidth(long dataWidth) { return chart.getViewWidth(dataWidth); }
+        public double getViewWidth(double dataWidth) { return chart.getViewWidth(dataWidth); }
 
-        public long getViewHeight(long dataHeight) { return chart.getViewHeight(dataHeight); }
+        public double getViewHeight(double dataHeight) { return chart.getViewHeight(dataHeight); }
 
         public LongRect getViewRect(LongRect dataRect) { return getViewRectImpl(dataRect); }
 
-        public long getDataX(int viewX) { return chart.getDataX(viewX); }
+        public double getDataX(double viewX) { return chart.getDataX(viewX); }
 
-        public long getReversedDataX(int viewX) { return chart.getReversedDataX(viewX); }
+        public double getReversedDataX(double viewX) { return chart.getReversedDataX(viewX); }
 
-        public long getDataY(int viewY) { return chart.getDataY(viewY); }
+        public double getDataY(double viewY) { return chart.getDataY(viewY); }
 
-        public long getReversedDataY(int viewY) { return chart.getReversedDataY(viewY); }
+        public double getReversedDataY(double viewY) { return chart.getReversedDataY(viewY); }
 
-        public long getDataWidth(int viewWidth) { return chart.getDataWidth(viewWidth); }
+        public double getDataWidth(double viewWidth) { return chart.getDataWidth(viewWidth); }
 
-        public long getDataHeight(int viewHeight) { return chart.getDataHeight(viewHeight); }
+        public double getDataHeight(double viewHeight) { return chart.getDataHeight(viewHeight); }
 
     }
 

@@ -394,8 +394,8 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         double newScaleY = fitsHeight ? scaleY : scaleY * factor * scaleRatio;
 
         // Cache data at zoom center
-        long dataX = getDataX(centerX);
-        long dataY = getDataY(centerY);
+        double dataX = getDataX(centerX);
+        double dataY = getDataY(centerY);
 
         // Set new scale
         setScale(newScaleX, newScaleY);
@@ -406,16 +406,16 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
 
         // Update x-offset to centerX if needed
         if (!fitsWidth) {
-            long dataWidth = dataX - getDataOffsetX();
-            long viewWidth = getViewWidth(dataWidth);
+            double dataWidth = dataX - getDataOffsetX();
+            long viewWidth = (long)getViewWidth(dataWidth);
             offsetX = isRightBased() ?
                       viewWidth - getWidth() + centerX : viewWidth - centerX;
         }
 
         // Update y-offset to centerY if needed
         if (!fitsHeight) {
-            long dataHeight = dataY - getDataOffsetY();
-            long viewHeight = getViewHeight(dataHeight);
+            double dataHeight = dataY - getDataOffsetY();
+            long viewHeight = (long)getViewHeight(dataHeight);
             offsetY = isBottomBased() ?
                       viewHeight - getHeight() + centerY : viewHeight - centerY;
         }
