@@ -125,8 +125,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         if (type == TYPE_ABSOLUTE) {
             return getViewBounds(xyItem.getBounds(), context);
         } else {
-            return getViewBounds(getRelativeDataBounds(xyItem.getBounds(), xyItem,
-                                                       context, maxOffset), context);
+            return getViewBoundsRelative(xyItem.getBounds(), xyItem, context);
         }
     }
 
@@ -168,11 +167,12 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
                 return getItemBounds(change.getItem(), context);
             } else {
-
-                return getViewBounds(getRelativeDataBounds(change.getDirtyValuesBounds(),
-                                     change.getItem(), context, maxOffset), context);
+                return getViewBoundsRelative(change.getDirtyValuesBounds(),
+                                             change.getItem(), context);
             }
+//            return new LongRect(0, 0, context.getViewportWidth(), context.getViewportHeight());
         }
+//        return new LongRect(0, 0, context.getViewportWidth(), context.getViewportHeight());
     }
 
 
@@ -219,31 +219,40 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         return bounds;
     }
 
-    private static LongRect getRelativeDataBounds(LongRect dataBounds, XYItem item,
-                                                  ChartContext context, int maxOffset) {
-        LongRect relativeBounds = new LongRect(dataBounds);
-        LongRect itemBounds = item.getBounds();
-
-        double itemValueFactor = (double)(context.getDataHeight() -
-                                 context.getDataHeight(maxOffset)) /
-                                 (double)(itemBounds.height);
-        // TODO: fix the math, no need to compute the value2 - height is enough
-        long value1 = context.getDataOffsetY() + (long)(itemValueFactor *
-                      (double)(relativeBounds.y - itemBounds.y));
-        long value2 = context.getDataOffsetY() + (long)(itemValueFactor *
-                      (double)((relativeBounds.y + relativeBounds.height)
-                      - itemBounds.y));
-
-        relativeBounds.y = value1;
-        relativeBounds.height = value2 - value1;
-
-        return relativeBounds;
-    }
-
     private LongRect getViewBounds(LongRect itemBounds, ChartContext context) {
         LongRect dataBounds = getDataBounds(itemBounds);
 
         LongRect viewBounds = context.getViewRect(dataBounds);
+        LongRect.addBorder(viewBounds, lineWidth);
+
+        return viewBounds;
+    }
+
+    private LongRect getViewBoundsRelative(LongRect dataBounds, XYItem item,
+                                           ChartContext context) {
+        LongRect itemBounds = item.getBounds();
+
+        double itemValueFactor = ((double)context.getDataHeight() /*-
+                                 context.getDataHeight(maxOffset)*/) /
+                                 ((double)itemBounds.height);
+
+        // TODO: fix the math!!!
+        double value1 = context.getDataOffsetY() + itemValueFactor *
+                      (double)(dataBounds.y - itemBounds.y);
+        double value2 = context.getDataOffsetY() + itemValueFactor *
+                      (double)(dataBounds.y + dataBounds.height - itemBounds.y);
+
+        long viewX = (long)context.getViewX(dataBounds.x);
+        long viewWidth = (long)context.getViewWidth(dataBounds.width);
+        if (context.isRightBased()) viewX -= viewWidth;
+
+        long viewY1 = (long)context.getViewY(value1);
+        long viewY2 = (long)context.getViewY(value2);
+        long viewHeight = context.isBottomBased() ? viewY1 - viewY2 :
+                                                    viewY2 - viewY1;
+        if (!context.isBottomBased()) viewY2 -= viewHeight;
+
+        LongRect viewBounds =  new LongRect(viewX, viewY2, viewWidth, viewHeight);
         LongRect.addBorder(viewBounds, lineWidth);
 
         return viewBounds;
@@ -314,9 +323,9 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
 
         double itemValueFactor = type == TYPE_RELATIVE ?
-                                         (double)(context.getDataHeight() -
-                                          context.getDataHeight(maxOffset)) /
-                                         (double)(item.getBounds().height) : 0;
+                                         ((double)context.getDataHeight() /*-
+                                          context.getDataHeight(maxOffset)*/) /
+                                         ((double)item.getBounds().height) : 0;
 
         for (int i = 0; i < visibleIndexes; i++) {
             xPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(
@@ -345,13 +354,13 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         return new int[][] { xPoints, yPoints };
     }
 
-    private static long getYValue(XYItem item, int valueIndex,
+    private static double getYValue(XYItem item, int valueIndex,
                                   int type, ChartContext context, double itemValueFactor) {
         if (type == TYPE_ABSOLUTE) {
             return context.getViewY(item.getYValue(valueIndex));
         } else {
-            return context.getViewY(context.getDataOffsetY() + (long)(itemValueFactor *
-                        (double)(item.getYValue(valueIndex) - item.getBounds().y)));
+            return context.getViewY(context.getDataOffsetY() + (itemValueFactor *
+                        (item.getYValue(valueIndex) - item.getBounds().y)));
         }
     }
 

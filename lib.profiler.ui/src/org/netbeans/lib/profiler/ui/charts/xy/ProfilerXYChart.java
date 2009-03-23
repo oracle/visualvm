@@ -199,7 +199,7 @@ public class ProfilerXYChart extends ChartComponent {
         if (timestampsCount == 0) return -1;
         if (timestampsCount == 1) return firstVisibleIndex;
 
-        long dataX = getDataX(x);
+        long dataX = (long)getDataX(x);
 
         int nearestIndex = firstVisibleIndex;
         long itemDataX = timeline.getTimestamp(nearestIndex);
@@ -235,11 +235,9 @@ public class ProfilerXYChart extends ChartComponent {
         }
 
         public void actionPerformed(ActionEvent e) {
-            boolean trackingEnd = tracksDataWidth() &&
-                                  getOffsetX() == getMaxOffsetX();
-
+            boolean followsWidth = currentlyFollowingDataWidth();
             zoom(getWidth() / 2, getHeight() / 2, 2d);
-            if (trackingEnd) setOffset(Long.MAX_VALUE, getOffsetY());
+            if (followsWidth) setOffset(getMaxOffsetX(), getOffsetY());
             
             repaintDirty();
         }
@@ -265,11 +263,9 @@ public class ProfilerXYChart extends ChartComponent {
         }
 
         public void actionPerformed(ActionEvent e) {
-            boolean trackingEnd = tracksDataWidth() &&
-                                  getOffsetX() == getMaxOffsetX();
-
+            boolean followsWidth = currentlyFollowingDataWidth();
             zoom(getWidth() / 2, getHeight() / 2, 0.5d);
-            if (trackingEnd) setOffset(Long.MAX_VALUE, getOffsetY());
+            if (followsWidth) setOffset(getMaxOffsetX(), getOffsetY());
             
             repaintDirty();
         }

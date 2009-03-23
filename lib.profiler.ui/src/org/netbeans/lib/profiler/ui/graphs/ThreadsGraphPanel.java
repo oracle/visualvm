@@ -56,6 +56,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import org.netbeans.lib.profiler.charts.AxisComponent;
+import org.netbeans.lib.profiler.charts.AxisMarksComputer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
@@ -162,12 +164,31 @@ public final class ThreadsGraphPanel extends GraphPanel {
         chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chart.setViewInsets(new Insets(10, 0, 0, 0));
 
+        // Horizontal axis
+        AxisComponent hAxis =
+                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
+                         100, chart.getChartContext(), SwingConstants.HORIZONTAL),
+                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                         SwingConstants.SOUTH);
+
+        // Vertical axis
+        AxisComponent vAxis =
+                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
+                         100, chart.getChartContext(), SwingConstants.VERTICAL),
+                         new AxisComponent.SimplePainter(),
+                         SwingConstants.WEST);
+
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
                              10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
+        chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
+        chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
+                                              SwingConstants.SOUTH_WEST });
+        chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
+                                              SwingConstants.SOUTH_WEST });
 
         // Small panel UI
         if (smallPanel) {
