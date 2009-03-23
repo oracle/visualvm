@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -76,18 +76,18 @@ public class AxisComponent extends JComponent implements ChartDecorator {
         setOpaque(false);
 
         if (horizontal) {
-            setPreferredSize(new Dimension(1, 30));
+            setPreferredSize(new Dimension(1, 10));
         } else {
-            setPreferredSize(new Dimension(30, 1));
+            setPreferredSize(new Dimension(10, 1));
         }
 
-        chart.addConfigurationListener(new ChartListener());
+//        chart.addConfigurationListener(new ChartListener());
 //        chart.addPostDecorator(this);
     }
-    
+
 
     public void paint(Graphics g) {
-        
+
         Rectangle clip = g.getClipBounds();
         if (clip == null) clip = new Rectangle(0, 0, getWidth(), getHeight());
 
@@ -97,31 +97,32 @@ public class AxisComponent extends JComponent implements ChartDecorator {
             chartBounds.y = clip.y;
             chartBounds.height = clip.height;
             paintHorizontalAxis(g, clip, chartBounds);
-            if (getPreferredSize().height < maxExtent + 25) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        setPreferredSize(new Dimension(getPreferredSize().width, maxExtent + 25));
-                        invalidate();
-                        ((JComponent)getParent()).revalidate();
-                        getParent().repaint();
-                    }
-                });
-            }
+//            if (getPreferredSize().height < maxExtent + 25) {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    public void run() {
+//                        setPreferredSize(new Dimension(getPreferredSize().width, maxExtent + 25));
+//                        invalidate();
+//                        ((JComponent)getParent()).revalidate();
+//                        getParent().repaint();
+//                    }
+//                });
+//            }
         } else {
             chartBounds.x = clip.x;
             chartBounds.width = clip.width;
             paintVerticalAxis(g, clip, chartBounds);
-            if (getPreferredSize().width < maxExtent + 25) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        setPreferredSize(new Dimension(maxExtent + 25, getPreferredSize().height));
-                        invalidate();
-                        ((JComponent)getParent()).revalidate();
-                        getParent().repaint();
-                    }
-                });
-            }
+//            if (getPreferredSize().width < maxExtent + 25) {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    public void run() {
+//                        setPreferredSize(new Dimension(maxExtent + 25, getPreferredSize().height));
+//                        invalidate();
+//                        ((JComponent)getParent()).revalidate();
+//                        getParent().repaint();
+//                    }
+//                });
+//            }
         }
+        super.paint(g);
     }
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
@@ -140,45 +141,45 @@ public class AxisComponent extends JComponent implements ChartDecorator {
             g.drawLine(chartMask.x, 0, chartMask.x + chartMask.width, 0);
         }
 
-        int viewStart = SwingUtilities.convertPoint(this, chartMask.x, 0, chart).x;
-        int viewEnd = viewStart + chartMask.width;
-//        long dataStart = chart.getChartContext().getDataX(viewStart);
-//        long dataEnd = chart.getChartContext().getDataX(viewStart + chartMask.width);
-
-        Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
-                                                 viewStart, viewEnd);
-
-        g.setColor(getForeground());
-        g.setFont(getFont());
-
-        while (marks.hasNext()) {
-            AxisMarksComputer.Mark mark = marks.next();
-            int x = ChartContext.getCheckedIntValue(chart.getChartContext().getViewX(mark.getValue()));
-            x = SwingUtilities.convertPoint(chart, x, 0, this).x;
-
-            if (x < chartMask.x || x >= chartMask.x + chartMask.width) continue;
-
-            int height = 10;
-            Component painter = marksPainter.getPainter(mark);
-            painter.setSize(painter.getPreferredSize());
-            int markHeight = painter.getHeight();
-            int markOffsetX = painter.getWidth() / 2;
-            maxExtent = Math.max(maxExtent, markHeight);
-
-            if (location == SwingConstants.NORTH) {
-                g.drawLine(x, getHeight() - 2, x, getHeight() - 2 - height);
-                
-                g.translate(x - markOffsetX, getHeight() - 7 - height - markHeight);
-                painter.paint(g);
-                g.translate(-x + markOffsetX, -getHeight() + 7 + height + markHeight);
-            } else {
-                g.drawLine(x, 1, x, 1 + height);
-
-                g.translate(x - markOffsetX, 1 + height);
-                painter.paint(g);
-                g.translate(-x + markOffsetX, -1 - height);
-            }
-        }
+//        int viewStart = SwingUtilities.convertPoint(this, chartMask.x, 0, chart).x;
+//        int viewEnd = viewStart + chartMask.width;
+////        long dataStart = chart.getChartContext().getDataX(viewStart);
+////        long dataEnd = chart.getChartContext().getDataX(viewStart + chartMask.width);
+//
+//        Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
+//                                                 viewStart, viewEnd);
+//
+//        g.setColor(getForeground());
+//        g.setFont(getFont());
+//
+//        while (marks.hasNext()) {
+//            AxisMarksComputer.Mark mark = marks.next();
+//            int x = ChartContext.getCheckedIntValue(chart.getChartContext().getViewX(mark.getValue()));
+//            x = SwingUtilities.convertPoint(chart, x, 0, this).x;
+//
+//            if (x < chartMask.x || x >= chartMask.x + chartMask.width) continue;
+//
+//            int height = 10;
+//            Component painter = marksPainter.getPainter(mark);
+//            painter.setSize(painter.getPreferredSize());
+//            int markHeight = painter.getHeight();
+//            int markOffsetX = painter.getWidth() / 2;
+//            maxExtent = Math.max(maxExtent, markHeight);
+//
+//            if (location == SwingConstants.NORTH) {
+//                g.drawLine(x, getHeight() - 2, x, getHeight() - 2 - height);
+//
+//                g.translate(x - markOffsetX, getHeight() - 7 - height - markHeight);
+//                painter.paint(g);
+//                g.translate(-x + markOffsetX, -getHeight() + 7 + height + markHeight);
+//            } else {
+//                g.drawLine(x, 1, x, 1 + height);
+//
+//                g.translate(x - markOffsetX, 1 + height);
+//                painter.paint(g);
+//                g.translate(-x + markOffsetX, -1 - height);
+//            }
+//        }
     }
 
     private void paintHorizontalAxisMesh(Graphics2D g, Rectangle clip, Rectangle chartMask) {
@@ -214,45 +215,45 @@ public class AxisComponent extends JComponent implements ChartDecorator {
             g.drawLine(0, chartMask.y, 0, chartMask.y + chartMask.height);
         }
 
-        int viewStart = SwingUtilities.convertPoint(this, 0, chartMask.y, chart).y;
-        int viewEnd = viewStart + chartMask.height;
-//        long dataStart = chart.getChartContext().getDataY(viewStart);
-//        long dataEnd = chart.getChartContext().getDataY(viewStart + chartMask.height);
-
-        Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
-                                                 viewStart, viewEnd);
-
-        g.setColor(getForeground());
-        g.setFont(getFont());
-
-        while (marks.hasNext()) {
-            AxisMarksComputer.Mark mark = marks.next();
-            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
-            y = SwingUtilities.convertPoint(chart, 0, y, this).y;
-
-            if (y < chartMask.y || y >= chartMask.y + chartMask.height) continue;
-
-            int width = 10;
-            Component painter = marksPainter.getPainter(mark);
-            painter.setSize(painter.getPreferredSize());
-            int markWidth = painter.getWidth();
-            int markOffsetY = painter.getHeight() / 2;
-            maxExtent = Math.max(maxExtent, markWidth);
-
-            if (location == SwingConstants.WEST) {
-                g.drawLine(getWidth() - 2, y, getWidth() - 2 - width, y);
-
-                g.translate(getWidth() - markWidth - 15, y - markOffsetY);
-                painter.paint(g);
-                g.translate(-getWidth() + markWidth + 15, -y + markOffsetY);
-            } else {
-                g.drawLine(1, y, 1 + width, y);
-
-                g.translate(width + 5, y - markOffsetY);
-                painter.paint(g);
-                g.translate(-width - 5, -y + markOffsetY);
-            }
-        }
+//        int viewStart = SwingUtilities.convertPoint(this, 0, chartMask.y, chart).y;
+//        int viewEnd = viewStart + chartMask.height;
+////        long dataStart = chart.getChartContext().getDataY(viewStart);
+////        long dataEnd = chart.getChartContext().getDataY(viewStart + chartMask.height);
+//
+//        Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
+//                                                 viewStart, viewEnd);
+//
+//        g.setColor(getForeground());
+//        g.setFont(getFont());
+//
+//        while (marks.hasNext()) {
+//            AxisMarksComputer.Mark mark = marks.next();
+//            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
+//            y = SwingUtilities.convertPoint(chart, 0, y, this).y;
+//
+//            if (y < chartMask.y || y >= chartMask.y + chartMask.height) continue;
+//
+//            int width = 10;
+//            Component painter = marksPainter.getPainter(mark);
+//            painter.setSize(painter.getPreferredSize());
+//            int markWidth = painter.getWidth();
+//            int markOffsetY = painter.getHeight() / 2;
+//            maxExtent = Math.max(maxExtent, markWidth);
+//
+//            if (location == SwingConstants.WEST) {
+//                g.drawLine(getWidth() - 2, y, getWidth() - 2 - width, y);
+//
+//                g.translate(getWidth() - markWidth - 15, y - markOffsetY);
+//                painter.paint(g);
+//                g.translate(-getWidth() + markWidth + 15, -y + markOffsetY);
+//            } else {
+//                g.drawLine(1, y, 1 + width, y);
+//
+//                g.translate(width + 5, y - markOffsetY);
+//                painter.paint(g);
+//                g.translate(-width - 5, -y + markOffsetY);
+//            }
+//        }
     }
 
     private void paintVerticalAxisMesh(Graphics2D g, Rectangle clip, Rectangle chartMask) {
@@ -304,14 +305,14 @@ public class AxisComponent extends JComponent implements ChartDecorator {
             maxExtent = 0;
 
             if (scaleX != lastScaleX || scaleY != lastScaleY) {
-//                repaint();
-                paintImmediately(0, 0, getWidth(), getHeight());
+                repaint();
+//                paintImmediately(0, 0, getWidth(), getHeight());
             } else if (horizontal) {
-//                if (offsetX != lastOffsetX) repaint();
-                if (offsetX != lastOffsetX) paintImmediately(0, 0, getWidth(), getHeight());
+                if (offsetX != lastOffsetX) repaint();
+//                if (offsetX != lastOffsetX) paintImmediately(0, 0, getWidth(), getHeight());
             } else {
-//                if (offsetY != lastOffsetY) repaint();
-                if (offsetY != lastOffsetY) paintImmediately(0, 0, getWidth(), getHeight());
+                if (offsetY != lastOffsetY) repaint();
+//                if (offsetY != lastOffsetY) paintImmediately(0, 0, getWidth(), getHeight());
             }
         }
 
