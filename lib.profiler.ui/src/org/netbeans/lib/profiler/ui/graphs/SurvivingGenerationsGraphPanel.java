@@ -40,284 +40,396 @@
 
 package org.netbeans.lib.profiler.ui.graphs;
 
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.charts.ChartModelListener;
-import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
-import org.netbeans.lib.profiler.ui.components.ColorIcon;
-import org.netbeans.lib.profiler.ui.monitor.SurvivingGenerationsXYChartModel;
-import org.netbeans.lib.profiler.ui.monitor.VMTelemetryXYChartModel;
-import org.netbeans.lib.profiler.ui.monitor.VMTelemetryXYChartModelDataResetListener;
-import java.awt.*;
-import java.awt.event.InputEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-import javax.swing.*;
+import java.util.Date;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import org.netbeans.lib.profiler.charts.AxisComponent;
+import org.netbeans.lib.profiler.charts.AxisMarksComputer;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.results.DataManagerListener;
+import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
+import org.netbeans.lib.profiler.ui.components.ColorIcon;
+import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 
 
 /**
- * A panel that contains the graph for surviving generations and time spent in GC.
  *
- * @author Vladislav Nemec
- * @author Ian Formanek
  * @author Jiri Sedlacek
  */
-public class SurvivingGenerationsGraphPanel extends GraphPanel implements ChartModelListener,
-                                                                          VMTelemetryXYChartModelDataResetListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
-    // -----
-    // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.graphs.Bundle"); // NOI18N
-    private static final String SURVGEN_CURRENT_STRING = messages.getString("SurvivingGenerationsGraphPanel_SurvGenCurrentString"); // NOI18N
-    private static final String SURVGEN_MAXIMUM_STRING = messages.getString("SurvivingGenerationsGraphPanel_SurvGenMaximumString"); // NOI18N
-    private static final String GC_TIME_CURRENT_STRING = messages.getString("SurvivingGenerationsGraphPanel_GcTimeCurrentString"); // NOI18N
-    private static final String GC_TIME_MAXIMUM_STRING = messages.getString("SurvivingGenerationsGraphPanel_GcTimeMaximumString"); // NOI18N
-    private static final String TIME_AT_CURSOR_STRING = messages.getString("SurvivingGenerationsGraphPanel_TimeAtCursorString"); // NOI18N
-    private static final String SURVGEN_AT_CURSOR_STRING = messages.getString("SurvivingGenerationsGraphPanel_SurvGenAtCursorString"); // NOI18N
-    private static final String GC_TIME_AT_CURSOR_STRING = messages.getString("SurvivingGenerationsGraphPanel_GcTimeAtCursorString"); // NOI18N
-    private static final String CHART_ACCESS_NAME = messages.getString("SurvivingGenerationsGraphPanel_ChartAccessName"); // NOI18N
-                                                                                                                          // -----
+    private ProfilerXYChart chart;
+    private Action[] chartActions;
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    private final VMTelemetryModels models;
 
-    private JPanel bigLegendPanel;
-    private JPanel smallLegendPanel;
-    private SurvivingGenerationsXYChartModel survivingGenerationsXYChartModel;
-    private SynchronousXYChart xyChart;
-    private boolean completeFunctionality;
-    private int chartTimeLength = 180000; // 3 minutes to switch from fitToWindow to trackingEnd
-                                          //private int chartTimeLength = 10000; // 10 seconds for testing purposes
+    private final boolean smallPanel;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Creates new form SurvivingGenerationsGraphPanel with the default history size (3 minutes)
-     * and no mouse zooming capabilities
-     */
-    public SurvivingGenerationsGraphPanel(final VMTelemetryXYChartModel survivingGenerationsXYChartModel,
-                                          final Action detailsAction) {
-        this(false, null, survivingGenerationsXYChartModel, null);
+    // --- Constructors --------------------------------------------------------
+
+    public static SurvivingGenerationsGraphPanel createBigPanel(VMTelemetryModels models) {
+        return new SurvivingGenerationsGraphPanel(models, false, null);
     }
 
-    /** Creates new form SurvivingGenerationsGraphPanel with the given amount of history to keep
-     *
-     * @param completeFunctionality if true, the chart can be zoomed using mouse and will display all history, if false, it will only display last session and 3 minutes of data
-     * @param backgroundPaint paint used for drawing graph background
-     */
-    public SurvivingGenerationsGraphPanel(final boolean completeFunctionality, final Color backgroundPaint,
-                                          final VMTelemetryXYChartModel survivingGenerationsXYChartModel,
-                                          final Action detailsAction) {
-        this.completeFunctionality = completeFunctionality;
-        this.survivingGenerationsXYChartModel = (SurvivingGenerationsXYChartModel) survivingGenerationsXYChartModel;
-
-        survivingGenerationsXYChartModel.addDataResetListener(this);
-
-        setLayout(new java.awt.BorderLayout());
-
-        // --- Big legend panel ----------------------------------------------------
-        JLabel survivingGenerationsLabelBig = new JLabel(survivingGenerationsXYChartModel.getSeriesName(0),
-                                                         new ColorIcon(survivingGenerationsXYChartModel.getSeriesColor(0),
-                                                                       Color.BLACK, 18, 9), SwingConstants.LEADING);
-        survivingGenerationsLabelBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-        JLabel relativeTimeGCBig = new JLabel(survivingGenerationsXYChartModel.getSeriesName(1),
-                                              new ColorIcon(survivingGenerationsXYChartModel.getSeriesColor(1), Color.BLACK, 18, 9),
-                                              SwingConstants.LEADING);
-        relativeTimeGCBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-        bigLegendPanel = new JPanel();
-        bigLegendPanel.add(survivingGenerationsLabelBig);
-        bigLegendPanel.add(relativeTimeGCBig);
-
-        // --- Small legend panel --------------------------------------------------
-        JLabel survivingGenerationsLabelSmall = new JLabel(survivingGenerationsXYChartModel.getSeriesName(0),
-                                                           new ColorIcon(survivingGenerationsXYChartModel.getSeriesColor(0),
-                                                                         null, 8, 8), SwingConstants.LEADING);
-        survivingGenerationsLabelSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-        survivingGenerationsLabelSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-        JLabel relativeTimeGCSmall = new JLabel(survivingGenerationsXYChartModel.getSeriesName(1),
-                                                new ColorIcon(survivingGenerationsXYChartModel.getSeriesColor(1), null, 8, 8),
-                                                SwingConstants.LEADING);
-        relativeTimeGCSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-        relativeTimeGCSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-        smallLegendPanel = new JPanel();
-        smallLegendPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
-        smallLegendPanel.setBackground(Color.WHITE);
-        smallLegendPanel.setBorder(new LineBorder(new Color(235, 235, 235), 1));
-        smallLegendPanel.add(survivingGenerationsLabelSmall);
-        smallLegendPanel.add(relativeTimeGCSmall);
-
-        // --- Chart panel ---------------------------------------------------------
-        xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_LINE, SynchronousXYChart.VALUES_INTERPOLATED, 0.01) {
-                public String getToolTipText(MouseEvent event) {
-                    return getChartToolTipText(event);
-                }
-                public Point getToolTipLocation(MouseEvent event) {
-                    return new Point(event.getX(), event.getY() + 20);
-                }
-            };
-
-        xyChart.setUseSecondaryVerticalAxis(true);
-
-        long time = System.currentTimeMillis();
-        xyChart.setupInitialAppearance(time, time + 1200, 0, 2);
-        getAccessibleContext().setAccessibleName(CHART_ACCESS_NAME);
-        xyChart.setAccessibleContext(getAccessibleContext());
-
-        if (completeFunctionality) {
-            xyChart.setTopChartMargin(50);
-            xyChart.allowSelection();
-            xyChart.setMinimumVerticalMarksDistance(50);
-        } else {
-            xyChart.setTopChartMargin(20);
-            xyChart.denySelection();
-            xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
-        }
-
-        xyChart.setVerticalAxisValueDivider2(10);
-        xyChart.setVerticalAxisValueString2("%"); // NOI18N
-
-        chartDataReset();
-
-        if (backgroundPaint != null) {
-            setOpaque(true);
-            setBackground(backgroundPaint);
-            xyChart.setBackgroundPaint(backgroundPaint);
-        }
-
-        xyChart.setModel(survivingGenerationsXYChartModel);
-
-        if (!completeFunctionality) {
-            survivingGenerationsXYChartModel.addChartModelListener(this); // Needs to be AFTER xyChart.setModel() !!!
-        }
-
-        add(xyChart);
-
-        xyChart.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
-                        if (detailsAction != null) {
-                            detailsAction.actionPerformed(null);
-                        }
-                    }
-                }
-            });
-
-        ToolTipManager.sharedInstance().registerComponent(xyChart);
+    public static SurvivingGenerationsGraphPanel createSmallPanel(VMTelemetryModels models,
+                                             Action chartAction) {
+        return new SurvivingGenerationsGraphPanel(models, true, chartAction);
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    private SurvivingGenerationsGraphPanel(VMTelemetryModels models,
+                             boolean smallPanel, Action chartAction) {
 
-    public JPanel getBigLegendPanel() {
-        return bigLegendPanel;
+        // Save models and panel type
+        this.models = models;
+        this.smallPanel = smallPanel;
+
+        // Create UI
+        initComponents(chartAction);
+
+        // Register listener
+        models.getDataManager().addDataListener(new DataManagerListener() {
+            public void dataChanged() { updateData(); }
+            public void dataReset() { resetData(); }
+        });
+
+        // Initialize chart & legend
+        resetData();
     }
 
-    // ----------------------------------------------------------------------------
-    // Public API
-    public SynchronousXYChart getChart() {
-        return xyChart;
+
+    // --- GraphPanel implementation -------------------------------------------
+
+    public Action[] getActions() {
+        return chartActions;
     }
 
-    public String getChartToolTipText(MouseEvent event) {
-        if (survivingGenerationsXYChartModel.getItemCount() < 2) {
-            return null;
-        }
 
-        StringBuffer toolTipBuffer = new StringBuffer();
+    // --- Private implementation ----------------------------------------------
 
-        toolTipBuffer.append("<html>"); // NOI18N
-
-        if (!completeFunctionality || !xyChart.hasValidDataForPosition(event.getX(), event.getY())) {
-            appendToolTipItem(toolTipBuffer, SURVGEN_CURRENT_STRING,
-                              intFormat.format(survivingGenerationsXYChartModel.getYValue(survivingGenerationsXYChartModel
-                                                                                                                                                                                                                                          .getItemCount()
-                                                                                          - 1, 0)), false);
-            appendToolTipItem(toolTipBuffer, SURVGEN_MAXIMUM_STRING,
-                              intFormat.format(survivingGenerationsXYChartModel.getMaxYValue(0)), false);
-            appendToolTipItem(toolTipBuffer, GC_TIME_CURRENT_STRING,
-                              percentFormat.format(survivingGenerationsXYChartModel.getYValue(survivingGenerationsXYChartModel
-                                                                                                                                                                                                                                                .getItemCount()
-                                                                                              - 1, 1) / 1000f), false);
-            appendToolTipItem(toolTipBuffer, GC_TIME_MAXIMUM_STRING,
-                              percentFormat.format(survivingGenerationsXYChartModel.getMaxYValue(1) / 1000f), true);
-        } else {
-            appendToolTipItem(toolTipBuffer, SURVGEN_CURRENT_STRING,
-                              intFormat.format(survivingGenerationsXYChartModel.getYValue(survivingGenerationsXYChartModel
-                                                                                                                                                                                                                                                       .getItemCount()
-                                                                                          - 1, 0)), false);
-            appendToolTipItem(toolTipBuffer, SURVGEN_MAXIMUM_STRING,
-                              intFormat.format(survivingGenerationsXYChartModel.getMaxYValue(0)), false);
-            appendToolTipItem(toolTipBuffer, GC_TIME_CURRENT_STRING,
-                              percentFormat.format(survivingGenerationsXYChartModel.getYValue(survivingGenerationsXYChartModel
-                                                                                                                                                                                                                                                             .getItemCount()
-                                                                                              - 1, 1) / 1000f), false);
-            appendToolTipItem(toolTipBuffer, GC_TIME_MAXIMUM_STRING,
-                              percentFormat.format(survivingGenerationsXYChartModel.getMaxYValue(1) / 1000f), false);
-
-            toolTipBuffer.append("<br>"); // NOI18N
-
-            appendToolTipItem(toolTipBuffer, TIME_AT_CURSOR_STRING, xyChart.getTimeAtPosition(event.getX()), false);
-            appendToolTipItem(toolTipBuffer, SURVGEN_AT_CURSOR_STRING,
-                              intFormat.format(xyChart.getYValueAtPosition(event.getX(), 0)), false);
-            appendToolTipItem(toolTipBuffer, GC_TIME_AT_CURSOR_STRING,
-                              percentFormat.format(xyChart.getYValueAtPosition(event.getX(), 1) / 1000f), true);
-        }
-
-        toolTipBuffer.append("</html>"); // NOI18N
-
-        return toolTipBuffer.toString();
-    }
-
-    public JPanel getSmallLegendPanel() {
-        return smallLegendPanel;
-    }
-
-    // --- ChartModelListener ----------------------------------------------------
-    public void chartDataChanged() {
-        if (!completeFunctionality) {
-            if (xyChart.isFitToWindow()
-                    && ((survivingGenerationsXYChartModel.getMaxXValue() - survivingGenerationsXYChartModel.getMinXValue()) >= chartTimeLength)) { // after 3 minutes switch from fitToWindow to trackingEnd
-                UIUtils.runInEventDispatchThread(new Runnable() {
-                        public void run() {
-                            xyChart.setTrackingEnd();
-                        }
-                    });
+    private void updateData() {
+        if (smallPanel) {
+            if (chart.fitsWidth()) {
+                VMTelemetryDataManager manager = models.getDataManager();
+                long[] timestamps = manager.timeStamps;
+                if (timestamps[manager.getItemCount() - 1] - timestamps[0] >=
+                    SMALL_CHART_FIT_TO_WINDOW_PERIOD)
+                        chart.setFitsWidth(false);
             }
+        } else {
         }
     }
 
-    // --- VMTelemetryXYChartModelDataResetListener ------------------------------
-    public void chartDataReset() {
-        UIUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    xyChart.resetChart();
+    private void resetData() {
+        if (smallPanel) {
+            chart.setScale(INITIAL_CHART_SCALEX, 1);
+            chart.setOffset(0, 0);
+            chart.setFitsWidth(true);
+        } else {
+            chart.setScale(INITIAL_CHART_SCALEX, 1);
+            chart.setOffset(0, 0);
+            chart.setFitsWidth(false);
+        }
+    }
 
-                    if (completeFunctionality) {
-                        //xyChart.setScale(0.01);
-                        //xyChart.setViewOffsetX(0);
-                        xyChart.resetTrackingEnd();
-                        xyChart.resetFitToWindow();
-                    } else {
-                        xyChart.setFitToWindow();
-                    }
+
+    private void initComponents(final Action chartAction) {
+        // Chart
+        chart = createChart(models.generationsItemsModel(),
+                            createGenerationsPaintersModel(), smallPanel);
+        chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
+        chart.setViewInsets(new Insets(10, 0, 0, 0));
+
+        // Horizontal axis
+        AxisComponent hAxis =
+                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
+                         100, chart.getChartContext(), SwingConstants.HORIZONTAL),
+                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                         SwingConstants.SOUTH);
+
+        // Vertical axis
+        AxisComponent vAxis =
+                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
+                         100, chart.getChartContext(), SwingConstants.VERTICAL),
+                         new AxisComponent.SimplePainter(),
+                         SwingConstants.WEST);
+
+        // Chart panel (chart & axes)
+        JPanel chartPanel = new JPanel(new CrossBorderLayout());
+        chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
+        chartPanel.setBorder(BorderFactory.createMatteBorder(
+                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+        chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
+        chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
+                                              SwingConstants.SOUTH_WEST });
+        chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
+                                              SwingConstants.SOUTH_WEST });
+
+        // Small panel UI
+        if (smallPanel) {
+
+            // Customize chart
+            chart.setMouseZoomingEnabled(false);
+            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
+
+            // Heap Size
+            JLabel heapSizeSmall = new JLabel(GraphsUI.SURVGEN_NAME,
+                                              new ColorIcon(GraphsUI.
+                                              SURVGEN_PAINTER_LINE_COLOR, null,
+                                              8, 8), SwingConstants.LEADING);
+            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
+            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
+            // Used heap
+            JLabel usedHeapSmall = new JLabel(GraphsUI.GC_TIME_NAME,
+                                              new ColorIcon(GraphsUI.
+                                              GC_TIME_PAINTER_LINE_COLOR, null,
+                                              8, 8), SwingConstants.LEADING);
+            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
+            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
+            // Legend container
+            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
+            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
+            smallLegendPanel.add(heapSizeSmall);
+            smallLegendPanel.add(usedHeapSmall);
+            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+            smallLegendContainer.add(smallLegendPanel);
+
+            // Master UI
+            setLayout(new BorderLayout());
+            add(chartPanel, BorderLayout.CENTER);
+            add(smallLegendContainer, BorderLayout.SOUTH);
+
+
+            // Doubleclick action
+            chart.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isLeftMouseButton(e) &&
+                        e.getClickCount() == 2)
+                            chartAction.actionPerformed(null);
                 }
             });
-    }
 
-    // --- ToolTip stuff ---------------------------------------------------------
-    private static void appendToolTipItem(StringBuffer toolTipBuffer, String itemName, String itemValue, boolean lastItem) {
-        toolTipBuffer.append("&nbsp;<b>"); // NOI18N
-        toolTipBuffer.append(itemName);
-        toolTipBuffer.append("</b>: "); // NOI18N
-        toolTipBuffer.append(itemValue);
-        toolTipBuffer.append("&nbsp;"); // NOI18N
+            // Toolbar actions
+            chartActions = new Action[] {};
 
-        if (!lastItem) {
-            toolTipBuffer.append("<br>"); // NOI18N
+        // Big panel UI
+        } else {
+
+            // Setup tooltip painter
+            ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(
+                                                GraphsUI.TOOLTIP_OVERLAY_LINE_WIDTH,
+                                                GraphsUI.TOOLTIP_OVERLAY_LINE_COLOR,
+                                                GraphsUI.TOOLTIP_OVERLAY_FILL_COLOR,
+                                                getTooltipModel());
+
+            // Customize chart
+            chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart,
+                                                                   tooltipPainter));
+
+            // Chart scrollbar
+            JScrollBar hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+            chart.attachHorizontalScrollBar(hScrollBar);
+
+            // Chart container (chart panel & scrollbar)
+            JPanel chartContainer = new JPanel(new BorderLayout());
+            chartContainer.setBorder(new BevelBorder(BevelBorder.LOWERED));
+            chartContainer.add(chartPanel, BorderLayout.CENTER);
+            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
+
+            // Heap Size
+            JLabel heapSizeBig = new JLabel(GraphsUI.SURVGEN_NAME,
+                                            new ColorIcon(GraphsUI.
+                                            SURVGEN_PAINTER_LINE_COLOR, Color.
+                                            BLACK, 18, 9), SwingConstants.LEADING);
+            heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
+            // Used heap
+            JLabel usedHeapBig = new JLabel(GraphsUI.GC_TIME_NAME,
+                                            new ColorIcon(GraphsUI.
+                                            GC_TIME_PAINTER_LINE_COLOR, Color.
+                                            BLACK, 18, 9), SwingConstants.LEADING);
+            usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
+            // Legend container
+            JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 10));
+            bigLegendPanel.add(heapSizeBig);
+            bigLegendPanel.add(usedHeapBig);
+
+            // Master UI
+            setLayout(new BorderLayout());
+            add(chartContainer, BorderLayout.CENTER);
+            add(bigLegendPanel, BorderLayout.SOUTH);
+
+
+            // Toolbar actions
+            chartActions = new Action[] { chart.zoomInAction(),
+                                          chart.zoomOutAction(),
+                                          chart.toggleViewAction()};
+
         }
+
     }
+
+    protected ProfilerXYTooltipModel createTooltipModel() {
+        return new ProfilerXYTooltipModel() {
+
+            public String getTimeValue(long timestamp) {
+                return DATE_FORMATTER.format(new Date(timestamp));
+            }
+
+            public int getRowsCount() {
+                return 2;
+            }
+
+            public String getRowName(int index) {
+                switch (index) {
+                    case 0:
+                        return GraphsUI.SURVGEN_NAME;
+                    case 1:
+                        return GraphsUI.GC_TIME_NAME;
+                    default:
+                        return null;
+                }
+            }
+
+            public Color getRowColor(int index) {
+                switch (index) {
+                    case 0:
+                        return GraphsUI.SURVGEN_PAINTER_LINE_COLOR;
+                    case 1:
+                        return GraphsUI.GC_TIME_PAINTER_LINE_COLOR;
+                    default:
+                        return null;
+                }
+            }
+
+            public String getRowValue(int index, long itemValue) {
+                switch (index) {
+                    case 0:
+                        return INT_FORMATTER.format(itemValue);
+                    case 1:
+                        String val = PERCENT_FORMATTER.format(itemValue / 1000f);
+                        return trimPercents(val);
+                    default:
+                        return null;
+                }
+            }
+
+            public String getRowUnits(int index, long itemValue) {
+                switch (index) {
+                    case 0:
+                        return "";
+                    case 1:
+                        return "%";
+                    default:
+                        return null;
+                }
+            }
+
+            public int getExtraRowsCount() {
+                return getRowsCount();
+            }
+
+            public String getExtraRowName(int index) {
+                return "Max " + getRowName(index);
+            }
+
+            public Color getExtraRowColor(int index) {
+                return getRowColor(index);
+            }
+
+            public String getExtraRowValue(int index) {
+                ProfilerXYItem item = models.generationsItemsModel().getItem(index);
+                switch (index) {
+                    case 0:
+                        return INT_FORMATTER.format(item.getMaxYValue());
+                    case 1:
+                        String val = PERCENT_FORMATTER.format(item.getMaxYValue() /
+                                                              1000f);
+                        return trimPercents(val);
+                    default:
+                        return null;
+                }
+            }
+
+            public String getExtraRowUnits(int index) {
+                return getRowUnits(index, -1);
+            }
+
+            private String trimPercents(String percents) {
+                return !percents.endsWith("%") ? percents :
+                        percents.substring(0, percents.length() - 1).trim();
+            }
+
+        };
+    }
+
+    private ProfilerXYPaintersModel createGenerationsPaintersModel() {
+        // Surviving generations
+        ProfilerXYItemPainter survgenPainter =
+                ProfilerXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
+                                                      GraphsUI.SURVGEN_PAINTER_LINE_COLOR,
+                                                      GraphsUI.SURVGEN_PAINTER_FILL_COLOR);
+        ProfilerXYItemMarker survgenMarker =
+                 ProfilerXYItemMarker.absolutePainter(GraphsUI.SURVGEN_MARKER_RADIUS,
+                                                      GraphsUI.SURVGEN_MARKER_LINE1_WIDTH,
+                                                      GraphsUI.SURVGEN_MARKER_LINE1_COLOR,
+                                                      GraphsUI.SURVGEN_MARKER_LINE2_WIDTH,
+                                                      GraphsUI.SURVGEN_MARKER_LINE2_COLOR,
+                                                      GraphsUI.SURVGEN_MARKER_FILL_COLOR);
+        XYItemPainter sgp = new CompoundProfilerXYItemPainter(survgenPainter,
+                                                      survgenMarker);
+
+        // Relative time spent in GC
+        ProfilerXYItemPainter gcTimePainter =
+                ProfilerXYItemPainter.relativePainter(GraphsUI.GC_TIME_PAINTER_LINE_WIDTH,
+                                                      GraphsUI.GC_TIME_PAINTER_LINE_COLOR,
+                                                      GraphsUI.GC_TIME_PAINTER_FILL_COLOR,
+                                                      10);
+        ProfilerXYItemMarker gcTimeMarker =
+                 ProfilerXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
+                                                      GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
+                                                      GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
+                                                      GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
+                                                      GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
+                                                      GraphsUI.GC_TIME_MARKER_FILL_COLOR,
+                                                      10);
+        XYItemPainter gtp = new CompoundProfilerXYItemPainter(gcTimePainter,
+                                                      gcTimeMarker);
+
+        // Model
+        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
+                 new XYItemPainter[] { sgp, gtp });
+
+        return model;
+    }
+
 }

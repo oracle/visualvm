@@ -155,6 +155,18 @@ class HprofHeap implements Heap {
         return classDumpBounds.createClassCollection();
     }
 
+    public List getBiggestObjectsByRetainedSize(int number) {
+        long[] ids;
+        List bigObjects = new ArrayList(number);
+        
+        computeRetainedSize();
+        ids = idToOffsetMap.getBiggestObjectsByRetainedSize(number);
+        for (int i=0;i<ids.length;i++) {
+            bigObjects.add(getInstanceByID(ids[i]));
+        }
+        return bigObjects;
+    }
+    
     public GCRoot getGCRoot(Instance instance) {
        Long instanceId = Long.valueOf(instance.getInstanceId());
        return getGCRoot(instanceId);
@@ -244,6 +256,13 @@ class HprofHeap implements Heap {
         return getClassDumpSegment().getJavaClassByName(fqn);
     }
 
+    public Collection getJavaClassesByRegExp(String regexp) {
+        if (heapDumpSegment == null) {
+            return Collections.EMPTY_LIST;
+        }
+        return getClassDumpSegment().getJavaClassesByRegExp(regexp);
+    }
+    
     public synchronized HeapSummary getSummary() {
         TagBounds summaryBound = tagBounds[HEAP_SUMMARY];
 
@@ -295,7 +314,7 @@ class HprofHeap implements Heap {
     }
     
     int getRetainedSize(Instance instance) {
-        computeRetainedSize(instance);
+        computeRetainedSize();
         return idToOffsetMap.get(instance.getInstanceId()).getRetainedSize();
     }
     
@@ -534,7 +553,7 @@ class HprofHeap implements Heap {
         return;
     }
     
-    synchronized void computeRetainedSize(Instance in) {
+    synchronized void computeRetainedSize() {
         if (retainedSizeComputed) {
             return;
         }
@@ -567,7 +586,7 @@ class HprofHeap implements Heap {
             LongMap.Entry instanceEntry = idToOffsetMap.get(instanceId);
             long idom = domTree.getIdomId(instanceId,instanceEntry);
 
-            if (!instanceEntry.isTreeObj() && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(instanceId) != null)) {
+            if (!instanceEntry.isTreeObj() && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
                 int origSize = instanceEntry.getRetainedSize();
                 instanceEntry.setRetainedSize(origSize + getInstanceByID(instanceId).getSize());
             }

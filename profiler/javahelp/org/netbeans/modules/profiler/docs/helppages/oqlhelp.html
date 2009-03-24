@@ -245,7 +245,7 @@ Examples:
 <li><a href="#refers">refers(jobject)</a>
 <li><a href="#root">root(jobject)</a>
 <li><a href="#sizeof">sizeof(jobject)</a>
-<li><a href="#retainedsize">retainedsize(jobject)</a>
+<li><a href="#rsizeof">rsizeof(jobject)</a>
 <li><a href="#toHtml">toHtml(obj)</a>
 </ul>
 
@@ -493,6 +493,7 @@ these functions may also be used with arbitrary JavaScript objects.
 <li><a href="#max">max(array/enumeration, [expression])</a>
 <li><a href="#min">min(array/enumeration, [expression])</a>
 <li><a href="#sort">sort(array/enumeration, [expression])</a>
+<li><a href="#top">top(array/enumeration, [expression], [top])</a>
 <li><a href="#sum">sum(array/enumeration, [expression])</a>
 <li><a href="#toArray">toArray(array/enumeration)</a>
 <li><a href="#unique">unique(array/enumeration, [expression])</a>
@@ -691,6 +692,35 @@ size as well.
 </pre>
 </ul>
 
+<a name="top"></a>
+<h5>top function</h5>
+<p>
+returns top N elements of the given array/enumeration. Optionally accepts code expression to
+compare elements of the array and the number of top elements. By default the first 10 elements
+in the order of appearence is returned.
+The comparison expression can use the following built-in variables:
+</p>
+<ul>
+<li>lhs -> left side element for comparison
+<li>rhs -> right side element for comparison
+</ul>
+Examples:
+<ul>
+<li> print 5 longest strings
+<pre>
+<code>
+    select top(<a href="#objects">heap.objects</a>('java.lang.String'), 'rhs.count - lhs.count', 5)
+</code>
+</pre>
+<li> print 5 longest strings but print
+size as well.
+<pre>
+<code>
+    select <a href="#map">map</a>(top(<a href="#objects">heap.objects</a>('java.lang.String'), 'rhs.count - lhs.count', 5), '{ length: it.count, obj: it }')
+</code>
+</pre>
+</ul>
+
 <a name="sum"></a>
 <h5>sum function</h5>
 <p>
@@ -707,8 +737,7 @@ Example: return sum of sizes of the reachable objects from each Properties objec
     // or omit the map as in ...
     select sum(<a href="#reachables">reachables</a>(p), '<a href="#sizeof">sizeof</a>(it)') 
     from java.util.Properties p
-</code>
-</pre>
+</code></pre>
 
 <a name="toArray"></a>
 <h5>toArray function</h5>

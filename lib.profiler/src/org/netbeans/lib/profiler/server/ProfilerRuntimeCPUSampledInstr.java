@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.server;
 
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.server.system.Threads;
 import org.netbeans.lib.profiler.server.system.Timers;
 
@@ -63,8 +64,8 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     static class SamplingThread extends Thread {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final boolean isSolaris = System.getProperty("os.name").startsWith("Sun"); // NOI18N
-        private static final boolean isLinux = System.getProperty("os.name").startsWith("Linux"); // NOI18N
+        private static final boolean isSolaris = Platform.isSolaris();
+        private static final boolean isLinux = Platform.isLinux();
         private static final boolean isUnix = isSolaris || isLinux;
         private static final int VIOLATION_THRESHOLD = 10;
         private static final boolean DEBUG = false;
