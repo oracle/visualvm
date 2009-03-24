@@ -113,14 +113,15 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
     private static class TitleUI extends ComponentUI {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private final int TITLE_X_OFFSET = 20;
+        private final int TITLE_X_OFFSET = 5;
         private final int TITLE_Y_OFFSET = 2;
 
         private final ImageIcon collapsedIcon = new ImageIcon(TitleUI.class.getResource("collapsedSnippet.png")); //NOI18N
         private final ImageIcon expandedIcon = new ImageIcon(TitleUI.class.getResource("expandedSnippet.png")); //NOI18N
-        private final JLabel titlePainter = new JLabel();
-        private final Font plainFont = titlePainter.getFont().deriveFont(Font.PLAIN);
-        private final Font boldFont = titlePainter.getFont().deriveFont(Font.BOLD);
+        private final JLabel plainPainter = new JLabel();
+        private final JLabel boldPainter = new JLabel();
+        private final Font plainFont = plainPainter.getFont().deriveFont(Font.PLAIN);
+        private final Font boldFont = boldPainter.getFont().deriveFont(Font.BOLD);
         private Dimension preferredSize;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -130,11 +131,18 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         }
 
         public void installUI(JComponent c) {
-            titlePainter.setText(((Title)c).name);
-            titlePainter.setFont(boldFont);
+            plainPainter.setText(((Title)c).name);
+            plainPainter.setIcon(collapsedIcon);
+            plainPainter.setFont(plainFont);
+            plainPainter.setIconTextGap(5);
+            boldPainter.setText(((Title)c).name);
+            boldPainter.setIcon(expandedIcon);
+            boldPainter.setFont(boldFont);
+            boldPainter.setIconTextGap(5);
 
-            Dimension titlePreferredSize = titlePainter.getPreferredSize();
-            titlePainter.setSize(titlePreferredSize);
+            plainPainter.setSize(plainPainter.getPreferredSize());
+            Dimension titlePreferredSize = boldPainter.getPreferredSize();
+            boldPainter.setSize(titlePreferredSize);
             preferredSize = new Dimension(TITLE_X_OFFSET + titlePreferredSize.width,
                                           titlePreferredSize.height + TITLE_Y_OFFSET * 2);
         }
@@ -142,12 +150,6 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         public void paint(Graphics g, JComponent c) {
 
             Title title = (Title)c;
-
-            if (title.collapsed) { // use plain font if collapsed
-                titlePainter.setFont(plainFont);
-            } else {
-                titlePainter.setFont(boldFont);
-            }
 
             g.setColor(lineColor);
             g.drawLine(0, 0, c.getWidth(), 0);
@@ -161,8 +163,8 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
                 }
             }
 
-            g.drawLine(0, 1 + titlePainter.getHeight() + TITLE_Y_OFFSET,
-                       c.getWidth(), 1 + titlePainter.getHeight() + TITLE_Y_OFFSET);
+            g.drawLine(0, 1 + plainPainter.getHeight() + TITLE_Y_OFFSET,
+                       c.getWidth(), 1 + plainPainter.getHeight() + TITLE_Y_OFFSET);
 
             if (title.rollOver || title.isFocusOwner()) {
                 g.setColor(focusedBackgroundColor);
@@ -170,17 +172,15 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
                 g.setColor(backgroundColor);
             }
 
-            g.fillRect(0, 1, c.getWidth(), titlePainter.getHeight() + TITLE_Y_OFFSET);
+            g.fillRect(0, 1, c.getWidth(), plainPainter.getHeight() + TITLE_Y_OFFSET);
 
             g.translate(TITLE_X_OFFSET, TITLE_Y_OFFSET);
-            titlePainter.paint(g);
+            if (title.collapsed) {
+                plainPainter.paint(g);
+            } else {
+                boldPainter.paint(g);
+            }
             g.translate(-TITLE_X_OFFSET, -TITLE_Y_OFFSET);
-
-            int iconX = 5;
-            int iconY = 5;
-            ImageIcon icon = title.collapsed ? collapsedIcon : expandedIcon;
-
-            icon.paintIcon(c, g, iconX, iconY);
         }
     }
 
