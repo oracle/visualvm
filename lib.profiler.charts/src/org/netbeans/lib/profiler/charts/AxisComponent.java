@@ -62,7 +62,7 @@ public class AxisComponent extends JComponent implements ChartDecorator {
 
     private int maxExtent;
 
-    private final Paint meshPaint = new Color(80, 80, 80, 50);
+    private final Paint meshPaint = Utils.checkedColor(new Color(80, 80, 80, 50));
     private final Stroke meshStroke = new BasicStroke(1);
 
 
