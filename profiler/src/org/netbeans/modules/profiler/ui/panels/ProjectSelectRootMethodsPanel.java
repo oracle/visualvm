@@ -47,7 +47,6 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
-import org.netbeans.modules.profiler.selector.ui.SelectionTreeView;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
@@ -68,7 +67,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -80,6 +79,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.lookup.Lookups;
 
@@ -140,6 +141,13 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         return RootSelectorTree.canBeShown();
     }
 
+    /**
+     * This method handles selecting root methods for a single profiling session
+     * The method also displays the UI for selecting root methods
+     * @param project The project to select root methods for or <b>null</b> for global mode
+     * @param currentSelection The current root method selection (valid for the profiling session)
+     * @return Returns the array of newly selected root methods or <b>null</b> to signal that no root methods were selected
+     */
     public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
         this.currentProject = project;
@@ -165,6 +173,12 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                     advancedLogicalPackageTree.setSelection(currentSelection);
                 }
             });
+
+            if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message("SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
+                DialogDisplayer.getDefault().notify(nd);
+                return null;
+            }
 
             final DialogDescriptor dd = new DialogDescriptor(this,
                     NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_Title"), // NOI18N
@@ -352,7 +366,8 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
     private void refreshBuilderList() {
         List<Type> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
-
+        if (builderTypes == null || builderTypes.isEmpty()) return;
+        
         try {
             changingBuilderList = true;
 
