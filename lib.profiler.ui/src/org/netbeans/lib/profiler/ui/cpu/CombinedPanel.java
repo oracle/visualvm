@@ -58,9 +58,9 @@ public class CombinedPanel extends JSplitPane implements ScreenshotProvider {
         super(splitOrientation, component1, component2);
     }
 
-    public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        ((CCTDisplay)leftComponent).exportData(exportedFileType, eDD, true);
-        ((SnapshotFlatProfilePanel)rightComponent).exportData(exportedFileType, eDD, true);
+    public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
+        ((CCTDisplay)leftComponent).exportData(exportedFileType, eDD, true, viewName);
+        ((SnapshotFlatProfilePanel)rightComponent).exportData(exportedFileType, eDD, true, viewName);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

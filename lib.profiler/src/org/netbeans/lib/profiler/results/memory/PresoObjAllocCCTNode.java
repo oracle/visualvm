@@ -465,11 +465,11 @@ public class PresoObjAllocCCTNode implements CCTNode {
     }
 
     public void exportHTMLData(ExportDataDumper eDD, int depth) {
-        StringBuffer result = new StringBuffer("<tr><td>."); //NOI18N
+        StringBuffer result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"); //NOI18N
         for (int i=0; i<depth; i++) {
-            result.append(".."); //NOI18N
+            result.append("."); //NOI18N
         }
-        result.append(replaceHTMLCharacters(getNodeName())+"</td><td>"+totalObjSize+"</td><td>"+nCalls+"</td><td>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"</td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+totalObjSize+"</td><td class=\"right\">"+nCalls+"</td><td class=\"parent\"><pre class=\"parent\">"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"</pre></td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
