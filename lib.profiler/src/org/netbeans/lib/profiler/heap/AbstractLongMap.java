@@ -60,9 +60,9 @@ abstract class AbstractLongMap {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final int VALUE_SIZE;
-    private final int ENTRY_SIZE;
+    final int ENTRY_SIZE;
     private File tempFile;
-    private long fileSize;
+    long fileSize;
     private long keys;
     final int KEY_SIZE;
     final int ID_SIZE;
@@ -189,7 +189,6 @@ abstract class AbstractLongMap {
         if (index >= fileSize) {
             index = 0;
         }
-
         return index;
     }
 

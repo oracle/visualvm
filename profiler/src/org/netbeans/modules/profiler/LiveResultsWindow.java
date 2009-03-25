@@ -290,7 +290,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        final GraphPanel panel;
+        final HistoryPanel panel;
         final JButton scaleToFitButton;
         final JButton zoomInButton;
         final JButton zoomOutButton;
@@ -301,7 +301,7 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public GraphTab(final GraphPanel panel) {
+        public GraphTab(final HistoryPanel panel) {
             this.panel = panel;
 
             setLayout(new BorderLayout());

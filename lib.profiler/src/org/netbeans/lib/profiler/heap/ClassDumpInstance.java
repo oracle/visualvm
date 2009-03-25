@@ -94,7 +94,7 @@ class ClassDumpInstance implements Instance {
     }
 
     public int getRetainedSize() {
-        return 0;
+        return classDump.getHprof().getRetainedSize(this);
     }
 
     public int getSize() {
