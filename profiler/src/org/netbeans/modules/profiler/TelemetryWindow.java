@@ -40,10 +40,13 @@
 
 package org.netbeans.modules.profiler;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Image;
+import java.awt.KeyboardFocusManager;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.charts.ChartActionListener;
-import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
 import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.MemoryGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
@@ -52,18 +55,17 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
+import java.util.Date;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 
 
 /** An IDE TopComponent to display profiling results.
@@ -75,25 +77,33 @@ import javax.swing.border.EmptyBorder;
 public final class TelemetryWindow extends TopComponent {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private static final class GraphTab extends JPanel implements ActionListener, ChartActionListener,
-                                                                  SaveViewAction.ViewProvider {
+    private static final class GraphTab extends JPanel implements /*ActionListener, ChartActionListener,*/
+                                                                  SaveViewAction.ViewProvider, ExportAction.ExportProvider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final ImageIcon zoomInIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomIn.png", false); //NOI18N
-        private static final ImageIcon zoomOutIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomOut.png", false); //NOI18N
-        private static final ImageIcon zoomIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoom.png", false); //NOI18N
-        private static final ImageIcon scaleToFitIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/scaleToFit.png", false); //NOI18N
+//        private static final ImageIcon zoomInIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomIn.png", false); //NOI18N
+//        private static final ImageIcon zoomOutIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomOut.png", false); //NOI18N
+//        private static final ImageIcon zoomIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoom.png", false); //NOI18N
+//        private static final ImageIcon scaleToFitIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/scaleToFit.png", false); //NOI18N
+        private static final String timestamp = "Timestamp";
+        private static final String heapSize = "Heap_Size_in_Bytes";
+        private static final String usedHeap = "Used_Heap_in_Bytes";
+        private static final String survivingGenerations = "Surviving_Generations";
+        private static final String timeInGC = "Relative_Time_Spent_in_GC";
+        private static final String  threadsCount = "Number_of_Threads";
+        private static final String loadedClasses = "Loaded_Classes_Count";
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final GraphPanel panel;
-        private final JButton scaleToFitButton;
-        private final JButton zoomInButton;
-        private final JButton zoomOutButton;
-        private final JScrollBar scrollBar;
-        private boolean lastTrackingEnd;
-        private double lastScale;
-        private long lastOffset;
+        private final ExportAction exportActionButton;
+//        private final JButton scaleToFitButton;
+//        private final JButton zoomInButton;
+//        private final JButton zoomOutButton;
+//        private final JScrollBar scrollBar;
+//        private boolean lastTrackingEnd;
+//        private double lastScale;
+//        private long lastOffset;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -112,60 +122,63 @@ public final class TelemetryWindow extends TopComponent {
                 }
             };
 
-            final boolean scaleToFit = panel.getChart().isFitToWindow();
+//            final boolean scaleToFit = panel.getChart().isFitToWindow();
+//
+//            zoomInButton = new JButton(zoomInIcon);
+//            zoomOutButton = new JButton(zoomOutIcon);
+//            scaleToFitButton = new JButton(scaleToFit ? zoomIcon : scaleToFitIcon);
+            exportActionButton = new ExportAction(this, null);
 
-            zoomInButton = new JButton(zoomInIcon);
-            zoomOutButton = new JButton(zoomOutIcon);
-            scaleToFitButton = new JButton(scaleToFit ? zoomIcon : scaleToFitIcon);
-
-            scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-
-            zoomInButton.setEnabled(!scaleToFit);
-            zoomOutButton.setEnabled(!scaleToFit);
-            scrollBar.setEnabled(!scaleToFit);
-
-            zoomInButton.setToolTipText(ZOOM_IN_TOOLTIP);
-            zoomOutButton.setToolTipText(ZOOM_OUT_TOOLTIP);
-            scaleToFitButton.setToolTipText(scaleToFit ? FIXED_SCALE_TOOLTIP : SCALE_TO_FIT_TOOLTIP);
-
-            if (!panel.getChart().containsValidData()) {
-                scaleToFitButton.setEnabled(false);
-                zoomInButton.setEnabled(false);
-                zoomOutButton.setEnabled(false);
-            }
+//            scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+//
+//            zoomInButton.setEnabled(!scaleToFit);
+//            zoomOutButton.setEnabled(!scaleToFit);
+//            scrollBar.setEnabled(!scaleToFit);
+//
+//            zoomInButton.setToolTipText(ZOOM_IN_TOOLTIP);
+//            zoomOutButton.setToolTipText(ZOOM_OUT_TOOLTIP);
+//            scaleToFitButton.setToolTipText(scaleToFit ? FIXED_SCALE_TOOLTIP : SCALE_TO_FIT_TOOLTIP);
+//
+//            if (!panel.getChart().containsValidData()) {
+//                scaleToFitButton.setEnabled(false);
+//                zoomInButton.setEnabled(false);
+//                zoomOutButton.setEnabled(false);
+//            }
 
             toolBar.setFloatable(false);
             toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
 
+            toolBar.add(exportActionButton);
             toolBar.add(new SaveViewAction(this));
             toolBar.addSeparator();
-            toolBar.add(zoomInButton);
-            toolBar.add(zoomOutButton);
-            toolBar.add(scaleToFitButton);
+            for (Action action : panel.getActions()) toolBar.add(action);
+//            toolBar.add(zoomInButton);
+//            toolBar.add(zoomOutButton);
+//            toolBar.add(scaleToFitButton);
 
-            final JPanel graphPanel = new JPanel();
-            graphPanel.setLayout(new BorderLayout());
-            graphPanel.setBorder(new CompoundBorder(new EmptyBorder(new Insets(0, 5, 0, 5)), new BevelBorder(BevelBorder.LOWERED)));
-            graphPanel.add(panel, BorderLayout.CENTER);
-            graphPanel.add(scrollBar, BorderLayout.SOUTH);
+//            final JPanel graphPanel = new JPanel();
+//            graphPanel.setLayout(new BorderLayout());
+//            graphPanel.setBorder(new CompoundBorder(new EmptyBorder(new Insets(0, 5, 0, 5)), new BevelBorder(BevelBorder.LOWERED)));
+//            graphPanel.add(panel, BorderLayout.CENTER);
+//            graphPanel.add(scrollBar, BorderLayout.SOUTH);
 
-            final JPanel legendContainer = new JPanel();
-            legendContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
-
-            if (panel.getBigLegendPanel() != null) {
-                legendContainer.add(panel.getBigLegendPanel());
-            }
+//            final JPanel legendContainer = new JPanel();
+//            legendContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
+//
+//            if (panel.getBigLegendPanel() != null) {
+//                legendContainer.add(panel.getBigLegendPanel());
+//            }
 
             add(toolBar, BorderLayout.NORTH);
-            add(graphPanel, BorderLayout.CENTER);
-            add(legendContainer, BorderLayout.SOUTH);
+            add(panel, BorderLayout.CENTER);
+//            add(legendContainer, BorderLayout.SOUTH);
 
-            zoomInButton.addActionListener(this);
-            zoomOutButton.addActionListener(this);
-            scaleToFitButton.addActionListener(this);
-
-            panel.getChart().associateJScrollBar(scrollBar);
-            panel.getChart().addChartActionListener(this);
+//            zoomInButton.addActionListener(this);
+//            zoomOutButton.addActionListener(this);
+//            scaleToFitButton.addActionListener(this);
+//
+//            panel.getChart().associateJScrollBar(scrollBar);
+//            panel.getChart().addChartActionListener(this);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -186,57 +199,57 @@ public final class TelemetryWindow extends TopComponent {
             return null;
         }
 
-        // --- ActionListener -------------------------------------------------------
-        public void actionPerformed(final ActionEvent e) {
-            final SynchronousXYChart xyChart = panel.getChart();
-
-            if (e.getSource() == scaleToFitButton) {
-                if (xyChart.isFitToWindow()) {
-                    if (lastTrackingEnd) {
-                        xyChart.setTrackingEnd(lastScale);
-                    } else {
-                        xyChart.setScaleAndOffsetX(lastScale, lastOffset);
-                    }
-                } else {
-                    lastScale = xyChart.getScale();
-                    lastOffset = xyChart.getViewOffsetX();
-                    lastTrackingEnd = xyChart.isTrackingEnd();
-                    xyChart.setFitToWindow();
-                }
-
-                //updateButtons();
-            } else if (e.getSource() == zoomInButton) {
-                xyChart.setScale(xyChart.getScale() * 2);
-            } else if (e.getSource() == zoomOutButton) {
-                xyChart.setScale(xyChart.getScale() / 2);
-            }
-        }
-
-        public void chartDataChanged() {
-            updateZoomButtons();
-        }
-
-        public void chartFitToWindowChanged() {
-            if (panel.getChart().isFitToWindow()) {
-                scaleToFitButton.setIcon(zoomIcon);
-                scaleToFitButton.setToolTipText(FIXED_SCALE_TOOLTIP);
-            } else {
-                scaleToFitButton.setIcon(scaleToFitIcon);
-                scaleToFitButton.setToolTipText(SCALE_TO_FIT_TOOLTIP);
-            }
-
-            updateZoomButtons();
-        }
-
-        public void chartPanned() {
-        }
-
-        public void chartTrackingEndChanged() {
-        }
-
-        public void chartZoomed() {
-            updateZoomButtons();
-        }
+//        // --- ActionListener -------------------------------------------------------
+//        public void actionPerformed(final ActionEvent e) {
+//            final SynchronousXYChart xyChart = panel.getChart();
+//
+//            if (e.getSource() == scaleToFitButton) {
+//                if (xyChart.isFitToWindow()) {
+//                    if (lastTrackingEnd) {
+//                        xyChart.setTrackingEnd(lastScale);
+//                    } else {
+//                        xyChart.setScaleAndOffsetX(lastScale, lastOffset);
+//                    }
+//                } else {
+//                    lastScale = xyChart.getScale();
+//                    lastOffset = xyChart.getViewOffsetX();
+//                    lastTrackingEnd = xyChart.isTrackingEnd();
+//                    xyChart.setFitToWindow();
+//                }
+//
+//                //updateButtons();
+//            } else if (e.getSource() == zoomInButton) {
+//                xyChart.setScale(xyChart.getScale() * 2);
+//            } else if (e.getSource() == zoomOutButton) {
+//                xyChart.setScale(xyChart.getScale() / 2);
+//            }
+//        }
+//
+//        public void chartDataChanged() {
+//            updateZoomButtons();
+//        }
+//
+//        public void chartFitToWindowChanged() {
+//            if (panel.getChart().isFitToWindow()) {
+//                scaleToFitButton.setIcon(zoomIcon);
+//                scaleToFitButton.setToolTipText(FIXED_SCALE_TOOLTIP);
+//            } else {
+//                scaleToFitButton.setIcon(scaleToFitIcon);
+//                scaleToFitButton.setToolTipText(SCALE_TO_FIT_TOOLTIP);
+//            }
+//
+//            updateZoomButtons();
+//        }
+//
+//        public void chartPanned() {
+//        }
+//
+//        public void chartTrackingEndChanged() {
+//        }
+//
+//        public void chartZoomed() {
+//            updateZoomButtons();
+//        }
 
         public boolean fitsVisibleArea() {
             return true;
@@ -247,32 +260,194 @@ public final class TelemetryWindow extends TopComponent {
             return true;
         }
 
-        // --- ChartActionListener -------------------------------------------------
-        private void updateZoomButtons() {
-            if (!panel.getChart().containsValidData()) {
-                scaleToFitButton.setEnabled(false);
-                zoomInButton.setEnabled(false);
-                zoomOutButton.setEnabled(false);
-            } else {
-                scaleToFitButton.setEnabled(true);
+        private void exportCSVData(String separator, ExportDataDumper eDD) {
+            VMTelemetryDataManager data = Profiler.getDefault().getVMTelemetryManager();
+            String newLine = "\r\n"; // NOI18N
+            String quote = "\""; // NOI18N
+            // Initialize data
+            int nItems = data.getItemCount();
+            long[] col1 = new long[nItems];
+            long[] col2 = new long[nItems];
+            long[] col3 = new long[nItems];
+            // TODO Issue #160475
+            String col1Name = timestamp;
+            String col2Name = new String();
+            String col3Name = new String();
+            System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
+            if (panel instanceof MemoryGraphPanel) {
+                System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
+                System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
+                col2Name=heapSize;
+                col3Name=usedHeap;
+            } else if (panel instanceof SurvivingGenerationsGraphPanel) {
+                System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
+                System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
+                col2Name=survivingGenerations;
+                col3Name=timeInGC;
+            } else if (panel instanceof ThreadsGraphPanel) {
+                System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
+                System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
+                col2Name=threadsCount;
+                col3Name=loadedClasses;
+            }
+            //header
+            eDD.dumpData(new StringBuffer(quote+col1Name+quote+separator+quote+col2Name+quote+separator+quote+col3Name+quote+newLine));
+            Date d = new Date();            
+            // Data
+            for (int i=0; i < (nItems); i++) {
+                d.setTime(col1[i]);
+                eDD.dumpData(new StringBuffer(quote+d.toString()+quote+separator+quote+col2[i]+quote+separator+quote+col3[i]+quote+newLine));
+            }
+            eDD.close();
+        }
 
-                if (panel.getChart().isFitToWindow()) {
-                    zoomInButton.setEnabled(false);
-                    zoomOutButton.setEnabled(false);
-                } else {
-                    if (panel.getChart().isMaximumZoom()) {
-                        zoomInButton.setEnabled(false);
-                    } else {
-                        zoomInButton.setEnabled(true);
-                    }
+        private void exportHTMLData(ExportDataDumper eDD) {
+            VMTelemetryDataManager data = Profiler.getDefault().getVMTelemetryManager();
+            // Initialize data
+            int nItems = data.getItemCount();
+            long[] col1 = new long[nItems];
+            long[] col2 = new long[nItems];
+            long[] col3 = new long[nItems];
+            
+            String col1Name = NbBundle.getMessage(TelemetryWindow.class,timestamp);
+            String col2Name = new String();
+            String col3Name = new String();
+            String viewName = new String();
+            System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
+            if (panel instanceof MemoryGraphPanel) {
+                System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
+                System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
+                viewName=MEMORY_HEAP_TAB_NAME;
+                col2Name=NbBundle.getMessage(TelemetryWindow.class,heapSize);
+                col3Name=NbBundle.getMessage(TelemetryWindow.class,usedHeap);
+            } else if (panel instanceof SurvivingGenerationsGraphPanel) {
+                System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
+                System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
+                viewName=MEMORY_GC_TAB_NAME;
+                col2Name=NbBundle.getMessage(TelemetryWindow.class,survivingGenerations);
+                col3Name=NbBundle.getMessage(TelemetryWindow.class,timeInGC);
+            } else if (panel instanceof ThreadsGraphPanel) {
+                System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
+                System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
+                viewName=THREADS_STATISTICS_TAB_NAME;
+                col2Name=NbBundle.getMessage(TelemetryWindow.class,threadsCount);
+                col3Name=NbBundle.getMessage(TelemetryWindow.class,loadedClasses);
+            }
+            //header
+            StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+            result.append("<th>"+col1Name+"</th><th>"+col2Name+"</th><th>"+col3Name+"</th></tr>"); //NOI18N
+            eDD.dumpData(result);
+            Date d = new Date();
+            // Data
+            for (int i=0; i < (nItems); i++) {
+                d.setTime(col1[i]);
+                eDD.dumpData(new StringBuffer("<tr><td>"+d.toString()+"</td><td align=right>"+col2[i]+"</td><td align=right>"+col3[i]+"</td></tr>")); //NOI18N
+            }
+            eDD.dumpDataAndClose(new StringBuffer("</table></BODY></HTML>"));
+        }
 
-                    if (panel.getChart().isMinimumZoom()) {
-                        zoomOutButton.setEnabled(false);
-                    } else {
-                        zoomOutButton.setEnabled(true);
-                    }
+        private void exportXMLData(ExportDataDumper eDD) {
+            VMTelemetryDataManager data = Profiler.getDefault().getVMTelemetryManager();
+            // Initialize data
+            int nItems = data.getItemCount();
+            long[] col1 = new long[nItems];
+            long[] col2 = new long[nItems];
+            long[] col3 = new long[nItems];
+
+            String col1Name = NbBundle.getMessage(TelemetryWindow.class,timestamp);
+            String col2Name = new String();
+            String col3Name = new String();
+            String viewName = new String();
+            System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
+            if (panel instanceof MemoryGraphPanel) {
+                System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
+                System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
+                viewName=MEMORY_HEAP_TAB_NAME;
+                col2Name=heapSize;
+                col3Name=usedHeap;
+            } else if (panel instanceof SurvivingGenerationsGraphPanel) {
+                System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
+                System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
+                viewName=MEMORY_GC_TAB_NAME;
+                col2Name=survivingGenerations;
+                col3Name=timeInGC;
+            } else if (panel instanceof ThreadsGraphPanel) {
+                System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
+                System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
+                viewName=THREADS_STATISTICS_TAB_NAME;
+                col2Name=threadsCount;
+                col3Name=loadedClasses;
+            }
+            //header
+            String newline = System.getProperty("line.separator"); // NOI18N
+            StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
+            result.append("<TableData NumRows=\""+nItems+"\" NumColumns=\"3\">"+newline+" <TableHeader>");  // NOI18N
+            result.append(" <TableColumn>"+col1Name+" </TableColumn>"+newline+" <TableColumn>"+col2Name+" </TableColumn>"+newline+" <TableColumn>"+col3Name+" </TableColumn>"+newline);  // NOI18N
+            result.append(" </TableHeader>"+newline+" <TableBody>"+newline); //NOI18N
+            eDD.dumpData(result);
+            Date d = new Date();
+            // Data
+            for (int i=0; i < (nItems); i++) {
+                d.setTime(col1[i]);
+                result = new StringBuffer("  <TableRow>"+newline+"   <TableCell>"+d.toString()+"</TableCell>"+newline);  // NOI18N
+                result.append("   <TableCell>"+col2[i]+"</TableCell>"+newline);  // NOI18N
+                result.append("   <TableCell>"+col3[i]+"</TableCell>"+newline+"  </TableRow>"+newline);  // NOI18N
+                eDD.dumpData(result);
+            }
+            eDD.dumpDataAndClose(new StringBuffer(" </TableBody>"+newline+"</TableData>"+newline+"</ExportedView>"));  // NOI18N
+        }
+
+//        // --- ChartActionListener -------------------------------------------------
+//        private void updateZoomButtons() {
+//            if (!panel.getChart().containsValidData()) {
+//                exportActionButton.setEnabled(false);
+//                scaleToFitButton.setEnabled(false);
+//                zoomInButton.setEnabled(false);
+//                zoomOutButton.setEnabled(false);
+//            } else {
+//                exportActionButton.setEnabled(true);
+//                scaleToFitButton.setEnabled(true);
+//
+//                if (panel.getChart().isFitToWindow()) {
+//                    zoomInButton.setEnabled(false);
+//                    zoomOutButton.setEnabled(false);
+//                } else {
+//                    if (panel.getChart().isMaximumZoom()) {
+//                        zoomInButton.setEnabled(false);
+//                    } else {
+//                        zoomInButton.setEnabled(true);
+//                    }
+//
+//                    if (panel.getChart().isMinimumZoom()) {
+//                        zoomOutButton.setEnabled(false);
+//                    } else {
+//                        zoomOutButton.setEnabled(true);
+//                    }
+//                }
+//            }
+//        }
+
+        public void exportData(int exportedFileType, ExportDataDumper eDD) {
+            if ( (panel instanceof MemoryGraphPanel)||(panel instanceof SurvivingGenerationsGraphPanel)||(panel instanceof ThreadsGraphPanel)) {
+                switch (exportedFileType) {
+                    case 1: exportCSVData(",", eDD); //NOI18N                            
+                            break;
+                    case 2: exportCSVData(";", eDD); //NOI18N                            
+                            break;
+                    case 3: exportXMLData(eDD); //NOI18N
+                            break;
+                    case 4: exportHTMLData(eDD);
+                            break;
                 }
             }
+        }
+
+        public boolean hasExportableView() {
+            return Profiler.getDefault().getVMTelemetryManager().getItemCount() > 0;
+        }
+
+        public boolean hasLoadedSnapshot() {
+            return false;
         }
     }
 
@@ -285,12 +460,12 @@ public final class TelemetryWindow extends TopComponent {
     private static final String MEMORY_HEAP_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class,
                                                                            "TelemetryWindow_MemoryHeapTabName"); // NOI18N
     private static final String MEMORY_GC_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_MemoryGCTabName"); // NOI18N
-    private static final String ZOOM_IN_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_ZoomInTooltip"); // NOI18N
-    private static final String ZOOM_OUT_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_ZoomOutTooltip"); // NOI18N
-    private static final String FIXED_SCALE_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class,
-                                                                          "TelemetryWindow_FixedScaleTooltip"); // NOI18N
-    private static final String SCALE_TO_FIT_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class,
-                                                                           "TelemetryWindow_ScaleToFitTooltip"); // NOI18N
+//    private static final String ZOOM_IN_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_ZoomInTooltip"); // NOI18N
+//    private static final String ZOOM_OUT_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_ZoomOutTooltip"); // NOI18N
+//    private static final String FIXED_SCALE_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class,
+//                                                                          "TelemetryWindow_FixedScaleTooltip"); // NOI18N
+//    private static final String SCALE_TO_FIT_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class,
+//                                                                           "TelemetryWindow_ScaleToFitTooltip"); // NOI18N
     private static final String THREADS_STATISTICS_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
                                                                                    "TelemetryWindow_ThreadsStatisticsTabDescr"); // NOI18N
     private static final String MEMORY_HEAP_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
@@ -329,18 +504,17 @@ public final class TelemetryWindow extends TopComponent {
         tabs.setTabPlacement(JTabbedPane.BOTTOM);
         add(tabs, BorderLayout.CENTER);
 
-        heapGraph = new MemoryGraphPanel(true, Color.WHITE, ((NetBeansProfiler) Profiler.getDefault()).getMemoryXYChartModel(),
-                                         null);
-        generationsGraph = new SurvivingGenerationsGraphPanel(true, Color.WHITE,
-                                                              ((NetBeansProfiler) Profiler.getDefault())
-                                                                                                                                                                                                                                                                                                                                               .getSurvivingGenerationsXYChartModel(),
-                                                              null);
-        threadsStatsGraph = new ThreadsGraphPanel(true, Color.WHITE,
-                                                  ((NetBeansProfiler) Profiler.getDefault()).getThreadsXYChartModel(), null);
+        heapGraph = MemoryGraphPanel.createBigPanel(NetBeansProfiler.getDefaultNB().
+                                                    getVMTelemetryModels());
+        generationsGraph = SurvivingGenerationsGraphPanel.createBigPanel(
+                                                    NetBeansProfiler.getDefaultNB().
+                                                    getVMTelemetryModels());
+        threadsStatsGraph = ThreadsGraphPanel.createBigPanel(NetBeansProfiler.getDefaultNB().
+                                                    getVMTelemetryModels());
 
-        heapGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
-        generationsGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
-        threadsStatsGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
+//        heapGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
+//        generationsGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
+//        threadsStatsGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
 
         heapPanel = new GraphTab(heapGraph);
         generationsPanel = new GraphTab(generationsGraph);
@@ -355,18 +529,16 @@ public final class TelemetryWindow extends TopComponent {
         tabs.getActionMap().getParent().remove("navigatePageDown"); // NOI18N
 
         // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
-        getActionMap().put("PreviousViewAction",
-                           new AbstractAction() {
+        getActionMap().put("PreviousViewAction", new AbstractAction() { // NOI18N
                 public void actionPerformed(ActionEvent e) {
                     moveToPreviousSubTab();
                 }
-            }); // NOI18N
-        getActionMap().put("NextViewAction",
-                           new AbstractAction() {
+            });
+        getActionMap().put("NextViewAction", new AbstractAction() { // NOI18N
                 public void actionPerformed(ActionEvent e) {
                     moveToNextSubTab();
                 }
-            }); // NOI18N
+            });
 
         setFocusable(true);
         setRequestFocusEnabled(true);

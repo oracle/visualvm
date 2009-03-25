@@ -88,7 +88,7 @@ public class Snapshot {
             }
         }
     }
-
+    
     public int getMinimumObjectSize() {
         return 4;
     }
@@ -154,6 +154,25 @@ public class Snapshot {
      **/
     public Iterator getClasses() {
         return delegate.getAllClasses().iterator();
+    }
+
+    public Iterator getClassNames(String regex)  {
+        final Iterator delegated = delegate.getJavaClassesByRegExp(regex).iterator();
+        return new Iterator() {
+
+            public boolean hasNext() {
+                return delegated.hasNext();
+            }
+
+            public Object next() {
+                return ((JavaClass)delegated.next()).getName();
+            }
+
+            public void remove() {
+                delegated.remove();
+            }
+        };
+
     }
 
     public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {

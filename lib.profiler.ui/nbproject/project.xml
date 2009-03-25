@@ -55,6 +55,15 @@ made subject to such option by the copyright holder.
                         <specification-version>1.1</specification-version>
                     </run-dependency>
                 </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.lib.profiler.charts</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.1</specification-version>
+                    </run-dependency>
+                </dependency>
             </module-dependencies>
             <friend-packages>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
@@ -69,6 +78,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.utilities</friend>
                 <package>org.netbeans.lib.profiler.ui</package>
                 <package>org.netbeans.lib.profiler.ui.charts</package>
+                <package>org.netbeans.lib.profiler.ui.charts.xy</package>
                 <package>org.netbeans.lib.profiler.ui.components</package>
                 <package>org.netbeans.lib.profiler.ui.components.table</package>
                 <package>org.netbeans.lib.profiler.ui.components.tree</package>

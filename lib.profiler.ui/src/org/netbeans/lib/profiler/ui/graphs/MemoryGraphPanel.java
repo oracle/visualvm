@@ -40,268 +40,368 @@
 
 package org.netbeans.lib.profiler.ui.graphs;
 
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.charts.ChartModelListener;
-import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
-import org.netbeans.lib.profiler.ui.components.ColorIcon;
-import org.netbeans.lib.profiler.ui.monitor.VMTelemetryXYChartModel;
-import org.netbeans.lib.profiler.ui.monitor.VMTelemetryXYChartModelDataResetListener;
-import java.awt.*;
-import java.awt.event.InputEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-import javax.swing.*;
+import java.util.Date;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import org.netbeans.lib.profiler.charts.AxisComponent;
+import org.netbeans.lib.profiler.charts.AxisMarksComputer;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.results.DataManagerListener;
+import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
+import org.netbeans.lib.profiler.ui.components.ColorIcon;
+import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
+
 
 
 /**
- * A panel with heap graph display.
  *
- * @author Vladislav Nemec
- * @author Ian Formanek
  * @author Jiri Sedlacek
  */
-public class MemoryGraphPanel extends GraphPanel implements ChartModelListener, VMTelemetryXYChartModelDataResetListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public final class MemoryGraphPanel extends GraphPanel {
 
-    // -----
-    // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.graphs.Bundle"); // NOI18N
-    private static final String TOTAL_MEMORY_CURRENT_STRING = messages.getString("MemoryGraphPanel_TotalMemoryCurrentString"); // NOI18N
-    private static final String USED_MEMORY_CURRENT_STRING = messages.getString("MemoryGraphPanel_UsedMemoryCurrentString"); // NOI18N
-    private static final String USED_MEMORY_MAXIMUM_STRING = messages.getString("MemoryGraphPanel_UsedMemoryMaximumString"); // NOI18N
-    private static final String TIME_AT_CURSOR_STRING = messages.getString("MemoryGraphPanel_TimeAtCursorString"); // NOI18N
-    private static final String TOTAL_MEMORY_AT_CURSOR_STRING = messages.getString("MemoryGraphPanel_TotalMemoryAtCursorString"); // NOI18N
-    private static final String USED_MEMORY_AT_CURSOR_STRING = messages.getString("MemoryGraphPanel_UsedMemoryAtCursorString"); // NOI18N
-    private static final String CHART_ACCESS_NAME = messages.getString("MemoryGraphPanel_ChartAccessName"); // NOI18N
-                                                                                                            // -----
+    private ProfilerXYChart chart;
+    private Action[] chartActions;
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    private final VMTelemetryModels models;
 
-    private JPanel bigLegendPanel;
-    private JPanel smallLegendPanel;
-    private SynchronousXYChart xyChart;
-    private VMTelemetryXYChartModel memoryXYChartModel;
-    private boolean completeFunctionality;
-    private int chartTimeLength = 180000; // 3 minutes to switch from fitToWindow to trackingEnd
-                                          //private int chartTimeLength = 10000; // 10 seconds for testing purposes
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    private final boolean smallPanel;
 
-    /** Creates new form MemoryGraphPanel with the default history size (3 minutes)
-     * and no mouse zooming capabilities
-     * @param telemetryManager The data manager for telemetry data
-     */
-    public MemoryGraphPanel(final VMTelemetryXYChartModel memoryXYChartModel, final Action detailsAction) {
-        this(false, null, memoryXYChartModel, detailsAction);
+
+    // --- Constructors --------------------------------------------------------
+    
+    public static MemoryGraphPanel createBigPanel(VMTelemetryModels models) {
+        return new MemoryGraphPanel(models, false, null);
+    }
+    
+    public static MemoryGraphPanel createSmallPanel(VMTelemetryModels models,
+                                             Action chartAction) {
+        return new MemoryGraphPanel(models, true, chartAction);
     }
 
-    /** Creates new form MemoryGraphPanel with the given amount of history to keep
-     *
-     * @param completeFunctionality if true, the chart can be zoomed using mouse and will display all history, if false, it will only display last session and 3 minutes of data
-     * @param backgroundPaint paint used for drawing graph background
-     * @param telemetryManager The data manager for telemetry data
-     */
-    public MemoryGraphPanel(final boolean completeFunctionality, final Color backgroundPaint,
-                            final VMTelemetryXYChartModel memoryXYChartModel, final Action detailsAction) {
-        this.completeFunctionality = completeFunctionality;
-        this.memoryXYChartModel = memoryXYChartModel;
+    private MemoryGraphPanel(VMTelemetryModels models,
+                             boolean smallPanel, Action chartAction) {
 
-        memoryXYChartModel.addDataResetListener(this);
+        // Save models and panel type
+        this.models = models;
+        this.smallPanel = smallPanel;
 
-        setLayout(new java.awt.BorderLayout());
+        // Create UI
+        initComponents(chartAction);
 
-        // --- Big legend panel ----------------------------------------------------
-        JLabel heapSizeBig = new JLabel(memoryXYChartModel.getSeriesName(0),
-                                        new ColorIcon(memoryXYChartModel.getSeriesColor(0), Color.BLACK, 18, 9),
-                                        SwingConstants.LEADING);
-        heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        // Register listener
+        models.getDataManager().addDataListener(new DataManagerListener() {
+            public void dataChanged() { updateData(); }
+            public void dataReset() { resetData(); }
+        });
 
-        JLabel usedHeapBig = new JLabel(memoryXYChartModel.getSeriesName(1),
-                                        new ColorIcon(memoryXYChartModel.getSeriesColor(1), Color.BLACK, 18, 9),
-                                        SwingConstants.LEADING);
-        usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-        bigLegendPanel = new JPanel();
-        bigLegendPanel.add(heapSizeBig);
-        bigLegendPanel.add(usedHeapBig);
-
-        // --- Small legend panel --------------------------------------------------
-        JLabel heapSizeSmall = new JLabel(memoryXYChartModel.getSeriesName(0),
-                                          new ColorIcon(memoryXYChartModel.getSeriesColor(0), null, 8, 8), SwingConstants.LEADING);
-        heapSizeSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-        heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-        JLabel usedHeapSmall = new JLabel(memoryXYChartModel.getSeriesName(1),
-                                          new ColorIcon(memoryXYChartModel.getSeriesColor(1), null, 8, 8), SwingConstants.LEADING);
-        usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-        usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-        smallLegendPanel = new JPanel();
-        smallLegendPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
-        smallLegendPanel.setBackground(Color.WHITE);
-        smallLegendPanel.setBorder(new LineBorder(new Color(235, 235, 235), 1));
-        smallLegendPanel.add(heapSizeSmall);
-        smallLegendPanel.add(usedHeapSmall);
-
-        // --- Chart panel ---------------------------------------------------------
-        xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01) {
-                public String getToolTipText(MouseEvent event) {
-                    return getChartToolTipText(event);
-                }
-                public Point getToolTipLocation(MouseEvent event) {
-                    return new Point(event.getX(), event.getY() + 20);
-                }
-            };
-
-        if (completeFunctionality) {
-            xyChart.setTopChartMargin(50);
-            xyChart.allowSelection();
-            xyChart.setMinimumVerticalMarksDistance(50);
-        } else {
-            xyChart.setTopChartMargin(20);
-            xyChart.denySelection();
-            xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
-        }
-
-        xyChart.setVerticalAxisValueDivider(1024 * 1024);
-        xyChart.setVerticalAxisValueString("M"); // NOI18N
-
-        long time = System.currentTimeMillis();
-        xyChart.setupInitialAppearance(time, time + 1200, 0, 2);
-        getAccessibleContext().setAccessibleName(CHART_ACCESS_NAME);
-        xyChart.setAccessibleContext(getAccessibleContext());
-
-        chartDataReset();
-
-        if (backgroundPaint != null) {
-            setOpaque(true);
-            setBackground(backgroundPaint);
-            xyChart.setBackgroundPaint(backgroundPaint);
-        }
-
-        xyChart.setModel(memoryXYChartModel);
-
-        if (!completeFunctionality) {
-            memoryXYChartModel.addChartModelListener(this); // Needs to be AFTER xyChart.setModel() !!!
-        }
-
-        add(xyChart);
-
-        xyChart.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
-                        if (detailsAction != null) {
-                            detailsAction.actionPerformed(null);
-                        }
-                    }
-                }
-            });
-
-        ToolTipManager.sharedInstance().registerComponent(xyChart);
+        // Initialize chart & legend
+        resetData();
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public JPanel getBigLegendPanel() {
-        return bigLegendPanel;
+    // --- GraphPanel implementation -------------------------------------------
+
+    public Action[] getActions() {
+        return chartActions;
     }
 
-    // ------------------------------------------------------------------------------------------
-    // Public API
-    public SynchronousXYChart getChart() {
-        return xyChart;
-    }
 
-    public String getChartToolTipText(MouseEvent event) {
-        if (memoryXYChartModel.getItemCount() < 2) {
-            return null;
-        }
+    // --- Private implementation ----------------------------------------------
 
-        StringBuffer toolTipBuffer = new StringBuffer();
-
-        toolTipBuffer.append("<html>"); // NOI18N
-
-        if (!completeFunctionality || !xyChart.hasValidDataForPosition(event.getX(), event.getY())) {
-            appendToolTipItem(toolTipBuffer, TOTAL_MEMORY_CURRENT_STRING,
-                              intFormat.format(memoryXYChartModel.getYValue(memoryXYChartModel.getItemCount() - 1, 0)) + " B",
-                              false); // NOI18N
-            appendToolTipItem(toolTipBuffer, USED_MEMORY_CURRENT_STRING,
-                              intFormat.format(memoryXYChartModel.getYValue(memoryXYChartModel.getItemCount() - 1, 1)) + " B",
-                              false); // NOI18N
-            appendToolTipItem(toolTipBuffer, USED_MEMORY_MAXIMUM_STRING,
-                              intFormat.format(memoryXYChartModel.getMaxYValue(1)) + " B", true); // NOI18N
-        } else {
-            appendToolTipItem(toolTipBuffer, TOTAL_MEMORY_CURRENT_STRING,
-                              intFormat.format(memoryXYChartModel.getYValue(memoryXYChartModel.getItemCount() - 1, 0)) + " B",
-                              false); // NOI18N
-            appendToolTipItem(toolTipBuffer, USED_MEMORY_CURRENT_STRING,
-                              intFormat.format(memoryXYChartModel.getYValue(memoryXYChartModel.getItemCount() - 1, 1)) + " B",
-                              false); // NOI18N
-            appendToolTipItem(toolTipBuffer, USED_MEMORY_MAXIMUM_STRING,
-                              intFormat.format(memoryXYChartModel.getMaxYValue(1)) + " B", false); // NOI18N
-
-            toolTipBuffer.append("<br>"); // NOI18N
-
-            appendToolTipItem(toolTipBuffer, TIME_AT_CURSOR_STRING, xyChart.getTimeAtPosition(event.getX()), false);
-            appendToolTipItem(toolTipBuffer, TOTAL_MEMORY_AT_CURSOR_STRING,
-                              intFormat.format(xyChart.getYValueAtPosition(event.getX(), 0)) + " B", false); // NOI18N
-            appendToolTipItem(toolTipBuffer, USED_MEMORY_AT_CURSOR_STRING,
-                              intFormat.format(xyChart.getYValueAtPosition(event.getX(), 1)) + " B", true); // NOI18N
-        }
-
-        toolTipBuffer.append("</html>"); // NOI18N
-
-        return toolTipBuffer.toString();
-    }
-
-    public JPanel getSmallLegendPanel() {
-        return smallLegendPanel;
-    }
-
-    // --- ChartModelListener ----------------------------------------------------
-    public void chartDataChanged() {
-        if (!completeFunctionality) {
-            if (xyChart.isFitToWindow()
-                    && ((memoryXYChartModel.getMaxXValue() - memoryXYChartModel.getMinXValue()) >= chartTimeLength)) { // after 3 minutes switch from fitToWindow to trackingEnd
-                UIUtils.runInEventDispatchThread(new Runnable() {
-                        public void run() {
-                            xyChart.setTrackingEnd();
-                        }
-                    });
+    private void updateData() {
+        if (smallPanel) {
+            if (chart.fitsWidth()) {
+                VMTelemetryDataManager manager = models.getDataManager();
+                long[] timestamps = manager.timeStamps;
+                if (timestamps[manager.getItemCount() - 1] - timestamps[0] >=
+                    SMALL_CHART_FIT_TO_WINDOW_PERIOD)
+                        chart.setFitsWidth(false);
             }
+        } else {
         }
     }
 
-    // --- VMTelemetryXYChartModelDataResetListener ------------------------------
-    public void chartDataReset() {
-        UIUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    xyChart.resetChart();
+    private void resetData() {
+        if (smallPanel) {
+            chart.setScale(INITIAL_CHART_SCALEX, 1);
+            chart.setOffset(0, 0);
+            chart.setFitsWidth(true);
+        } else {
+            chart.setScale(INITIAL_CHART_SCALEX, 1);
+            chart.setOffset(0, 0);
+            chart.setFitsWidth(false);
+        }
+    }
 
-                    if (completeFunctionality) {
-                        //xyChart.setScale(0.01);
-                        //xyChart.setViewOffsetX(0);
-                        xyChart.resetTrackingEnd();
-                        xyChart.resetFitToWindow();
-                    } else {
-                        xyChart.setFitToWindow();
-                    }
+    
+    private void initComponents(final Action chartAction) {
+        // Chart
+        chart = createChart(models.memoryItemsModel(),
+                            createMemoryPaintersModel(), smallPanel);
+        chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
+        chart.setViewInsets(new Insets(10, 0, 0, 0));
+
+        // Horizontal axis
+        AxisComponent hAxis =
+                new AxisComponent(chart, AxisMarksComputer.createTimeMarksComputer(
+                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
+                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                         SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
+
+//        // Vertical axis
+//        AxisComponent vAxis =
+//                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
+//                         100, chart.getChartContext(), SwingConstants.VERTICAL),
+//                         new AxisComponent.SimplePainter(),
+//                         SwingConstants.WEST);
+
+        // Chart panel (chart & axes)
+        JPanel chartPanel = new JPanel(new CrossBorderLayout());
+        chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
+        chartPanel.setBorder(BorderFactory.createMatteBorder(
+                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+        chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
+        chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
+                                              SwingConstants.SOUTH_WEST });
+//        chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
+//                                              SwingConstants.SOUTH_WEST });
+
+        // Small panel UI
+        if (smallPanel) {
+
+            // Customize chart
+            chart.setMouseZoomingEnabled(false);
+            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
+
+            // Heap Size
+            JLabel heapSizeSmall = new JLabel(GraphsUI.HEAP_SIZE_NAME,
+                                              new ColorIcon(GraphsUI.
+                                              HEAP_SIZE_PAINTER_FILL_COLOR, null,
+                                              8, 8), SwingConstants.LEADING);
+            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
+            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
+            // Used heap
+            JLabel usedHeapSmall = new JLabel(GraphsUI.USED_HEAP_NAME,
+                                              new ColorIcon(GraphsUI.
+                                              USED_HEAP_PAINTER_FILL_COLOR, null,
+                                              8, 8), SwingConstants.LEADING);
+            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
+            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
+            // Legend container
+            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
+            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
+            smallLegendPanel.add(heapSizeSmall);
+            smallLegendPanel.add(usedHeapSmall);
+            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+            smallLegendContainer.add(smallLegendPanel);
+
+            // Master UI
+            setLayout(new BorderLayout());
+            add(chartPanel, BorderLayout.CENTER);
+            add(smallLegendContainer, BorderLayout.SOUTH);
+
+            
+            // Doubleclick action
+            chart.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isLeftMouseButton(e) &&
+                        e.getClickCount() == 2)
+                            chartAction.actionPerformed(null);
                 }
             });
-    }
 
-    // --- ToolTip stuff ---------------------------------------------------------
-    private static void appendToolTipItem(StringBuffer toolTipBuffer, String itemName, String itemValue, boolean lastItem) {
-        toolTipBuffer.append("&nbsp;<b>"); // NOI18N
-        toolTipBuffer.append(itemName);
-        toolTipBuffer.append("</b>: "); // NOI18N
-        toolTipBuffer.append(itemValue);
-        toolTipBuffer.append("&nbsp;"); // NOI18N
+            // Toolbar actions
+            chartActions = new Action[] {};
 
-        if (!lastItem) {
-            toolTipBuffer.append("<br>"); // NOI18N
+        // Big panel UI
+        } else {
+
+            // Setup tooltip painter
+            ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(
+                                                GraphsUI.TOOLTIP_OVERLAY_LINE_WIDTH,
+                                                GraphsUI.TOOLTIP_OVERLAY_LINE_COLOR,
+                                                GraphsUI.TOOLTIP_OVERLAY_FILL_COLOR,
+                                                getTooltipModel());
+
+            // Customize chart
+            chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart,
+                                                                   tooltipPainter));
+
+            // Chart scrollbar
+            JScrollBar hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+            chart.attachHorizontalScrollBar(hScrollBar);
+
+            // Chart container (chart panel & scrollbar)
+            JPanel chartContainer = new JPanel(new BorderLayout());
+            chartContainer.setBorder(new BevelBorder(BevelBorder.LOWERED));
+            chartContainer.add(chartPanel, BorderLayout.CENTER);
+            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
+
+            // Heap Size
+            JLabel heapSizeBig = new JLabel(GraphsUI.HEAP_SIZE_NAME,
+                                            new ColorIcon(GraphsUI.
+                                            HEAP_SIZE_PAINTER_FILL_COLOR, Color.
+                                            BLACK, 18, 9), SwingConstants.LEADING);
+            heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
+            // Used heap
+            JLabel usedHeapBig = new JLabel(GraphsUI.USED_HEAP_NAME,
+                                            new ColorIcon(GraphsUI.
+                                            USED_HEAP_PAINTER_FILL_COLOR, Color.
+                                            BLACK, 18, 9), SwingConstants.LEADING);
+            usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+
+            // Legend container
+            JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 10));
+            bigLegendPanel.add(heapSizeBig);
+            bigLegendPanel.add(usedHeapBig);
+
+            // Master UI
+            setLayout(new BorderLayout());
+            add(chartContainer, BorderLayout.CENTER);
+            add(bigLegendPanel, BorderLayout.SOUTH);
+
+
+            // Toolbar actions
+            chartActions = new Action[] { chart.zoomInAction(),
+                                          chart.zoomOutAction(),
+                                          chart.toggleViewAction()};
+
         }
+
     }
+    
+
+    protected ProfilerXYTooltipModel createTooltipModel() {
+        return new ProfilerXYTooltipModel() {
+
+            public String getTimeValue(long timestamp) {
+                return DATE_FORMATTER.format(new Date(timestamp));
+            }
+
+            public int getRowsCount() {
+                return 2;
+            }
+
+            public String getRowName(int index) {
+                switch (index) {
+                    case 0:
+                        return GraphsUI.HEAP_SIZE_NAME;
+                    case 1:
+                        return GraphsUI.USED_HEAP_NAME;
+                    default:
+                        return null;
+                }
+            }
+
+            public Color getRowColor(int index) {
+                switch (index) {
+                    case 0:
+                        return GraphsUI.HEAP_SIZE_PAINTER_FILL_COLOR;
+                    case 1:
+                        return GraphsUI.USED_HEAP_PAINTER_FILL_COLOR;
+                    default:
+                        return null;
+                }
+            }
+
+            public String getRowValue(int index, long itemValue) {
+                return INT_FORMATTER.format(itemValue);
+            }
+
+            public String getRowUnits(int index, long itemValue) {
+                return "B";
+            }
+
+            public int getExtraRowsCount() {
+                return getRowsCount();
+            }
+
+            public String getExtraRowName(int index) {
+                return "Max " + getRowName(index);
+            }
+
+            public Color getExtraRowColor(int index) {
+                return getRowColor(index);
+            }
+
+            public String getExtraRowValue(int index) {
+                ProfilerXYItem item = models.memoryItemsModel().getItem(index);
+                return INT_FORMATTER.format(item.getMaxYValue());
+            }
+
+            public String getExtraRowUnits(int index) {
+                return getRowUnits(index, -1);
+            }
+
+        };
+    }
+
+    private ProfilerXYPaintersModel createMemoryPaintersModel() {
+        // Heap size
+        ProfilerXYItemPainter heapSizePainter =
+                ProfilerXYItemPainter.absolutePainter(GraphsUI.HEAP_SIZE_PAINTER_LINE_WIDTH,
+                                                      GraphsUI.HEAP_SIZE_PAINTER_LINE_COLOR,
+                                                      GraphsUI.HEAP_SIZE_PAINTER_FILL_COLOR);
+        ProfilerXYItemMarker heapSizeMarker =
+                 ProfilerXYItemMarker.absolutePainter(GraphsUI.HEAP_SIZE_MARKER_RADIUS,
+                                                      GraphsUI.HEAP_SIZE_MARKER_LINE1_WIDTH,
+                                                      GraphsUI.HEAP_SIZE_MARKER_LINE1_COLOR,
+                                                      GraphsUI.HEAP_SIZE_MARKER_LINE2_WIDTH,
+                                                      GraphsUI.HEAP_SIZE_MARKER_LINE2_COLOR,
+                                                      GraphsUI.HEAP_SIZE_MARKER_FILL_COLOR);
+        XYItemPainter hsp = new CompoundProfilerXYItemPainter(heapSizePainter,
+                                                      heapSizeMarker);
+
+        // Used heap
+        ProfilerXYItemPainter usedHeapPainter =
+                ProfilerXYItemPainter.absolutePainter(GraphsUI.USED_HEAP_PAINTER_LINE_WIDTH,
+                                                      GraphsUI.USED_HEAP_PAINTER_LINE_COLOR,
+                                                      GraphsUI.USED_HEAP_PAINTER_FILL_COLOR);
+        ProfilerXYItemMarker usedHeapMarker =
+                 ProfilerXYItemMarker.absolutePainter(GraphsUI.USED_HEAP_MARKER_RADIUS,
+                                                      GraphsUI.USED_HEAP_MARKER_LINE1_WIDTH,
+                                                      GraphsUI.USED_HEAP_MARKER_LINE1_COLOR,
+                                                      GraphsUI.USED_HEAP_MARKER_LINE2_WIDTH,
+                                                      GraphsUI.USED_HEAP_MARKER_LINE2_COLOR,
+                                                      GraphsUI.USED_HEAP_MARKER_FILL_COLOR);
+        XYItemPainter uhp = new CompoundProfilerXYItemPainter(usedHeapPainter,
+                                                      usedHeapMarker);
+
+        // Model
+        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
+                                            new XYItemPainter[] { hsp, uhp });
+
+        return model;
+    }
+
 }
