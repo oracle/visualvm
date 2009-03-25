@@ -34,45 +34,50 @@ import javax.swing.SwingConstants;
  */
 public abstract class AxisMarksComputer {
 
+    // --- Abstract definition -------------------------------------------------
+
+
     public abstract Iterator<Mark> marksIterator(int start, int end);
     
     
-    public static AxisMarksComputer simpleComputer(int step,
-                                                   ChartContext chartContext,
-                                                   int orientation) {
-        return new SimpleComputer(step, chartContext, orientation);
+    // --- Time computer -------------------------------------------------------
+
+    public static AxisMarksComputer createTimeMarksComputer(ChartContext context,
+                                                            int orientation,
+                                                            int minMarksDistance) {
+        
+        return new TimeMarksComputer(context, orientation, minMarksDistance);
     }
 
-//    public static AxisMarksComputer percentComputer(ChartContext chartContext,
-//                                                   int orientation) {
-//        return new PercentComputer(chartContext, orientation);
-//    }
+    private static class TimeMarksComputer extends AxisMarksComputer {
+        
+        private final ChartContext context;
+        private final int orientation;
+        private final int minMarksDistance;
+
+        private final boolean horizontal;
+        private final boolean reverse;
 
 
-    private static class SimpleComputer extends AxisMarksComputer {
+        public TimeMarksComputer(ChartContext context, int orientation,
+                                 int minMarksDistance) {
+            this.context = context;
+            this.orientation = orientation;
+            this.minMarksDistance = minMarksDistance;
 
-        private int step;
-        private boolean horizontal;
-        private boolean reverse;
-        private ChartContext chartContext;
-
-
-        public SimpleComputer(int step, ChartContext chartContext, int orientation) {
-            this.step = step;
-            this.chartContext = chartContext;
             horizontal = orientation == SwingConstants.HORIZONTAL;
-            reverse = horizontal ? chartContext.isRightBased() :
-                                   chartContext.isBottomBased();
+            reverse = horizontal ? context.isRightBased() :
+                                   context.isBottomBased();
         }
 
-
         public Iterator<Mark> marksIterator(int start, int end) {
+            final long step = getTimeUnits(context, horizontal, minMarksDistance);
             final long dataStart = horizontal ?
-                                   ((long)chartContext.getDataX(start) / step) * step :
-                                   ((long)chartContext.getDataY(start) / step) * step;
+                                   ((long)context.getDataX(start) / step) * step :
+                                   ((long)context.getDataY(start) / step) * step;
             final long dataEnd = horizontal ?
-                                   ((long)chartContext.getDataX(end) / step) * step :
-                                   ((long)chartContext.getDataY(end) / step) * step;
+                                   ((long)context.getDataX(end) / step) * step :
+                                   ((long)context.getDataY(end) / step) * step;
             final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
             final long[] iterIndex = new long[] { 0 };
 
@@ -96,8 +101,63 @@ public abstract class AxisMarksComputer {
                 }
 
             };
+
         }
 
+    }
+
+
+    // --- Decimal computer ----------------------------------------------------
+
+
+    // --- Percent computer ----------------------------------------------------
+
+
+    // --- General support -----------------------------------------------------
+
+    private static final long[] decimalUnitsGrid = new long[] { 1, 2, 5 };
+
+    private static final long[] timeUnitsGrid = new long[] {
+        1 /*1*/, 2 /*2*/, 5 /*5*/, 10 /*10*/, 20 /*20*/, 50 /*50*/, 100 /*100*/, 250 /*250*/, 500 /*500*/,  // milliseconds
+        1000 /*1*/, 2000 /*2*/, 5000 /*5*/, 10000 /*10*/, 15000 /*15*/, 30000 /*30*/,                       // seconds
+        60000 /*1*/, 120000 /*2*/, 300000 /*5*/, 600000 /*10*/, 900000 /*15*/, 1800000 /*30*/,              // minutes
+        3600000 /*1*/, 7200000 /*2*/, 10800000 /*3*/, 21600000 /*6*/, 43200000 /*12*/,                      // hours
+        86400000 /*1*/, 172800000 /*2*/,                                                                    // days
+        604800000 /*1*/, 1209600000 /*2*/,                                                                  // weeks
+        2628000000l /*1*/, 5256000000l /*2*/, 7884000000l /*3*/, 15768000000l /*6*/,                        // months (NOTE: not exactly!!!)
+        31536000000l /*1*/, 63072000000l /*2*/, 157680000000l /*5*/, 315360000000l /*10*/                   // years (NOTE: not exactly!!!)
+    };
+
+
+    public static long getDecimalUnits(ChartContext context, boolean horizontal,
+                                       int minDistance) {
+
+        long decimalFactor = 1;
+
+        while (true) {
+            for (int i = 0; i < decimalUnitsGrid.length; i++) {
+                long distance = horizontal ?
+                                (long)context.getViewWidth(timeUnitsGrid[i]) :
+                                (long)context.getViewHeight(timeUnitsGrid[i]);
+                if ((distance * decimalFactor) >= minDistance)
+                    return decimalUnitsGrid[i] * decimalFactor;
+            }
+
+            decimalFactor *= 10;
+        }
+    }
+
+    public static long getTimeUnits(ChartContext context, boolean horizontal,
+                                    int minDistance) {
+        
+        for (int i = 0; i < timeUnitsGrid.length; i++) {
+            long distance = horizontal ?
+                                (long)context.getViewWidth(timeUnitsGrid[i]) :
+                                (long)context.getViewHeight(timeUnitsGrid[i]);
+            if (distance >= minDistance) return timeUnitsGrid[i];
+        }
+
+        return timeUnitsGrid[timeUnitsGrid.length - 1];
     }
 
 
