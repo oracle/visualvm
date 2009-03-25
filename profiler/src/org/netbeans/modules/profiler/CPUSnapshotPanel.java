@@ -1113,15 +1113,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
-            cctPanel.exportData(exportedFileType,eDD,false);
+            cctPanel.exportData(exportedFileType,eDD,false, getTitle());
         } else if (tabs.getSelectedComponent() instanceof SnapshotFlatProfilePanel) { // Hot Spots
-            flatPanel.exportData(exportedFileType,eDD,false);
+            flatPanel.exportData(exportedFileType,eDD,false, getTitle());
         } else if (tabs.getSelectedComponent() instanceof SubtreeCallGraphPanel) { //Subtree
-            subtreeView.exportData(exportedFileType,eDD);
+            subtreeView.exportData(exportedFileType,eDD, getTitle());
         } else if (tabs.getSelectedComponent() instanceof ReverseCallGraphPanel) { //Back Trace
-            backtraceView.exportData(exportedFileType,eDD);
+            backtraceView.exportData(exportedFileType,eDD, getTitle());
         } else if (tabs.getSelectedComponent()==combined) { // Combined
-            combined.exportData(exportedFileType,eDD);
+            combined.exportData(exportedFileType,eDD, getTitle());
         }
     }
 

@@ -461,7 +461,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             return Math.ceil((dataOffsetX - dataX) * scaleX) +
                     offsetX + getWidth() - viewInsets.right;
         } else {
-            return Math.floor((dataX - dataOffsetX) * scaleX) -
+            return Math.ceil((dataX - dataOffsetX) * scaleX) -
                                offsetX + viewInsets.left;
         }
     }
@@ -479,7 +479,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             return Math.ceil((dataOffsetY - dataY) * scaleY) +
                     offsetY + getHeight() - viewInsets.bottom;
         } else {
-            return Math.floor((dataY - dataOffsetY) * scaleY) -
+            return Math.ceil((dataY - dataOffsetY) * scaleY) -
                                offsetY + viewInsets.top;
         }
     }
@@ -506,7 +506,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             return dataOffsetX - Math.ceil((viewX + viewInsets.right -
                                             offsetX - getWidth()) / scaleX);
         } else {
-            return Math.floor((viewX + offsetX - viewInsets.left) /
+            return Math.ceil((viewX + offsetX - viewInsets.left) /
                                scaleX) + dataOffsetX;
         }
     }
@@ -524,7 +524,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             return dataOffsetY - Math.ceil((viewY + viewInsets.bottom -
                                             offsetY - getHeight()) / scaleY);
         } else {
-            return Math.floor((viewY + offsetY - viewInsets.top) /
+            return Math.ceil((viewY + offsetY - viewInsets.top) /
                                scaleY) + dataOffsetY;
         }
     }
@@ -726,11 +726,11 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private void updateContentsWidths() {
         if (fitsWidth) contentsWidth = getWidth();
-        else contentsWidth = (long)getViewWidth(dataWidth) + viewInsets.left +
+        else contentsWidth = (long)Math.ceil(getViewWidth(dataWidth)) + viewInsets.left +
                              viewInsets.right;
 
         if (fitsHeight) contentsHeight = getHeight();
-        else contentsHeight = (long)getViewHeight(dataHeight) + viewInsets.top +
+        else contentsHeight = (long)Math.ceil(getViewHeight(dataHeight)) + viewInsets.top +
                               viewInsets.bottom;
     }
 
