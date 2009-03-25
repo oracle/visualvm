@@ -164,7 +164,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         return result;
     }
 
-    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+    public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
         switch (exportedFileType) {
             case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
                     callGraphManager.getRootNode().exportCSVData(",", 0, eDD); //NOI18N
@@ -174,20 +174,19 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                     callGraphManager.getRootNode().exportCSVData(";", 0, eDD); //NOI18N
                     eDD.close();
                     break;
-            case 3: eDD.dumpData(getXMLHeader());
+            case 3: eDD.dumpData(getXMLHeader(viewName));
                     callGraphManager.getRootNode().exportXMLData(eDD, " "); //NOI18N
                     eDD.dumpDataAndClose(getXMLFooter());
                     break;
-            case 4: eDD.dumpData(getHTMLHeader());
+            case 4: eDD.dumpData(getHTMLHeader(viewName));
                     callGraphManager.getRootNode().exportHTMLData(eDD,0);
                     eDD.dumpDataAndClose(getHTMLFooter());
                     break;
         }
-
     }
 
-    private StringBuffer getHTMLHeader() {
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>Memory Allocation Stack Traces</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+    private StringBuffer getHTMLHeader(String viewName) {
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
         result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th><th>"+messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+"</th></tr>"); //NOI18N
         return result;
     }
@@ -196,9 +195,9 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         return new StringBuffer("</TABLE></BODY></HTML>"); //NOI18N
     }
 
-    private StringBuffer getXMLHeader() {
+    private StringBuffer getXMLHeader(String viewName) {
         String newline = System.getProperty("line.separator"); // NOI18N
-        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\"Memory allocation stack trace\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
         return result;
     }
 

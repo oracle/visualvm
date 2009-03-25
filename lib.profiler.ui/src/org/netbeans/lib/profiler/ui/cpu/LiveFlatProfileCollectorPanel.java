@@ -325,18 +325,22 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         this.setPreferredSize(new Dimension(800, 600));
     }
 
-    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+    public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
+        percentFormat.setMaximumFractionDigits(2);
+        percentFormat.setMinimumFractionDigits(2);
         switch (exportedFileType) {
             case 1: exportCSV(",", eDD); break; //NOI18N
             case 2: exportCSV(";", eDD); break; //NOI18N
-            case 3: exportXML(eDD); break;
-            case 4: exportHTML(eDD); break;
+            case 3: exportXML(eDD, viewName); break;
+            case 4: exportHTML(eDD, viewName); break;
         }
+        percentFormat.setMaximumFractionDigits(1);
+        percentFormat.setMinimumFractionDigits(0);
     }
 
-    private void exportHTML(ExportDataDumper eDD) {
+    private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
             result.append("<th>"+columnNames[i]+"</th>"); //NOI18N
         }
@@ -346,18 +350,18 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         eDD.dumpData(result);
         for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>"); //NOI18N
-            result.append("<td align=\"char\">"+flatProfileContainer.getPercentAtRow(i)+" %</td>"); //NOI18N
-            result.append("<td align=char>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>"); //NOI18N
+            result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
+            result.append("<td align=right>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>"); //NOI18N
             result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>"); //NOI18N
             eDD.dumpData(result);
         }
         eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>")); //NOI18N
     }
 
-    private void exportXML(ExportDataDumper eDD) {
+    private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
         String newline = System.getProperty("line.separator"); // NOI18N
-        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+this.getViewName()+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
             result.append("   <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline); //NOI18N
         }
@@ -366,7 +370,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
         for (int i=0; i < (flatProfileContainer.getNRows()); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline); //NOI18N
-            result.append("    <TableColumn><![CDATA["+flatProfileContainer.getPercentAtRow(i)+" %]]></TableColumn>"+newline); //NOI18N
+            result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+"]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline); //NOI18N
             eDD.dumpData(result);
