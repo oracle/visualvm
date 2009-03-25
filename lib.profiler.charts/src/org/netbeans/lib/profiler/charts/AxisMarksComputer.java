@@ -27,6 +27,8 @@ package org.netbeans.lib.profiler.charts;
 
 import java.util.Iterator;
 import javax.swing.SwingConstants;
+import org.netbeans.lib.profiler.charts.xy.XYItem;
+import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 
 /**
  *
@@ -42,14 +44,7 @@ public abstract class AxisMarksComputer {
     
     // --- Time computer -------------------------------------------------------
 
-    public static AxisMarksComputer createTimeMarksComputer(ChartContext context,
-                                                            int orientation,
-                                                            int minMarksDistance) {
-        
-        return new TimeMarksComputer(context, orientation, minMarksDistance);
-    }
-
-    private static class TimeMarksComputer extends AxisMarksComputer {
+    public static class TimeMarksComputer extends AxisMarksComputer {
         
         private final ChartContext context;
         private final int orientation;
@@ -71,7 +66,10 @@ public abstract class AxisMarksComputer {
         }
 
         public Iterator<Mark> marksIterator(int start, int end) {
-            final long step = getTimeUnits(context, horizontal, minMarksDistance);
+            double scale =  horizontal ? context.getViewWidth(1d) :
+                                         context.getViewHeight(1d);
+            
+            final long step = getTimeUnits(scale, minMarksDistance);
             final long dataStart = horizontal ?
                                    ((long)context.getDataX(start) / step) * step :
                                    ((long)context.getDataY(start) / step) * step;
@@ -109,6 +107,123 @@ public abstract class AxisMarksComputer {
 
     // --- Decimal computer ----------------------------------------------------
 
+    public static class VerticalDecimalComputer extends AxisMarksComputer {
+
+        private final XYItem item;
+        private final XYItemPainter painter;
+        private final ChartContext context;
+        private final int minMarksDistance;
+
+        private final boolean reverse;
+
+
+        public VerticalDecimalComputer(XYItem item, XYItemPainter painter,
+                                       ChartContext context, int minMarksDistance) {
+            this.item = item;
+            this.painter = painter;
+            this.context = context;
+            this.minMarksDistance = minMarksDistance;
+
+            reverse = context.isBottomBased();
+        }
+
+        public Iterator<Mark> marksIterator(int start, int end) {
+            double scale = painter.getItemValueScale(item, context);
+            final long step = getDecimalUnits(scale, minMarksDistance);
+            final long dataStart = ((long)painter.getItemValue(start, item,
+                                          context) / step) * step;
+            final long dataEnd = ((long)painter.getItemValue(end, item,
+                                          context) / step) * step;
+            final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
+            final long[] iterIndex = new long[] { 0 };
+
+
+            return new Iterator<Mark>() {
+
+                public boolean hasNext() {
+                    return iterIndex[0] < iterCount;
+                }
+
+                public Mark next() {
+                    long value = reverse ? dataStart - iterIndex[0] * step :
+                                           dataStart + iterIndex[0] * step;
+
+                    iterIndex[0]++;
+                    return new Mark(value);
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException(
+                              "AxisMarksComputer does not support remove()");
+                }
+
+            };
+
+        }
+
+    }
+
+
+    // --- Decimal computer ----------------------------------------------------
+
+    public static class VerticalBytesComputer extends AxisMarksComputer {
+
+        private final XYItem item;
+        private final XYItemPainter painter;
+        private final ChartContext context;
+        private final int minMarksDistance;
+
+        private final boolean reverse;
+
+
+        public VerticalBytesComputer(XYItem item, XYItemPainter painter,
+                                     ChartContext context, int minMarksDistance) {
+            this.item = item;
+            this.painter = painter;
+            this.context = context;
+            this.minMarksDistance = minMarksDistance;
+
+            reverse = context.isBottomBased();
+        }
+
+        public Iterator<Mark> marksIterator(int start, int end) {
+            double scale = painter.getItemValueScale(item, context);
+            long[] units = getBytesUnits(scale, minMarksDistance);
+            final long step = units[0];
+            final int radix = (int)units[1];
+            final long dataStart = ((long)painter.getItemValue(start, item,
+                                          context) / step) * step;
+            final long dataEnd = ((long)painter.getItemValue(end, item,
+                                          context) / step) * step;
+            final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
+            final long[] iterIndex = new long[] { 0 };
+
+
+            return new Iterator<Mark>() {
+
+                public boolean hasNext() {
+                    return iterIndex[0] < iterCount;
+                }
+
+                public Mark next() {
+                    long value = reverse ? dataStart - iterIndex[0] * step :
+                                           dataStart + iterIndex[0] * step;
+
+                    iterIndex[0]++;
+                    return new BytesMark(value, radix);
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException(
+                              "AxisMarksComputer does not support remove()");
+                }
+
+            };
+
+        }
+
+    }
+
 
     // --- Percent computer ----------------------------------------------------
 
@@ -116,6 +231,8 @@ public abstract class AxisMarksComputer {
     // --- General support -----------------------------------------------------
 
     private static final long[] decimalUnitsGrid = new long[] { 1, 2, 5 };
+
+    private static final long[] bytesUnitsGrid = new long[] { 1, 2, 5, 10, 25, 50, 100, 250, 500 };
 
     private static final long[] timeUnitsGrid = new long[] {
         1 /*1*/, 2 /*2*/, 5 /*5*/, 10 /*10*/, 20 /*20*/, 50 /*50*/, 100 /*100*/, 250 /*250*/, 500 /*500*/,  // milliseconds
@@ -129,36 +246,58 @@ public abstract class AxisMarksComputer {
     };
 
 
-    public static long getDecimalUnits(ChartContext context, boolean horizontal,
-                                       int minDistance) {
+    public static long getDecimalUnits(double scale, int minDistance) {
+        if (scale == 0) return decimalUnitsGrid[0];
 
         long decimalFactor = 1;
 
         while (true) {
-            for (int i = 0; i < decimalUnitsGrid.length; i++) {
-                long distance = horizontal ?
-                                (long)context.getViewWidth(timeUnitsGrid[i]) :
-                                (long)context.getViewHeight(timeUnitsGrid[i]);
-                if ((distance * decimalFactor) >= minDistance)
+            for (int i = 0; i < decimalUnitsGrid.length; i++)
+                if ((decimalUnitsGrid[i] * scale * decimalFactor) >= minDistance)
                     return decimalUnitsGrid[i] * decimalFactor;
-            }
 
             decimalFactor *= 10;
         }
     }
 
-    public static long getTimeUnits(ChartContext context, boolean horizontal,
-                                    int minDistance) {
-        
-        for (int i = 0; i < timeUnitsGrid.length; i++) {
-            long distance = horizontal ?
-                                (long)context.getViewWidth(timeUnitsGrid[i]) :
-                                (long)context.getViewHeight(timeUnitsGrid[i]);
-            if (distance >= minDistance) return timeUnitsGrid[i];
-        }
+    public static long[] getBytesUnits(double scale, int minDistance) {
+        if (scale == 0) return new long[] { bytesUnitsGrid[0], 1 };
 
+        long bytesFactor = 1;
+        long bytesRadix  = 0;
+
+        while (true) {
+            for (int i = 0; i < bytesUnitsGrid.length; i++)
+                if ((bytesUnitsGrid[i] * scale * bytesFactor) >= minDistance)
+                    return new long[] { bytesUnitsGrid[i] * bytesFactor, bytesRadix };
+
+            bytesFactor *= 1024;
+            bytesRadix  += 1;
+        }
+    }
+
+    public static long getTimeUnits(double scale, int minDistance) {
+
+        if (scale == 0) return timeUnitsGrid[0];
+
+        for (int i = 0; i < timeUnitsGrid.length; i++)
+            if (timeUnitsGrid[i] * scale >= minDistance)
+                return timeUnitsGrid[i];
         return timeUnitsGrid[timeUnitsGrid.length - 1];
     }
+
+//    public static long getTimeUnits(ChartContext context, boolean horizontal,
+//                                    int minDistance) {
+//
+//        for (int i = 0; i < timeUnitsGrid.length; i++) {
+//            long distance = horizontal ?
+//                                (long)context.getViewWidth(timeUnitsGrid[i]) :
+//                                (long)context.getViewHeight(timeUnitsGrid[i]);
+//            if (distance >= minDistance) return timeUnitsGrid[i];
+//        }
+//
+//        return timeUnitsGrid[timeUnitsGrid.length - 1];
+//    }
 
 
 //    private static class PercentComputer extends AxisMarksComputer {
@@ -227,6 +366,20 @@ public abstract class AxisMarksComputer {
         public Mark(long value) { this.value = value; }
 
         public long getValue() { return value; }
+
+    }
+
+    public static class BytesMark extends Mark {
+
+        private final int radix;
+
+
+        public BytesMark(long value, int radix) {
+            super(value);
+            this.radix = radix;
+        }
+
+        public int getRadix() { return radix; }
 
     }
 

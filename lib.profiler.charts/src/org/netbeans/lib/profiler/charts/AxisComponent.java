@@ -42,6 +42,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.charts.AxisMarksComputer.BytesMark;
 
 /**
  *
@@ -151,14 +152,16 @@ public class AxisComponent extends JComponent implements ChartDecorator {
         Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
                                                  viewStart, viewEnd);
 
-        g.setColor(getForeground());
+        int lZeroOffset = chart.isRightBased() ? 0 : 1;
+        int rZeroOffset = chart.isRightBased() ? 1 : 0;
 
         while (marks.hasNext()) {
             AxisMarksComputer.Mark mark = marks.next();
             int x = ChartContext.getCheckedIntValue(chart.getChartContext().getViewX(mark.getValue()));
             x = SwingUtilities.convertPoint(chart, x, 0, this).x;
 
-            if (x < chartMask.x || x >= chartMask.x + chartMask.width) continue;
+            if (x < chartMask.x - lZeroOffset ||
+                x >= chartMask.x + chartMask.width + rZeroOffset) continue;
 
             int height = 10;
             Component painter = marksPainter.getPainter(mark);
@@ -166,6 +169,8 @@ public class AxisComponent extends JComponent implements ChartDecorator {
             int markHeight = painter.getHeight();
             int markOffsetX = painter.getWidth() / 2;
             maxExtent = Math.max(maxExtent, markHeight);
+
+            g.setColor(getForeground());
 
             if (location == SwingConstants.NORTH) {
                 g.drawLine(x, getHeight() - 2, x, getHeight() - 2 - height);
@@ -207,45 +212,46 @@ public class AxisComponent extends JComponent implements ChartDecorator {
             g.drawLine(0, chartMask.y, 0, chartMask.y + chartMask.height);
         }
 
-//        int viewStart = SwingUtilities.convertPoint(this, 0, chartMask.y, chart).y;
-//        int viewEnd = viewStart + chartMask.height;
-////        long dataStart = chart.getChartContext().getDataY(viewStart);
-////        long dataEnd = chart.getChartContext().getDataY(viewStart + chartMask.height);
-//
-//        Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
-//                                                 viewStart, viewEnd);
-//
-//        g.setColor(getForeground());
-//        g.setFont(getFont());
-//
-//        while (marks.hasNext()) {
-//            AxisMarksComputer.Mark mark = marks.next();
-//            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
-//            y = SwingUtilities.convertPoint(chart, 0, y, this).y;
-//
-//            if (y < chartMask.y || y >= chartMask.y + chartMask.height) continue;
-//
-//            int width = 10;
-//            Component painter = marksPainter.getPainter(mark);
-//            painter.setSize(painter.getPreferredSize());
-//            int markWidth = painter.getWidth();
-//            int markOffsetY = painter.getHeight() / 2;
-//            maxExtent = Math.max(maxExtent, markWidth);
-//
-//            if (location == SwingConstants.WEST) {
-//                g.drawLine(getWidth() - 2, y, getWidth() - 2 - width, y);
-//
-//                g.translate(getWidth() - markWidth - 15, y - markOffsetY);
-//                painter.paint(g);
-//                g.translate(-getWidth() + markWidth + 15, -y + markOffsetY);
-//            } else {
-//                g.drawLine(1, y, 1 + width, y);
-//
-//                g.translate(width + 5, y - markOffsetY);
-//                painter.paint(g);
-//                g.translate(-width - 5, -y + markOffsetY);
-//            }
-//        }
+        int viewStart = SwingUtilities.convertPoint(this, 0, chartMask.y, chart).y;
+        int viewEnd = viewStart + chartMask.height;
+
+        Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
+                                                 viewStart, viewEnd);
+
+        int tZeroOffset = chart.isBottomBased() ? 0 : 1;
+        int bZeroOffset = chart.isBottomBased() ? 1 : 0;
+
+        while (marks.hasNext()) {
+            AxisMarksComputer.Mark mark = marks.next();
+            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
+            y = SwingUtilities.convertPoint(chart, 0, y, this).y;
+
+            if (y < chartMask.y - tZeroOffset ||
+                y >= chartMask.y + chartMask.height + bZeroOffset) continue;
+
+            int width = 6;
+            Component painter = marksPainter.getPainter(mark);
+            painter.setSize(painter.getPreferredSize());
+            int markWidth = painter.getWidth();
+            int markOffsetY = painter.getHeight() / 2;
+            maxExtent = Math.max(maxExtent, markWidth);
+
+            g.setColor(getForeground());
+
+            if (location == SwingConstants.WEST) {
+                g.drawLine(getWidth() - 2, y, getWidth() - 2 - width, y);
+
+                g.translate(getWidth() - markWidth - 15, y - markOffsetY);
+                painter.paint(g);
+                g.translate(-getWidth() + markWidth + 15, -y + markOffsetY);
+            } else {
+                g.drawLine(1, y, 1 + width, y);
+
+                g.translate(width + 5, y - markOffsetY);
+                painter.paint(g);
+                g.translate(-width - 5, -y + markOffsetY);
+            }
+        }
     }
 
     private void paintVerticalAxisMesh(Graphics2D g, Rectangle clip, Rectangle chartMask) {
@@ -314,6 +320,47 @@ public class AxisComponent extends JComponent implements ChartDecorator {
 
         public Component getPainter(Mark mark) {
             setText(Long.toString(mark.getValue()));
+            return this;
+        }
+
+    }
+
+    public static class BytesPainter extends JLabel implements MarkValuePainter {
+
+        public Component getPainter(Mark mark) {
+            BytesMark bmark = (BytesMark)mark;
+
+            long value = bmark.getValue();
+            int radix = bmark.getRadix();
+
+            value /= Math.pow(1024, radix);
+
+            String units = "";
+            switch (radix) {
+                case 0:
+                    units = "B";
+                    break;
+                case 1:
+                    units = "KB";
+                    break;
+                case 2:
+                    units = "MB";
+                    break;
+                case 3:
+                    units = "GB";
+                    break;
+                case 4:
+                    units = "TB";
+                    break;
+                case 5:
+                    units = "PB";
+                    break;
+                default:
+                    units = "";
+
+            }
+
+            setText(Long.toString(value) + " " + units);
             return this;
         }
 
