@@ -431,7 +431,7 @@ public abstract class ClassRepository implements CommonConstants {
             }
 
             for (int i = 0; i < extensions.length; i++) {
-                extClassPathElementList.add(extPath + File.separatorChar + extensions[i]);
+                extClassPathElementList.add(extDir.getAbsolutePath() + File.separatorChar + extensions[i]);
             }
         }
 
