@@ -166,28 +166,28 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
-                         100, chart.getChartContext(), SwingConstants.HORIZONTAL),
+                new AxisComponent(chart, AxisMarksComputer.createTimeMarksComputer(
+                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
                          new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
-                         SwingConstants.SOUTH);
+                         SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
-        // Vertical axis
-        AxisComponent vAxis =
-                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
-                         100, chart.getChartContext(), SwingConstants.VERTICAL),
-                         new AxisComponent.SimplePainter(),
-                         SwingConstants.WEST);
+//        // Vertical axis
+//        AxisComponent vAxis =
+//                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
+//                         100, chart.getChartContext(), SwingConstants.VERTICAL),
+//                         new AxisComponent.SimplePainter(),
+//                         SwingConstants.WEST);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
                                               SwingConstants.SOUTH_WEST });
-        chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
-                                              SwingConstants.SOUTH_WEST });
+//        chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
+//                                              SwingConstants.SOUTH_WEST });
 
         // Small panel UI
         if (smallPanel) {
