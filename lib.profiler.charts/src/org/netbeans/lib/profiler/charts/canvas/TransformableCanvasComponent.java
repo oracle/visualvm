@@ -628,8 +628,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             }
         }
 
-        if (offsetX != lastOffsetX || offsetY != lastOffsetY ||
-            lastScaleX != scaleX || lastScaleY != scaleY)
+//        if (offsetX != lastOffsetX || offsetY != lastOffsetY ||
+//            lastScaleX != scaleX || lastScaleY != scaleY)
             viewChanged(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
                     lastOffsetY, lastScaleX, lastScaleY, shiftX, shiftY);
 

@@ -176,6 +176,16 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
 
+    public double getItemView(double dataY, XYItem item, ChartContext context) {
+        if (type == TYPE_ABSOLUTE) {
+            return super.getItemView(dataY, item, context);
+        } else {
+            double itemValueFactor = (double)context.getDataHeight() /
+                                     (double)item.getBounds().height;
+            return context.getViewY(context.getDataOffsetY() + (itemValueFactor * dataY));
+        }
+    }
+
     public double getItemValue(double viewY, XYItem item, ChartContext context) {
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValue(viewY, item, context);
@@ -190,10 +200,11 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValueScale(item, context);
         } else {
-            double itemValueFactor = (double)context.getDataHeight() /
-                                     (double)item.getBounds().height;
-//            System.err.println(">>> itemValueFactor: " + itemValueFactor);
-            return context.getDataHeight(itemValueFactor);
+            long itemHeight = item.getBounds().height;
+            if (itemHeight == 0) return 1;
+
+            double itemValueFactor = (double)context.getDataHeight() / (double)itemHeight;
+            return itemValueFactor / context.getDataHeight(1d);
         }
     }
 

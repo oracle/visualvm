@@ -161,7 +161,7 @@ public class CrossBorderLayout implements LayoutManager2 {
             int height = parent.getHeight() - insets.bottom - insets.top;
 
             int left = insets.left;
-            int right = parent.getWidth() - insets.right - insets.left;
+            int right = parent.getWidth() - insets.right;
             int width = parent.getWidth() - insets.right - insets.left;
 
             int northHeight = north != null ? north.getPreferredSize().height : 0;
@@ -171,7 +171,7 @@ public class CrossBorderLayout implements LayoutManager2 {
 
             if (center != null) {
                 center.setBounds(left + westWidth, top + northHeight,
-                right - eastWidth - westWidth, height - southHeight - northHeight);
+                width - eastWidth - westWidth, height - southHeight - northHeight);
             }
 
             if (north != null) {

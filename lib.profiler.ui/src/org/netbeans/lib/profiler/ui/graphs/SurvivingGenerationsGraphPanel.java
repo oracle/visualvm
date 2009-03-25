@@ -187,6 +187,18 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
                          survgenMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
+        // Surviving generations axis
+        XYItem gcTimeItem = models.generationsItemsModel().getItem(1);
+        XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
+        AxisComponent.PercentPainter gcTimeMarksPainter =
+                new AxisComponent.PercentPainter(0, 1000);
+        gcTimeMarksPainter.setForeground(GraphsUI.GC_TIME_PAINTER_LINE_COLOR);
+        AxisComponent gAxis =
+                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
+                         gcTimeItem, gcTimePainter, chart.getChartContext(), 40),
+                         gcTimeMarksPainter, SwingConstants.EAST,
+                         AxisComponent.MESH_FOREGROUND);
+
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
@@ -197,6 +209,8 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(sAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
+        chartPanel.add(gAxis, new Integer[] { SwingConstants.EAST,
+                                              SwingConstants.SOUTH_EAST });
 
         // Small panel UI
         if (smallPanel) {

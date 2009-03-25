@@ -90,7 +90,9 @@ public abstract class AxisMarksComputer {
                     long value = reverse ? dataStart - iterIndex[0] * step :
                                            dataStart + iterIndex[0] * step;
                     iterIndex[0]++;
-                    return new Mark(value);
+                    int position = ChartContext.getCheckedIntValue(
+                                        context.getViewX(value));
+                    return new Mark(value, position);
                 }
 
                 public void remove() {
@@ -135,6 +137,7 @@ public abstract class AxisMarksComputer {
             final long dataEnd = ((long)painter.getItemValue(end, item,
                                           context) / step) * step;
             final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
+//            System.err.println(">>> start: " + dataStart + ", end: " + dataEnd + ", scale: " + 1d/scale + ", step: " + step + ", iterCount: " + iterCount);
             final long[] iterIndex = new long[] { 0 };
 
 
@@ -149,7 +152,9 @@ public abstract class AxisMarksComputer {
                                            dataStart + iterIndex[0] * step;
 
                     iterIndex[0]++;
-                    return new Mark(value);
+                    int position = ChartContext.getCheckedIntValue(
+                                        painter.getItemView(value, item, context));
+                    return new Mark(value, position);
                 }
 
                 public void remove() {
@@ -210,7 +215,9 @@ public abstract class AxisMarksComputer {
                                            dataStart + iterIndex[0] * step;
 
                     iterIndex[0]++;
-                    return new BytesMark(value, radix);
+                    int position = ChartContext.getCheckedIntValue(
+                                        painter.getItemView(value, item, context));
+                    return new BytesMark(value, position, radix);
                 }
 
                 public void remove() {
@@ -361,11 +368,17 @@ public abstract class AxisMarksComputer {
     public static class Mark {
 
         private final long value;
+        private final int position;
 
 
-        public Mark(long value) { this.value = value; }
+        public Mark(long value, int position) {
+            this.value = value;
+            this.position = position;
+        }
 
         public long getValue() { return value; }
+
+        public int getPosition() { return position; }
 
     }
 
@@ -374,8 +387,8 @@ public abstract class AxisMarksComputer {
         private final int radix;
 
 
-        public BytesMark(long value, int radix) {
-            super(value);
+        public BytesMark(long value, int position, int radix) {
+            super(value, position);
             this.radix = radix;
         }
 

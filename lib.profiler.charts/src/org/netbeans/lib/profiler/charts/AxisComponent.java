@@ -43,6 +43,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.AxisMarksComputer.BytesMark;
+import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 
 /**
  *
@@ -140,6 +141,9 @@ public class AxisComponent extends JComponent implements ChartDecorator {
 
 
     private void paintHorizontalAxis(Graphics g, Rectangle clip, Rectangle chartMask) {
+
+        g.setColor(getForeground());
+
         if (location == SwingConstants.NORTH) {
             g.drawLine(chartMask.x - 1, getHeight() - 1, chartMask.x + chartMask.width, getHeight() - 1);
         } else {
@@ -157,8 +161,8 @@ public class AxisComponent extends JComponent implements ChartDecorator {
 
         while (marks.hasNext()) {
             AxisMarksComputer.Mark mark = marks.next();
-            int x = ChartContext.getCheckedIntValue(chart.getChartContext().getViewX(mark.getValue()));
-            x = SwingUtilities.convertPoint(chart, x, 0, this).x;
+//            int x = ChartContext.getCheckedIntValue(chart.getChartContext().getViewX(mark.getValue()));
+            int x = SwingUtilities.convertPoint(chart, mark.getPosition(), 0, this).x;
 
             if (x < chartMask.x - lZeroOffset ||
                 x >= chartMask.x + chartMask.width + rZeroOffset) continue;
@@ -192,9 +196,6 @@ public class AxisComponent extends JComponent implements ChartDecorator {
         Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
                                                  chartMask.x, chartMask.x + chartMask.width);
 
-        g.setColor(getForeground());
-        g.setFont(getFont());
-
         while (marks.hasNext()) {
             AxisMarksComputer.Mark mark = marks.next();
             int x = ChartContext.getCheckedIntValue(chart.getChartContext().getViewX(mark.getValue()));
@@ -206,6 +207,9 @@ public class AxisComponent extends JComponent implements ChartDecorator {
     }
 
     private void paintVerticalAxis(Graphics g, Rectangle clip, Rectangle chartMask) {
+
+        g.setColor(getForeground());
+        
         if (location == SwingConstants.WEST) {
             g.drawLine(getWidth() - 1, chartMask.y - 1, getWidth() - 1, chartMask.y + chartMask.height);
         } else {
@@ -223,8 +227,10 @@ public class AxisComponent extends JComponent implements ChartDecorator {
 
         while (marks.hasNext()) {
             AxisMarksComputer.Mark mark = marks.next();
-            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
-            y = SwingUtilities.convertPoint(chart, 0, y, this).y;
+//            System.err.println(">>> Mark value: " + mark.getValue() + ", mark position: " + mark.getPosition());
+//            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
+//            int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
+            int y = SwingUtilities.convertPoint(chart, 0, mark.getPosition(), this).y;
 
             if (y < chartMask.y - tZeroOffset ||
                 y >= chartMask.y + chartMask.height + bZeroOffset) continue;
@@ -259,9 +265,6 @@ public class AxisComponent extends JComponent implements ChartDecorator {
         Iterator<AxisMarksComputer.Mark> marks = marksComputer.marksIterator(
                                                  chartMask.y, chartMask.y + chartMask.height);
 
-        g.setColor(getForeground());
-        g.setFont(getFont());
-
         while (marks.hasNext()) {
             AxisMarksComputer.Mark mark = marks.next();
             int y = ChartContext.getCheckedIntValue(chart.getChartContext().getViewY(mark.getValue()));
@@ -293,17 +296,20 @@ public class AxisComponent extends JComponent implements ChartDecorator {
                                 int shiftX, int shiftY) {
 
             maxExtent = 0;
-
-            if (scaleX != lastScaleX || scaleY != lastScaleY) {
-                repaint();
-//                paintImmediately(0, 0, getWidth(), getHeight());
-            } else if (horizontal) {
-                if (offsetX != lastOffsetX) repaint();
-//                if (offsetX != lastOffsetX) paintImmediately(0, 0, getWidth(), getHeight());
-            } else {
-                if (offsetY != lastOffsetY) repaint();
-//                if (offsetY != lastOffsetY) paintImmediately(0, 0, getWidth(), getHeight());
-            }
+//            paintImmediately(0, 0, getWidth(), getHeight());
+            repaint(); // TODO: update just the marks computer!!!
+            
+//            System.err.println("viewChanged");
+//            if (scaleX != lastScaleX || scaleY != lastScaleY) {
+//                repaint();
+////                paintImmediately(0, 0, getWidth(), getHeight());
+//            } else if (horizontal) {
+//                if (offsetX != lastOffsetX) repaint();
+////                if (offsetX != lastOffsetX) paintImmediately(0, 0, getWidth(), getHeight());
+//            } else {
+//                if (offsetY != lastOffsetY) repaint();
+////                if (offsetY != lastOffsetY) paintImmediately(0, 0, getWidth(), getHeight());
+//            }
         }
 
     }
@@ -368,17 +374,20 @@ public class AxisComponent extends JComponent implements ChartDecorator {
 
     public static class PercentPainter extends JLabel implements MarkValuePainter {
 
-        private final ChartContext chartContext;
+        private final long minValue;
+        private final long maxValue;
 
 
-        public PercentPainter(ChartContext chartContext) {
-            this.chartContext = chartContext;
+        public PercentPainter(long minValue, long maxValue) {
+            this.minValue = minValue;
+            this.maxValue = maxValue;
         }
 
 
         public Component getPainter(Mark mark) {
-//            System.err.println(">>> chartContext.getDataHeight()" + chartContext.getDataHeight());
-            setText((int)((float)mark.getValue() / (float)chartContext.getDataHeight() * 100) + "%"); // NOI18N
+            long value = mark.getValue();
+            float relValue = (float)(value - minValue) / (float)maxValue * 100f;
+            setText((int)relValue + "%"); // NOI18N
             return this;
         }
 

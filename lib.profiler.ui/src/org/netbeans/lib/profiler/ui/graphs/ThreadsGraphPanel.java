@@ -187,16 +187,16 @@ public final class ThreadsGraphPanel extends GraphPanel {
                          threadsMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
-//        // Loaded classes axis
-//        XYItem classesItem = models.threadsItemsModel().getItem(1);
-//        XYItemPainter classesPainter = (XYItemPainter)paintersModel.getPainter(classesItem);
-//        AxisComponent.SimplePainter classesMarksPainter = new AxisComponent.SimplePainter();
-//        classesMarksPainter.setForeground(GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR);
-//        AxisComponent cAxis =
-//                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-//                         classesItem, classesPainter, chart.getChartContext(), 40),
-//                         threadsMarksPainter, SwingConstants.EAST,
-//                         AxisComponent.MESH_FOREGROUND);
+        // Loaded classes axis
+        XYItem classesItem = models.threadsItemsModel().getItem(1);
+        XYItemPainter classesPainter = (XYItemPainter)paintersModel.getPainter(classesItem);
+        AxisComponent.SimplePainter classesMarksPainter = new AxisComponent.SimplePainter();
+        classesMarksPainter.setForeground(GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR);
+        AxisComponent cAxis =
+                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
+                         classesItem, classesPainter, chart.getChartContext(), 40),
+                         classesMarksPainter, SwingConstants.EAST,
+                         AxisComponent.NO_MESH);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
@@ -208,8 +208,8 @@ public final class ThreadsGraphPanel extends GraphPanel {
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(tAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
-//        chartPanel.add(cAxis, new Integer[] { SwingConstants.EAST,
-//                                              SwingConstants.SOUTH_EAST });
+        chartPanel.add(cAxis, new Integer[] { SwingConstants.EAST,
+                                              SwingConstants.SOUTH_EAST });
 
         // Small panel UI
         if (smallPanel) {
