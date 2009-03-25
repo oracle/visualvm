@@ -74,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -368,7 +369,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
 
     // --- Public interface ------------------------------------------------------
     public static Configuration selectProfileProjectTask(Project project, FileObject profiledFile, boolean enableOverride) {
-        SelectProfilingTask spt = getDefault();
+        final SelectProfilingTask spt = getDefault();
         spt.setSubmitButton(spt.runButton);
         spt.setupProfileProject(project, profiledFile, enableOverride);
 
@@ -376,27 +377,42 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         spt.dd = new DialogDescriptor(spt, MessageFormat.format(PROFILE_DIALOG_CAPTION, new Object[] { targetName }), true,
                                       new Object[] { spt.runButton, spt.cancelButton }, spt.runButton, 0, null, null);
 
-        Dialog d = ProfilerDialogs.createDialog(spt.dd);
-        d.pack();
-        d.setVisible(true);
+        final CountDownLatch latch = new CountDownLatch(1);
 
-        Configuration result = null;
+        SwingUtilities.invokeLater(new Runnable() {
 
-        if (spt.dd.getValue() == spt.runButton) {
-            ProfilingSettings settings = spt.createFinalSettings();
-            if (settings.getOverrideGlobalSettings()) {
-                String workDir = settings.getWorkingDir().trim();
-                if (workDir.length() != 0 && !new java.io.File(workDir).exists()) {
-                    settings.setWorkingDir(""); // NOI18N
-                    NetBeansProfiler.getDefaultNB().displayWarning(WORKDIR_INVALID_MSG);
-                }
+            public void run() {
+                Dialog d = ProfilerDialogs.createDialog(spt.dd);
+                d.pack();
+                d.setVisible(true);
+                latch.countDown();
             }
-            result = new Configuration(project, settings, null);
+        });
+
+        try {
+            latch.await();
+
+            Configuration result = null;
+
+            if (spt.dd.getValue() == spt.runButton) {
+                ProfilingSettings settings = spt.createFinalSettings();
+                if (settings.getOverrideGlobalSettings()) {
+                    String workDir = settings.getWorkingDir().trim();
+                    if (workDir.length() != 0 && !new java.io.File(workDir).exists()) {
+                        settings.setWorkingDir(""); // NOI18N
+                        NetBeansProfiler.getDefaultNB().displayWarning(WORKDIR_INVALID_MSG);
+                    }
+                }
+                result = new Configuration(project, settings, null);
+            }
+
+            spt.cleanup();
+
+            return result;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-
-        spt.cleanup();
-
-        return result;
+        return null;
     }
 
     public HelpCtx getHelpCtx() {
