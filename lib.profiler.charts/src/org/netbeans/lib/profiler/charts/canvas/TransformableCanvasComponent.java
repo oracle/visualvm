@@ -69,8 +69,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     private long contentsHeight;
 
     // Transform from data to component coordinate system
-    private double scaleX, lastScaleX;
-    private double scaleY, lastScaleY;
+    private double scaleX, lastScaleX, oldScaleX /* just for setDataBounds*/;
+    private double scaleY, lastScaleY, oldScaleY /* just for setDataBounds*/;
 
     // Viewport (JComponent) bounds, component coordinate system
     private long offsetX, maxOffsetX, lastOffsetX;
@@ -124,6 +124,18 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     }
 
 
+    // --- Insets --------------------------------------------------------------
+
+    public final void setViewInsets(Insets insets) {
+        viewInsets.set(insets.top, insets.left, insets.bottom, insets.right);
+    }
+
+    public final Insets getViewInsets() {
+        return new Insets(viewInsets.top, viewInsets.left,
+                          viewInsets.bottom, viewInsets.right);
+    }
+
+
     // --- Canvas orientation --------------------------------------------------
 
     public final void setRightBased(boolean rightBased) {
@@ -143,22 +155,65 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     }
 
 
-    // --- Insets --------------------------------------------------------------
+    // --- Sticky data ---------------------------------------------------------
 
-    public final void setViewInsets(Insets insets) {
-        viewInsets.set(insets.top, insets.left, insets.bottom, insets.right);
+    public final void setTracksDataOffsetX(boolean tracksDataOffsetX) {
+        this.tracksDataOffsetX = tracksDataOffsetX;
+        // TODO: anything special for runtime change???
     }
 
-    public final Insets getViewInsets() {
-        return new Insets(viewInsets.top, viewInsets.left,
-                          viewInsets.bottom, viewInsets.right);
+    public final boolean tracksDataOffsetX() {
+        return tracksDataOffsetX;
+    }
+
+    public final void setTracksDataOffsetY(boolean tracksDataOffsetY) {
+        this.tracksDataOffsetY = tracksDataOffsetY;
+        // TODO: anything special for runtime change???
+    }
+
+    public final boolean tracksDataOffsetY() {
+        return tracksDataOffsetY;
+    }
+
+    public final void setTracksDataWidth(boolean tracksDataWidth) {
+        this.tracksDataWidth = tracksDataWidth;
+        // TODO: anything special for runtime change???
+    }
+
+    public final boolean tracksDataWidth() {
+        return tracksDataWidth;
+    }
+
+    public final boolean currentlyFollowingDataWidth() {
+        return tracksDataWidth && !fitsWidth && offsetX == maxOffsetX;
+    }
+
+    public final void setTracksDataHeight(boolean tracksDataHeight) {
+        this.tracksDataHeight = tracksDataHeight;
+        // TODO: anything special for runtime change???
+    }
+
+    public final boolean tracksDataHeight() {
+        return tracksDataHeight;
+    }
+
+    public final boolean currentlyFollowingDataHeight() {
+        return tracksDataHeight && !fitsHeight && offsetY == maxOffsetY;
     }
 
 
     // --- Fixed scale ---------------------------------------------------------
 
     public final void setFitsWidth(boolean fitsWidth) {
+        if (this.fitsWidth == fitsWidth) return;
         this.fitsWidth = fitsWidth;
+
+        if (fitsWidth) {
+            updateScale();
+        } else {
+            updateContentsWidths();
+            updateMaxOffsets();
+        }
     }
 
     public final boolean fitsWidth() {
@@ -166,7 +221,15 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     }
 
     public final void setFitsHeight(boolean fitsHeight) {
+        if (this.fitsHeight == fitsHeight) return;
         this.fitsHeight = fitsHeight;
+
+        if (fitsHeight) {
+            updateScale();
+        } else {
+            updateContentsWidths();
+            updateMaxOffsets();
+        }
     }
 
     public final boolean fitsHeight() {
@@ -228,8 +291,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     public final void setScale(double scaleX, double scaleY) {
         if (this.scaleX == scaleX && this.scaleY == scaleY) return;
 
-        double oldScaleX = this.scaleX;
-        double oldScaleY = this.scaleY;
+        double origScaleX = this.scaleX;
+        double origScaleY = this.scaleY;
 
         this.scaleX = scaleX;
         this.scaleY = scaleY;
@@ -238,9 +301,9 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
         updateMaxOffsets();
 
         // Fix offsets according to changed maxOffsets
-        setOffset(getOffsetX(), getOffsetY());
+        setOffset(offsetX, offsetY);
 
-        scaleChanged(oldScaleX, oldScaleY, scaleX, scaleY);
+        scaleChanged(origScaleX, origScaleY, scaleX, scaleY);
 //        dataBoundsChanged();
 
         invalidateImage();
@@ -253,6 +316,14 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
 
     // --- Bounds support ------------------------------------------------------
+
+    public final long getDataOffsetX() {
+        return dataOffsetX;
+    }
+
+    public final long getDataOffsetY() {
+        return dataOffsetY;
+    }
 
     public final long getDataWidth() {
         return dataWidth;
@@ -297,8 +368,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             this.dataWidth = dataWidth;
             this.dataHeight = dataHeight;
 
-            contentsOffsetX = getViewWidth(dataOffsetX);
-            contentsOffsetY = getViewHeight(dataOffsetY);
+            contentsOffsetX = (long)getViewWidth(dataOffsetX);
+            contentsOffsetY = (long)getViewHeight(dataOffsetY);
 
             updateScale();
             updateContentsWidths();
@@ -310,7 +381,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             if (!fitsWidth) {
                 if (tracksDataWidth && offsetX == oldMaxOffsetX) {
                     newOffsetX = maxOffsetX;
-                } else if (!tracksDataOffsetX || offsetX != 0) {
+                } else if (oldScaleX == scaleX &&
+                          (!tracksDataOffsetX || offsetX != 0)) {
                     newOffsetX = offsetX + oldContentsOffsetX - contentsOffsetX;
                 }
             }
@@ -318,7 +390,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             if (!fitsHeight) {
                 if (tracksDataHeight && offsetY == oldMaxOffsetY) {
                     newOffsetY = maxOffsetY;
-                } else if (!tracksDataOffsetY || offsetY != 0) {
+                } else if (oldScaleY == scaleY &&
+                          (!tracksDataOffsetY || offsetY != 0)) {
                     newOffsetY = offsetY + oldContentsOffsetY - contentsOffsetY;
                 }
             }
@@ -330,6 +403,9 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
             dx = (oldContentsOffsetX - contentsOffsetX) - (offsetX - oldOffsetX);
             dy = (oldContentsOffsetY - contentsOffsetY) - (offsetY - oldOffsetY);
+
+            oldScaleX = scaleX;
+            oldScaleY = scaleY;
         }
     }
 
@@ -372,93 +448,93 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     // --- Coordinate systems conversion support -------------------------------
 
-    protected final long getViewX(long dataX) {
+    protected final double getViewX(double dataX) {
         return getViewX(dataX, false);
     }
     
-    protected final long getReversedViewX(long dataX) {
+    protected final double getReversedViewX(double dataX) {
         return getViewX(dataX, true);
     }
 
-    private long getViewX(long dataX, boolean reverse) {
+    private double getViewX(double dataX, boolean reverse) {
         if ((rightBased && !reverse) || (!rightBased && reverse)) {
-            return (long)Math.ceil((double)(dataOffsetX - dataX) * scaleX) +
+            return Math.ceil((dataOffsetX - dataX) * scaleX) +
                     offsetX + getWidth() - viewInsets.right;
         } else {
-            return (long)Math.floor((double)(dataX - dataOffsetX) * scaleX) -
-                                    offsetX + viewInsets.left;
+            return Math.ceil((dataX - dataOffsetX) * scaleX) -
+                               offsetX + viewInsets.left;
         }
     }
 
-    protected final long getViewY(long dataY) {
+    protected final double getViewY(double dataY) {
         return getViewY(dataY, false);
     }
     
-    protected final long getReversedViewY(long dataY) {
+    protected final double getReversedViewY(double dataY) {
         return getViewY(dataY, true);
     }
 
-    private long getViewY(long dataY, boolean reverse) {
+    private double getViewY(double dataY, boolean reverse) {
         if ((bottomBased && !reverse) || (!bottomBased && reverse)) {
-            return (long)Math.ceil((double)(dataOffsetY - dataY) * scaleY) +
+            return Math.ceil((dataOffsetY - dataY) * scaleY) +
                     offsetY + getHeight() - viewInsets.bottom;
         } else {
-            return (long)Math.floor((double)(dataY - dataOffsetY) * scaleY) -
-                                    offsetY + viewInsets.top;
+            return Math.ceil((dataY - dataOffsetY) * scaleY) -
+                               offsetY + viewInsets.top;
         }
     }
 
-    protected final long getViewWidth(long dataWidth) {
-        return (long)Math.ceil((double)dataWidth * scaleX);
+    protected final double getViewWidth(double dataWidth) {
+        return Math.ceil(dataWidth * scaleX);
     }
 
-    protected final long getViewHeight(long dataHeight) {
-        return (long)Math.ceil((double)dataHeight * scaleY);
+    protected final double getViewHeight(double dataHeight) {
+        return Math.ceil(dataHeight * scaleY);
     }
 
 
-    protected final long getDataX(long viewX) {
+    protected final double getDataX(double viewX) {
         return getDataX(viewX, false);
     }
 
-    protected final long getReversedDataX(long viewX) {
+    protected final double getReversedDataX(double viewX) {
         return getDataX(viewX, true);
     }
 
-    private long getDataX(long viewX, boolean reverse) {
+    private double getDataX(double viewX, boolean reverse) {
         if ((rightBased && !reverse) || (!rightBased && reverse)) {
-            return dataOffsetX - (long)Math.ceil((double)(viewX + viewInsets.right -
-                                                  offsetX - getWidth()) / scaleX);
+            return dataOffsetX - Math.ceil((viewX + viewInsets.right -
+                                            offsetX - getWidth()) / scaleX);
         } else {
-            return (long)Math.floor((double)(viewX + offsetX - viewInsets.left) /
-                                     scaleX) + dataOffsetX;
+            return Math.ceil((viewX + offsetX - viewInsets.left) /
+                               scaleX) + dataOffsetX;
         }
     }
 
-    protected final long getDataY(long viewY) {
+    protected final double getDataY(double viewY) {
         return getDataY(viewY, false);
     }
 
-    protected final long getReversedDataY(long viewY) {
+    protected final double getReversedDataY(double viewY) {
         return getDataY(viewY, true);
     }
 
-    private long getDataY(long viewY, boolean reverse) {
+    private double getDataY(double viewY, boolean reverse) {
         if ((bottomBased && !reverse) || (!bottomBased && reverse)) {
-            return dataOffsetY - (long)Math.ceil((double)(viewY + viewInsets.bottom -
-                                                  offsetY - getHeight()) / scaleY);
+            return dataOffsetY - Math.ceil((viewY + viewInsets.bottom -
+                                            offsetY - getHeight()) / scaleY);
         } else {
-            return (long)Math.floor((double)(viewY + offsetY - viewInsets.top) /
-                                     scaleY) + dataOffsetY;
+            return Math.ceil((viewY + offsetY - viewInsets.top) /
+                               scaleY) + dataOffsetY;
         }
     }
 
-    protected final long getDataWidth(long viewWidth) {
-        return (long)Math.ceil((double)viewWidth / scaleX);
+    protected final double getDataWidth(double viewWidth) {
+        return Math.ceil(viewWidth / scaleX);
     }
 
-    protected final long getDataHeight(long viewHeight) {
-        return (long)Math.ceil((double)viewHeight / scaleY);
+    protected final double getDataHeight(double viewHeight) {
+        return Math.ceil(viewHeight / scaleY);
     }
 
 
@@ -477,12 +553,18 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     protected void reshaped(Rectangle oldBounds, Rectangle newBounds) {
         super.reshaped(oldBounds, newBounds);
 
+        // Save sticky sides
+        // TODO: implement also followsOffsetX, followsOffsetY!
+        boolean followsWidth = currentlyFollowingDataWidth();
+        boolean followsHeight = currentlyFollowingDataHeight();
+
         updateScale();
         updateContentsWidths();
         updateMaxOffsets();
 
         // Fix offsets according to changed maxOffsets
-        setOffset(getOffsetX(), getOffsetY());
+        setOffset(followsWidth ? maxOffsetX : offsetX,
+                  followsHeight ? maxOffsetY : offsetY);
     }
 
     protected final void paintComponent(Graphics g, Rectangle invalidArea) {
@@ -644,11 +726,11 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private void updateContentsWidths() {
         if (fitsWidth) contentsWidth = getWidth();
-        else contentsWidth = getViewWidth(dataWidth) + viewInsets.left +
+        else contentsWidth = (long)Math.ceil(getViewWidth(dataWidth)) + viewInsets.left +
                              viewInsets.right;
 
         if (fitsHeight) contentsHeight = getHeight();
-        else contentsHeight = getViewHeight(dataHeight) + viewInsets.top +
+        else contentsHeight = (long)Math.ceil(getViewHeight(dataHeight)) + viewInsets.top +
                               viewInsets.bottom;
     }
 
