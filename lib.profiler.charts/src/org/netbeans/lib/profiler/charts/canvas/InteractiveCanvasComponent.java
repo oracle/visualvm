@@ -407,7 +407,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         // Update x-offset to centerX if needed
         if (!fitsWidth) {
             double dataWidth = dataX - getDataOffsetX();
-            long viewWidth = (long)getViewWidth(dataWidth);
+            long viewWidth = (long)Math.ceil(getViewWidth(dataWidth));
             offsetX = isRightBased() ?
                       viewWidth - getWidth() + centerX : viewWidth - centerX;
         }
@@ -415,7 +415,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         // Update y-offset to centerY if needed
         if (!fitsHeight) {
             double dataHeight = dataY - getDataOffsetY();
-            long viewHeight = (long)getViewHeight(dataHeight);
+            long viewHeight = (long)Math.ceil(getViewHeight(dataHeight));
             offsetY = isBottomBased() ?
                       viewHeight - getHeight() + centerY : viewHeight - centerY;
         }
