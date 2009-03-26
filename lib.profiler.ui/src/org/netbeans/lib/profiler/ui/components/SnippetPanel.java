@@ -113,39 +113,45 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
     private static class TitleUI extends ComponentUI {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        ImageIcon collapsedIcon = new ImageIcon(TitleUI.class.getResource("collapsedSnippet.png")); //NOI18N
-        ImageIcon expandedIcon = new ImageIcon(TitleUI.class.getResource("expandedSnippet.png")); //NOI18N
+        private final int TITLE_X_OFFSET = 5;
+        private final int TITLE_Y_OFFSET = 2;
+
+        private final ImageIcon collapsedIcon = new ImageIcon(TitleUI.class.getResource("collapsedSnippet.png")); //NOI18N
+        private final ImageIcon expandedIcon = new ImageIcon(TitleUI.class.getResource("expandedSnippet.png")); //NOI18N
+        private final JLabel plainPainter = new JLabel();
+        private final JLabel boldPainter = new JLabel();
+        private final Font plainFont = plainPainter.getFont().deriveFont(Font.PLAIN);
+        private final Font boldFont = boldPainter.getFont().deriveFont(Font.BOLD);
+        private Dimension preferredSize;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public Dimension getPreferredSize(JComponent c) {
-            FontMetrics fm = c.getGraphics().getFontMetrics(c.getFont());
-
-            return new Dimension(20 /* 20 is hardcoded x-offset for title string in paint(Graphics g, JComponent c)*/
-                                 + fm.getStringBounds(((Title) c).name, c.getGraphics()).getBounds().width, fm.getHeight() + 4);
+            return preferredSize;
         }
 
         public void installUI(JComponent c) {
-            Font f = UIManager.getFont("Label.font"); //NOI18N
-            c.setFont(f.deriveFont(Font.BOLD));
+            plainPainter.setText(((Title)c).name);
+            plainPainter.setIcon(collapsedIcon);
+            plainPainter.setFont(plainFont);
+            plainPainter.setIconTextGap(5);
+            boldPainter.setText(((Title)c).name);
+            boldPainter.setIcon(expandedIcon);
+            boldPainter.setFont(boldFont);
+            boldPainter.setIconTextGap(5);
+
+            plainPainter.setSize(plainPainter.getPreferredSize());
+            Dimension titlePreferredSize = boldPainter.getPreferredSize();
+            boldPainter.setSize(titlePreferredSize);
+            preferredSize = new Dimension(TITLE_X_OFFSET + titlePreferredSize.width,
+                                          titlePreferredSize.height + TITLE_Y_OFFSET * 2);
         }
 
         public void paint(Graphics g, JComponent c) {
-            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            Title title = (Title) c;
-            Font font = c.getFont();
-
-            if (title.collapsed) { // use plain font if collapsed
-                g.setFont(font.deriveFont(Font.PLAIN));
-            } else {
-                g.setFont(font);
-            }
+            Title title = (Title)c;
 
             g.setColor(lineColor);
-
-            FontMetrics fm = g.getFontMetrics(font);
-
             g.drawLine(0, 0, c.getWidth(), 0);
 
             if (title.collapsed) { // do not draw bottom line if collapsed
@@ -157,7 +163,8 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
                 }
             }
 
-            g.drawLine(0, 1 + fm.getHeight() + 2, c.getWidth(), 1 + fm.getHeight() + 2);
+            g.drawLine(0, 1 + plainPainter.getHeight() + TITLE_Y_OFFSET,
+                       c.getWidth(), 1 + plainPainter.getHeight() + TITLE_Y_OFFSET);
 
             if (title.rollOver || title.isFocusOwner()) {
                 g.setColor(focusedBackgroundColor);
@@ -165,16 +172,15 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
                 g.setColor(backgroundColor);
             }
 
-            g.fillRect(0, 1, c.getWidth(), fm.getHeight() + 2);
+            g.fillRect(0, 1, c.getWidth(), plainPainter.getHeight() + TITLE_Y_OFFSET);
 
-            g.setColor(textColor);
-            g.drawString(title.name, 20, fm.getHeight() - 1);
-
-            int iconX = 5;
-            int iconY = 5;
-            ImageIcon icon = title.collapsed ? collapsedIcon : expandedIcon;
-
-            icon.paintIcon(c, g, iconX, iconY);
+            g.translate(TITLE_X_OFFSET, TITLE_Y_OFFSET);
+            if (title.collapsed) {
+                plainPainter.paint(g);
+            } else {
+                boldPainter.paint(g);
+            }
+            g.translate(-TITLE_X_OFFSET, -TITLE_Y_OFFSET);
         }
     }
 
@@ -183,7 +189,6 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
     private static Color lineColor;
     private static Color backgroundColor;
     private static Color focusedBackgroundColor;
-    private static Color textColor;
     
     static { initColors(); }
 
@@ -237,8 +242,6 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
             backgroundColor = UIUtils.getSafeColor(backgroundRed - 7 /*248*/, backgroundGreen - 7 /*248*/, backgroundBlue - 7 /*248*/);
             focusedBackgroundColor = UIUtils.getSafeColor(backgroundRed - 25 /*230*/, backgroundGreen - 25 /*230*/, backgroundBlue - 25 /*230*/);
         }
-        
-        textColor = UIManager.getColor("Button.foreground"); // NOI18N
     }
 
     public void setCollapsed(boolean collapsed) {
