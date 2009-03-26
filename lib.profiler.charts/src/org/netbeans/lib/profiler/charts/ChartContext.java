@@ -127,12 +127,12 @@ public abstract class ChartContext {
     protected final LongRect getViewRectImpl(LongRect dataRect) {
         LongRect viewRect = new LongRect();
 
-        viewRect.x = (long)getViewX(dataRect.x);
-        viewRect.width = (long)getViewWidth(dataRect.width);
+        viewRect.x = (long)Math.ceil(getViewX(dataRect.x));
+        viewRect.width = (long)Math.ceil(getViewWidth(dataRect.width));
         if (isRightBased()) viewRect.x -= viewRect.width;
 
-        viewRect.y = (long)getViewY(dataRect.y);
-        viewRect.height = (long)getViewHeight(dataRect.height);
+        viewRect.y = (long)Math.ceil(getViewY(dataRect.y));
+        viewRect.height = (long)Math.ceil(getViewHeight(dataRect.height));
         if (isBottomBased()) viewRect.y -= viewRect.height;
 
         return viewRect;
