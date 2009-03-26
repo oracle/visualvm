@@ -368,8 +368,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             this.dataWidth = dataWidth;
             this.dataHeight = dataHeight;
 
-            contentsOffsetX = (long)getViewWidth(dataOffsetX);
-            contentsOffsetY = (long)getViewHeight(dataOffsetY);
+            contentsOffsetX = (long)Math.ceil(getViewWidth(dataOffsetX));
+            contentsOffsetY = (long)Math.ceil(getViewHeight(dataOffsetY));
 
             updateScale();
             updateContentsWidths();
@@ -458,10 +458,10 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private double getViewX(double dataX, boolean reverse) {
         if ((rightBased && !reverse) || (!rightBased && reverse)) {
-            return Math.ceil((dataOffsetX - dataX) * scaleX) +
+            return ((dataOffsetX - dataX) * scaleX) +
                     offsetX + getWidth() - viewInsets.right;
         } else {
-            return Math.floor((dataX - dataOffsetX) * scaleX) -
+            return ((dataX - dataOffsetX) * scaleX) -
                                offsetX + viewInsets.left;
         }
     }
@@ -476,20 +476,20 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private double getViewY(double dataY, boolean reverse) {
         if ((bottomBased && !reverse) || (!bottomBased && reverse)) {
-            return Math.ceil((dataOffsetY - dataY) * scaleY) +
+            return ((dataOffsetY - dataY) * scaleY) +
                     offsetY + getHeight() - viewInsets.bottom;
         } else {
-            return Math.floor((dataY - dataOffsetY) * scaleY) -
+            return ((dataY - dataOffsetY) * scaleY) -
                                offsetY + viewInsets.top;
         }
     }
 
     protected final double getViewWidth(double dataWidth) {
-        return Math.ceil(dataWidth * scaleX);
+        return dataWidth * scaleX;
     }
 
     protected final double getViewHeight(double dataHeight) {
-        return Math.ceil(dataHeight * scaleY);
+        return dataHeight * scaleY;
     }
 
 
@@ -503,10 +503,10 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private double getDataX(double viewX, boolean reverse) {
         if ((rightBased && !reverse) || (!rightBased && reverse)) {
-            return dataOffsetX - Math.ceil((viewX + viewInsets.right -
+            return dataOffsetX - ((viewX + viewInsets.right -
                                             offsetX - getWidth()) / scaleX);
         } else {
-            return Math.floor((viewX + offsetX - viewInsets.left) /
+            return ((viewX + offsetX - viewInsets.left) /
                                scaleX) + dataOffsetX;
         }
     }
@@ -521,20 +521,20 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private double getDataY(double viewY, boolean reverse) {
         if ((bottomBased && !reverse) || (!bottomBased && reverse)) {
-            return dataOffsetY - Math.ceil((viewY + viewInsets.bottom -
+            return dataOffsetY - ((viewY + viewInsets.bottom -
                                             offsetY - getHeight()) / scaleY);
         } else {
-            return Math.floor((viewY + offsetY - viewInsets.top) /
+            return ((viewY + offsetY - viewInsets.top) /
                                scaleY) + dataOffsetY;
         }
     }
 
     protected final double getDataWidth(double viewWidth) {
-        return Math.ceil(viewWidth / scaleX);
+        return viewWidth / scaleX;
     }
 
     protected final double getDataHeight(double viewHeight) {
-        return Math.ceil(viewHeight / scaleY);
+        return viewHeight / scaleY;
     }
 
 
@@ -628,8 +628,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             }
         }
 
-        if (offsetX != lastOffsetX || offsetY != lastOffsetY ||
-            lastScaleX != scaleX || lastScaleY != scaleY)
+//        if (offsetX != lastOffsetX || offsetY != lastOffsetY ||
+//            lastScaleX != scaleX || lastScaleY != scaleY)
             viewChanged(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
                     lastOffsetY, lastScaleX, lastScaleY, shiftX, shiftY);
 
@@ -726,11 +726,11 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     private void updateContentsWidths() {
         if (fitsWidth) contentsWidth = getWidth();
-        else contentsWidth = (long)getViewWidth(dataWidth) + viewInsets.left +
+        else contentsWidth = (long)Math.floor(getViewWidth(dataWidth)) + viewInsets.left +
                              viewInsets.right;
 
         if (fitsHeight) contentsHeight = getHeight();
-        else contentsHeight = (long)getViewHeight(dataHeight) + viewInsets.top +
+        else contentsHeight = (long)Math.floor(getViewHeight(dataHeight)) + viewInsets.top +
                               viewInsets.bottom;
     }
 
