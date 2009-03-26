@@ -263,12 +263,12 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
         double value2 = context.getDataOffsetY() + itemValueFactor *
                       (double)(dataBounds.y + dataBounds.height - itemBounds.y);
 
-        long viewX = (long)context.getViewX(dataBounds.x);
-        long viewWidth = (long)context.getViewWidth(dataBounds.width);
+        long viewX = (long)Math.ceil(context.getViewX(dataBounds.x));
+        long viewWidth = (long)Math.ceil(context.getViewWidth(dataBounds.width));
         if (context.isRightBased()) viewX -= viewWidth;
 
-        long viewY1 = (long)context.getViewY(value1);
-        long viewY2 = (long)context.getViewY(value2);
+        long viewY1 = (long)Math.ceil(context.getViewY(value1));
+        long viewY2 = (long)Math.ceil(context.getViewY(value2));
         long viewHeight = context.isBottomBased() ? viewY1 - viewY2 :
                                                     viewY2 - viewY1;
         if (!context.isBottomBased()) viewY2 -= viewHeight;
