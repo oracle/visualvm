@@ -73,13 +73,8 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     private static final String ACTION_NAME_STOP = "Stop sampling and take snapshot"; // NOI18N
     private static final String ACTION_DESCR = "Will take a snapshot based on the thread dump"; // NOI18N
     private static final String THREAD_NAME = "IDE Self Sampler"; // NOI18N
-    private StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
-    private final ThreadFactory threadFactory = new ThreadFactory() {
-
-        public Thread newThread(Runnable r) {
-            return new Thread(r, THREAD_NAME);
-        }
-    };
+    private StackTraceSnapshotBuilder builder;
+    private ThreadFactory threadFactory;
     private ScheduledExecutorService executor;
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
@@ -97,7 +92,6 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         if (System.getProperty(SelfSamplerAction.class.getName() + ".sniff") != null) {
             Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
         }
-        builder.setIgnoredThreads(Collections.singleton(THREAD_NAME));
     }
 
     public static final SelfSamplerAction getInstance() {
@@ -105,6 +99,25 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @return the builder
+     */
+    private synchronized StackTraceSnapshotBuilder getBuilder() {
+        if (builder == null) {
+            builder = new StackTraceSnapshotBuilder();
+            threadFactory = new ThreadFactory() {
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, THREAD_NAME);
+                }
+            };
+            builder.setIgnoredThreads(Collections.singleton(THREAD_NAME));
+        }
+        return builder;
+    }
+
+
+
     @Override
     public boolean isEnabled() {
         return true;
@@ -121,12 +134,12 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                     "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png" //NOI18N
             , false)
             );
+            final StackTraceSnapshotBuilder b = getBuilder();
             executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
             startTime = System.currentTimeMillis();
             executor.scheduleAtFixedRate(new Runnable() {
-
                 public void run() {
-                    builder.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
+                    b.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
                 }
             }, 10, 10, TimeUnit.MILLISECONDS);
         } else if (isRunning.compareAndSet(true, false)) {
@@ -139,10 +152,10 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
             try {
                 executor.shutdown();
                 executor.awaitTermination(100, TimeUnit.MILLISECONDS);
-                CPUResultsSnapshot snapshot = builder.createSnapshot(startTime, System.nanoTime());
+                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                 ResultsManager.getDefault().openSnapshot(loadedSnapshot);
-                builder.reset();
+                getBuilder().reset();
 
             } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
                 ex.printStackTrace();
