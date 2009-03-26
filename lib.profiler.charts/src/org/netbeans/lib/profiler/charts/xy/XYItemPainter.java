@@ -34,14 +34,25 @@ import org.netbeans.lib.profiler.charts.ItemPainter;
  */
 public interface XYItemPainter extends ItemPainter {
 
-    public long[] getDataValues(long[] viewValues, XYItem item, ChartContext context);
+    public double getItemView(double dataY, XYItem item, ChartContext context);
+
+    public double getItemValue(double viewY, XYItem item, ChartContext context);
+
+    public double getItemValueScale(XYItem item, ChartContext context);
 
 
     public static abstract class Abstract implements XYItemPainter {
 
-        public long[] getDataValues(long[] viewValues, XYItem item,
-                                    ChartContext context) {
-            return viewValues;
+        public double getItemView(double dataY, XYItem item, ChartContext context) {
+            return context.getViewY(dataY);
+        }
+
+        public double getItemValue(double viewY, XYItem item, ChartContext context) {
+            return context.getDataY(viewY);
+        }
+
+        public double getItemValueScale(XYItem item, ChartContext context) {
+            return context.getViewHeight(1d);
         }
 
     }
