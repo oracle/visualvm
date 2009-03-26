@@ -176,6 +176,39 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
 
+    public double getItemView(double dataY, XYItem item, ChartContext context) {
+        if (type == TYPE_ABSOLUTE) {
+            return super.getItemView(dataY, item, context);
+        } else {
+            double itemValueFactor = (double)context.getDataHeight() /
+                                     (double)item.getBounds().height;
+            return context.getViewY(context.getDataOffsetY() + (itemValueFactor * dataY));
+        }
+    }
+
+    public double getItemValue(double viewY, XYItem item, ChartContext context) {
+        if (type == TYPE_ABSOLUTE) {
+            return super.getItemValue(viewY, item, context);
+        } else {
+            double itemValueFactor = (double)context.getDataHeight() /
+                                     (double)item.getBounds().height;
+            return context.getDataY(viewY) / itemValueFactor;
+        }
+    }
+
+    public double getItemValueScale(XYItem item, ChartContext context) {
+        if (type == TYPE_ABSOLUTE) {
+            return super.getItemValueScale(item, context);
+        } else {
+            long itemHeight = item.getBounds().height;
+            if (itemHeight == 0) return 1;
+
+            double itemValueFactor = (double)context.getDataHeight() / (double)itemHeight;
+            return itemValueFactor / context.getDataHeight(1d);
+        }
+    }
+
+
     public boolean supportsHovering(ChartItem item) {
         return false;
     }
@@ -242,12 +275,12 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         double value2 = context.getDataOffsetY() + itemValueFactor *
                       (double)(dataBounds.y + dataBounds.height - itemBounds.y);
 
-        long viewX = (long)context.getViewX(dataBounds.x);
-        long viewWidth = (long)context.getViewWidth(dataBounds.width);
+        long viewX = (long)Math.ceil(context.getViewX(dataBounds.x));
+        long viewWidth = (long)Math.ceil(context.getViewWidth(dataBounds.width));
         if (context.isRightBased()) viewX -= viewWidth;
 
-        long viewY1 = (long)context.getViewY(value1);
-        long viewY2 = (long)context.getViewY(value2);
+        long viewY1 = (long)Math.ceil(context.getViewY(value1));
+        long viewY2 = (long)Math.ceil(context.getViewY(value2));
         long viewHeight = context.isBottomBased() ? viewY1 - viewY2 :
                                                     viewY2 - viewY1;
         if (!context.isBottomBased()) viewY2 -= viewHeight;
@@ -328,27 +361,27 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
                                          ((double)item.getBounds().height) : 0;
 
         for (int i = 0; i < visibleIndexes; i++) {
-            xPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(
-                                        context.getViewX(item.getXValue(firstVisibleIndex + i)));
-            yPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(
+            xPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(Math.ceil(
+                                        context.getViewX(item.getXValue(firstVisibleIndex + i))));
+            yPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(Math.ceil(
                                         getYValue(item, firstVisibleIndex + i,
-                                        type, context, itemValueFactor));
+                                        type, context, itemValueFactor)));
         }
 
         if (extraFirstIndex == 1) {
-            xPoints[0] = ChartContext.getCheckedIntValue(context.getViewX(
-                                      item.getXValue(firstVisibleIndex - 1)));
-            yPoints[0] = ChartContext.getCheckedIntValue(
+            xPoints[0] = ChartContext.getCheckedIntValue(Math.ceil(context.getViewX(
+                                      item.getXValue(firstVisibleIndex - 1))));
+            yPoints[0] = ChartContext.getCheckedIntValue(Math.ceil(
                                       getYValue(item, firstVisibleIndex - 1,
-                                      type, context, itemValueFactor));
+                                      type, context, itemValueFactor)));
         }
 
         if (extraLastIndex == 1) {
-            xPoints[xPoints.length - 3] = ChartContext.getCheckedIntValue(context.getViewX(
-                                      item.getXValue(lastVisibleIndex + 1)));
-            yPoints[xPoints.length - 3] = ChartContext.getCheckedIntValue(
+            xPoints[xPoints.length - 3] = ChartContext.getCheckedIntValue(Math.ceil(context.getViewX(
+                                      item.getXValue(lastVisibleIndex + 1))));
+            yPoints[xPoints.length - 3] = ChartContext.getCheckedIntValue(Math.ceil(
                                       getYValue(item, lastVisibleIndex + 1,
-                                      type, context, itemValueFactor));
+                                      type, context, itemValueFactor)));
         }
         
         return new int[][] { xPoints, yPoints };
