@@ -147,14 +147,14 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel14, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "MSG_Do_Not_Show_Again")); // NOI18N
         jLabel14.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton2, "R&eset");
+        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "BTN_Reset2")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel15, "Reset calibration data:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel15, org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_ResetData")); // NOI18N
         jLabel15.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 0));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
