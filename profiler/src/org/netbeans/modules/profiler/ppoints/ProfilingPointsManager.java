@@ -1127,6 +1127,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
 
         for (ProfilingPointFactory factory : factories) {
+            if (factory == null) continue;
+
             for (Project project : projects) {
                 try {
                     factory.saveProfilingPoints(project);

@@ -70,20 +70,24 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         super(actionsHandler, selectionHandler);
     }
 
-    public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine) {
+    public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine, String viewName) {
+        percentFormat.setMinimumFractionDigits(2);
+        percentFormat.setMaximumFractionDigits(2);
         switch (exportedFileType) {
             case 1: exportCSV(",", eDD,combine); break; // normal CSV
             case 2: exportCSV(";", eDD,combine); break; // Excel CSV
-            case 3: exportXML(eDD, combine); break;
-            case 4: exportHTML(eDD, combine); break;
+            case 3: exportXML(eDD, combine, viewName); break;
+            case 4: exportHTML(eDD, combine, viewName); break;
         }
+        percentFormat.setMinimumFractionDigits(0);
+        percentFormat.setMaximumFractionDigits(1);
     }
 
-    private void exportHTML(ExportDataDumper eDD, boolean combine) {
+    private void exportHTML(ExportDataDumper eDD, boolean combine, String viewName) {
          // Header
         StringBuffer result;
         if (!combine) {
-            result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getDefaultViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>");
+            result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr>");
         } else {
             result = new StringBuffer("<br><br><table border=\"1\"><tr>"); // NOI18N
         }
@@ -96,21 +100,21 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         eDD.dumpData(result);
 
         for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
-            result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>");
-            result.append("<td align=\"char\">"+flatProfileContainer.getPercentAtRow(i)+" %</td>");
-            result.append("<td align=char>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>");
-            result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>");
+            result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</pre></td>");
+            result.append("<td class=\"right\">"+percentFormat.format((double)flatProfileContainer.getPercentAtRow(i))+"</td>");
+            result.append("<td class=\"right\">"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>");
+            result.append("<td class=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>");
             eDD.dumpData(result);
         }
         eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));
     }
 
-    private void exportXML(ExportDataDumper eDD, boolean combine) {
+    private void exportXML(ExportDataDumper eDD, boolean combine, String viewName) {
          // Header
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result;
         if (!combine) {
-            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+this.getDefaultViewName()+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
+            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         } else {
             result = new StringBuffer(newline+"<TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         }
@@ -122,7 +126,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
         for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
-            result.append("    <TableColumn><![CDATA["+flatProfileContainer.getPercentAtRow(i)+" %]]></TableColumn>"+newline);
+            result.append("    <TableColumn><![CDATA["+percentFormat.format((double)flatProfileContainer.getPercentAtRow(i))+"]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline);
             eDD.dumpData(result);
