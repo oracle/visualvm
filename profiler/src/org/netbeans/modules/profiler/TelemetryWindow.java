@@ -85,6 +85,13 @@ public final class TelemetryWindow extends TopComponent {
 //        private static final ImageIcon zoomOutIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomOut.png", false); //NOI18N
 //        private static final ImageIcon zoomIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoom.png", false); //NOI18N
 //        private static final ImageIcon scaleToFitIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/scaleToFit.png", false); //NOI18N
+        private static final String timestamp = "Timestamp";
+        private static final String heapSize = "Heap_Size_in_Bytes";
+        private static final String usedHeap = "Used_Heap_in_Bytes";
+        private static final String survivingGenerations = "Surviving_Generations";
+        private static final String timeInGC = "Relative_Time_Spent_in_GC";
+        private static final String  threadsCount = "Number_of_Threads";
+        private static final String loadedClasses = "Loaded_Classes_Count";
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -142,6 +149,7 @@ public final class TelemetryWindow extends TopComponent {
             toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
 
             toolBar.add(exportActionButton);
+            toolBar.add(new SaveViewAction(this));
             toolBar.addSeparator();
             for (Action action : panel.getActions()) toolBar.add(action);
 //            toolBar.add(zoomInButton);
@@ -262,25 +270,25 @@ public final class TelemetryWindow extends TopComponent {
             long[] col2 = new long[nItems];
             long[] col3 = new long[nItems];
             // TODO Issue #160475
-            String col1Name = new String("Timestamp"); //NOI18N
+            String col1Name = timestamp;
             String col2Name = new String();
             String col3Name = new String();
             System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
                 System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
-                col2Name="Heap Size (bytes)"; //NOI18N
-                col3Name="Used Heap (bytes)"; //NOI18N
+                col2Name=heapSize;
+                col3Name=usedHeap;
             } else if (panel instanceof SurvivingGenerationsGraphPanel) {
                 System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
                 System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
-                col2Name="Surviving Generations"; //NOI18N
-                col3Name="Relative Time Spent in GC (%)"; //NOI18N
+                col2Name=survivingGenerations;
+                col3Name=timeInGC;
             } else if (panel instanceof ThreadsGraphPanel) {
                 System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
-                col2Name="Threads"; //NOI18N
-                col3Name="Loaded Classes"; //NOI18N
+                col2Name=threadsCount;
+                col3Name=loadedClasses;
             }
             //header
             eDD.dumpData(new StringBuffer(quote+col1Name+quote+separator+quote+col2Name+quote+separator+quote+col3Name+quote+newLine));
@@ -300,27 +308,30 @@ public final class TelemetryWindow extends TopComponent {
             long[] col1 = new long[nItems];
             long[] col2 = new long[nItems];
             long[] col3 = new long[nItems];
-            // TODO Issue #160475
-            String col1Name = new String("Timestamp"); //NOI18N
+            
+            String col1Name = NbBundle.getMessage(TelemetryWindow.class,timestamp);
             String col2Name = new String();
             String col3Name = new String();
-            String viewName = panel.getName();
+            String viewName = new String();
             System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
                 System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
-                col2Name="Heap Size (bytes)"; //NOI18N
-                col3Name="Used Heap (bytes)"; //NOI18N
+                viewName=MEMORY_HEAP_TAB_NAME;
+                col2Name=NbBundle.getMessage(TelemetryWindow.class,heapSize);
+                col3Name=NbBundle.getMessage(TelemetryWindow.class,usedHeap);
             } else if (panel instanceof SurvivingGenerationsGraphPanel) {
                 System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
                 System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
-                col2Name="Surviving Generations"; //NOI18N
-                col3Name="Relative Time Spent in GC (%)"; //NOI18N
+                viewName=MEMORY_GC_TAB_NAME;
+                col2Name=NbBundle.getMessage(TelemetryWindow.class,survivingGenerations);
+                col3Name=NbBundle.getMessage(TelemetryWindow.class,timeInGC);
             } else if (panel instanceof ThreadsGraphPanel) {
                 System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
-                col2Name="Threads"; //NOI18N
-                col3Name="Loaded Classes"; //NOI18N
+                viewName=THREADS_STATISTICS_TAB_NAME;
+                col2Name=NbBundle.getMessage(TelemetryWindow.class,threadsCount);
+                col3Name=NbBundle.getMessage(TelemetryWindow.class,loadedClasses);
             }
             //header
             StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
@@ -342,8 +353,8 @@ public final class TelemetryWindow extends TopComponent {
             long[] col1 = new long[nItems];
             long[] col2 = new long[nItems];
             long[] col3 = new long[nItems];
-            // TODO Issue #160475
-            String col1Name = new String("Timestamp"); //NOI18N
+
+            String col1Name = NbBundle.getMessage(TelemetryWindow.class,timestamp);
             String col2Name = new String();
             String col3Name = new String();
             String viewName = new String();
@@ -351,28 +362,28 @@ public final class TelemetryWindow extends TopComponent {
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
                 System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
-                col2Name="Heap Size (bytes)"; //NOI18N
-                col3Name="Used Heap (bytes)"; //NOI18N
-                viewName="Memory (Heap)"; //NOI18N
+                viewName=MEMORY_HEAP_TAB_NAME;
+                col2Name=heapSize;
+                col3Name=usedHeap;
             } else if (panel instanceof SurvivingGenerationsGraphPanel) {
                 System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
                 System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
-                col2Name="Surviving Generations"; //NOI18N
-                col3Name="Relative Time Spent in GC (%)"; //NOI18N
-                viewName="Memory (GC)"; //NOI18N
+                viewName=MEMORY_GC_TAB_NAME;
+                col2Name=survivingGenerations;
+                col3Name=timeInGC;
             } else if (panel instanceof ThreadsGraphPanel) {
                 System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
-                col2Name="Threads"; //NOI18N
-                col3Name="Loaded Classes"; //NOI18N
-                viewName="Threads / Loaded Classes"; //NOI18N
+                viewName=THREADS_STATISTICS_TAB_NAME;
+                col2Name=threadsCount;
+                col3Name=loadedClasses;
             }
             //header
             String newline = System.getProperty("line.separator"); // NOI18N
             StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
-            result.append(" <TableData NumRows=\""+nItems+"\" NumColumns=\"3\">"+newline+"<TableHeader>");  // NOI18N
-            result.append("<TableColumn>"+col1Name+"</TableColumn>"+newline+"<TableColumn>"+col2Name+"</TableColumn>"+newline+"<TableColumn>"+col3Name+"</TableColumn>"+newline);  // NOI18N
-            result.append("</TableHeader>"+newline+"<TableBody>"); //NOI18N
+            result.append("<TableData NumRows=\""+nItems+"\" NumColumns=\"3\">"+newline+" <TableHeader>");  // NOI18N
+            result.append(" <TableColumn>"+col1Name+" </TableColumn>"+newline+" <TableColumn>"+col2Name+" </TableColumn>"+newline+" <TableColumn>"+col3Name+" </TableColumn>"+newline);  // NOI18N
+            result.append(" </TableHeader>"+newline+" <TableBody>"+newline); //NOI18N
             eDD.dumpData(result);
             Date d = new Date();
             // Data
@@ -383,7 +394,7 @@ public final class TelemetryWindow extends TopComponent {
                 result.append("   <TableCell>"+col3[i]+"</TableCell>"+newline+"  </TableRow>"+newline);  // NOI18N
                 eDD.dumpData(result);
             }
-            eDD.dumpDataAndClose(new StringBuffer(" </TableData>"+newline+"</ExportedView>"));  // NOI18N
+            eDD.dumpDataAndClose(new StringBuffer(" </TableBody>"+newline+"</TableData>"+newline+"</ExportedView>"));  // NOI18N
         }
 
 //        // --- ChartActionListener -------------------------------------------------
