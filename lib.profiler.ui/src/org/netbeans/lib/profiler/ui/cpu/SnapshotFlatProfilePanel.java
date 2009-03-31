@@ -101,7 +101,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
         for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
             result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</pre></td>");
-            result.append("<td class=\"right\">"+percentFormat.format((double)flatProfileContainer.getPercentAtRow(i))+"</td>");
+            result.append("<td class=\"right\">"+percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)+"</td>");
             result.append("<td class=\"right\">"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>");
             result.append("<td class=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>");
             eDD.dumpData(result);
@@ -126,7 +126,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
         for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
-            result.append("    <TableColumn><![CDATA["+percentFormat.format((double)flatProfileContainer.getPercentAtRow(i))+"]]></TableColumn>"+newline);
+            result.append("    <TableColumn><![CDATA["+percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)+"]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline);
             eDD.dumpData(result);
