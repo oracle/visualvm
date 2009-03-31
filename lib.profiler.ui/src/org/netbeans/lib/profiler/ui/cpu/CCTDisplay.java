@@ -148,7 +148,10 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         setDefaultSorting();
     }
 
-    public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine) {
+    public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine, String viewName) {
+        percentFormat.setMaximumFractionDigits(2);
+        percentFormat.setMinimumFractionDigits(2);
+        PrestimeCPUCCTNodeBacked.setPercentFormat(percentFormat);
         switch (exportedFileType) {
             case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
                     ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportCSVData(",",exportedFileType, eDD);
@@ -162,7 +165,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                         eDD.close();
                     }
                     break;
-            case 3: eDD.dumpData(getXMLHeader(combine));
+            case 3: eDD.dumpData(getXMLHeader(combine, viewName));
                     ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportXMLData(eDD, "  ");
                     if (!combine) {
                         eDD.dumpDataAndClose(getXMLFooter(combine));
@@ -170,7 +173,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                         eDD.dumpData(getXMLFooter(combine));
                     }
                     break;
-            case 4: eDD.dumpData(getHTMLHeader(combine));
+            case 4: eDD.dumpData(getHTMLHeader(viewName));
                     ((PrestimeCPUCCTNodeBacked)abstractTreeTableModel.getRoot()).exportHTMLData(eDD, 0);
                     if (!combine) {
                         eDD.dumpDataAndClose(getHTMLFooter(combine));
@@ -180,6 +183,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
                     break;
         }
+        percentFormat.setMaximumFractionDigits(1);
+        percentFormat.setMinimumFractionDigits(0);
     }
 
     private StringBuffer getCSVHeader(String separator) {
@@ -193,13 +198,9 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         return result;
     }
 
-    private StringBuffer getHTMLHeader(boolean combine) {
+    private StringBuffer getHTMLHeader(String viewName) {
         StringBuffer result;
-        if (combine) {
-            result=new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+((CombinedPanel)getParent()).getDefaultViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
-        } else {
-            result= new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getDefaultViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
-        }
+        result=new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
         result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[1]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th></tr>"); //NOI18N
         return result;
     }
@@ -212,14 +213,10 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         }
     }
 
-    private StringBuffer getXMLHeader(boolean combine) {
+    private StringBuffer getXMLHeader(boolean combine, String viewName) {
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result;
-        if (combine) {
-            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+((CombinedPanel)getParent()).getDefaultViewName()+"\" type=\"combined\">"+newline+"<tree>"+newline); // NOI18N
-        } else {
-            result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+getDefaultViewName()+"\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
-        }
+        result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\""+((combine)?("combined"):("tree"))+"\">"+newline+"<tree>"+newline); // NOI18N
         return result;
     }
 

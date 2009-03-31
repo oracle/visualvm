@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
+ * 
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- *
+ * 
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- *
+ * 
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
+ * 
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -104,7 +104,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         if (comp == null) return null;
         return map.get(comp);
     }
-
+    
     public Object getConstraints(int constraint) {
         Component comp = getLayoutComponent(constraint);
         if (comp == null) return null;
@@ -161,7 +161,7 @@ public class CrossBorderLayout implements LayoutManager2 {
             int height = parent.getHeight() - insets.bottom - insets.top;
 
             int left = insets.left;
-            int right = parent.getWidth() - insets.right - insets.left;
+            int right = parent.getWidth() - insets.right;
             int width = parent.getWidth() - insets.right - insets.left;
 
             int northHeight = north != null ? north.getPreferredSize().height : 0;
@@ -171,7 +171,7 @@ public class CrossBorderLayout implements LayoutManager2 {
 
             if (center != null) {
                 center.setBounds(left + westWidth, top + northHeight,
-                right - eastWidth - westWidth, height - southHeight - northHeight);
+                width - eastWidth - westWidth, height - southHeight - northHeight);
             }
 
             if (north != null) {
@@ -241,7 +241,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         }
     }
 
-
+    
     private static boolean isNorth(Integer[] constraints) {
         return constraints[1] == SwingConstants.NORTH;
     }
@@ -283,7 +283,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         if (constraint == SwingConstants.SOUTH_WEST) return;
         if (constraint == SwingConstants.SOUTH_EAST) return;
         if (constraint == SwingConstants.CENTER) return;
-
+        
         throw new IllegalArgumentException("Unsupported constraint: " + constraint); // NOI18N
     }
 
