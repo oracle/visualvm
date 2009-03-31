@@ -380,7 +380,7 @@ public final class MemoryGraphPanel extends GraphPanel {
         };
     }
 
-    private ProfilerXYPaintersModel createMemoryPaintersModel() {
+    private PaintersModel createMemoryPaintersModel() {
         // Heap size
         ProfilerXYItemPainter heapSizePainter =
                 ProfilerXYItemPainter.absolutePainter(GraphsUI.HEAP_SIZE_PAINTER_LINE_WIDTH,

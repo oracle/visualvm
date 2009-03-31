@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
+ * 
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- *
+ * 
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- *
+ * 
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
+ * 
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -43,12 +43,12 @@ public abstract class AxisMarksComputer {
 
 
     public abstract Iterator<Mark> marksIterator(int start, int end);
-
-
+    
+    
     // --- Time computer -------------------------------------------------------
 
     public static class TimeMarksComputer extends AxisMarksComputer {
-
+        
         private final ChartContext context;
         private final int orientation;
         private final int minMarksDistance;
@@ -69,11 +69,11 @@ public abstract class AxisMarksComputer {
         }
 
         public Iterator<Mark> marksIterator(int start, int end) {
+            if (context.getViewWidth() == 0) return EMPTY_ITERATOR;
             double scale =  horizontal ? context.getViewWidth(1d) :
                                          context.getViewHeight(1d);
-
+            
             final long step = getTimeUnits(scale, minMarksDistance);
-
             if (step == -1) return EMPTY_ITERATOR;
 
             final long dataStart = horizontal ?
@@ -137,8 +137,9 @@ public abstract class AxisMarksComputer {
 
         public Iterator<Mark> marksIterator(int start, int end) {
             double scale = painter.getItemValueScale(item, context);
-            final long step = getDecimalUnits(scale, minMarksDistance);
+            if (scale == -1) return EMPTY_ITERATOR;
 
+            final long step = getDecimalUnits(scale, minMarksDistance);
             if (step == -1) return EMPTY_ITERATOR;
 
             final long dataStart = ((long)painter.getItemValue(start, item,
@@ -202,11 +203,13 @@ public abstract class AxisMarksComputer {
 
         public Iterator<Mark> marksIterator(int start, int end) {
             double scale = painter.getItemValueScale(item, context);
+            if (scale == -1) return EMPTY_ITERATOR;
+
             long[] units = getBytesUnits(scale, minMarksDistance);
             final long step = units[0];
-            final int radix = (int)units[1];
-
             if (step == -1) return EMPTY_ITERATOR;
+
+            final int radix = (int)units[1];
 
             final long dataStart = ((long)painter.getItemValue(start, item,
                                           context) / step) * step;
@@ -267,7 +270,7 @@ public abstract class AxisMarksComputer {
 
     public static long getDecimalUnits(double scale, int minDistance) {
         if (scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
-
+        
         long decimalFactor = 1;
 
         while (true) {
