@@ -60,6 +60,8 @@ import org.netbeans.lib.profiler.charts.AxisComponent;
 import org.netbeans.lib.profiler.charts.AxisMarksComputer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
@@ -160,31 +162,37 @@ public final class MemoryGraphPanel extends GraphPanel {
 
     
     private void initComponents(final Action chartAction) {
+        // Painters model
+        PaintersModel paintersModel = createMemoryPaintersModel();
+
         // Chart
         chart = createChart(models.memoryItemsModel(),
-                            createMemoryPaintersModel(), smallPanel);
+                            paintersModel, smallPanel);
         chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chart.setViewInsets(new Insets(10, 0, 0, 0));
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
-                         100, chart.getChartContext(), SwingConstants.HORIZONTAL),
+                new AxisComponent(chart, new AxisMarksComputer.TimeMarksComputer(
+                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
                          new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
-                         SwingConstants.SOUTH);
+                         SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
         // Vertical axis
+        XYItem memoryItem = models.memoryItemsModel().getItem(0);
+        XYItemPainter memoryPainter = (XYItemPainter)paintersModel.getPainter(memoryItem);
+        AxisComponent.BytesPainter memoryMarksPainter = new AxisComponent.BytesPainter();
         AxisComponent vAxis =
-                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
-                         100, chart.getChartContext(), SwingConstants.VERTICAL),
-                         new AxisComponent.SimplePainter(),
-                         SwingConstants.WEST);
+                new AxisComponent(chart, new AxisMarksComputer.VerticalBytesComputer(
+                         memoryItem, memoryPainter, chart.getChartContext(), 40),
+                         memoryMarksPainter, SwingConstants.WEST,
+                         AxisComponent.MESH_FOREGROUND);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
                                               SwingConstants.SOUTH_WEST });

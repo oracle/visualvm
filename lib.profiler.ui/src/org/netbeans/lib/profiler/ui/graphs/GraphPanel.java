@@ -59,10 +59,10 @@ import javax.swing.ToolTipManager;
 import org.netbeans.lib.profiler.charts.ChartSelectionListener;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemSelection;
+import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 
 
@@ -98,7 +98,7 @@ public abstract class GraphPanel extends JPanel {
     // --- Chart support -------------------------------------------------------
 
     protected ProfilerXYChart createChart(ProfilerXYItemsModel itemsModel,
-                                          ProfilerXYPaintersModel paintersModel,
+                                          PaintersModel paintersModel,
                                           final boolean smallPanel) {
 
         if (smallPanel) {

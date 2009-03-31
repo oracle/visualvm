@@ -51,8 +51,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
-import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
@@ -72,7 +72,10 @@ public class OQLEditor extends JPanel {
     private JEditorPane queryEditor = null;
     final private OQLEngine engine;
 
-    final private Color disabledBgColor = UIManager.getLookAndFeel().getDefaults().getColor("desktop");
+    final private Color disabledBgColor = UIUtils.isGTKLookAndFeel() ?
+                  UIManager.getLookAndFeel().getDefaults().getColor("desktop") : // NOI18N
+                  UIManager.getColor("TextField.disabledBackground"); // NOI18N
+
     final private Caret nullCaret = new Caret() {
 
         public void install(JTextComponent c) {

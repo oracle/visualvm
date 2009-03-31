@@ -89,18 +89,18 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         }
     }
 
-    public void exportData(int typeOfFile, ExportDataDumper eDD) {
+    public void exportData(int typeOfFile, ExportDataDumper eDD, String viewName) {
         switch (typeOfFile) {
             case 1: exportCSV(",", eDD); break;  //NOI18N
             case 2: exportCSV(";", eDD); break;  //NOI18N
-            case 3: exportXML(eDD); break;
-            case 4: exportHTML(eDD); break;
+            case 3: exportXML(eDD, viewName); break;
+            case 4: exportHTML(eDD, viewName); break;
         }
     }
 
-    private void exportHTML(ExportDataDumper eDD) {
+    private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>Allocations Comparison</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
             if (!(columnRenderers[i]==null)) {
                 result.append("<th>"+columnNames[i]+"</th>"); //NOI18N
@@ -119,11 +119,11 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>")); //NOI18N
     }
 
-    private void exportXML(ExportDataDumper eDD) {
+    private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline); // NOI18N
-        result.append("<ExportedView Name=\"Allocations Comparison\">"+newline); //NOI18N
+        result.append("<ExportedView Name=\""+viewName+"\">"+newline); //NOI18N
         result.append(" <TableData NumRows=\""+nTrackedItems+"\" NumColumns=\"3\">"+newline); //NOI18N
         result.append("<TableHeader>"); //NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
