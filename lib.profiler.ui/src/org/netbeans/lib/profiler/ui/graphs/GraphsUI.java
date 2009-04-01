@@ -74,6 +74,8 @@ public interface GraphsUI {
     public static final Color  USED_HEAP_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  USED_HEAP_MARKER_FILL_COLOR = PROFILER_BLUE;
 
+    public static final Color  HEAP_LIMIT_FILL_COLOR = new Color(220, 220, 220);
+    
     public static final String SURVGEN_NAME = "Surviving Generations";
     public static final float  SURVGEN_PAINTER_LINE_WIDTH = 3f;
     public static final Color  SURVGEN_PAINTER_LINE_COLOR = PROFILER_RED;
@@ -95,6 +97,8 @@ public interface GraphsUI {
     public static final float  GC_TIME_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  GC_TIME_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  GC_TIME_MARKER_FILL_COLOR = PROFILER_BLUE;
+
+    public static final Color  GC_ACTIVITY_FILL_COLOR = new Color(250, 230, 230);
 
     public static final String THREADS_NAME = "Threads";
     public static final float  THREADS_PAINTER_LINE_WIDTH = 3f;
