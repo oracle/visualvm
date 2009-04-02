@@ -102,7 +102,7 @@ public abstract class ClassRepository implements CommonConstants {
     static final String LOCATION_VMSUPPLIED = "<VM_SUPPLIED>"; // NOI18N
     private static ClassPath classPath;
     private static Hashtable classes;
-    private static HashSet notFoundClasses;
+    private static Set notFoundClasses;
     private static Map definingClassLoaderMap;
 
     static {
@@ -111,7 +111,7 @@ public abstract class ClassRepository implements CommonConstants {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static ArrayList getAllClassVersions(String className) {
+    public static List getAllClassVersions(String className) {
         className = className.replace('.', '/').intern(); // NOI18N
 
         Object entry = classes.get(className);
@@ -136,7 +136,7 @@ public abstract class ClassRepository implements CommonConstants {
         class ClassesEnumeration implements Enumeration {
             private Enumeration baseEnum;
             private Object nextElement;
-            private ArrayList classes;
+            private List classes;
             private int idx;
 
             ClassesEnumeration(Enumeration baseEnum) {
@@ -195,12 +195,12 @@ public abstract class ClassRepository implements CommonConstants {
      * Returns names of all classes that can be located on the given classpath.
      * Since this method performs directory scanning, it is recommended to call it once and cache the results.
      */
-    public static ArrayList getClassesOnClasspath(ArrayList classPathElementList) { // TODO CHECK: unused method
+    public static List getClassesOnClasspath(ArrayList classPathElementList) { // TODO CHECK: unused method
 
-        ArrayList list = new ArrayList();
+        List list = new ArrayList();
         list.addAll(classPathElementList);
 
-        ArrayList res = new ArrayList();
+        List res = new ArrayList();
 
         for (Iterator e = list.iterator(); e.hasNext();) {
             String dirOrJar = (String) e.next();
@@ -406,15 +406,15 @@ public abstract class ClassRepository implements CommonConstants {
      * @param classPaths            the 3 elements should be the user, extension, and boot class paths, respectively
      */
     public static void initClassPaths(String workingDir, String[] classPaths) {
-        ArrayList userClassPathElementList = MiscUtils.getPathComponents(classPaths[0], true, workingDir);
-        ArrayList bootClassPathElementList = MiscUtils.getPathComponents(classPaths[2], true, workingDir);
+        List userClassPathElementList = MiscUtils.getPathComponents(classPaths[0], true, workingDir);
+        List bootClassPathElementList = MiscUtils.getPathComponents(classPaths[2], true, workingDir);
 
         String extPath = classPaths[1];
-        ArrayList extClassPathElementList = new ArrayList();
+        List extClassPathElementList = new ArrayList();
 
         // Extension class path needs special handling, since it consists of directories, which contain .jars
         // So we need to find all these .jars in all these dirs and add them to extClassPathElementList
-        ArrayList dirs = MiscUtils.getPathComponents(extPath, true, workingDir);
+        List dirs = MiscUtils.getPathComponents(extPath, true, workingDir);
 
         for (Iterator e = dirs.iterator(); e.hasNext();) {
             File extDir = new File((String) e.next());
@@ -431,11 +431,13 @@ public abstract class ClassRepository implements CommonConstants {
             }
 
             for (int i = 0; i < extensions.length; i++) {
-                extClassPathElementList.add(extPath + File.separatorChar + extensions[i]);
+                String extJar = extDir.getAbsolutePath() + File.separatorChar + extensions[i];
+                List allJarComponents = MiscUtils.getPathComponents(extJar,true,workingDir);
+                extClassPathElementList.addAll(allJarComponents);
             }
         }
 
-        ArrayList list = new ArrayList();
+        List list = new ArrayList();
         list.addAll(bootClassPathElementList);
         list.addAll(extClassPathElementList);
         list.addAll(userClassPathElementList);

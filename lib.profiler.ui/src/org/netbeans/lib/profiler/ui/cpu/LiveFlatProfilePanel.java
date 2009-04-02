@@ -205,8 +205,8 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
         //    }
     }
 
-    public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        fpCollectorPanel.exportData(exportedFileType, eDD);
+    public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
+        fpCollectorPanel.exportData(exportedFileType, eDD, viewName);
     }
 
     private void initComponents() {

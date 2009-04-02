@@ -377,7 +377,7 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
 
         setDisplayName(ActionsUtil.formatProjectSensitiveName(getNamePattern(), projects));
 
-        if ((projects != null) && (projects.length > 0)) {
+        if ((projects != null) && (projects.length == 1)) { // must be selected single project
             setEnabled(getPerformer().enable(projects[0], context, true));
         } else {
             setEnabled(false);
