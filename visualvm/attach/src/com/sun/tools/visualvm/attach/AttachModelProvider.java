@@ -77,7 +77,7 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
         String thisArch = System.getProperty("sun.arch.data.model");    // NOI18N
         if (thisArch != null) {
             return Boolean.valueOf("64".equals(thisArch));  // NOI18N
-}
+        }
         return null;
     }
 }
