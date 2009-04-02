@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -47,11 +48,36 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
             JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
             
             if (jvmstat != null && jvmstat.isAttachable()) {
+                if (Utilities.isWindows()) {
+                    // on Windows Attach API attach to the process of the same
+                    // architecture ( 32bit / 64bit )
+                    Boolean this64bitArch = is64BitArchitecture();
+                    Boolean app64bitArch = is64BitArchitecture(jvmstat);
+                    if (this64bitArch != null && app64bitArch != null) {
+                        if (!this64bitArch.equals(app64bitArch)) {
+                            return null;
+                        }
+                    }
+                }
                 return new AttachModelImpl(app);
             }
         }
         return null;
     }
     
+    private static Boolean is64BitArchitecture(JvmJvmstatModel jvmstat) {
+        String name = jvmstat.getVmName();
+        if (name != null) {
+            return name.toLowerCase().contains("64-bit");   // NOI18N
+        }
+        return null;
+    }
     
+    private static Boolean is64BitArchitecture() {
+        String thisArch = System.getProperty("sun.arch.data.model");    // NOI18N
+        if (thisArch != null) {
+            return Boolean.valueOf("64".equals(thisArch));  // NOI18N
+}
+        return null;
+    }
 }

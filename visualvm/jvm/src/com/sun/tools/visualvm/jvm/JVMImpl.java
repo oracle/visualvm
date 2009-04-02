@@ -98,7 +98,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean isAttachable() {
         if (jvmstatModel != null) {
-            return jvmstatModel.isAttachable();
+            if (!jvmstatModel.isAttachable()) {
+                return false;
+        }
+            return getAttach() != null;
         }
         return false;
     }
