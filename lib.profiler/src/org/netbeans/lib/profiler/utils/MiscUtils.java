@@ -40,8 +40,8 @@
 
 package org.netbeans.lib.profiler.utils;
 
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -330,7 +330,8 @@ public class MiscUtils implements CommonConstants {
 
             while (tok.hasMoreTokens()) {
                 String name = tok.nextToken();
-
+                boolean addedToList = false;
+                
                 if ((name == null) || (name.length() == 0)) {
                     continue; // Essentially sanity check, but who knows?
                 }
@@ -338,31 +339,34 @@ public class MiscUtils implements CommonConstants {
                 if (doCheck) {
                     name = getAbsoluteFilePath(name, workingDir);
                     name = getCanonicalPath(new File(name)); // clean up the name into a canonical path
-
-                    if (name != null) {
+                    if (name != null && !list.contains(name)) {
                         list.add(name);
+                        addedToList = true;
                     }
                 } else {
                     list.add(name);
+                    addedToList = true;
                 }
-                if (name != null) {
+                if (addedToList) {
                     try {
                         getClassPathFromManifest(name,list);
                     } catch (URISyntaxException ex) {
+                        System.out.println("Error processing "+name);
                         ex.printStackTrace();
                     } catch (IOException ex) {
+                        System.out.println("Error processing "+name);
                         ex.printStackTrace();
                     }
                 }
             }
         }
-
         return list;
     }
 
-    private static void getClassPathFromManifest(String path,List pathList) throws IOException, URISyntaxException {
-        if (path.toLowerCase().endsWith(".jar")) {
-            JarFile jarFile = new JarFile(path);
+    private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
+        if (jarPath.toLowerCase().endsWith(".jar")) {
+            File pathFile = new File(jarPath);
+            JarFile jarFile = new JarFile(pathFile);
             Manifest manifest = jarFile.getManifest();
             
             if (manifest != null) {
@@ -372,24 +376,37 @@ public class MiscUtils implements CommonConstants {
                     String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
 
                     if (jarCp != null) {
-                        URL baseUrl = new File(path).toURL();
+                        File parent = pathFile.getParentFile();
                         StringTokenizer tokens = new StringTokenizer(jarCp);
                         
                         while(tokens.hasMoreTokens()) {
-                            String cp = tokens.nextToken();
-                            URL cpURL = new URL(baseUrl,cp);
-                            File cpFile = new File(cpURL.toURI());
-                            if (cpFile.exists()) {
-                                String pathName = cpFile.getAbsolutePath();
-
-                                pathList.add(pathName);
-                                getClassPathFromManifest(pathName,pathList);
+                            String cpName;
+                            File cpFile = new File(new URI(tokens.nextToken()));
+                            
+                            if (!cpFile.isAbsolute()) {
+                                cpFile = new File(parent,cpFile.getPath());
+                            }
+                            cpName = getCanonicalPath(cpFile);
+                            if (cpName != null && !pathList.contains(cpName)) {
+                                pathList.add(cpName);
+                                getClassPathFromManifest(cpName,pathList);
                             }
                         }
                     }
                 }
             }
         }
+    }
+    
+    
+    private static boolean addToList(File file,List path) {
+        String pathName = getCanonicalPath(file);
+        
+        if (pathName != null && !path.contains(pathName)) {
+            path.add(pathName);
+            return true;
+        }
+        return false;
     }
     
     public static void setSilent(boolean silent) {
