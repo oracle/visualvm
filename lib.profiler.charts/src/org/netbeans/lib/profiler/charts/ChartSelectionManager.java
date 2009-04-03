@@ -348,9 +348,9 @@ class ChartSelectionManager implements ChartSelectionModel {
                                       long oldDataOffsetX, long oldDataOffsetY,
                                       long oldDataWidth, long oldDataHeight) {
 
-            ChartContext context = chart.getChartContext();
-            if (context.getViewWidth() <= context.getViewportWidth())
-                updateHighlightedItems();
+//            ChartContext context = chart.getChartContext();
+//            if (context.getViewWidth() <= context.getViewportWidth())
+//                updateHighlightedItems();
         }
 
         public void viewChanged(long offsetX, long offsetY,
