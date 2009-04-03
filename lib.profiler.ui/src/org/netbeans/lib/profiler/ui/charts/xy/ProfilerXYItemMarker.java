@@ -193,7 +193,16 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 //            throw new UnsupportedOperationException("Unsupported selection: " + selection); // NOI18N
 
         XYItemSelection sel = (XYItemSelection)selection;
-        return getViewBounds(sel.getItem(), new int[] { sel.getValueIndex() }, context);
+        XYItem item  = sel.getItem();
+        int selectedValueIndex = sel.getValueIndex();
+
+        if (selectedValueIndex == -1 ||
+            selectedValueIndex >= item.getValuesCount())
+            // This happens on reset - bounds of the selection are unknown, let's clear whole area
+            return new LongRect(0, 0, context.getViewportWidth(),
+                                context.getViewportHeight());
+        else
+            return getViewBounds(item, new int[] { sel.getValueIndex() }, context);
     }
 
     public XYItemSelection getClosestSelection(ChartItem item, int viewX,

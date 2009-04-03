@@ -44,6 +44,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import java.io.File;
@@ -362,23 +363,28 @@ public class MiscUtils implements CommonConstants {
     private static void getClassPathFromManifest(String path,List pathList) throws IOException, URISyntaxException {
         if (path.toLowerCase().endsWith(".jar")) {
             JarFile jarFile = new JarFile(path);
-            Attributes attrs = jarFile.getManifest().getMainAttributes();
+            Manifest manifest = jarFile.getManifest();
             
-            if (attrs != null) {
-            String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
-            
-                if (jarCp != null) {
-                    URL baseUrl = new File(path).toURL();
-                    StringTokenizer tokens = new StringTokenizer(jarCp);
-                    while(tokens.hasMoreTokens()) {
-                        String cp = tokens.nextToken();
-                        URL cpURL = new URL(baseUrl,cp);
-                        File cpFile = new File(cpURL.toURI());
-                        if (cpFile.exists()) {
-                            String pathName = cpFile.getAbsolutePath();
+            if (manifest != null) {
+                Attributes attrs = manifest.getMainAttributes();
 
-                            pathList.add(pathName);
-                            getClassPathFromManifest(pathName,pathList);
+                if (attrs != null) {
+                    String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
+
+                    if (jarCp != null) {
+                        URL baseUrl = new File(path).toURL();
+                        StringTokenizer tokens = new StringTokenizer(jarCp);
+                        
+                        while(tokens.hasMoreTokens()) {
+                            String cp = tokens.nextToken();
+                            URL cpURL = new URL(baseUrl,cp);
+                            File cpFile = new File(cpURL.toURI());
+                            if (cpFile.exists()) {
+                                String pathName = cpFile.getAbsolutePath();
+
+                                pathList.add(pathName);
+                                getClassPathFromManifest(pathName,pathList);
+                            }
                         }
                     }
                 }
