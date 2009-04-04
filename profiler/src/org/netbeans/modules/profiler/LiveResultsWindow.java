@@ -863,6 +863,8 @@ public final class LiveResultsWindow extends TopComponent implements ResultsList
         if (currentDisplayComponent == memoryTabPanel) {
             if (tabs.getSelectedComponent() instanceof LiveAllocResultsPanel) {
                 ((LiveAllocResultsPanel) currentDisplay).exportData(exportedFileType, eDD, NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName"));
+            } else if (tabs.getSelectedComponent() instanceof LiveLivenessResultsPanel) {
+                ((LiveLivenessResultsPanel) currentDisplay).exportData(exportedFileType, eDD, NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName"));
             }
         } else if (currentDisplayComponent instanceof LiveFlatProfilePanel) {
             ((LiveFlatProfilePanel) currentDisplay).exportData(exportedFileType, eDD, NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName"));

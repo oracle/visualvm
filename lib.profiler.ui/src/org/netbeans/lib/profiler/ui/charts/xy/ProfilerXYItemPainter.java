@@ -49,12 +49,12 @@ import org.netbeans.lib.profiler.charts.xy.XYItem;
  */
 public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
-    private static final int TYPE_ABSOLUTE = 0;
-    private static final int TYPE_RELATIVE = 1;
+    static final int TYPE_ABSOLUTE = 0;
+    static final int TYPE_RELATIVE = 1;
 
     private final int lineWidth;
     private final Color lineColor;
-    private final Color fillColor;
+    final Color fillColor;
 
     private final Stroke lineStroke;
 
@@ -82,8 +82,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
 
-    private ProfilerXYItemPainter(float lineWidth, Color lineColor, Color fillColor,
-                                  int type, int maxOffset) {
+    ProfilerXYItemPainter(float lineWidth, Color lineColor, Color fillColor,
+                          int type, int maxOffset) {
 
         if (lineColor == null && fillColor == null)
             throw new IllegalArgumentException("No parameters defined"); // NOI18N
@@ -197,6 +197,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
     public double getItemValueScale(XYItem item, ChartContext context) {
+        if (item.getValuesCount() < 2) return -1;
+
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValueScale(item, context);
         } else {
@@ -292,7 +294,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
     
-    private void paint(XYItem item, List<ItemSelection> highlighted,
+    protected void paint(XYItem item, List<ItemSelection> highlighted,
                        List<ItemSelection> selected, Graphics2D g,
                        Rectangle dirtyArea, ProfilerXYChart.Context context) {
 
