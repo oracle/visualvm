@@ -37,6 +37,7 @@ public interface GraphsUI {
     
     public static final Color  PROFILER_BLUE = new Color(127, 63, 191);
     public static final Color  PROFILER_RED = new Color(255, 127, 127);
+    public static final Color  PROFILER_GREEN = new Color(30, 157, 68);
 
 
     // --- Charts colors definition --------------------------------------------
@@ -50,7 +51,65 @@ public interface GraphsUI {
     public static final Color  TOOLTIP_OVERLAY_FILL_COLOR = new Color(250, 250, 255);
     
     
-    // --- Items colors definition ---------------------------------------------
+    // --- Class History graphs ------------------------------------------------
+
+    public static final String A_ALLOC_OBJECTS_NAME = "Allocated Objects";
+    public static final float  A_ALLOC_OBJECTS_PAINTER_LINE_WIDTH = 3f;
+    public static final Color  A_ALLOC_OBJECTS_PAINTER_LINE_COLOR = PROFILER_RED;
+    public static final Color  A_ALLOC_OBJECTS_PAINTER_FILL_COLOR = null;
+    public static final int    A_ALLOC_OBJECTS_MARKER_RADIUS = 5;
+    public static final float  A_ALLOC_OBJECTS_MARKER_LINE1_WIDTH = 0.75f;
+    public static final Color  A_ALLOC_OBJECTS_MARKER_LINE1_COLOR = Color.BLACK;
+    public static final float  A_ALLOC_OBJECTS_MARKER_LINE2_WIDTH = 3.5f;
+    public static final Color  A_ALLOC_OBJECTS_MARKER_LINE2_COLOR = Color.WHITE;
+    public static final Color  A_ALLOC_OBJECTS_MARKER_FILL_COLOR = PROFILER_RED;
+
+    public static final String A_ALLOC_BYTES_NAME = "Allocated Bytes";
+    public static final float  A_ALLOC_BYTES_PAINTER_LINE_WIDTH = 3f;
+    public static final Color  A_ALLOC_BYTES_PAINTER_LINE_COLOR = PROFILER_BLUE;
+    public static final Color  A_ALLOC_BYTES_PAINTER_FILL_COLOR = null;
+    public static final int    A_ALLOC_BYTES_MARKER_RADIUS = 5;
+    public static final float  A_ALLOC_BYTES_MARKER_LINE1_WIDTH = 0.75f;
+    public static final Color  A_ALLOC_BYTES_MARKER_LINE1_COLOR = Color.BLACK;
+    public static final float  A_ALLOC_BYTES_MARKER_LINE2_WIDTH = 3.5f;
+    public static final Color  A_ALLOC_BYTES_MARKER_LINE2_COLOR = Color.WHITE;
+    public static final Color  A_ALLOC_BYTES_MARKER_FILL_COLOR = PROFILER_BLUE;
+
+    public static final String L_LIVE_OBJECTS_NAME = "Live Objects";
+    public static final float  L_LIVE_OBJECTS_PAINTER_LINE_WIDTH = 3f;
+    public static final Color  L_LIVE_OBJECTS_PAINTER_LINE_COLOR = PROFILER_RED;
+    public static final Color  L_LIVE_OBJECTS_PAINTER_FILL_COLOR = null;
+    public static final int    L_LIVE_OBJECTS_MARKER_RADIUS = 5;
+    public static final float  L_LIVE_OBJECTS_MARKER_LINE1_WIDTH = 0.75f;
+    public static final Color  L_LIVE_OBJECTS_MARKER_LINE1_COLOR = Color.BLACK;
+    public static final float  L_LIVE_OBJECTS_MARKER_LINE2_WIDTH = 3.5f;
+    public static final Color  L_LIVE_OBJECTS_MARKER_LINE2_COLOR = Color.WHITE;
+    public static final Color  L_LIVE_OBJECTS_MARKER_FILL_COLOR = PROFILER_RED;
+
+    public static final String L_LIVE_BYTES_NAME = "Live Bytes";
+    public static final float  L_LIVE_BYTES_PAINTER_LINE_WIDTH = 3f;
+    public static final Color  L_LIVE_BYTES_PAINTER_LINE_COLOR = PROFILER_BLUE;
+    public static final Color  L_LIVE_BYTES_PAINTER_FILL_COLOR = null;
+    public static final int    L_LIVE_BYTES_MARKER_RADIUS = 5;
+    public static final float  L_LIVE_BYTES_MARKER_LINE1_WIDTH = 0.75f;
+    public static final Color  L_LIVE_BYTES_MARKER_LINE1_COLOR = Color.BLACK;
+    public static final float  L_LIVE_BYTES_MARKER_LINE2_WIDTH = 3.5f;
+    public static final Color  L_LIVE_BYTES_MARKER_LINE2_COLOR = Color.WHITE;
+    public static final Color  L_LIVE_BYTES_MARKER_FILL_COLOR = PROFILER_BLUE;
+
+    public static final String L_ALLOC_OBJECTS_NAME = "Allocated Objects";
+    public static final float  L_ALLOC_OBJECTS_PAINTER_LINE_WIDTH = 3f;
+    public static final Color  L_ALLOC_OBJECTS_PAINTER_LINE_COLOR = PROFILER_GREEN;
+    public static final Color  L_ALLOC_OBJECTS_PAINTER_FILL_COLOR = null;
+    public static final int    L_ALLOC_OBJECTS_MARKER_RADIUS = 5;
+    public static final float  L_ALLOC_OBJECTS_MARKER_LINE1_WIDTH = 0.75f;
+    public static final Color  L_ALLOC_OBJECTS_MARKER_LINE1_COLOR = Color.BLACK;
+    public static final float  L_ALLOC_OBJECTS_MARKER_LINE2_WIDTH = 3.5f;
+    public static final Color  L_ALLOC_OBJECTS_MARKER_LINE2_COLOR = Color.WHITE;
+    public static final Color  L_ALLOC_OBJECTS_MARKER_FILL_COLOR = PROFILER_GREEN;
+
+
+    // --- VM Telemetry graphs -------------------------------------------------
 
     public static final String HEAP_SIZE_NAME = "Heap Size";
     public static final float  HEAP_SIZE_PAINTER_LINE_WIDTH = 0f;
