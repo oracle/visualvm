@@ -1292,6 +1292,12 @@ public final class NetBeansProfiler extends Profiler {
                     targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
                     ProfilingPointsManager.getDefault().reset();
                     ResultsManager.getDefault().reset();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (LiveResultsWindow.hasDefault())
+                                LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
+                        }
+                    });
 
                     try {
                         Thread.sleep(100);
@@ -1833,6 +1839,8 @@ public final class NetBeansProfiler extends Profiler {
             public void run() {
                 profiler.getThreadsManager().reset();
                 profiler.getVMTelemetryManager().reset();
+                if (LiveResultsWindow.hasDefault())
+                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
             }
         });
         ProfilingPointsManager.getDefault().reset();
