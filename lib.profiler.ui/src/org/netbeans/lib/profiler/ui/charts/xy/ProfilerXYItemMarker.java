@@ -64,7 +64,7 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
     private final int decorationRadius;
 
     private final int type;
-    private final int maxOffset;
+    private final int maxValueOffset;
 
 
     // --- Constructor ---------------------------------------------------------
@@ -97,7 +97,7 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 
     private ProfilerXYItemMarker(int markRadius, float line1Width, Color line1Color,
                                  float line2Width, Color line2Color, Color fillColor,
-                                 int type, int maxOffset) {
+                                 int type, int maxValueOffset) {
 
         if (line1Color == null && line2Color == null && fillColor == null)
             throw new IllegalArgumentException("No parameters defined"); // NOI18N
@@ -120,7 +120,7 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
         decorationRadius = markRadius + this.line1Width + this.line2Width;
 
         this.type = type;
-        this.maxOffset = maxOffset;
+        this.maxValueOffset = maxValueOffset;
     }
 
 
@@ -237,34 +237,12 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 
     // --- Private implementation ----------------------------------------------
 
-    private static LongRect getRelativeDataBounds(LongRect dataBounds, XYItem item,
-                                                  ChartContext context, int maxOffset) {
-        LongRect relativeBounds = new LongRect(dataBounds);
-        LongRect itemBounds = item.getBounds();
-
-        double itemValueFactor = (double)(context.getDataHeight() -
-                                 context.getDataHeight(maxOffset)) /
-                                 (double)(itemBounds.height);
-        // TODO: fix the math, no need to compute the value2 - height is enough
-        long value1 = context.getDataOffsetY() + (long)(itemValueFactor *
-                      (double)(relativeBounds.y - itemBounds.y));
-        long value2 = context.getDataOffsetY() + (long)(itemValueFactor *
-                      (double)((relativeBounds.y + relativeBounds.height)
-                      - itemBounds.y));
-
-        relativeBounds.y = value1;
-        relativeBounds.height = value2 - value1;
-
-        return relativeBounds;
-    }
-
     private LongRect getViewBoundsRelative(LongRect dataBounds, XYItem item,
                                            ChartContext context) {
         LongRect itemBounds = item.getBounds();
 
-        double itemValueFactor = ((double)context.getDataHeight() /*-
-                                 context.getDataHeight(maxOffset)*/) /
-                                 ((double)itemBounds.height);
+        double itemValueFactor = getItemValueFactor(context, maxValueOffset,
+                                                    itemBounds.height);
 
         // TODO: fix the math!!!
         double value1 = context.getDataOffsetY() + itemValueFactor *
@@ -334,9 +312,8 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
         if (highlighted.isEmpty()) return;
 
         double itemValueFactor = type == TYPE_RELATIVE ?
-                                         (double)(context.getDataHeight() /*-
-                                          context.getDataHeight(maxOffset)*/) /
-                                         (double)(item.getBounds().height) : 0;
+                                         getItemValueFactor(context, maxValueOffset,
+                                         item.getBounds().height) : 0;
 
         for (ItemSelection selection : highlighted) {
 
@@ -384,6 +361,13 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
             return context.getViewY(context.getDataOffsetY() + (itemValueFactor *
                         (item.getYValue(valueIndex) - item.getBounds().y)));
         }
+    }
+
+    private static double getItemValueFactor(ChartContext context,
+                                             double maxValueOffset,
+                                             double itemHeight) {
+        return ((double)context.getDataHeight() -
+               context.getDataHeight(maxValueOffset)) / itemHeight;
     }
 
 }
