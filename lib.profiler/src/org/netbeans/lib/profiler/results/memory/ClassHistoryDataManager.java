@@ -84,8 +84,7 @@ public class ClassHistoryDataManager extends DataManager {
 
 
     public synchronized void setup(int trackedClassID, String trackedClassName) {
-        if (this.trackedClassID == trackedClassID) return;
-        if (isTrackingClass()) reset();
+        reset();
         
         this.trackedClassID = trackedClassID;
         this.trackedClassName = trackedClassName;

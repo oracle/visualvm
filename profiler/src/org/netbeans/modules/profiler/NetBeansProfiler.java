@@ -1286,18 +1286,19 @@ public final class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (LiveResultsWindow.hasDefault())
+                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
+            }
+        });
+
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
                     targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
                     ProfilingPointsManager.getDefault().reset();
                     ResultsManager.getDefault().reset();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (LiveResultsWindow.hasDefault())
-                                LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
-                        }
-                    });
 
                     try {
                         Thread.sleep(100);
