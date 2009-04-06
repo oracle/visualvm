@@ -1494,12 +1494,12 @@ public final class NetBeansProfiler extends Profiler {
         return true;
     }
 
-    public boolean rerunAvaliable() {
-        return actionSupport.isActionAvalaible();
+    public boolean rerunAvailable() {
+        return actionSupport.isActionAvailable();
     }
 
-    public boolean modifyAvaliable() {
-        return getProfilingMode()==MODE_ATTACH||actionSupport.isActionAvalaible();
+    public boolean modifyAvailable() {
+        return getProfilingMode()==MODE_ATTACH||actionSupport.isActionAvailable();
     }
 
     public void rerunLastProfiling() {

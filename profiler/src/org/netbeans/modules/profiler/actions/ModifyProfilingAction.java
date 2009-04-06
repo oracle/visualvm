@@ -67,14 +67,14 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
 
     @Override
     public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().modifyAvaliable();
+        return super.isEnabled() && Profiler.getDefault().modifyAvailable();
     }
 
     /**
      *  Updates the action to react to rename or delete of the profiled project only
      */
     public void updateAction() {
-        if (!Profiler.getDefault().modifyAvaliable()) {
+        if (!Profiler.getDefault().modifyAvailable()) {
             boolean shouldBeEnabled = isEnabled();
             firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
         }
