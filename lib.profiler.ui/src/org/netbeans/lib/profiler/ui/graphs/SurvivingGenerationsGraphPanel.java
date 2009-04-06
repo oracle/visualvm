@@ -66,6 +66,7 @@ import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
@@ -177,7 +178,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
         // Surviving generations axis
-        XYItem survgenItem = models.generationsItemsModel().getItem(0);
+        XYItem survgenItem = models.generationsItemsModel().getItem(1);
         XYItemPainter survgenPainter = (XYItemPainter)paintersModel.getPainter(survgenItem);
         AxisComponent.SimplePainter survgenMarksPainter = new AxisComponent.SimplePainter();
         survgenMarksPainter.setForeground(GraphsUI.SURVGEN_PAINTER_LINE_COLOR);
@@ -188,7 +189,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
                          AxisComponent.MESH_FOREGROUND);
 
         // Surviving generations axis
-        XYItem gcTimeItem = models.generationsItemsModel().getItem(1);
+        XYItem gcTimeItem = models.generationsItemsModel().getItem(2);
         XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
         AxisComponent.PercentPainter gcTimeMarksPainter =
                 new AxisComponent.PercentPainter(0, 1000);
@@ -415,7 +416,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         };
     }
 
-    private ProfilerXYPaintersModel createGenerationsPaintersModel() {
+    private PaintersModel createGenerationsPaintersModel() {
         // Surviving generations
         ProfilerXYItemPainter survgenPainter =
                 ProfilerXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
@@ -448,9 +449,12 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         XYItemPainter gtp = new CompoundProfilerXYItemPainter(gcTimePainter,
                                                       gcTimeMarker);
 
+        // GC events painter
+        XYItemPainter gep = ProfilerGCXYItemPainter.painter(GraphsUI.GC_ACTIVITY_FILL_COLOR);
+
         // Model
-        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
-                 new XYItemPainter[] { sgp, gtp });
+        PaintersModel model = new ProfilerXYPaintersModel(
+                 new XYItemPainter[] { gep ,sgp, gtp });
 
         return model;
     }

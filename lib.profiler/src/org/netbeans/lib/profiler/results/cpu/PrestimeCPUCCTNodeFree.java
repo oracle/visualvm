@@ -194,7 +194,7 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
         StringBuffer result = new StringBuffer(indent+"<node>"+newline); //NOI18N
         result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"</Name>"+newline); //NOI18N
         result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PrestimeCPUCCTNodeFree)getParent()).getNodeName()))+"</Parent>"+newline); //NOI18N
-        result.append(indent+" <Time_Relative>"+percentFormat.format((double)getTotalTime0InPerCent())+"</Time_Relative>"+newline); //NOI18N
+        result.append(indent+" <Time_Relative>"+percentFormat.format(((double)getTotalTime0InPerCent())/100)+"</Time_Relative>"+newline); //NOI18N
         result.append(indent+" <Time>"+getTotalTime0()+"</Time>"+newline); //NOI18N
         result.append(indent+" <Invocations>"+getNCalls()+"</Invocations>"+newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
@@ -213,7 +213,7 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
         for (int i=0; i<depth; i++) {
             result.append("."); //NOI18N
         }
-        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+percentFormat.format((double)getTotalTime0InPerCent())+"</td><td class=\"right\">"+getTotalTime0()+"</td><td class=\"right\">"+getNCalls()+"</td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+percentFormat.format(((double)getTotalTime0InPerCent())/100)+"</td><td class=\"right\">"+getTotalTime0()+"</td><td class=\"right\">"+getNCalls()+"</td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
