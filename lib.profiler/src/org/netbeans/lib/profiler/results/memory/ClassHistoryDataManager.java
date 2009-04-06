@@ -136,6 +136,8 @@ public class ClassHistoryDataManager extends DataManager {
         nTrackedLiveObjects = new int[arrayBufferSize];
         trackedLiveObjectsSize = new long[arrayBufferSize];
 
+        currentArraysSize = arrayBufferSize;
+
         fireDataReset();
     }
     
