@@ -223,6 +223,8 @@ public abstract class Profiler {
 
     public abstract boolean rerunAvaliable();
 
+    public abstract boolean modifyAvaliable();
+
     public abstract void rerunLastProfiling();
 
     public abstract boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture);
