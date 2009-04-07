@@ -127,11 +127,7 @@ public class ProfilerClient implements CommonConstants {
                             EventBufferDumpedCommand bufferDumpedCmd = ((EventBufferDumpedCommand) cmd);
                             
                             EventBufferProcessor.readDataAndPrepareForProcessing(bufferDumpedCmd);
-
-                            List profilePointHits = new ArrayList();
                             EventBufferResultsProvider.getDefault().dataReady(bufferDumpedCmd.getBufSize(), getCurrentInstrType());
-                            //              processProfilingResults(bufSize, profilePointHits);
-                            //              profilePointHit(profilePointHits);
                             sendSimpleRespToServer(true, null);
 
                             break;
