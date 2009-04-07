@@ -64,6 +64,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public static final int SORT_BY_NAME = 6;
     public static final int SORT_BY_TOTAL_ALLOC_OBJ = 7;
     private static boolean dontShowZeroLiveObjNodes;
+    public static NumberFormat decimalFormat = NumberFormat.getInstance(Locale.ENGLISH);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -279,15 +280,66 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         sortInts(values, sortOrder);
     }
 
+    @Override
+    public void exportXMLData(ExportDataDumper eDD,String indent) {
+        String newline = System.getProperty("line.separator"); // NOI18N
+        StringBuffer result = new StringBuffer(indent+"<Node>"+newline); //NOI18N
+        result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"<Name>"+newline); //NOI18N
+        result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"<Parent>"+newline); //NOI18N
+        result.append(indent+" <Live_Bytes>"+totalObjSize+"</Live_Bytes>"+newline); //NOI18N
+        result.append(indent+" <Live_Objects>"+nLiveObjects+"</Live_Objects>"+newline); //NOI18N
+        result.append(indent+" <Allocated_Objects>"+nCalls+"</Allocated_Objects>"+newline); //NOI18N
+        result.append(indent+" <Avg_Age>"+avgObjectAge+"</Avg_Age>"+newline); //NOI18N
+        result.append(indent+" <Generations>"+survGen+"</Generations>"+newline); //NOI18N
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < getNChildren(); i++) {
+                children[i].exportXMLData(eDD, indent+" "); //NOI18N
+            }
+        }
+        result=new StringBuffer(indent+"</Node>"); //NOI18N
+        eDD.dumpData(result);
+    }
+
+    @Override
+    public void exportHTMLData(ExportDataDumper eDD, int depth) {
+        StringBuffer result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"); //NOI18N
+        for (int i=0; i<depth; i++) {
+            result.append("."); //NOI18N
+        }
+        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+totalObjSize+"</td><td class=\"right\">"+nLiveObjects+"</td><td class=\"right\">"+nCalls+"</td><td class=\"right\">"+avgObjectAge+"</td><td class=\"right\">"+survGen+"</td><td class=\"parent\"><pre class=\"parent\">"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"</pre></td></tr>"); //NOI18N
+        eDD.dumpData(result); //dumps the current row
+        // children nodes
+        if (children!=null) {
+            for (int i = 0; i < children.length; i++) {
+                children[i].exportHTMLData(eDD, depth+1);
+            }
+        }
+    }
+
+    private String replaceHTMLCharacters(String s) {
+        StringBuffer sb = new StringBuffer();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+          char c = s.charAt(i);
+          switch (c) {
+              case '<': sb.append("&lt;"); break; // NOI18N
+              case '>': sb.append("&gt;"); break; // NOI18N
+              case '&': sb.append("&amp;"); break; // NOI18N
+              case '"': sb.append("&quot;"); break; // NOI18N
+              default: sb.append(c); break;
+          }
+        }
+        return sb.toString();
+    }
+
+    @Override
     public void exportCSVData(String separator, int depth, ExportDataDumper eDD) {
         StringBuffer result = new StringBuffer();
         String newLine = "\r\n"; // NOI18N
         String quote = "\""; // NOI18N
         String indent = " "; // NOI18N
-
-        NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-        nf.setMaximumFractionDigits(3);
-        nf.setMinimumFractionDigits(3);
 
         // this node
         result.append(quote);
@@ -298,8 +350,9 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         result.append(quote+totalObjSize+quote+separator);
         result.append(quote+nLiveObjects+quote+separator);
         result.append(quote+nCalls+quote+separator);
-        result.append(quote+nf.format(avgObjectAge)+quote+separator);
-        result.append(quote+survGen+quote+newLine);
+        result.append(quote+decimalFormat.format(avgObjectAge)+quote+separator);
+        result.append(quote+survGen+quote+separator);
+        result.append(quote+((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+newLine); // NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -307,5 +360,10 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
                 ((PresoObjLivenessCCTNode) children[i]).exportCSVData(separator, depth+1, eDD);
             }
         }
+    }
+
+    public void setDecimalFormat() {
+        decimalFormat.setMinimumFractionDigits(3);
+        decimalFormat.setMaximumFractionDigits(3);
     }
 }
