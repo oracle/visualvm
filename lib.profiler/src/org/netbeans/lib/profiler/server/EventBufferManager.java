@@ -40,9 +40,12 @@
 
 package org.netbeans.lib.profiler.server;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
-import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -101,27 +104,12 @@ public class EventBufferManager implements CommonConstants {
 
             mapByteBuf.reset();
             mapByteBuf.put(eventBuffer, startPos, length);
-            bufFileOk = profilerServer.sendEventBufferDumpedCommand(length, true); // This will wait for response as well
+            bufFileOk = profilerServer.sendEventBufferDumpedCommand(length, null, -1);
         } else {
-            synchronized (profilerServer) {
-                profilerServer.sendEventBufferDumpedCommand(length, false); // This will not wait for response
-
-                ObjectOutputStream os = profilerServer.getSocketOutputStream();
-
-                try {
-                    if (DEBUG) {
-                        System.err.println("EventBufferManager.DEBUG: Dumping to wire: startPos:" + startPos + ", curPtrPos:"
-                                           + curPtrPos + ", length:" + (curPtrPos - startPos)); // NOI18N
-                    }
-
-                    os.write(eventBuffer, startPos, curPtrPos - startPos);
-                    os.flush();
-                } catch (IOException ex) {
-                    System.err.println("Profiler Agent Error: error writing collected data to the socket: " + ex.getMessage()); // NOI18N
-                }
+            if (DEBUG) {
+                System.err.println("EventBufferManager.DEBUG: Dumping to compressed wire: startPos:" + startPos + ", length:" + length); // NOI18N
             }
-
-            bufFileOk = profilerServer.getAndCheckLastResponse();
+            profilerServer.sendEventBufferDumpedCommand(length, eventBuffer, startPos);
         }
     }
 

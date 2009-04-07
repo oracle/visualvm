@@ -635,10 +635,6 @@ public class ProfilerServer extends Thread implements CommonConstants {
         return res;
     }
 
-    public ObjectOutputStream getSocketOutputStream() {
-        return socketOut;
-    }
-
     public static void notifyClientOnResultsAvailability() {
         if (!connectionOpen) {
             return;
@@ -715,17 +711,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
     }
 
     // Several methods to send commands specific for modules that use wireprotocol just occasionally
-    public boolean sendEventBufferDumpedCommand(int length, boolean waitForResponse) {
-        EventBufferDumpedCommand cmd = new EventBufferDumpedCommand(length);
+    public boolean sendEventBufferDumpedCommand(int length, byte[] buffer, int startPos) {
+        EventBufferDumpedCommand cmd = new EventBufferDumpedCommand(length,buffer,startPos);
         sendComplexCmdToClient(cmd);
 
-        if (waitForResponse) {
-            Response resp = getLastResponse();
+        Response resp = getLastResponse();
 
-            return resp.isOK();
-        } else {
-            return true;
-        }
+        return resp.isOK();
     }
 
     public synchronized void sendSimpleCmdToClient(int cmdType) {
