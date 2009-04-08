@@ -41,8 +41,16 @@ public class CompoundProfilerXYItemPainter extends CompoundItemPainter implement
     }
 
 
-    public long[] getDataValues(long[] viewValues, XYItem item, ChartContext context) {
-        return getPainter1().getDataValues(viewValues, item, context);
+    public double getItemView(double dataY, XYItem item, ChartContext context) {
+        return getPainter1().getItemView(dataY, item, context);
+    }
+
+    public double getItemValue(double viewY, XYItem item, ChartContext context) {
+        return getPainter1().getItemValue(viewY, item, context);
+    }
+
+    public double getItemValueScale(XYItem item, ChartContext context) {
+        return getPainter1().getItemValueScale(item, context);
     }
 
 

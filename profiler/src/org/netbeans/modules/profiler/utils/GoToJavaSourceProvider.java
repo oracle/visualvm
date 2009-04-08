@@ -39,26 +39,21 @@
 package org.netbeans.modules.profiler.utils;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.classpath.GlobalPathRegistry;
-import org.netbeans.api.java.source.CancellableTask;
+import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.java.source.CompilationController;
-import org.netbeans.api.java.source.ElementUtilities;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
@@ -79,12 +74,18 @@ public class GoToJavaSourceProvider extends GoToSourceProvider {
     public boolean openSource(final Project project, final String className, final String methodName, final String signature, final int line) {
         final AtomicBoolean result = new AtomicBoolean(false);
 
-        ClassPath cp = ClassPathSupport.createClassPath(GlobalPathRegistry.getDefault().getSourceRoots().toArray(new FileObject[0]));
-        if (cp == null) {
-            return false;
+        String javaClassName = getJavaFileName(className);
+        
+        ClasspathInfo cpi = ProjectUtilities.getClasspathInfo(project, true);
+        ClassPath cp = cpi.getClassPath(ClasspathInfo.PathKind.SOURCE);
+
+        FileObject sourceFile = cp != null ? cp.findResource(javaClassName) : null;
+
+        if (sourceFile == null) {
+            cp = ClassPathSupport.createClassPath(GlobalPathRegistry.getDefault().getSourceRoots().toArray(new FileObject[0]));
+            sourceFile = cp != null ? cp.findResource(javaClassName) : null;
         }
 
-        final FileObject sourceFile = cp.findResource(getJavaFileName(className));
         if (sourceFile == null) {
             return false;
         }
