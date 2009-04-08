@@ -124,14 +124,10 @@ public class ProfilerClient implements CommonConstants {
 
                             break;
                         case Command.EVENT_BUFFER_DUMPED:
-
-                            int bufSize = ((EventBufferDumpedCommand) cmd).getBufSize();
-                            EventBufferProcessor.readDataAndPrepareForProcessing(bufSize);
-
-                            List profilePointHits = new ArrayList();
-                            EventBufferResultsProvider.getDefault().dataReady(bufSize, getCurrentInstrType());
-                            //              processProfilingResults(bufSize, profilePointHits);
-                            //              profilePointHit(profilePointHits);
+                            EventBufferDumpedCommand bufferDumpedCmd = ((EventBufferDumpedCommand) cmd);
+                            
+                            EventBufferProcessor.readDataAndPrepareForProcessing(bufferDumpedCmd);
+                            EventBufferResultsProvider.getDefault().dataReady(bufferDumpedCmd.getBufSize(), getCurrentInstrType());
                             sendSimpleRespToServer(true, null);
 
                             break;
@@ -1878,7 +1874,7 @@ public class ProfilerClient implements CommonConstants {
             //  - remote profiling
             //  - explicite Get results (forceObtainedResultsDumpCalled)
             //  - CPU or Code Fragment profiling
-            EventBufferProcessor.readDataAndPrepareForProcessing(bufSize);
+            EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
             EventBufferResultsProvider.getDefault().dataReady(bufSize, instrType);
             handlingEventBufferDump = false;
             sendSimpleRespToServer(true, null);

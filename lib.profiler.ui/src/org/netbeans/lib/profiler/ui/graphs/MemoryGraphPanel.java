@@ -43,7 +43,9 @@ package org.netbeans.lib.profiler.ui.graphs;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Date;
@@ -58,6 +60,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import org.netbeans.lib.profiler.charts.AxisComponent;
 import org.netbeans.lib.profiler.charts.AxisMarksComputer;
+import org.netbeans.lib.profiler.charts.ChartContext;
+import org.netbeans.lib.profiler.charts.ChartDecorator;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
@@ -170,6 +174,8 @@ public final class MemoryGraphPanel extends GraphPanel {
                             paintersModel, smallPanel);
         chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chart.setViewInsets(new Insets(10, 0, 0, 0));
+        
+        chart.addPreDecorator(createMaxHeapDecorator());
 
         // Horizontal axis
         AxisComponent hAxis =
@@ -374,7 +380,7 @@ public final class MemoryGraphPanel extends GraphPanel {
         };
     }
 
-    private ProfilerXYPaintersModel createMemoryPaintersModel() {
+    private PaintersModel createMemoryPaintersModel() {
         // Heap size
         ProfilerXYItemPainter heapSizePainter =
                 ProfilerXYItemPainter.absolutePainter(GraphsUI.HEAP_SIZE_PAINTER_LINE_WIDTH,
@@ -410,6 +416,26 @@ public final class MemoryGraphPanel extends GraphPanel {
                                             new XYItemPainter[] { hsp, uhp });
 
         return model;
+    }
+
+    private ChartDecorator createMaxHeapDecorator() {
+        return new ChartDecorator() {
+            public void paint(Graphics2D g, Rectangle dirtyArea,
+                              ChartContext context) {
+
+                int limitHeight = ChartContext.getCheckedIntValue(
+                                  context.getViewY(models.getDataManager().
+                                  maxHeapSize));
+                if (limitHeight <= context.getViewportHeight()) {
+                    g.setColor(GraphsUI.HEAP_LIMIT_FILL_COLOR);
+                    if (context.isBottomBased())
+                        g.fillRect(0, 0, context.getViewportWidth(), limitHeight);
+                    else
+                        g.fillRect(0, limitHeight, context.getViewportWidth(),
+                                   context.getViewportHeight() - limitHeight);
+                }
+            }
+        };
     }
 
 }
