@@ -43,6 +43,9 @@ package org.netbeans.lib.profiler.wireprotocol;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 
 /**
@@ -51,40 +54,80 @@ import java.io.ObjectOutputStream;
  *
  * @author Misha Dmitriev
  * @author Ian Formanek
+ * @author Tomas Hurka
  */
 public class EventBufferDumpedCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    
     private int bufSize;
-
+    private byte[] buffer;
+    private int startPos;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public EventBufferDumpedCommand(int bufSize) {
+    
+    public EventBufferDumpedCommand(int bufSize, byte[] buf, int start) {
         super(EVENT_BUFFER_DUMPED);
         this.bufSize = bufSize;
+        buffer = buf;
+        startPos = start;
     }
-
+    
     // Custom serialization support
     EventBufferDumpedCommand() {
         super(EVENT_BUFFER_DUMPED);
     }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
+    
     public int getBufSize() {
         return bufSize;
     }
-
+    
+    public byte[] getBuffer() {
+        return buffer;
+    }    
     // For debugging
     public String toString() {
         return super.toString() + ", bufSize: " + bufSize; // NOI18N
     }
-
+    
     void readObject(ObjectInputStream in) throws IOException {
+        boolean hasBuffer;
+        
         bufSize = in.readInt();
+        hasBuffer = in.readBoolean();
+        if (hasBuffer) {
+            int compressedSize = in.readInt();
+            byte[] compressedBuf = new byte[compressedSize];
+            Inflater decompressor = new Inflater();
+            
+            buffer = new byte[bufSize];
+            in.readFully(compressedBuf);
+            decompressor.setInput(compressedBuf);
+            try {
+                int originalSize = decompressor.inflate(buffer);
+                assert originalSize==bufSize;
+            } catch (DataFormatException ex) {
+                throw new IOException(ex.getMessage());
+            } finally {
+                decompressor.end();
+            }
+        }
     }
-
+    
     void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(bufSize);
+        out.writeBoolean(buffer != null);
+        if (buffer != null) {
+            Deflater compressor = new Deflater();
+            byte[] compressedBytes = new byte[bufSize];
+            int compressedSize;
+            
+            compressor.setInput(buffer,startPos,bufSize);
+            compressor.finish();
+            compressedSize = compressor.deflate(compressedBytes);
+            out.writeInt(compressedSize);
+            out.write(compressedBytes,0,compressedSize);
+        }
     }
 }

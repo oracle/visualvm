@@ -76,7 +76,7 @@ public final class RerunAction extends CallableSystemAction implements Profiling
             return false;
         }
 
-        lastState = Profiler.getDefault().rerunAvaliable();
+        lastState = Profiler.getDefault().rerunAvailable();
 
         return lastState;
     }
@@ -142,7 +142,7 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     }
 
     public void updateAction() {
-        if (lastState != Profiler.getDefault().rerunAvaliable()) {
+        if (lastState != Profiler.getDefault().rerunAvailable()) {
             boolean shouldBeEnabled = isEnabled();
             firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
         }
