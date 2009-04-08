@@ -60,7 +60,7 @@ import java.io.ObjectOutputStream;
 public class WireIO {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.wireprotocol.WireIO") != null; // NOI18N
+    static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.wireprotocol.WireIO") != null; // NOI18N
     private static final int IS_SIMPLE_COMMAND = 1;
     private static final int IS_COMPLEX_COMMAND = 2;
     private static final int IS_SIMPLE_RESPONSE = 3;

@@ -49,17 +49,17 @@ import org.netbeans.lib.profiler.charts.xy.XYItem;
  */
 public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
-    private static final int TYPE_ABSOLUTE = 0;
-    private static final int TYPE_RELATIVE = 1;
+    static final int TYPE_ABSOLUTE = 0;
+    static final int TYPE_RELATIVE = 1;
 
     private final int lineWidth;
     private final Color lineColor;
-    private final Color fillColor;
+    final Color fillColor;
 
     private final Stroke lineStroke;
 
     private final int type;
-    private final int maxOffset;
+    private final int maxValueOffset;
 
 
     // --- Constructor ---------------------------------------------------------
@@ -82,8 +82,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
 
-    private ProfilerXYItemPainter(float lineWidth, Color lineColor, Color fillColor,
-                                  int type, int maxOffset) {
+    ProfilerXYItemPainter(float lineWidth, Color lineColor, Color fillColor,
+                          int type, int maxValueOffset) {
 
         if (lineColor == null && fillColor == null)
             throw new IllegalArgumentException("No parameters defined"); // NOI18N
@@ -96,7 +96,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
                                           BasicStroke.JOIN_ROUND);
 
         this.type = type;
-        this.maxOffset = maxOffset;
+        this.maxValueOffset = maxValueOffset;
     }
 
 
@@ -180,8 +180,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         if (type == TYPE_ABSOLUTE) {
             return super.getItemView(dataY, item, context);
         } else {
-            double itemValueFactor = (double)context.getDataHeight() /
-                                     (double)item.getBounds().height;
+            double itemValueFactor = getItemValueFactor(context,
+                                     maxValueOffset, item.getBounds().height);
             return context.getViewY(context.getDataOffsetY() + (itemValueFactor * dataY));
         }
     }
@@ -190,20 +190,23 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValue(viewY, item, context);
         } else {
-            double itemValueFactor = (double)context.getDataHeight() /
-                                     (double)item.getBounds().height;
+            double itemValueFactor = getItemValueFactor(context,
+                                     maxValueOffset, item.getBounds().height);
             return context.getDataY(viewY) / itemValueFactor;
         }
     }
 
     public double getItemValueScale(XYItem item, ChartContext context) {
+        if (item.getValuesCount() < 2) return -1;
+
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValueScale(item, context);
         } else {
             long itemHeight = item.getBounds().height;
             if (itemHeight == 0) return 1;
 
-            double itemValueFactor = (double)context.getDataHeight() / (double)itemHeight;
+            double itemValueFactor = getItemValueFactor(context,
+                                     maxValueOffset, itemHeight);
             return itemValueFactor / context.getDataHeight(1d);
         }
     }
@@ -265,9 +268,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
                                            ChartContext context) {
         LongRect itemBounds = item.getBounds();
 
-        double itemValueFactor = ((double)context.getDataHeight() /*-
-                                 context.getDataHeight(maxOffset)*/) /
-                                 ((double)itemBounds.height);
+        double itemValueFactor = getItemValueFactor(context,
+                                 maxValueOffset, itemBounds.height);
 
         // TODO: fix the math!!!
         double value1 = context.getDataOffsetY() + itemValueFactor *
@@ -292,13 +294,13 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
     
-    private void paint(XYItem item, List<ItemSelection> highlighted,
+    protected void paint(XYItem item, List<ItemSelection> highlighted,
                        List<ItemSelection> selected, Graphics2D g,
                        Rectangle dirtyArea, ProfilerXYChart.Context context) {
 
         if (item.getValuesCount() < 2) return;
 
-        int[][] points = createPoints(item, dirtyArea, context, type, maxOffset);
+        int[][] points = createPoints(item, dirtyArea, context, type, maxValueOffset);
         int[] xPoints  = points[0];
         int[] yPoints  = points[1];
         int npoints = xPoints.length;
@@ -341,7 +343,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
     private static int[][] createPoints(XYItem item, Rectangle dirtyArea,
                                  ProfilerXYChart.Context context,
-                                 int type, int maxOffset) {
+                                 int type, int maxValueOffset) {
         
         int[] visibleBounds   = context.getVisibleBounds(dirtyArea);
         int firstVisibleIndex = visibleBounds[0];
@@ -355,10 +357,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         int[] yPoints = new int[visibleIndexes + extraFirstIndex + extraLastIndex + 2];
 
 
-        double itemValueFactor = type == TYPE_RELATIVE ?
-                                         ((double)context.getDataHeight() /*-
-                                          context.getDataHeight(maxOffset)*/) /
-                                         ((double)item.getBounds().height) : 0;
+        double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
+                                 maxValueOffset, item.getBounds().height) : 0;
 
         for (int i = 0; i < visibleIndexes; i++) {
             xPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(Math.ceil(
@@ -395,6 +395,13 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
             return context.getViewY(context.getDataOffsetY() + (itemValueFactor *
                         (item.getYValue(valueIndex) - item.getBounds().y)));
         }
+    }
+
+    private static double getItemValueFactor(ChartContext context,
+                                             double maxValueOffset,
+                                             double itemHeight) {
+        return ((double)context.getDataHeight() -
+               context.getDataHeight(maxValueOffset)) / itemHeight;
     }
 
 }
