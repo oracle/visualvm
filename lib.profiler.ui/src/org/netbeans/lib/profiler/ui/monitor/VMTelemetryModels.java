@@ -28,6 +28,7 @@ package org.netbeans.lib.profiler.ui.monitor;
 import org.netbeans.lib.profiler.charts.xy.XYTimeline;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItem;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
 import org.netbeans.lib.profiler.ui.graphs.GraphsUI;
@@ -145,9 +146,24 @@ public final class VMTelemetryModels {
             }
         };
 
+        // GC intervals
+        ProfilerGCXYItem gcIntervalsItem = new ProfilerGCXYItem("") { // NOI18N
+
+            public long[] getGCStarts(int index) {
+                return dataManager.gcStarts[index];
+            }
+
+            public long[] getGCEnds(int index) {
+                return dataManager.gcFinishs[index];
+            }
+
+        };
+
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
-                 new ProfilerXYItem[] { survivingGenerationsItem, gcTimeItem });
+                 new ProfilerXYItem[] { gcIntervalsItem,
+                                        survivingGenerationsItem,
+                                        gcTimeItem });
 
         return model;
     }

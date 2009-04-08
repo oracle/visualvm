@@ -56,6 +56,8 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 
 /**
@@ -80,8 +82,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
 
     protected TargetAppRunner runner;
 
-    //common actions handler
-    ActionsHandler handler;
+    private ClassHistoryActionsHandler historyActionsHandler;
+    private ClassHistoryDataManager classHistoryManager;
     private JMenuItem popupShowSource;
     private JMenuItem popupShowStacks;
     private JMenuItem startHisto;
@@ -92,15 +94,15 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public LiveAllocResultsPanel(TargetAppRunner runner, MemoryResUserActionsHandler actionsHandler) {
-        this(runner, actionsHandler, null);
-    }
-
-    public LiveAllocResultsPanel(TargetAppRunner runner, MemoryResUserActionsHandler actionsHandler, ActionsHandler handler) {
+    public LiveAllocResultsPanel(TargetAppRunner runner,
+                                 MemoryResUserActionsHandler actionsHandler,
+                                 ClassHistoryActionsHandler historyActionsHandler,
+                                 ClassHistoryDataManager classHistoryManager) {
         super(actionsHandler);
         this.status = runner.getProfilerClient().getStatus();
         this.runner = runner;
-        this.handler = handler;
+        this.historyActionsHandler = historyActionsHandler;
+        this.classHistoryManager = classHistoryManager;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -122,8 +124,11 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
         } else if (e.getSource() == popupShowSource) {
             showSourceForClass(selectedClassId);
-        } else if ((e.getSource() == startHisto) && (handler != null)) {
-            handler.performAction("history logging",new Object[] { new Integer(selectedClassId), getClassName(selectedClassId), Boolean.FALSE }); // NOI18N
+        } else if (e.getSource() == startHisto) {
+            String selectedClassName = StringUtils.userFormClassName(
+                                                getClassName(selectedClassId));
+            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
+                classHistoryManager.setup(selectedClassId, selectedClassName);
         }
     }
 
@@ -162,9 +167,13 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
                 nTotalClasses += nTotalAllocObjects[i];
             }
 
-            if (handler != null) {
-                handler.performAction("history update", new Object[] { nTotalAllocObjects, totalAllocObjectsSize }); // NOI18N
-            }
+            if (classHistoryManager.isTrackingClass())
+                classHistoryManager.processData(nTotalAllocObjects,
+                                                totalAllocObjectsSize);
+
+//            if (handler != null) {
+//                handler.performAction("history update", new Object[] { nTotalAllocObjects, totalAllocObjectsSize }); // NOI18N
+//            }
 
             initDataUponResultsFetch();
         }
