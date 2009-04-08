@@ -385,7 +385,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
         };
     }
 
-    private ProfilerXYPaintersModel createThreadsPaintersModel() {
+    private PaintersModel createThreadsPaintersModel() {
         // Threads
         ProfilerXYItemPainter threadsPainter =
                 ProfilerXYItemPainter.absolutePainter(GraphsUI.THREADS_PAINTER_LINE_WIDTH,
