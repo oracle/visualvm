@@ -480,7 +480,9 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         if (tabs.getSelectedComponent() == memoryPanel) {
             if (memoryPanel instanceof SnapshotAllocResultsPanel) {
                 ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD, MEMORY_RESULTS_TAB_NAME);
-            }
+            } else if (memoryPanel instanceof SnapshotLivenessResultsPanel) {
+                ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, MEMORY_RESULTS_TAB_NAME);
+            } 
         } else if (tabs.getSelectedComponent() == reversePanel) {
             reversePanel.exportData(exportedFileType, eDD, STACK_TRACES_TAB_NAME);
         }

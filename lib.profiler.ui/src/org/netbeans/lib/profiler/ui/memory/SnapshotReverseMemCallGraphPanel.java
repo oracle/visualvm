@@ -165,29 +165,55 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
-        switch (exportedFileType) {
-            case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
-                    callGraphManager.getRootNode().exportCSVData(",", 0, eDD); //NOI18N
-                    eDD.close();
-                    break;
-            case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
-                    callGraphManager.getRootNode().exportCSVData(";", 0, eDD); //NOI18N
-                    eDD.close();
-                    break;
-            case 3: eDD.dumpData(getXMLHeader(viewName));
-                    callGraphManager.getRootNode().exportXMLData(eDD, " "); //NOI18N
-                    eDD.dumpDataAndClose(getXMLFooter());
-                    break;
-            case 4: eDD.dumpData(getHTMLHeader(viewName));
-                    callGraphManager.getRootNode().exportHTMLData(eDD,0);
-                    eDD.dumpDataAndClose(getHTMLFooter());
-                    break;
+        if (callGraphManager.getRootNode() instanceof PresoObjLivenessCCTNode) {
+            ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).setDecimalFormat();
+            switch (exportedFileType) {
+                case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
+                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportCSVData(",", 0, eDD); //NOI18N
+                        eDD.close();
+                        break;
+                case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
+                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportCSVData(";", 0, eDD); //NOI18N
+                        eDD.close();
+                        break;
+                case 3: eDD.dumpData(getXMLHeader(viewName));
+                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportXMLData(eDD, " "); //NOI18N
+                        eDD.dumpDataAndClose(getXMLFooter());
+                        break;
+                case 4: eDD.dumpData(getHTMLHeader(viewName));
+                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportHTMLData(eDD,0);
+                        eDD.dumpDataAndClose(getHTMLFooter());
+                        break;
+            }
+
+        } else if (callGraphManager.getRootNode() instanceof PresoObjAllocCCTNode) {
+            switch (exportedFileType) {
+                case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
+                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportCSVData(",", 0, eDD); //NOI18N
+                        eDD.close();
+                        break;
+                case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
+                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportCSVData(";", 0, eDD); //NOI18N
+                        eDD.close();
+                        break;
+                case 3: eDD.dumpData(getXMLHeader(viewName));
+                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportXMLData(eDD, " "); //NOI18N
+                        eDD.dumpDataAndClose(getXMLFooter());
+                        break;
+                case 4: eDD.dumpData(getHTMLHeader(viewName));
+                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportHTMLData(eDD,0);
+                        eDD.dumpDataAndClose(getHTMLFooter());
+                        break;
+            }
         }
     }
 
     private StringBuffer getHTMLHeader(String viewName) {
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
-        result.append("<th>"+columnNames[0]+"</th><th>"+columnNames[2]+"</th><th>"+columnNames[3]+"</th><th>"+messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+"</th></tr>"); //NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr><th>"+columnNames[0]+"</th>"); // NOI18N
+        for (int i = 2; i < (columnNames.length); i++) {
+            result.append("<th>"+columnNames[i]+"</th>");
+        }
+        result.append("<th>"+messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+"</th></tr>"); //NOI18N
         return result;
     }
 
