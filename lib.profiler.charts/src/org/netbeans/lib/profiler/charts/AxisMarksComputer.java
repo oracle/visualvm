@@ -26,6 +26,7 @@
 package org.netbeans.lib.profiler.charts;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
@@ -35,6 +36,8 @@ import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
  * @author Jiri Sedlacek
  */
 public abstract class AxisMarksComputer {
+
+    protected static final Iterator<Mark> EMPTY_ITERATOR = new EmptyIterator();
 
     // --- Abstract definition -------------------------------------------------
 
@@ -66,10 +69,13 @@ public abstract class AxisMarksComputer {
         }
 
         public Iterator<Mark> marksIterator(int start, int end) {
+            if (context.getViewWidth() == 0) return EMPTY_ITERATOR;
             double scale =  horizontal ? context.getViewWidth(1d) :
                                          context.getViewHeight(1d);
             
             final long step = getTimeUnits(scale, minMarksDistance);
+            if (step == -1) return EMPTY_ITERATOR;
+
             final long dataStart = horizontal ?
                                    ((long)context.getDataX(start) / step) * step :
                                    ((long)context.getDataY(start) / step) * step;
@@ -131,7 +137,11 @@ public abstract class AxisMarksComputer {
 
         public Iterator<Mark> marksIterator(int start, int end) {
             double scale = painter.getItemValueScale(item, context);
+            if (scale == -1) return EMPTY_ITERATOR;
+
             final long step = getDecimalUnits(scale, minMarksDistance);
+            if (step == -1) return EMPTY_ITERATOR;
+
             final long dataStart = ((long)painter.getItemValue(start, item,
                                           context) / step) * step;
             final long dataEnd = ((long)painter.getItemValue(end, item,
@@ -193,9 +203,14 @@ public abstract class AxisMarksComputer {
 
         public Iterator<Mark> marksIterator(int start, int end) {
             double scale = painter.getItemValueScale(item, context);
+            if (scale == -1) return EMPTY_ITERATOR;
+
             long[] units = getBytesUnits(scale, minMarksDistance);
             final long step = units[0];
+            if (step == -1) return EMPTY_ITERATOR;
+
             final int radix = (int)units[1];
+
             final long dataStart = ((long)painter.getItemValue(start, item,
                                           context) / step) * step;
             final long dataEnd = ((long)painter.getItemValue(end, item,
@@ -254,8 +269,8 @@ public abstract class AxisMarksComputer {
 
 
     public static long getDecimalUnits(double scale, int minDistance) {
-        if (scale == 0) return decimalUnitsGrid[0];
-
+        if (scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
+        
         long decimalFactor = 1;
 
         while (true) {
@@ -268,7 +283,8 @@ public abstract class AxisMarksComputer {
     }
 
     public static long[] getBytesUnits(double scale, int minDistance) {
-        if (scale == 0) return new long[] { bytesUnitsGrid[0], 1 };
+        if (scale == Double.POSITIVE_INFINITY || scale <= 0)
+            return new long[] { -1, -1 };
 
         long bytesFactor = 1;
         long bytesRadix  = 0;
@@ -284,8 +300,7 @@ public abstract class AxisMarksComputer {
     }
 
     public static long getTimeUnits(double scale, int minDistance) {
-
-        if (scale == 0) return timeUnitsGrid[0];
+        if (scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
 
         for (int i = 0; i < timeUnitsGrid.length; i++)
             if (timeUnitsGrid[i] * scale >= minDistance)
@@ -363,6 +378,13 @@ public abstract class AxisMarksComputer {
 //        }
 //
 //    }
+
+
+    private static class EmptyIterator implements Iterator<Mark> {
+        public boolean hasNext() { return false; }
+        public Mark next() { throw new NoSuchElementException(); }
+        public void remove() { throw new IllegalStateException(); }
+    }
 
 
     public static class Mark {

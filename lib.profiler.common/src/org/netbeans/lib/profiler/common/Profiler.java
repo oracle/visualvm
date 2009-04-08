@@ -221,7 +221,9 @@ public abstract class Profiler {
 
     public abstract boolean profileClass(ProfilingSettings profilingSettings, SessionSettings sessionSettings);
 
-    public abstract boolean rerunAvaliable();
+    public abstract boolean rerunAvailable();
+
+    public abstract boolean modifyAvailable();
 
     public abstract void rerunLastProfiling();
 
