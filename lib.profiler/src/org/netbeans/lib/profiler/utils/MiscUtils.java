@@ -40,6 +40,10 @@
 
 package org.netbeans.lib.profiler.utils;
 
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import java.io.File;
@@ -197,7 +201,7 @@ public class MiscUtils implements CommonConstants {
                 continue;
             }
 
-            ArrayList paths = getPathComponents(sourcePath, true, workingDir);
+            List paths = getPathComponents(sourcePath, true, workingDir);
 
             for (int j = 0; j < paths.size(); j++) {
                 String path = (String) paths.get(j);
@@ -296,7 +300,7 @@ public class MiscUtils implements CommonConstants {
 
     /** For a string representing a class path, remove all entries that don't correspond to existing files, and return the remaining ones. */
     public static String getLiveClassPathSubset(String path, String workingDir) {
-        ArrayList liveComponents = getPathComponents(path, true, workingDir);
+        List liveComponents = getPathComponents(path, true, workingDir);
         StringBuffer buf = new StringBuffer(liveComponents.size() * 10);
 
         if (liveComponents.size() > 0) {
@@ -317,7 +321,7 @@ public class MiscUtils implements CommonConstants {
      * and returns only existing components. workingDir is needed in case the passed path has
      * a local form.
      */
-    public static ArrayList getPathComponents(String path, boolean doCheck, String workingDir) {
+    public static List getPathComponents(String path, boolean doCheck, String workingDir) {
         ArrayList list = new ArrayList();
 
         if (path != null) {
@@ -340,12 +344,48 @@ public class MiscUtils implements CommonConstants {
                 } else {
                     list.add(name);
                 }
+                if (name != null) {
+                    try {
+                        getClassPathFromManifest(name,list);
+                    } catch (URISyntaxException ex) {
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         }
 
         return list;
     }
 
+    private static void getClassPathFromManifest(String path,List pathList) throws IOException, URISyntaxException {
+        if (path.toLowerCase().endsWith(".jar")) {
+            JarFile jarFile = new JarFile(path);
+            Attributes attrs = jarFile.getManifest().getMainAttributes();
+            
+            if (attrs != null) {
+            String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
+            
+                if (jarCp != null) {
+                    URL baseUrl = new File(path).toURL();
+                    StringTokenizer tokens = new StringTokenizer(jarCp);
+                    while(tokens.hasMoreTokens()) {
+                        String cp = tokens.nextToken();
+                        URL cpURL = new URL(baseUrl,cp);
+                        File cpFile = new File(cpURL.toURI());
+                        if (cpFile.exists()) {
+                            String pathName = cpFile.getAbsolutePath();
+
+                            pathList.add(pathName);
+                            getClassPathFromManifest(pathName,pathList);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     public static void setSilent(boolean silent) {
         printInfo = !silent;
     }
@@ -418,7 +458,7 @@ public class MiscUtils implements CommonConstants {
     public static boolean containsDirectoryOnPath(String directory, String path) {
         String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase();
         String normalizedPath = new File(path).getAbsolutePath().toLowerCase();
-        ArrayList pathComponents = getPathComponents(normalizedPath, false, null);
+        List pathComponents = getPathComponents(normalizedPath, false, null);
 
         for (int i = 0; i < pathComponents.size(); i++) {
             if (normalizedDirectory.equals(pathComponents.get(i))) {
