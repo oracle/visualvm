@@ -57,6 +57,8 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 
 /**
@@ -85,8 +87,8 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
 
     protected TargetAppRunner runner;
 
-    //common actions handler
-    ActionsHandler handler;
+    private ClassHistoryActionsHandler historyActionsHandler;
+    private ClassHistoryDataManager classHistoryManager;
     private JMenuItem popupRemoveProfForClass;
     private JMenuItem popupRemoveProfForClassesBelow;
     private JMenuItem popupShowSource;
@@ -99,16 +101,16 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public LiveLivenessResultsPanel(TargetAppRunner runner, MemoryResUserActionsHandler actionsHandler) {
-        this(runner, actionsHandler, null);
-    }
-
-    public LiveLivenessResultsPanel(TargetAppRunner runner, MemoryResUserActionsHandler actionsHandler, ActionsHandler handler) {
+    public LiveLivenessResultsPanel(TargetAppRunner runner,
+                                    MemoryResUserActionsHandler actionsHandler,
+                                    ClassHistoryActionsHandler historyActionsHandler,
+                                    ClassHistoryDataManager classHistoryManager) {
         super(actionsHandler);
         this.runner = runner;
         this.status = runner.getProfilerClient().getStatus();
+        this.historyActionsHandler = historyActionsHandler;
+        this.classHistoryManager = classHistoryManager;
         initColumnsData();
-        this.handler = handler;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -178,9 +180,11 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
             showSourceForClass(selectedClassId);
         } else if (source == popupShowStacks) {
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
-        } else if ((e.getSource() == startHisto) && (handler != null)) {
-            handler.performAction("history logging",
-                                  new Object[] { new Integer(selectedClassId), getClassName(selectedClassId), Boolean.TRUE }); // NOI18N
+        } else if (e.getSource() == startHisto) {
+            String selectedClassName = StringUtils.userFormClassName(
+                                                getClassName(selectedClassId));
+            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
+                classHistoryManager.setup(selectedClassId, selectedClassName);
         }
     }
 
@@ -239,9 +243,14 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
                 nTotalTracked += nTrackedLiveObjects[i];
             }
 
-            if (handler != null) {
-                handler.performAction("history update", new Object[] { nTrackedLiveObjects, nTotalAllocObjects }); // NOI18N
-            }
+            if (classHistoryManager.isTrackingClass())
+                classHistoryManager.processData(nTotalAllocObjects,
+                                                nTrackedLiveObjects,
+                                                trackedLiveObjectsSize);
+
+//            if (handler != null) {
+//                handler.performAction("history update", new Object[] { nTrackedLiveObjects, nTotalAllocObjects }); // NOI18N
+//            }
 
             initDataUponResultsFetch();
         }

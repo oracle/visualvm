@@ -40,13 +40,17 @@
 
 package org.netbeans.lib.profiler.results;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import org.netbeans.lib.profiler.wireprotocol.EventBufferDumpedCommand;
 
 
 /**
@@ -56,6 +60,7 @@ import java.nio.channels.FileChannel;
  * usage in ProfilerClient and, as a superclass, in CPUCallGraphBuilder etc.
  *
  * @author Misha Dmitirev
+ * @author Tomas Hurka
  */
 public class EventBufferProcessor implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -119,25 +124,18 @@ public class EventBufferProcessor implements CommonConstants {
         status = profilerClient.getStatus();
     }
 
-    public static synchronized void readDataAndPrepareForProcessing(int bufSizeInBytes) {
-        if ((buf == null) || (buf.length < bufSizeInBytes)) {
-            buf = new byte[bufSizeInBytes];
-        }
-
+    public static synchronized void readDataAndPrepareForProcessing(EventBufferDumpedCommand cmd) {
         if (!status.remoteProfiling) {
+            int bufSizeInBytes = cmd.getBufSize();
+            if ((buf == null) || (buf.length < bufSizeInBytes)) {
+                buf = new byte[bufSizeInBytes];
+            }
             mapByteBuf.reset();
             mapByteBuf.get(buf, 0, bufSizeInBytes);
         } else {
-            ObjectInputStream ois = profilerClient.getSocketInputStream();
-
-            try {
-                ois.readFully(buf, 0, bufSizeInBytes);
-            } catch (IOException ex) { // TODO [misha]: error reporting should be made more user-friendly
-                ProfilerLogger.severe("error reading profiling data from socket:"); // NOI18N
-                ProfilerLogger.log(ex);
-            }
+            buf = cmd.getBuffer();
+            assert buf != null;
         }
-
         startDataProcessingTime = System.currentTimeMillis();
     }
 

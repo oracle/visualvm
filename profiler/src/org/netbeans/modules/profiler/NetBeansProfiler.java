@@ -1286,6 +1286,13 @@ public final class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (LiveResultsWindow.hasDefault())
+                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
+            }
+        });
+
         IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
@@ -1487,8 +1494,12 @@ public final class NetBeansProfiler extends Profiler {
         return true;
     }
 
-    public boolean rerunAvaliable() {
-        return actionSupport.isActionAvalaible();
+    public boolean rerunAvailable() {
+        return actionSupport.isActionAvailable();
+    }
+
+    public boolean modifyAvailable() {
+        return getProfilingMode()==MODE_ATTACH||actionSupport.isActionAvailable();
     }
 
     public void rerunLastProfiling() {
@@ -1833,6 +1844,8 @@ public final class NetBeansProfiler extends Profiler {
             public void run() {
                 profiler.getThreadsManager().reset();
                 profiler.getVMTelemetryManager().reset();
+                if (LiveResultsWindow.hasDefault())
+                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
             }
         });
         ProfilingPointsManager.getDefault().reset();
