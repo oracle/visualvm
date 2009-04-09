@@ -380,11 +380,14 @@ public class MiscUtils implements CommonConstants {
                         StringTokenizer tokens = new StringTokenizer(jarCp);
                         
                         while(tokens.hasMoreTokens()) {
+                            URI fileUri = new URI(tokens.nextToken());
+                            File cpFile;
                             String cpName;
-                            File cpFile = new File(new URI(tokens.nextToken()));
                             
-                            if (!cpFile.isAbsolute()) {
-                                cpFile = new File(parent,cpFile.getPath());
+                            if (!fileUri.isAbsolute()) {
+                                cpFile = new File(parent,fileUri.getPath());
+                            } else {
+                                cpFile = new File(fileUri);
                             }
                             cpName = getCanonicalPath(cpFile);
                             if (cpName != null && !pathList.contains(cpName)) {

@@ -31,6 +31,8 @@ import org.netbeans.lib.profiler.charts.ChartComponent;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import java.awt.Rectangle;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -61,8 +63,15 @@ public class ProfilerXYChart extends ChartComponent {
     private ZoomOutAction zoomOutAction;
     private ToggleViewAction toggleViewAction;
 
-    private int firstVisibleIndex;
-    private int lastVisibleIndex;
+    private int firstVisibleIndex[];
+    private int lastVisibleIndex[];
+    private Map<Rectangle, int[][]> indexesCache;
+
+    private boolean visibleIndexesDirty;
+    private boolean contentsWidthChanged;
+    private int oldBoundsWidth, newBoundsWidth;
+    private long oldOffsetX, newOffsetX;
+    private double oldScaleX, newScaleX;
 
 
     // --- Constructors --------------------------------------------------------
@@ -86,8 +95,10 @@ public class ProfilerXYChart extends ChartComponent {
 
         timeline = itemsModel.getTimeline();
 
-        firstVisibleIndex = 0;
-        lastVisibleIndex  = 0;
+//        firstVisibleIndex = 0;
+//        lastVisibleIndex  = 0;
+        indexesCache = new HashMap();
+        recomputeVisibleBounds();
 
         addConfigurationListener(new VisibleBoundsListener());
     }
@@ -120,76 +131,167 @@ public class ProfilerXYChart extends ChartComponent {
 
     // --- Private implementation ----------------------------------------------
 
-    private void updateFirstIndex(boolean searchToRight) {
-        if (timeline.getTimestampsCount() == 0) {
-            firstVisibleIndex = 0;
-        } else {
-            if (searchToRight) {
-                while(firstVisibleIndex + 1 < timeline.getTimestampsCount() &&
-                      getViewX(timeline.getTimestamp(firstVisibleIndex)) < 0)
-                    firstVisibleIndex++;
-            } else {
-                while(firstVisibleIndex > 0 &&
-                      getViewX(timeline.getTimestamp(firstVisibleIndex - 1)) >= 0)
-                    firstVisibleIndex--;
-            }
+    // startIndex: any visible index
+    private int[] findFirstVisibleL(int[] startIndex, int viewStart, int viewEnd) {
+        if (timeline.getTimestampsCount() == 0 ||
+            startIndex[0] == -1 && startIndex[1] == -1)
+                return new int[] { -1, -1 };
+
+        int index = startIndex[0];
+        if (index == -1) return new int[] { -1, startIndex[1] - 1 };
+        while (index > 0) {
+            double viewX = getViewX(timeline.getTimestamp(index - 1));
+
+            if (viewX < viewStart) return new int[] { index, -1 };
+            
+            index--;
         }
+
+        return getViewX(timeline.getTimestamp(index)) >= viewStart ?
+                                                         new int[] { index, -1 } :
+                                                         new int[] { -1, -1 };
     }
 
-    private void updateLastIndex(boolean searchToRight) {
-        if (timeline.getTimestampsCount() == 0) {
-            lastVisibleIndex = 0;
-        } else {
-            if (searchToRight) {
-                while(lastVisibleIndex + 1 < timeline.getTimestampsCount() &&
-                      getViewX(timeline.getTimestamp(lastVisibleIndex + 1)) <= getWidth())
-                    lastVisibleIndex++;
-            } else {
-                while(lastVisibleIndex > 0 &&
-                      getViewX(timeline.getTimestamp(lastVisibleIndex)) > getWidth())
-                    lastVisibleIndex--;
-            }
+    // startIndex: any invisible or last visible index
+    private int[] findLastVisibleL(int[] startIndex, int viewStart, int viewEnd) {
+        if (timeline.getTimestampsCount() == 0 ||
+            startIndex[0] == -1 && startIndex[1] == -1)
+                return new int[] { -1, -1 };
+
+        int index = startIndex[0];
+        if (index == -1) index = startIndex[1];
+        while (index >= 0) {
+            double viewX = getViewX(timeline.getTimestamp(index));
+
+            if (viewX < viewStart) return new int[] { -1, index + 1 };
+            if (viewX <= viewEnd) return new int[] { index, -1 };
+            
+            index--;
         }
+
+        return new int[] { -1, -1 };
     }
 
-    private void resetFirstIndex() {
-        firstVisibleIndex = 0;
+    // startIndex: any invisible or first visible index
+    private int[] findFirstVisibleR(int[] startIndex, int viewStart, int viewEnd) {
+        if (timeline.getTimestampsCount() == 0 ||
+            startIndex[0] == -1 && startIndex[1] == -1)
+                return new int[] { -1, -1 };
+
+        int index = startIndex[0];
+        if (index == -1) index = startIndex[1];
+        while (index <= timeline.getTimestampsCount() - 1) {
+            double viewX = getViewX(timeline.getTimestamp(index));
+
+            if (viewX > viewEnd) return new int[] { -1, index - 1 };
+            if (viewX >= viewStart) return new int[] { index, -1 };
+            
+            index++;
+        }
+
+        return new int[] { -1, -1 };
     }
 
-    private void resetLastIndex() {
-        int timestampsCount = timeline.getTimestampsCount();
-        lastVisibleIndex = timestampsCount == 0 ? 0 : timestampsCount - 1;
+    // startIndex: any visible index
+    private int[] findLastVisibleR(int[] startIndex, int viewStart, int viewEnd) {
+        if (timeline.getTimestampsCount() == 0 ||
+            startIndex[0] == -1 && startIndex[1] == -1)
+                return new int[] { -1, -1 };
+
+        int index = startIndex[0];
+        if (index == -1) return new int[] { -1, startIndex[1] + 1 };
+        while (index < timeline.getTimestampsCount() - 1) {
+            double viewX = getViewX(timeline.getTimestamp(index + 1));
+
+            if (viewX > viewEnd) return new int[] { index, -1 };
+
+            index++;
+        }
+
+        return getViewX(timeline.getTimestamp(index)) <= viewEnd ?
+                                                         new int[] { index, -1 } :
+                                                         new int[] { -1, -1 };
     }
 
     // Use in case of absolute panic, will always work
     private void recomputeVisibleBounds() {
-        resetFirstIndex();
-        resetLastIndex();
-        updateFirstIndex(true);
-        updateLastIndex(false);
+        indexesCache.clear();
+
+        firstVisibleIndex = new int[] {0, -1};
+        lastVisibleIndex = new int[] { Math.max(0, timeline.getTimestampsCount() - 1), -1 };
+
+        if (!fitsWidth()) {
+            firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
+            lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+        }
     }
 
     protected void reshaped(Rectangle oldBounds, Rectangle newBounds) {
         if (!fitsWidth() && oldBounds.width != newBounds.width) {
-            if (oldBounds.width < newBounds.width) {
-                updateFirstIndex(false);
-                updateLastIndex(true);
-            } else {
-                updateFirstIndex(true);
-                updateLastIndex(false);
-            }
+            visibleIndexesDirty = true;
+            oldBoundsWidth = oldBounds.width;
+            newBoundsWidth = newBounds.width;
         }
 
         super.reshaped(oldBounds, newBounds);
     }
 
 
-//    private int[] getVisibleBounds() {
-//        return new int[] { firstVisibleIndex, lastVisibleIndex };
-//    }
+    private void updateVisibleIndexes() {
+        if (!visibleIndexesDirty) return;
+
+        indexesCache.clear();
+
+        if (contentsWidthChanged) {
+            recomputeVisibleBounds();
+        } else if (oldBoundsWidth != newBoundsWidth) {
+            if (oldBoundsWidth < newBoundsWidth) {
+                firstVisibleIndex = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex = findLastVisibleR(firstVisibleIndex, 0, getWidth());
+            } else {
+                firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+            }
+        } else if (oldScaleX != newScaleX) {
+            if (oldScaleX < newScaleX) {
+                firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+            } else {
+                firstVisibleIndex = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex = findLastVisibleR(lastVisibleIndex, 0, getWidth());
+            }
+        } else if (oldOffsetX != newOffsetX) {
+            if (newOffsetX > oldOffsetX) {
+                firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex = findLastVisibleR(firstVisibleIndex, 0, getWidth());
+            } else {
+                lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+                firstVisibleIndex = findFirstVisibleL(lastVisibleIndex, 0, getWidth());
+            }
+        }
+
+        visibleIndexesDirty = false;
+    }
     
-    private int[] getVisibleBounds(Rectangle viewRect) {
-        return new int[] { firstVisibleIndex, lastVisibleIndex };
+    private int[][] getVisibleBounds(Rectangle viewRect) {
+        updateVisibleIndexes();
+
+        if (fitsWidth() || viewRect.x == 0 && viewRect.width == getWidth())
+            return new int[][] { firstVisibleIndex, lastVisibleIndex };
+
+        Rectangle rect = new Rectangle(viewRect.x, 0, viewRect.width, 0);
+        int[][] bounds = indexesCache.get(rect);
+
+        if (bounds == null) {
+            int[] firstIndex = findFirstVisibleR(firstVisibleIndex, viewRect.x,
+                                                 viewRect.x + viewRect.width);
+            int[] lastIndex = findLastVisibleL(lastVisibleIndex, viewRect.x,
+                                                 viewRect.x + viewRect.width);
+            bounds = new int[][] { firstIndex, lastIndex };
+            indexesCache.put(rect, bounds);
+        }
+
+        return bounds;
     }
 
 
@@ -197,15 +299,18 @@ public class ProfilerXYChart extends ChartComponent {
         int timestampsCount = timeline.getTimestampsCount();
 
         if (timestampsCount == 0) return -1;
-        if (timestampsCount == 1) return firstVisibleIndex;
+        if (timestampsCount == 1) return 0;
 
         long dataX = (long)getDataX(x);
 
-        int nearestIndex = firstVisibleIndex;
+        int nearestIndex = firstVisibleIndex[0];
+        if (nearestIndex == -1) nearestIndex = firstVisibleIndex[1];
         long itemDataX = timeline.getTimestamp(nearestIndex);
         long nearestDistance = Math.abs(dataX - itemDataX);
 
-        while(nearestIndex + 1 <= lastVisibleIndex) {
+        int lastIndex = lastVisibleIndex[0];
+        if (lastIndex == -1) lastIndex = lastVisibleIndex[1];
+        while(nearestIndex + 1 <= lastIndex) {
             itemDataX = timeline.getTimestamp(nearestIndex + 1);
             long distance = Math.abs(dataX - itemDataX);
 
@@ -328,11 +433,10 @@ public class ProfilerXYChart extends ChartComponent {
     private class VisibleBoundsListener implements ChartConfigurationListener {
         public void offsetChanged(long oldOffsetX, long oldOffsetY,
                                   long newOffsetX, long newOffsetY) {
-
             if (oldOffsetX != newOffsetX) {
-                boolean searchToRight = newOffsetX > oldOffsetX;
-                updateFirstIndex(searchToRight);
-                updateLastIndex(searchToRight);
+                visibleIndexesDirty = true;
+                ProfilerXYChart.this.oldOffsetX = oldOffsetX;
+                ProfilerXYChart.this.newOffsetX = newOffsetX;
             }
 
         }
@@ -346,8 +450,8 @@ public class ProfilerXYChart extends ChartComponent {
             if (zoomOutAction != null) zoomOutAction.updateAction();
 
             if (getContentsWidth() <= getWidth()) {
-                resetFirstIndex();
-                resetLastIndex();
+                visibleIndexesDirty = true;
+                contentsWidthChanged = true;
             }
 
         }
@@ -359,16 +463,9 @@ public class ProfilerXYChart extends ChartComponent {
             if (zoomOutAction != null) zoomOutAction.updateAction();
 
             if (!fitsWidth() && oldScaleX != newScaleX) {
-                if (oldScaleX < newScaleX) {
-                    updateFirstIndex(true);
-                    updateLastIndex(false);
-                } else {
-                    updateFirstIndex(false);
-                    updateLastIndex(true);
-                }
-            } else {
-                resetFirstIndex();
-                resetLastIndex();
+                visibleIndexesDirty = true;
+                ProfilerXYChart.this.oldScaleX = oldScaleX;
+                ProfilerXYChart.this.newScaleX = newScaleX;
             }
 
         }
@@ -394,11 +491,7 @@ public class ProfilerXYChart extends ChartComponent {
         }
 
 
-//        public int[] getVisibleBounds() {
-//            return getChartComponent().getVisibleBounds();
-//        }
-
-        public int[] getVisibleBounds(Rectangle viewRect) {
+        public int[][] getVisibleBounds(Rectangle viewRect) {
             return getChartComponent().getVisibleBounds(viewRect);
         }
 
