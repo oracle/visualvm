@@ -148,11 +148,16 @@ public class ProfilerGCXYItemPainter extends ProfilerXYItemPainter {
 
         if (item.getValuesCount() < 2) return;
 
-        int[] visibleBounds = context.getVisibleBounds(dirtyArea);
-        int index = visibleBounds[0];
-        int lastIndex = visibleBounds[1] == item.getValuesCount() - 1 ?
-                                            visibleBounds[1] :
-                                            visibleBounds[1] + 1;
+        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
+        int index = visibleBounds[0][0];
+        if (index == -1) index = visibleBounds[0][1];
+        if (index == -1) return;
+
+        int lastIndex = visibleBounds[1][0];
+        if (lastIndex == -1) lastIndex = visibleBounds[1][1];
+        if (lastIndex == -1) lastIndex = item.getValuesCount() - 1;
+
+        if (lastIndex < item.getValuesCount() - 1) lastIndex++;
 
         ProfilerGCXYItem xyItem = (ProfilerGCXYItem)item;
 

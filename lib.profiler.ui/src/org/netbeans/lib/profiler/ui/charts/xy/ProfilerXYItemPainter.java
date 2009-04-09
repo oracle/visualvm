@@ -301,11 +301,13 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         if (item.getValuesCount() < 2) return;
 
         int[][] points = createPoints(item, dirtyArea, context, type, maxValueOffset);
+        if (points == null) return;
+
         int[] xPoints  = points[0];
         int[] yPoints  = points[1];
         int npoints = xPoints.length;
 
-//long start = System.currentTimeMillis();
+//long start = System.nanoTime();
         if (fillColor != null) {
             int zeroY = (int)context.getViewY(0);
             Polygon polygon = new Polygon();
@@ -325,7 +327,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
             g.setStroke(lineStroke);
             g.drawPolyline(xPoints, yPoints, npoints - 2);
         }
-//System.err.println(">>> Paint: " + (System.currentTimeMillis() - start) + " [ms], dirtyArea: " + dirtyArea);
+//System.err.println(">>> Paint: " + (System.nanoTime() - start) / 1000 + " [ms], dirtyArea: " + dirtyArea);
 //        if (type == TYPE_RELATIVE) {
 //        g.setColor(Color.RED);
 //        Rectangle bbox = new Rectangle(dirtyArea);
@@ -345,9 +347,18 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
                                  ProfilerXYChart.Context context,
                                  int type, int maxValueOffset) {
         
-        int[] visibleBounds   = context.getVisibleBounds(dirtyArea);
-        int firstVisibleIndex = visibleBounds[0];
-        int lastVisibleIndex  = visibleBounds[1];
+        int[][] visibleBounds   = context.getVisibleBounds(dirtyArea);
+
+        int firstVisibleIndex = visibleBounds[0][0];
+        if (firstVisibleIndex == -1) firstVisibleIndex = visibleBounds[0][1];
+        if (firstVisibleIndex == -1) return null;
+
+        int lastVisibleIndex  = visibleBounds[1][0];
+        if (lastVisibleIndex == -1) lastVisibleIndex = visibleBounds[1][1];
+        if (lastVisibleIndex == -1) lastVisibleIndex = item.getValuesCount() - 1;
+
+//        System.err.println(">>> Painting from " + firstVisibleIndex + " to " + lastVisibleIndex);
+        
         int visibleIndexes    = lastVisibleIndex - firstVisibleIndex + 1;
 
         int extraFirstIndex = firstVisibleIndex == 0 ? 0 : 1;
