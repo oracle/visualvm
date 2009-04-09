@@ -96,9 +96,9 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
     }
     
     private boolean checkValidity() {
-        if (!checkPlatformValidity()) {
-            return false;
-        }
+//        if (!checkPlatformValidity()) {
+//            return false;
+//        }
         if (txtName.getText().trim().length() == 0) {
             setError(getMessage("ERR_Name_Prefix_Empty"));
             return false;
@@ -117,30 +117,30 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
         return true;
     }
     
-    private boolean checkPlatformValidity() {
-        NbModuleProject nbprj = data.getProject().getLookup().lookup(NbModuleProject.class);
-        if (nbprj == null) {
-            //ignore this check for non default netbeans projects.
-            return true;
-        }
-        NbPlatform platform = nbprj.getPlatform(false);
-        if (platform == null) {
-            setError(getMessage("ERR_No_Platform"));
-            return false;
-        }
-        ModuleEntry[] entries = platform.getModules();
-        Collection<String> modules = new HashSet<String>(Arrays.asList(NewProjectIterator.MODULES));
-        
-        for (int i = 0; i < entries.length; i++) {
-            modules.remove(entries[i].getCodeNameBase());
-        }
-        if (modules.size() > 0) {
-            setError(getMessage("ERR_Missing_Modules"));
-            return false;
-        }
-        return true;
-    }
-    
+//    private boolean checkPlatformValidity() {
+//        NbModuleProject nbprj = data.getProject().getLookup().lookup(NbModuleProject.class);
+//        if (nbprj == null) {
+//            //ignore this check for non default netbeans projects.
+//            return true;
+//        }
+//        NbPlatform platform = nbprj.getPlatform(false);
+//        if (platform == null) {
+//            setError(getMessage("ERR_No_Platform"));
+//            return false;
+//        }
+//        ModuleEntry[] entries = platform.getModules();
+//        Collection<String> modules = new HashSet<String>(Arrays.asList(NewProjectIterator.MODULES));
+//
+//        for (int i = 0; i < entries.length; i++) {
+//            modules.remove(entries[i].getCodeNameBase());
+//        }
+//        if (modules.size() > 0) {
+//            setError(getMessage("ERR_Missing_Modules"));
+//            return false;
+//        }
+//        return true;
+//    }
+//
   
     
     protected HelpCtx getHelp() {
