@@ -25,41 +25,26 @@
 
 package org.netbeans.lib.profiler.ui.charts.xy;
 
-import org.netbeans.lib.profiler.charts.CompoundItemPainter;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-
 /**
  *
  * @author Jiri Sedlacek
  */
-public class CompoundProfilerXYItemPainter extends CompoundItemPainter implements XYItemPainter {
+public abstract class ProfilerGCXYItem extends ProfilerXYItem {
 
-    public CompoundProfilerXYItemPainter(XYItemPainter painter1, XYItemPainter painter2) {
-        super(painter1, painter2);
+    // --- Constructor ---------------------------------------------------------
+
+    public ProfilerGCXYItem(String name) {
+        super(name, Long.MAX_VALUE, Long.MIN_VALUE);
     }
 
 
-    public double getItemView(double dataY, XYItem item, ChartContext context) {
-        return getPainter1().getItemView(dataY, item, context);
-    }
+    // --- Item telemetry ------------------------------------------------------
 
-    public double getItemValue(double viewY, XYItem item, ChartContext context) {
-        return getPainter1().getItemValue(viewY, item, context);
-    }
+    public abstract long[] getGCStarts(int index);
 
-    public double getItemValueScale(XYItem item, ChartContext context) {
-        return getPainter1().getItemValueScale(item, context);
-    }
+    public abstract long[] getGCEnds(int index);
 
-
-    protected XYItemPainter getPainter1() {
-        return (XYItemPainter)super.getPainter1();
-    }
-
-    protected XYItemPainter getPainter2() {
-        return (XYItemPainter)super.getPainter2();
-    }
+    
+    public long getYValue(int index) { return 0; }
 
 }

@@ -56,6 +56,8 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 
 /**
@@ -80,8 +82,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
 
     protected TargetAppRunner runner;
 
-    //common actions handler
-    ActionsHandler handler;
+    private ClassHistoryActionsHandler historyActionsHandler;
+    private ClassHistoryDataManager classHistoryManager;
     private JMenuItem popupShowSource;
     private JMenuItem popupShowStacks;
     private JMenuItem startHisto;
@@ -92,15 +94,15 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public LiveAllocResultsPanel(TargetAppRunner runner, MemoryResUserActionsHandler actionsHandler) {
-        this(runner, actionsHandler, null);
-    }
-
-    public LiveAllocResultsPanel(TargetAppRunner runner, MemoryResUserActionsHandler actionsHandler, ActionsHandler handler) {
+    public LiveAllocResultsPanel(TargetAppRunner runner,
+                                 MemoryResUserActionsHandler actionsHandler,
+                                 ClassHistoryActionsHandler historyActionsHandler,
+                                 ClassHistoryDataManager classHistoryManager) {
         super(actionsHandler);
         this.status = runner.getProfilerClient().getStatus();
         this.runner = runner;
-        this.handler = handler;
+        this.historyActionsHandler = historyActionsHandler;
+        this.classHistoryManager = classHistoryManager;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -122,8 +124,11 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
         } else if (e.getSource() == popupShowSource) {
             showSourceForClass(selectedClassId);
-        } else if ((e.getSource() == startHisto) && (handler != null)) {
-            handler.performAction("history logging",new Object[] { new Integer(selectedClassId), getClassName(selectedClassId), Boolean.FALSE }); // NOI18N
+        } else if (e.getSource() == startHisto) {
+            String selectedClassName = StringUtils.userFormClassName(
+                                                getClassName(selectedClassId));
+            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
+                classHistoryManager.setup(selectedClassId, selectedClassName);
         }
     }
 
@@ -162,9 +167,13 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
                 nTotalClasses += nTotalAllocObjects[i];
             }
 
-            if (handler != null) {
-                handler.performAction("history update", new Object[] { nTotalAllocObjects, totalAllocObjectsSize }); // NOI18N
-            }
+            if (classHistoryManager.isTrackingClass())
+                classHistoryManager.processData(nTotalAllocObjects,
+                                                totalAllocObjectsSize);
+
+//            if (handler != null) {
+//                handler.performAction("history update", new Object[] { nTotalAllocObjects, totalAllocObjectsSize }); // NOI18N
+//            }
 
             initDataUponResultsFetch();
         }
@@ -310,20 +319,22 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         return memoryResPopupMenu;
     }
 
-    public void exportData(int typeOfFile, ExportDataDumper eDD) {
+    public void exportData(int typeOfFile, ExportDataDumper eDD, String viewName) {
         percentFormat.setMinimumFractionDigits(2);
+        percentFormat.setMaximumFractionDigits(2);
         switch (typeOfFile) {
             case 1: exportCSV(",", eDD); break; // normal CSV   // NOI18N
             case 2: exportCSV(";", eDD); break; // Excel CSV  // NOI18N
-            case 3: exportXML(eDD); break;
-            case 4: exportHTML(eDD); break;
+            case 3: exportXML(eDD, viewName); break;
+            case 4: exportHTML(eDD, viewName); break;
         }
         percentFormat.setMinimumFractionDigits(0);
+        percentFormat.setMaximumFractionDigits(1);
     }
 
-    private void exportHTML(ExportDataDumper eDD) {
+    private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+getViewName()+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
             result.append("<th>"+columnNames[i]+"</th>");  // NOI18N
         }
@@ -341,10 +352,10 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));  // NOI18N
     }
 
-    private void exportXML(ExportDataDumper eDD) {
+    private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
         String newline = System.getProperty("line.separator"); // NOI18N
-        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+getViewName()+"\">"+newline); // NOI18N
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
         result.append(" <TableData NumRows=\""+nTrackedItems+"\" NumColumns=\"4\">"+newline+"<TableHeader>");  // NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
             result.append("  <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline);  // NOI18N

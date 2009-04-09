@@ -107,7 +107,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
                                           long dataWidth, long dataHeight,
                                           long oldDataOffsetX, long oldDataOffsetY,
                                           long oldDataWidth, long oldDataHeight) {
-                updateTooltip(chart);
+//                updateTooltip(chart);
             }
 
             public void viewChanged(long offsetX, long offsetY,
