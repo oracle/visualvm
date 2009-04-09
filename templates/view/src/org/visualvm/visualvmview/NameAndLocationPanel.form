@@ -4,6 +4,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
@@ -22,7 +23,7 @@
                       <EmptySpace min="54" pref="54" max="54" attributes="0"/>
                   </Group>
                   <Component id="lblProjectName" pref="118" max="32767" attributes="0"/>
-                  <Component id="lblPackageName" max="32767" attributes="0"/>
+                  <Component id="lblPackageName" pref="118" max="32767" attributes="0"/>
                   <Component id="createdFiles" pref="118" max="32767" attributes="0"/>
                   <Component id="modifiedFiles" pref="118" max="32767" attributes="0"/>
               </Group>
