@@ -42,6 +42,7 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import java.text.NumberFormat;
 
 
 /**
@@ -52,6 +53,8 @@ import org.netbeans.lib.profiler.results.ExportDataDumper;
  * @author Misha Dmitriev
  */
 public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
+
+    private static NumberFormat percentFormat=null;
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected int methodId;
@@ -191,7 +194,7 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
         StringBuffer result = new StringBuffer(indent+"<node>"+newline); //NOI18N
         result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"</Name>"+newline); //NOI18N
         result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PrestimeCPUCCTNodeFree)getParent()).getNodeName()))+"</Parent>"+newline); //NOI18N
-        result.append(indent+" <Time_Relative>"+getTotalTime0InPerCent()+"</Time_Relative>"+newline); //NOI18N
+        result.append(indent+" <Time_Relative>"+percentFormat.format(((double)getTotalTime0InPerCent())/100)+"</Time_Relative>"+newline); //NOI18N
         result.append(indent+" <Time>"+getTotalTime0()+"</Time>"+newline); //NOI18N
         result.append(indent+" <Invocations>"+getNCalls()+"</Invocations>"+newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
@@ -206,11 +209,11 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
     }
 
     public void exportHTMLData(ExportDataDumper eDD, int depth) {
-        StringBuffer result = new StringBuffer("<tr><td>."); //NOI18N
+        StringBuffer result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"); //NOI18N
         for (int i=0; i<depth; i++) {
             result.append("."); //NOI18N
         }
-        result.append(replaceHTMLCharacters(getNodeName())+"</td><td>"+getTotalTime0InPerCent()+"</td><td>"+getTotalTime0()+"</td><td>"+getNCalls()+"</td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+percentFormat.format(((double)getTotalTime0InPerCent())/100)+"</td><td class=\"right\">"+getTotalTime0()+"</td><td class=\"right\">"+getNCalls()+"</td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -258,5 +261,9 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
                 ((PrestimeCPUCCTNodeFree)children[i]).exportCSVData(separator, depth+1, eDD);
             }
         }
+    }
+
+    public static void setPercentFormat(NumberFormat percentFormat) {
+        PrestimeCPUCCTNodeFree.percentFormat = percentFormat;
     }
 }

@@ -60,10 +60,13 @@ import org.netbeans.lib.profiler.charts.AxisComponent;
 import org.netbeans.lib.profiler.charts.AxisMarksComputer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
@@ -158,36 +161,57 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
 
     private void initComponents(final Action chartAction) {
+        // Painters model
+        PaintersModel paintersModel = createGenerationsPaintersModel();
+
         // Chart
         chart = createChart(models.generationsItemsModel(),
-                            createGenerationsPaintersModel(), smallPanel);
+                            paintersModel, smallPanel);
         chart.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chart.setViewInsets(new Insets(10, 0, 0, 0));
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
-                         100, chart.getChartContext(), SwingConstants.HORIZONTAL),
+                new AxisComponent(chart, new AxisMarksComputer.TimeMarksComputer(
+                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
                          new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
-                         SwingConstants.SOUTH);
+                         SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
-        // Vertical axis
-        AxisComponent vAxis =
-                new AxisComponent(chart, AxisMarksComputer.simpleComputer(
-                         100, chart.getChartContext(), SwingConstants.VERTICAL),
-                         new AxisComponent.SimplePainter(),
-                         SwingConstants.WEST);
+        // Surviving generations axis
+        XYItem survgenItem = models.generationsItemsModel().getItem(1);
+        XYItemPainter survgenPainter = (XYItemPainter)paintersModel.getPainter(survgenItem);
+        AxisComponent.SimplePainter survgenMarksPainter = new AxisComponent.SimplePainter();
+        survgenMarksPainter.setForeground(GraphsUI.SURVGEN_PAINTER_LINE_COLOR);
+        AxisComponent sAxis =
+                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
+                         survgenItem, survgenPainter, chart.getChartContext(), 40),
+                         survgenMarksPainter, SwingConstants.WEST,
+                         AxisComponent.MESH_FOREGROUND);
+
+        // Surviving generations axis
+        XYItem gcTimeItem = models.generationsItemsModel().getItem(2);
+        XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
+        AxisComponent.PercentPainter gcTimeMarksPainter =
+                new AxisComponent.PercentPainter(0, 1000);
+        gcTimeMarksPainter.setForeground(GraphsUI.GC_TIME_PAINTER_LINE_COLOR);
+        AxisComponent gAxis =
+                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
+                         gcTimeItem, gcTimePainter, chart.getChartContext(), 40),
+                         gcTimeMarksPainter, SwingConstants.EAST,
+                         AxisComponent.MESH_FOREGROUND);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
                                               SwingConstants.SOUTH_WEST });
-        chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
+        chartPanel.add(sAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
+        chartPanel.add(gAxis, new Integer[] { SwingConstants.EAST,
+                                              SwingConstants.SOUTH_EAST });
 
         // Small panel UI
         if (smallPanel) {
@@ -392,7 +416,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         };
     }
 
-    private ProfilerXYPaintersModel createGenerationsPaintersModel() {
+    private PaintersModel createGenerationsPaintersModel() {
         // Surviving generations
         ProfilerXYItemPainter survgenPainter =
                 ProfilerXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
@@ -425,9 +449,12 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         XYItemPainter gtp = new CompoundProfilerXYItemPainter(gcTimePainter,
                                                       gcTimeMarker);
 
+        // GC events painter
+        XYItemPainter gep = ProfilerGCXYItemPainter.painter(GraphsUI.GC_ACTIVITY_FILL_COLOR);
+
         // Model
-        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
-                 new XYItemPainter[] { sgp, gtp });
+        PaintersModel model = new ProfilerXYPaintersModel(
+                 new XYItemPainter[] { gep ,sgp, gtp });
 
         return model;
     }

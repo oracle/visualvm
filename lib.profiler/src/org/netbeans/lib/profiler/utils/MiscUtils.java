@@ -40,6 +40,11 @@
 
 package org.netbeans.lib.profiler.utils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import java.io.File;
@@ -197,7 +202,7 @@ public class MiscUtils implements CommonConstants {
                 continue;
             }
 
-            ArrayList paths = getPathComponents(sourcePath, true, workingDir);
+            List paths = getPathComponents(sourcePath, true, workingDir);
 
             for (int j = 0; j < paths.size(); j++) {
                 String path = (String) paths.get(j);
@@ -296,7 +301,7 @@ public class MiscUtils implements CommonConstants {
 
     /** For a string representing a class path, remove all entries that don't correspond to existing files, and return the remaining ones. */
     public static String getLiveClassPathSubset(String path, String workingDir) {
-        ArrayList liveComponents = getPathComponents(path, true, workingDir);
+        List liveComponents = getPathComponents(path, true, workingDir);
         StringBuffer buf = new StringBuffer(liveComponents.size() * 10);
 
         if (liveComponents.size() > 0) {
@@ -317,7 +322,7 @@ public class MiscUtils implements CommonConstants {
      * and returns only existing components. workingDir is needed in case the passed path has
      * a local form.
      */
-    public static ArrayList getPathComponents(String path, boolean doCheck, String workingDir) {
+    public static List getPathComponents(String path, boolean doCheck, String workingDir) {
         ArrayList list = new ArrayList();
 
         if (path != null) {
@@ -325,7 +330,8 @@ public class MiscUtils implements CommonConstants {
 
             while (tok.hasMoreTokens()) {
                 String name = tok.nextToken();
-
+                boolean addedToList = false;
+                
                 if ((name == null) || (name.length() == 0)) {
                     continue; // Essentially sanity check, but who knows?
                 }
@@ -333,19 +339,79 @@ public class MiscUtils implements CommonConstants {
                 if (doCheck) {
                     name = getAbsoluteFilePath(name, workingDir);
                     name = getCanonicalPath(new File(name)); // clean up the name into a canonical path
-
-                    if (name != null) {
+                    if (name != null && !list.contains(name)) {
                         list.add(name);
+                        addedToList = true;
                     }
                 } else {
                     list.add(name);
+                    addedToList = true;
+                }
+                if (addedToList) {
+                    try {
+                        getClassPathFromManifest(name,list);
+                    } catch (URISyntaxException ex) {
+                        System.out.println("Error processing "+name);
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        System.out.println("Error processing "+name);
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
-
         return list;
     }
 
+    private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
+        if (jarPath.toLowerCase().endsWith(".jar")) {
+            File pathFile = new File(jarPath);
+            JarFile jarFile = new JarFile(pathFile);
+            Manifest manifest = jarFile.getManifest();
+            
+            if (manifest != null) {
+                Attributes attrs = manifest.getMainAttributes();
+
+                if (attrs != null) {
+                    String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
+
+                    if (jarCp != null) {
+                        File parent = pathFile.getParentFile();
+                        StringTokenizer tokens = new StringTokenizer(jarCp);
+                        
+                        while(tokens.hasMoreTokens()) {
+                            URI fileUri = new URI(tokens.nextToken());
+                            File cpFile;
+                            String cpName;
+                            
+                            if (!fileUri.isAbsolute()) {
+                                cpFile = new File(parent,fileUri.getPath());
+                            } else {
+                                cpFile = new File(fileUri);
+                            }
+                            cpName = getCanonicalPath(cpFile);
+                            if (cpName != null && !pathList.contains(cpName)) {
+                                pathList.add(cpName);
+                                getClassPathFromManifest(cpName,pathList);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    private static boolean addToList(File file,List path) {
+        String pathName = getCanonicalPath(file);
+        
+        if (pathName != null && !path.contains(pathName)) {
+            path.add(pathName);
+            return true;
+        }
+        return false;
+    }
+    
     public static void setSilent(boolean silent) {
         printInfo = !silent;
     }
@@ -418,7 +484,7 @@ public class MiscUtils implements CommonConstants {
     public static boolean containsDirectoryOnPath(String directory, String path) {
         String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase();
         String normalizedPath = new File(path).getAbsolutePath().toLowerCase();
-        ArrayList pathComponents = getPathComponents(normalizedPath, false, null);
+        List pathComponents = getPathComponents(normalizedPath, false, null);
 
         for (int i = 0; i < pathComponents.size(); i++) {
             if (normalizedDirectory.equals(pathComponents.get(i))) {

@@ -23,43 +23,18 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
-
-import org.netbeans.lib.profiler.charts.CompoundItemPainter;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+package org.netbeans.lib.profiler.ui.memory;
 
 /**
+ * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public class CompoundProfilerXYItemPainter extends CompoundItemPainter implements XYItemPainter {
+public interface ClassHistoryActionsHandler {
 
-    public CompoundProfilerXYItemPainter(XYItemPainter painter1, XYItemPainter painter2) {
-        super(painter1, painter2);
-    }
-
-
-    public double getItemView(double dataY, XYItem item, ChartContext context) {
-        return getPainter1().getItemView(dataY, item, context);
-    }
-
-    public double getItemValue(double viewY, XYItem item, ChartContext context) {
-        return getPainter1().getItemValue(viewY, item, context);
-    }
-
-    public double getItemValueScale(XYItem item, ChartContext context) {
-        return getPainter1().getItemValueScale(item, context);
-    }
-
-
-    protected XYItemPainter getPainter1() {
-        return (XYItemPainter)super.getPainter1();
-    }
-
-    protected XYItemPainter getPainter2() {
-        return (XYItemPainter)super.getPainter2();
-    }
+    // Returns true if history of the class should be tracked.
+    // The implementation notifies the user that previous history tracking
+    // will be reset and ensures that the history graph is visible.
+    public boolean showClassHistory(int classID, String className);
 
 }
