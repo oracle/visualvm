@@ -44,9 +44,9 @@ import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.utils.MiscUtils;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 
 /**
@@ -57,7 +57,7 @@ import java.util.Enumeration;
 public class MiscInstrumentationOps extends ClassManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ArrayList instrClasses;
+    private List instrClasses;
     private int nInstrClasses;
     private int nInstrMethods;
 
@@ -113,7 +113,7 @@ public class MiscInstrumentationOps extends ClassManager {
         String methodName = rootMethods.methodNames[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];
         String methodSignature = rootMethods.methodSignatures[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];
 
-        ArrayList classes = ClassRepository.getAllClassVersions(className);
+        List classes = ClassRepository.getAllClassVersions(className);
 
         if (classes == null) {
             return null; // Can happen if actually nothing was instrumented, since class of intrest hasn't been loaded

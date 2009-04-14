@@ -139,7 +139,8 @@ public class ProfilerInterface implements CommonConstants {
                                                                           // for take heap dump
 
                     Class.forName("java.lang.reflect.InvocationTargetException"); // NOI18N
-                    Class.forName("java.lang.InterruptedException");
+                    Class.forName("java.lang.InterruptedException");    // NOI18N
+                    Class.forName("java.util.zip.Deflater");    // NOI18N compressed remote profiling
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace(System.err);
                 }
