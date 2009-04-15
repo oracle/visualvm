@@ -819,7 +819,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
     
     private void addFileWatch(File file) {
-        FileObject fileo = FileUtil.toFileObject(file);
+        FileObject fileo = null;
+        if (file.isFile())
+            fileo = FileUtil.toFileObject(FileUtil.normalizeFile(file));
         if (fileo != null) {
             FileWatch fileWatch = profilingPointsFiles.get(file);
             if (fileWatch == null) {
@@ -833,7 +835,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
     
     private void removeFileWatch(File file) {
-        FileObject fileo = file.exists() && file.isFile() ? FileUtil.toFileObject(file) : null;
+        FileObject fileo = null;
+        if (file.isFile())
+            fileo = FileUtil.toFileObject(FileUtil.normalizeFile(file));
         if (fileo != null) {
             FileWatch fileWatch = profilingPointsFiles.get(file);
             if (fileWatch != null) {
@@ -850,8 +854,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         for (CodeProfilingPoint.Annotation annotation : annotations) {
             CodeProfilingPoint.Location location = cpp.getLocation(annotation);
             String filename = location.getFile();
-            File file = new File(filename);
-            if (file.exists() && file.isFile()) addFileWatch(file);
+            addFileWatch(new File(filename));
         }
     }
     
@@ -860,8 +863,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         for (CodeProfilingPoint.Annotation annotation : annotations) {
             CodeProfilingPoint.Location location = cpp.getLocation(annotation);
             String filename = location.getFile();
-            File file = new File(filename);
-            removeFileWatch(file);
+            removeFileWatch(new File(filename));
         }
     }
     
