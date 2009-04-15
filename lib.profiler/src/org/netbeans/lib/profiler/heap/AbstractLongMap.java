@@ -82,11 +82,14 @@ abstract class AbstractLongMap {
         ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
         fileSize = keys * ENTRY_SIZE;
         tempFile = File.createTempFile("NBProfiler", ".map"); // NOI18N
-        byte[] zeros = new byte[512*1024];
 
         RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
-         while(file.length()<fileSize) {
-            file.write(zeros);
+        if (Boolean.getBoolean("org.netbeans.lib.profiler.heap.zerofile")) {    // NOI18N
+            byte[] zeros = new byte[512*1024];
+            while(file.length()<fileSize) {
+                file.write(zeros);
+            }
+            file.write(zeros,0,(int)(fileSize-file.length()));
         }
         file.setLength(fileSize);
         setDumpBuffer(file);
