@@ -40,7 +40,7 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="OptionsDialog">
         <folder name="Advanced">
@@ -127,12 +127,15 @@ made subject to such option by the copyright holder.
       <!--file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.shadow">
         <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
       </file-->
-            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance">
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-AttachAction.instance"/>
                 <attr name="position" intvalue="200"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <file name="profiler-sep1.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="400"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <file name="profiler-sep2.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
@@ -167,14 +170,20 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance">
                 <attr name="position" intvalue="900"/>
             </file>
-            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance">
+            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
-            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance">
-                <attr name="position" intvalue="1600"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
+            <file name="org-netbeans-modules-profiler-OpenHeapWalkerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance"/>
                 <attr name="position" intvalue="1500"/>
+                <attr name="ergonomics" boolvalue="true"/>
+            </file>
+            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
+                <attr name="position" intvalue="1600"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <folder name="ProfileOther">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
@@ -267,6 +276,35 @@ made subject to such option by the copyright holder.
     <folder name="Actions">
         <folder name="Profile">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance">
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.actions.AttachAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#LBL_AttachMainProjectAction"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/attach.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.actions.CompareSnapshotsAction"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#CompareSnapshotsAction_ActionName"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance">
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.actions.LoadSnapshotAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#LoadSnapshotAction_ActionName"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/openSnapshot.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.heapwalk.ui.OpenHeapWalkerAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalk.ui.Bundle#OpenHeapWalkerAction_ActionName"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/resources/memory.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
             <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
             <file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
@@ -279,7 +317,6 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance">
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileMainProject"/>
             </file>
-            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-RerunAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-StopAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance"/>
