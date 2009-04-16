@@ -130,10 +130,12 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-AttachAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-AttachAction.instance"/>
                 <attr name="position" intvalue="200"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <file name="profiler-sep1.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="400"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <file name="profiler-sep2.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
@@ -171,14 +173,17 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <file name="org-netbeans-modules-profiler-OpenHeapWalkerAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance"/>
                 <attr name="position" intvalue="1500"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
                 <attr name="position" intvalue="1600"/>
+                <attr name="ergonomics" boolvalue="true"/>
             </file>
             <folder name="ProfileOther">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
