@@ -50,7 +50,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -729,8 +728,6 @@ public class CompareSnapshotsAction extends AbstractAction {
 
     // -----
     // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(CompareSnapshotsAction.class,
-                                                                  "CompareSnapshotsAction_ActionName"); // NOI18N
     private static final String ACTION_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                    "CompareSnapshotsAction_ActionDescr"); // NOI18N
     private static final String SELECT_DIALOG_CAPTION = NbBundle.getMessage(CompareSnapshotsAction.class,
@@ -797,9 +794,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
     public CompareSnapshotsAction() {
         snapshot = null;
-        putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png", false)); // NOI18N
     }
 
     public CompareSnapshotsAction(LoadedSnapshot snapshot) {
