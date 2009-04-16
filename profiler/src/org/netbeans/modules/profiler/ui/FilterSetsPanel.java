@@ -377,6 +377,8 @@ public final class FilterSetsPanel extends JPanel implements ActionListener, Hel
         }
 
         private void updateDefinedFilterSetsList() {
+            if (selectedFilterSet == null) return;
+
             String selectedFilterSetName = filterNameTextField.getText().trim();
 
             if (selectedFilterSetName.length() == 0) {
@@ -416,7 +418,6 @@ public final class FilterSetsPanel extends JPanel implements ActionListener, Hel
                 case KeyEvent.VK_ENTER:
                     e.consume();
                     processUniqueFilterSetNameCheckAt(definedFilterSetsList.getSelectedIndex());
-                    filterNameTextField.setText(selectedFilterSet.getFilterSetName());
                     filterTypeExclusiveRadio.requestFocus();
 
                     break;
@@ -952,6 +953,9 @@ public final class FilterSetsPanel extends JPanel implements ActionListener, Hel
     }
 
     private void processUniqueFilterSetNameCheckAt(final int index) {
+        int selectedIndex = definedFilterSetsList.getSelectedIndex();
+        if (selectedIndex == -1) return;
+
         if ((filterSets.getFilterSetAt(index).getFilterSetName().trim().length() == 0)
                 || (containsFilterSetNameExceptIndex(filterSets.getFilterSetAt(index).getFilterSetName(), index))) {
             filterSets.getFilterSetAt(index)
@@ -959,7 +963,7 @@ public final class FilterSetsPanel extends JPanel implements ActionListener, Hel
             ((DefinedFilterSetsListModel) definedFilterSetsList.getModel()).fireContentsChanged(index, index);
         }
 
-        filterNameTextField.setText(filterSets.getFilterSetAt(definedFilterSetsList.getSelectedIndex()).getFilterSetName());
+        filterNameTextField.setText(filterSets.getFilterSetAt(selectedIndex).getFilterSetName());
     }
 
     private void removeSelectedFilterSet() {
