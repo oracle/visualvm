@@ -47,10 +47,8 @@ import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.MessageFormat;
@@ -69,7 +67,6 @@ public final class LoadSnapshotAction extends AbstractAction {
 
     // -----
     // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(LoadSnapshotAction.class, "LoadSnapshotAction_ActionName"); // NOI18N
     private static final String ACTION_DESCR = NbBundle.getMessage(LoadSnapshotAction.class, "LoadSnapshotAction_ActionDescr"); // NOI18N
     private static final String OPEN_SNAPSHOT_DIALOG_CAPTION = NbBundle.getMessage(LoadSnapshotAction.class,
                                                                                    "LoadSnapshotAction_OpenSnapshotDialogCaption"); // NOI18N
@@ -87,13 +84,12 @@ public final class LoadSnapshotAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LoadSnapshotAction() {
-        putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/openSnapshot.png", false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public boolean isEnabled() {
         if (!NetBeansProfiler.isInitialized()) {
             return false;
