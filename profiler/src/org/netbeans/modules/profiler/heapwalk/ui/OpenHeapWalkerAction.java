@@ -37,56 +37,24 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import javax.swing.JFileChooser;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.actions.SystemAction;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import javax.swing.*;
-
 
 /**
  * Opens the Heap Walker
  *
  * @author Jiri Sedlacek
  */
-public class OpenHeapWalkerAction extends SystemAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(OpenHeapWalkerAction.class, "OpenHeapWalkerAction_ActionName"); // NOI18N
-    private static final String DIALOG_CAPTION = NbBundle.getMessage(OpenHeapWalkerAction.class,
-                                                                     "OpenHeapWalkerAction_DialogCaption"); // NOI18N
-                                                                                                            // -----
+public final class OpenHeapWalkerAction implements ActionListener {
     private static File importDir;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public OpenHeapWalkerAction() {
-        putValue("noIconInMenu", null); // NOI18N        
-        setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memory.png", true)); // NOI18N
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public HelpCtx getHelpCtx() {
-        return new HelpCtx(OpenHeapWalkerAction.class);
-    }
-
-    public String getName() {
-        return ACTION_NAME;
-    }
 
     public void actionPerformed(ActionEvent e) {
         final File heapDumpFile = getHeapDumpFile();
@@ -98,7 +66,6 @@ public class OpenHeapWalkerAction extends SystemAction {
                 }
             });
     }
-
     private static File getHeapDumpFile() {
         JFileChooser chooser = new JFileChooser();
 
@@ -109,7 +76,9 @@ public class OpenHeapWalkerAction extends SystemAction {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        chooser.setDialogTitle(DIALOG_CAPTION);
+        chooser.setDialogTitle(
+            NbBundle.getMessage(OpenHeapWalkerAction.class, "OpenHeapWalkerAction_DialogCaption") // NOI18N
+        );
 
         if (chooser.showOpenDialog(IDEUtils.getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             importDir = chooser.getCurrentDirectory();
