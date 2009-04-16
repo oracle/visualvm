@@ -201,6 +201,8 @@ public class ProfilingPointsWindowUI extends JPanel implements ActionListener, L
     private int initialSortingColumn;
     private int minProfilingPointColumnWidth; // minimal width of Profiling Point column
 
+    private boolean internalComboChange;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ProfilingPointsWindowUI() {
@@ -236,7 +238,7 @@ public class ProfilingPointsWindowUI extends JPanel implements ActionListener, L
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == projectsCombo) {
-            refreshProfilingPoints();
+            if (!internalComboChange) refreshProfilingPoints();
         } else if (e.getSource() == addButton) {
             SystemAction.get(InsertProfilingPointAction.class).performAction(getSelectedProject());
         } else if (e.getSource() == removeButton) {
@@ -860,6 +862,8 @@ public class ProfilingPointsWindowUI extends JPanel implements ActionListener, L
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) projectsCombo.getModel();
         Object selectedItem = projectsCombo.getSelectedItem();
 
+        internalComboChange = true;
+
         comboModel.removeAllElements();
 
         for (int i = 0; i < items.size(); i++) {
@@ -871,5 +875,9 @@ public class ProfilingPointsWindowUI extends JPanel implements ActionListener, L
         } else {
             projectsCombo.setSelectedItem(ALL_PROJECTS_STRING);
         }
+
+        internalComboChange = false;
+
+        refreshProfilingPoints();
     }
 }
