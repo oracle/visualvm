@@ -46,7 +46,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.lib.profiler.marker.Marker;
 import org.netbeans.modules.profiler.ui.stp.DefaultSettingsConfigurator;
 import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
 import org.openide.filesystems.FileObject;
@@ -56,6 +55,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.swing.JComponent;
+import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
@@ -190,7 +190,38 @@ public interface ProjectTypeProfiler {
         }
 
         public float getProfilingOverhead(ProfilingSettings settings) {
-            return 0F;
+            // Simply copy-pasted from org.netbeans.modules.profiler.AbstractProjectTypeProfiler
+            // to fix #156000.
+
+            // TODO: this code should be implemented in one place, PTPUtilities?
+
+            float o = 0.0f;
+
+            if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
+                //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
+            } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
+                if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
+                    o += 0.5f; // entire app
+                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
+                    o += 0.2f; // part of app
+                }
+
+                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
+                    o += 0.5f; // profile all classes
+                }
+            } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
+                if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
+                    o += 0.5f; // object allocations
+                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
+                    o += 0.7f; // object liveness
+                }
+
+                if (settings.getAllocStackTraceLimit() != 0) {
+                    o += 0.3f; // record allocation stack traces
+                }
+            }
+
+            return o;
         }
     };
 
