@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -21,11 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -36,57 +31,24 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import javax.swing.JFileChooser;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.actions.SystemAction;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import javax.swing.*;
 
-
-/**
- * Opens the Heap Walker
- *
- * @author Jiri Sedlacek
- */
-public class OpenHeapWalkerAction extends SystemAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(OpenHeapWalkerAction.class, "OpenHeapWalkerAction_ActionName"); // NOI18N
-    private static final String DIALOG_CAPTION = NbBundle.getMessage(OpenHeapWalkerAction.class,
-                                                                     "OpenHeapWalkerAction_DialogCaption"); // NOI18N
-                                                                                                            // -----
+public final class OpenHeapWalkerAction implements ActionListener {
     private static File importDir;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public OpenHeapWalkerAction() {
-        putValue("noIconInMenu", null); // NOI18N        
-        setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memory.png", true)); // NOI18N
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public HelpCtx getHelpCtx() {
-        return new HelpCtx(OpenHeapWalkerAction.class);
-    }
-
-    public String getName() {
-        return ACTION_NAME;
-    }
 
     public void actionPerformed(ActionEvent e) {
         final File heapDumpFile = getHeapDumpFile();
@@ -98,7 +60,6 @@ public class OpenHeapWalkerAction extends SystemAction {
                 }
             });
     }
-
     private static File getHeapDumpFile() {
         JFileChooser chooser = new JFileChooser();
 
@@ -109,7 +70,9 @@ public class OpenHeapWalkerAction extends SystemAction {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        chooser.setDialogTitle(DIALOG_CAPTION);
+        chooser.setDialogTitle(
+            NbBundle.getMessage(OpenHeapWalkerAction.class, "OpenHeapWalkerAction_DialogCaption") // NOI18N
+        );
 
         if (chooser.showOpenDialog(IDEUtils.getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             importDir = chooser.getCurrentDirectory();

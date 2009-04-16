@@ -40,7 +40,7 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="OptionsDialog">
         <folder name="Advanced">
@@ -170,11 +170,12 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance">
                 <attr name="position" intvalue="1400"/>
             </file>
+            <file name="org-netbeans-modules-profiler-OpenHeapWalkerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance"/>
+                <attr name="position" intvalue="1500"/>
+            </file>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance">
                 <attr name="position" intvalue="1600"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
-                <attr name="position" intvalue="1500"/>
             </file>
             <folder name="ProfileOther">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
@@ -267,6 +268,13 @@ made subject to such option by the copyright holder.
     <folder name="Actions">
         <folder name="Profile">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.heapwalk.ui.OpenHeapWalkerAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalk.ui.Bundle#OpenHeapWalkerAction_ActionName"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/resources/memory.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
             <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
             <file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
