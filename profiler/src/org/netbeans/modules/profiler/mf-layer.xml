@@ -167,7 +167,8 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance">
                 <attr name="position" intvalue="900"/>
             </file>
-            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance">
+            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
             </file>
             <file name="org-netbeans-modules-profiler-OpenHeapWalkerAction.shadow">
@@ -268,6 +269,13 @@ made subject to such option by the copyright holder.
     <folder name="Actions">
         <folder name="Profile">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance">
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.actions.LoadSnapshotAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#LoadSnapshotAction_ActionName"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/openSnapshot.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
             <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
                 <attr name="delegate" newvalue="org.netbeans.modules.profiler.heapwalk.ui.OpenHeapWalkerAction"/>
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalk.ui.Bundle#OpenHeapWalkerAction_ActionName"/>
