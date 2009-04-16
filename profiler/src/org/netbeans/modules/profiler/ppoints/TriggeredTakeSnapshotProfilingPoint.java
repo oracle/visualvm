@@ -271,8 +271,9 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
 
                         if ((snapshotFile != null) && snapshotFile.exists()) {
                             if (TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_PROFDATA_KEY)) {
+                                File sf = FileUtil.normalizeFile(snapshotFile);
                                 LoadedSnapshot snapshot = ResultsManager.getDefault()
-                                                                        .loadSnapshot(FileUtil.toFileObject(snapshotFile));
+                                                                        .loadSnapshot(FileUtil.toFileObject(sf));
                                 ResultsManager.getDefault().openSnapshot(snapshot);
                             } else if (TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_HEAPDUMP_KEY)) {
                                 RequestProcessor.getDefault().post(new Runnable() {
