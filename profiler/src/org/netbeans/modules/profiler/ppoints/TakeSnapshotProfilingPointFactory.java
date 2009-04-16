@@ -110,7 +110,8 @@ public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory
 
             return new TakeSnapshotProfilingPoint(name, location, project);
         } else {
-            String filename = FileUtil.toFileObject(new File(location.getFile())).getName();
+            File file = FileUtil.normalizeFile(new File(location.getFile()));
+            String filename = FileUtil.toFileObject(file).getName();
             String name = Utils.getUniqueName(getType(),
                                               MessageFormat.format(PP_DEFAULT_NAME,
                                                                    new Object[] { "", filename, location.getLine() }), project); // NOI18N
