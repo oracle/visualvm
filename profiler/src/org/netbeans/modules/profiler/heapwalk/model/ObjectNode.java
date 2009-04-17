@@ -181,7 +181,7 @@ public class ObjectNode extends InstanceNode {
                             }
                         }
                     } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
-                        fieldValues.addAll(getInstance().getReferences());
+                        fieldValues.addAll(getReferences());
 
                         if (fieldValues.size() == 0) {
                             // Instance has no fields
