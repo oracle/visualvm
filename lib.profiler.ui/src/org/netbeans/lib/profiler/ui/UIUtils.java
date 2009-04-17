@@ -64,8 +64,12 @@ import javax.swing.tree.TreePath;
 public final class UIUtils {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    // Used to mark explicit expand/collapse on JTree which shouldn't be handled by automatic expander
+    public static final String PROP_EXPANSION_TRANSACTION = "expansion_transaction"; // NOI18N
+
     private static final Logger LOGGER = Logger.getLogger(UIUtils.class.getName());
     public static final float ALTERNATE_ROW_DARKER_FACTOR = 0.96f;
+    private static final int MAX_TREE_AUTOEXPAND_LINES = 50;
     private static boolean toolTipValuesInitialized = false;
     private static Color unfocusedSelBg;
     private static Color unfocusedSelFg;
@@ -316,12 +320,17 @@ public final class UIUtils {
      * @param path
      * @param maxChildToExpand
      */
-    public static void autoExpand(JTree tree, TreePath path, int maxChildToExpand, boolean dontExpandToLeafs) {
+    public static void autoExpand(JTree tree, TreePath path, int maxLines, int maxChildToExpand, boolean dontExpandToLeafs) {
         TreeModel model = tree.getModel();
         Object node = path.getLastPathComponent();
         TreePath newPath = path;
 
-        while (!model.isLeaf(node) && (model.getChildCount(node) > 0) && (model.getChildCount(node) <= maxChildToExpand)) {
+        int currentLines = 0;
+
+        while (currentLines++ < maxLines &&
+                !model.isLeaf(node) &&
+                (model.getChildCount(node) > 0) &&
+                (model.getChildCount(node) <= maxChildToExpand)) {
             for (int i = 0; i < model.getChildCount(node); i++) {
                 node = tree.getModel().getChild(node, i);
 
@@ -362,7 +371,7 @@ public final class UIUtils {
         }
 
         TreePath rootPath = new TreePath(root);
-        autoExpand(tree, rootPath, maxChildToExpand, false);
+        autoExpand(tree, rootPath, MAX_TREE_AUTOEXPAND_LINES, maxChildToExpand, false);
     }
 
     public static long[] copyArray(long[] array) {
@@ -526,7 +535,7 @@ public final class UIUtils {
         makeTreeAutoExpandable(tree, maxChildToExpand, false);
     }
 
-    public static void makeTreeAutoExpandable(JTree tree, final int maxChildToExpand, final boolean dontExpandToLeafs) {
+    public static void makeTreeAutoExpandable(final JTree tree, final int maxChildToExpand, final boolean dontExpandToLeafs) {
         tree.addTreeExpansionListener(new TreeExpansionListener() {
                 boolean internalChange = false;
 
@@ -534,7 +543,7 @@ public final class UIUtils {
                 }
 
                 public void treeExpanded(TreeExpansionEvent event) {
-                    if (internalChange) {
+                    if (internalChange || Boolean.TRUE.equals(tree.getClientProperty(PROP_EXPANSION_TRANSACTION))) { // NOI18N
                         return;
                     }
 
@@ -542,7 +551,7 @@ public final class UIUtils {
                     TreePath path = event.getPath();
                     JTree tree = (JTree) event.getSource();
                     internalChange = true;
-                    autoExpand(tree, path, maxChildToExpand, dontExpandToLeafs);
+                    autoExpand(tree, path, MAX_TREE_AUTOEXPAND_LINES, maxChildToExpand, dontExpandToLeafs);
                     internalChange = false;
                 }
             });
