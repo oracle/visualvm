@@ -479,7 +479,7 @@ class HprofHeap implements Heap {
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
         Map classIdToClassMap = classDumpBounds.getClassIdToClassMap();
 
-        while (offset[0] < allInstanceDumpBounds.endOffset) {
+        for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
             long start = offset[0];
             int tag = readDumpTag(offset);
 
@@ -524,6 +524,7 @@ class HprofHeap implements Heap {
                     }
                 }
             }
+            HeapProgress.progress(counter,allInstanceDumpBounds.startOffset,start,allInstanceDumpBounds.endOffset);
         }
         
         Iterator classesIt = getClassDumpSegment().createClassCollection().iterator();
@@ -550,6 +551,7 @@ class HprofHeap implements Heap {
             }
         }
         idToOffsetMap.flush();
+        HeapProgress.progressFinish();        
         referencesComputed = true;
         return;
     }
