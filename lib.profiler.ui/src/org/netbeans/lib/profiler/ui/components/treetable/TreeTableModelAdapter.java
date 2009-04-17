@@ -51,6 +51,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 public class TreeTableModelAdapter extends AbstractTableModel {
@@ -209,10 +210,12 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     public void restoreExpandedPaths(Vector paths) {
         Enumeration e = paths.elements();
 
+        tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.TRUE); // NOI18N
         while (e.hasMoreElements()) {
             TreePath path = (TreePath) e.nextElement();
             tree.expandPath(path);
         }
+        tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.FALSE); // NOI18N
     }
 
     public void updateTreeTable() {
