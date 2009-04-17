@@ -76,8 +76,8 @@ public class GoToJavaSourceProvider extends GoToSourceProvider {
 
         String javaClassName = getJavaFileName(className);
         
-        ClasspathInfo cpi = ProjectUtilities.getClasspathInfo(project, true);
-        ClassPath cp = cpi.getClassPath(ClasspathInfo.PathKind.SOURCE);
+        ClasspathInfo cpi = project != null ? ProjectUtilities.getClasspathInfo(project, true) : null;
+        ClassPath cp = cpi != null ? cpi.getClassPath(ClasspathInfo.PathKind.SOURCE) : null;
 
         FileObject sourceFile = cp != null ? cp.findResource(javaClassName) : null;
 
