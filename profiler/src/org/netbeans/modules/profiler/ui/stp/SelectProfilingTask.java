@@ -319,32 +319,52 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static Configuration selectAttachProfilerTask(Project project) { // profiledFile = null, enableOverride = false,
+        // Running this code in EDT would cause deadlock
+        assert !SwingUtilities.isEventDispatchThread();
 
-        SelectProfilingTask spt = getDefault();
+        final SelectProfilingTask spt = getDefault();
         spt.setSubmitButton(spt.attachButton);
         spt.setupAttachProfiler(project);
 
         spt.dd = new DialogDescriptor(spt, ATTACH_DIALOG_CAPTION, true, new Object[] { spt.attachButton, spt.cancelButton },
                                       spt.attachButton, 0, null, null);
 
-        Dialog d = ProfilerDialogs.createDialog(spt.dd);
-        d.pack();
-        d.setVisible(true);
+        final CountDownLatch latch = new CountDownLatch(1);
 
-        Configuration result = null;
+        SwingUtilities.invokeLater(new Runnable() {
 
-        if (spt.dd.getValue() == spt.attachButton) {
-            result = new Configuration(spt.project, spt.createFinalSettings(), spt.getAttachSettings());
+            public void run() {
+                Dialog d = ProfilerDialogs.createDialog(spt.dd);
+                d.pack();
+                d.setVisible(true);
+                latch.countDown();
+            }
+        });
+
+        try {
+            latch.await();
+
+            Configuration result = null;
+
+            if (spt.dd.getValue() == spt.attachButton) {
+                result = new Configuration(spt.project, spt.createFinalSettings(), spt.getAttachSettings());
+            }
+
+            spt.cleanup();
+
+            return result;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-
-        spt.cleanup();
-
-        return result;
+        return null;
     }
 
     public static Configuration selectModifyProfilingTask(Project project, FileObject profiledFile, boolean isAttach) { // profiledFile = null, enableOverride = false,
+        // Running this code in EDT would cause deadlock
+        assert !SwingUtilities.isEventDispatchThread();
 
-        SelectProfilingTask spt = getDefault();
+        final SelectProfilingTask spt = getDefault();
         spt.setSubmitButton(spt.modifyButton);
         spt.setupModifyProfiling(project, profiledFile, isAttach);
 
@@ -352,23 +372,42 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
                                       MessageFormat.format(MODIFY_DIALOG_CAPTION, new Object[] { Utils.getProjectName(project) }),
                                       true, new Object[] { spt.modifyButton, spt.cancelButton }, spt.modifyButton, 0, null, null);
 
-        Dialog d = ProfilerDialogs.createDialog(spt.dd);
-        d.pack();
-        d.setVisible(true);
+        final CountDownLatch latch = new CountDownLatch(1);
 
-        Configuration result = null;
+        SwingUtilities.invokeLater(new Runnable() {
 
-        if (spt.dd.getValue() == spt.modifyButton) {
-            result = new Configuration(project, spt.createFinalSettings(), null);
+            public void run() {
+                Dialog d = ProfilerDialogs.createDialog(spt.dd);
+                d.pack();
+                d.setVisible(true);
+                latch.countDown();
+            }
+        });
+
+        try {
+            latch.await();
+
+            Configuration result = null;
+
+            if (spt.dd.getValue() == spt.modifyButton) {
+                result = new Configuration(project, spt.createFinalSettings(), null);
+            }
+
+            spt.cleanup();
+
+            return result;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-
-        spt.cleanup();
-
-        return result;
+        return null;
     }
 
     // --- Public interface ------------------------------------------------------
     public static Configuration selectProfileProjectTask(Project project, FileObject profiledFile, boolean enableOverride) {
+        // Running this code in EDT would cause deadlock
+        assert !SwingUtilities.isEventDispatchThread();
+        
         final SelectProfilingTask spt = getDefault();
         spt.setSubmitButton(spt.runButton);
         spt.setupProfileProject(project, profiledFile, enableOverride);

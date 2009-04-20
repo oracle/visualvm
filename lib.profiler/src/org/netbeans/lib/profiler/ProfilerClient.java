@@ -796,7 +796,13 @@ public class ProfilerClient implements CommonConstants {
                 }
             }
         } while (!dumped && (--retryCounter > 0));
-
+        // fix for Issue #135532
+        if (dumped) {
+             try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+            }
+        }
         return dumped;
     }
 
