@@ -250,8 +250,11 @@ public class ProfilerXYChart extends ChartComponent {
 
         indexesCache.clear();
 
-        if (contentsWidthChanged) {
+        if (fitsWidth()) {
             recomputeVisibleBounds();
+        } else if (contentsWidthChanged) {
+            recomputeVisibleBounds();
+            contentsWidthChanged = false;
         } else if (firstVisibleIndex[0] == -1 && firstVisibleIndex[1] == -1) {
             recomputeVisibleBounds();
         } else if (oldBoundsWidth != newBoundsWidth) {
@@ -477,8 +480,8 @@ public class ProfilerXYChart extends ChartComponent {
             if (zoomInAction != null) zoomInAction.updateAction();
             if (zoomOutAction != null) zoomOutAction.updateAction();
 
+            visibleIndexesDirty = true;
             if (!fitsWidth() && oldScaleX != newScaleX) {
-                visibleIndexesDirty = true;
                 ProfilerXYChart.this.oldScaleX = oldScaleX;
                 ProfilerXYChart.this.newScaleX = newScaleX;
             }
