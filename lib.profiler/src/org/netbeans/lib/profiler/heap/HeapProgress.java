@@ -38,15 +38,58 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.monitor;
+package org.netbeans.lib.profiler.heap;
+
+import javax.swing.BoundedRangeModel;
+import javax.swing.DefaultBoundedRangeModel;
 
 
 /**
- *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public interface VMTelemetryXYChartModelDataResetListener {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+public final class HeapProgress {
+    
+    public static final int PROGRESS_MAX = 1000;
+    private static ThreadLocal progressThreadLocal = new ThreadLocal();
+    
+    private HeapProgress() {
+        
+    }
+    
+    public static BoundedRangeModel getProgress() {
+        BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
+        
+        if (model == null) {
+            model = new DefaultBoundedRangeModel(0,0,0,PROGRESS_MAX);
+            progressThreadLocal.set(model);
+        }
+        return model;
+    }
+    
+    static void progress(long counter, long startOffset, long value, long endOffset) {
+        // keep this method short so that it can be inlined 
+        if (counter % 100000 == 0) {
+            progress(value, endOffset, startOffset);
+        }
+    }
 
-    public void chartDataReset();
+    static void progress(long value, long endValue) {
+        progress(value,0,value,endValue);
+    }
+    
+    private static void progress(final long value, final long endOffset, final long startOffset) {
+        BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
+        if (model != null) {
+            long val = PROGRESS_MAX*(value - startOffset)/(endOffset - startOffset);
+            model.setValue((int)val);
+        }
+    }
+    
+    static void progressFinish() {
+        BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
+        if (model != null) {
+            model.setValue(PROGRESS_MAX);
+            progressThreadLocal.remove();
+        }
+    }
 }
