@@ -73,6 +73,10 @@ public final class HeapProgress {
         }
     }
 
+    static void progress(long value, long endValue) {
+        progress(value,0,value,endValue);
+    }
+    
     private static void progress(final long value, final long endOffset, final long startOffset) {
         BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
         if (model != null) {

@@ -65,7 +65,7 @@ final public class GoToSourceHelper {
         Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
         
         String st = MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class, "OpeningSourceMsg"),
-                                                             new Object[] { location.toString() }); // NOI18N
+                                                             new Object[] { location.className }); // NOI18N
         final String finalStatusText = st + " ..."; // NOI18N
         StatusDisplayer.getDefault().setStatusText(finalStatusText);
         
@@ -79,7 +79,7 @@ final public class GoToSourceHelper {
         
         Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class,
                                                                                         "NoSourceFoundMessage"), // NOI18N
-                                                                                        new Object[] { location.toString() }));
+                                                                                        new Object[] { location.className }));
         
         return false;
     }
