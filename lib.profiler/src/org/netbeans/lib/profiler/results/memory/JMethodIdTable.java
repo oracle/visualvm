@@ -103,6 +103,22 @@ public class JMethodIdTable {
             addEntry(methodIds[i], methodNamesAndSigs[0][i], methodNamesAndSigs[1][i], methodNamesAndSigs[2][i]);
         }
     }
+    
+    JMethodIdTable(JMethodIdTable otherTable) {
+        staticTable = true;
+        threshold = otherTable.nElements + 1;
+        size = (threshold * 4) / 3 ;
+        nElements = 0;
+        entries = new JMethodIdTableEntry[size];
+        
+        for (int i = 0; i < otherTable.entries.length; i++) {
+            JMethodIdTableEntry entry = otherTable.entries[i];
+            
+            if (entry != null) {
+                addEntry(entry.methodId, entry.className, entry.methodName, entry.methodSig);
+            }
+        }
+    }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
