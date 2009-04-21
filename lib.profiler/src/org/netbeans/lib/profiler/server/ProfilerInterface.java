@@ -345,9 +345,6 @@ public class ProfilerInterface implements CommonConstants {
         int len = nMethods * 3;
         packedArrayOffsets = new int[len];
 
-        System.gc(); // To avoid as much as possible a GC that happens concurrently while the call below is in progress
-                     // (though I am not sure now it's a real problem)
-
         byte[] packedData = Stacks.getMethodNamesForJMethodIds(nMethods, methodIds, packedArrayOffsets);
         MethodNamesResponse resp = new MethodNamesResponse(packedData, packedArrayOffsets);
 
