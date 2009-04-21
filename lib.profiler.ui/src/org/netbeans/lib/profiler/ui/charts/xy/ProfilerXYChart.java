@@ -254,7 +254,6 @@ public class ProfilerXYChart extends ChartComponent {
             recomputeVisibleBounds();
         } else if (contentsWidthChanged) {
             recomputeVisibleBounds();
-            contentsWidthChanged = false;
         } else if (firstVisibleIndex[0] == -1 && firstVisibleIndex[1] == -1) {
             recomputeVisibleBounds();
         } else if (oldBoundsWidth != newBoundsWidth) {
@@ -265,7 +264,6 @@ public class ProfilerXYChart extends ChartComponent {
                 firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
                 lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
             }
-            oldBoundsWidth = newBoundsWidth;
         } else if (oldScaleX != newScaleX) {
             if (oldScaleX < newScaleX) {
                 firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
@@ -274,7 +272,6 @@ public class ProfilerXYChart extends ChartComponent {
                 firstVisibleIndex = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
                 lastVisibleIndex = findLastVisibleR(lastVisibleIndex, 0, getWidth());
             }
-            oldScaleX = newScaleX;
         } else if (oldOffsetX != newOffsetX) {
             if (newOffsetX > oldOffsetX) {
                 firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
@@ -283,9 +280,13 @@ public class ProfilerXYChart extends ChartComponent {
                 lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
                 firstVisibleIndex = findFirstVisibleL(lastVisibleIndex, 0, getWidth());
             }
-            oldOffsetX = newOffsetX;
         }
 
+        // clear dirty flags
+        contentsWidthChanged = false;
+        oldBoundsWidth = newBoundsWidth;
+        oldScaleX = newScaleX;
+        oldOffsetX = newOffsetX;
         visibleIndexesDirty = false;
     }
 
@@ -451,12 +452,11 @@ public class ProfilerXYChart extends ChartComponent {
     private class VisibleBoundsListener implements ChartConfigurationListener {
         public void offsetChanged(long oldOffsetX, long oldOffsetY,
                                   long newOffsetX, long newOffsetY) {
-            if (oldOffsetX != newOffsetX) {
+            if (!fitsWidth() && oldOffsetX != newOffsetX) {
                 visibleIndexesDirty = true;
                 ProfilerXYChart.this.oldOffsetX = oldOffsetX;
                 ProfilerXYChart.this.newOffsetX = newOffsetX;
             }
-
         }
 
         public void dataBoundsChanged(long dataOffsetX, long dataOffsetY,
@@ -471,7 +471,6 @@ public class ProfilerXYChart extends ChartComponent {
                 visibleIndexesDirty = true;
                 contentsWidthChanged = true;
             }
-
         }
 
         public void scaleChanged(double oldScaleX, double oldScaleY,
@@ -485,7 +484,6 @@ public class ProfilerXYChart extends ChartComponent {
                 ProfilerXYChart.this.oldScaleX = oldScaleX;
                 ProfilerXYChart.this.newScaleX = newScaleX;
             }
-
         }
 
         public void viewChanged(long offsetX, long offsetY,
