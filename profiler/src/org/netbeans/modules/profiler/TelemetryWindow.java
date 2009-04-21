@@ -61,6 +61,7 @@ import java.awt.image.BufferedImage;
 import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -81,10 +82,6 @@ public final class TelemetryWindow extends TopComponent {
                                                                   SaveViewAction.ViewProvider, ExportAction.ExportProvider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-//        private static final ImageIcon zoomInIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomIn.png", false); //NOI18N
-//        private static final ImageIcon zoomOutIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoomOut.png", false); //NOI18N
-//        private static final ImageIcon zoomIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/zoom.png", false); //NOI18N
-//        private static final ImageIcon scaleToFitIcon = ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/scaleToFit.png", false); //NOI18N
         private static final String timestamp = "Timestamp";
         private static final String heapSize = "Heap_Size_in_Bytes";
         private static final String usedHeap = "Used_Heap_in_Bytes";
@@ -97,13 +94,6 @@ public final class TelemetryWindow extends TopComponent {
 
         private final GraphPanel panel;
         private final ExportAction exportActionButton;
-//        private final JButton scaleToFitButton;
-//        private final JButton zoomInButton;
-//        private final JButton zoomOutButton;
-//        private final JScrollBar scrollBar;
-//        private boolean lastTrackingEnd;
-//        private double lastScale;
-//        private long lastOffset;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -122,63 +112,19 @@ public final class TelemetryWindow extends TopComponent {
                 }
             };
 
-//            final boolean scaleToFit = panel.getChart().isFitToWindow();
-//
-//            zoomInButton = new JButton(zoomInIcon);
-//            zoomOutButton = new JButton(zoomOutIcon);
-//            scaleToFitButton = new JButton(scaleToFit ? zoomIcon : scaleToFitIcon);
             exportActionButton = new ExportAction(this, null);
-
-//            scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-//
-//            zoomInButton.setEnabled(!scaleToFit);
-//            zoomOutButton.setEnabled(!scaleToFit);
-//            scrollBar.setEnabled(!scaleToFit);
-//
-//            zoomInButton.setToolTipText(ZOOM_IN_TOOLTIP);
-//            zoomOutButton.setToolTipText(ZOOM_OUT_TOOLTIP);
-//            scaleToFitButton.setToolTipText(scaleToFit ? FIXED_SCALE_TOOLTIP : SCALE_TO_FIT_TOOLTIP);
-//
-//            if (!panel.getChart().containsValidData()) {
-//                scaleToFitButton.setEnabled(false);
-//                zoomInButton.setEnabled(false);
-//                zoomOutButton.setEnabled(false);
-//            }
 
             toolBar.setFloatable(false);
             toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
+            toolBar.setBorder(BorderFactory.createEmptyBorder(2, 0, 4, 0));
 
             toolBar.add(exportActionButton);
             toolBar.add(new SaveViewAction(this));
             toolBar.addSeparator();
             for (Action action : panel.getActions()) toolBar.add(action);
-//            toolBar.add(zoomInButton);
-//            toolBar.add(zoomOutButton);
-//            toolBar.add(scaleToFitButton);
-
-//            final JPanel graphPanel = new JPanel();
-//            graphPanel.setLayout(new BorderLayout());
-//            graphPanel.setBorder(new CompoundBorder(new EmptyBorder(new Insets(0, 5, 0, 5)), new BevelBorder(BevelBorder.LOWERED)));
-//            graphPanel.add(panel, BorderLayout.CENTER);
-//            graphPanel.add(scrollBar, BorderLayout.SOUTH);
-
-//            final JPanel legendContainer = new JPanel();
-//            legendContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
-//
-//            if (panel.getBigLegendPanel() != null) {
-//                legendContainer.add(panel.getBigLegendPanel());
-//            }
 
             add(toolBar, BorderLayout.NORTH);
             add(panel, BorderLayout.CENTER);
-//            add(legendContainer, BorderLayout.SOUTH);
-
-//            zoomInButton.addActionListener(this);
-//            zoomOutButton.addActionListener(this);
-//            scaleToFitButton.addActionListener(this);
-//
-//            panel.getChart().associateJScrollBar(scrollBar);
-//            panel.getChart().addChartActionListener(this);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -198,58 +144,6 @@ public final class TelemetryWindow extends TopComponent {
 
             return null;
         }
-
-//        // --- ActionListener -------------------------------------------------------
-//        public void actionPerformed(final ActionEvent e) {
-//            final SynchronousXYChart xyChart = panel.getChart();
-//
-//            if (e.getSource() == scaleToFitButton) {
-//                if (xyChart.isFitToWindow()) {
-//                    if (lastTrackingEnd) {
-//                        xyChart.setTrackingEnd(lastScale);
-//                    } else {
-//                        xyChart.setScaleAndOffsetX(lastScale, lastOffset);
-//                    }
-//                } else {
-//                    lastScale = xyChart.getScale();
-//                    lastOffset = xyChart.getViewOffsetX();
-//                    lastTrackingEnd = xyChart.isTrackingEnd();
-//                    xyChart.setFitToWindow();
-//                }
-//
-//                //updateButtons();
-//            } else if (e.getSource() == zoomInButton) {
-//                xyChart.setScale(xyChart.getScale() * 2);
-//            } else if (e.getSource() == zoomOutButton) {
-//                xyChart.setScale(xyChart.getScale() / 2);
-//            }
-//        }
-//
-//        public void chartDataChanged() {
-//            updateZoomButtons();
-//        }
-//
-//        public void chartFitToWindowChanged() {
-//            if (panel.getChart().isFitToWindow()) {
-//                scaleToFitButton.setIcon(zoomIcon);
-//                scaleToFitButton.setToolTipText(FIXED_SCALE_TOOLTIP);
-//            } else {
-//                scaleToFitButton.setIcon(scaleToFitIcon);
-//                scaleToFitButton.setToolTipText(SCALE_TO_FIT_TOOLTIP);
-//            }
-//
-//            updateZoomButtons();
-//        }
-//
-//        public void chartPanned() {
-//        }
-//
-//        public void chartTrackingEndChanged() {
-//        }
-//
-//        public void chartZoomed() {
-//            updateZoomButtons();
-//        }
 
         public boolean fitsVisibleArea() {
             return true;
@@ -397,36 +291,6 @@ public final class TelemetryWindow extends TopComponent {
             eDD.dumpDataAndClose(new StringBuffer(" </TableBody>"+newline+"</TableData>"+newline+"</ExportedView>"));  // NOI18N
         }
 
-//        // --- ChartActionListener -------------------------------------------------
-//        private void updateZoomButtons() {
-//            if (!panel.getChart().containsValidData()) {
-//                exportActionButton.setEnabled(false);
-//                scaleToFitButton.setEnabled(false);
-//                zoomInButton.setEnabled(false);
-//                zoomOutButton.setEnabled(false);
-//            } else {
-//                exportActionButton.setEnabled(true);
-//                scaleToFitButton.setEnabled(true);
-//
-//                if (panel.getChart().isFitToWindow()) {
-//                    zoomInButton.setEnabled(false);
-//                    zoomOutButton.setEnabled(false);
-//                } else {
-//                    if (panel.getChart().isMaximumZoom()) {
-//                        zoomInButton.setEnabled(false);
-//                    } else {
-//                        zoomInButton.setEnabled(true);
-//                    }
-//
-//                    if (panel.getChart().isMinimumZoom()) {
-//                        zoomOutButton.setEnabled(false);
-//                    } else {
-//                        zoomOutButton.setEnabled(true);
-//                    }
-//                }
-//            }
-//        }
-
         public void exportData(int exportedFileType, ExportDataDumper eDD) {
             if ( (panel instanceof MemoryGraphPanel)||(panel instanceof SurvivingGenerationsGraphPanel)||(panel instanceof ThreadsGraphPanel)) {
                 switch (exportedFileType) {
@@ -460,12 +324,6 @@ public final class TelemetryWindow extends TopComponent {
     private static final String MEMORY_HEAP_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class,
                                                                            "TelemetryWindow_MemoryHeapTabName"); // NOI18N
     private static final String MEMORY_GC_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_MemoryGCTabName"); // NOI18N
-//    private static final String ZOOM_IN_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_ZoomInTooltip"); // NOI18N
-//    private static final String ZOOM_OUT_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_ZoomOutTooltip"); // NOI18N
-//    private static final String FIXED_SCALE_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class,
-//                                                                          "TelemetryWindow_FixedScaleTooltip"); // NOI18N
-//    private static final String SCALE_TO_FIT_TOOLTIP = NbBundle.getMessage(TelemetryWindow.class,
-//                                                                           "TelemetryWindow_ScaleToFitTooltip"); // NOI18N
     private static final String THREADS_STATISTICS_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
                                                                                    "TelemetryWindow_ThreadsStatisticsTabDescr"); // NOI18N
     private static final String MEMORY_HEAP_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
@@ -511,10 +369,6 @@ public final class TelemetryWindow extends TopComponent {
                                                     getVMTelemetryModels());
         threadsStatsGraph = ThreadsGraphPanel.createBigPanel(NetBeansProfiler.getDefaultNB().
                                                     getVMTelemetryModels());
-
-//        heapGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
-//        generationsGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
-//        threadsStatsGraph.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 20, Color.WHITE));
 
         heapPanel = new GraphTab(heapGraph);
         generationsPanel = new GraphTab(generationsGraph);
