@@ -45,7 +45,6 @@ import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.java.platform.PlatformsCustomizer;
 import org.netbeans.api.java.platform.Specification;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
@@ -114,7 +113,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private HTMLLabel noteLabel;
+    private JLabel noteLabel;
     private JButton okButton = new JButton(OK_BUTTON_NAME);
     private JCheckBox alwaysCheckBox;
     private JList list;
@@ -129,8 +128,9 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.addListSelectionListener(this);
         list.getAccessibleContext().setAccessibleName(LIST_ACCESS_NAME);
-        noteLabel = new HTMLLabel();
-        noteLabel.setFocusable(false);
+        noteLabel = new JLabel();
+        noteLabel.setLabelFor(list);
+        noteLabel.setFocusable(false);        
         alwaysCheckBox = new JCheckBox(USE_SEL_PLATFORM_CHCKBOX_NAME, false);
         add(new JScrollPane(list), BorderLayout.CENTER);
         add(noteLabel, BorderLayout.NORTH);
@@ -183,7 +183,9 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
         list.setSelectedIndex(0);
         validateOKButton();
-        ProfilerDialogs.createDialog(dd).setVisible(true);
+        Dialog selectDialog = ProfilerDialogs.createDialog(dd);
+        selectDialog.getAccessibleContext().setAccessibleDescription(SELECT_PLATFORM_CALIBRATE_DIALOG_CAPTION);
+        selectDialog.setVisible(true);
 
         if (dd.getValue() == okButton) {
             int idx = list.getSelectedIndex();
