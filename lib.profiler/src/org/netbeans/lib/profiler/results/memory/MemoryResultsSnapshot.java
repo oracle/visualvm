@@ -132,12 +132,13 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
             System.arraycopy(s_classNames, 0, classNames, 0, len);
 
             //      System.out.println("Created snapshot [" + timeTaken + "] with " + classNames.length + " classes; nProfiledClasses = " + nProfiledClasses);
-            if ((provider.getStacksForClasses() != null) && checkContainsStacks(provider.getStacksForClasses())) {
-                stacksForClasses = new RuntimeMemoryCCTNode[provider.getStacksForClasses().length];
+            RuntimeMemoryCCTNode[] stacks = provider.getStacksForClasses();
+            if ((stacks != null) && checkContainsStacks(stacks)) {
+                stacksForClasses = new RuntimeMemoryCCTNode[stacks.length];
 
                 for (int i = 0; i < stacksForClasses.length; i++) {
-                    if (provider.getStacksForClasses()[i] != null) {
-                        stacksForClasses[i] = (RuntimeMemoryCCTNode) provider.getStacksForClasses()[i].clone();
+                    if (stacks[i] != null) {
+                        stacksForClasses[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
                     }
                 }
 
