@@ -88,9 +88,9 @@ public final class VMTelemetryModels {
     // --- DataManagerListener implementation ----------------------------------
 
     private void dataChangedImpl() {
-        memoryItemsModel.valueAdded();
-        generationsItemsModel.valueAdded();
-        threadsItemsModel.valueAdded();
+        memoryItemsModel.valuesAdded();
+        generationsItemsModel.valuesAdded();
+        threadsItemsModel.valuesAdded();
     }
 
     private void dataResetImpl() {
