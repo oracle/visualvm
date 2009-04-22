@@ -305,6 +305,8 @@ public class ProfilerXYChart extends ChartComponent {
 
         int nearestIndex = firstVisibleIndex[0];
         if (nearestIndex == -1) nearestIndex = firstVisibleIndex[1];
+        if (nearestIndex == -1) return -1;
+        
         long itemDataX = timeline.getTimestamp(nearestIndex);
         long nearestDistance = Math.abs(dataX - itemDataX);
 
