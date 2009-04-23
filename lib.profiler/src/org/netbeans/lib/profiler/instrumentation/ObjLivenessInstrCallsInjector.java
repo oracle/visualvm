@@ -275,7 +275,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                 String refMethodName = cms[1];
 
                 if (refMethodName == "<init>") { // NOI18N  // It's really a constructor call, not e.g. a call to a private method of 'this'
-                    if (refClassName.equals(newOpClassName) && (nestedNewOps == 0)) {
+                    if (nestedNewOps == 0) {
                         bci += opcodeLength(bci);
                         return bci;
                     } else {
