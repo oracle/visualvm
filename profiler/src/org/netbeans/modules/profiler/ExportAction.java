@@ -346,8 +346,13 @@ public final class ExportAction extends AbstractAction {
         }
 
         if (exportedFileType==MODE_NPS) {
+            final File file = saveFile.getSelectedFile();
+            if (!checkFileExists(file)) {
+                return; // user doesn't want to overwrite existing file or it can't be overwritten
+            }
             try {
                 FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder)).createData(saveFile.fileName, saveFile.fileExt);
+                saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {
                 ErrorManager.getDefault().annotate(e1, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }));
@@ -382,7 +387,7 @@ public final class ExportAction extends AbstractAction {
                         } catch (FileNotFoundException ex) {
                             ex.printStackTrace();
                         } catch (OutOfMemoryError e) {
-                            NetBeansProfiler.getDefaultNB().displayError(OOME_EXPORTING_MSG);
+                            NetBeansProfiler.getDefaultNB().displayError(OOME_EXPORTING_MSG+e.getMessage());
                         } finally {
                             if (pHandle != null) {
                                 pHandle.finish();
