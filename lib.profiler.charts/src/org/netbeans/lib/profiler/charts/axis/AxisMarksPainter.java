@@ -23,17 +23,32 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.charts.axis;
+
+import java.awt.Component;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
 /**
- * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public interface ClassHistoryActionsHandler {
+public interface AxisMarksPainter {
 
-    // The implementation notifies the user that previous history tracking
-    // will be reset and ensures that the history graph is visible.
-    public void showClassHistory(int classID, String className);
+    public Component getPainter(AxisMark mark);
+
+
+    public static abstract class Abstract extends JLabel implements AxisMarksPainter {
+
+        public Abstract() { setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4)); }
+
+        protected abstract String formatMark(AxisMark mark);
+
+        public Component getPainter(AxisMark mark) {
+            setText(formatMark(mark));
+            return this;
+        }
+
+    }
 
 }
