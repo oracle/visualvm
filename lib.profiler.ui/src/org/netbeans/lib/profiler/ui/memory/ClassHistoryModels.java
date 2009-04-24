@@ -25,7 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.memory;
 
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
@@ -42,7 +42,7 @@ public final class ClassHistoryModels {
 
     private final ClassHistoryDataManager dataManager;
 
-    private final XYTimeline timeline;
+    private final Timeline timeline;
     private final ProfilerXYItemsModel allocationsItemsModel;
     private final ProfilerXYItemsModel livenessItemsModel;
 
@@ -93,14 +93,14 @@ public final class ClassHistoryModels {
 
     // --- Private implementation ----------------------------------------------
 
-    private XYTimeline createTimeline() {
-        return new XYTimeline() {
+    private Timeline createTimeline() {
+        return new Timeline() {
             public int getTimestampsCount() { return dataManager.getItemCount(); }
             public long getTimestamp(int index) { return dataManager.timeStamps[index]; }
         };
     }
 
-    private ProfilerXYItemsModel createAllocationsItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createAllocationsItemsModel(Timeline timeline) {
         // Objects Allocated
         ProfilerXYItem allocObjectsItem = new ProfilerXYItem(GraphsUI.A_ALLOC_OBJECTS_NAME, 0) {
             public long getYValue(int index) {
@@ -122,7 +122,7 @@ public final class ClassHistoryModels {
         return model;
     }
 
-    private ProfilerXYItemsModel createLivenessItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createLivenessItemsModel(Timeline timeline) {
         // Live Objects
         ProfilerXYItem liveObjectsItem = new ProfilerXYItem(GraphsUI.L_LIVE_OBJECTS_NAME, 0) {
             public long getYValue(int index) {

@@ -23,17 +23,17 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.charts.axis;
 
 /**
- * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public interface ClassHistoryActionsHandler {
+public class BytesMarksPainter extends AxisMarksPainter.Abstract {
 
-    // The implementation notifies the user that previous history tracking
-    // will be reset and ensures that the history graph is visible.
-    public void showClassHistory(int classID, String className);
+    protected String formatMark(AxisMark mark) {
+        if (!(mark instanceof BytesMark)) return mark.toString();
+        return BytesAxisUtils.formatBytes((BytesMark)mark);
+    }
 
 }

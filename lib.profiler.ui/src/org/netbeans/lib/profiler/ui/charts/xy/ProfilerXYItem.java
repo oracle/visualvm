@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
+ * 
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- *
+ * 
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- *
+ * 
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
+ * 
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -29,7 +29,7 @@ import org.netbeans.lib.profiler.charts.ChartItemListener;
 import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemChange;
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.Timeline;
 
 /**
  *
@@ -40,10 +40,10 @@ public abstract class ProfilerXYItem implements XYItem {
     private final String name;
 
     private int itemIndex;
-    private XYTimeline timeline;
+    private Timeline timeline;
 
     private int lastIndex;
-
+    
     private final LongRect bounds;
     private long initialMinY;
     private long initialMaxY;
@@ -158,7 +158,7 @@ public abstract class ProfilerXYItem implements XYItem {
 
         lastIndex = index;
         return change;
-
+        
     }
 
     public int getValuesCount() { return timeline.getTimestampsCount(); }
@@ -170,7 +170,7 @@ public abstract class ProfilerXYItem implements XYItem {
     public long getMinYValue() { return minY; }
 
     public long getMaxYValue() { return maxY; }
-
+    
     public LongRect getBounds() { return bounds; }
 
 
@@ -183,7 +183,7 @@ public abstract class ProfilerXYItem implements XYItem {
 
     // --- Internal interface --------------------------------------------------
 
-    void setTimeline(XYTimeline timeline) { this.timeline = timeline; }
+    void setTimeline(Timeline timeline) { this.timeline = timeline; }
 
     void setItemIndex(int itemIndex) { this.itemIndex = itemIndex; }
 
