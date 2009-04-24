@@ -23,17 +23,28 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.charts.axis;
 
 /**
- * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public interface ClassHistoryActionsHandler {
+public class DecimalAxisUtils {
 
-    // The implementation notifies the user that previous history tracking
-    // will be reset and ensures that the history graph is visible.
-    public void showClassHistory(int classID, String className);
+    public static final long[] decimalUnitsGrid = new long[] { 1, 2, 5 };
+
+    public static long getDecimalUnits(double scale, int minDistance) {
+        if (scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
+
+        long decimalFactor = 1;
+
+        while (true) {
+            for (int i = 0; i < decimalUnitsGrid.length; i++)
+                if ((decimalUnitsGrid[i] * scale * decimalFactor) >= minDistance)
+                    return decimalUnitsGrid[i] * decimalFactor;
+
+            decimalFactor *= 10;
+        }
+    }
 
 }

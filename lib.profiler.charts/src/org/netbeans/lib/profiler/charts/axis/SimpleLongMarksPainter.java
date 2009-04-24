@@ -23,16 +23,21 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.charts.xy;
+package org.netbeans.lib.profiler.charts.axis;
+
+import java.text.NumberFormat;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public interface XYTimeline {
-    
-    public int getTimestampsCount();
+public class SimpleLongMarksPainter extends AxisMarksPainter.Abstract {
 
-    public long getTimestamp(int index);
+    private static final NumberFormat FORMAT = NumberFormat.getInstance();
+
+    protected String formatMark(AxisMark mark) {
+        if (!(mark instanceof LongMark)) return mark.toString();
+        return FORMAT.format(((LongMark)mark).getValue());
+    }
 
 }

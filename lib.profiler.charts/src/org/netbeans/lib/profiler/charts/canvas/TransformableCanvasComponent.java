@@ -116,7 +116,13 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     protected abstract void paintContents(Graphics g, Rectangle invalidArea);
 
-    protected void viewChanged(long offsetX, long offsetY,
+    protected void contentsWillBeUpdated(long offsetX, long offsetY,
+                               double scaleX, double scaleY,
+                               long lastOffsetX, long lastOffsetY,
+                               double lastScaleX, double lastScaleY) {
+    }
+
+    protected void contentsUpdated(long offsetX, long offsetY,
                                double scaleX, double scaleY,
                                long lastOffsetX, long lastOffsetY,
                                double lastScaleX, double lastScaleY,
@@ -571,6 +577,9 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
         int shiftX = 0;
         int shiftY = 0;
 
+        contentsWillBeUpdated(offsetX, offsetY, scaleX, scaleY,
+                              lastOffsetX, lastOffsetY, lastScaleX, lastScaleY);
+
         if (!translationPending()) {
             // No translation
             paintContents(g, invalidArea);
@@ -628,10 +637,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             }
         }
 
-//        if (offsetX != lastOffsetX || offsetY != lastOffsetY ||
-//            lastScaleX != scaleX || lastScaleY != scaleY)
-            viewChanged(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
-                    lastOffsetY, lastScaleX, lastScaleY, shiftX, shiftY);
+        contentsUpdated(offsetX, offsetY, scaleX, scaleY, lastOffsetX, lastOffsetY,
+                        lastScaleX, lastScaleY, shiftX, shiftY);
 
         dx = 0;
         dy = 0;

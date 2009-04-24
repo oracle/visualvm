@@ -23,17 +23,35 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.charts.axis;
+
+import java.text.NumberFormat;
 
 /**
- * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public interface ClassHistoryActionsHandler {
+public class PercentLongMarksPainter extends AxisMarksPainter.Abstract {
 
-    // The implementation notifies the user that previous history tracking
-    // will be reset and ensures that the history graph is visible.
-    public void showClassHistory(int classID, String className);
+    protected final long minValue;
+    protected final long maxValue;
+
+    protected NumberFormat format;
+
+
+    public PercentLongMarksPainter(long minValue, long maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+
+        format = NumberFormat.getPercentInstance();
+    }
+
+
+    protected String formatMark(AxisMark mark) {
+        if (!(mark instanceof LongMark)) return mark.toString();
+        long value = ((LongMark)mark).getValue();
+        float relValue = (float)(value - minValue) / (float)maxValue;
+        return format.format(relValue);
+    }
 
 }
