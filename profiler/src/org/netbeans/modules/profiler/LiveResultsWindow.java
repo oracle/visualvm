@@ -321,7 +321,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private final class HistoryActionsHandler implements ClassHistoryActionsHandler {
-        public boolean showClassHistory(int classID, final String className) {
+        public void showClassHistory(int classID, final String className) {
 
             int currentlyTrackedClass = classHistoryManager.getTrackedClassID();
             String currentlyTrackedClassName = classHistoryManager.getTrackedClassName();
@@ -338,7 +338,7 @@ public final class LiveResultsWindow extends TopComponent
 
                     if (!ProfilerDialogs.notify(dnsa).equals(
                             ProfilerDialogs.DNSAConfirmationChecked.YES_OPTION)) {
-                        return false;
+                        return;
                     }
                 } else {
                     ProfilerDialogs.DNSAConfirmationChecked dnsa =
@@ -352,10 +352,13 @@ public final class LiveResultsWindow extends TopComponent
 
                     if (!ProfilerDialogs.notify(dnsa).equals(
                             ProfilerDialogs.DNSAConfirmationChecked.YES_OPTION)) {
-                        return false;
+                        return;
                     }
                 }
             }
+
+            // Reset current history
+            classHistoryManager.setupClass(classID, className);
             
             // Let the graphs update before showing the tab
             SwingUtilities.invokeLater(new Runnable() {
@@ -394,8 +397,6 @@ public final class LiveResultsWindow extends TopComponent
                     tabs.setSelectedIndex(1);
                 }
             });
-
-            return true;
         }
     }
 
@@ -722,7 +723,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public void handleCleanupBeforeProfiling() {
-        classHistoryManager.setup(-1, null);
+        classHistoryManager.resetClass();
     }
 
     // --- Save Current View action support ------------------------------------
