@@ -23,17 +23,33 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.charts.xy;
+
+import org.netbeans.lib.profiler.charts.ChartContext;
+import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
+
 
 /**
- * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public interface ClassHistoryActionsHandler {
+public abstract class XYItemMarksComputer extends AxisMarksComputer.Abstract {
+    
+    protected final XYItem item;
+    protected final XYItemPainter painter;
 
-    // The implementation notifies the user that previous history tracking
-    // will be reset and ensures that the history graph is visible.
-    public void showClassHistory(int classID, String className);
+
+    public XYItemMarksComputer(XYItem item,
+                               XYItemPainter painter,
+                               ChartContext context,
+                               int orientation,
+                               int minMarksDistance) {
+
+        super(context, orientation, minMarksDistance);
+
+        this.item = item;
+        this.painter = painter;
+
+    }
 
 }

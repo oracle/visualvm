@@ -56,11 +56,15 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
-import org.netbeans.lib.profiler.charts.AxisComponent;
-import org.netbeans.lib.profiler.charts.AxisMarksComputer;
+import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
+import org.netbeans.lib.profiler.charts.axis.PercentLongMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
@@ -172,41 +176,44 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, new AxisMarksComputer.TimeMarksComputer(
+                new AxisComponent(chart, new TimelineMarksComputer(
+                         models.generationsItemsModel().getTimeline(),
                          chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
-                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                         new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
         // Surviving generations axis
         XYItem survgenItem = models.generationsItemsModel().getItem(1);
         XYItemPainter survgenPainter = (XYItemPainter)paintersModel.getPainter(survgenItem);
-        AxisComponent.SimplePainter survgenMarksPainter = new AxisComponent.SimplePainter();
+        SimpleLongMarksPainter survgenMarksPainter = new SimpleLongMarksPainter();
         survgenMarksPainter.setForeground(GraphsUI.SURVGEN_PAINTER_LINE_COLOR);
         AxisComponent sAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-                         survgenItem, survgenPainter, chart.getChartContext(), 40),
+                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+                         survgenItem, survgenPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL, 40),
                          survgenMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
-        // Surviving generations axis
+        // GC time axis
         XYItem gcTimeItem = models.generationsItemsModel().getItem(2);
         XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
-        AxisComponent.PercentPainter gcTimeMarksPainter =
-                new AxisComponent.PercentPainter(0, 1000);
+        PercentLongMarksPainter gcTimeMarksPainter = new PercentLongMarksPainter(0, 1000);
         gcTimeMarksPainter.setForeground(GraphsUI.GC_TIME_PAINTER_LINE_COLOR);
         AxisComponent gAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-                         gcTimeItem, gcTimePainter, chart.getChartContext(), 40),
+                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+                         gcTimeItem, gcTimePainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL, 40),
                          gcTimeMarksPainter, SwingConstants.EAST,
-                         AxisComponent.MESH_FOREGROUND);
+                         AxisComponent.NO_MESH);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
+                                              SwingConstants.SOUTH_EAST,
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(sAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });

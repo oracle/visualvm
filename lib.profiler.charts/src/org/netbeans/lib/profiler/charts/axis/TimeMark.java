@@ -23,17 +23,25 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.charts.axis;
 
 /**
- * Handler for the Class History live results view.
  *
  * @author Jiri Sedlacek
  */
-public interface ClassHistoryActionsHandler {
+public class TimeMark extends LongMark {
 
-    // The implementation notifies the user that previous history tracking
-    // will be reset and ensures that the history graph is visible.
-    public void showClassHistory(int classID, String className);
+    private final String format;
+
+
+    public TimeMark(long value, int position, String format) {
+        super(value, position);
+        this.format = format;
+    }
+
+
+    public String getFormat() {
+        return format;
+    }
 
 }

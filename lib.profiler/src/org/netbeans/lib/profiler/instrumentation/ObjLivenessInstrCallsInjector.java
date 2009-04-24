@@ -252,10 +252,9 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
         int bc;
         int bci = startBCI;
         int nestedNewOps = 0;
-
+        
         while (bci < bytecodesLength) {
-            bc = (bytecodes[bci] & 0xFF);
-
+            bc = bytecodes[bci] & 0xFF;
             if (bc == opc_new) {
                 nestedNewOps++;
             } else if (bc == opc_invokespecial) {
@@ -267,14 +266,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                     System.err.println("new Op class: " + newOpClassName); // NOI18N
                     System.err.println("bci: " + bci + ", startBCI: " + startBCI); // NOI18N
                     System.err.println("constant pool ref index: " + index); // NOI18N
-
-                    try {
-                        ClassRewriter.saveToDisk(clazz.getName(), ((DynamicClassInfo) clazz).getClassFileBytes());
-                    } catch (IOException e) {
-                        System.err.println("Caught exception while dumping class: " + clazz.getName() + ", " + e.getMessage()); // NOI18N
-                        e.printStackTrace(System.err);
-                    }
-
+                    dumpClassFile();
                     //debug = true;
                     return -1;
                 }
@@ -283,23 +275,29 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                 String refMethodName = cms[1];
 
                 if (refMethodName == "<init>") { // NOI18N  // It's really a constructor call, not e.g. a call to a private method of 'this'
-
-                    if (refClassName.equals(newOpClassName) && (nestedNewOps == 0)) {
+                    if (nestedNewOps == 0) {
                         bci += opcodeLength(bci);
-
                         return bci;
                     } else {
                         nestedNewOps--;
                     }
                 }
             }
-
             bci += opcodeLength(bci);
         }
 
         System.err.println("Profiler Warning: Failed to instrument creation of class " + newOpClassName // NOI18N
                            + " in method " + clazz.getName() + "." + clazz.getMethodName(methodIdx)); // NOI18N
-
+        dumpClassFile();
         return -1; // not instrumentable, there is no call to constructor
+    }
+
+    private void dumpClassFile() {
+        try {
+            ClassRewriter.saveToDisk(clazz.getName(), ((DynamicClassInfo) clazz).getClassFileBytes());
+        } catch (IOException e) {
+            System.err.println("Caught exception while dumping class: " + clazz.getName() + ", " + e.getMessage()); // NOI18N
+            e.printStackTrace(System.err);
+        }
     }
 }
