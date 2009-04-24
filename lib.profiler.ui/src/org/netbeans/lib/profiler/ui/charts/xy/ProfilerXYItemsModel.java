@@ -25,7 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.charts.xy;
 
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.ItemsModel;
 import java.util.ArrayList;
@@ -38,12 +38,12 @@ import java.util.List;
 public class ProfilerXYItemsModel extends ItemsModel.Abstract {
 
     private final ProfilerXYItem[] items;
-    private final XYTimeline timeline;
+    private final Timeline timeline;
 
 
     // --- Constructor ---------------------------------------------------------
 
-    public ProfilerXYItemsModel(XYTimeline timeline, ProfilerXYItem[] items) {
+    public ProfilerXYItemsModel(Timeline timeline, ProfilerXYItem[] items) {
         if (items == null)
             throw new IllegalArgumentException("Items cannot be null"); // NOI18N
         if (items.length == 0)
@@ -56,15 +56,17 @@ public class ProfilerXYItemsModel extends ItemsModel.Abstract {
             items[i].setItemIndex(i);
             items[i].setTimeline(timeline);
         }
+
+        if (timeline.getTimestampsCount() > 0) valuesAdded();
     }
 
 
     // --- Public interface ----------------------------------------------------
 
-    public void valueAdded() {
+    public void valuesAdded() {
         // Update values
         List<ChartItemChange> itemChanges = new ArrayList(items.length);
-        for (ProfilerXYItem item : items) itemChanges.add(item.getChange());
+        for (ProfilerXYItem item : items) itemChanges.add(item.valuesAdded());
         fireItemsChanged(itemChanges);
 
         // Check timestamp
@@ -83,12 +85,12 @@ public class ProfilerXYItemsModel extends ItemsModel.Abstract {
     public void valuesReset() {
         // Update values
         List<ChartItemChange> itemChanges = new ArrayList(items.length);
-        for (ProfilerXYItem item : items) itemChanges.add(item.getChange());
+        for (ProfilerXYItem item : items) itemChanges.add(item.valuesAdded());
         fireItemsChanged(itemChanges);
     }
 
 
-    public XYTimeline getTimeline() {
+    public Timeline getTimeline() {
         return timeline;
     }
 
