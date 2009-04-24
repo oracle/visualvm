@@ -44,8 +44,6 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Set;
-
 
 /**
  * A node of the run time Memory Profiling Calling Context Tree (CCT). Unlike the presentation-time CCT, this one
@@ -108,24 +106,6 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
         }
 
         throw new IllegalArgumentException("Illegal type: " + type); // NOI18N
-    }
-
-    public void addAllJMethodIds(Set set) {
-        if (methodId != 0) {
-            set.add(new Integer(methodId));
-        }
-
-        if (children != null) {
-            if (children instanceof RuntimeMemoryCCTNode) {
-                ((RuntimeMemoryCCTNode) children).addAllJMethodIds(set);
-            } else {
-                RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) children;
-
-                for (int i = 0; i < ar.length; i++) {
-                    ar[i].addAllJMethodIds(set);
-                }
-            }
-        }
     }
 
     public RuntimeMemoryCCTNode addNewChild(int methodId) {
