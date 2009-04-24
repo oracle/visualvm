@@ -81,8 +81,8 @@ public final class ClassHistoryModels {
     // --- DataManagerListener implementation ----------------------------------
 
     private void dataChangedImpl() {
-        allocationsItemsModel.valueAdded();
-        livenessItemsModel.valueAdded();
+        allocationsItemsModel.valuesAdded();
+        livenessItemsModel.valuesAdded();
     }
 
     private void dataResetImpl() {
