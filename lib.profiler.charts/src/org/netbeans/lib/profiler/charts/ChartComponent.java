@@ -25,6 +25,7 @@
 
 package org.netbeans.lib.profiler.charts;
 
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.canvas.InteractiveCanvasComponent;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -208,14 +209,24 @@ public class ChartComponent extends InteractiveCanvasComponent {
                               oldDataOffsetX, oldDataOffsetY, oldDataWidth, oldDataHeight);
     }
 
-    protected final void viewChanged(long offsetX, long offsetY,
+    protected final void contentsWillBeUpdated(long offsetX, long offsetY,
+                               double scaleX, double scaleY,
+                               long lastOffsetX, long lastOffsetY,
+                               double lastScaleX, double lastScaleY) {
+        super.contentsWillBeUpdated(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
+                          lastOffsetY, lastScaleX, lastScaleY);
+        fireContentsWillBeUpdated(offsetX, offsetY, scaleX, scaleY,
+                                  lastOffsetX, lastOffsetY, lastScaleX, lastScaleY);
+    }
+
+    protected final void contentsUpdated(long offsetX, long offsetY,
                             double scaleX, double scaleY,
                             long lastOffsetX, long lastOffsetY,
                             double lastScaleX, double lastScaleY,
                             int shiftX, int shiftY) {
-        super.viewChanged(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
+        super.contentsUpdated(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
                           lastOffsetY, lastScaleX, lastScaleY, shiftX, shiftY);
-        fireViewChanged(offsetX, offsetY, scaleX, scaleY, lastOffsetX, lastOffsetY,
+        fireContentsUpdated(offsetX, offsetY, scaleX, scaleY, lastOffsetX, lastOffsetY,
                         lastScaleX, lastScaleY, shiftX, shiftY);
     }
 
@@ -245,14 +256,24 @@ public class ChartComponent extends InteractiveCanvasComponent {
                                        oldDataWidth, oldDataHeight);
     }
 
-    private void fireViewChanged(long offsetX, long offsetY,
+    private void fireContentsWillBeUpdated(long offsetX, long offsetY,
+                            double scaleX, double scaleY,
+                            long lastOffsetX, long lastOffsetY,
+                            double lastScaleX, double lastScaleY) {
+        if (configurationListeners == null) return;
+        for (ChartConfigurationListener listener : configurationListeners)
+            listener.contentsWillBeUpdated(offsetX, offsetY, scaleX, scaleY,
+                              lastOffsetX, lastOffsetY, lastScaleX, lastScaleY);
+    }
+
+    private void fireContentsUpdated(long offsetX, long offsetY,
                             double scaleX, double scaleY,
                             long lastOffsetX, long lastOffsetY,
                             double lastScaleX, double lastScaleY,
                             int shiftX, int shiftY) {
         if (configurationListeners == null) return;
         for (ChartConfigurationListener listener : configurationListeners)
-            listener.viewChanged(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
+            listener.contentsUpdated(offsetX, offsetY, scaleX, scaleY, lastOffsetX,
                                  lastOffsetY, lastScaleX, lastScaleY, shiftX, shiftY);
     }
 
