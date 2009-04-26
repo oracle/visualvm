@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -224,14 +224,17 @@ public class AxisComponent extends JComponent {
 
             int x = SwingUtilities.convertPoint(chart, mark.getPosition(), 0, this).x;
 
-            if (/**x < clip.x || x >= clip.x + clip.width ||**/
-                x < chartMask.x - lZeroOffset ||
+            if (x < chartMask.x - lZeroOffset ||
                 x >= chartMask.x + chartMask.width + rZeroOffset) continue;
 
             Component painter = marksPainter.getPainter(mark);
             painter.setSize(painter.getPreferredSize());
             int markHeight = painter.getHeight();
             int markOffsetX = painter.getWidth() / 2;
+
+            if (x + markOffsetX < clip.x ||
+                x - markOffsetX >= clip.x + clip.width) continue;
+
             maxExtent = Math.max(maxExtent, markHeight);
 
             paintHorizontalTick(g, mark, x, clip, chartMask);
@@ -270,7 +273,7 @@ public class AxisComponent extends JComponent {
 
     protected void paintVerticalAxis(Graphics g, Rectangle clip, Rectangle chartMask) {
         paintVerticalBasis(g, clip, chartMask);
-        
+
         int viewStart = SwingUtilities.convertPoint(this, 0, chartMask.y, chart).y;
         int viewEnd = viewStart + chartMask.height;
 
@@ -286,14 +289,17 @@ public class AxisComponent extends JComponent {
 
             int y = SwingUtilities.convertPoint(chart, 0, mark.getPosition(), this).y;
 
-            if (/**y < clip.y || y >= clip.y + clip.height ||**/
-                y < chartMask.y - tZeroOffset ||
+            if (y < chartMask.y - tZeroOffset ||
                 y >= chartMask.y + chartMask.height + bZeroOffset) continue;
 
             Component painter = marksPainter.getPainter(mark);
             painter.setSize(painter.getPreferredSize());
             int markWidth = painter.getWidth();
             int markOffsetY = painter.getHeight() / 2;
+
+            if (y + markOffsetY < clip.y ||
+                y - markOffsetY >= clip.y + clip.height) continue;
+
             maxExtent = Math.max(maxExtent, markWidth);
 
             paintVerticalTick(g, mark, y, clip, chartMask);
