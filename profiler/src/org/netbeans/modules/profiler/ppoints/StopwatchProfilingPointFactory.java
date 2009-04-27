@@ -115,7 +115,8 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
 
                 return new StopwatchProfilingPoint(name, location, null, project);
             } else {
-                String filename = FileUtil.toFileObject(new File(location.getFile())).getName();
+                File file = FileUtil.normalizeFile(new File(location.getFile()));
+                String filename = FileUtil.toFileObject(file).getName();
                 String name = Utils.getUniqueName(getType(),
                                                   MessageFormat.format(PP_DEFAULT_NAME,
                                                                        new Object[] { "", filename, location.getLine() }), project); // NOI18N
@@ -125,7 +126,8 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
         } else {
             CodeProfilingPoint.Location startLocation = selectionLocations[0];
             CodeProfilingPoint.Location endLocation = selectionLocations[1];
-            String filename = FileUtil.toFileObject(new File(startLocation.getFile())).getName();
+            File file = FileUtil.normalizeFile(new File(startLocation.getFile()));
+            String filename = FileUtil.toFileObject(file).getName();
             String name = Utils.getUniqueName(getType(),
                                               MessageFormat.format(PP_DEFAULT_NAME,
                                                                    new Object[] { "", filename, startLocation.getLine() }),
