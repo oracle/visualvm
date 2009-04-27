@@ -78,8 +78,6 @@ public class HintsControllerUI extends JTitledPanel {
     private static final String LABEL1_STRING = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_Label1String"); // NOI18N
     private static final String LABEL2_STRING = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_Label2String"); // NOI18N
     
-//    private static ImageIcon ICON_HINTS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/suggestion.png", false); // NOI18N
-    
     private static final Number OBJECTS_DEFAULT = 20;
     private static final int OBJECTS_MAX = 100;
     
@@ -114,6 +112,7 @@ public class HintsControllerUI extends JTitledPanel {
     // --- Public interface ------------------------------------------------------
     public void setResult(String result) {
         dataArea.setText(result);
+        try { dataArea.setCaretPosition(0); } catch (Exception e) {}
         findButton.setEnabled(true);
     }
     
@@ -142,7 +141,7 @@ public class HintsControllerUI extends JTitledPanel {
         
         // Spinner
         spinner = new JExtendedSpinner(new SpinnerNumberModel(OBJECTS_DEFAULT, 1, OBJECTS_MAX, 1)) {
-            public Dimension getPreferredSize() { return new Dimension(45, SPINNER_HEIGHT); }
+            public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, SPINNER_HEIGHT); }
             public Dimension getMinimumSize()   { return getPreferredSize(); }
         };
         constraints = new GridBagConstraints();
