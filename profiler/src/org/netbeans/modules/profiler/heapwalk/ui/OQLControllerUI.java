@@ -262,8 +262,6 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
 
         private void initComponents() {
-            setLayout(new BorderLayout());
-
             resultsArea = new HTMLTextArea() {
                 protected void showURL(URL url) {
                     resultsController.showURL(url);
