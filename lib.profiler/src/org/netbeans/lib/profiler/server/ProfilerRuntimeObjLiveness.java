@@ -132,7 +132,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
                 rehash();
             }
 
-            int pos = key.hashCode() % capacity;
+            int pos = (key.hashCode() & 0x7FFFFFFF) % capacity;
 
             while (keys[pos] != null) {
                 pos = (pos + 1) % capacity;
@@ -143,7 +143,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
         }
 
         public synchronized void remove(WeakReference key) {
-            int pos = key.hashCode() % capacity;
+            int pos = (key.hashCode() & 0x7FFFFFFF) % capacity;
 
             while (keys[pos] != key) {
                 pos = (pos + 1) % capacity;
@@ -165,7 +165,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
 
             for (int i = 0; i < oldCapacity; i++) {
                 if (oldKeys[i] != null) {
-                    int pos = oldKeys[i].hashCode() % capacity;
+                    int pos = (oldKeys[i].hashCode() & 0x7FFFFFFF) % capacity;
 
                     while (keys[pos] != null) {
                         pos = (pos + 1) % capacity;
