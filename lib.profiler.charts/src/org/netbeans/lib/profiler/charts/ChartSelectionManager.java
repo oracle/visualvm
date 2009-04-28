@@ -333,27 +333,9 @@ class ChartSelectionManager implements ChartSelectionModel {
     }
 
 
-    private class ChartListener implements ChartConfigurationListener {
+    private class ChartListener extends ChartConfigurationListener.Adapter {
 
-        public void offsetChanged(long oldOffsetX, long oldOffsetY,
-                                  long newOffsetX, long newOffsetY) {
-        }
-
-        public void scaleChanged(double oldScaleX, double oldScaleY,
-                                 double newScaleX, double newScaleY) {
-        }
-
-        public void dataBoundsChanged(long dataOffsetX, long dataOffsetY,
-                                      long dataWidth, long dataHeight,
-                                      long oldDataOffsetX, long oldDataOffsetY,
-                                      long oldDataWidth, long oldDataHeight) {
-
-//            ChartContext context = chart.getChartContext();
-//            if (context.getViewWidth() <= context.getViewportWidth())
-//                updateHighlightedItems();
-        }
-
-        public void viewChanged(long offsetX, long offsetY,
+        public void contentsUpdated(long offsetX, long offsetY,
                                 double scaleX, double scaleY,
                                 long lastOffsetX, long lastOffsetY,
                                 double lastScaleX, double lastScaleY,

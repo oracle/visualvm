@@ -27,7 +27,7 @@ package org.netbeans.lib.profiler.ui.charts.xy;
 
 import org.netbeans.lib.profiler.charts.ChartComponent;
 import org.netbeans.lib.profiler.charts.ChartOverlay;
-import org.netbeans.lib.profiler.charts.Utils;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
@@ -95,22 +95,9 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
         });
 
-        chart.addConfigurationListener(new ChartConfigurationListener() {
+        chart.addConfigurationListener(new ChartConfigurationListener.Adapter() {
 
-            public void offsetChanged(long oldOffsetX, long oldOffsetY,
-                                      long newOffsetX, long newOffsetY) {}
-
-            public void scaleChanged(double oldScaleX, double oldScaleY,
-                                     double newScaleX, double newScaleY) {}
-
-            public void dataBoundsChanged(long dataOffsetX, long dataOffsetY,
-                                          long dataWidth, long dataHeight,
-                                          long oldDataOffsetX, long oldDataOffsetY,
-                                          long oldDataWidth, long oldDataHeight) {
-//                updateTooltip(chart);
-            }
-
-            public void viewChanged(long offsetX, long offsetY,
+            public void contentsUpdated(long offsetX, long offsetY,
                                     double scaleX, double scaleY,
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
