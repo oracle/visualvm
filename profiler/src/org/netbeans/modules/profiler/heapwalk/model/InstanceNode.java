@@ -41,9 +41,17 @@
 package org.netbeans.modules.profiler.heapwalk.model;
 
 
+import java.util.Collections;
+import java.util.List;
 import org.openide.util.NbBundle;
 import java.text.MessageFormat;
+import javax.swing.BoundedRangeModel;
 import javax.swing.ImageIcon;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.heap.HeapProgress;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 
@@ -59,7 +67,8 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
     // -----
     // I18N String constants
     private static final String LOOP_TO_STRING = NbBundle.getMessage(InstanceNode.class, "InstanceNode_LoopToString"); // NOI18N
-                                                                                                                       // -----
+    private static final String REFERENCES_STRING = NbBundle.getMessage(InstanceNode.class, "InstanceNode_References"); // NOI18N
+
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -107,6 +116,26 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         return instance != null;
     }
 
+    protected List getReferences() {
+        if (hasInstance()) {
+            ProgressHandle pHandle = null;
+
+            try {
+                pHandle = ProgressHandleFactory.createHandle(REFERENCES_STRING);
+                pHandle.setInitialDelay(200);
+                pHandle.start(HeapProgress.PROGRESS_MAX);
+
+                setProgress(pHandle);
+                return getInstance().getReferences();
+            } finally {
+                if (pHandle != null) {
+                    pHandle.finish();
+                }
+            }
+        }
+        return Collections.EMPTY_LIST;
+    }
+    
     protected abstract ChildrenComputer getChildrenComputer();
 
     protected HeapWalkerNode[] computeChildren() {
@@ -183,5 +212,14 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         }
 
         return BrowserUtils.createLoopIcon(icon);
+    }
+    
+    private static void setProgress(final ProgressHandle pHandle) {
+        final BoundedRangeModel progress = HeapProgress.getProgress();
+        progress.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                pHandle.progress(progress.getValue());
+            }
+        });
     }
 }
