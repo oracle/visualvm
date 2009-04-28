@@ -678,8 +678,11 @@ public final class ResultsManager {
                 ErrorManager.getDefault().notify(ErrorManager.ERROR, e2);
             } catch (OutOfMemoryError e) {
                 try {
-                    runner.resetTimers();
+                    reset(); // reset the client data
+                    runner.resetTimers(); // reset the server data
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
+                    // the target app has died; clean up all client data
+                    runner.getProfilerClient().resetClientData();
                 }
 
                 ErrorManager.getDefault().annotate(e, OUT_OF_MEMORY_MSG);
