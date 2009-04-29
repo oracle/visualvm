@@ -127,8 +127,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         } else if (e.getSource() == startHisto) {
             String selectedClassName = StringUtils.userFormClassName(
                                                 getClassName(selectedClassId));
-            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
-                classHistoryManager.setup(selectedClassId, selectedClassName);
+            historyActionsHandler.showClassHistory(selectedClassId, selectedClassName);
+                
         }
     }
 
