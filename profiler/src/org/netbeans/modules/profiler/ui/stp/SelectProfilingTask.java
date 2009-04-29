@@ -422,6 +422,7 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
 
             public void run() {
                 Dialog d = ProfilerDialogs.createDialog(spt.dd);
+                d.getAccessibleContext().setAccessibleDescription(d.getTitle());
                 d.pack();
                 d.setVisible(true);
                 latch.countDown();
