@@ -105,12 +105,10 @@ public class SummaryControllerUI extends JPanel {
         setLayout(new BorderLayout());
         
         final JPanel hintsPanel = summaryController.getHintsController().getPanel();
-        hintsPanel.setPreferredSize(new Dimension(250, 500));
-        hintsPanel.setVisible(false);
 
         JExtendedSplitPane contentsSplit = new JExtendedSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                                summaryController.getOverViewController().getPanel(), hintsPanel);
-        contentsSplit.setResizeWeight(1d);
+        contentsSplit.setResizeWeight(0.75d);
 
         tweakSplitPaneUI(contentsSplit);
 
