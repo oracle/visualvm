@@ -40,16 +40,20 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.awt.Color;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.HintsControllerUI;
 import org.openide.util.NbBundle;
 
@@ -128,55 +132,83 @@ public class HintsController extends AbstractController {
             }
         }
     }
+
+    public void computeBiggestObjects(final int number) {
+        BrowserUtils.performTask(new Runnable() {
+            public void run() {
+                int retainedSizesState = getSummaryController().getHeapFragmentWalker().
+                                         computeRetainedSizes(false);
+
+                final String result = retainedSizesState == HeapFragmentWalker.
+                                      RETAINED_SIZES_COMPUTED ?
+                                      findBiggestObjects(number) : "&lt;No Data&gt;";
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ((HintsControllerUI)getPanel()).setResult(result);
+                    }
+                });
+            }
+        });
+    }
     
-    public String findBiggestObjects(int number) {
+    private String findBiggestObjects(int number) {
         Heap heap = getSummaryController().getHeapFragmentWalker().getHeapFragment();
         List<Instance> bigObjects = heap.getBiggestObjectsByRetainedSize(number);
         StringBuffer output = new StringBuffer();
         JavaClass java_lang_Class = heap.getJavaClassByName(Class.class.getName());
         NumberFormat formatter =  NumberFormat.getInstance();
+
+        final boolean[] oddRow = new boolean[1];
+        Color oddRowBackground = UIUtils.getDarker(
+                        UIUtils.getProfilerResultsBackground());
+        final String oddRowBackgroundString =
+                "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                         oddRowBackground.getGreen() + "," + //NOI18N
+                         oddRowBackground.getBlue() + ")"; //NOI18N
         
-        output.append("<table border=\"1\">");  // NOI18N
-        output.append("<tr>");  // NOI18N
+        output.append("<table border='0' width='100%'>");  // NOI18N
+        output.append("<tr style='background-color:");  // NOI18N
+        output.append(oddRowBackgroundString + ";'>");  // NOI18N
         addHeading(output,"Class Name");
         addHeading(output,"Retained Size");
         output.append("</tr>"); // NOI18N
         for(Instance in : bigObjects) {
-            output.append("<tr>");  // NOI18N
+            output.append(oddRow[0] ? "<tr style='background-color: " + // NOI18N
+                                      oddRowBackgroundString + ";'>" :  // NOI18N
+                                      "<tr>");  // NOI18N
             if (in.getJavaClass().equals(java_lang_Class)) {
                 JavaClass javaClass = heap.getJavaClassByID(in.getInstanceId());
-                addCell(output,printClass(javaClass));
+                addCell(output,printClass(javaClass), false);
             } else {
-                addCell(output,printInstance(in));
+                addCell(output,printInstance(in), false);
             }
-            addCell(output,formatter.format(in.getRetainedSize()));
-            output.append("</tr>");
+            addCell(output,formatter.format(in.getRetainedSize()), true);
+            output.append("</tr>");   // NOI18N
+            oddRow[0] = !oddRow[0];
         }
-        output.append("</table");
+        output.append("</table>");   // NOI18N
         return output.toString();
     }
     
     // --- Private implementation ------------------------------------------------
-    public void update() {
-        ((HintsControllerUI) getPanel()).update();
-    }
     
     protected AbstractButton createControllerPresenter() {
         return ((HintsControllerUI) getPanel()).getPresenter();
     }
     
     private void addHeading(StringBuffer output,String text) {
-        addTag(output,text,"th");   // NOI18N
+        addTag(output,text,"th", false);   // NOI18N
     }
 
-    private void addCell(StringBuffer output,String text) {
-        addTag(output,text,"td");   // NOI18N
+    private void addCell(StringBuffer output,String text, boolean ralign) {
+        addTag(output,text,"td", ralign);   // NOI18N
     }
 
-    private void addTag(StringBuffer output,String text,String tag) {
-        output.append("<"+tag+">");
+    private void addTag(StringBuffer output,String text,String tag, boolean ralign) {
+        output.append("<" + tag + (ralign ? " style='text-align: right;'>" : ">"));   // NOI18N
         output.append(text);
-        output.append("</"+tag+">");
+        output.append("</" + tag + ">");   // NOI18N
     }
     
     private String printInstance(Instance in) {

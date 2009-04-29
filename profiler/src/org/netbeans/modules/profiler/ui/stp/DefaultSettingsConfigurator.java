@@ -453,8 +453,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             boolean recordStackTrace = basicSettingsPanel.getRecordStackTrace();
             advancedSettingsPanel.setRecordStackTrace(recordStackTrace);
             advancedSettingsPanel.updateRunGC(basicSettingsPanel.getProfilingType() ==
-                                              ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS,
-                                              recordStackTrace);
+                                              ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
         }
 
         public void synchronizeSettings() {
