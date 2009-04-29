@@ -246,8 +246,8 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
         runGCCheckbox.setSelected(runGC);
     }
 
-    public void updateRunGC(boolean allocOnly, boolean record) {
-        runGCCheckbox.setEnabled(!allocOnly && !record && threadsMonitoringCheckbox.isEnabled()); // Check for preset
+    public void updateRunGC(boolean allocOnly) {
+        runGCCheckbox.setEnabled(!allocOnly && threadsMonitoringCheckbox.isEnabled()); // Check for preset
     }
 
     public boolean getRunGC() {
