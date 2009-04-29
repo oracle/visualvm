@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
+import java.awt.BorderLayout;
 import java.util.Enumeration;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
@@ -71,12 +72,14 @@ import java.util.Properties;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 import org.openide.util.ImageUtilities;
@@ -452,30 +455,6 @@ public class OverviewControllerUI extends JTitledPanel {
     }
     
     private void initComponents() {
-        setLayout(new GridBagLayout());
-        
-        GridBagConstraints constraints;
-        // Top separator
-        JSeparator separator = new JSeparator() {
-            public Dimension getMaximumSize() {
-                return new Dimension(super.getMaximumSize().width, 1);
-            }
-            
-            public Dimension getPreferredSize() {
-                return new Dimension(super.getPreferredSize().width, 1);
-            }
-        };
-        
-        separator.setBackground(getBackground());
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        add(separator, constraints);
-        
         // dataArea
         dataArea = new HTMLTextArea() {
             protected void showURL(URL url) {
@@ -497,22 +476,25 @@ public class OverviewControllerUI extends JTitledPanel {
                 refreshSummary();
             }
         };
-        
-        JScrollPane dataAreaScrollPane = new JScrollPane(dataArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        dataAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        JScrollPane dataAreaScrollPane = new JScrollPane(dataArea,
+                                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        dataAreaScrollPane.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
+                                        UIUtils.getProfilerResultsBackground()));
         dataAreaScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-        dataAreaScrollPane.setBackground(dataArea.getBackground());
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(5, 5, 5, 5);
-        add(dataAreaScrollPane, constraints);
+        dataAreaScrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        dataAreaScrollPane.getHorizontalScrollBar().setUnitIncrement(10);
+
+        JPanel contentsPanel = new JPanel();
+        contentsPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, getTitleBorderColor()));
+        contentsPanel.setLayout(new BorderLayout());
+        contentsPanel.setOpaque(true);
+        contentsPanel.setBackground(dataArea.getBackground());
+        contentsPanel.add(dataAreaScrollPane, BorderLayout.CENTER);
+
+        setLayout(new BorderLayout());
+        add(contentsPanel, BorderLayout.CENTER);
         
         // UI tweaks
         setBackground(dataArea.getBackground());
