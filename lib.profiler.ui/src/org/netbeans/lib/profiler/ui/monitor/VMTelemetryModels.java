@@ -25,7 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.monitor;
 
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItem;
@@ -43,7 +43,7 @@ public final class VMTelemetryModels {
 
     private final VMTelemetryDataManager dataManager;
 
-    private final XYTimeline timeline;
+    private final Timeline timeline;
     private final ProfilerXYItemsModel memoryItemsModel;
     private final ProfilerXYItemsModel generationsItemsModel;
     private final ProfilerXYItemsModel threadsItemsModel;
@@ -88,9 +88,9 @@ public final class VMTelemetryModels {
     // --- DataManagerListener implementation ----------------------------------
 
     private void dataChangedImpl() {
-        memoryItemsModel.valueAdded();
-        generationsItemsModel.valueAdded();
-        threadsItemsModel.valueAdded();
+        memoryItemsModel.valuesAdded();
+        generationsItemsModel.valuesAdded();
+        threadsItemsModel.valuesAdded();
     }
 
     private void dataResetImpl() {
@@ -102,14 +102,14 @@ public final class VMTelemetryModels {
 
     // --- Private implementation ----------------------------------------------
 
-    private XYTimeline createTimeline() {
-        return new XYTimeline() {
+    private Timeline createTimeline() {
+        return new Timeline() {
             public int getTimestampsCount() { return dataManager.getItemCount(); }
             public long getTimestamp(int index) { return dataManager.timeStamps[index]; }
         };
     }
 
-    private ProfilerXYItemsModel createMemoryItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createMemoryItemsModel(Timeline timeline) {
         // Heap size
         ProfilerXYItem heapSizeItem = new ProfilerXYItem(GraphsUI.HEAP_SIZE_NAME, 0) {
             public long getYValue(int index) {
@@ -131,7 +131,7 @@ public final class VMTelemetryModels {
         return model;
     }
 
-    private ProfilerXYItemsModel createGenerationsItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createGenerationsItemsModel(Timeline timeline) {
         // Surviving generations
         ProfilerXYItem survivingGenerationsItem = new ProfilerXYItem(GraphsUI.SURVGEN_NAME, 0) {
             public long getYValue(int index) {
@@ -168,7 +168,7 @@ public final class VMTelemetryModels {
         return model;
     }
 
-    private ProfilerXYItemsModel createThreadsItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createThreadsItemsModel(Timeline timeline) {
         // Threads
         ProfilerXYItem threadsItem = new ProfilerXYItem(GraphsUI.THREADS_NAME, 0) {
             public long getYValue(int index) {
