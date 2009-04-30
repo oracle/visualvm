@@ -179,7 +179,7 @@ public class ObjectArrayNode extends ArrayNode {
                             }
                         }
                     } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
-                        List fields = getInstance().getReferences();
+                        List fields = getReferences();
 
                         if (fields.size() == 0) {
                             // Instance has no fields
