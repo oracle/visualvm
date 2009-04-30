@@ -221,7 +221,18 @@ class LongMap extends AbstractLongMap {
 
         public int compareTo(Object o) {
             RetainedSizeEntry other = (RetainedSizeEntry) o;
-            return other.retainedSize - retainedSize;
+            int diff = other.retainedSize - retainedSize;
+            if (diff == 0) {
+                // sizes are the same, compare ids
+                long idDiff = other.instanceId - instanceId;
+                if (idDiff < 0) {
+                    return -1;
+                } else if (idDiff > 0) {
+                    return 1;
+                }
+                return 0;
+            }
+            return diff;
         }
 
         public boolean equals(Object obj) {
