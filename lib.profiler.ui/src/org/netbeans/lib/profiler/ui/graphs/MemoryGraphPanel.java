@@ -184,7 +184,7 @@ public final class MemoryGraphPanel extends GraphPanel {
         AxisComponent hAxis =
                 new AxisComponent(chart, new TimelineMarksComputer(
                          models.memoryItemsModel().getTimeline(),
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
                          new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
@@ -194,7 +194,7 @@ public final class MemoryGraphPanel extends GraphPanel {
         AxisComponent vAxis =
                 new AxisComponent(chart, new BytesXYItemMarksComputer(
                          memoryItem, memoryPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          new BytesMarksPainter(), SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
