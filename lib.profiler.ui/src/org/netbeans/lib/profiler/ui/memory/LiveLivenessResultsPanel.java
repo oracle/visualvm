@@ -183,8 +183,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
         } else if (e.getSource() == startHisto) {
             String selectedClassName = StringUtils.userFormClassName(
                                                 getClassName(selectedClassId));
-            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
-                classHistoryManager.setup(selectedClassId, selectedClassName);
+            historyActionsHandler.showClassHistory(selectedClassId, selectedClassName);
         }
     }
 

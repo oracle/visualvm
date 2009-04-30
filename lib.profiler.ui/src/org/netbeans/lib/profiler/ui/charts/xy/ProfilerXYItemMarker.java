@@ -25,7 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.charts.xy;
 
-import org.netbeans.lib.profiler.charts.Utils;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
