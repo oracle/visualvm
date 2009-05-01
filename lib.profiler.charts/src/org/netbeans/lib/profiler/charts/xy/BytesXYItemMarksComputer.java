@@ -46,10 +46,9 @@ public class BytesXYItemMarksComputer extends XYItemMarksComputer {
     public BytesXYItemMarksComputer(XYItem item,
                                     XYItemPainter painter,
                                     ChartContext context,
-                                    int orientation,
-                                    int minMarksDistance) {
+                                    int orientation) {
 
-        super(item, painter, context, orientation, minMarksDistance);
+        super(item, painter, context, orientation);
 
         scale = -1;
         step = -1;
@@ -74,7 +73,7 @@ public class BytesXYItemMarksComputer extends XYItemMarksComputer {
                 step = -1;
                 radix = -1;
             } else {
-                long[] units = BytesAxisUtils.getBytesUnits(scale, minMarksDistance);
+                long[] units = BytesAxisUtils.getBytesUnits(scale, getMinMarksDistance());
                 step = units[0];
                 radix = step == -1 ? -1 : (int)units[1];
             }
