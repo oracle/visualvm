@@ -45,10 +45,9 @@ public class DecimalXYItemMarksComputer extends XYItemMarksComputer {
     public DecimalXYItemMarksComputer(XYItem item,
                                       XYItemPainter painter,
                                       ChartContext context,
-                                      int orientation,
-                                      int minMarksDistance) {
+                                      int orientation) {
 
-        super(item, painter, context, orientation, minMarksDistance);
+        super(item, painter, context, orientation);
 
         scale = -1;
         step = -1;
@@ -73,7 +72,7 @@ public class DecimalXYItemMarksComputer extends XYItemMarksComputer {
             if (scale == -1) {
                 step = -1;
             } else {
-                step = DecimalAxisUtils.getDecimalUnits(scale, minMarksDistance);
+                step = DecimalAxisUtils.getDecimalUnits(scale, getMinMarksDistance());
             }
 
             oldScale = scale;
