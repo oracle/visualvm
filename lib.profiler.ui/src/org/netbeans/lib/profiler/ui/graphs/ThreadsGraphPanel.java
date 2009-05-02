@@ -176,7 +176,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
         AxisComponent hAxis =
                 new AxisComponent(chart, new TimelineMarksComputer(
                          models.threadsItemsModel().getTimeline(),
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
                          new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
@@ -188,7 +188,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
         AxisComponent tAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          threadsItem, threadsPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          threadsMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
@@ -200,7 +200,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
         AxisComponent cAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          classesItem, classesPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          classesMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 
