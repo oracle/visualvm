@@ -147,7 +147,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
         AxisComponent hAxis =
                 new AxisComponent(chart, new TimelineMarksComputer(
                          models.allocationsItemsModel().getTimeline(),
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
                          new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
@@ -159,7 +159,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
         AxisComponent tAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          allocObjectsItem, allocObjectsPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          allocObjectsMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
@@ -171,7 +171,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
         AxisComponent cAxis =
                 new AxisComponent(chart, new BytesXYItemMarksComputer(
                          allocBytesItem, allocBytesPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          allocBytesMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 

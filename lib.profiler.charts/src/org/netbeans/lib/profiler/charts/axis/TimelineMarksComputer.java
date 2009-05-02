@@ -43,16 +43,19 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
 
     public TimelineMarksComputer(Timeline timeline,
                                  ChartContext context,
-                                 int orientation,
-                                 int minMarksDistance) {
+                                 int orientation) {
 
-        super(context, orientation, minMarksDistance);
+        super(context, orientation);
         this.timeline = timeline;
 
         scale = -1;
         step = -1;
     }
 
+
+    protected int getMinMarksDistance() {
+            return 120;
+        }
 
     protected boolean refreshConfiguration() {
         double oldScale = scale;
@@ -72,7 +75,7 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
             if (scale == -1) {
                 step = -1;
             } else {
-                step = TimeAxisUtils.getTimeUnits(scale, minMarksDistance);
+                step = TimeAxisUtils.getTimeUnits(scale, getMinMarksDistance());
             }
 
             oldScale = scale;
