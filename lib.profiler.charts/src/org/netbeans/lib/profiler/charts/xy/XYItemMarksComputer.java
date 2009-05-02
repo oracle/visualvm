@@ -42,10 +42,9 @@ public abstract class XYItemMarksComputer extends AxisMarksComputer.Abstract {
     public XYItemMarksComputer(XYItem item,
                                XYItemPainter painter,
                                ChartContext context,
-                               int orientation,
-                               int minMarksDistance) {
+                               int orientation) {
 
-        super(context, orientation, minMarksDistance);
+        super(context, orientation);
 
         this.item = item;
         this.painter = painter;
