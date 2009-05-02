@@ -178,7 +178,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         AxisComponent hAxis =
                 new AxisComponent(chart, new TimelineMarksComputer(
                          models.generationsItemsModel().getTimeline(),
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
                          new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
@@ -190,7 +190,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         AxisComponent sAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          survgenItem, survgenPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          survgenMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
@@ -202,7 +202,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
         AxisComponent gAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          gcTimeItem, gcTimePainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          gcTimeMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 
