@@ -146,24 +146,41 @@ public class ProfilerGCXYItemPainter extends ProfilerXYItemPainter {
 //        if (!(item instanceof ProfilerGCXYItem))
 //            throw new UnsupportedOperationException("Unsupported item: " + item); // NOI18N
 
-        if (item.getValuesCount() < 2) return;
+        int valuesCount = item.getValuesCount();
+        if (valuesCount < 2) return;
 
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
-        int index = visibleBounds[0][0];
+
+        int firstFirst = visibleBounds[0][0];
+        int index = firstFirst;
         if (index == -1) index = visibleBounds[0][1];
         if (index == -1) return;
 
-        int lastIndex = visibleBounds[1][0];
+        int lastFirst = visibleBounds[1][0];
+        int lastIndex = lastFirst;
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
-        if (lastIndex == -1) lastIndex = item.getValuesCount() - 1;
+        if (lastIndex == -1) lastIndex = valuesCount - 1;
+        if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
 
-        if (lastIndex < item.getValuesCount() - 1) lastIndex++;
+        int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
+        if (itemsStep == 0) itemsStep = 1;
+
+        int visibleCount = lastIndex - index + 1;
+
+        if (itemsStep > 1) {
+            int firstMod = index % itemsStep;
+            index -= firstMod;
+            int lastMod = lastIndex % itemsStep;
+            lastIndex = lastIndex - lastMod + itemsStep;
+            visibleCount = (lastIndex - index) / itemsStep + 1;
+            lastIndex = Math.min(lastIndex, valuesCount - 1);
+        }
 
         ProfilerGCXYItem xyItem = (ProfilerGCXYItem)item;
 
         g.setColor(fillColor);
 
-        while(index <= lastIndex) {
+        for (int iter = 0; iter < visibleCount; iter++) {
             long[] gcStarts = xyItem.getGCStarts(index);
             if (gcStarts.length > 0) {
                 long[] gcEnds = xyItem.getGCEnds(index);
@@ -181,7 +198,8 @@ public class ProfilerGCXYItemPainter extends ProfilerXYItemPainter {
                                context.getViewportHeight());
                 }
             }
-            index++;
+            
+            index = Math.min(index + itemsStep, lastIndex);
         }
         
     }
