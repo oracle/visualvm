@@ -148,7 +148,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         AxisComponent hAxis =
                 new AxisComponent(chart, new TimelineMarksComputer(
                          models.livenessItemsModel().getTimeline(),
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
                          new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
@@ -160,7 +160,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         AxisComponent loAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          liveObjectsItem, liveObjectsPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          liveObjectsMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
@@ -172,7 +172,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         AxisComponent lbAxis =
                 new AxisComponent(chart, new BytesXYItemMarksComputer(
                          liveBytesItem, liveBytesPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          allocBytesMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 
@@ -184,7 +184,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         AxisComponent aoAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          allocObjectsItem, allocObjectsPainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL, 40),
+                         SwingConstants.VERTICAL),
                          allocObjectsMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 

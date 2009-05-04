@@ -57,6 +57,7 @@ import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -69,10 +70,10 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
 
     // -----
     // I18N String constants
-    private static final String ACTION_NAME_START = "Start sampling IDE"; // NOI18N
-    private static final String ACTION_NAME_STOP = "Stop sampling and take snapshot"; // NOI18N
-    private static final String ACTION_DESCR = "Will take a snapshot based on the thread dump"; // NOI18N
-    private static final String THREAD_NAME = "IDE Self Sampler"; // NOI18N
+    private static final String ACTION_NAME_START = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionNameStart");
+    private static final String ACTION_NAME_STOP = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionNameStop");
+    private static final String ACTION_DESCR = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionDescription");
+    private static final String THREAD_NAME = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ThreadName");
     private StackTraceSnapshotBuilder builder;
     private ThreadFactory threadFactory;
     private ScheduledExecutorService executor;
@@ -89,7 +90,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                 "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
         , false)
         );
-        if (System.getProperty(SelfSamplerAction.class.getName() + ".sniff") != null) {
+        if (System.getProperty(SelfSamplerAction.class.getName() + ".sniff") != null) { //NOI18N
             Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
         }
     }
@@ -169,7 +170,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     public void eventDispatched(AWTEvent event) {
         KeyEvent kevent = (KeyEvent)event;
         if (kevent.getID() == KeyEvent.KEY_RELEASED && kevent.getKeyCode() == KeyEvent.VK_ALT_GRAPH) { // AltGr
-            actionPerformed(new ActionEvent(this, event.getID(), "shortcut"));
+            actionPerformed(new ActionEvent(this, event.getID(), "shortcut")); //NOI18N
             kevent.consume();
         }
     }
