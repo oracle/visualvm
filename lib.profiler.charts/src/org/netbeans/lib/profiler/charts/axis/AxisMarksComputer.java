@@ -52,24 +52,25 @@ public interface AxisMarksComputer {
         protected final ChartContext context;
 
         protected final int orientation;
-        protected final int minMarksDistance;
 
         protected final boolean horizontal;
         protected final boolean reverse;
 
 
-        public Abstract(ChartContext context,
-                        int orientation,
-                        int minMarksDistance) {
+        public Abstract(ChartContext context, int orientation) {
             
             this.context = context;
             
             this.orientation = orientation;
-            this.minMarksDistance = minMarksDistance;
 
             horizontal = orientation == SwingConstants.HORIZONTAL;
             reverse = horizontal ? context.isRightBased() :
                                    context.isBottomBased();
+        }
+
+        // Return minimum distance between two axis marks
+        protected int getMinMarksDistance() {
+            return 50;
         }
 
         // Returns true if the configuration changed and axis should be repainted
