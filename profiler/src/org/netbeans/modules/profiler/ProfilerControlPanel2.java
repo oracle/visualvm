@@ -277,29 +277,26 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             setBorder(BorderFactory.createEmptyBorder(8, 3, 9, 3));
             setLayout(new GridBagLayout());
 
-            final Font labelFont = UIManager.getFont("Label.font"); // NOI18N
-            final Font boldFont = new Font(labelFont.getName(), labelFont.getStyle() | Font.BOLD, labelFont.getSize());
-
             final JLabel instrLabel = new JLabel(INSTRUMENTED_LABEL_STRING);
-            instrLabel.setFont(boldFont);
+            instrLabel.setFont(instrLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel instrFilterLabel = new JLabel(FILTER_LABEL_STRING);
-            instrFilterLabel.setFont(boldFont);
+            instrFilterLabel.setFont(instrFilterLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel threadsLabel = new JLabel(THREADS_LABEL_STRING);
-            threadsLabel.setFont(boldFont);
+            threadsLabel.setFont(threadsLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel typeLabel = new JLabel(TYPE_LABEL_STRING);
-            typeLabel.setFont(boldFont);
+            typeLabel.setFont(typeLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel totalMemLabel = new JLabel(TOTAL_MEMORY_LABEL_STRING);
-            totalMemLabel.setFont(boldFont);
+            totalMemLabel.setFont(totalMemLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel usedMemLabel = new JLabel(USED_MEMORY_LABEL_STRING);
-            usedMemLabel.setFont(boldFont);
+            usedMemLabel.setFont(usedMemLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel relTimeLabel = new JLabel(GC_TIME_LABEL_STRING);
-            relTimeLabel.setFont(boldFont);
+            relTimeLabel.setFont(relTimeLabel.getFont().deriveFont(Font.BOLD));
 
             instrValueLabel = new JLabel(savedInstrText);
             instrFilterValueLabel = new JLabel(""); // NOI18N
@@ -1390,22 +1387,20 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             setBorder(BorderFactory.createEmptyBorder(8, 3, 9, 3));
             setLayout(new GridBagLayout());
 
-            final Font labelFont = UIManager.getFont("Label.font"); // NOI18N
-            final Font boldFont = new Font(labelFont.getName(), labelFont.getStyle() | Font.BOLD, labelFont.getSize());
-
             final JLabel modeLabel = new JLabel(MODE_LABEL_STRING);
-            modeLabel.setFont(boldFont);
+            modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel typeLabel = new JLabel(TYPE_LABEL_STRING);
-            typeLabel.setFont(boldFont);
+            typeLabel.setFont(typeLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel profileLabel = new JLabel(CONFIG_LABEL_STRING);
-            profileLabel.setFont(boldFont);
+            profileLabel.setFont(profileLabel.getFont().deriveFont(Font.BOLD));
+
             onLabel = new JLabel(ON_LABEL_STRING);
-            onLabel.setFont(boldFont);
+            onLabel.setFont(onLabel.getFont().deriveFont(Font.BOLD));
 
             final JLabel statusLabel = new JLabel(STATUS_LABEL_STRING);
-            statusLabel.setFont(boldFont);
+            statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
 
             modeValueLabel = new JLabel(NO_CONFIGURATION_STRING);
             typeValueLabel = new JLabel(NO_CONFIGURATION_STRING);
