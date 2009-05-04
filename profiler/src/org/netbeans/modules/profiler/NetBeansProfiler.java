@@ -123,6 +123,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -175,12 +176,14 @@ public final class NetBeansProfiler extends Profiler {
 
         private Dialog dialog;
         private final Object dialogStateLock = new Object();
+        private final Object dialogInitLock = new Object();
 
         //@GuardedBy dialogStatusLock
         private DialogState dialogState = DialogState.NOT_OPENED;
         private String message;
         private boolean cancelAllowed;
         private boolean cancelled = false;
+        //@GuardedBy dialogInitLock
         private boolean instantiated;
         private boolean showProgress;
 
@@ -263,52 +266,52 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         private void instantiate() {
-            if (instantiated) {
-                return;
-            }
+            synchronized(dialogInitLock) {
+                if (instantiated) {
+                    return;
+                }
 
-            JPanel panel = new JPanel();
-            panel.setLayout(new BorderLayout(10, 10));
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
-            panel.add(new JLabel(message), BorderLayout.NORTH);
+                JPanel panel = new JPanel();
+                panel.setLayout(new BorderLayout(10, 10));
+                panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+                panel.add(new JLabel(message), BorderLayout.NORTH);
 
-            final Dimension ps = panel.getPreferredSize();
-            ps.setSize(Math.max(ps.getWidth(), DEFAULT_WIDTH),
-                       Math.max(ps.getHeight(), showProgress ? DEFAULT_HEIGHT : ps.getHeight()));
-            panel.setPreferredSize(ps);
+                final Dimension ps = panel.getPreferredSize();
+                ps.setSize(Math.max(ps.getWidth(), DEFAULT_WIDTH),
+                           Math.max(ps.getHeight(), showProgress ? DEFAULT_HEIGHT : ps.getHeight()));
+                panel.setPreferredSize(ps);
 
-            if (showProgress) {
-                final JProgressBar progress = new JProgressBar();
-                progress.setIndeterminate(true);
-                panel.add(progress, BorderLayout.SOUTH);
-            }
+                if (showProgress) {
+                    final JProgressBar progress = new JProgressBar();
+                    progress.setIndeterminate(true);
+                    panel.add(progress, BorderLayout.SOUTH);
+                }
 
-            dialog = ProfilerDialogs.createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
-                                                                       cancelAllowed
-                                                                       ? new Object[] { DialogDescriptor.CANCEL_OPTION }
-                                                                       : new Object[] {  }, DialogDescriptor.CANCEL_OPTION,
-                                                                       DialogDescriptor.RIGHT_ALIGN, null,
-                                                                       new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        cancelled = true;
+                dialog = ProfilerDialogs.createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
+                                                                           cancelAllowed
+                                                                           ? new Object[] { DialogDescriptor.CANCEL_OPTION }
+                                                                           : new Object[] {  }, DialogDescriptor.CANCEL_OPTION,
+                                                                           DialogDescriptor.RIGHT_ALIGN, null,
+                                                                           new ActionListener() {
+                        public void actionPerformed(final ActionEvent e) {
+                            cancelled = true;
 
-                        synchronized (dialogStateLock) {
-                            assert dialogState == DialogState.OPEN;
-                            LOGGER.finest("Closing async dialog (cancel)"); // NOI18N
-                            dialogState = DialogState.CLOSED;
+                            synchronized (dialogStateLock) {
+                                assert dialogState == DialogState.OPEN;
+                                LOGGER.finest("Closing async dialog (cancel)"); // NOI18N
+                                dialogState = DialogState.CLOSED;
+                            }
                         }
-                    }
-                }));
-            instantiated = true;
+                    }));
+                instantiated = true;
+            }
         }
     }
 
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
     private final class IDEAppStatusHandler implements AppStatusHandler {
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public AppStatusHandler.AsyncDialog getAsyncDialogInstance(final String message, final boolean showProgress,
-                                                                   final boolean cancelAllowed) {
+        public AppStatusHandler.AsyncDialog getAsyncDialogInstance(final String message, final boolean showProgress, final boolean cancelAllowed) {
             return new ProgressPanel(message, showProgress, cancelAllowed);
         }
 
