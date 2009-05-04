@@ -822,6 +822,7 @@ public final class GlobalFiltersPanel extends JPanel implements HelpCtx.Provider
 
         // newButton
         newButton = new JButton();
+        org.openide.awt.Mnemonics.setLocalizedText(newButton, NEW_BUTTON_TEXT);
         
         newButton.getAccessibleContext().setAccessibleDescription(NEW_BUTTON_ACCESS_DESC);
         newButton.addActionListener(buttonsListener);
