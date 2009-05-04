@@ -26,23 +26,36 @@
 package org.netbeans.lib.profiler.ui.charts.xy;
 
 import java.awt.event.ActionEvent;
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.ChartComponent;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public class ProfilerXYChart extends ChartComponent {
+
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.charts.xy.Bundle"); // NOI18N
+    private static final String ZOOM_IN_STRING = messages.getString("ProfilerXYChart_ZoomInString"); // NOI18N
+    private static final String ZOOM_OUT_STRING = messages.getString("ProfilerXYChart_ZoomOutString"); // NOI18N
+    private static final String FIXED_SCALE_STRING = messages.getString("ProfilerXYChart_FixedScaleString"); // NOI18N
+    private static final String SCALE_TO_FIT_STRING = messages.getString("ProfilerXYChart_ScaleToFitString"); // NOI18N
+    // -----
 
     private static final Icon ZOOM_IN_ICON =
             new ImageIcon(ProfilerXYChart.class.getResource(
@@ -57,7 +70,9 @@ public class ProfilerXYChart extends ChartComponent {
             new ImageIcon(ProfilerXYChart.class.getResource(
             "/org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); // NOI18N
 
-    private final XYTimeline timeline;
+    private static final int[] VISIBLE_NONE = new int[] { -1, -1 };
+
+    private final Timeline timeline;
 
     private ZoomInAction zoomInAction;
     private ZoomOutAction zoomOutAction;
@@ -95,10 +110,11 @@ public class ProfilerXYChart extends ChartComponent {
 
         timeline = itemsModel.getTimeline();
 
-//        firstVisibleIndex = 0;
-//        lastVisibleIndex  = 0;
         indexesCache = new HashMap();
-        recomputeVisibleBounds();
+
+        firstVisibleIndex = VISIBLE_NONE;
+        lastVisibleIndex  = VISIBLE_NONE;
+        visibleIndexesDirty = true;
 
         addConfigurationListener(new VisibleBoundsListener());
     }
@@ -133,96 +149,114 @@ public class ProfilerXYChart extends ChartComponent {
 
     // startIndex: any visible index
     private int[] findFirstVisibleL(int[] startIndex, int viewStart, int viewEnd) {
-        if (timeline.getTimestampsCount() == 0 ||
-            startIndex[0] == -1 && startIndex[1] == -1)
-                return new int[] { -1, -1 };
+        int timestampsCount = timeline.getTimestampsCount();
+
+        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+
+        double dataStart = getDataX(viewStart);
 
         int index = startIndex[0];
-        if (index == -1) return new int[] { -1, startIndex[1] - 1 };
-        while (index > 0) {
-            double viewX = getViewX(timeline.getTimestamp(index - 1));
+        if (index == -1) {
+            index = startIndex[1];
+            if (timeline.getTimestamp(index) < dataStart)
+                return findFirstVisibleR(startIndex, viewStart, viewEnd);
+        }
 
-            if (viewX < viewStart) return new int[] { index, -1 };
-            
+        while (index > 0) {
+            long data = timeline.getTimestamp(index - 1);
+            if (data < dataStart) return new int[] { index, -1 };
             index--;
         }
 
-        return getViewX(timeline.getTimestamp(index)) >= viewStart ?
-                                                         new int[] { index, -1 } :
-                                                         new int[] { -1, -1 };
+        return timeline.getTimestamp(index) >= dataStart ? new int[] { index, -1 } :
+                                                           VISIBLE_NONE;
     }
 
     // startIndex: any invisible or last visible index
     private int[] findLastVisibleL(int[] startIndex, int viewStart, int viewEnd) {
-        if (timeline.getTimestampsCount() == 0 ||
-            startIndex[0] == -1 && startIndex[1] == -1)
-                return new int[] { -1, -1 };
+        int timestampsCount = timeline.getTimestampsCount();
+
+        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
 
         int index = startIndex[0];
         if (index == -1) index = startIndex[1];
-        while (index >= 0) {
-            double viewX = getViewX(timeline.getTimestamp(index));
 
-            if (viewX < viewStart) return new int[] { -1, index + 1 };
-            if (viewX <= viewEnd) return new int[] { index, -1 };
-            
+        double dataStart = getDataX(viewStart);
+        double dataEnd = getDataX(viewEnd);
+
+        while (index >= 0) {
+            long data = timeline.getTimestamp(index);
+            if (data < dataStart) return new int[] { -1, index + 1 };
+            if (data <= dataEnd) return new int[] { index, -1 };
             index--;
         }
 
-        return new int[] { -1, -1 };
+        return VISIBLE_NONE;
     }
 
     // startIndex: any invisible or first visible index
     private int[] findFirstVisibleR(int[] startIndex, int viewStart, int viewEnd) {
-        if (timeline.getTimestampsCount() == 0 ||
-            startIndex[0] == -1 && startIndex[1] == -1)
-                return new int[] { -1, -1 };
+        int timestampsCount = timeline.getTimestampsCount();
+
+        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
 
         int index = startIndex[0];
         if (index == -1) index = startIndex[1];
-        while (index <= timeline.getTimestampsCount() - 1) {
-            double viewX = getViewX(timeline.getTimestamp(index));
 
-            if (viewX > viewEnd) return new int[] { -1, index - 1 };
-            if (viewX >= viewStart) return new int[] { index, -1 };
-            
+        double dataStart = getDataX(viewStart);
+        double dataEnd = getDataX(viewEnd);
+
+        int maxIndex = timestampsCount - 1;
+        while (index <= maxIndex) {
+            long data = timeline.getTimestamp(index);
+            if (data > dataEnd) return new int[] { -1, index - 1 };
+            if (data >= dataStart) return new int[] { index, -1 };
             index++;
         }
 
-        return new int[] { -1, -1 };
+        return VISIBLE_NONE;
     }
 
     // startIndex: any visible index
     private int[] findLastVisibleR(int[] startIndex, int viewStart, int viewEnd) {
-        if (timeline.getTimestampsCount() == 0 ||
-            startIndex[0] == -1 && startIndex[1] == -1)
-                return new int[] { -1, -1 };
+        int timestampsCount = timeline.getTimestampsCount();
+
+        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+
+        double dataEnd = getDataX(viewEnd);
 
         int index = startIndex[0];
-        if (index == -1) return new int[] { -1, startIndex[1] + 1 };
-        while (index < timeline.getTimestampsCount() - 1) {
-            double viewX = getViewX(timeline.getTimestamp(index + 1));
+        if (index == -1) {
+            index = startIndex[1];
+            if (timeline.getTimestamp(index) > dataEnd)
+                return findLastVisibleL(startIndex, viewStart, viewEnd);
+        }
 
-            if (viewX > viewEnd) return new int[] { index, -1 };
-
+        int maxIndex = timestampsCount - 1;
+        while (index < maxIndex) {
+            long data = timeline.getTimestamp(index + 1);
+            if (data > dataEnd) return new int[] { index, -1 };
             index++;
         }
 
-        return getViewX(timeline.getTimestamp(index)) <= viewEnd ?
-                                                         new int[] { index, -1 } :
-                                                         new int[] { -1, -1 };
+        return timeline.getTimestamp(index) <= dataEnd ? new int[] { index, -1 } :
+                                                         VISIBLE_NONE;
     }
 
     // Use in case of absolute panic, will always work
+    // Note: doesn't clear cache, indexesCache.clear() must be invoked explicitely
     private void recomputeVisibleBounds() {
-        indexesCache.clear();
-
-        firstVisibleIndex = new int[] {0, -1};
-        lastVisibleIndex = new int[] { Math.max(0, timeline.getTimestampsCount() - 1), -1 };
-
-        if (!fitsWidth()) {
-            firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
-            lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+        int timestampsCount = timeline.getTimestampsCount();
+        if (timestampsCount == 0) {
+            firstVisibleIndex = VISIBLE_NONE;
+            lastVisibleIndex  = VISIBLE_NONE;
+        } else {
+            firstVisibleIndex = new int[] { 0, -1 };
+            lastVisibleIndex  = new int[] { timestampsCount - 1, -1 };
+            if (!fitsWidth()) {
+                firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex  = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+            }
         }
     }
 
@@ -242,15 +276,29 @@ public class ProfilerXYChart extends ChartComponent {
 
         indexesCache.clear();
 
-        if (contentsWidthChanged) {
+        if (fitsWidth()) {
+            recomputeVisibleBounds();
+        } else if (contentsWidthChanged) {
+            recomputeVisibleBounds();
+        } else if (firstVisibleIndex == VISIBLE_NONE) {
             recomputeVisibleBounds();
         } else if (oldBoundsWidth != newBoundsWidth) {
             if (oldBoundsWidth < newBoundsWidth) {
                 firstVisibleIndex = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
-                lastVisibleIndex = findLastVisibleR(firstVisibleIndex, 0, getWidth());
+                if (currentlyFollowingDataWidth()) {
+                    lastVisibleIndex[0] = timeline.getTimestampsCount() - 1;
+                    lastVisibleIndex[1] = -1;
+                } else {
+                    lastVisibleIndex = findLastVisibleR(firstVisibleIndex, 0, getWidth());
+                }
             } else {
                 firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
-                lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+                if (currentlyFollowingDataWidth()) {
+                    lastVisibleIndex[0] = timeline.getTimestampsCount() - 1;
+                    lastVisibleIndex[1] = -1;
+                } else {
+                    lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+                }
             }
         } else if (oldScaleX != newScaleX) {
             if (oldScaleX < newScaleX) {
@@ -263,13 +311,18 @@ public class ProfilerXYChart extends ChartComponent {
         } else if (oldOffsetX != newOffsetX) {
             if (newOffsetX > oldOffsetX) {
                 firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
-                lastVisibleIndex = findLastVisibleR(firstVisibleIndex, 0, getWidth());
+                lastVisibleIndex = findLastVisibleR(lastVisibleIndex, 0, getWidth());
             } else {
+                firstVisibleIndex = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
                 lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
-                firstVisibleIndex = findFirstVisibleL(lastVisibleIndex, 0, getWidth());
             }
         }
 
+        // clear dirty flags
+        contentsWidthChanged = false;
+        oldBoundsWidth = newBoundsWidth;
+        oldScaleX = newScaleX;
+        oldOffsetX = newOffsetX;
         visibleIndexesDirty = false;
     }
     
@@ -283,10 +336,11 @@ public class ProfilerXYChart extends ChartComponent {
         int[][] bounds = indexesCache.get(rect);
 
         if (bounds == null) {
+            // TODO: OPTIMIZE - DETERMINE OPTIMAL R/L DIRECTION !!!
             int[] firstIndex = findFirstVisibleR(firstVisibleIndex, viewRect.x,
                                                  viewRect.x + viewRect.width);
             int[] lastIndex = findLastVisibleL(lastVisibleIndex, viewRect.x,
-                                                 viewRect.x + viewRect.width);
+                                               viewRect.x + viewRect.width);
             bounds = new int[][] { firstIndex, lastIndex };
             indexesCache.put(rect, bounds);
         }
@@ -303,8 +357,10 @@ public class ProfilerXYChart extends ChartComponent {
 
         long dataX = (long)getDataX(x);
 
+        if (firstVisibleIndex == VISIBLE_NONE) return -1;
         int nearestIndex = firstVisibleIndex[0];
         if (nearestIndex == -1) nearestIndex = firstVisibleIndex[1];
+        
         long itemDataX = timeline.getTimestamp(nearestIndex);
         long nearestDistance = Math.abs(dataX - itemDataX);
 
@@ -333,7 +389,7 @@ public class ProfilerXYChart extends ChartComponent {
         public ZoomInAction() {
             super();
 
-            putValue(SHORT_DESCRIPTION, "Zoom In");
+            putValue(SHORT_DESCRIPTION, ZOOM_IN_STRING);
             putValue(SMALL_ICON, ZOOM_IN_ICON);
 
             updateAction();
@@ -361,7 +417,7 @@ public class ProfilerXYChart extends ChartComponent {
         public ZoomOutAction() {
             super();
 
-            putValue(SHORT_DESCRIPTION, "Zoom Out");
+            putValue(SHORT_DESCRIPTION, ZOOM_OUT_STRING);
             putValue(SMALL_ICON, ZOOM_OUT_ICON);
 
             updateAction();
@@ -390,6 +446,12 @@ public class ProfilerXYChart extends ChartComponent {
         public ToggleViewAction() {
             super();
             updateAction();
+            addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isMiddleMouseButton(e))
+                        actionPerformed(null);
+                }
+            });
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -420,7 +482,7 @@ public class ProfilerXYChart extends ChartComponent {
         private void updateAction() {
             boolean fitsWidth = fitsWidth();
             Icon icon = fitsWidth ? FIXED_SCALE_ICON : SCALE_TO_FIT_ICON;
-            String name = fitsWidth ? "Fixed Scale" : "Scale To Fit";
+            String name = fitsWidth ? FIXED_SCALE_STRING : SCALE_TO_FIT_STRING;
             putValue(SHORT_DESCRIPTION, name);
             putValue(SMALL_ICON, icon);
         }
@@ -430,15 +492,14 @@ public class ProfilerXYChart extends ChartComponent {
 
     // --- ChartConfigurationListener implementation ---------------------------
 
-    private class VisibleBoundsListener implements ChartConfigurationListener {
+    private class VisibleBoundsListener extends ChartConfigurationListener.Adapter {
         public void offsetChanged(long oldOffsetX, long oldOffsetY,
                                   long newOffsetX, long newOffsetY) {
-            if (oldOffsetX != newOffsetX) {
+            if (!fitsWidth() && oldOffsetX != newOffsetX) {
                 visibleIndexesDirty = true;
                 ProfilerXYChart.this.oldOffsetX = oldOffsetX;
                 ProfilerXYChart.this.newOffsetX = newOffsetX;
             }
-
         }
 
         public void dataBoundsChanged(long dataOffsetX, long dataOffsetY,
@@ -453,7 +514,6 @@ public class ProfilerXYChart extends ChartComponent {
                 visibleIndexesDirty = true;
                 contentsWidthChanged = true;
             }
-
         }
 
         public void scaleChanged(double oldScaleX, double oldScaleY,
@@ -462,19 +522,12 @@ public class ProfilerXYChart extends ChartComponent {
             if (zoomInAction != null) zoomInAction.updateAction();
             if (zoomOutAction != null) zoomOutAction.updateAction();
 
+            visibleIndexesDirty = true;
             if (!fitsWidth() && oldScaleX != newScaleX) {
-                visibleIndexesDirty = true;
                 ProfilerXYChart.this.oldScaleX = oldScaleX;
                 ProfilerXYChart.this.newScaleX = newScaleX;
             }
-
         }
-
-        public void viewChanged(long offsetX, long offsetY,
-                                double scaleX, double scaleY,
-                                long lastOffsetX, long lastOffsetY,
-                                double lastScaleX, double lastScaleY,
-                                int shiftX, int shiftY) {}
     }
 
 
@@ -482,7 +535,7 @@ public class ProfilerXYChart extends ChartComponent {
 
     public static final class Context extends ChartComponent.DefaultContext {
 
-        public Context(ProfilerXYChart chart) {
+        Context(ProfilerXYChart chart) {
             super(chart);
         }
 

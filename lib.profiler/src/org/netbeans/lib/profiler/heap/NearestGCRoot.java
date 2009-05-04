@@ -66,6 +66,8 @@ class NearestGCRoot {
     private LongBuffer multipleParents;
     private Set referenceClasses;
     private boolean gcRootsComputed;
+    private long allInstances;
+    private long processedInstances;
 //private long leavesCount;
 //private long firstLevel;
 //private long multiParentsCount;
@@ -107,6 +109,7 @@ class NearestGCRoot {
         referenceClasses.addAll(softRef.getSubClasses());
         referentFiled = computeReferentFiled();
         heap.computeReferences(); // make sure references are computed first
+        allInstances = heap.getSummary().getTotalLiveInstances();
         
         try {
             createBuffers();
@@ -122,6 +125,7 @@ class NearestGCRoot {
 
         deleteBuffers();
         heap.idToOffsetMap.flush();
+        HeapProgress.progressFinish();
         gcRootsComputed = true;
     }
 
@@ -136,6 +140,7 @@ class NearestGCRoot {
             if (instanceId == 0L) { // end of level
                 break;
             }
+            HeapProgress.progress(processedInstances++,allInstances);
             instance = heap.getInstanceByID(instanceId);
             if (instance instanceof ObjectArrayInstance) {
                 Iterator instanceIt = ((ObjectArrayInstance) instance).getValues().iterator();
