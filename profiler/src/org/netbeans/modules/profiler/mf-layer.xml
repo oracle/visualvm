@@ -90,7 +90,7 @@ made subject to such option by the copyright holder.
     <folder name="Menu">
         <folder name="Window">
             <folder name="Profile">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/profiler/resources/ide/empty.gif"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/resources/ide/empty.gif"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
                 <attr name="position" intvalue="1500"/>
                 <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance">
