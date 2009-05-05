@@ -139,6 +139,7 @@ made subject to such option by the copyright holder.
                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.NpsDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                         <attr name="mimeType" stringvalue="x-application/nps"/>
+                        <attr name="position" intvalue="100"/>
                      </file>
                  </folder>
              </folder>
