@@ -749,7 +749,7 @@ public class Utils {
 
         List<CodeProfilingPoint> lineProfilingPoints = new ArrayList();
         List<CodeProfilingPoint> profilingPoints = ProfilingPointsManager.getDefault()
-                                                                         .getProfilingPoints(CodeProfilingPoint.class, null);
+                                                                         .getProfilingPoints(CodeProfilingPoint.class, null, false);
 
         for (CodeProfilingPoint profilingPoint : profilingPoints) {
             for (CodeProfilingPoint.Annotation annotation : profilingPoint.getAnnotations()) {
@@ -817,7 +817,7 @@ public class Utils {
     }
 
     public static String getUniqueName(String name, String nameSuffix, Project project) {
-        List<ProfilingPoint> projectProfilingPoints = ProfilingPointsManager.getDefault().getProfilingPoints(project, true);
+        List<ProfilingPoint> projectProfilingPoints = ProfilingPointsManager.getDefault().getProfilingPoints(project, false, true);
         List<String> projectProfilingPointsNames = new LinkedList();
 
         for (ProfilingPoint projectProfilingPoint : projectProfilingPoints) {

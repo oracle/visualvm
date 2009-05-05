@@ -201,7 +201,7 @@ public abstract class ProfilingPointFactory {
 
     void saveProfilingPoints(Project project) throws IOException {
         saveProfilingPoints((ProfilingPoint[]) ProfilingPointsManager.getDefault()
-                                                                     .getProfilingPoints(getProfilingPointsClass(), project)
+                                                                     .getProfilingPoints(getProfilingPointsClass(), project, false)
                                                                      .toArray(new ProfilingPoint[0]), project);
     }
 
