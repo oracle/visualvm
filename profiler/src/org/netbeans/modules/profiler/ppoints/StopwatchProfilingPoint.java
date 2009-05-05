@@ -49,7 +49,6 @@ import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -412,16 +411,12 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public StopwatchProfilingPoint(String name, Location startLocation, Location endLocation, Project project) {
-        super(name, startLocation, endLocation, project);
+    public StopwatchProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
+        super(name, startLocation, endLocation, project, factory);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public ProfilingPointFactory getFactory() {
-        return StopwatchProfilingPointFactory.getDefault();
-    }
 
     public boolean hasResults() {
         return results.size() > 0;

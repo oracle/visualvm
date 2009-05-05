@@ -44,13 +44,11 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.ppoints.ui.ResetResultsCustomizer;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -307,16 +305,12 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public ResetResultsProfilingPoint(String name, Location location, Project project) {
-        super(name, location, project);
+    public ResetResultsProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory) {
+        super(name, location, project, factory);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public ProfilingPointFactory getFactory() {
-        return ResetResultsProfilingPointFactory.getDefault();
-    }
 
     public boolean hasResults() {
         return results.size() > 0;

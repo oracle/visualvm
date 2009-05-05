@@ -63,7 +63,6 @@ import org.openide.text.Line;
 import org.openide.text.NbDocument;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
