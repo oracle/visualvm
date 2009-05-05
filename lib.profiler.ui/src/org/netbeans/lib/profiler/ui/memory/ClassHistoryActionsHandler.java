@@ -32,9 +32,8 @@ package org.netbeans.lib.profiler.ui.memory;
  */
 public interface ClassHistoryActionsHandler {
 
-    // Returns true if history of the class should be tracked.
     // The implementation notifies the user that previous history tracking
     // will be reset and ensures that the history graph is visible.
-    public boolean showClassHistory(int classID, String className);
+    public void showClassHistory(int classID, String className);
 
 }
