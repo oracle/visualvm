@@ -2,7 +2,7 @@
 <feature
       id="VisualVM_Launcher"
       label="VisualVM_Launcher Feature"
-      version="1.0.0"
+      version="1.0.1"
       provider-name="Sun Microsystems">
 
    <description>

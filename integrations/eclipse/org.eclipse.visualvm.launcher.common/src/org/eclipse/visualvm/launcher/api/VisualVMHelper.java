@@ -24,8 +24,15 @@
  */
 package org.eclipse.visualvm.launcher.api;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.visualvm.launcher.Activator;
 import org.eclipse.visualvm.launcher.preferences.PreferenceConstants;
 
@@ -39,6 +46,23 @@ public final class VisualVMHelper {
 	}
 	
 	public static void openInVisualVM(long id) throws IOException {
+		String jv = getJavaVersion();
+		if (jv == null || !jv.startsWith("1.6")) {
+			try {
+				final Display d = Display.getDefault();
+				d.asyncExec(new Runnable() {
+					public void run() {
+						Shell s = new Shell(d);
+						MessageDialog.openError(s, "VisualVM requires JDK1.6+ to run", "You are trying to launch VisualVM using an unsupported JDK.\n\nUse 'Window\\Preferences\\Run/Debug\\Launching\\VisualVM Configuration' to set the VisualVM JDK_HOME.");						
+					}
+				});
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+		
 		Runtime.getRuntime().exec(
 			new String[] { 
 					Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH),
@@ -47,5 +71,45 @@ public final class VisualVMHelper {
 					"--openid",
 					String.valueOf(id) 
 		});
+	}
+	
+	private static String getJavaVersion() {
+		try {
+			String javaCmd = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_JAVAHOME) + File.separator + "bin" + File.separator + "java";
+			Process prc = Runtime.getRuntime().exec(
+				new String[] {
+						javaCmd,
+						"-version"
+				}
+			);
+			
+			String version = getJavaVersion(prc.getErrorStream());
+			if (version == null) {
+				version = getJavaVersion(prc.getInputStream());
+			}
+			return version;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static String getJavaVersion(InputStream is) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				if (line.startsWith("java version")) {
+					int start = line.indexOf("\"");
+					int end = line.lastIndexOf("\"");
+					if (start > -1 && end > -1) {
+						return line.substring(start + 1, end);
+					}
+				}
+			}
+		} finally {
+			br.close();
+		}
+		return null;
 	}
 }
