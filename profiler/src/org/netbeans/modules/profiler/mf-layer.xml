@@ -92,7 +92,7 @@ made subject to such option by the copyright holder.
                         <attr name="position" intvalue="300"/>
                     </file>
                     <file name="org-openide-actions-CopyAction.instance">
-                        <attr name="position" intvalue="300"/>
+                        <attr name="position" intvalue="301"/>
                     </file>
                     <file name="org-openide-actions-CutAction.instance">
                         <attr name="position" intvalue="200"/>
