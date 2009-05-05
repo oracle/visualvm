@@ -416,7 +416,7 @@ made subject to such option by the copyright holder.
         <folder name="MIMEResolver">
             <file name="NpsResolver.xml" url="NpsResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="100"/>
+                <attr name="position" intvalue="99500"/>
             </file>
         </folder>
     </folder>
