@@ -183,8 +183,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
         } else if (e.getSource() == startHisto) {
             String selectedClassName = StringUtils.userFormClassName(
                                                 getClassName(selectedClassId));
-            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
-                classHistoryManager.setup(selectedClassId, selectedClassName);
+            historyActionsHandler.showClassHistory(selectedClassId, selectedClassName);
         }
     }
 
@@ -408,6 +407,10 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
                     }
                 });
         }
+        // Only show these items when target JVM is alive
+        popupShowStacks.setEnabled(status.targetAppRunning);
+        popupRemoveProfForClass.setEnabled(status.targetAppRunning);
+        popupRemoveProfForClassesBelow.setEnabled(status.targetAppRunning);
 
         return popup;
     }

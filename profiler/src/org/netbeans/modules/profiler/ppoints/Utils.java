@@ -365,7 +365,8 @@ public class Utils {
     }
 
     public static String getClassName(CodeProfilingPoint.Location location) {
-        FileObject fileObject = FileUtil.toFileObject(new File(location.getFile()));
+        File file = FileUtil.normalizeFile(new File(location.getFile()));
+        FileObject fileObject = FileUtil.toFileObject(file);
 
         if ((fileObject == null) || !fileObject.isValid()) {
             return null;
@@ -381,7 +382,8 @@ public class Utils {
     }
     
     public static String getMethodName(CodeProfilingPoint.Location location) {
-        FileObject fileObject = FileUtil.toFileObject(new File(location.getFile()));
+        File file = FileUtil.normalizeFile(new File(location.getFile()));
+        FileObject fileObject = FileUtil.toFileObject(file);
 
         if ((fileObject == null) || !fileObject.isValid()) {
             return null;
@@ -550,7 +552,8 @@ public class Utils {
     }
 
     public static int getDocumentOffset(CodeProfilingPoint.Location location) {
-        FileObject fileObject = FileUtil.toFileObject(new File(location.getFile()));
+        File file = FileUtil.normalizeFile(new File(location.getFile()));
+        FileObject fileObject = FileUtil.toFileObject(file);
 
         if ((fileObject == null) || !fileObject.isValid()) {
             return -1;
@@ -784,8 +787,10 @@ public class Utils {
             return sourceFileAbsolutePath; // file not placed in project directory
         }
 
-        return PROJECT_DIRECTORY_MARK + "/"
-               + FileUtil.getRelativePath(project.getProjectDirectory(), FileUtil.toFileObject(new File(sourceFileAbsolutePath))); // file placed in project directory => relative path used
+        File file = FileUtil.normalizeFile(new File(sourceFileAbsolutePath));
+
+        return PROJECT_DIRECTORY_MARK + "/" // NOI18N
+               + FileUtil.getRelativePath(project.getProjectDirectory(), FileUtil.toFileObject(file)); // file placed in project directory => relative path used
     }
 
     public static EnhancedTableCellRenderer getScopeRenderer() {
@@ -865,7 +870,8 @@ public class Utils {
     }
 
     public static void openLocation(CodeProfilingPoint.Location location) {
-        final FileObject fileObject = FileUtil.toFileObject(new File(location.getFile()));
+        File file = FileUtil.normalizeFile(new File(location.getFile()));
+        final FileObject fileObject = FileUtil.toFileObject(file);
 
         if ((fileObject == null) || !fileObject.isValid()) {
             return;
