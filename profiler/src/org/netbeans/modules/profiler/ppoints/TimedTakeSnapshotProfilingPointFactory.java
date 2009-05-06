@@ -46,11 +46,9 @@ import org.netbeans.modules.profiler.ppoints.ui.TimedTakeSnapshotCustomizer;
 import org.openide.ErrorManager;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Lookup;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -75,10 +73,6 @@ public class TimedTakeSnapshotProfilingPointFactory extends CodeProfilingPointFa
     public static final String TAKE_SNAPSHOT_PP_DESCR = PP_DESCR;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static TimedTakeSnapshotProfilingPointFactory getDefault() {
-        return Lookup.getDefault().lookup(TimedTakeSnapshotProfilingPointFactory.class);
-    }
 
     public String getDescription() {
         return TAKE_SNAPSHOT_PP_DESCR;
@@ -107,7 +101,7 @@ public class TimedTakeSnapshotProfilingPointFactory extends CodeProfilingPointFa
                                                                    "", ProjectUtils.getInformation(project).getDisplayName()
                                                                }), project);
 
-        return new TimedTakeSnapshotProfilingPoint(name, project);
+        return new TimedTakeSnapshotProfilingPoint(name, project, this);
     }
 
     public boolean supportsCPU() {
@@ -152,7 +146,7 @@ public class TimedTakeSnapshotProfilingPointFactory extends CodeProfilingPointFa
         TimedTakeSnapshotProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new TimedTakeSnapshotProfilingPoint(name, project);
+            profilingPoint = new TimedTakeSnapshotProfilingPoint(name, project, this);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
             profilingPoint.setSnapshotType(type);
             profilingPoint.setSnapshotTarget(target);
