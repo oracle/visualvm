@@ -46,11 +46,9 @@ import org.netbeans.modules.profiler.ppoints.ui.TriggeredTakeSnapshotCustomizer;
 import org.openide.ErrorManager;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Lookup;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -75,10 +73,6 @@ public class TriggeredTakeSnapshotProfilingPointFactory extends CodeProfilingPoi
     public static final String TAKE_SNAPSHOT_PP_DESCR = PP_DESCR;
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static TriggeredTakeSnapshotProfilingPointFactory getDefault() {
-        return Lookup.getDefault().lookup(TriggeredTakeSnapshotProfilingPointFactory.class);
-    }
 
     public String getDescription() {
         return TAKE_SNAPSHOT_PP_DESCR;
@@ -107,7 +101,7 @@ public class TriggeredTakeSnapshotProfilingPointFactory extends CodeProfilingPoi
                                                                    "", ProjectUtils.getInformation(project).getDisplayName()
                                                                }), project);
 
-        return new TriggeredTakeSnapshotProfilingPoint(name, project);
+        return new TriggeredTakeSnapshotProfilingPoint(name, project, this);
     }
 
     public boolean supportsCPU() {
@@ -154,7 +148,7 @@ public class TriggeredTakeSnapshotProfilingPointFactory extends CodeProfilingPoi
         TriggeredTakeSnapshotProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new TriggeredTakeSnapshotProfilingPoint(name, project);
+            profilingPoint = new TriggeredTakeSnapshotProfilingPoint(name, project, this);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
             profilingPoint.setSnapshotType(type);
             profilingPoint.setSnapshotTarget(target);

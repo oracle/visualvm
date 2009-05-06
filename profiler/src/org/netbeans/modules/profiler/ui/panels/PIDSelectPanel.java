@@ -115,6 +115,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     private static final String COMBO_ACCESS_NAME = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_ComboAccessName"); //NOI18N
     private static final String COMBO_ACCESS_DESCR = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_ComboAccessDescr"); //NOI18N
     private static final String BUTTON_ACCESS_DESCR = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_ButtonAccessDescr"); //NOI18N
+    private static final String PROCESS_DETAILS_ACCESS_NAME = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_SelectedProcessAccessName"); //NOI18N
                                                                                                                                      // -----
     private static final int MAX_WIDTH = 500;
 
@@ -131,10 +132,12 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         this.okButton = okButton;
 
         combo = new JComboBox();
-        button = new JButton(REFRESH_BUTTON_NAME);
+        button = new JButton();
+        org.openide.awt.Mnemonics.setLocalizedText(button, REFRESH_BUTTON_NAME);
 
         JPanel infoPanel = new JPanel(new BorderLayout());
         detailsArea = new HTMLTextArea();
+        detailsArea.getAccessibleContext().setAccessibleName(PROCESS_DETAILS_ACCESS_NAME);
         detailsArea.setEditable(false);
         detailsArea.setOpaque(true);
         detailsArea.setBackground(UIManager.getDefaults().getColor("Panel.background")); //NOI18N

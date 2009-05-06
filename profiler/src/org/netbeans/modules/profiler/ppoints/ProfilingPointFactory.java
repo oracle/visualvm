@@ -48,8 +48,6 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Utilities;
-import org.openide.util.WeakListeners;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -58,13 +56,11 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -201,7 +197,7 @@ public abstract class ProfilingPointFactory {
 
     void saveProfilingPoints(Project project) throws IOException {
         saveProfilingPoints((ProfilingPoint[]) ProfilingPointsManager.getDefault()
-                                                                     .getProfilingPoints(getProfilingPointsClass(), project)
+                                                                     .getProfilingPoints(getProfilingPointsClass(), project, false)
                                                                      .toArray(new ProfilingPoint[0]), project);
     }
 
