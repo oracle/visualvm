@@ -95,7 +95,9 @@ public final class ProfilingMonitor {
 
         public void run() {
             Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
-            final int ppsize = ProfilingPointsManager.getDefault().getProfilingPoints(project, false).size(); // PPs are not modifiable during runtime!
+            final int ppsize = ProfilingPointsManager.getDefault().getProfilingPoints(
+                               project, ProfilerIDESettings.getInstance().
+                               getIncludeProfilingPointsDependencies(), false).size(); // PPs are not modifiable during runtime!
 
             while (keepRunning) { // Main loop
 
