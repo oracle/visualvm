@@ -45,7 +45,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityListener;
 import org.netbeans.modules.profiler.ppoints.ui.WizardPanel1UI;
-import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -99,7 +98,7 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
             return component;
         }
 
-        public void hiding() {
+        public void hiding(boolean cancelled) {
             selectedPPFactoryIndex = ((WizardPanel1UI) getComponent()).getSelectedIndex();
 
             if (selectedPPFactoryIndex != selectedPPFactoryIndexRef) {
@@ -157,15 +156,15 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
             return customizerScrollPane;
         }
 
-        public void hiding() {
-            if ((profilingPoint != null) && (customizer != null)) {
+        public void hiding(boolean cancelled) {
+            if (!cancelled && profilingPoint != null && customizer != null) {
                 profilingPoint.setValues(customizer);
             }
 
             unregisterCustomizerListener();
         }
 
-        public void notifyClosed() {
+        public void notifyClosed(boolean cancelled) {
             releaseCurrentCustomizer();
             profilingPoint = null;
         }
@@ -250,10 +249,10 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
             listenerList.add(ChangeListener.class, listener);
         }
 
-        public void hiding() {
+        public void hiding(boolean cancelled) {
         }
 
-        public void notifyClosed() {
+        public void notifyClosed(boolean cancelled) {
         }
 
         public void readSettings(Object settings) {
@@ -385,14 +384,14 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
         return getCurrentWizardPanel();
     }
 
-    public ProfilingPoint finish() {
-        ProfilingPoint result = profilingPoint;
+    public ProfilingPoint finish(boolean cancelled) {
+        ProfilingPoint result = cancelled ? null : profilingPoint;
 
         if (wizardPanels != null) {
-            wizardPanels[currentPanel].hiding();
+            wizardPanels[currentPanel].hiding(cancelled);
 
             for (int i = 0; i < wizardPanels.length; i++) {
-                wizardPanels[i].notifyClosed(); // Will invoke profilingPoint = null
+                wizardPanels[i].notifyClosed(cancelled); // Will invoke profilingPoint = null
             }
 
             preferredPanelSize = wizardPanels[currentPanel].getComponent().getSize(); // Persist customized size
@@ -414,13 +413,13 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
     }
 
     public void nextPanel() {
-        getCurrentWizardPanel().hiding();
+        getCurrentWizardPanel().hiding(false);
         wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(++currentPanel)); // NOI18N
         getCurrentWizardPanel().showing();
     }
 
     public void previousPanel() {
-        getCurrentWizardPanel().hiding();
+        getCurrentWizardPanel().hiding(false);
         wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(--currentPanel)); // NOI18N
         getCurrentWizardPanel().showing();
     }

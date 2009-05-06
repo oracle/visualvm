@@ -179,8 +179,8 @@ public abstract class TriggeredGlobalProfilingPoint extends GlobalProfilingPoint
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    TriggeredGlobalProfilingPoint(String name, Project project) {
-        super(name, project);
+    TriggeredGlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
+        super(name, project, factory);
         condition = new TriggerCondition();
     }
 

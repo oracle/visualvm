@@ -64,8 +64,8 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        Paired(String name, Location startLocation, Location endLocation, Project project) {
-            super(name, project);
+        Paired(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
+            super(name, project, factory);
             this.startLocation = startLocation;
             this.endLocation = endLocation;
         }
@@ -197,8 +197,8 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        Single(String name, Location location, Project project) {
-            super(name, project);
+        Single(String name, Location location, Project project, ProfilingPointFactory factory) {
+            super(name, project, factory);
             this.location = location;
         }
 
@@ -386,8 +386,8 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    CodeProfilingPoint(String name, Project project) {
-        super(name, project);
+    CodeProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
+        super(name, project, factory);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
