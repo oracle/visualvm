@@ -74,6 +74,7 @@ public class ProfilingPointsDisplayer extends JPanel implements HelpCtx.Provider
                                                                     "ProfilingPointsDisplayer_PpActiveMsg"); // NOI18N
     private static final String NO_ACTIVE_PPS_STRING = NbBundle.getMessage(ProfilingPointsDisplayer.class,
                                                                            "ProfilingPointsDisplayer_NoActivePpsString"); // NOI18N
+    private static final String LIST_ACCESS_NAME = NbBundle.getMessage(ProfilingPointsDisplayer.class, "ProfilingPointsDisplayer_ListAccessName"); // NOI18N
                                                                                                                           // -----
     
     private static final String HELP_CTX_KEY = "ProfilingPointsDisplayer.HelpCtx"; // NOI18N
@@ -132,6 +133,7 @@ public class ProfilingPointsDisplayer extends JPanel implements HelpCtx.Provider
 
         listModel = new DefaultListModel();
         list = new JList(listModel);
+        list.getAccessibleContext().setAccessibleName(LIST_ACCESS_NAME);
         list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setVisibleRowCount(6);
         list.setCellRenderer(org.netbeans.modules.profiler.ppoints.Utils.getPresenterListRenderer());
