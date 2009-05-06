@@ -51,7 +51,6 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -421,8 +420,8 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of LoadGenProfilingPoint */
-    public LoadGenProfilingPoint(String name, Location startLocation, Location endLocation, Project project) {
-        super(name, startLocation, endLocation, project);
+    public LoadGenProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
+        super(name, startLocation, endLocation, project, factory);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
@@ -451,10 +450,6 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
         }
 
         return retValue;
-    }
-
-    public ProfilingPointFactory getFactory() {
-        return LoadGenProfilingPointFactory.getDefault();
     }
 
     public String getScriptFileName() {
