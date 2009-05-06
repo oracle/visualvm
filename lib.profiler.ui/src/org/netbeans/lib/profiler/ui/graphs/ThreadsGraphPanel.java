@@ -56,23 +56,26 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
-import org.netbeans.lib.profiler.charts.AxisComponent;
-import org.netbeans.lib.profiler.charts.AxisMarksComputer;
+import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
+import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
@@ -171,30 +174,33 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, new AxisMarksComputer.TimeMarksComputer(
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
-                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                new AxisComponent(chart, new TimelineMarksComputer(
+                         models.threadsItemsModel().getTimeline(),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
+                         new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
         // Threads axis
         XYItem threadsItem = models.threadsItemsModel().getItem(0);
         XYItemPainter threadsPainter = (XYItemPainter)paintersModel.getPainter(threadsItem);
-        AxisComponent.SimplePainter threadsMarksPainter = new AxisComponent.SimplePainter();
+        SimpleLongMarksPainter threadsMarksPainter = new SimpleLongMarksPainter();
         threadsMarksPainter.setForeground(GraphsUI.THREADS_PAINTER_LINE_COLOR);
         AxisComponent tAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-                         threadsItem, threadsPainter, chart.getChartContext(), 40),
+                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+                         threadsItem, threadsPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL),
                          threadsMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
         // Loaded classes axis
         XYItem classesItem = models.threadsItemsModel().getItem(1);
         XYItemPainter classesPainter = (XYItemPainter)paintersModel.getPainter(classesItem);
-        AxisComponent.SimplePainter classesMarksPainter = new AxisComponent.SimplePainter();
+        SimpleLongMarksPainter classesMarksPainter = new SimpleLongMarksPainter();
         classesMarksPainter.setForeground(GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR);
         AxisComponent cAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-                         classesItem, classesPainter, chart.getChartContext(), 40),
+                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+                         classesItem, classesPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL),
                          classesMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 
@@ -202,9 +208,10 @@ public final class ThreadsGraphPanel extends GraphPanel {
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
+                                              SwingConstants.SOUTH_EAST,
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(tAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
