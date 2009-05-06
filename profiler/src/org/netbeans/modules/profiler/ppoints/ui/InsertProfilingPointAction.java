@@ -112,20 +112,21 @@ public class InsertProfilingPointAction extends NodeAction {
             final Dialog d = ProfilerDialogs.createDialog(wd);
             d.setVisible(true);
 
-            ProfilingPoint profilingPoint = ppWizard.finish(); // Wizard must be finished even in cancelled to release its resources
+            boolean createPPoint = wd.getValue() == WizardDescriptor.FINISH_OPTION;
+            ProfilingPoint profilingPoint = ppWizard.finish(!createPPoint); // Wizard must be finished even in cancelled to release its resources
 
-            if (wd.getValue() == WizardDescriptor.FINISH_OPTION) {
+            if (createPPoint) {
                 ProfilingPointsManager.getDefault().addProfilingPoint(profilingPoint);
 
                 if (profilingPoint instanceof GlobalProfilingPoint) {
                     SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (!ProfilingPointsWindow.getDefault().isOpened()) {
-                                    ProfilingPointsWindow.getDefault().open();
-                                    ProfilingPointsWindow.getDefault().requestVisible();
-                                }
+                        public void run() {
+                            if (!ProfilingPointsWindow.getDefault().isOpened()) {
+                                ProfilingPointsWindow.getDefault().open();
+                                ProfilingPointsWindow.getDefault().requestVisible();
                             }
-                        });
+                        }
+                    });
                 }
             }
         }

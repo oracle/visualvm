@@ -50,7 +50,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -124,6 +123,7 @@ public class CompareSnapshotsAction extends AbstractAction {
             snapshot1Field = new JTextField();
             snapshot1Field.setPreferredSize(new Dimension(250, snapshot1Field.getPreferredSize().height));
             snapshot1Label.setLabelFor(snapshot1Field);
+            snapshot1Field.getAccessibleContext().setAccessibleDescription(SNAPSHOT_ACCESS_DESCR);
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = 0;
@@ -135,6 +135,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
             snapshot1Button = new JButton();
             org.openide.awt.Mnemonics.setLocalizedText(snapshot1Button, BROWSE_BUTTON_TEXT);
+            snapshot1Button.getAccessibleContext().setAccessibleDescription(BROWSE_BUTTON_ACCESS_DESCR);
             c = new GridBagConstraints();
             c.gridx = 2;
             c.gridy = 0;
@@ -156,6 +157,7 @@ public class CompareSnapshotsAction extends AbstractAction {
             snapshot2Field = new JTextField();
             snapshot2Field.setPreferredSize(new Dimension(250, snapshot2Field.getPreferredSize().height));
             snapshot2Label.setLabelFor(snapshot2Field);
+            snapshot2Field.getAccessibleContext().setAccessibleDescription(SNAPSHOT_ACCESS_DESCR);
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = 1;
@@ -166,6 +168,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
             snapshot2Button = new JButton();
             org.openide.awt.Mnemonics.setLocalizedText(snapshot2Button, BROWSE2_BUTTON_TEXT);
+            snapshot2Button.getAccessibleContext().setAccessibleDescription(BROWSE_BUTTON_ACCESS_DESCR);
             c = new GridBagConstraints();
             c.gridx = 2;
             c.gridy = 1;
@@ -479,6 +482,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
             externalFileButton = new JButton();
             org.openide.awt.Mnemonics.setLocalizedText(externalFileButton, BROWSE_BUTTON_TEXT);
+            externalFileButton.getAccessibleContext().setAccessibleDescription(BROWSE_BUTTON_ACCESS_DESCR);
             externalFileButton.setEnabled(false);
             c = new GridBagConstraints();
             c.gridx = 2;
@@ -775,10 +779,14 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                                          "CompareSnapshotsAction_BrowseButtonText"); // NOI18N
     private static final String BROWSE2_BUTTON_TEXT = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                           "CompareSnapshotsAction_Browse2ButtonText"); // NOI18N
+    private static final String BROWSE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
+                                                                          "CompareSnapshotsAction_BrowseButtonAccessDescr"); // NOI18N
     private static final String SNAPSHOT1_STRING = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                        "CompareSnapshotsAction_Snapshot1String"); // NOI18N
     private static final String SNAPSHOT2_STRING = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                        "CompareSnapshotsAction_Snapshot2String"); // NOI18N
+    private static final String SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
+                                                                       "CompareSnapshotsAction_SnapshotAccessDescr"); // NOI18N
     private static final String SNAPSHOTS_LIST_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                                   "CompareSnapshotsAction_SnapshotsListAccessDescr"); // NOI18N
                                                                                                                                       // -----

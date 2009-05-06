@@ -63,7 +63,6 @@ import org.openide.text.Line;
 import org.openide.text.NbDocument;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
@@ -749,7 +748,7 @@ public class Utils {
 
         List<CodeProfilingPoint> lineProfilingPoints = new ArrayList();
         List<CodeProfilingPoint> profilingPoints = ProfilingPointsManager.getDefault()
-                                                                         .getProfilingPoints(CodeProfilingPoint.class, null);
+                                                                         .getProfilingPoints(CodeProfilingPoint.class, null, false);
 
         for (CodeProfilingPoint profilingPoint : profilingPoints) {
             for (CodeProfilingPoint.Annotation annotation : profilingPoint.getAnnotations()) {
@@ -817,7 +816,7 @@ public class Utils {
     }
 
     public static String getUniqueName(String name, String nameSuffix, Project project) {
-        List<ProfilingPoint> projectProfilingPoints = ProfilingPointsManager.getDefault().getProfilingPoints(project, true);
+        List<ProfilingPoint> projectProfilingPoints = ProfilingPointsManager.getDefault().getProfilingPoints(project, false, true);
         List<String> projectProfilingPointsNames = new LinkedList();
 
         for (ProfilingPoint projectProfilingPoint : projectProfilingPoints) {
