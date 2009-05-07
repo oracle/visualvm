@@ -61,13 +61,13 @@ public class BytesXYItemMarksComputer extends XYItemMarksComputer {
 
         if (context.getViewWidth() == 0) {
             scale = -1;
-        } else if (item.getValuesCount() == 0) {
-            // Initial scale
-            scale = -1;
+//        } else if (item.getValuesCount() == 0) {
+//            // Initial scale
+//            scale = -1;
         } else {
             scale = painter.getItemValueScale(item, context);
         }
-
+        
         if (oldScale != scale) {
             if (scale == -1) {
                 step = -1;
