@@ -52,9 +52,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
-import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
 import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
@@ -131,6 +131,8 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         chart.setScale(INITIAL_CHART_SCALEX, 1);
         chart.setOffset(0, 0);
         chart.setFitsWidth(false);
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.L_LIVE_OBJECTS_INITIAL_VALUE));
     }
 
 

@@ -65,6 +65,15 @@ public final class LongRect {
         lr.width = 0;
         lr.height = 0;
     }
+
+    // Returns true if lr.x == 0 and lr.y == 0 and lr.width == 0 and lr.height == 0
+    public static boolean isClear(LongRect lr) {
+        if (lr.x != 0) return false;
+        if (lr.y != 0) return false;
+        if (lr.width != 0) return false;
+        if (lr.height != 0) return false;
+        return true;
+    }
     
     // Returns true if lr.width <= 0 or lr.height <= 0
     public static boolean isEmpty(LongRect lr) {

@@ -34,7 +34,7 @@ import java.awt.Color;
 public interface GraphsUI {
 
     // --- General colors definition -------------------------------------------
-    
+
     public static final Color  PROFILER_BLUE = new Color(127, 63, 191);
     public static final Color  PROFILER_RED = new Color(255, 127, 127);
     public static final Color  PROFILER_GREEN = new Color(30, 157, 68);
@@ -63,6 +63,7 @@ public interface GraphsUI {
     public static final float  A_ALLOC_OBJECTS_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  A_ALLOC_OBJECTS_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  A_ALLOC_OBJECTS_MARKER_FILL_COLOR = PROFILER_RED;
+    public static final long   A_ALLOC_OBJECTS_INITIAL_VALUE = 100l;
 
     public static final String A_ALLOC_BYTES_NAME = "Allocated Bytes";
     public static final float  A_ALLOC_BYTES_PAINTER_LINE_WIDTH = 3f;
@@ -74,6 +75,7 @@ public interface GraphsUI {
     public static final float  A_ALLOC_BYTES_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  A_ALLOC_BYTES_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  A_ALLOC_BYTES_MARKER_FILL_COLOR = PROFILER_BLUE;
+    public static final long   A_ALLOC_BYTES_INITIAL_VALUE = 102400l;
 
     public static final String L_LIVE_OBJECTS_NAME = "Live Objects";
     public static final float  L_LIVE_OBJECTS_PAINTER_LINE_WIDTH = 3f;
@@ -85,6 +87,7 @@ public interface GraphsUI {
     public static final float  L_LIVE_OBJECTS_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  L_LIVE_OBJECTS_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  L_LIVE_OBJECTS_MARKER_FILL_COLOR = PROFILER_RED;
+    public static final long   L_LIVE_OBJECTS_INITIAL_VALUE = 100l;
 
     public static final String L_LIVE_BYTES_NAME = "Live Bytes";
     public static final float  L_LIVE_BYTES_PAINTER_LINE_WIDTH = 3f;
@@ -96,6 +99,7 @@ public interface GraphsUI {
     public static final float  L_LIVE_BYTES_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  L_LIVE_BYTES_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  L_LIVE_BYTES_MARKER_FILL_COLOR = PROFILER_BLUE;
+    public static final long   L_LIVE_BYTES_INITIAL_VALUE = 102400l;
 
     public static final String L_ALLOC_OBJECTS_NAME = "Allocated Objects";
     public static final float  L_ALLOC_OBJECTS_PAINTER_LINE_WIDTH = 3f;
@@ -107,6 +111,7 @@ public interface GraphsUI {
     public static final float  L_ALLOC_OBJECTS_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  L_ALLOC_OBJECTS_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  L_ALLOC_OBJECTS_MARKER_FILL_COLOR = PROFILER_GREEN;
+    public static final long   L_ALLOC_OBJECTS_INITIAL_VALUE = 100l;
 
 
     // --- VM Telemetry graphs -------------------------------------------------
@@ -121,6 +126,7 @@ public interface GraphsUI {
     public static final float  HEAP_SIZE_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  HEAP_SIZE_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  HEAP_SIZE_MARKER_FILL_COLOR = PROFILER_RED;
+    public static final long   HEAP_SIZE_INITIAL_VALUE = 5177344l;
 
     public static final String USED_HEAP_NAME = "Used Heap";
     public static final float  USED_HEAP_PAINTER_LINE_WIDTH = 0f;
@@ -132,6 +138,7 @@ public interface GraphsUI {
     public static final float  USED_HEAP_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  USED_HEAP_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  USED_HEAP_MARKER_FILL_COLOR = PROFILER_BLUE;
+    public static final long   USED_HEAP_INITIAL_VALUE = 1048576l;
 
     public static final Color  HEAP_LIMIT_FILL_COLOR = new Color(220, 220, 220);
     
@@ -145,6 +152,7 @@ public interface GraphsUI {
     public static final float  SURVGEN_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  SURVGEN_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  SURVGEN_MARKER_FILL_COLOR = PROFILER_RED;
+    public static final long   SURVGEN_INITIAL_VALUE = 2;
 
     public static final String GC_TIME_NAME = "Relative Time Spent in GC";
     public static final float  GC_TIME_PAINTER_LINE_WIDTH = 3f;
@@ -169,6 +177,7 @@ public interface GraphsUI {
     public static final float  THREADS_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  THREADS_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  THREADS_MARKER_FILL_COLOR = PROFILER_RED;
+    public static final long   THREADS_INITIAL_VALUE = 3;
 
     public static final String LOADED_CLASSES_NAME = "Loaded Classes";
     public static final float  LOADED_CLASSES_PAINTER_LINE_WIDTH = 3f;
@@ -180,5 +189,6 @@ public interface GraphsUI {
     public static final float  LOADED_CLASSES_MARKER_LINE2_WIDTH = 3.5f;
     public static final Color  LOADED_CLASSES_MARKER_LINE2_COLOR = Color.WHITE;
     public static final Color  LOADED_CLASSES_MARKER_FILL_COLOR = PROFILER_BLUE;
+    public static final long   LOADED_CLASSES_INITIAL_VALUE = 732;
 
 }

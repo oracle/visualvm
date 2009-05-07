@@ -62,6 +62,7 @@ import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
@@ -165,6 +166,8 @@ public final class MemoryGraphPanel extends GraphPanel {
             chart.setOffset(0, 0);
             chart.setFitsWidth(false);
         }
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.HEAP_SIZE_INITIAL_VALUE));
     }
 
     
