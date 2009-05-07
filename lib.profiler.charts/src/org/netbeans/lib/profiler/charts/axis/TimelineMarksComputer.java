@@ -40,6 +40,9 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
     private double scale;
     private long step;
 
+    private long firstTimestamp;
+    private long lastTimestamp;
+
 
     public TimelineMarksComputer(Timeline timeline,
                                  ChartContext context,
@@ -59,19 +62,43 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
 
     protected boolean refreshConfiguration() {
         double oldScale = scale;
-
-        if (context.getViewWidth() == 0) {
+        long oldFirstTimestamp = firstTimestamp;
+        long oldLastTimestamp = lastTimestamp;
+        
+        if ((horizontal && context.getViewWidth() == 0) ||
+            (!horizontal && context.getViewHeight() == 0)) {
             scale = -1;
-        } else if (timeline.getTimestampsCount() == 0) {
-            // Initial scale
-            scale = -1;
+//        } else if (timeline.getTimestampsCount() == 0) {
+//            // Initial scale
+//            scale = -1;
         } else {
             scale = horizontal ? context.getViewWidth(1d) :
                                  context.getViewHeight(1d);
         }
 
+        int timestampsCount = timeline.getTimestampsCount();
+        if (horizontal) {
+            firstTimestamp = timestampsCount == 0 ? (long)context.getDataX(0) :
+                                                     timeline.getTimestamp(0);
+            lastTimestamp = timestampsCount == 0 ? (long)context.getDataX(
+                                                    context.getViewportWidth()):
+                                                    Math.max(timeline.getTimestamp
+                                                    (timestampsCount - 1),
+                                                    (long)context.getDataX(
+                                                    context.getViewportWidth()));
+        } else {
+            firstTimestamp = timestampsCount == 0 ? (long)context.getDataY(0) :
+                                                     timeline.getTimestamp(0);
+            lastTimestamp = timestampsCount == 0 ? (long)context.getDataY(
+                                                    context.getViewportWidth()):
+                                                    Math.max(timeline.getTimestamp
+                                                    (timestampsCount - 1),
+                                                    (long)context.getDataY(
+                                                    context.getViewportWidth()));
+        }
+        
         if (oldScale != scale) {
-            
+
             if (scale == -1) {
                 step = -1;
             } else {
@@ -81,7 +108,8 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
             oldScale = scale;
             return true;
         } else {
-            return false;
+            return oldFirstTimestamp != firstTimestamp ||
+                   oldLastTimestamp != lastTimestamp;
         }
     }
 
@@ -98,12 +126,8 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
         final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
         final long[] iterIndex = new long[] { 0 };
 
-        long lastVisibleTimestamp = (long)context.getDataX(context.getViewportWidth());
-        final String format = TimeAxisUtils.getFormatString(step,
-                                            timeline.getTimestamp(0),
-                                            Math.max(timeline.getTimestamp(
-                                            timeline.getTimestampsCount() - 1),
-                                            lastVisibleTimestamp));
+        final String format = TimeAxisUtils.getFormatString(step, firstTimestamp,
+                                                            lastTimestamp);
 
 
         return new AxisMarksComputer.AbstractIterator() {
