@@ -41,7 +41,6 @@
 package org.netbeans.modules.profiler.ppoints;
 
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.table.HTMLLabelTableCellRenderer;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
@@ -117,6 +116,7 @@ public abstract class ProfilingPoint {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private final ProfilingPointFactory factory;
     private Project project; // Project for which the Profiling Point is defined
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private ResultsRenderer resultsRenderer;
@@ -125,14 +125,17 @@ public abstract class ProfilingPoint {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    ProfilingPoint(String name, Project project) {
+    ProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
         this.name = name;
         this.project = project;
+        this.factory = factory;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public abstract ProfilingPointFactory getFactory();
+    public final ProfilingPointFactory getFactory() {
+        return factory;
+    }
 
     public void setEnabled(boolean enabled) {
         if (this.enabled == enabled) {

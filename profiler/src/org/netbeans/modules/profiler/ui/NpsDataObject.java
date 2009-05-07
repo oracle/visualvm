@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -21,11 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -36,26 +31,45 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- */
-
-package org.netbeans.modules.profiler.ppoints;
-
-import org.netbeans.api.project.Project;
-
-
-/**
- * Abstract superclass for all Profiling Points defined globally for profiling session
  *
- * @author Jiri Sedlacek
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-public abstract class GlobalProfilingPoint extends ProfilingPoint {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+package org.netbeans.modules.profiler.ui;
 
-    GlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+import java.io.IOException;
+import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
+import org.openide.cookies.OpenCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.loaders.DataNode;
+import org.openide.loaders.DataObjectExistsException;
+import org.openide.loaders.MultiDataObject;
+import org.openide.loaders.MultiFileLoader;
+import org.openide.nodes.Node;
+import org.openide.nodes.Children;
+import org.openide.util.Lookup;
+
+public class NpsDataObject extends MultiDataObject implements OpenCookie {
+
+    public NpsDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
+        super(pf, loader);
+
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    @Override
+    protected Node createNodeDelegate() {
+        return new DataNode(this, Children.LEAF, getLookup());
+    }
 
-    abstract void hit(long hitValue);
+    @Override
+    public Lookup getLookup() {
+        return getCookieSet().getLookup();
+    }
+
+    public void open() {
+        LoadedSnapshot imported = ResultsManager.getDefault().loadSnapshot(getPrimaryFile());
+        ResultsManager.getDefault().openSnapshot(imported);
+    }
 }
