@@ -58,6 +58,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
@@ -161,6 +162,8 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             chart.setOffset(0, 0);
             chart.setFitsWidth(false);
         }
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.SURVGEN_INITIAL_VALUE));
     }
 
 
@@ -377,9 +380,9 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             public String getRowUnits(int index, long itemValue) {
                 switch (index) {
                     case 0:
-                        return "";
+                        return ""; // NOI18N
                     case 1:
-                        return "%";
+                        return "%"; // NOI18N
                     default:
                         return null;
                 }
@@ -390,7 +393,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {
@@ -416,7 +419,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             private String trimPercents(String percents) {
-                return !percents.endsWith("%") ? percents :
+                return !percents.endsWith("%") ? percents : // NOI18N
                         percents.substring(0, percents.length() - 1).trim();
             }
 
@@ -461,7 +464,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
         // Model
         PaintersModel model = new ProfilerXYPaintersModel(
-                 new XYItemPainter[] { gep ,sgp, gtp });
+                 new XYItemPainter[] { gep, sgp, gtp });
 
         return model;
     }

@@ -501,7 +501,7 @@ public class ProfilerInterface implements CommonConstants {
         }
 
         ProfilerRuntime.init(new ProfilerRuntime.ExternalActionsHandler() {
-                public void handleFirstTimeMethodInvoke(int methodId) {
+                public void handleFirstTimeMethodInvoke(char methodId) {
                     firstTimeMethodInvokeHook(methodId);
                 }
 
@@ -955,7 +955,7 @@ public class ProfilerInterface implements CommonConstants {
         }
     }
 
-    private static void firstTimeMethodInvokeHook(int methodId) {
+    private static void firstTimeMethodInvokeHook(char methodId) {
         serialClientOperationsLock.beginTrans(true);
 
         try {
