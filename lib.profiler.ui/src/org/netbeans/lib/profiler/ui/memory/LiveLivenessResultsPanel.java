@@ -408,9 +408,10 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
                 });
         }
         // Only show these items when target JVM is alive
-        popupShowStacks.setEnabled(status.targetAppRunning);
-        popupRemoveProfForClass.setEnabled(status.targetAppRunning);
-        popupRemoveProfForClassesBelow.setEnabled(status.targetAppRunning);
+        boolean jvmAlive = status.targetAppRunning;
+        if (popupShowStacks != null) popupShowStacks.setEnabled(jvmAlive);
+        popupRemoveProfForClass.setEnabled(jvmAlive);
+        popupRemoveProfForClassesBelow.setEnabled(jvmAlive);
 
         return popup;
     }
