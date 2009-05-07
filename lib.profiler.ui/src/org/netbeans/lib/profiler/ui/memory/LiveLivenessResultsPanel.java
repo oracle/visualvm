@@ -389,29 +389,30 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
             startHisto.addActionListener(this);
 
             popup.addPopupMenuListener(new PopupMenuListener() {
-                    public void popupMenuCanceled(PopupMenuEvent e) {
-                    }
+                public void popupMenuCanceled(PopupMenuEvent e) {
+                }
 
-                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                    }
+                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                }
 
-                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    if (updateResultsPending) {
-                                        updateLiveResults();
-                                        updateResultsPending = false;
-                                    }
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (updateResultsPending) {
+                                    updateLiveResults();
+                                    updateResultsPending = false;
                                 }
-                            });
-                    }
-                });
+                            }
+                        });
+                }
+            });
         }
         // Only show these items when target JVM is alive
         boolean jvmAlive = status.targetAppRunning;
         if (popupShowStacks != null) popupShowStacks.setEnabled(jvmAlive);
         popupRemoveProfForClass.setEnabled(jvmAlive);
         popupRemoveProfForClassesBelow.setEnabled(jvmAlive);
+        startHisto.setEnabled(jvmAlive);
 
         return popup;
     }
