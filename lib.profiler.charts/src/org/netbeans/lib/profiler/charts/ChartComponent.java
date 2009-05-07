@@ -53,6 +53,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     private PaintersModel paintersModel;
 
     private LongRect dataBounds;
+    private LongRect initialDataBounds;
     private ChartContext chartContext;
 
     private ItemsModelListener itemsListener;
@@ -73,6 +74,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
         paintersListener = new PaintersModelListener();
 
         dataBounds = new LongRect();
+        initialDataBounds = new LongRect();
 
         setLayout(null);
 
@@ -140,6 +142,22 @@ public class ChartComponent extends InteractiveCanvasComponent {
         return selectionModel;
     }
 
+
+    // --- Initial data bounds -------------------------------------------------
+
+    public final void setInitialDataBounds(LongRect bounds) {
+        if (LongRect.equals(bounds, initialDataBounds)) return;
+        LongRect.set(initialDataBounds, bounds);
+        if (LongRect.isEmpty(dataBounds)) {
+            resizeChart();
+            invalidateImage();
+            repaintDirty();
+        }
+    }
+
+    public final LongRect getInitialDataBounds() {
+        return initialDataBounds;
+    }
 
     // --- Customizable RenderingHints -----------------------------------------
 
@@ -419,14 +437,27 @@ public class ChartComponent extends InteractiveCanvasComponent {
     }
 
     private void resizeChart() {
-        setDataBounds(dataBounds.x, dataBounds.y, dataBounds.width, dataBounds.height);
+        if (LongRect.isEmpty(dataBounds)) {
+            LongRect bounds = new LongRect(dataBounds);
+            if (bounds.width == 0) {
+                bounds.width = initialDataBounds.width;
+                if (bounds.x == 0) bounds.x = initialDataBounds.x;
+            }
+            if (bounds.height == 0) {
+                bounds.height = initialDataBounds.height;
+                if (bounds.y == 0) bounds.y = initialDataBounds.y;
+            }
+            setDataBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+        } else {
+            setDataBounds(dataBounds.x, dataBounds.y, dataBounds.width, dataBounds.height);
+        }
     }
 
     private void updateChart() {
         computeDataBounds();
         resizeChart();
         invalidateImage();
-        repaint();
+        repaintDirty();
     }
 
 
@@ -542,6 +573,8 @@ public class ChartComponent extends InteractiveCanvasComponent {
                 }
                 invalidateImage(ChartContext.getCheckedRectangle(uiBounds));
                 repaintDirtyAccel();
+            } else {
+                repaintDirty();
             }
         }
 

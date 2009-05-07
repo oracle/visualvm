@@ -25,7 +25,9 @@
 
 package org.netbeans.lib.profiler.charts.axis;
 
+import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -33,8 +35,20 @@ import java.text.NumberFormat;
  */
 public class BytesAxisUtils {
 
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.charts.axis.Bundle"); // NOI18N
+    public static final String UNITS_B = messages.getString("BytesAxisUtils_AbbrBytes"); // NOI18N
+    public static final String UNITS_KB = messages.getString("BytesAxisUtils_AbbrKiloBytes"); // NOI18N
+    public static final String UNITS_MB = messages.getString("BytesAxisUtils_AbbrMegaBytes"); // NOI18N
+    public static final String UNITS_GB = messages.getString("BytesAxisUtils_AbbrGigaBytes"); // NOI18N
+    public static final String UNITS_TB = messages.getString("BytesAxisUtils_AbbrTeraBytes"); // NOI18N
+    public static final String UNITS_PB = messages.getString("BytesAxisUtils_AbbrPetaBytes"); // NOI18N
+    private static final String SIZE_FORMAT = messages.getString("BytesAxisUtils_SizeFormat"); // NOI18N
+    // -----
+
     public static final long[] bytesUnitsGrid = new long[] { 1, 2, 5, 10, 25, 50, 100, 250, 500 };
-    public static final String[] radixUnits = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
+    public static final String[] radixUnits = new String[] { UNITS_B, UNITS_KB, UNITS_MB, UNITS_GB, UNITS_TB, UNITS_PB };
 
     private static final NumberFormat FORMAT = NumberFormat.getInstance();
 
@@ -66,7 +80,7 @@ public class BytesAxisUtils {
         long value = mark.getValue() / (long)Math.pow(1024, radix);
         String units = getRadixUnits(mark);
 
-        return FORMAT.format(value) + " " + units;
+        return MessageFormat.format(SIZE_FORMAT, new Object[] { FORMAT.format(value), units });
     }
 
 }
