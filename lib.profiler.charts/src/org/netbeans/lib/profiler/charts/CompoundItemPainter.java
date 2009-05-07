@@ -73,23 +73,7 @@ public class CompoundItemPainter implements ItemPainter {
         LongRect.add(dirtyBounds, painter2.getDirtyBounds(itemChange, context));
         return dirtyBounds;
     }
-
-//    public ChartChangeDescriptor getChangeDescriptor(ChartItemChange itemChange, ChartContext context) {
-//        ChartChangeDescriptor descriptor1 = painter1.getChangeDescriptor(itemChange, context);
-//        ChartChangeDescriptor descriptor2 = painter2.getChangeDescriptor(itemChange, context);
-//
-//        LongRect oldBounds = descriptor1.getOldBounds();
-//        LongRect.add(oldBounds, descriptor2.getOldBounds());
-//
-//        LongRect newBounds = descriptor1.getNewBounds();
-//        LongRect.add(newBounds, descriptor2.getNewBounds());
-//
-//        LongRect dirtyBounds = descriptor1.getDirtyBounds();
-//        LongRect.add(dirtyBounds, descriptor2.getDirtyBounds());
-//
-//        return new ChartChangeDescriptor(oldBounds, newBounds, dirtyBounds);
-//    }
-
+    
 
     public boolean supportsHovering(ChartItem item) {
         return painter1.supportsHovering(item) || painter2.supportsHovering(item);
