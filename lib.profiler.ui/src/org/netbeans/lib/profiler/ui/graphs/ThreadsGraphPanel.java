@@ -368,7 +368,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
             }
 
             public String getRowUnits(int index, long itemValue) {
-                return "";
+                return ""; // NOI18N
             }
 
             public int getExtraRowsCount() {
@@ -376,7 +376,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {

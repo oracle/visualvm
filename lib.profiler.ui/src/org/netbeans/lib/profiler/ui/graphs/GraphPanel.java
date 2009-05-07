@@ -48,9 +48,11 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
@@ -60,6 +62,7 @@ import org.netbeans.lib.profiler.charts.ChartSelectionListener;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
@@ -71,6 +74,13 @@ import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
  */
 public abstract class GraphPanel extends JPanel {
 
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.graphs.Bundle"); // NOI18N
+    private static final String NO_DATA_TOOLTIP = messages.getString("GraphPanel_NoDataTooltip"); // NOI18N
+    private static final String MAX_VALUE_STRING = messages.getString("GraphPanel_MaxValueString"); // NOI18N
+    // -----
+
     protected static final DateFormat DATE_FORMATTER;
     protected static final NumberFormat INT_FORMATTER;
     protected static final NumberFormat PERCENT_FORMATTER;
@@ -80,11 +90,12 @@ public abstract class GraphPanel extends JPanel {
     // 3 minutes to switch from Scale To Fit to Fixed Scale
     protected static final long SMALL_CHART_FIT_TO_WINDOW_PERIOD = 180000;
 
-    private static final String NO_DATA_TOOLTIP = "<No Data>";
-
     
     static {
-        DATE_FORMATTER = new SimpleDateFormat("h:mm:ss.SSS a, MMM d, yyyy");
+        String format = MessageFormat.format(TimeAxisUtils.TIME_DATE_FORMAT,
+                                             new Object[] { TimeAxisUtils.TIME_MSEC,
+                                                            TimeAxisUtils.DATE_YEAR });
+        DATE_FORMATTER = new SimpleDateFormat(format);
 
         INT_FORMATTER = NumberFormat.getIntegerInstance();
         INT_FORMATTER.setGroupingUsed(true);
@@ -92,6 +103,13 @@ public abstract class GraphPanel extends JPanel {
         PERCENT_FORMATTER = NumberFormat.getPercentInstance();
         PERCENT_FORMATTER.setMinimumFractionDigits(1);
         PERCENT_FORMATTER.setMaximumIntegerDigits(2);
+    }
+
+
+    // --- Messages support ----------------------------------------------------
+
+    protected String getMaxValueString(String origString) {
+        return MessageFormat.format(MAX_VALUE_STRING, new Object[] { origString });
     }
 
 

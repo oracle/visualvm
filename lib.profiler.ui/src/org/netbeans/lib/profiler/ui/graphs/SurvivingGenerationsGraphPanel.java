@@ -380,9 +380,9 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             public String getRowUnits(int index, long itemValue) {
                 switch (index) {
                     case 0:
-                        return "";
+                        return ""; // NOI18N
                     case 1:
-                        return "%";
+                        return "%"; // NOI18N
                     default:
                         return null;
                 }
@@ -393,7 +393,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {
@@ -419,7 +419,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             private String trimPercents(String percents) {
-                return !percents.endsWith("%") ? percents :
+                return !percents.endsWith("%") ? percents : // NOI18N
                         percents.substring(0, percents.length() - 1).trim();
             }
 

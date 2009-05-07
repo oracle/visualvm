@@ -54,7 +54,7 @@ public final class LongRect {
     
     
     public String toString() {
-        return "LongRect: [" + x + ", " + y + ", " + width + ", " + height + "]";
+        return "LongRect: [" + x + ", " + y + ", " + width + ", " + height + "]"; // NOI18N
     }
     
     

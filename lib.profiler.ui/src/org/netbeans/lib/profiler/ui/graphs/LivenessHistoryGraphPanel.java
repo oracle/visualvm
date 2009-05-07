@@ -55,6 +55,7 @@ import javax.swing.border.BevelBorder;
 import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
+import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
@@ -314,11 +315,11 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
             public String getRowUnits(int index, long itemValue) {
                 switch (index) {
                     case 0:
-                        return "";
+                        return ""; // NOI18N
                     case 1:
-                        return "B";
+                        return BytesAxisUtils.UNITS_B;
                     case 2:
-                        return "";
+                        return ""; // NOI18N
                     default:
                         return null;
                 }
@@ -329,7 +330,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {

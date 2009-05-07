@@ -84,7 +84,7 @@ public interface AxisMarksComputer {
     public static abstract class AbstractIterator implements Iterator<AxisMark> {
         public void remove() {
             throw new UnsupportedOperationException(
-                      "AxisMarksComputer does not support remove()");
+                      "AxisMarksComputer does not support remove()"); // NOI18N
         }
     }
 
