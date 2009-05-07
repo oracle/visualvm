@@ -62,7 +62,7 @@ public class ProfilerRuntime implements CommonConstants {
 
         public void handleEventBufferDump(byte[] eventBuffer, int startPos, int curPtrPos);
 
-        public void handleFirstTimeMethodInvoke(int methodId);
+        public void handleFirstTimeMethodInvoke(char methodId);
 
         public int handleFirstTimeVMObjectAlloc(String className, int classLoaderId);
 
