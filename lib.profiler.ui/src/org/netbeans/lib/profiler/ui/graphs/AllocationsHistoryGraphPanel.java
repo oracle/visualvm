@@ -52,8 +52,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
+import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
@@ -130,6 +132,8 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
         chart.setScale(INITIAL_CHART_SCALEX, 1);
         chart.setOffset(0, 0);
         chart.setFitsWidth(false);
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.A_ALLOC_OBJECTS_INITIAL_VALUE));
     }
 
 
@@ -282,9 +286,9 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
             public String getRowUnits(int index, long itemValue) {
                 switch (index) {
                     case 0:
-                        return "";
+                        return ""; // NOI18N
                     case 1:
-                        return "B";
+                        return BytesAxisUtils.UNITS_B;
                     default:
                         return null;
                 }
@@ -295,7 +299,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {
