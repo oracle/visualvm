@@ -155,6 +155,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                 executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                 CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+                loadedSnapshot.setSaved(true);
                 ResultsManager.getDefault().openSnapshot(loadedSnapshot);
                 getBuilder().reset();
 
