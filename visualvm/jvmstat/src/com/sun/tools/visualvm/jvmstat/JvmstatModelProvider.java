@@ -58,7 +58,7 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         } catch (Exception ex) { 
             // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows, 
             // when opening shared memory file (java.lang.Exception: Could not open PerfMemory)
-            LOGGER.log(Level.INFO,"getMonitoredVm failed",ex);  // NOI18N
+            LOGGER.log(Level.FINER,"getMonitoredVm failed",ex);  // NOI18N
             return null;            
         }
     }
