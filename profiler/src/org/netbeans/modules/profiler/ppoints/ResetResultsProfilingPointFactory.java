@@ -46,12 +46,10 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Lookup;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -76,10 +74,6 @@ public class ResetResultsProfilingPointFactory extends CodeProfilingPointFactory
     public static final String RESET_RESULTS_PP_DESCR = PP_DESCR;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static ResetResultsProfilingPointFactory getDefault() {
-        return Lookup.getDefault().lookup(ResetResultsProfilingPointFactory.class);
-    }
 
     public String getDescription() {
         return RESET_RESULTS_PP_DESCR;
@@ -108,14 +102,15 @@ public class ResetResultsProfilingPointFactory extends CodeProfilingPointFactory
             String filename = ""; // NOI18N
             String name = Utils.getUniqueName(getType(), "", project); // NOI18N
 
-            return new ResetResultsProfilingPoint(name, location, project);
+            return new ResetResultsProfilingPoint(name, location, project, this);
         } else {
-            String filename = FileUtil.toFileObject(new File(location.getFile())).getName();
+            File file = FileUtil.normalizeFile(new File(location.getFile()));
+            String filename = FileUtil.toFileObject(file).getName();
             String name = Utils.getUniqueName(getType(),
                                               MessageFormat.format(PP_DEFAULT_NAME,
                                                                    new Object[] { "", filename, location.getLine() }), project); // NOI18N
 
-            return new ResetResultsProfilingPoint(name, location, project);
+            return new ResetResultsProfilingPoint(name, location, project, this);
         }
     }
 
@@ -155,7 +150,7 @@ public class ResetResultsProfilingPointFactory extends CodeProfilingPointFactory
         ResetResultsProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new ResetResultsProfilingPoint(name, location, project);
+            profilingPoint = new ResetResultsProfilingPoint(name, location, project, this);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());

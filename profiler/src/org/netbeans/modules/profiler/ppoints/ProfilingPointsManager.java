@@ -306,7 +306,6 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private CustomizerButton customizerButton = new CustomizerButton();
     private List<GlobalProfilingPoint> activeGlobalProfilingPoints = new ArrayList();
     private Map<Integer, RuntimeProfilingPointMapper> activeCodeProfilingPoints = new HashMap();
-    private Map<Project, Set<Project>> openedSubprojects = new HashMap();
     private PropertyChangeListener pcl = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(ProfilingPointFactory.AVAILABILITY_PROPERTY)) {
@@ -321,7 +320,6 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private Vector<ValidityAwarePanel> customizers = new Vector();
     private Vector<Project> openedProjects = new Vector();
     private Vector<ProfilingPoint> profilingPoints = new Vector();
-    private Vector<PropertyChangeListener> propertyChangeListeners = new Vector();
     private ProfilingPointFactory[] profilingPointFactories = new ProfilingPointFactory[0];
     private boolean profilingInProgress = false; // collecting data
     private boolean profilingSessionInProgress = false; // session started and not yet finished
@@ -355,7 +353,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     public List<ProfilingPoint> getCompatibleProfilingPoints(Project project, ProfilingSettings profilingSettings, boolean sorted) {
         List<ProfilingPoint> projectProfilingPoints = sorted ? getSortedProfilingPoints(project, 1, false)
-                                                             : getProfilingPoints(project, false); // TODO: define default sorting (current sorting of Profiling Points window?)
+                                                             : getProfilingPoints(project, ProfilerIDESettings.
+                                                               getInstance().getIncludeProfilingPointsDependencies(), false); // TODO: define default sorting (current sorting of Profiling Points window?)
         List<ProfilingPoint> compatibleProfilingPoints = new ArrayList();
 
         for (ProfilingPoint profilingPoint : projectProfilingPoints) {
@@ -376,37 +375,50 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         return profilingPointFactories;
     }
 
-    public List<ProfilingPoint> getProfilingPoints(Project project, boolean all) {
-        return getProfilingPoints(ProfilingPoint.class, project, all);
+    public List<ProfilingPoint> getProfilingPoints(Project project,
+                                                   boolean inclSubprojects,
+                                                   boolean inclUnavailable) {
+        return getProfilingPoints(ProfilingPoint.class, project,
+                                  inclSubprojects, inclUnavailable);
     }
 
-    public <T extends ProfilingPoint> List<T> getProfilingPoints(Class<T> ppClass, Project project) {
-        return getProfilingPoints(ppClass, project, true);
+    public <T extends ProfilingPoint> List<T> getProfilingPoints(Class<T> ppClass,
+                                                                 Project project,
+                                                                 boolean inclSubprojects) {
+        return getProfilingPoints(ppClass, project, inclSubprojects, true);
     }
 
-    public <T extends ProfilingPoint> List<T> getProfilingPoints(Class<T> ppClass, Project project, boolean all) {
+    public <T extends ProfilingPoint> List<T> getProfilingPoints(Class<T> ppClass,
+                                                                 Project project,
+                                                                 boolean inclSubprojects,
+                                                                 boolean inclUnavailable) {
         Set<Project> projects = new HashSet();
-        projects.add(project);
 
-        boolean includeDependencies = ProfilerIDESettings.getInstance().getIncludeProfilingPointsDependencies();
-
-        if (includeDependencies) {
-            projects.addAll(getCachedSubprojects(project));
-        }
+        if (project == null) {
+            projects.addAll(openedProjects);
+        } else {
+            projects.add(project);
+            if (inclSubprojects) projects.addAll(getOpenSubprojects(project));
+        }        
 
         ArrayList<T> filteredProfilingPoints = new ArrayList();
         Iterator<ProfilingPoint> iterator = profilingPoints.iterator();
 
         while (iterator.hasNext()) {
             ProfilingPoint profilingPoint = iterator.next();
+            ProfilingPointFactory factory = profilingPoint.getFactory();
 
-            if (ppClass.isInstance(profilingPoint)) {
-                if (((project == null) && (includeDependencies ? true : openedProjects.contains(profilingPoint.getProject())))
-                        || projects.contains(profilingPoint.getProject())) {
-                    if (all || profilingPoint.getFactory().isAvailable()) {
-                        filteredProfilingPoints.add((T) profilingPoint);
+            // Bugfix #162132, the factory may already be unloaded
+            if (factory != null) {
+                if (ppClass.isInstance(profilingPoint)) {
+                    if (projects.contains(profilingPoint.getProject())) {
+                        if (inclUnavailable || factory.isAvailable()) {
+                            filteredProfilingPoints.add((T) profilingPoint);
+                        }
                     }
                 }
+            } else {
+                // TODO: profiling points without factories should be cleaned up somehow
             }
         }
 
@@ -419,7 +431,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     public List<ProfilingPoint> getSortedProfilingPoints(Project project, int sortBy, boolean sortOrder) {
-        List<ProfilingPoint> sortedProfilingPoints = getProfilingPoints(project, false);
+        List<ProfilingPoint> sortedProfilingPoints = getProfilingPoints(project, ProfilerIDESettings.getInstance().
+                                                                        getIncludeProfilingPointsDependencies(), false);
         Collections.sort(sortedProfilingPoints, new ProfilingPointsComparator(sortBy, sortOrder));
 
         return sortedProfilingPoints;
@@ -466,8 +479,6 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             }
         }
 
-        ;
-
         return runtimeProfilingPoints.toArray(new RuntimeProfilingPoint[runtimeProfilingPoints.size()]);
     }
 
@@ -483,8 +494,6 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                 activeGlobalProfilingPoints.add((GlobalProfilingPoint) compatibleProfilingPoint);
             }
         }
-
-        ;
 
         return activeGlobalProfilingPoints.toArray(new GlobalProfilingPoint[activeGlobalProfilingPoints.size()]);
     }
@@ -777,19 +786,18 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                || propertyName.equals(ProfilingPoint.PROPERTY_PROJECT) || propertyName.equals(ProfilingPoint.PROPERTY_RESULTS);
     }
 
-    private Set<Project> getCachedSubprojects(Project project) {
-        Set<Project> cachedSubprojects = new HashSet();
-        Set<Project> allSubprojects = openedSubprojects.keySet();
+    private Set<Project> getOpenSubprojects(Project project) {
+        Set<Project> subprojects = new HashSet();
+        ProjectUtilities.fetchSubprojects(project, subprojects);
 
-        for (Project subproject : allSubprojects) {
-            Set<Project> referringProjects = openedSubprojects.get(subproject);
+        if (subprojects.isEmpty()) return subprojects;
 
-            if ((referringProjects != null) && referringProjects.contains(project)) {
-                cachedSubprojects.add(subproject);
-            }
-        }
+        Set<Project> openSubprojects = new HashSet();
+        for (Project openProject : openedProjects)
+            if (subprojects.contains(openProject))
+                openSubprojects.add(openProject);
 
-        return cachedSubprojects;
+        return openSubprojects;
     }
     
     // Returns only valid profiling points (currently all GlobalProfilingPoints and CodeProfilingPoints with all locations pointing to a valid java file)
@@ -813,7 +821,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
     
     private void addFileWatch(File file) {
-        FileObject fileo = FileUtil.toFileObject(file);
+        FileObject fileo = null;
+        if (file.isFile())
+            fileo = FileUtil.toFileObject(FileUtil.normalizeFile(file));
         if (fileo != null) {
             FileWatch fileWatch = profilingPointsFiles.get(file);
             if (fileWatch == null) {
@@ -827,7 +837,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
     
     private void removeFileWatch(File file) {
-        FileObject fileo = file.exists() && file.isFile() ? FileUtil.toFileObject(file) : null;
+        FileObject fileo = null;
+        if (file.isFile())
+            fileo = FileUtil.toFileObject(FileUtil.normalizeFile(file));
         if (fileo != null) {
             FileWatch fileWatch = profilingPointsFiles.get(file);
             if (fileWatch != null) {
@@ -844,8 +856,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         for (CodeProfilingPoint.Annotation annotation : annotations) {
             CodeProfilingPoint.Location location = cpp.getLocation(annotation);
             String filename = location.getFile();
-            File file = new File(filename);
-            if (file.exists() && file.isFile()) addFileWatch(file);
+            addFileWatch(new File(filename));
         }
     }
     
@@ -854,8 +865,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         for (CodeProfilingPoint.Annotation annotation : annotations) {
             CodeProfilingPoint.Location location = cpp.getLocation(annotation);
             String filename = location.getFile();
-            File file = new File(filename);
-            removeFileWatch(file);
+            removeFileWatch(new File(filename));
         }
     }
     
@@ -924,25 +934,6 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         if (!internalChange) {
             storeProfilingPoints(profilingPointsArr);
             firePropertyChanged(PROPERTY_PROFILING_POINTS_CHANGED);
-        }
-    }
-
-    private void addSubprojects(Project project) {
-        Set<Project> subprojects = new HashSet();
-        ProjectUtilities.fetchSubprojects(project, subprojects);
-
-        for (Project subproject : subprojects) {
-            Set<Project> owners = openedSubprojects.get(subproject);
-
-            if ((owners == null) || (owners.size() == 0)) { // new subproject, needs to be added to cache
-
-                Set<Project> ownerProjs = new HashSet();
-                ownerProjs.add(project);
-                openedSubprojects.put(subproject, ownerProjs);
-                loadProfilingPoints(subproject);
-            } else { // already known subproject
-                owners.add(project);
-            }
         }
     }
 
@@ -1019,23 +1010,11 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private void projectClosed(Project project) {
-        // Unload profiling points of subprojects
-        removeSubprojects(project);
-
-        // Unload profiling points of the project
-        if (!openedSubprojects.containsKey(project)) {
-            unloadProfilingPoints(project);
-        }
+        unloadProfilingPoints(project);
     }
 
     private void projectOpened(Project project) {
-        // Load profiling points of the project
-        if (!openedSubprojects.containsKey(project)) {
-            loadProfilingPoints(project);
-        }
-
-        // Load profiling points of subprojects
-        addSubprojects(project);
+        loadProfilingPoints(project);
     }
 
     private void refreshOpenedProjects() {
@@ -1085,29 +1064,6 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    private void removeSubprojects(Project project) {
-        Set<Project> subprojects = new HashSet();
-        ProjectUtilities.fetchSubprojects(project, subprojects);
-
-        for (Project subproject : subprojects) {
-            Set<Project> owners = openedSubprojects.get(subproject);
-
-            if ((owners == null) || (owners.size() == 0) || !owners.contains(project)) {
-                return;
-            }
-
-            if (owners.size() == 1) { // project is last referrer to subproject, subproject will be removed
-                openedSubprojects.remove(subproject);
-
-                if (!openedProjects.contains(subproject)) {
-                    unloadProfilingPoints(subproject);
-                }
-            } else { // subproject is referenced by other project(s), needs to be kept in cache
-                owners.remove(project);
-            }
-        }
-    }
-
     private void storeDirtyProfilingPoints() {
         ProfilingPoint[] dirtyProfilingPointsArr = new ProfilingPoint[dirtyProfilingPoints.size()];
         dirtyProfilingPoints.toArray(dirtyProfilingPointsArr);
@@ -1145,7 +1101,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private void unloadProfilingPoints(Project project) {
-        List<ProfilingPoint> closedProfilingPoints = getProfilingPoints(project, true);
+        List<ProfilingPoint> closedProfilingPoints = getProfilingPoints(project, false, true);
         List<ProfilingPoint> dirtyClosedProfilingPoints = new ArrayList();
 
         for (ProfilingPoint profilingPoint : closedProfilingPoints) {

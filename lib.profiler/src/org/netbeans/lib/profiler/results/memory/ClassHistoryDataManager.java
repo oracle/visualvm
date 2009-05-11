@@ -83,11 +83,15 @@ public class ClassHistoryDataManager extends DataManager {
     }
 
 
-    public synchronized void setup(int trackedClassID, String trackedClassName) {
+    public synchronized void setupClass(int trackedClassID, String trackedClassName) {
         reset();
         
         this.trackedClassID = trackedClassID;
         this.trackedClassName = trackedClassName;
+    }
+
+    public synchronized void resetClass() {
+        reset();
     }
 
     public synchronized void processData(int[] nTotalAllocObjects,

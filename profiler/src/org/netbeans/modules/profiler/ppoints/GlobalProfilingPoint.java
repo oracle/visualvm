@@ -51,8 +51,8 @@ import org.netbeans.api.project.Project;
 public abstract class GlobalProfilingPoint extends ProfilingPoint {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    GlobalProfilingPoint(String name, Project project) {
-        super(name, project);
+    GlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
+        super(name, project, factory);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

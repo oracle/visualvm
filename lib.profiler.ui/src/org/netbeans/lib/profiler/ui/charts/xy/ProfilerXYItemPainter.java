@@ -25,7 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.charts.xy;
 
-import org.netbeans.lib.profiler.charts.Utils;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
@@ -33,7 +33,6 @@ import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -197,14 +196,11 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
     public double getItemValueScale(XYItem item, ChartContext context) {
-        if (item.getValuesCount() < 2) return -1;
-
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValueScale(item, context);
         } else {
             long itemHeight = item.getBounds().height;
             if (itemHeight == 0) return 1;
-
             double itemValueFactor = getItemValueFactor(context,
                                      maxValueOffset, itemHeight);
             return itemValueFactor / context.getDataHeight(1d);
@@ -224,8 +220,8 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         throw new UnsupportedOperationException("getSelectionBounds() not supported"); // NOI18N
     }
 
-    public XYItemSelection getClosestSelection(ChartItem item, int viewX,
-                                                       int viewY, ChartContext context) {
+    public ItemSelection getClosestSelection(ChartItem item, int viewX,
+                                             int viewY, ChartContext context) {
         return null;
     }
 
@@ -299,6 +295,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
                        Rectangle dirtyArea, ProfilerXYChart.Context context) {
 
         if (item.getValuesCount() < 2) return;
+        if (context.getViewWidth() == 0 || context.getViewHeight() == 0) return;
 
         int[][] points = createPoints(item, dirtyArea, context, type, maxValueOffset);
         if (points == null) return;
@@ -346,53 +343,57 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     private static int[][] createPoints(XYItem item, Rectangle dirtyArea,
                                  ProfilerXYChart.Context context,
                                  int type, int maxValueOffset) {
-        
-        int[][] visibleBounds   = context.getVisibleBounds(dirtyArea);
 
-        int firstVisibleIndex = visibleBounds[0][0];
-        if (firstVisibleIndex == -1) firstVisibleIndex = visibleBounds[0][1];
-        if (firstVisibleIndex == -1) return null;
+        int valuesCount = item.getValuesCount();
+//        long st = System.currentTimeMillis();
+        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
+//        System.err.println(">>> Create points: " + (System.currentTimeMillis() - st));
 
-        int lastVisibleIndex  = visibleBounds[1][0];
-        if (lastVisibleIndex == -1) lastVisibleIndex = visibleBounds[1][1];
-        if (lastVisibleIndex == -1) lastVisibleIndex = item.getValuesCount() - 1;
+        int firstFirst = visibleBounds[0][0];
+        int firstIndex = firstFirst;
+        if (firstIndex == -1) firstIndex = visibleBounds[0][1];
+        if (firstIndex == -1) return null;
+        if (firstFirst != -1 && firstIndex > 0) firstIndex -= 1;
 
-//        System.err.println(">>> Painting from " + firstVisibleIndex + " to " + lastVisibleIndex);
-        
-        int visibleIndexes    = lastVisibleIndex - firstVisibleIndex + 1;
+        int lastFirst = visibleBounds[1][0];
+        int lastIndex = lastFirst;
+        if (lastIndex == -1) lastIndex = visibleBounds[1][1];
+        if (lastIndex == -1) lastIndex = valuesCount - 1;
+        if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
 
-        int extraFirstIndex = firstVisibleIndex == 0 ? 0 : 1;
-        int extraLastIndex  = lastVisibleIndex == item.getValuesCount() - 1 ? 0 : 1;
+        int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
+        if (itemsStep == 0) itemsStep = 1;
 
-        int[] xPoints = new int[visibleIndexes + extraFirstIndex + extraLastIndex + 2];
-        int[] yPoints = new int[visibleIndexes + extraFirstIndex + extraLastIndex + 2];
+        int visibleCount = lastIndex - firstIndex + 1;
+//        if (visibleCount + 2 < 0) System.err.println(">>> Negative, first: " + Arrays.toString(visibleBounds[0]) + ", last: " + Arrays.toString(visibleBounds[1]));
+//        System.err.println(">>> first: " + Arrays.toString(visibleBounds[0]) + ", last: " + Arrays.toString(visibleBounds[1]));
+
+        if (itemsStep > 1) {
+            int firstMod = firstIndex % itemsStep;
+            firstIndex -= firstMod;
+            int lastMod = lastIndex % itemsStep;
+            lastIndex = lastIndex - lastMod + itemsStep;
+            visibleCount = (lastIndex - firstIndex) / itemsStep + 1;
+            lastIndex = Math.min(lastIndex, valuesCount - 1);
+        }
+
+//        if (visibleCount + 2 < 0) System.err.println(">>> Negative, first: " + firstIndex + ", last: " + lastIndex);
+
+        int[] xPoints = new int[visibleCount + 2];
+        int[] yPoints = new int[visibleCount + 2];
 
 
         double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
                                  maxValueOffset, item.getBounds().height) : 0;
-
-        for (int i = 0; i < visibleIndexes; i++) {
-            xPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(Math.ceil(
-                                        context.getViewX(item.getXValue(firstVisibleIndex + i))));
-            yPoints[i + extraFirstIndex] = ChartContext.getCheckedIntValue(Math.ceil(
-                                        getYValue(item, firstVisibleIndex + i,
-                                        type, context, itemValueFactor)));
-        }
-
-        if (extraFirstIndex == 1) {
-            xPoints[0] = ChartContext.getCheckedIntValue(Math.ceil(context.getViewX(
-                                      item.getXValue(firstVisibleIndex - 1))));
-            yPoints[0] = ChartContext.getCheckedIntValue(Math.ceil(
-                                      getYValue(item, firstVisibleIndex - 1,
-                                      type, context, itemValueFactor)));
-        }
-
-        if (extraLastIndex == 1) {
-            xPoints[xPoints.length - 3] = ChartContext.getCheckedIntValue(Math.ceil(context.getViewX(
-                                      item.getXValue(lastVisibleIndex + 1))));
-            yPoints[xPoints.length - 3] = ChartContext.getCheckedIntValue(Math.ceil(
-                                      getYValue(item, lastVisibleIndex + 1,
-                                      type, context, itemValueFactor)));
+//        System.err.println(">>> Painting: " + visibleCount);
+        for (int i = 0; i < visibleCount; i++) {
+            int dataIndex = i == visibleCount - 1 ? lastIndex :
+                                 firstIndex + i * itemsStep;
+            xPoints[i] = ChartContext.getCheckedIntValue(Math.ceil(
+                         context.getViewX(item.getXValue(dataIndex))));
+            yPoints[i] = ChartContext.getCheckedIntValue(Math.ceil(
+                         getYValue(item, dataIndex,
+                         type, context, itemValueFactor)));
         }
         
         return new int[][] { xPoints, yPoints };

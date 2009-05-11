@@ -65,6 +65,10 @@ import java.util.WeakHashMap;
  * @author Ian Formanek
  */
 public class ProfilerInterface implements CommonConstants {
+
+    private static final boolean INSTRUMENT_JFLUID_CLASSES =
+            Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class HFIRIThread extends Thread {
@@ -79,7 +83,7 @@ public class ProfilerInterface implements CommonConstants {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void run() {
-            RootClassLoadedCommand cmd = new RootClassLoadedCommand(new String[] { "*FAKE_CLASS_1*", "*FAKE_CLASS_2*" },
+            RootClassLoadedCommand cmd = new RootClassLoadedCommand(new String[] { "*FAKE_CLASS_1*", "*FAKE_CLASS_2*" }, // NOI18N
                                                                     new int[] { 0, 0 }, null, 2, new int[] { -1 }, ""); // NOI18N
             profilerServer.sendComplexCmdToClient(cmd);
 
@@ -341,9 +345,6 @@ public class ProfilerInterface implements CommonConstants {
         int len = nMethods * 3;
         packedArrayOffsets = new int[len];
 
-        System.gc(); // To avoid as much as possible a GC that happens concurrently while the call below is in progress
-                     // (though I am not sure now it's a real problem)
-
         byte[] packedData = Stacks.getMethodNamesForJMethodIds(nMethods, methodIds, packedArrayOffsets);
         MethodNamesResponse resp = new MethodNamesResponse(packedData, packedArrayOffsets);
 
@@ -500,7 +501,7 @@ public class ProfilerInterface implements CommonConstants {
         }
 
         ProfilerRuntime.init(new ProfilerRuntime.ExternalActionsHandler() {
-                public void handleFirstTimeMethodInvoke(int methodId) {
+                public void handleFirstTimeMethodInvoke(char methodId) {
                     firstTimeMethodInvokeHook(methodId);
                 }
 
@@ -954,7 +955,7 @@ public class ProfilerInterface implements CommonConstants {
         }
     }
 
-    private static void firstTimeMethodInvokeHook(int methodId) {
+    private static void firstTimeMethodInvokeHook(char methodId) {
         serialClientOperationsLock.beginTrans(true);
 
         try {
@@ -1140,7 +1141,7 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     private static boolean internalClassName(String name) {
-        return (name.startsWith(PROFILER_DOTTED_CLASS_PREFIX)
+        return (serverInternalClassName(name)
                || // WARNING: sun.reflect.* are not really internal classes, but they may create too many problems by being loaded unexpectedly
         // by our internal code and causing classLoadHook to be invoked recursively. At least we need sun.reflect.Generated* to be
         // dismissed. Others could probably be less of a problem if ClassLoaderManager didn't use reflection.
@@ -1152,6 +1153,16 @@ public class ProfilerInterface implements CommonConstants {
                                                      // but its root cause is still unclear to me.
                || name.equals("com.sun.enterprise.J2EESecurityManager") // NOI18N
         );
+    }
+
+    private static boolean serverInternalClassName(String name) {
+        if (INSTRUMENT_JFLUID_CLASSES) {
+            return name.startsWith("org.netbeans.lib.profiler.server") || // NOI18N
+                   name.startsWith("org.netbeans.lib.profiler.global") || // NOI18N
+                   name.startsWith("org.netbeans.lib.profiler.wireprotocol"); // NOI18N
+        } else {
+            return name.startsWith(PROFILER_DOTTED_CLASS_PREFIX);
+        }
     }
 
     private static void reflectiveMethodInvokeHook(Method method) {

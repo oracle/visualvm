@@ -52,10 +52,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import org.netbeans.lib.profiler.charts.AxisComponent;
-import org.netbeans.lib.profiler.charts.AxisMarksComputer;
-import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.axis.AxisComponent;
+import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
+import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
+import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
+import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
@@ -125,6 +132,8 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         chart.setScale(INITIAL_CHART_SCALEX, 1);
         chart.setOffset(0, 0);
         chart.setFitsWidth(false);
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.L_LIVE_OBJECTS_INITIAL_VALUE));
     }
 
 
@@ -140,43 +149,47 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, new AxisMarksComputer.TimeMarksComputer(
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
-                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                new AxisComponent(chart, new TimelineMarksComputer(
+                         models.livenessItemsModel().getTimeline(),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
+                         new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
         // Live objects axis
         XYItem liveObjectsItem = models.livenessItemsModel().getItem(0);
         XYItemPainter liveObjectsPainter = (XYItemPainter)paintersModel.getPainter(liveObjectsItem);
-        AxisComponent.SimplePainter liveObjectsMarksPainter = new AxisComponent.SimplePainter();
+        SimpleLongMarksPainter liveObjectsMarksPainter = new SimpleLongMarksPainter();
         liveObjectsMarksPainter.setForeground(GraphsUI.L_LIVE_OBJECTS_PAINTER_LINE_COLOR);
         AxisComponent loAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-                         liveObjectsItem, liveObjectsPainter, chart.getChartContext(), 40),
+                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+                         liveObjectsItem, liveObjectsPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL),
                          liveObjectsMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
         // Live bytes axis
         XYItem liveBytesItem = models.livenessItemsModel().getItem(1);
         XYItemPainter liveBytesPainter = (XYItemPainter)paintersModel.getPainter(liveBytesItem);
-        AxisComponent.BytesPainter liveBytesMarksPainter = new AxisComponent.BytesPainter();
-        liveBytesMarksPainter.setForeground(GraphsUI.L_LIVE_BYTES_PAINTER_LINE_COLOR);
+        BytesMarksPainter allocBytesMarksPainter = new BytesMarksPainter();
+        allocBytesMarksPainter.setForeground(GraphsUI.L_LIVE_BYTES_PAINTER_LINE_COLOR);
         AxisComponent lbAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalBytesComputer(
-                         liveBytesItem, liveBytesPainter, chart.getChartContext(), 40),
-                         liveBytesMarksPainter, SwingConstants.EAST,
+                new AxisComponent(chart, new BytesXYItemMarksComputer(
+                         liveBytesItem, liveBytesPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL),
+                         allocBytesMarksPainter, SwingConstants.EAST,
                          AxisComponent.NO_MESH);
 
         // Allocated objects axis
         XYItem allocObjectsItem = models.livenessItemsModel().getItem(2);
         XYItemPainter allocObjectsPainter = (XYItemPainter)paintersModel.getPainter(allocObjectsItem);
-        AxisComponent.SimplePainter allocObjectsMarksPainter = new AxisComponent.SimplePainter();
+        SimpleLongMarksPainter allocObjectsMarksPainter = new SimpleLongMarksPainter();
         allocObjectsMarksPainter.setForeground(GraphsUI.L_ALLOC_OBJECTS_PAINTER_LINE_COLOR);
         AxisComponent aoAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalDecimalComputer(
-                         allocObjectsItem, allocObjectsPainter, chart.getChartContext(), 40),
+                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+                         allocObjectsItem, allocObjectsPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL),
                          allocObjectsMarksPainter, SwingConstants.EAST,
-                         AxisComponent.MESH_FOREGROUND);
+                         AxisComponent.NO_MESH);
 
         JPanel multiAxisContainer = new JPanel(new BorderLayout());
         multiAxisContainer.add(lbAxis, BorderLayout.WEST);
@@ -187,10 +200,11 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
-                                              SwingConstants.SOUTH_WEST });
+                                              SwingConstants.SOUTH_WEST,
+                                              SwingConstants.SOUTH_EAST });
         chartPanel.add(loAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(multiAxisContainer, new Integer[] { SwingConstants.EAST,
@@ -301,11 +315,11 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
             public String getRowUnits(int index, long itemValue) {
                 switch (index) {
                     case 0:
-                        return "";
+                        return ""; // NOI18N
                     case 1:
-                        return "B";
+                        return BytesAxisUtils.UNITS_B;
                     case 2:
-                        return "";
+                        return ""; // NOI18N
                     default:
                         return null;
                 }
@@ -316,7 +330,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {

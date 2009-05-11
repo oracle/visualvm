@@ -127,8 +127,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         } else if (e.getSource() == startHisto) {
             String selectedClassName = StringUtils.userFormClassName(
                                                 getClassName(selectedClassId));
-            if (historyActionsHandler.showClassHistory(selectedClassId, selectedClassName))
-                classHistoryManager.setup(selectedClassId, selectedClassName);
+            historyActionsHandler.showClassHistory(selectedClassId, selectedClassName);
+                
         }
     }
 
@@ -295,9 +295,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             startHisto.setText(LOG_CLASS_HISTORY);
             memoryResPopupMenu.add(startHisto);
             startHisto.addActionListener(this);
-        }
 
-        memoryResPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+            memoryResPopupMenu.addPopupMenuListener(new PopupMenuListener() {
                 public void popupMenuCanceled(PopupMenuEvent e) {
                 }
 
@@ -315,6 +314,12 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
                         });
                 }
             });
+        }
+
+        // Only show these items when target JVM is alive
+        boolean jvmAlive = status.targetAppRunning;
+        if (popupShowStacks != null) popupShowStacks.setEnabled(jvmAlive);
+        startHisto.setEnabled(jvmAlive);
 
         return memoryResPopupMenu;
     }

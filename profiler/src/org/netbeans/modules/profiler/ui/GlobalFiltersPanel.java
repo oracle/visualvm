@@ -710,8 +710,10 @@ public final class GlobalFiltersPanel extends JPanel implements HelpCtx.Provider
 
     private void initComponents() {
         // buttons to export
-        OKButton = new JButton(OK_BUTTON_TEXT);
-        CancelButton = new JButton(CANCEL_BUTTON_TEXT);
+        OKButton = new JButton();
+        org.openide.awt.Mnemonics.setLocalizedText(OKButton, OK_BUTTON_TEXT);
+        CancelButton = new JButton();
+        org.openide.awt.Mnemonics.setLocalizedText(CancelButton, CANCEL_BUTTON_TEXT);
 
         // listeners
         buttonsListener = new ButtonsListener();
@@ -821,6 +823,7 @@ public final class GlobalFiltersPanel extends JPanel implements HelpCtx.Provider
         // newButton
         newButton = new JButton();
         org.openide.awt.Mnemonics.setLocalizedText(newButton, NEW_BUTTON_TEXT);
+        
         newButton.getAccessibleContext().setAccessibleDescription(NEW_BUTTON_ACCESS_DESC);
         newButton.addActionListener(buttonsListener);
 

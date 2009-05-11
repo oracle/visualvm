@@ -81,8 +81,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.openide.cookies.EditorCookie;
-import org.openide.loaders.DataObject;
 
 
 /**
@@ -286,8 +284,9 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
 
                         if ((snapshotFile != null) && snapshotFile.exists()) {
                             if (TakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_PROFDATA_KEY)) {
+                                File sf = FileUtil.normalizeFile(snapshotFile);
                                 LoadedSnapshot snapshot = ResultsManager.getDefault()
-                                                                        .loadSnapshot(FileUtil.toFileObject(snapshotFile));
+                                                                        .loadSnapshot(FileUtil.toFileObject(sf));
                                 ResultsManager.getDefault().openSnapshot(snapshot);
                             } else if (TakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_HEAPDUMP_KEY)) {
                                 RequestProcessor.getDefault().post(new Runnable() {
@@ -426,16 +425,12 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public TakeSnapshotProfilingPoint(String name, Location location, Project project) {
-        super(name, location, project);
+    public TakeSnapshotProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory) {
+        super(name, location, project, factory);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public ProfilingPointFactory getFactory() {
-        return TakeSnapshotProfilingPointFactory.getDefault();
-    }
 
     public void setResetResults(boolean resetResults) {
         if (this.resetResults == resetResults) {

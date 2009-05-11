@@ -51,14 +51,12 @@ import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -108,13 +106,6 @@ public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static synchronized LoadGenProfilingPointFactory getDefault() {
-        return Lookup.getDefault().lookup(LoadGenProfilingPointFactory.class);
-
-        //    if (defaultInstance == null) defaultInstance = new LoadGenProfilingPointFactory();
-        //    return defaultInstance;
-    }
-
     public boolean isAvailable() {
         return available;
     }
@@ -149,25 +140,27 @@ public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
                 String filename = ""; // NOI18N
                 String name = Utils.getUniqueName(getType(), "", project); // NOI18N
 
-                return new LoadGenProfilingPoint(name, location, null, project);
+                return new LoadGenProfilingPoint(name, location, null, project, this);
             } else {
-                String filename = FileUtil.toFileObject(new File(location.getFile())).getName();
+                File file = FileUtil.normalizeFile(new File(location.getFile()));
+                String filename = FileUtil.toFileObject(file).getName();
                 String name = Utils.getUniqueName(getType(),
                                                   MessageFormat.format(PP_DEFAULT_NAME,
                                                                        new Object[] { "", filename, location.getLine() }), project); // NOI18N
 
-                return new LoadGenProfilingPoint(name, location, null, project);
+                return new LoadGenProfilingPoint(name, location, null, project, this);
             }
         } else {
             CodeProfilingPoint.Location startLocation = selectionLocations[0];
             CodeProfilingPoint.Location endLocation = selectionLocations[1];
-            String filename = FileUtil.toFileObject(new File(startLocation.getFile())).getName();
+            File file = FileUtil.normalizeFile(new File(startLocation.getFile()));
+            String filename = FileUtil.toFileObject(file).getName();
             String name = Utils.getUniqueName(getType(),
                                               MessageFormat.format(PP_DEFAULT_NAME,
                                                                    new Object[] { "", filename, startLocation.getLine() }),
                                               project); // NOI18N
 
-            return new LoadGenProfilingPoint(name, startLocation, endLocation, project);
+            return new LoadGenProfilingPoint(name, startLocation, endLocation, project, this);
         }
     }
 
@@ -210,7 +203,7 @@ public class LoadGenProfilingPointFactory extends CodeProfilingPointFactory {
         LoadGenProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new LoadGenProfilingPoint(name, startLocation, endLocation, project);
+            profilingPoint = new LoadGenProfilingPoint(name, startLocation, endLocation, project, this);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
             profilingPoint.setSriptFileName(scriptFile);
         } catch (Exception e) {
