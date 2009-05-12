@@ -46,12 +46,10 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Lookup;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -78,10 +76,6 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
     private static final String END_LOCATION_PREFIX = "end_"; // NOI18N
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static synchronized StopwatchProfilingPointFactory getDefault() {
-        return Lookup.getDefault().lookup(StopwatchProfilingPointFactory.class);
-    }
 
     public String getDescription() {
         return RESET_RESULTS_PP_DESCR;
@@ -113,25 +107,27 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
                 String filename = ""; // NOI18N
                 String name = Utils.getUniqueName(getType(), "", project); // NOI18N
 
-                return new StopwatchProfilingPoint(name, location, null, project);
+                return new StopwatchProfilingPoint(name, location, null, project, this);
             } else {
-                String filename = FileUtil.toFileObject(new File(location.getFile())).getName();
+                File file = FileUtil.normalizeFile(new File(location.getFile()));
+                String filename = FileUtil.toFileObject(file).getName();
                 String name = Utils.getUniqueName(getType(),
                                                   MessageFormat.format(PP_DEFAULT_NAME,
                                                                        new Object[] { "", filename, location.getLine() }), project); // NOI18N
 
-                return new StopwatchProfilingPoint(name, location, null, project);
+                return new StopwatchProfilingPoint(name, location, null, project, this);
             }
         } else {
             CodeProfilingPoint.Location startLocation = selectionLocations[0];
             CodeProfilingPoint.Location endLocation = selectionLocations[1];
-            String filename = FileUtil.toFileObject(new File(startLocation.getFile())).getName();
+            File file = FileUtil.normalizeFile(new File(startLocation.getFile()));
+            String filename = FileUtil.toFileObject(file).getName();
             String name = Utils.getUniqueName(getType(),
                                               MessageFormat.format(PP_DEFAULT_NAME,
                                                                    new Object[] { "", filename, startLocation.getLine() }),
                                               project); // NOI18N
 
-            return new StopwatchProfilingPoint(name, startLocation, endLocation, project);
+            return new StopwatchProfilingPoint(name, startLocation, endLocation, project, this);
         }
     }
 
@@ -173,7 +169,7 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
         StopwatchProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new StopwatchProfilingPoint(name, startLocation, endLocation, project);
+            profilingPoint = new StopwatchProfilingPoint(name, startLocation, endLocation, project, this);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());

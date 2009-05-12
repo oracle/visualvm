@@ -82,7 +82,6 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-@ServiceProvider(service=ResultsManager.class) // XXX is this really useful?
 public final class ResultsManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -119,6 +118,7 @@ public final class ResultsManager {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    private static ResultsManager defaultResultsManager;
 
     // -----
     // I18N String constants
@@ -187,10 +187,16 @@ public final class ResultsManager {
     private Window mainWindow;
     private boolean resultsAvailable = false;
 
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    private ResultsManager() {}
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static ResultsManager getDefault() {
-        return Lookup.getDefault().lookup(ResultsManager.class);
+        if (defaultResultsManager==null) {
+            defaultResultsManager=new ResultsManager();
+        }
+        return defaultResultsManager;
     }
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
@@ -672,8 +678,11 @@ public final class ResultsManager {
                 ErrorManager.getDefault().notify(ErrorManager.ERROR, e2);
             } catch (OutOfMemoryError e) {
                 try {
-                    runner.resetTimers();
+                    reset(); // reset the client data
+                    runner.resetTimers(); // reset the server data
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
+                    // the target app has died; clean up all client data
+                    runner.getProfilerClient().resetClientData();
                 }
 
                 ErrorManager.getDefault().annotate(e, OUT_OF_MEMORY_MSG);

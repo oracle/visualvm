@@ -29,7 +29,7 @@ import org.netbeans.lib.profiler.charts.ChartItemListener;
 import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemChange;
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.Timeline;
 
 /**
  *
@@ -40,11 +40,15 @@ public abstract class ProfilerXYItem implements XYItem {
     private final String name;
 
     private int itemIndex;
-    private XYTimeline timeline;
+    private Timeline timeline;
+
+    private int lastIndex;
     
     private final LongRect bounds;
     private long initialMinY;
     private long initialMaxY;
+
+    private LongRect initialBounds;
 
     private long minY;
     private long maxY;
@@ -64,7 +68,11 @@ public abstract class ProfilerXYItem implements XYItem {
         this.name = name;
         this.initialMinY = initialMinY;
         this.initialMaxY = initialMaxY;
+        minY = Long.MAX_VALUE;
+        maxY = Long.MIN_VALUE;
         bounds = new LongRect();
+        initialBounds = new LongRect();
+        lastIndex = -1;
     }
 
 
@@ -72,59 +80,92 @@ public abstract class ProfilerXYItem implements XYItem {
 
     public String getName() { return name; }
 
-    public XYItemChange getChange() {
-        
-        int valuesCount = timeline.getTimestampsCount();
+    public void setInitialBounds(LongRect initialBounds) { this.initialBounds = initialBounds; }
 
-        if (valuesCount > 0) {
+    public LongRect getInitialBounds() { return initialBounds; }
 
-            // Resolve current timestamp
-            int lastIndex = valuesCount - 1;
-            long timestamp = timeline.getTimestamp(lastIndex);
-            long value = getYValue(lastIndex);
+    public XYItemChange valuesAdded() {
+
+        int index = timeline.getTimestampsCount() - 1;
+        XYItemChange change = null;
+
+        if (lastIndex == index) { // No change
+
+            LongRect b = new LongRect(bounds);
+            change = new XYItemChange.Default(this, new int[] { -1 }, b, b, b);
+
+        } else if (index > -1) { // New item(s)
 
             // Save oldBounds, setup dirtyBounds
             LongRect oldBounds = new LongRect(bounds);
             LongRect dirtyBounds = new LongRect();
 
-            // Update min & max values, bounds and dirtyBounds
-            if (lastIndex == 0) {
-                minY = value;
-                maxY = value;
+            boolean initBounds = lastIndex == -1;
+            int dirtyIndex = lastIndex == -1 ? 0 : lastIndex;
 
-                bounds.x = timestamp;
-                bounds.y = Math.min(value, initialMinY);
-                bounds.width = 0;
-                bounds.height = Math.max(value, initialMaxY) - bounds.y;
+            // Process other values
+            for (int i = dirtyIndex; i <= index; i++) {
 
-                LongRect.set(dirtyBounds, timestamp, value, 0, 0);
-            } else {
+                long timestamp = timeline.getTimestamp(i);
+                long value = getYValue(i);
+
+                // Update item minY/maxY
                 minY = Math.min(value, minY);
                 maxY = Math.max(value, maxY);
 
-                LongRect.add(bounds, timestamp, value);
-                long previousValue = getYValue(lastIndex - 1);
-                dirtyBounds.x = timeline.getTimestamp(timeline.getTimestampsCount() - 2);
-                dirtyBounds.width = timestamp - dirtyBounds.x;
-                dirtyBounds.y = Math.min(previousValue, value);
-                dirtyBounds.height = Math.max(previousValue, value) - dirtyBounds.y;
+                // Process item bounds
+                if (initBounds) {
+                    // Initialize item bounds
+                    bounds.x = timestamp;
+                    bounds.y = Math.min(value, initialMinY);
+                    bounds.width = 0;
+                    bounds.height = Math.max(value, initialMaxY) - bounds.y;
+                    initBounds = false;
+                } else {
+                    // Update item bounds
+                    LongRect.add(bounds, timestamp, value);
+                }
+
+                // Process dirty bounds
+                if (i == dirtyIndex) {
+                    // Setup dirty bounds
+                    dirtyBounds.x = timestamp;
+                    dirtyBounds.y = value;
+                    dirtyBounds.width = timeline.getTimestamp(index) - dirtyBounds.x;
+                } else {
+                    // Update dirty y/height
+                    long dirtyY = dirtyBounds.y;
+                    dirtyBounds.y = Math.min(dirtyY, value);
+                    dirtyBounds.height = Math.max(dirtyY, value) - dirtyBounds.y;
+                }
+
             }
 
             // Return ItemChange
-            return new XYItemChange.Default(this, new int[] { lastIndex }, oldBounds,
-                                            new LongRect(bounds), dirtyBounds);
+            int indexesCount = index - lastIndex;
+            int[] indexes = new int[indexesCount];
+            for (int i = 0; i < indexesCount; i++) indexes[i] = lastIndex + 1 + i;
+            change = new XYItemChange.Default(this, indexes, oldBounds,
+                                              new LongRect(bounds), dirtyBounds);
 
-        } else {
+        } else { // Reset
+
+            minY = Long.MAX_VALUE;
+            maxY = Long.MIN_VALUE;
 
             // Save oldBounds
             LongRect oldBounds = new LongRect(bounds);
             LongRect.set(bounds, 0, 0, 0, 0);
 
             // Return ItemChange
-            return new XYItemChange.Default(this, new int[] { -1 }, oldBounds,
+            change = new XYItemChange.Default(this, new int[] { -1 }, oldBounds,
                                             new LongRect(bounds), oldBounds);
 
         }
+
+        lastIndex = index;
+        return change;
+        
     }
 
     public int getValuesCount() { return timeline.getTimestampsCount(); }
@@ -137,7 +178,10 @@ public abstract class ProfilerXYItem implements XYItem {
 
     public long getMaxYValue() { return maxY; }
     
-    public LongRect getBounds() { return bounds; }
+    public LongRect getBounds() {
+        if (getValuesCount() == 0) return initialBounds;
+        else return bounds;
+    }
 
 
     // --- ChartItem implementation (ChartItemListener not supported) ----------
@@ -149,7 +193,7 @@ public abstract class ProfilerXYItem implements XYItem {
 
     // --- Internal interface --------------------------------------------------
 
-    void setTimeline(XYTimeline timeline) { this.timeline = timeline; }
+    void setTimeline(Timeline timeline) { this.timeline = timeline; }
 
     void setItemIndex(int itemIndex) { this.itemIndex = itemIndex; }
 

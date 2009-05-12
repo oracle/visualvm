@@ -47,8 +47,6 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 
 
@@ -134,35 +132,17 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
             System.arraycopy(s_classNames, 0, classNames, 0, len);
 
             //      System.out.println("Created snapshot [" + timeTaken + "] with " + classNames.length + " classes; nProfiledClasses = " + nProfiledClasses);
-            if ((provider.getStacksForClasses() != null) && checkContainsStacks(provider.getStacksForClasses())) {
-                stacksForClasses = new RuntimeMemoryCCTNode[provider.getStacksForClasses().length];
-
-                Set ids = new HashSet(10000);
+            RuntimeMemoryCCTNode[] stacks = provider.getStacksForClasses();
+            if ((stacks != null) && checkContainsStacks(stacks)) {
+                stacksForClasses = new RuntimeMemoryCCTNode[stacks.length];
 
                 for (int i = 0; i < stacksForClasses.length; i++) {
-                    if (provider.getStacksForClasses()[i] != null) {
-                        stacksForClasses[i] = (RuntimeMemoryCCTNode) provider.getStacksForClasses()[i].clone();
-                        stacksForClasses[i].addAllJMethodIds(ids);
+                    if (stacks[i] != null) {
+                        stacksForClasses[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
                     }
                 }
 
-                // if we are taking allocation stack traces, we need to obtain names and signatures for all methods
-                Integer[] array = new Integer[ids.size()];
-                ids.toArray(array);
-
-                int[] primArray = new int[ids.size()];
-
-                for (int j = 0; j < array.length; j++) {
-                    primArray[j] = array[j].intValue();
-                }
-
-                //      System.err.println("Going to ask for jmethodId names: len:"+primArray.length);
-                //      for (int i = 0; i < primArray.length; i++) {
-                //        System.err.println("value ["+i+"] = " + primArray[i]);
-                //      }
-                String[][] methodNames = client.getMethodNamesForJMethodIds(primArray);
-                //      System.err.println("Returned size is: "+methodNames.length + "x" + methodNames[0].length);
-                table = new JMethodIdTable(primArray, methodNames);
+                table = new JMethodIdTable(JMethodIdTable.getDefault());
             }
         } finally {
             status.endTrans();

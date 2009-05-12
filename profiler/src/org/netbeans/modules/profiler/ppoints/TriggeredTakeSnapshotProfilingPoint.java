@@ -42,24 +42,15 @@ package org.netbeans.modules.profiler.ppoints;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ppoints.ui.TriggeredTakeSnapshotCustomizer;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
@@ -71,7 +62,6 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -271,8 +261,9 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
 
                         if ((snapshotFile != null) && snapshotFile.exists()) {
                             if (TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_PROFDATA_KEY)) {
+                                File sf = FileUtil.normalizeFile(snapshotFile);
                                 LoadedSnapshot snapshot = ResultsManager.getDefault()
-                                                                        .loadSnapshot(FileUtil.toFileObject(snapshotFile));
+                                                                        .loadSnapshot(FileUtil.toFileObject(sf));
                                 ResultsManager.getDefault().openSnapshot(snapshot);
                             } else if (TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_HEAPDUMP_KEY)) {
                                 RequestProcessor.getDefault().post(new Runnable() {
@@ -415,16 +406,12 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public TriggeredTakeSnapshotProfilingPoint(String name, Project project) {
-        super(name, project);
+    public TriggeredTakeSnapshotProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
+        super(name, project, factory);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public ProfilingPointFactory getFactory() {
-        return TriggeredTakeSnapshotProfilingPointFactory.getDefault();
-    }
 
     public void setResetResults(boolean resetResults) {
         if (this.resetResults == resetResults) {

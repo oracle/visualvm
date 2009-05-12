@@ -135,6 +135,7 @@ public class CPUSettingsBasicPanel extends DefaultSettingsPanel implements Actio
                                                                                    "StpManageFilterSetsTooltip"); // NOI18N
     private static final String STP_USEPPS_TOOLTIP = NbBundle.getMessage(CPUSettingsBasicPanel.class, "StpUsePpsTooltip"); // NOI18N
     private static final String STP_SHOWPPS_TOOLTIP = NbBundle.getMessage(CPUSettingsBasicPanel.class, "StpShowPpsTooltip"); // NOI18N
+    private static final String SHOW_FILTER_CAPTION = NbBundle.getMessage(CPUSettingsBasicPanel.class, "CPUSettingsBasicPanel_ShowFilterCaption"); // NOI18N
                                                                                                                              // -----
 
     // --- Instance variables declaration ----------------------------------------
@@ -760,8 +761,8 @@ public class CPUSettingsBasicPanel extends DefaultSettingsPanel implements Actio
             }
         };
 
-        final DialogDescriptor dd = new DialogDescriptor(preferredInstrFilterPanel,
-                                                         ((SimpleFilter) selectedInstrumentationFilter).getFilterName(), true,
+        final DialogDescriptor dd = new DialogDescriptor(preferredInstrFilterPanel, MessageFormat.format(SHOW_FILTER_CAPTION, new Object[] {
+                                                         ((SimpleFilter) selectedInstrumentationFilter).getFilterName() }), true,
                                                          new Object[] {
                                                              preferredInstrFilterPanel.OPEN_IN_QUICKFILTER_BUTTON,
                                                              preferredInstrFilterPanel.CLOSE_BUTTON

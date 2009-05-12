@@ -58,13 +58,18 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
-import org.netbeans.lib.profiler.charts.AxisComponent;
-import org.netbeans.lib.profiler.charts.AxisMarksComputer;
+import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
+import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
+import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
+import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
+import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
@@ -162,6 +167,8 @@ public final class MemoryGraphPanel extends GraphPanel {
             chart.setOffset(0, 0);
             chart.setFitsWidth(false);
         }
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.HEAP_SIZE_INITIAL_VALUE));
     }
 
     
@@ -179,26 +186,27 @@ public final class MemoryGraphPanel extends GraphPanel {
 
         // Horizontal axis
         AxisComponent hAxis =
-                new AxisComponent(chart, new AxisMarksComputer.TimeMarksComputer(
-                         chart.getChartContext(), SwingConstants.HORIZONTAL, 100),
-                         new AxisComponent.TimestampPainter("h:mm:ss.SSS a"),
+                new AxisComponent(chart, new TimelineMarksComputer(
+                         models.memoryItemsModel().getTimeline(),
+                         chart.getChartContext(), SwingConstants.HORIZONTAL),
+                         new TimeMarksPainter(),
                          SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
 
         // Vertical axis
         XYItem memoryItem = models.memoryItemsModel().getItem(0);
         XYItemPainter memoryPainter = (XYItemPainter)paintersModel.getPainter(memoryItem);
-        AxisComponent.BytesPainter memoryMarksPainter = new AxisComponent.BytesPainter();
         AxisComponent vAxis =
-                new AxisComponent(chart, new AxisMarksComputer.VerticalBytesComputer(
-                         memoryItem, memoryPainter, chart.getChartContext(), 40),
-                         memoryMarksPainter, SwingConstants.WEST,
+                new AxisComponent(chart, new BytesXYItemMarksComputer(
+                         memoryItem, memoryPainter, chart.getChartContext(),
+                         SwingConstants.VERTICAL),
+                         new BytesMarksPainter(), SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
                                               SwingConstants.SOUTH_WEST });
@@ -353,7 +361,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             }
 
             public String getRowUnits(int index, long itemValue) {
-                return "B";
+                return BytesAxisUtils.UNITS_B;
             }
 
             public int getExtraRowsCount() {
@@ -361,7 +369,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {

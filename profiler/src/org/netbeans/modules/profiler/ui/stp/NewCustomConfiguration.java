@@ -110,12 +110,18 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
                                                                       "NewCustomConfiguration_TypeLabelText"); // NOI18N
     private static final String NAME_LABEL_TEXT = NbBundle.getMessage(NewCustomConfiguration.class,
                                                                       "NewCustomConfiguration_NameLabelText"); // NOI18N
+    private static final String NAME_LABEL_ACCESS_DESCR = NbBundle.getMessage(NewCustomConfiguration.class,
+                                                                      "NewCustomConfiguration_NameLabelAccessDescr"); // NOI18N
     private static final String INIT_SETTINGS_LABEL_TEXT = NbBundle.getMessage(NewCustomConfiguration.class,
                                                                                "NewCustomConfiguration_InitSettingsLabelText"); // NOI18N
     private static final String DEFAULT_RADIO_TEXT = NbBundle.getMessage(NewCustomConfiguration.class,
                                                                          "NewCustomConfiguration_DefaultRadioText"); // NOI18N
+    private static final String DEFAULT_RADIO_ACCESS_DESCR = NbBundle.getMessage(NewCustomConfiguration.class,
+                                                                         "NewCustomConfiguration_DefaultRadioAccessDescr"); // NOI18N
     private static final String EXISTING_RADIO_TEXT = NbBundle.getMessage(NewCustomConfiguration.class,
                                                                           "NewCustomConfiguration_ExistingRadioText"); // NOI18N
+    private static final String EXISTING_RADIO_ACCESS_DESCR = NbBundle.getMessage(NewCustomConfiguration.class,
+                                                                          "NewCustomConfiguration_ExistingRadioAccessDescr"); // NOI18N
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(NewCustomConfiguration.class,
                                                                      "NewCustomConfiguration_OkButtonText"); // NOI18N
                                                                                                              // -----
@@ -219,9 +225,8 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         }
         
         // Remove mnemonics wildcard
-        typeString = typeString.replace("&", "");
+        typeString = typeString.replace("&", ""); // NOI18N
 
-        //    final DialogDescriptor dd = new DialogDescriptor(ncc, "New Custom Configuration" + typeString);
         final DialogDescriptor dd = new DialogDescriptor(ncc, NEW_CONFIG_DIALOG_CAPTION + typeString, true,
                                                          new Object[] { ncc.okButton, DialogDescriptor.CANCEL_OPTION },
                                                          ncc.okButton, 0, null, null);
@@ -469,6 +474,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         nameTextfield = new JTextField();
         nameTextfield.getDocument().addDocumentListener(this);
         nameTextfield.setPreferredSize(new Dimension(250, nameTextfield.getPreferredSize().height));
+        nameTextfield.getAccessibleContext().setAccessibleDescription(NAME_LABEL_ACCESS_DESCR);
         nameLabel.setLabelFor(nameTextfield);
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -494,6 +500,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         defaultSettingsRadio = new JRadioButton();
         org.openide.awt.Mnemonics.setLocalizedText(defaultSettingsRadio, DEFAULT_RADIO_TEXT);
         settingsRadiosGroup.add(defaultSettingsRadio);
+        defaultSettingsRadio.getAccessibleContext().setAccessibleDescription(DEFAULT_RADIO_ACCESS_DESCR);
         defaultSettingsRadio.addChangeListener(this);
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -508,6 +515,7 @@ public class NewCustomConfiguration extends JPanel implements ChangeListener, Li
         existingSettingsRadio = new JRadioButton();
         org.openide.awt.Mnemonics.setLocalizedText(existingSettingsRadio, EXISTING_RADIO_TEXT);
         settingsRadiosGroup.add(existingSettingsRadio);
+        existingSettingsRadio.getAccessibleContext().setAccessibleDescription(EXISTING_RADIO_ACCESS_DESCR);
         existingSettingsRadio.setSelected(true);
         existingSettingsRadio.addChangeListener(this);
         constraints = new GridBagConstraints();

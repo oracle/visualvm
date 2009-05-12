@@ -52,7 +52,9 @@ public interface XYItemPainter extends ItemPainter {
         }
 
         public double getItemValueScale(XYItem item, ChartContext context) {
-            return context.getViewHeight(1d);
+            double scale = context.getViewHeight(1d);
+            if (scale <= 0) scale = -1;
+            return scale;
         }
 
     }

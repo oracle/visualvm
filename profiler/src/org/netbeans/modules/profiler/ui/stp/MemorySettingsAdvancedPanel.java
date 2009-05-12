@@ -235,15 +235,19 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
     }
 
     public void setRecordStackTrace(boolean record) {
-        recordStackTracesLabel.setEnabled(record && runGCCheckbox.isEnabled()); // Check for preset
-        fullDepthRadio.setEnabled(record && runGCCheckbox.isEnabled()); // Check for preset
-        definedDepthRadio.setEnabled(record && runGCCheckbox.isEnabled()); // Check for preset
-        defineDepthSpinner.setEnabled(record && runGCCheckbox.isEnabled()); // Check for preset
+        recordStackTracesLabel.setEnabled(record && threadsMonitoringCheckbox.isEnabled()); // Check for preset
+        fullDepthRadio.setEnabled(record && threadsMonitoringCheckbox.isEnabled()); // Check for preset
+        definedDepthRadio.setEnabled(record && threadsMonitoringCheckbox.isEnabled()); // Check for preset
+        defineDepthSpinner.setEnabled(record && threadsMonitoringCheckbox.isEnabled()); // Check for preset
         updateEnabling();
     }
 
     public void setRunGC(boolean runGC) {
         runGCCheckbox.setSelected(runGC);
+    }
+
+    public void updateRunGC(boolean allocOnly) {
+        runGCCheckbox.setEnabled(!allocOnly && threadsMonitoringCheckbox.isEnabled()); // Check for preset
     }
 
     public boolean getRunGC() {

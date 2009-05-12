@@ -197,20 +197,21 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             ti.inCallGraph = true;
         }
 
-        // This is to bypass what seems to be a compiler bug (at least C1 on Windows): when methodId > 64K/2 is passed here
-        // using our instrumentation's sipush command at the call site, it's treated here as a signed integer. Thus without
+        // when methodId > 64K/2 is passed here using our instrumentation's sipush command at the call site, 
+        // it's treated here as a signed integer. Thus without
         // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
-        methodId = (char) ((int) methodId);
-
-        if (!instrMethodInvoked[methodId]) {
+        int methodIdInt = methodId&0xff;
+        methodIdInt |= methodId&0xff00;
+            
+        if (!instrMethodInvoked[methodIdInt]) {
             if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
                 long absTimeStamp = Timers.getCurrentTimeInCounts();
                 long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
                 externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
-                instrMethodInvoked[methodId] = true; // Mark this method as invoked
+                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
                 writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
             } else { // DO NOT perform instrumentation of its immediate callees
-                instrMethodInvoked[methodId] = true;
+                instrMethodInvoked[methodIdInt] = true;
             }
         }
 
@@ -282,14 +283,15 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             //System.out.println("++++++methodEntry, depth = " + ti.stackDepth + ", id = " + (int) methodId);
 
             // See comment marked with (***)
-            methodId = (char) ((int) methodId);
-
+            int methodIdInt = methodId&0xff;
+            methodIdInt |= methodId&0xff00;
+            
             // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
-            if (!instrMethodInvoked[methodId]) {
+            if (!instrMethodInvoked[methodIdInt]) {
                 long absTimeStamp = Timers.getCurrentTimeInCounts();
                 long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
                 externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
-                instrMethodInvoked[methodId] = true; // Mark this method as invoked
+                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
                 writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
             }
 
@@ -414,15 +416,14 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
                 }
             }
 
-            // This is to bypass what seems to be a compiler bug (at least C1 on Windows): when methodId > 64K/2 is passed here
-            // using our instrumentation's sipush command at the call site, it's treated here as a signed integer. Thus without
-            // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
-            methodId = (char) ((int) methodId);
-
+            // See comment marked with (***)
+            int methodIdInt = methodId&0xff;
+            methodIdInt |= methodId&0xff00;
+            
             // Check if it's the first invocation of this method, and if so, perform instrumentation of its immediate callees
-            if (!instrMethodInvoked[methodId]) {
+            if (!instrMethodInvoked[methodIdInt]) {
                 externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
-                instrMethodInvoked[methodId] = true;
+                instrMethodInvoked[methodIdInt] = true;
             }
 
             ti.stackDepth++; //= 1;  // This is the logical stack depth

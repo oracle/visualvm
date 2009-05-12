@@ -46,12 +46,10 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Lookup;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 
 /**
@@ -76,10 +74,6 @@ public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory
     public static final String TAKE_SNAPSHOT_PP_DESCR = PP_DESCR;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static TakeSnapshotProfilingPointFactory getDefault() {
-        return Lookup.getDefault().lookup(TakeSnapshotProfilingPointFactory.class);
-    }
 
     public String getDescription() {
         return TAKE_SNAPSHOT_PP_DESCR;
@@ -108,14 +102,15 @@ public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory
             String filename = ""; // NOI18N
             String name = Utils.getUniqueName(getType(), "", project); // NOI18N
 
-            return new TakeSnapshotProfilingPoint(name, location, project);
+            return new TakeSnapshotProfilingPoint(name, location, project, this);
         } else {
-            String filename = FileUtil.toFileObject(new File(location.getFile())).getName();
+            File file = FileUtil.normalizeFile(new File(location.getFile()));
+            String filename = FileUtil.toFileObject(file).getName();
             String name = Utils.getUniqueName(getType(),
                                               MessageFormat.format(PP_DEFAULT_NAME,
                                                                    new Object[] { "", filename, location.getLine() }), project); // NOI18N
 
-            return new TakeSnapshotProfilingPoint(name, location, project);
+            return new TakeSnapshotProfilingPoint(name, location, project, this);
         }
     }
 
@@ -160,7 +155,7 @@ public class TakeSnapshotProfilingPointFactory extends CodeProfilingPointFactory
         TakeSnapshotProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new TakeSnapshotProfilingPoint(name, location, project);
+            profilingPoint = new TakeSnapshotProfilingPoint(name, location, project, this);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
             profilingPoint.setSnapshotType(type);
             profilingPoint.setSnapshotTarget(target);

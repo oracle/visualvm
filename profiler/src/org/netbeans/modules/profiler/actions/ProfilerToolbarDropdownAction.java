@@ -53,6 +53,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import org.openide.filesystems.FileUtil;
 
 
 /**
@@ -84,7 +85,10 @@ public class ProfilerToolbarDropdownAction implements Action, Presenter.Toolbar 
     // --- Presenter.Toolbar implementation --------------------------------------
     public Component getToolbarPresenter() {
         if (toolbarPresenter == null) {
-            final Action attachAction = new AttachAction();
+            // gets the real action registered in the menu from layer
+            final Action attachAction = (Action)FileUtil.getConfigFile(
+                "Actions/Profile/org-netbeans-modules-profiler-actions-AttachAction.instance" // NOI18N
+            ).getAttribute("instanceCreate"); // NOI18N
 
             final JMenuItem dropdownItem1 = createDropdownItem(defaultAction);
             final JMenuItem dropdownItem2 = createDropdownItem(attachAction);

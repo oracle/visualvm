@@ -25,7 +25,8 @@
 
 package org.netbeans.lib.profiler.ui.monitor;
 
-import org.netbeans.lib.profiler.charts.xy.XYTimeline;
+import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItem;
@@ -43,7 +44,7 @@ public final class VMTelemetryModels {
 
     private final VMTelemetryDataManager dataManager;
 
-    private final XYTimeline timeline;
+    private final Timeline timeline;
     private final ProfilerXYItemsModel memoryItemsModel;
     private final ProfilerXYItemsModel generationsItemsModel;
     private final ProfilerXYItemsModel threadsItemsModel;
@@ -88,9 +89,9 @@ public final class VMTelemetryModels {
     // --- DataManagerListener implementation ----------------------------------
 
     private void dataChangedImpl() {
-        memoryItemsModel.valueAdded();
-        generationsItemsModel.valueAdded();
-        threadsItemsModel.valueAdded();
+        memoryItemsModel.valuesAdded();
+        generationsItemsModel.valuesAdded();
+        threadsItemsModel.valuesAdded();
     }
 
     private void dataResetImpl() {
@@ -102,20 +103,21 @@ public final class VMTelemetryModels {
 
     // --- Private implementation ----------------------------------------------
 
-    private XYTimeline createTimeline() {
-        return new XYTimeline() {
+    private Timeline createTimeline() {
+        return new Timeline() {
             public int getTimestampsCount() { return dataManager.getItemCount(); }
             public long getTimestamp(int index) { return dataManager.timeStamps[index]; }
         };
     }
 
-    private ProfilerXYItemsModel createMemoryItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createMemoryItemsModel(Timeline timeline) {
         // Heap size
         ProfilerXYItem heapSizeItem = new ProfilerXYItem(GraphsUI.HEAP_SIZE_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.totalMemory[index];
             }
         };
+        heapSizeItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.HEAP_SIZE_INITIAL_VALUE));
 
         // Used heap
         ProfilerXYItem usedHeapItem = new ProfilerXYItem(GraphsUI.USED_HEAP_NAME, 0) {
@@ -123,6 +125,7 @@ public final class VMTelemetryModels {
                 return dataManager.usedMemory[index];
             }
         };
+        usedHeapItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.USED_HEAP_INITIAL_VALUE));
 
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
@@ -131,13 +134,14 @@ public final class VMTelemetryModels {
         return model;
     }
 
-    private ProfilerXYItemsModel createGenerationsItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createGenerationsItemsModel(Timeline timeline) {
         // Surviving generations
         ProfilerXYItem survivingGenerationsItem = new ProfilerXYItem(GraphsUI.SURVGEN_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nSurvivingGenerations[index];
             }
         };
+        survivingGenerationsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.SURVGEN_INITIAL_VALUE));
 
         // Relative time spent in GC
         ProfilerXYItem gcTimeItem = new ProfilerXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
@@ -145,6 +149,7 @@ public final class VMTelemetryModels {
                 return dataManager.relativeGCTimeInPerMil[index];
             }
         };
+        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
 
         // GC intervals
         ProfilerGCXYItem gcIntervalsItem = new ProfilerGCXYItem("") { // NOI18N
@@ -168,13 +173,14 @@ public final class VMTelemetryModels {
         return model;
     }
 
-    private ProfilerXYItemsModel createThreadsItemsModel(XYTimeline timeline) {
+    private ProfilerXYItemsModel createThreadsItemsModel(Timeline timeline) {
         // Threads
         ProfilerXYItem threadsItem = new ProfilerXYItem(GraphsUI.THREADS_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nTotalThreads[index];
             }
         };
+        threadsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.THREADS_INITIAL_VALUE));
 
         // Loaded classes
         ProfilerXYItem loadedClassesItem = new ProfilerXYItem(GraphsUI.LOADED_CLASSES_NAME, 0) {
@@ -182,6 +188,7 @@ public final class VMTelemetryModels {
                 return dataManager.loadedClassesCount[index];
             }
         };
+        loadedClassesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.LOADED_CLASSES_INITIAL_VALUE));
 
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
