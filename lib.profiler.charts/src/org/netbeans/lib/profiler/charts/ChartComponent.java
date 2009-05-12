@@ -380,28 +380,30 @@ public class ChartComponent extends InteractiveCanvasComponent {
         // Paint chart items
         if (itemsModel != null && paintersModel != null) {
             int itemsCount = itemsModel.getItemsCount();
-            if (itemsCount == 0) return;
 
-            boolean sel = selectionModel != null;
-            List<ItemSelection> highlightedSelection = sel ? selectionModel.getHighlightedItems() : null;
-            List<ItemSelection> selectedSelection = sel ? selectionModel.getSelectedItems() : null;
-            List<ItemSelection> filteredHighlighted = sel ? new ArrayList() : Collections.EMPTY_LIST;
-            List<ItemSelection> filteredSelected = sel ? new ArrayList() : Collections.EMPTY_LIST;
+            if (itemsCount != 0) {
+                boolean sel = selectionModel != null;
 
-            for (int i = 0; i < itemsCount; i++) {
-                ChartItem item = itemsModel.getItem(i);
-                ItemPainter painter = paintersModel.getPainter(item);
+                List<ItemSelection> highlightedSelection = sel ? selectionModel.getHighlightedItems() : null;
+                List<ItemSelection> selectedSelection = sel ? selectionModel.getSelectedItems() : null;
+                List<ItemSelection> filteredHighlighted = sel ? new ArrayList() : Collections.EMPTY_LIST;
+                List<ItemSelection> filteredSelected = sel ? new ArrayList() : Collections.EMPTY_LIST;
 
-                if (sel) {
-                    filteredHighlighted.clear();
-                    if (painter.supportsHovering(item))
-                        filterSelection(highlightedSelection, filteredHighlighted, item);
-                    filteredSelected.clear();
-                    if (painter.supportsSelecting(item))
-                        filterSelection(selectedSelection, filteredSelected, item);
+                for (int i = 0; i < itemsCount; i++) {
+                    ChartItem item = itemsModel.getItem(i);
+                    ItemPainter painter = paintersModel.getPainter(item);
+
+                    if (sel) {
+                        filteredHighlighted.clear();
+                        if (painter.supportsHovering(item))
+                            filterSelection(highlightedSelection, filteredHighlighted, item);
+                        filteredSelected.clear();
+                        if (painter.supportsSelecting(item))
+                            filterSelection(selectedSelection, filteredSelected, item);
+                    }
+
+                    painter.paintItem(item, filteredHighlighted, filteredSelected, g2, invalidArea, getChartContext());
                 }
-
-                painter.paintItem(item, filteredHighlighted, filteredSelected, g2, invalidArea, getChartContext());
             }
         }
 
