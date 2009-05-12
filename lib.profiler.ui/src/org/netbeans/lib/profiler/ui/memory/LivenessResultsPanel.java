@@ -740,7 +740,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
         result.append("</tr>"); // NOI18N
         eDD.dumpData(result);
 
-        for (int i=0; i < (nTrackedItems-1); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
 
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(sortedClassNames[i])+"</td>"); // NOI18N
             result.append("<td align=\"right\">"+trackedLiveObjectsSize[i]+"</td>"); // NOI18N
@@ -768,7 +768,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (nTrackedItems-1); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
             result = new StringBuffer("  <TableRow>"+newline);
             result.append("   <TableColumn><![CDATA["+sortedClassNames[i]+"]]></TableColumn>"+newline);
             result.append("   <TableColumn><![CDATA["+trackedLiveObjectsSize[i]+"]]></TableColumn>"+newline);
@@ -798,7 +798,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
 
         // Data
         
-        for (int i=0; i < (nTrackedItems-1); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
             result = new StringBuffer();
             result.append(quote+sortedClassNames[i]+quote+separator);
             result.append(quote+trackedLiveObjectsSize[i]+quote+separator);

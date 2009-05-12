@@ -99,7 +99,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         result.append("</tr>");
         eDD.dumpData(result);
 
-        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+        for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</pre></td>");
             result.append("<td class=\"right\">"+percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)+"</td>");
             result.append("<td class=\"right\">"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>");
@@ -124,7 +124,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         result.append("  </TableHeader>"+newline+"  <TableBody>"+newline);
         eDD.dumpData(result);
 
-        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+        for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA["+percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)+"]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline);
@@ -151,7 +151,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+        for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer();
             result.append(quote+flatProfileContainer.getMethodNameAtRow(i)+quote+separator);
             result.append(quote+flatProfileContainer.getPercentAtRow(i)+quote+separator);

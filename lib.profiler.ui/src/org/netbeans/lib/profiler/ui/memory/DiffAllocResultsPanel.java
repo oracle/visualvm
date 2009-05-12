@@ -109,7 +109,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         result.append("</tr>"); //NOI18N
         eDD.dumpData(result);
 
-        for (int i=0; i < (nTrackedItems-1); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
 
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(sortedClassNames[i])+"</td>"); //NOI18N
             result.append("<td align=\"right\">"+totalAllocObjectsSize[i]+"</td>"); //NOI18N
@@ -135,7 +135,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (nTrackedItems-1); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
             result = new StringBuffer("  <TableRow>"+newline+"   <TableColumn><![CDATA["+sortedClassNames[i]+"]]></TableColumn>"+newline); //NOI18N
             result.append("   <TableColumn><![CDATA["+totalAllocObjectsSize[i]+"]]></TableColumn>"+newline); //NOI18N
             result.append("   <TableColumn><![CDATA["+nTotalAllocObjects[i]+"]]></TableColumn>"+newline+"  </TableRow>"+newline); //NOI18N
@@ -150,7 +150,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         String newLine = "\r\n"; // NOI18N
         String quote = "\""; // NOI18N
 
-        for (int i = 0; i < (columnNames.length); i++) {
+        for (int i = 0; i < columnNames.length; i++) {
             if (!(columnRenderers[i]==null)) {
                 result.append(quote+columnNames[i]+quote+separator);
             }
@@ -160,7 +160,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (nTrackedItems-1); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
             result = new StringBuffer();
             result.append(quote+sortedClassNames[i]+quote+separator);
             result.append(quote+totalAllocObjectsSize[i]+quote+separator);
