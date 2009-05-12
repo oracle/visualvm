@@ -513,6 +513,9 @@ function wrapJavaObject(thing) {
                     return fldValueCache["len"];
                 } else if (name == 'toString') {
                     return function() { 
+                        if (array.javaClass.name == 'char[]') {
+                            return snapshot.valueString(array);
+                        }
                         return array.toString();
                     }
                 } else if (name == 'wrapped-object') {
