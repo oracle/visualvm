@@ -335,7 +335,7 @@ function wrapJavaObject(thing) {
                     if (name == things.get(i).field.name) return true;
                 }
                 return name == 'clazz' || name == 'toString' ||
-                name == 'wrapped-object';
+                name == 'id' || name == 'wrapped-object';
             },
             __get__ : function(name) {
                 if (name == 'clazz') {
@@ -389,16 +389,21 @@ function wrapJavaObject(thing) {
                         return true;
                     }					
                 }
-                return theJavaClassProto[name] != undefined;
+                return name == 'id' || theJavaClassProto[name] != undefined;
             },
             __get__ : function(name) {
                 if (name == "toString") {
                     result = jclass.toString();
                 } else {
                     if (fldValueCache[name] == undefined) {
-                        var result = theJavaClassProto[name];
-                        if (result == null) {
-                            result = wrapJavaObject(jclass.getValueOfStaticField(name));
+                        var result;
+                        if (name == 'id') {
+                            result = jclass.javaClassId;
+                        } else {
+                            result = theJavaClassProto[name];
+                            if (result == null) {
+                                result = wrapJavaObject(jclass.getValueOfStaticField(name));
+                            }
                         }
                         fldValueCache[name] = result;
                     }
