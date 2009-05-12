@@ -339,7 +339,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
 
     private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
             result.append("<th>"+columnNames[i]+"</th>");  // NOI18N
         }
@@ -354,14 +354,14 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             result.append("<td align=\"right\">"+nTotalAllocObjects[i]+"</td></tr>");  // NOI18N
             eDD.dumpData(result);
         }
-        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));  // NOI18N
+        eDD.dumpDataAndClose(new StringBuffer(" </TABLE></BODY></HTML>"));  // NOI18N
     }
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
-        result.append(" <TableData NumRows=\""+nTrackedItems+"\" NumColumns=\"4\">"+newline+"<TableHeader>");  // NOI18N
+        result.append("<TableData NumRows=\""+nTrackedItems+"\" NumColumns=\"4\">"+newline+"<TableHeader>");  // NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
             result.append("  <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline);  // NOI18N
         }
@@ -376,7 +376,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             result.append("   <TableColumn><![CDATA["+nTotalAllocObjects[i]+"]]></TableColumn>"+newline+"  </TableRow>"+newline);  // NOI18N
             eDD.dumpData(result);
         }
-        eDD.dumpDataAndClose(new StringBuffer(" </Table>"+newline+"</ExportedView>"));  // NOI18N
+        eDD.dumpDataAndClose(new StringBuffer(" </TableData>"+newline+"</ExportedView>"));  // NOI18N
     }
 
     private void exportCSV(String separator, ExportDataDumper eDD) {

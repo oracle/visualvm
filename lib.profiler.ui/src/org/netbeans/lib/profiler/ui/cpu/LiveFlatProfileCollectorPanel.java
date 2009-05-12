@@ -340,7 +340,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
     private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
             result.append("<th>"+columnNames[i]+"</th>"); //NOI18N
         }
@@ -355,7 +355,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>"); //NOI18N
             eDD.dumpData(result);
         }
-        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>")); //NOI18N
+        eDD.dumpDataAndClose(new StringBuffer(" </TABLE></BODY></HTML>")); //NOI18N
     }
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
