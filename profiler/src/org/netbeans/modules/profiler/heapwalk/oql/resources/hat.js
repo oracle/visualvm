@@ -1679,7 +1679,7 @@ function sum(array, code) {
 function unique(array, code) {
     array = wrapIterator(array);
     if (code == undefined) {
-        code = new Function("it", "return objectid(it);");
+        code = new Function("it", "var id = objectid(it);return id != undefined ? id : it;");
     } else if (typeof(code) == 'string') {
         code = new Function("it", "return " + code);
     }
@@ -1692,11 +1692,13 @@ function unique(array, code) {
     } else {
         for (var index in array) {
             var it = array[index];
+            println("array: adding " + it + ", indexed as " + code(it));
             tmp[code(it)] = it;
         }
     }
     var res = new Array();
     for (var index in tmp) {
+        println("copying result: " + index + " ->" + tmp[index]);
         res[res.length] = tmp[index];
     }
     return res;
