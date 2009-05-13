@@ -48,6 +48,8 @@ public abstract class ProfilerXYItem implements XYItem {
     private long initialMinY;
     private long initialMaxY;
 
+    private LongRect initialBounds;
+
     private long minY;
     private long maxY;
 
@@ -69,6 +71,7 @@ public abstract class ProfilerXYItem implements XYItem {
         minY = Long.MAX_VALUE;
         maxY = Long.MIN_VALUE;
         bounds = new LongRect();
+        initialBounds = new LongRect();
         lastIndex = -1;
     }
 
@@ -76,6 +79,10 @@ public abstract class ProfilerXYItem implements XYItem {
     // --- Item telemetry ------------------------------------------------------
 
     public String getName() { return name; }
+
+    public void setInitialBounds(LongRect initialBounds) { this.initialBounds = initialBounds; }
+
+    public LongRect getInitialBounds() { return initialBounds; }
 
     public XYItemChange valuesAdded() {
 
@@ -171,7 +178,10 @@ public abstract class ProfilerXYItem implements XYItem {
 
     public long getMaxYValue() { return maxY; }
     
-    public LongRect getBounds() { return bounds; }
+    public LongRect getBounds() {
+        if (getValuesCount() == 0) return initialBounds;
+        else return bounds;
+    }
 
 
     // --- ChartItem implementation (ChartItemListener not supported) ----------

@@ -39,7 +39,6 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.util.Arrays;
 import java.util.List;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 
@@ -197,14 +196,11 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
     public double getItemValueScale(XYItem item, ChartContext context) {
-        if (item.getValuesCount() < 2) return -1;
-
         if (type == TYPE_ABSOLUTE) {
             return super.getItemValueScale(item, context);
         } else {
             long itemHeight = item.getBounds().height;
             if (itemHeight == 0) return 1;
-
             double itemValueFactor = getItemValueFactor(context,
                                      maxValueOffset, itemHeight);
             return itemValueFactor / context.getDataHeight(1d);
