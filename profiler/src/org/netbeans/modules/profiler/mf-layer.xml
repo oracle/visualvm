@@ -173,7 +173,7 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
 
-    
+
 
         <folder name="Profile">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
@@ -326,8 +326,8 @@ made subject to such option by the copyright holder.
         <file name="C-U D.instance">
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.LiveResultsWindow$ActivateDrillDownAction"/>
         </file>
-        <file name="AS-Y.instance">
-            <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.SelfSamplerAction.getInstance"/>
+        <file name="AS-Y.shadow">
+            <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance"/>
         </file>
     </folder>
 
@@ -382,7 +382,12 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.SelfSamplerAction.getInstance"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#SelfSamplerAction_ActionNameStart"/>
+                <attr name="ShortDescription" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#SelfSamplerAction_ActionDescription"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/openSnapshot.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="delegate" methodvalue="org.netbeans.modules.profiler.actions.SelfSamplerAction.getInstance"/>
             </file>
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
             <file name="org-netbeans-modules-profiler-ppoints-ui-ToggleProfilingPointAction.instance">
@@ -426,9 +431,9 @@ made subject to such option by the copyright holder.
             <file name="filters-default.xml" url="filters-default.xml"/>
             <file name="filtersets-default.xml" url="filtersets-default.xml"/>
             <file name="oqlqueries-default.xml" url="heapwalk/oqlqueries-default.xml"/>
-        </folder> 
+        </folder>
     </folder>
-    
+
     <folder name="Editors">
         <folder name="text">
             <folder name="x-java">
@@ -493,7 +498,7 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-  
+
     <folder name="Windows2">
         <folder name="Components">
             <file name="profiler_cp.settings" url="profiler_cp.settings"/>
@@ -522,5 +527,5 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-    
+
 </filesystem>
