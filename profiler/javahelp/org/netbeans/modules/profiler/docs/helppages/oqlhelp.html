@@ -664,7 +664,7 @@ Examples:
 <li>find Vector instance that has the maximum length
 <pre>
 <code>
-    select min(heap.objects('java.util.Vector'), 'lhs.elementData.length < rhs.elementData.length')
+    select min(heap.objects('java.util.Vector'), 'lhs.elementData.length &lt; rhs.elementData.length')
 </code>
 </pre>
 </ul>
