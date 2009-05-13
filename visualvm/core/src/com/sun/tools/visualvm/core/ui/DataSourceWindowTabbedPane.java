@@ -87,35 +87,10 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     CloseButtonListener.install();
     //Bugfix #28263: Disable focus.
     setFocusable(false);
-    setFocusCycleRoot(true);
-    setFocusTraversalPolicy(new CBTPPolicy());
-  }
-  
-  private Component sel() {
-      Component c = getSelectedComponent();
-      return c == null ? this : c;
-  }
 
-  private class CBTPPolicy extends FocusTraversalPolicy {
-      public Component getComponentAfter(Container aContainer, Component aComponent) {
-          return sel();
-      }
-
-      public Component getComponentBefore(Container aContainer, Component aComponent) {
-          return sel();
-      }
-
-      public Component getFirstComponent(Container aContainer) {
-          return sel();
-      }
-
-      public Component getLastComponent(Container aContainer) {
-          return sel();
-      }
-
-      public Component getDefaultComponent(Container aContainer) {
-          return sel();
-      }
+    // VisualVM bugfix #279 - do not override FocusTraversalPolicy
+//    setFocusCycleRoot(true);
+//    setFocusTraversalPolicy(new CBTPPolicy());
   }
   
   
@@ -581,6 +556,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
           setLayout(new BorderLayout());
           setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
           setBackground(Color.WHITE);
+          setFocusable(false);
           
           add(viewComponent, BorderLayout.CENTER);
           if (caption != null) {
