@@ -83,7 +83,7 @@ public class HeapDumpProvider {
                     try {
                         File file = jvm.takeHeapDump();
                         if (file != null && file.isFile()) {
-                            final HeapDumpImpl heapDump = new HeapDumpImpl(jvm.takeHeapDump(), application);
+                            final HeapDumpImpl heapDump = new HeapDumpImpl(file, application);
                             application.getRepository().addDataSource(heapDump);
                             if (openView) SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
