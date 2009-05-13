@@ -62,8 +62,10 @@ import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
 import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
@@ -165,6 +167,8 @@ public final class MemoryGraphPanel extends GraphPanel {
             chart.setOffset(0, 0);
             chart.setFitsWidth(false);
         }
+        chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
+                                       2500, GraphsUI.HEAP_SIZE_INITIAL_VALUE));
     }
 
     
@@ -357,7 +361,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             }
 
             public String getRowUnits(int index, long itemValue) {
-                return "B";
+                return BytesAxisUtils.UNITS_B;
             }
 
             public int getExtraRowsCount() {
@@ -365,7 +369,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowName(int index) {
-                return "Max " + getRowName(index);
+                return getMaxValueString(getRowName(index));
             }
 
             public Color getExtraRowColor(int index) {
