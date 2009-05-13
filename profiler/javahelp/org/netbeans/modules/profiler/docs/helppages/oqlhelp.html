@@ -776,7 +776,7 @@ more than one String instance can share the same char[] for the content.
 <pre>
 <code>
    select <a href="#map">map</a>(<a href="#sort">sort</a>(map(heap.objects('java.lang.ClassLoader'), 
-   '{ loader: it, count: it.classes.elementCount }'), 'lhs.count < rhs.count'),
+   '{ loader: it, count: it.classes.elementCount }'), 'lhs.count &lt; rhs.count'),
    'toHtml(it) + "&lt;br&gt;"')
 </code>
 </pre>
