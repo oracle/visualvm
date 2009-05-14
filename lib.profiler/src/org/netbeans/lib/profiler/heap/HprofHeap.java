@@ -51,7 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.netbeans.lib.profiler.heap.LongMap.Entry;
 
 /**
  *
@@ -564,7 +563,6 @@ class HprofHeap implements Heap {
         DominatorTree domTree = new DominatorTree(this,nearestGCRoot.getMultipleParents());
         domTree.computeDominators();
         int idSize = dumpBuffer.getIDSize();
-        Map domTreeMap = new HashMap(1000);
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
         while (offset[0] < allInstanceDumpBounds.endOffset) {
@@ -600,32 +598,11 @@ class HprofHeap implements Heap {
                     size = getInstanceByID(instanceId).getSize();
                 }
                 for (;idom!=0;idom=domTree.getIdomId(idom,entry)) {
-                    Object[] cachedDomPath = (Object[]) domTreeMap.get(new Long(idom));
-                    
-                    if (cachedDomPath != null) {
-                        if (domPath != null) {
-                            domPath[1] = cachedDomPath;
-                        }
-                        for(;cachedDomPath!=null;cachedDomPath=(Object[]) cachedDomPath[1]) {
-                            entry = (Entry) cachedDomPath[0];
-                            entry.setRetainedSize(entry.getRetainedSize()+size);
-                        }
+                    entry = idToOffsetMap.get(idom);
+                    if (entry.isTreeObj()) {
                         break;
-                    } else {
-                        Object[] newDomPath;
-                        
-                        entry = idToOffsetMap.get(idom);
-                        if (entry.isTreeObj()) {
-                            break;
-                        }
-                        entry.setRetainedSize(entry.getRetainedSize()+size);
-                        newDomPath = new Object[]{entry,null};
-                        if (domPath != null) {
-                            domPath[1] = newDomPath;
-                        }
-                        domTreeMap.put(new Long(idom),newDomPath);
-                        domPath = newDomPath;
                     }
+                    entry.setRetainedSize(entry.getRetainedSize()+size);
                 }
             }
         }
