@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Value;
 
 /**
@@ -362,16 +363,27 @@ public class Snapshot {
         return reachableExcludes;
     }
 
-    public String valueString(Instance arrayDump) {
-        if (arrayDump == null) return null;
+    public String valueString(Instance instance) {
+        if (instance == null) return null;
         try {
-            Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy"); // NOI18N
-            Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
-            method.setAccessible(true);
-            return (String) method.invoke(proxy, arrayDump);
+            if (instance.getJavaClass().getName().equals(String.class.getName())) {
+                Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy"); // NOI18N
+                Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
+                method.setAccessible(true);
+                return (String) method.invoke(proxy, instance);
+            } else if (instance.getJavaClass().getName().equals("char[]")) { // NOI18N
+                Method method = instance.getClass().getDeclaredMethod("getChars", int.class, int.class);
+                method.setAccessible(true);
+                char[] chars = (char[])method.invoke(instance, 0, ((PrimitiveArrayInstance)instance).getLength());
+                if (chars != null) {
+                    return new String(chars);
+                } else {
+                    return "*null*"; // NOI18N
+                }
+            }
         } catch (Exception ex) {
             Logger.getLogger(Snapshot.class.getName()).log(Level.WARNING, "Error getting toString() value of an instance dump", ex); // NO18N
         }
-        return arrayDump.toString();
+        return instance.toString();
     }
 }
