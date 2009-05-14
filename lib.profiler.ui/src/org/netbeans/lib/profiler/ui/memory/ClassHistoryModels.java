@@ -25,6 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.memory;
 
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
@@ -107,6 +108,7 @@ public final class ClassHistoryModels {
                 return dataManager.nTotalAllocObjects[index];
             }
         };
+        allocObjectsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.A_ALLOC_OBJECTS_INITIAL_VALUE));
 
         // Bytes Allocated
         ProfilerXYItem allocBytesItem = new ProfilerXYItem(GraphsUI.A_ALLOC_BYTES_NAME, 0) {
@@ -114,6 +116,7 @@ public final class ClassHistoryModels {
                 return dataManager.totalAllocObjectsSize[index];
             }
         };
+        allocBytesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.A_ALLOC_BYTES_INITIAL_VALUE));
 
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
@@ -129,6 +132,7 @@ public final class ClassHistoryModels {
                 return dataManager.nTrackedLiveObjects[index];
             }
         };
+        liveObjectsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.L_LIVE_OBJECTS_INITIAL_VALUE));
 
         // Live Bytes
         ProfilerXYItem liveBytesItem = new ProfilerXYItem(GraphsUI.L_LIVE_BYTES_NAME, 0) {
@@ -136,6 +140,7 @@ public final class ClassHistoryModels {
                 return dataManager.trackedLiveObjectsSize[index];
             }
         };
+        liveBytesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.L_LIVE_BYTES_INITIAL_VALUE));
 
         // Objects Allocated
         ProfilerXYItem allocObjectsItem = new ProfilerXYItem(GraphsUI.A_ALLOC_OBJECTS_NAME, 0) {
@@ -143,6 +148,7 @@ public final class ClassHistoryModels {
                 return dataManager.nTotalAllocObjects[index];
             }
         };
+        allocObjectsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.A_ALLOC_OBJECTS_INITIAL_VALUE));
 
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
