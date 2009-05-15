@@ -55,7 +55,15 @@ class NearestGCRoot {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final int BUFFER_SIZE = (64 * 1024) / 8;
-
+    private static final String[] REF_CLASSES = {
+        "java.lang.ref.WeakReference",    // NOI18N
+        "java.lang.ref.SoftReference",    // NOI18N
+        "java.lang.ref.FinalReference",   // NOI18N
+        "java.lang.ref.PhantomReference"  // NOI18N
+    };
+    private static final String JAVA_LANG_REF_REFERENCE = "java.lang.ref.Reference";   // NOI18N
+    private static final String REFERENT_FILED_NAME = "referent"; // NOI18N
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Field referentFiled;
@@ -89,7 +97,7 @@ class NearestGCRoot {
         return heap.getInstanceByID(nextGCPathId);
     }
 
-    private boolean isWeakOrSoftReference(FieldValue value, Instance instance) {
+    private boolean isSpecialReference(FieldValue value, Instance instance) {
         Field f = value.getField();
 
         return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass());
@@ -99,14 +107,12 @@ class NearestGCRoot {
         if (gcRootsComputed) {
             return;
         }
-
-        JavaClass weakRef = heap.getJavaClassByName("java.lang.ref.WeakReference"); // NOI18N
-        JavaClass softRef = heap.getJavaClassByName("java.lang.ref.SoftReference"); // NOI18N
         referenceClasses = new HashSet();
-        referenceClasses.add(weakRef);
-        referenceClasses.addAll(weakRef.getSubClasses());
-        referenceClasses.add(softRef);
-        referenceClasses.addAll(softRef.getSubClasses());
+        for (int i=0; i<REF_CLASSES.length; i++) {
+            JavaClass ref = heap.getJavaClassByName(REF_CLASSES[i]);
+            referenceClasses.add(ref);
+            referenceClasses.addAll(ref.getSubClasses());
+        }
         referentFiled = computeReferentFiled();
         heap.computeReferences(); // make sure references are computed first
         allInstances = heap.getSummary().getTotalLiveInstances();
@@ -177,9 +183,10 @@ class NearestGCRoot {
                 FieldValue val = (FieldValue) valuesIt.next();
 
                 if (val instanceof ObjectFieldValue) {
-                    if (!isWeakOrSoftReference(val, instance)) { // skip Soft and Weak References
-
+                     // skip Soft, Weak, Final and Phantom References
+                    if (!isSpecialReference(val, instance)) {
                         Instance refInstance = ((ObjectFieldValue) val).getInstance();
+                        
                         writeConnection(instanceId, refInstance);
                         if (refInstance != null) {
                             hasValues = true;
@@ -195,13 +202,13 @@ class NearestGCRoot {
     }
 
     private Field computeReferentFiled() {
-        JavaClass reference = heap.getJavaClassByName("java.lang.ref.Reference"); // NOI18N
+        JavaClass reference = heap.getJavaClassByName(JAVA_LANG_REF_REFERENCE);
         Iterator fieldRef = reference.getFields().iterator();
 
         while (fieldRef.hasNext()) {
             Field f = (Field) fieldRef.next();
 
-            if (f.getName().equals("referent")) { // NOI18N
+            if (f.getName().equals(REFERENT_FILED_NAME)) {
 
                 return f;
             }

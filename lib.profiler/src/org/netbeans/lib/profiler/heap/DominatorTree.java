@@ -99,6 +99,8 @@ class DominatorTree {
             ex.printStackTrace();
         }
         deleteBuffers();
+        nearestGCRootCache = null;
+        dirtySet = Collections.EMPTY_SET;
     }
     
     private boolean computeOneLevel(boolean ignoreDirty) throws IOException {
@@ -175,7 +177,7 @@ class DominatorTree {
             return nearestGCLong;
         }
         entry = heap.idToOffsetMap.get(instanceIdLong.longValue());
-        nearestGC = new Long(entry.getNearestGCRootPointer());
+        nearestGC = Long.valueOf(entry.getNearestGCRootPointer());
         nearestGCRootCache.put(instanceIdLong,nearestGC);
         return nearestGC;
     }
