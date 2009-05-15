@@ -60,13 +60,13 @@ public class DecimalXYItemMarksComputer extends XYItemMarksComputer {
 
         if (context.getViewWidth() == 0) {
             scale = -1;
-        } else if (item.getValuesCount() == 0) {
-            // Initial scale
-            scale = -1;
+//        } else if (item.getValuesCount() == 0) {
+//            // Initial scale
+//            scale = -1;
         } else {
             scale = painter.getItemValueScale(item, context);
         }
-
+        
         if (oldScale != scale) {
 
             if (scale == -1) {
@@ -91,7 +91,6 @@ public class DecimalXYItemMarksComputer extends XYItemMarksComputer {
             final long dataEnd = ((long)painter.getItemValue(end, item,
                                           context) / step) * step;
             final long iterCount = Math.abs(dataEnd - dataStart) / step + 2;
-
             final long[] iterIndex = new long[] { 0 };
 
 

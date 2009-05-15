@@ -55,11 +55,11 @@ import java.io.ObjectOutputStream;
 public class MethodInvokedFirstTimeCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private int methodId;
+    private char methodId;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public MethodInvokedFirstTimeCommand(int methodId) {
+    public MethodInvokedFirstTimeCommand(char methodId) {
         super(METHOD_INVOKED_FIRST_TIME);
         this.methodId = methodId;
     }
@@ -81,10 +81,10 @@ public class MethodInvokedFirstTimeCommand extends Command {
     }
 
     void readObject(ObjectInputStream in) throws IOException {
-        methodId = in.readInt();
+        methodId = in.readChar();
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(methodId);
+        out.writeChar(methodId);
     }
 }
