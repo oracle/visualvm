@@ -335,11 +335,10 @@ class ChartSelectionManager implements ChartSelectionModel {
 
     private class ChartListener extends ChartConfigurationListener.Adapter {
 
-        public void contentsUpdated(long offsetX, long offsetY,
+        public void contentsWillBeUpdated(long offsetX, long offsetY,
                                 double scaleX, double scaleY,
                                 long lastOffsetX, long lastOffsetY,
-                                double lastScaleX, double lastScaleY,
-                                int shiftX, int shiftY) {
+                                double lastScaleX, double lastScaleY) {
             updateHighlightedItems();
         }
 

@@ -66,7 +66,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
     public ProfilerXYTooltipOverlay(final ChartComponent chart,
                                     ProfilerXYTooltipPainter tooltipPainter) {
         if (chart.getSelectionModel() == null)
-            throw new NullPointerException("No ChartSelectionModel set for " + chart);
+            throw new NullPointerException("No ChartSelectionModel set for " + chart); // NOI18N
         
         if (!Utils.forceSpeed()) {
             timer = new Timer(TOOLTIP_RESPONSE / ANIMATION_STEPS, this);
