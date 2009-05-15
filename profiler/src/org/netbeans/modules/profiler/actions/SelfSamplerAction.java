@@ -72,7 +72,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     // I18N String constants
     private static final String ACTION_NAME_START = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionNameStart");
     private static final String ACTION_NAME_STOP = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionNameStop");
-    private static final String ACTION_DESCR = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionDescription");
+//    private static final String ACTION_DESCR = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionDescription");
     private static final String THREAD_NAME = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ThreadName");
     private StackTraceSnapshotBuilder builder;
     private ThreadFactory threadFactory;
@@ -84,7 +84,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private SelfSamplerAction() {
         putValue(Action.NAME, ACTION_NAME_START);
-        putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
+//        putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
         putValue(Action.SMALL_ICON,
             ImageUtilities.loadImageIcon(
                 "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
@@ -155,6 +155,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                 executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                 CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+                loadedSnapshot.setSaved(true);
                 ResultsManager.getDefault().openSnapshot(loadedSnapshot);
                 getBuilder().reset();
 

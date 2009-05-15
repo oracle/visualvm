@@ -58,6 +58,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.text.DateFormat;
 import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -190,7 +191,7 @@ public final class TelemetryWindow extends TopComponent {
             // Data
             for (int i=0; i < (nItems); i++) {
                 d.setTime(col1[i]);
-                eDD.dumpData(new StringBuffer(quote+d.toString()+quote+separator+quote+col2[i]+quote+separator+quote+col3[i]+quote+newLine));
+                eDD.dumpData(new StringBuffer(quote+DateFormat.getDateTimeInstance().format(d)+quote+separator+quote+col2[i]+quote+separator+quote+col3[i]+quote+newLine));
             }
             eDD.close();
         }
@@ -235,7 +236,7 @@ public final class TelemetryWindow extends TopComponent {
             // Data
             for (int i=0; i < (nItems); i++) {
                 d.setTime(col1[i]);
-                eDD.dumpData(new StringBuffer("<tr><td>"+d.toString()+"</td><td align=right>"+col2[i]+"</td><td align=right>"+col3[i]+"</td></tr>")); //NOI18N
+                eDD.dumpData(new StringBuffer("<tr><td>"+DateFormat.getDateTimeInstance().format(d)+"</td><td align=right>"+col2[i]+"</td><td align=right>"+col3[i]+"</td></tr>")); //NOI18N
             }
             eDD.dumpDataAndClose(new StringBuffer("</table></BODY></HTML>"));
         }
@@ -283,7 +284,7 @@ public final class TelemetryWindow extends TopComponent {
             // Data
             for (int i=0; i < (nItems); i++) {
                 d.setTime(col1[i]);
-                result = new StringBuffer("  <TableRow>"+newline+"   <TableCell>"+d.toString()+"</TableCell>"+newline);  // NOI18N
+                result = new StringBuffer("  <TableRow>"+newline+"   <TableCell>"+DateFormat.getDateTimeInstance().format(d)+"</TableCell>"+newline);  // NOI18N
                 result.append("   <TableCell>"+col2[i]+"</TableCell>"+newline);  // NOI18N
                 result.append("   <TableCell>"+col3[i]+"</TableCell>"+newline+"  </TableRow>"+newline);  // NOI18N
                 eDD.dumpData(result);
