@@ -133,7 +133,7 @@ public class ProfilerGCXYItemPainter extends ProfilerXYItemPainter {
     }
 
     public double getItemValueScale(XYItem item, ChartContext context) {
-        return 0;
+        return -1;
     }
 
 
