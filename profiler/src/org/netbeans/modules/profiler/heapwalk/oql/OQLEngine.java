@@ -240,15 +240,20 @@ public class OQLEngine {
 
             if (q.className != null) {
                 Stack toInspect = new Stack();
+                Set inspected = new HashSet();
+
                 toInspect.push(clazz);
 
                 Object inspecting = null;
                 while(!toInspect.isEmpty()) {
                     inspecting = toInspect.pop();
+                    inspected.add(inspecting);
                     JavaClass clz = (JavaClass)inspecting;
                     if (q.isInstanceOf) {
                         for(Object subclass : clz.getSubClasses()) {
-                            toInspect.push(subclass);
+                            if (!inspected.contains(subclass) && !toInspect.contains(subclass)) {
+                                toInspect.push(subclass);
+                            }
                         }
                     }
                     List objects = clz.getInstances();
