@@ -25,6 +25,7 @@
 
 package org.netbeans.lib.profiler.ui.monitor;
 
+import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
@@ -116,6 +117,7 @@ public final class VMTelemetryModels {
                 return dataManager.totalMemory[index];
             }
         };
+        heapSizeItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.HEAP_SIZE_INITIAL_VALUE));
 
         // Used heap
         ProfilerXYItem usedHeapItem = new ProfilerXYItem(GraphsUI.USED_HEAP_NAME, 0) {
@@ -123,6 +125,7 @@ public final class VMTelemetryModels {
                 return dataManager.usedMemory[index];
             }
         };
+        usedHeapItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.USED_HEAP_INITIAL_VALUE));
 
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
@@ -138,6 +141,7 @@ public final class VMTelemetryModels {
                 return dataManager.nSurvivingGenerations[index];
             }
         };
+        survivingGenerationsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.SURVGEN_INITIAL_VALUE));
 
         // Relative time spent in GC
         ProfilerXYItem gcTimeItem = new ProfilerXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
@@ -145,6 +149,7 @@ public final class VMTelemetryModels {
                 return dataManager.relativeGCTimeInPerMil[index];
             }
         };
+        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
 
         // GC intervals
         ProfilerGCXYItem gcIntervalsItem = new ProfilerGCXYItem("") { // NOI18N
@@ -175,6 +180,7 @@ public final class VMTelemetryModels {
                 return dataManager.nTotalThreads[index];
             }
         };
+        threadsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.THREADS_INITIAL_VALUE));
 
         // Loaded classes
         ProfilerXYItem loadedClassesItem = new ProfilerXYItem(GraphsUI.LOADED_CLASSES_NAME, 0) {
@@ -182,6 +188,7 @@ public final class VMTelemetryModels {
                 return dataManager.loadedClassesCount[index];
             }
         };
+        loadedClassesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.LOADED_CLASSES_INITIAL_VALUE));
 
         // Model
         ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
