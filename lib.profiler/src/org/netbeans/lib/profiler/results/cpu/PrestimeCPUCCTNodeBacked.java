@@ -227,8 +227,11 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(indent+" <Invocations>"+getNCalls()+"</Invocations>"+newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
+        if (children==null && nChildren>0) {
+            children= (PrestimeCPUCCTNode[]) getChildren();
+        }
         if (children!=null) {
-            for (int i = 0; i < getNChildren(); i++) {
+            for (int i = 0; i < nChildren; i++) {
                 ((PrestimeCPUCCTNodeBacked)children[i]).exportXMLData(eDD, indent+"  "); //NOI18N
             }
         }
@@ -244,8 +247,11 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+percentFormat.format(((double) getTotalTime0InPerCent())/100)+"</td><td class=\"right\">"+getTotalTime0()+"</td><td class=\"right\">"+getNCalls()+"</td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
+        if (children==null && nChildren>0) {
+            children= (PrestimeCPUCCTNode[]) getChildren();
+        }
         if (children!=null) {
-            for (int i = 0; i < getNChildren(); i++) {
+            for (int i = 0; i < nChildren; i++) {
                 ((PrestimeCPUCCTNodeBacked)children[i]).exportHTMLData(eDD, depth+1);
             }
         }
@@ -284,8 +290,11 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(quote+getNCalls()+quote+newLine);
         eDD.dumpData(result); //dumps the current row
         // children nodes
+        if (children==null && nChildren>0) {            
+            children= (PrestimeCPUCCTNode[]) getChildren();
+        }
         if (children!=null) {
-            for (int i = 0; i < getNChildren(); i++) {
+            for (int i = 0; i < nChildren; i++) {
                 ((PrestimeCPUCCTNodeBacked)children[i]).exportCSVData(separator, depth+1, eDD);
             }
         }
