@@ -25,6 +25,7 @@
 
 package org.netbeans.lib.profiler.charts;
 
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.canvas.InteractiveCanvasComponent;
 import java.awt.Color;
@@ -52,7 +53,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     private ItemsModel itemsModel;
     private PaintersModel paintersModel;
 
-    private LongRect dataBounds;
+    protected LongRect dataBounds;
     private LongRect initialDataBounds;
     private ChartContext chartContext;
 
@@ -169,7 +170,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
         return (RenderingHints)renderingHints.clone();
     }
 
-    final void applyRenderingHints(Graphics2D g) {
+    private void applyRenderingHints(Graphics2D g) {
         if (renderingHints != null) g.setRenderingHints(renderingHints);
     }
 
@@ -183,12 +184,16 @@ public class ChartComponent extends InteractiveCanvasComponent {
     // --- ChartContext --------------------------------------------------------
 
     public final ChartContext getChartContext() {
+        return getChartContext(null);
+    }
+
+    protected ChartContext getChartContext(ChartItem item) {
         if (chartContext == null) chartContext = createChartContext();
         return chartContext;
     }
 
     protected ChartContext createChartContext() {
-        return new DefaultContext(this);
+        return new Context(this);
     }
 
 
@@ -380,10 +385,10 @@ public class ChartComponent extends InteractiveCanvasComponent {
         // Paint chart items
         if (itemsModel != null && paintersModel != null) {
             int itemsCount = itemsModel.getItemsCount();
-
+            
             if (itemsCount != 0) {
                 boolean sel = selectionModel != null;
-
+                
                 List<ItemSelection> highlightedSelection = sel ? selectionModel.getHighlightedItems() : null;
                 List<ItemSelection> selectedSelection = sel ? selectionModel.getSelectedItems() : null;
                 List<ItemSelection> filteredHighlighted = sel ? new ArrayList() : Collections.EMPTY_LIST;
@@ -401,8 +406,9 @@ public class ChartComponent extends InteractiveCanvasComponent {
                         if (painter.supportsSelecting(item))
                             filterSelection(selectedSelection, filteredSelected, item);
                     }
-
-                    painter.paintItem(item, filteredHighlighted, filteredSelected, g2, invalidArea, getChartContext());
+                    
+                    painter.paintItem(item, filteredHighlighted, filteredSelected,
+                                      g2, invalidArea, getChartContext(item));
                 }
             }
         }
@@ -421,9 +427,16 @@ public class ChartComponent extends InteractiveCanvasComponent {
     }
 
 
-    // --- Private implementation ----------------------------------------------
+    // --- UI tweaks -----------------------------------------------------------
 
-    private void computeDataBounds() {
+    public void setBackground(Color bg) {
+        super.setBackground(Utils.checkedColor(bg));
+    }
+
+
+    // --- Protected implementation ----------------------------------------------
+
+    protected void computeDataBounds() {
         LongRect.clear(dataBounds);
         if (itemsModel == null || paintersModel == null) return;
 
@@ -438,7 +451,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
         }
     }
 
-    private void resizeChart() {
+    protected void resizeChart() {
         if (LongRect.isEmpty(dataBounds)) {
             LongRect bounds = new LongRect(dataBounds);
             if (bounds.width == 0) {
@@ -455,10 +468,155 @@ public class ChartComponent extends InteractiveCanvasComponent {
         }
     }
 
-    private void updateChart() {
+    protected void updateChart() {
         computeDataBounds();
         resizeChart();
         invalidateImage();
+        repaintDirty();
+    }
+
+    protected void itemsAdded(List<ChartItem> addedItems) {
+        // Update chart size
+        LongRect oldBounds = new LongRect(dataBounds);
+        for (ChartItem item : addedItems) {
+            ItemPainter painter = paintersModel.getPainter(item);
+            LongRect.add(dataBounds, painter.getItemBounds(item));
+        }
+        if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
+
+        // Update chart appearance
+        LongRect uiBounds = null;
+        for (ChartItem item : addedItems) {
+            ItemPainter painter = paintersModel.getPainter(item);
+            if (uiBounds == null) uiBounds =
+                new LongRect(painter.getItemBounds(item, getChartContext(item)));
+            else
+                LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext(item)));
+        }
+        invalidateImage(Utils.getCheckedRectangle(uiBounds));
+        repaintDirty();
+    }
+
+    protected void itemsRemoved(List<ChartItem> removedItems) {
+        List<ItemPainter> painters = new ArrayList(removedItems.size());
+
+        // Try to resolve painters for all removed items
+        for (ChartItem item : removedItems) {
+            ItemPainter painter = paintersModel.getPainter(item);
+            if (painter == null) {
+                painters = null;
+                break;
+            }
+            painters.add(painter);
+        }
+
+        if (painters == null) {
+            // Some or all painters for removed items not available
+            updateChart();
+        } else {
+            // All painters for removed items available
+
+            // Update chart size
+            LongRect oldBounds = new LongRect(dataBounds);
+            computeDataBounds();
+            if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
+
+            // Update chart appearance
+            LongRect uiBounds = null;
+            for (int i = 0; i < removedItems.size(); i++) {
+                ChartItem item = removedItems.get(i);
+                ItemPainter painter = painters.get(i);
+                if (uiBounds == null) uiBounds =
+                    new LongRect(painter.getItemBounds(item, getChartContext(item)));
+                else
+                    LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext(item)));
+            }
+            invalidateImage(Utils.getCheckedRectangle(uiBounds));
+            repaintDirty();
+        }
+    }
+
+    protected void itemsChanged(List<ChartItemChange> itemChanges) {
+        // Resolve painters for changedItems
+        List<ItemPainter> painters = new ArrayList(itemChanges.size());
+        for (ChartItemChange change : itemChanges)
+            painters.add(paintersModel.getPainter(change.getItem()));
+
+        // Check if items bounds changed
+        boolean boundsChange = false;
+        for (int i = 0; i < itemChanges.size(); i++) {
+            ChartItemChange change = itemChanges.get(i);
+            ItemPainter painter = painters.get(i);
+            boundsChange = painter.isBoundsChange(change);
+            if (boundsChange) break;
+        }
+
+        // Update chart size
+        if (boundsChange) {
+            LongRect oldBounds = new LongRect(dataBounds);
+            computeDataBounds();
+            if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
+        }
+
+        // Check if items appearance changed
+        boolean appearanceChange = false;
+        for (int i = 0; i < itemChanges.size(); i++) {
+            ChartItemChange change = itemChanges.get(i);
+            ItemPainter painter = painters.get(i);
+            appearanceChange = painter.isAppearanceChange(change);
+            if (appearanceChange) break;
+        }
+
+        // Update chart appearance
+        if (appearanceChange) {
+            LongRect uiBounds = null;
+            for (int i = 0; i < itemChanges.size(); i++) {
+                ChartItemChange change = itemChanges.get(i);
+                ChartItem item = change.getItem();
+                ItemPainter painter = paintersModel.getPainter(item);
+                if (painter.isAppearanceChange(change)) {
+                    if (uiBounds == null) uiBounds =
+                        new LongRect(painter.getDirtyBounds(change, getChartContext(item)));
+                    else
+                        LongRect.add(uiBounds, painter.getDirtyBounds(change, getChartContext(item)));
+                }
+            }
+            invalidateImage(Utils.getCheckedRectangle(uiBounds));
+            repaintDirtyAccel();
+        } else {
+            repaintDirty();
+        }
+    }
+
+    protected void paintersChanged() {
+        updateChart();
+    }
+
+    protected void paintersChanged(List<ItemPainter> changedPainters) {
+        Set<ChartItem> changedItems = new HashSet();
+
+        // Update chart size
+        LongRect oldBounds = new LongRect(dataBounds);
+        computeDataBounds();
+        if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
+
+        // Resolve changed items
+        for (int i = 0; i < itemsModel.getItemsCount(); i++) {
+            ChartItem item = itemsModel.getItem(i);
+            if (changedPainters.contains(paintersModel.getPainter(item)))
+                changedItems.add(item);
+        }
+
+        // Update chart appearance
+        LongRect uiBounds = null;
+        for (ChartItem item : changedItems) {
+            ItemPainter painter = paintersModel.getPainter(item);
+            if (uiBounds == null) uiBounds =
+                new LongRect(painter.getItemBounds(item, getChartContext(item)));
+            else
+                LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext(item)));
+        }
+        invalidateImage(Utils.getCheckedRectangle(uiBounds));
         repaintDirty();
     }
 
@@ -468,124 +626,17 @@ public class ChartComponent extends InteractiveCanvasComponent {
     private class ItemsModelListener implements ItemsListener {
 
         public void itemsAdded(List<ChartItem> addedItems) {
-            // Update chart size
-            LongRect oldBounds = new LongRect(dataBounds);
-            for (ChartItem item : addedItems) {
-                ItemPainter painter = paintersModel.getPainter(item);
-                LongRect.add(dataBounds, painter.getItemBounds(item));
-            }
-            if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
-
-            // Update chart appearance
-            LongRect uiBounds = null;
-            for (ChartItem item : addedItems) {
-                ItemPainter painter = paintersModel.getPainter(item);
-                if (uiBounds == null) uiBounds =
-                    new LongRect(painter.getItemBounds(item, getChartContext()));
-                else
-                    LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext()));
-            }
-            invalidateImage(ChartContext.getCheckedRectangle(uiBounds));
-            repaintDirty();
+            ChartComponent.this.itemsAdded(addedItems);
         }
 
         public void itemsRemoved(List<ChartItem> removedItems) {
-            List<ItemPainter> painters = new ArrayList(removedItems.size());
-
-            // Try to resolve painters for all removed items
-            for (ChartItem item : removedItems) {
-                ItemPainter painter = paintersModel.getPainter(item);
-                if (painter == null) {
-                    painters = null;
-                    break;
-                }
-                painters.add(painter);
-            }
-
-            if (painters == null) {
-                // Some or all painters for removed items not available
-                updateChart();
-            } else {
-                // All painters for removed items available
-
-                // Update chart size
-                LongRect oldBounds = new LongRect(dataBounds);
-                computeDataBounds();
-                if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
-
-                // Update chart appearance
-                LongRect uiBounds = null;
-                for (int i = 0; i < removedItems.size(); i++) {
-                    ChartItem item = removedItems.get(i);
-                    ItemPainter painter = painters.get(i);
-                    if (uiBounds == null) uiBounds =
-                        new LongRect(painter.getItemBounds(item, getChartContext()));
-                    else
-                        LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext()));
-                }
-                invalidateImage(ChartContext.getCheckedRectangle(uiBounds));
-                repaintDirty();
-            }
+            ChartComponent.this.itemsRemoved(removedItems);
         }
 
         public void itemsChanged(List<ChartItemChange> itemChanges) {
-            // Resolve painters for changedItems
-            List<ItemPainter> painters = new ArrayList(itemChanges.size());
-            for (ChartItemChange change : itemChanges)
-                painters.add(paintersModel.getPainter(change.getItem()));
-
-            // Check if items bounds changed
-            boolean boundsChange = false;
-            for (int i = 0; i < itemChanges.size(); i++) {
-                ChartItemChange change = itemChanges.get(i);
-                ItemPainter painter = painters.get(i);
-                boundsChange = painter.isBoundsChange(change);
-                if (boundsChange) break;
-            }
-
-            // Update chart size
-            if (boundsChange) {
-                LongRect oldBounds = new LongRect(dataBounds);
-                computeDataBounds();
-                if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
-            }
-
-            // Check if items appearance changed
-            boolean appearanceChange = false;
-            for (int i = 0; i < itemChanges.size(); i++) {
-                ChartItemChange change = itemChanges.get(i);
-                ItemPainter painter = painters.get(i);
-                appearanceChange = painter.isAppearanceChange(change, getChartContext());
-                if (appearanceChange) break;
-            }
-
-            // Update chart appearance
-            if (appearanceChange) {
-                LongRect uiBounds = null;
-                for (int i = 0; i < itemChanges.size(); i++) {
-                    ChartItemChange change = itemChanges.get(i);
-                    ChartItem item = change.getItem();
-                    ItemPainter painter = paintersModel.getPainter(item);
-                    if (painter.isAppearanceChange(change, getChartContext())) {
-                        if (uiBounds == null) uiBounds =
-                            new LongRect(painter.getDirtyBounds(change, getChartContext()));
-                        else
-                            LongRect.add(uiBounds, painter.getDirtyBounds(change, getChartContext()));
-                    }
-                }
-                invalidateImage(ChartContext.getCheckedRectangle(uiBounds));
-                repaintDirtyAccel();
-            } else {
-                repaintDirty();
-            }
+            ChartComponent.this.itemsChanged(itemChanges);
         }
 
-    }
-
-    // --- UI tweaks -----------------------------------------------------------
-
-    public void setBackground(Color bg) {
-        super.setBackground(Utils.checkedColor(bg));
     }
 
 
@@ -594,35 +645,11 @@ public class ChartComponent extends InteractiveCanvasComponent {
     private class PaintersModelListener implements PaintersListener {
 
         public void paintersChanged() {
-            updateChart();
+            ChartComponent.this.paintersChanged();
         }
 
         public void paintersChanged(List<ItemPainter> changedPainters) {
-            Set<ChartItem> changedItems = new HashSet();
-
-            // Update chart size
-            LongRect oldBounds = new LongRect(dataBounds);
-            computeDataBounds();
-            if (!LongRect.equals(oldBounds, dataBounds)) resizeChart();
-
-            // Resolve changed items
-            for (int i = 0; i < itemsModel.getItemsCount(); i++) {
-                ChartItem item = itemsModel.getItem(i);
-                if (changedPainters.contains(paintersModel.getPainter(item)))
-                    changedItems.add(item);
-            }
-
-            // Update chart appearance
-            LongRect uiBounds = null;
-            for (ChartItem item : changedItems) {
-                ItemPainter painter = paintersModel.getPainter(item);
-                if (uiBounds == null) uiBounds =
-                    new LongRect(painter.getItemBounds(item, getChartContext()));
-                else
-                    LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext()));
-            }
-            invalidateImage(ChartContext.getCheckedRectangle(uiBounds));
-            repaintDirty();
+            ChartComponent.this.paintersChanged(changedPainters);
         }
 
     }
@@ -657,11 +684,11 @@ public class ChartComponent extends InteractiveCanvasComponent {
                     ItemPainter painter = paintersModel.getPainter(item);
                     if (painter.supportsHovering(item)) {
                         if (dirtyArea.isEmpty())
-                            dirtyArea.setBounds(ChartContext.getCheckedRectangle(
-                            painter.getSelectionBounds(sel, getChartContext())));
+                            dirtyArea.setBounds(Utils.getCheckedRectangle(
+                            painter.getSelectionBounds(sel, getChartContext(item))));
                         else
-                            dirtyArea.add(ChartContext.getCheckedRectangle(
-                            painter.getSelectionBounds(sel, getChartContext())));
+                            dirtyArea.add(Utils.getCheckedRectangle(
+                            painter.getSelectionBounds(sel, getChartContext(item))));
                     }
                 }
 
@@ -678,11 +705,11 @@ public class ChartComponent extends InteractiveCanvasComponent {
                     ItemPainter painter = paintersModel.getPainter(item);
                     if (painter.supportsHovering(item)) {
                         if (dirtyArea.isEmpty())
-                            dirtyArea.setBounds(ChartContext.getCheckedRectangle(
-                            painter.getSelectionBounds(sel, getChartContext())));
+                            dirtyArea.setBounds(Utils.getCheckedRectangle(
+                            painter.getSelectionBounds(sel, getChartContext(item))));
                         else
-                            dirtyArea.add(ChartContext.getCheckedRectangle(
-                            painter.getSelectionBounds(sel, getChartContext())));
+                            dirtyArea.add(Utils.getCheckedRectangle(
+                            painter.getSelectionBounds(sel, getChartContext(item))));
                     }
                 }
 
@@ -702,12 +729,12 @@ public class ChartComponent extends InteractiveCanvasComponent {
 
     // --- ChartContext implementation -----------------------------------------
 
-    protected static class DefaultContext extends ChartContext {
+    protected static class Context implements ChartContext {
 
         private ChartComponent chart;
 
 
-        public DefaultContext(ChartComponent chart) { this.chart = chart; }
+        public Context(ChartComponent chart) { this.chart = chart; }
 
         protected ChartComponent getChartComponent() { return chart; }
 
@@ -761,6 +788,21 @@ public class ChartComponent extends InteractiveCanvasComponent {
         public double getDataWidth(double viewWidth) { return chart.getDataWidth(viewWidth); }
 
         public double getDataHeight(double viewHeight) { return chart.getDataHeight(viewHeight); }
+
+
+        private LongRect getViewRectImpl(LongRect dataRect) {
+            LongRect viewRect = new LongRect();
+
+            viewRect.x = (long)Math.ceil(getViewX(dataRect.x));
+            viewRect.width = (long)Math.ceil(getViewWidth(dataRect.width));
+            if (isRightBased()) viewRect.x -= viewRect.width;
+
+            viewRect.y = (long)Math.ceil(getViewY(dataRect.y));
+            viewRect.height = (long)Math.ceil(getViewHeight(dataRect.height));
+            if (isBottomBased()) viewRect.y -= viewRect.height;
+
+            return viewRect;
+        }
 
     }
 

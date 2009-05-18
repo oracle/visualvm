@@ -61,8 +61,10 @@ import javax.swing.border.LineBorder;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
+import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.ItemsModel;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
@@ -70,18 +72,18 @@ import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
 import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.CompoundXYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
@@ -377,7 +379,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowValue(int index) {
-                ProfilerXYItem item = models.memoryItemsModel().getItem(index);
+                SynchronousXYItem item = models.memoryItemsModel().getItem(index);
                 return INT_FORMATTER.format(item.getMaxYValue());
             }
 
@@ -390,37 +392,40 @@ public final class MemoryGraphPanel extends GraphPanel {
 
     private PaintersModel createMemoryPaintersModel() {
         // Heap size
-        ProfilerXYItemPainter heapSizePainter =
-                ProfilerXYItemPainter.absolutePainter(GraphsUI.HEAP_SIZE_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter heapSizePainter =
+                SynchronousXYItemPainter.absolutePainter(GraphsUI.HEAP_SIZE_PAINTER_LINE_WIDTH,
                                                       GraphsUI.HEAP_SIZE_PAINTER_LINE_COLOR,
                                                       GraphsUI.HEAP_SIZE_PAINTER_FILL_COLOR);
-        ProfilerXYItemMarker heapSizeMarker =
-                 ProfilerXYItemMarker.absolutePainter(GraphsUI.HEAP_SIZE_MARKER_RADIUS,
+        SynchronousXYItemMarker heapSizeMarker =
+                 SynchronousXYItemMarker.absolutePainter(GraphsUI.HEAP_SIZE_MARKER_RADIUS,
                                                       GraphsUI.HEAP_SIZE_MARKER_LINE1_WIDTH,
                                                       GraphsUI.HEAP_SIZE_MARKER_LINE1_COLOR,
                                                       GraphsUI.HEAP_SIZE_MARKER_LINE2_WIDTH,
                                                       GraphsUI.HEAP_SIZE_MARKER_LINE2_COLOR,
                                                       GraphsUI.HEAP_SIZE_MARKER_FILL_COLOR);
-        XYItemPainter hsp = new CompoundProfilerXYItemPainter(heapSizePainter,
+        XYItemPainter hsp = new CompoundXYItemPainter(heapSizePainter,
                                                       heapSizeMarker);
 
         // Used heap
-        ProfilerXYItemPainter usedHeapPainter =
-                ProfilerXYItemPainter.absolutePainter(GraphsUI.USED_HEAP_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter usedHeapPainter =
+                SynchronousXYItemPainter.absolutePainter(GraphsUI.USED_HEAP_PAINTER_LINE_WIDTH,
                                                       GraphsUI.USED_HEAP_PAINTER_LINE_COLOR,
                                                       GraphsUI.USED_HEAP_PAINTER_FILL_COLOR);
-        ProfilerXYItemMarker usedHeapMarker =
-                 ProfilerXYItemMarker.absolutePainter(GraphsUI.USED_HEAP_MARKER_RADIUS,
+        SynchronousXYItemMarker usedHeapMarker =
+                 SynchronousXYItemMarker.absolutePainter(GraphsUI.USED_HEAP_MARKER_RADIUS,
                                                       GraphsUI.USED_HEAP_MARKER_LINE1_WIDTH,
                                                       GraphsUI.USED_HEAP_MARKER_LINE1_COLOR,
                                                       GraphsUI.USED_HEAP_MARKER_LINE2_WIDTH,
                                                       GraphsUI.USED_HEAP_MARKER_LINE2_COLOR,
                                                       GraphsUI.USED_HEAP_MARKER_FILL_COLOR);
-        XYItemPainter uhp = new CompoundProfilerXYItemPainter(usedHeapPainter,
+        XYItemPainter uhp = new CompoundXYItemPainter(usedHeapPainter,
                                                       usedHeapMarker);
 
         // Model
-        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
+        ItemsModel items = models.memoryItemsModel();
+        PaintersModel model = new PaintersModel.Default(
+                                            new ChartItem[] { items.getItem(0),
+                                                              items.getItem(1) },
                                             new XYItemPainter[] { hsp, uhp });
 
         return model;
@@ -431,7 +436,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             public void paint(Graphics2D g, Rectangle dirtyArea,
                               ChartContext context) {
 
-                int limitHeight = ChartContext.getCheckedIntValue(
+                int limitHeight = Utils.getCheckedIntValue(
                                   context.getViewY(models.getDataManager().
                                   maxHeapSize));
                 if (limitHeight <= context.getViewportHeight()) {

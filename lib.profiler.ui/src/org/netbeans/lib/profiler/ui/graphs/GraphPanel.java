@@ -64,8 +64,8 @@ import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 
 
@@ -115,7 +115,7 @@ public abstract class GraphPanel extends JPanel {
 
     // --- Chart support -------------------------------------------------------
 
-    protected ProfilerXYChart createChart(ProfilerXYItemsModel itemsModel,
+    protected ProfilerXYChart createChart(SynchronousXYItemsModel itemsModel,
                                           PaintersModel paintersModel,
                                           final boolean smallPanel) {
 

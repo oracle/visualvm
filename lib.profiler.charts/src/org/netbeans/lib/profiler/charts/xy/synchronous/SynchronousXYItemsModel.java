@@ -23,50 +23,67 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.netbeans.lib.profiler.charts.xy.synchronous;
 
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.ItemsModel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.netbeans.lib.profiler.charts.ChartItem;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerXYItemsModel extends ItemsModel.Abstract {
+public class SynchronousXYItemsModel extends ItemsModel.Abstract {
 
-    private final ProfilerXYItem[] items;
+    private final ArrayList<SynchronousXYItem> items = new ArrayList();
     private final Timeline timeline;
 
 
     // --- Constructor ---------------------------------------------------------
 
-    public ProfilerXYItemsModel(Timeline timeline, ProfilerXYItem[] items) {
+    public SynchronousXYItemsModel(Timeline timeline) {
+        this.timeline = timeline;
+    }
+
+    public SynchronousXYItemsModel(Timeline timeline, SynchronousXYItem[] items) {
+        this(timeline);
+
         if (items == null)
             throw new IllegalArgumentException("Items cannot be null"); // NOI18N
         if (items.length == 0)
             throw new IllegalArgumentException("Items cannot be empty"); // NOI18N
 
-        this.items = items;
-        this.timeline = timeline;
-
-        for (int i = 0; i < items.length; i++) {
-            items[i].setItemIndex(i);
-            items[i].setTimeline(timeline);
-        }
-
-        if (timeline.getTimestampsCount() > 0) valuesAdded();
+        addItems(items);
     }
 
 
     // --- Public interface ----------------------------------------------------
 
-    public void valuesAdded() {
+    public void addItems(SynchronousXYItem[] addedItems) {
+        for (int i = 0; i < addedItems.length; i++) {
+            addedItems[i].setTimeline(timeline);
+            items.add(addedItems[i]);
+        }
+        
+        fireItemsAdded(Arrays.asList((ChartItem[])addedItems));
+
+        if (timeline.getTimestampsCount() > 0) valuesAdded();
+    }
+
+    public void removeItems(SynchronousXYItem[] removedItems) {
+        for (SynchronousXYItem item : removedItems) items.remove(item);
+        fireItemsRemoved(Arrays.asList((ChartItem[])removedItems));
+    }
+
+
+    public final void valuesAdded() {
         // Update values
-        List<ChartItemChange> itemChanges = new ArrayList(items.length);
-        for (ProfilerXYItem item : items) itemChanges.add(item.valuesAdded());
+        List<ChartItemChange> itemChanges = new ArrayList(items.size());
+        for (SynchronousXYItem item : items) itemChanges.add(item.valuesChanged());
         fireItemsChanged(itemChanges);
 
         // Check timestamp
@@ -74,7 +91,7 @@ public class ProfilerXYItemsModel extends ItemsModel.Abstract {
         long timestamp = timeline.getTimestamp(valueIndex);
         long previousTimestamp = valueIndex == 0 ? -1 :
                                  timeline.getTimestamp(valueIndex - 1);
-//
+        
         if (previousTimestamp != -1 && previousTimestamp >= timestamp)
             throw new IllegalArgumentException(
                            "ProfilerXYItemsModel: new timestamp " + timestamp + // NOI18N
@@ -82,23 +99,23 @@ public class ProfilerXYItemsModel extends ItemsModel.Abstract {
                            ", skipping the values."); // NOI18N
     }
 
-    public void valuesReset() {
+    public final void valuesReset() {
         // Update values
-        List<ChartItemChange> itemChanges = new ArrayList(items.length);
-        for (ProfilerXYItem item : items) itemChanges.add(item.valuesAdded());
+        List<ChartItemChange> itemChanges = new ArrayList(items.size());
+        for (SynchronousXYItem item : items) itemChanges.add(item.valuesChanged());
         fireItemsChanged(itemChanges);
     }
 
 
-    public Timeline getTimeline() {
+    public final Timeline getTimeline() {
         return timeline;
     }
 
 
     // --- AbstractItemsModel implementation -----------------------------------
 
-    public int getItemsCount() { return items.length; }
+    public final int getItemsCount() { return items.size(); }
 
-    public ProfilerXYItem getItem(int index) { return items[index]; }
+    public final SynchronousXYItem getItem(int index) { return items.get(index); }
 
 }

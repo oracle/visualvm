@@ -27,6 +27,7 @@ package org.netbeans.lib.profiler.charts.swing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.lang.reflect.Method;
@@ -106,6 +107,27 @@ public final class Utils {
         // If we get here we're most likely being run on some other O/S
         // or we didn't properly detect Windows.
         return true;
+    }
+
+
+    // --- long <-> int conversions --------------------------------------------
+
+    public static final int VALUE_OUT_OF_RANGE_NEG = Integer.MIN_VALUE;
+    public static final int VALUE_OUT_OF_RANGE_POS = Integer.MAX_VALUE;
+    
+
+    public static final int getCheckedIntValue(double value) {
+        if (value < Integer.MIN_VALUE) return VALUE_OUT_OF_RANGE_NEG;
+        if (value > Integer.MAX_VALUE) return VALUE_OUT_OF_RANGE_POS;
+        else return (int)value;
+    }
+
+    public static final Rectangle getCheckedRectangle(LongRect rect) {
+        // TODO: this is incorrect, width/height don't reflect x/y truncation!
+        return new Rectangle(getCheckedIntValue(rect.x),
+                            getCheckedIntValue(rect.y),
+                            getCheckedIntValue(rect.width),
+                            getCheckedIntValue(rect.height));
     }
 
 }

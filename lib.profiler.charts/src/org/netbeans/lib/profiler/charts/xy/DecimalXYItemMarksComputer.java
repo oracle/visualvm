@@ -31,6 +31,7 @@ import org.netbeans.lib.profiler.charts.axis.AxisMark;
 import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
 import org.netbeans.lib.profiler.charts.axis.DecimalAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.LongMark;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 
 /**
  *
@@ -105,8 +106,8 @@ public class DecimalXYItemMarksComputer extends XYItemMarksComputer {
                                            dataStart + iterIndex[0] * step;
 
                     iterIndex[0]++;
-                    int position = ChartContext.getCheckedIntValue(
-                                        painter.getItemView(value, item, context));
+                    int position = Utils.getCheckedIntValue(
+                                         painter.getItemView(value, item, context));
                     return new LongMark(value, position);
                 }
 
