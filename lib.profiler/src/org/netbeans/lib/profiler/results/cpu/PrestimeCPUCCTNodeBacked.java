@@ -227,12 +227,20 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(indent+" <Invocations>"+getNCalls()+"</Invocations>"+newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
-        if (children==null && nChildren>0) {
-            children= (PrestimeCPUCCTNode[]) getChildren();
-        }
         if (children!=null) {
             for (int i = 0; i < nChildren; i++) {
                 ((PrestimeCPUCCTNodeBacked)children[i]).exportXMLData(eDD, indent+"  "); //NOI18N
+            }
+        } else {
+            if (nChildren>0) {
+                int tempNChildren=nChildren;
+                PrestimeCPUCCTNode[] tempChildren=(PrestimeCPUCCTNode[]) getChildren();
+                children=null;
+                for (int i = 0; i < nChildren; i++) {
+                    ((PrestimeCPUCCTNodeBacked)tempChildren[i]).exportXMLData(eDD, indent+"  "); //NOI18N
+                }
+                tempChildren=null;
+                nChildren=tempNChildren;
             }
         }
         result=new StringBuffer(indent+"</node>"); //NOI18N
@@ -247,12 +255,20 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+percentFormat.format(((double) getTotalTime0InPerCent())/100)+"</td><td class=\"right\">"+getTotalTime0()+"</td><td class=\"right\">"+getNCalls()+"</td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
-        if (children==null && nChildren>0) {
-            children= (PrestimeCPUCCTNode[]) getChildren();
-        }
         if (children!=null) {
             for (int i = 0; i < nChildren; i++) {
                 ((PrestimeCPUCCTNodeBacked)children[i]).exportHTMLData(eDD, depth+1);
+            }
+        } else {
+            if (nChildren>0) {
+                int tempNChildren=nChildren;
+                PrestimeCPUCCTNode[] tempChildren=(PrestimeCPUCCTNode[]) getChildren();
+                children=null;
+                for (int i = 0; i < nChildren; i++) {
+                    ((PrestimeCPUCCTNodeBacked)tempChildren[i]).exportHTMLData(eDD, depth+1);
+                }
+                tempChildren=null;
+                nChildren=tempNChildren;
             }
         }
     }
@@ -290,12 +306,20 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(quote+getNCalls()+quote+newLine);
         eDD.dumpData(result); //dumps the current row
         // children nodes
-        if (children==null && nChildren>0) {            
-            children= (PrestimeCPUCCTNode[]) getChildren();
-        }
         if (children!=null) {
             for (int i = 0; i < nChildren; i++) {
                 ((PrestimeCPUCCTNodeBacked)children[i]).exportCSVData(separator, depth+1, eDD);
+            }
+        } else {
+            if (nChildren>0) {
+                int tempNChildren=nChildren;
+                PrestimeCPUCCTNode[] tempChildren=(PrestimeCPUCCTNode[]) getChildren();
+                children=null;
+                for (int i = 0; i < nChildren; i++) {
+                    ((PrestimeCPUCCTNodeBacked)tempChildren[i]).exportCSVData(separator, depth+1, eDD);
+                }
+                tempChildren=null;
+                nChildren=tempNChildren;
             }
         }
     }
