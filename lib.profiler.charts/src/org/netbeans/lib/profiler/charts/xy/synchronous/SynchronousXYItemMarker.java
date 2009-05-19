@@ -23,14 +23,14 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.netbeans.lib.profiler.charts.xy.synchronous;
 
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
@@ -46,42 +46,39 @@ import java.util.List;
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
+public class SynchronousXYItemMarker extends XYItemPainter.Abstract {
 
-    private static final int TYPE_ABSOLUTE = 0;
-    private static final int TYPE_RELATIVE = 1;
+    protected final int markRadius;
+    protected final int line1Width;
+    protected final Color line1Color;
+    protected final int line2Width;
+    protected final Color line2Color;
+    protected final Color fillColor;
 
-    private final int markRadius;
-    private final int line1Width;
-    private final Color line1Color;
-    private final int line2Width;
-    private final Color line2Color;
-    private final Color fillColor;
+    protected final Stroke line1Stroke;
+    protected final Stroke line2Stroke;
 
-    private final Stroke line1Stroke;
-    private final Stroke line2Stroke;
+    protected final int decorationRadius;
 
-    private final int decorationRadius;
-
-    private final int type;
-    private final int maxValueOffset;
+    protected final int type;
+    protected final int maxValueOffset;
 
 
     // --- Constructor ---------------------------------------------------------
 
-    public static ProfilerXYItemMarker absolutePainter(int markRadius,
+    public static SynchronousXYItemMarker absolutePainter(int markRadius,
                                                        float line1Width,
                                                        Color line1Color,
                                                        float line2Width,
                                                        Color line2Color,
                                                        Color fillColor) {
 
-        return new ProfilerXYItemMarker(markRadius, line1Width, line1Color,
+        return new SynchronousXYItemMarker(markRadius, line1Width, line1Color,
                                         line2Width, line2Color, fillColor,
                                         TYPE_ABSOLUTE, 0);
     }
 
-    public static ProfilerXYItemMarker relativePainter(int markRadius,
+    public static SynchronousXYItemMarker relativePainter(int markRadius,
                                                        float line1Width,
                                                        Color line1Color,
                                                        float line2Width,
@@ -89,13 +86,13 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
                                                        Color fillColor,
                                                        int maxOffset) {
 
-        return new ProfilerXYItemMarker(markRadius, line1Width, line1Color,
+        return new SynchronousXYItemMarker(markRadius, line1Width, line1Color,
                                         line2Width, line2Color, fillColor,
                                         TYPE_RELATIVE, maxOffset);
     }
 
 
-    private ProfilerXYItemMarker(int markRadius, float line1Width, Color line1Color,
+    public SynchronousXYItemMarker(int markRadius, float line1Width, Color line1Color,
                                  float line2Width, Color line2Color, Color fillColor,
                                  int type, int maxValueOffset) {
 
@@ -130,7 +127,7 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 //        if (!(item instanceof ProfilerXYItem))
 //            throw new UnsupportedOperationException("Unsupported item: " + item); // NOI18N
 
-        ProfilerXYItem xyItem = (ProfilerXYItem)item;
+        SynchronousXYItem xyItem = (SynchronousXYItem)item;
         if (type == TYPE_ABSOLUTE) {
             return xyItem.getBounds();
         } else {
@@ -145,7 +142,7 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 //        if (!(item instanceof ProfilerXYItem))
 //            throw new UnsupportedOperationException("Unsupported item: " + item); // NOI18N
 
-        ProfilerXYItem xyItem = (ProfilerXYItem)item;
+        SynchronousXYItem xyItem = (SynchronousXYItem)item;
         return getViewBounds(xyItem, null, context);
     }
 
@@ -160,7 +157,7 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
                                 change.getNewValuesBounds());
     }
 
-    public boolean isAppearanceChange(ChartItemChange itemChange, ChartContext context) {
+    public boolean isAppearanceChange(ChartItemChange itemChange) {
 //        if (!(itemChange instanceof XYItemChange))
 //            throw new UnsupportedOperationException("Unsupported itemChange: " + itemChange);
         
@@ -206,18 +203,18 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
     }
 
     public XYItemSelection getClosestSelection(ChartItem item, int viewX,
-                                                       int viewY, ChartContext context) {
+                                               int viewY, ChartContext context) {
 //        if (!(item instanceof ProfilerXYItem))
 //            throw new UnsupportedOperationException("Unsupported item: " + item); // NOI18N
 //        if (!(context instanceof ProfilerXYChartComponent.Context))
 //            throw new UnsupportedOperationException("Unsupported context: " + context);
 
-        ProfilerXYChart.Context contx = (ProfilerXYChart.Context)context;
+        SynchronousXYChartContext contx = (SynchronousXYChartContext)context;
 
         int nearestTimestampIndex = contx.getNearestTimestampIndex(viewX, viewY);
         if (nearestTimestampIndex == -1) return null; // item not visible
 
-        ProfilerXYItem xyItem = (ProfilerXYItem)item;
+        SynchronousXYItem xyItem = (SynchronousXYItem)item;
         return new XYItemSelection.Default(xyItem, nearestTimestampIndex,
                                            ItemSelection.DISTANCE_UNKNOWN);
     }
@@ -230,8 +227,8 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
 //        if (!(context instanceof ProfilerXYChartComponent.Context))
 //            throw new UnsupportedOperationException("Unsupported context: " + context);
         
-        paint((ProfilerXYItem)item, highlighted, selected, g, dirtyArea,
-              (ProfilerXYChart.Context)context);
+        paint((SynchronousXYItem)item, highlighted, selected, g, dirtyArea,
+              (SynchronousXYChartContext)context);
     }
 
 
@@ -305,9 +302,9 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
     }
 
     
-    private void paint(ProfilerXYItem item, List<ItemSelection> highlighted,
+    private void paint(SynchronousXYItem item, List<ItemSelection> highlighted,
                        List<ItemSelection> selected, Graphics2D g,
-                       Rectangle dirtyArea, ProfilerXYChart.Context context) {
+                       Rectangle dirtyArea, SynchronousXYChartContext context) {
 
         if (highlighted.isEmpty()) return;
         if (item.getValuesCount() < 1) return;
@@ -323,10 +320,10 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
             int valueIndex = sel.getValueIndex();
             if (valueIndex == -1) continue;
 
-            int itemX = ChartContext.getCheckedIntValue(context.getViewX(
-                                                        item.getXValue(valueIndex)));
-            int itemY = ChartContext.getCheckedIntValue(getYValue(item, valueIndex,
-                                                        type, context, itemValueFactor));
+            int itemX = Utils.getCheckedIntValue(context.getViewX(
+                                                 item.getXValue(valueIndex)));
+            int itemY = Utils.getCheckedIntValue(getYValue(item, valueIndex,
+                                                 type, context, itemValueFactor));
 
             if (fillColor != null) {
                 g.setPaint(fillColor);

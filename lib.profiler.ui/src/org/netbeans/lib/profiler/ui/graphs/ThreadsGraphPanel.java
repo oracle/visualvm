@@ -56,9 +56,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.ItemsModel;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
@@ -67,16 +69,15 @@ import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.CompoundXYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
@@ -384,7 +385,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowValue(int index) {
-                ProfilerXYItem item = models.threadsItemsModel().getItem(index);
+                SynchronousXYItem item = models.threadsItemsModel().getItem(index);
                 return INT_FORMATTER.format(item.getMaxYValue());
             }
 
@@ -397,40 +398,43 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
     private PaintersModel createThreadsPaintersModel() {
         // Threads
-        ProfilerXYItemPainter threadsPainter =
-                ProfilerXYItemPainter.absolutePainter(GraphsUI.THREADS_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter threadsPainter =
+                SynchronousXYItemPainter.absolutePainter(GraphsUI.THREADS_PAINTER_LINE_WIDTH,
                                                       GraphsUI.THREADS_PAINTER_LINE_COLOR,
                                                       GraphsUI.THREADS_PAINTER_FILL_COLOR);
-        ProfilerXYItemMarker threadsMarker =
-                 ProfilerXYItemMarker.absolutePainter(GraphsUI.THREADS_MARKER_RADIUS,
+        SynchronousXYItemMarker threadsMarker =
+                 SynchronousXYItemMarker.absolutePainter(GraphsUI.THREADS_MARKER_RADIUS,
                                                       GraphsUI.THREADS_MARKER_LINE1_WIDTH,
                                                       GraphsUI.THREADS_MARKER_LINE1_COLOR,
                                                       GraphsUI.THREADS_MARKER_LINE2_WIDTH,
                                                       GraphsUI.THREADS_MARKER_LINE2_COLOR,
                                                       GraphsUI.THREADS_MARKER_FILL_COLOR);
-        XYItemPainter thp = new CompoundProfilerXYItemPainter(threadsPainter,
+        XYItemPainter thp = new CompoundXYItemPainter(threadsPainter,
                                                       threadsMarker);
 
         // Loaded classes
-        ProfilerXYItemPainter loadedClassesPainter =
-                ProfilerXYItemPainter.relativePainter(GraphsUI.LOADED_CLASSES_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter loadedClassesPainter =
+                SynchronousXYItemPainter.relativePainter(GraphsUI.LOADED_CLASSES_PAINTER_LINE_WIDTH,
                                                       GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR,
                                                       GraphsUI.LOADED_CLASSES_PAINTER_FILL_COLOR,
                                                       10);
-        ProfilerXYItemMarker loadedClassesMarker =
-                 ProfilerXYItemMarker.relativePainter(GraphsUI.LOADED_CLASSES_MARKER_RADIUS,
+        SynchronousXYItemMarker loadedClassesMarker =
+                 SynchronousXYItemMarker.relativePainter(GraphsUI.LOADED_CLASSES_MARKER_RADIUS,
                                                       GraphsUI.LOADED_CLASSES_MARKER_LINE1_WIDTH,
                                                       GraphsUI.LOADED_CLASSES_MARKER_LINE1_COLOR,
                                                       GraphsUI.LOADED_CLASSES_MARKER_LINE2_WIDTH,
                                                       GraphsUI.LOADED_CLASSES_MARKER_LINE2_COLOR,
                                                       GraphsUI.LOADED_CLASSES_MARKER_FILL_COLOR,
                                                       10);
-        XYItemPainter lcp = new CompoundProfilerXYItemPainter(loadedClassesPainter,
+        XYItemPainter lcp = new CompoundXYItemPainter(loadedClassesPainter,
                                                       loadedClassesMarker);
 
         // Model
-        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
-           new XYItemPainter[] { thp, lcp });
+        ItemsModel items = models.threadsItemsModel();
+        PaintersModel model = new PaintersModel.Default(
+                                            new ChartItem[] { items.getItem(0),
+                                                              items.getItem(1) },
+                                            new XYItemPainter[] { thp, lcp });
 
         return model;
     }

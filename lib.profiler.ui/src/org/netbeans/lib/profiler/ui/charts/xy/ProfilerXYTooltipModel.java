@@ -33,18 +33,18 @@ import java.awt.Color;
  */
 public interface ProfilerXYTooltipModel {
 
-        public String getTimeValue      (long timestamp);
+    public String getTimeValue      (long timestamp);
 
-        public int    getRowsCount      ();
-        public String getRowName        (int index);
-        public Color  getRowColor       (int index);
-        public String getRowValue       (int index, long itemValue);
-        public String getRowUnits       (int index, long itemValue);
+    public int    getRowsCount      ();
+    public String getRowName        (int index);
+    public Color  getRowColor       (int index);
+    public String getRowValue       (int index, long itemValue);
+    public String getRowUnits       (int index, long itemValue);
 
-        public int    getExtraRowsCount ();
-        public String getExtraRowName   (int index);
-        public Color  getExtraRowColor  (int index);
-        public String getExtraRowValue  (int index);
-        public String getExtraRowUnits  (int index);
+    public int    getExtraRowsCount ();
+    public String getExtraRowName   (int index);
+    public Color  getExtraRowColor  (int index);
+    public String getExtraRowValue  (int index);
+    public String getExtraRowUnits  (int index);
 
 }

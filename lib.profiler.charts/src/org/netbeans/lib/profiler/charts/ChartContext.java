@@ -25,117 +25,82 @@
 
 package org.netbeans.lib.profiler.charts;
 
-import java.awt.Rectangle;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class ChartContext {
-
-    public static final int VALUE_OUT_OF_RANGE_NEG = Integer.MIN_VALUE;
-    public static final int VALUE_OUT_OF_RANGE_POS = Integer.MAX_VALUE;
-
+public interface ChartContext {
 
     // --- Chart orientation ---------------------------------------------------
 
-    public abstract boolean isRightBased();
+    public boolean isRightBased();
 
-    public abstract boolean isBottomBased();
+    public boolean isBottomBased();
 
 
     // --- Fixed scale ---------------------------------------------------------
 
-    public abstract boolean fitsWidth();
+    public boolean fitsWidth();
 
-    public abstract boolean fitsHeight();
+    public boolean fitsHeight();
 
 
     // --- Chart bounds --------------------------------------------------------
 
-    public abstract long getDataOffsetX();
+    public long getDataOffsetX();
 
-    public abstract long getDataOffsetY();
+    public long getDataOffsetY();
 
-    public abstract long getDataWidth();
+    public long getDataWidth();
 
-    public abstract long getDataHeight();
+    public long getDataHeight();
 
-    public abstract long getViewWidth();
+    public long getViewWidth();
 
-    public abstract long getViewHeight();
+    public long getViewHeight();
 
-    public abstract int getViewportWidth();
+    public int getViewportWidth();
 
-    public abstract int getViewportHeight();
+    public int getViewportHeight();
 
 
     // --- Data to View --------------------------------------------------------
 
-    public abstract double getViewX(double dataX);
+    public double getViewX(double dataX);
 
-    public abstract double getReversedViewX(double dataX);
+    public double getReversedViewX(double dataX);
 
-    public abstract double getViewY(double dataY);
+    public double getViewY(double dataY);
 
-    public abstract double getReversedViewY(double dataY);
+    public double getReversedViewY(double dataY);
 
-    public abstract double getViewWidth(double dataWidth);
+    public double getViewWidth(double dataWidth);
 
-    public abstract double getViewHeight(double dataHeight);
+    public double getViewHeight(double dataHeight);
 
-    public abstract LongRect getViewRect(LongRect dataRect);
+    public LongRect getViewRect(LongRect dataRect);
 
-//    public abstract LongRect getReversedViewRect(LongRect dataRect);
+//    public LongRect getReversedViewRect(LongRect dataRect);
 
 
     // --- View to Data --------------------------------------------------------
 
-    public abstract double getDataX(double viewX);
+    public double getDataX(double viewX);
 
-    public abstract double getReversedDataX(double viewX);
+    public double getReversedDataX(double viewX);
 
-    public abstract double getDataY(double viewY);
+    public double getDataY(double viewY);
 
-    public abstract double getReversedDataY(double viewY);
+    public double getReversedDataY(double viewY);
 
-    public abstract double getDataWidth(double viewWidth);
+    public double getDataWidth(double viewWidth);
 
-    public abstract double getDataHeight(double viewHeight);
+    public double getDataHeight(double viewHeight);
 
-//    public abstract LongRect getDataRect(LongRect viewRect);
+//    public LongRect getDataRect(LongRect viewRect);
 //
-//    public abstract LongRect getReversedDataRect(LongRect viewRect);
-
-
-    // --- Utils ---------------------------------------------------------------
-
-    public static final int getCheckedIntValue(double value) {
-        if (value < Integer.MIN_VALUE) return VALUE_OUT_OF_RANGE_NEG;
-        if (value > Integer.MAX_VALUE) return VALUE_OUT_OF_RANGE_POS;
-        else return (int)value;
-    }
-
-    public static final Rectangle getCheckedRectangle(LongRect rect) {
-        // TODO: this is incorrect, width/height don't reflect x/y truncation!
-        return new Rectangle(getCheckedIntValue(rect.x),
-                            getCheckedIntValue(rect.y),
-                            getCheckedIntValue(rect.width),
-                            getCheckedIntValue(rect.height));
-    }
-
-    protected final LongRect getViewRectImpl(LongRect dataRect) {
-        LongRect viewRect = new LongRect();
-
-        viewRect.x = (long)Math.ceil(getViewX(dataRect.x));
-        viewRect.width = (long)Math.ceil(getViewWidth(dataRect.width));
-        if (isRightBased()) viewRect.x -= viewRect.width;
-
-        viewRect.y = (long)Math.ceil(getViewY(dataRect.y));
-        viewRect.height = (long)Math.ceil(getViewHeight(dataRect.height));
-        if (isBottomBased()) viewRect.y -= viewRect.height;
-
-        return viewRect;
-    }
+//    public LongRect getReversedDataRect(LongRect viewRect);
 
 }

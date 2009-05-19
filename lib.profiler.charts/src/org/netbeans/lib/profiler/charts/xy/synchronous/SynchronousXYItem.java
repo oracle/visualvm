@@ -23,10 +23,10 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.netbeans.lib.profiler.charts.xy.synchronous;
 
 import org.netbeans.lib.profiler.charts.ChartItemListener;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.Timeline;
@@ -35,11 +35,10 @@ import org.netbeans.lib.profiler.charts.Timeline;
  *
  * @author Jiri Sedlacek
  */
-public abstract class ProfilerXYItem implements XYItem {
+public abstract class SynchronousXYItem implements XYItem {
 
     private final String name;
 
-    private int itemIndex;
     private Timeline timeline;
 
     private int lastIndex;
@@ -56,15 +55,15 @@ public abstract class ProfilerXYItem implements XYItem {
 
     // --- Constructor ---------------------------------------------------------
 
-    public ProfilerXYItem(String name) {
+    public SynchronousXYItem(String name) {
         this(name, Long.MAX_VALUE);
     }
 
-    public ProfilerXYItem(String name, long initialMinY) {
+    public SynchronousXYItem(String name, long initialMinY) {
         this(name, initialMinY, Long.MIN_VALUE);
     }
 
-    public ProfilerXYItem(String name, long initialMinY, long initialMaxY) {
+    public SynchronousXYItem(String name, long initialMinY, long initialMaxY) {
         this.name = name;
         this.initialMinY = initialMinY;
         this.initialMaxY = initialMaxY;
@@ -84,7 +83,7 @@ public abstract class ProfilerXYItem implements XYItem {
 
     public LongRect getInitialBounds() { return initialBounds; }
 
-    public XYItemChange valuesAdded() {
+    public XYItemChange valuesChanged() {
 
         int index = timeline.getTimestampsCount() - 1;
         XYItemChange change = null;
@@ -162,7 +161,7 @@ public abstract class ProfilerXYItem implements XYItem {
                                             new LongRect(bounds), oldBounds);
 
         }
-
+        
         lastIndex = index;
         return change;
         
@@ -194,9 +193,5 @@ public abstract class ProfilerXYItem implements XYItem {
     // --- Internal interface --------------------------------------------------
 
     void setTimeline(Timeline timeline) { this.timeline = timeline; }
-
-    void setItemIndex(int itemIndex) { this.itemIndex = itemIndex; }
-
-    int getItemIndex() { return itemIndex; }
 
 }
