@@ -303,7 +303,11 @@ public class SynchronousXYItemPainter extends XYItemPainter.Abstract {
 
 //long start = System.nanoTime();
         if (fillColor != null) {
-            int zeroY = (int)context.getViewY(0);
+            int zeroY = Utils.getCheckedIntValue(context.getViewY(context.getDataOffsetY()));
+            zeroY = Math.max(Utils.getCheckedIntValue(context.getViewportOffsetY()), zeroY);
+            zeroY = Math.min(Utils.getCheckedIntValue(context.getViewportOffsetY() +
+                                                      context.getViewportHeight()), zeroY);
+
             Polygon polygon = new Polygon();
             polygon.xpoints = xPoints;
             polygon.ypoints = yPoints;

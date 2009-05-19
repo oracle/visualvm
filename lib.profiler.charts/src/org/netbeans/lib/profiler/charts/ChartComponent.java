@@ -759,6 +759,10 @@ public class ChartComponent extends InteractiveCanvasComponent {
 
         public long getViewHeight() { return chart.getContentsHeight(); }
 
+        public long getViewportOffsetX() { return 0; }
+
+        public long getViewportOffsetY() { return 0; }
+
         public int getViewportWidth() { return chart.getWidth(); }
 
         public int getViewportHeight() { return chart.getHeight(); }
