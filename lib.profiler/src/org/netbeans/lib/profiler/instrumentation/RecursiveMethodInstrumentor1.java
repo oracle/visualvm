@@ -69,14 +69,12 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void transferDataIntoRealClass(DynamicClassInfo clazz) {
-            super.transferDataIntoRealClass(clazz);
-
+        public void processReachableMethods(DynamicClassInfo clazz) {
             int len = methodNamesAndSigs.size();
 
             for (int i = 0; i < len; i += 2) {
                 locateAndMarkMethodReachable(clazz, (String) methodNamesAndSigs.get(i), (String) methodNamesAndSigs.get(i + 1),
-                                             false, false, false);
+                                             false, true, false);
             }
         }
     }
@@ -188,6 +186,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
         }
 
+        BaseClassInfo placeholder = loadedJavaClassOrExistingPlaceholderForName(className, classLoaderId);
         DynamicClassInfo clazz = javaClassForName(className, classLoaderId);
 
         if (clazz == null) {
@@ -195,7 +194,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
         }
 
         initInstrMethodData();
-        instrumentClinit = threadInCallGraph;
+        boolean instrumentClinit = threadInCallGraph;
 
         if (!clazz.isLoaded()) {
             clazz.setLoaded(true);
@@ -240,11 +239,17 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                     }
                 }
             }
-
+            if (instrumentClinit) {
+                instrumentClinit(clazz);
+            }
+            if (placeholder instanceof ReachableMethodPlaceholder1) {
+                ((ReachableMethodPlaceholder1)placeholder).processReachableMethods(clazz);
+            } else if (placeholder != null) {
+//                System.out.println("Class: "+placeholder.getNameAndLoader());
+            }
             tryInstrumentSpawnedThreads(clazz);
-            countReachableScannableMethods(clazz);
 
-            return createInstrumentedMethodPack(clazz);
+            return createInstrumentedMethodPack();
         } else {
             return null;
         }
@@ -281,7 +286,6 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
         }
 
         initInstrMethodData();
-        instrumentClinit = true;
 
         methodName = methodName.intern();
         methodSignature = methodSignature.intern();
@@ -364,6 +368,10 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
         return false;
     }
 
+    private void instrumentClinit(DynamicClassInfo clazz) {
+        locateAndMarkMethodReachable(clazz, "<clinit>", "()V", false, false, false); // NOI18N        
+    }
+
     private void checkAndScanMethod(String className, int classLoaderId, String methodName, String methodSignature) {
         DynamicClassInfo clazz = javaClassForName(className, classLoaderId);
 
@@ -383,23 +391,6 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
         clazz.setMethodScanned(idx);
         scanMethod(clazz, idx);
-    }
-
-    /** Called to count methods to instrument in a single loaded class. */
-    private void countReachableScannableMethods(DynamicClassInfo clazz) {
-        nInstrMethods = 0;
-
-        String[] methodNames = clazz.getMethodNames();
-
-        for (int i = 0; i < methodNames.length; i++) {
-            if (!clazz.isMethodInstrumented(i)) {
-                if (clazz.isMethodReachable(i) && !clazz.isMethodUnscannable(i)) {
-                    nInstrMethods++;
-                } else if (instrumentClinit && (methodNames[i] == "<clinit>")) {
-                    nInstrMethods++; // NOI18N
-                }
-            }
-        }
     }
 
     /**
@@ -431,8 +422,8 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             clazz.setMethodReachable(idx);
 
             if (!clazz.isMethodStatic(idx) && !clazz.isMethodPrivate(idx) && !clazz.isMethodFinal(idx)
-                    && (methodName != "<init>")) {
-                clazz.setMethodVirtual(idx); // NOI18N
+                    && (methodName != "<init>")) {  // NOI18N
+                clazz.setMethodVirtual(idx);
             }
 
             if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)
@@ -454,9 +445,9 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
             if (!clazz.isLoaded()) {
                 return true; // No need to check subclasses because there are no loaded subclasses if this class itself is not loaded
-                             // Class is loaded, method is reachable and not unscannable are sufficient conditions for instrumenting method
             }
-
+            
+            // Class is loaded, method is reachable and not unscannable are sufficient conditions for instrumenting method
             if (!clazz.isMethodUnscannable(idx)) {
                 markClassAndMethodForInstrumentation(clazz, idx);
             }
