@@ -109,7 +109,7 @@ public class BytesXYItemMarksComputer extends XYItemMarksComputer {
                                            dataStart + iterIndex[0] * step;
 
                     iterIndex[0]++;
-                    int position = Utils.getCheckedIntValue(Math.floor(
+                    int position = Utils.checkedInt(Math.floor(
                                          painter.getItemView(value, item, context)));
                     return new BytesMark(value, position, radix);
                 }

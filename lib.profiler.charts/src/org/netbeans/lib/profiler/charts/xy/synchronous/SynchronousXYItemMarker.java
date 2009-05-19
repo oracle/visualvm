@@ -320,9 +320,9 @@ public class SynchronousXYItemMarker extends XYItemPainter.Abstract {
             int valueIndex = sel.getValueIndex();
             if (valueIndex == -1) continue;
 
-            int itemX = Utils.getCheckedIntValue(context.getViewX(
+            int itemX = Utils.checkedInt(context.getViewX(
                                                  item.getXValue(valueIndex)));
-            int itemY = Utils.getCheckedIntValue(getYValue(item, valueIndex,
+            int itemY = Utils.checkedInt(getYValue(item, valueIndex,
                                                  type, context, itemValueFactor));
 
             if (fillColor != null) {

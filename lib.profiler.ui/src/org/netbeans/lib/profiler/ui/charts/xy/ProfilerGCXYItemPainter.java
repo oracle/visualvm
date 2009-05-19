@@ -195,12 +195,12 @@ public class ProfilerGCXYItemPainter extends SynchronousXYItemPainter {
             if (gcStarts.length > 0) {
                 long[] gcEnds = xyItem.getGCEnds(index);
                 for (int i = 0; i < gcStarts.length; i++) {
-                    int itemStart = Utils.getCheckedIntValue(
+                    int itemStart = Utils.checkedInt(
                                           context.getViewX(gcStarts[i]));
                     long gcEnd = gcEnds[i];
                     if (gcEnd == -1)
                         gcEnd =  item.getXValue(item.getValuesCount() - 1);
-                    int itemLength = Utils.getCheckedIntValue(
+                    int itemLength = Utils.checkedInt(
                                            context.getViewWidth(
                                            gcEnd - gcStarts[i]));
 

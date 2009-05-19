@@ -303,9 +303,9 @@ public class SynchronousXYItemPainter extends XYItemPainter.Abstract {
 
 //long start = System.nanoTime();
         if (fillColor != null) {
-            int zeroY = Utils.getCheckedIntValue(context.getViewY(context.getDataOffsetY()));
-            zeroY = Math.max(Utils.getCheckedIntValue(context.getViewportOffsetY()), zeroY);
-            zeroY = Math.min(Utils.getCheckedIntValue(context.getViewportOffsetY() +
+            int zeroY = Utils.checkedInt(context.getViewY(context.getDataOffsetY()));
+            zeroY = Math.max(Utils.checkedInt(context.getViewportOffsetY()), zeroY);
+            zeroY = Math.min(Utils.checkedInt(context.getViewportOffsetY() +
                                                       context.getViewportHeight()), zeroY);
 
             Polygon polygon = new Polygon();
@@ -396,9 +396,9 @@ public class SynchronousXYItemPainter extends XYItemPainter.Abstract {
         for (int i = 0; i < visibleCount; i++) {
             int dataIndex = i == visibleCount - 1 ? lastIndex :
                                  firstIndex + i * itemsStep;
-            xPoints[i] = Utils.getCheckedIntValue(Math.ceil(
+            xPoints[i] = Utils.checkedInt(Math.ceil(
                          context.getViewX(item.getXValue(dataIndex))));
-            yPoints[i] = Utils.getCheckedIntValue(Math.ceil(
+            yPoints[i] = Utils.checkedInt(Math.ceil(
                          getYValue(item, dataIndex,
                          type, context, itemValueFactor)));
         }

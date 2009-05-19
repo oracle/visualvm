@@ -106,7 +106,7 @@ public class DecimalXYItemMarksComputer extends XYItemMarksComputer {
                                            dataStart + iterIndex[0] * step;
 
                     iterIndex[0]++;
-                    int position = Utils.getCheckedIntValue(
+                    int position = Utils.checkedInt(
                                          painter.getItemView(value, item, context));
                     return new LongMark(value, position);
                 }

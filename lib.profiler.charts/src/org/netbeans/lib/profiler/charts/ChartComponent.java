@@ -493,7 +493,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
             else
                 LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext(item)));
         }
-        invalidateImage(Utils.getCheckedRectangle(uiBounds));
+        invalidateImage(Utils.checkedRectangle(uiBounds));
         repaintDirty();
     }
 
@@ -531,7 +531,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
                 else
                     LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext(item)));
             }
-            invalidateImage(Utils.getCheckedRectangle(uiBounds));
+            invalidateImage(Utils.checkedRectangle(uiBounds));
             repaintDirty();
         }
     }
@@ -581,7 +581,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
                         LongRect.add(uiBounds, painter.getDirtyBounds(change, getChartContext(item)));
                 }
             }
-            invalidateImage(Utils.getCheckedRectangle(uiBounds));
+            invalidateImage(Utils.checkedRectangle(uiBounds));
             repaintDirtyAccel();
         } else {
             repaintDirty();
@@ -616,7 +616,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
             else
                 LongRect.add(uiBounds, painter.getItemBounds(item, getChartContext(item)));
         }
-        invalidateImage(Utils.getCheckedRectangle(uiBounds));
+        invalidateImage(Utils.checkedRectangle(uiBounds));
         repaintDirty();
     }
 
@@ -684,10 +684,10 @@ public class ChartComponent extends InteractiveCanvasComponent {
                     ItemPainter painter = paintersModel.getPainter(item);
                     if (painter.supportsHovering(item)) {
                         if (dirtyArea.isEmpty())
-                            dirtyArea.setBounds(Utils.getCheckedRectangle(
+                            dirtyArea.setBounds(Utils.checkedRectangle(
                             painter.getSelectionBounds(sel, getChartContext(item))));
                         else
-                            dirtyArea.add(Utils.getCheckedRectangle(
+                            dirtyArea.add(Utils.checkedRectangle(
                             painter.getSelectionBounds(sel, getChartContext(item))));
                     }
                 }
@@ -705,10 +705,10 @@ public class ChartComponent extends InteractiveCanvasComponent {
                     ItemPainter painter = paintersModel.getPainter(item);
                     if (painter.supportsHovering(item)) {
                         if (dirtyArea.isEmpty())
-                            dirtyArea.setBounds(Utils.getCheckedRectangle(
+                            dirtyArea.setBounds(Utils.checkedRectangle(
                             painter.getSelectionBounds(sel, getChartContext(item))));
                         else
-                            dirtyArea.add(Utils.getCheckedRectangle(
+                            dirtyArea.add(Utils.checkedRectangle(
                             painter.getSelectionBounds(sel, getChartContext(item))));
                     }
                 }

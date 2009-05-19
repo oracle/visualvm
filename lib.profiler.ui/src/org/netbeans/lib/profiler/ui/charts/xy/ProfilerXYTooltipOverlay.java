@@ -172,7 +172,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
         for (ItemSelection selection : selectedItems) {
             ChartItem item = selection.getItem();
             ItemPainter painter = paintersModel.getPainter(item);
-            Rectangle bounds = Utils.getCheckedRectangle(
+            Rectangle bounds = Utils.checkedRectangle(
                                painter.getSelectionBounds(selection,
                                chartContext));
             if (tooltipX == -1) tooltipX += bounds.x + bounds.width / 2;

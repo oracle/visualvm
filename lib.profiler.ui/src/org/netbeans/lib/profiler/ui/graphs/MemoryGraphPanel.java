@@ -436,7 +436,7 @@ public final class MemoryGraphPanel extends GraphPanel {
             public void paint(Graphics2D g, Rectangle dirtyArea,
                               ChartContext context) {
 
-                int limitHeight = Utils.getCheckedIntValue(
+                int limitHeight = Utils.checkedInt(
                                   context.getViewY(models.getDataManager().
                                   maxHeapSize));
                 if (limitHeight <= context.getViewportHeight()) {
