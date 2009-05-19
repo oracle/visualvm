@@ -28,6 +28,7 @@ package org.netbeans.lib.profiler.charts.axis;
 import java.util.Iterator;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.Timeline;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 
 /**
  *
@@ -141,10 +142,8 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
                                        dataStart + iterIndex[0] * step;
                 iterIndex[0]++;
                 int position = horizontal ?
-                               ChartContext.getCheckedIntValue(
-                                            context.getViewX(value)) :
-                               ChartContext.getCheckedIntValue(
-                                            context.getViewY(value));
+                               Utils.checkedInt(context.getViewX(value)) :
+                               Utils.checkedInt(context.getViewY(value));
                 return new TimeMark(value, position, format);
             }
 

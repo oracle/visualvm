@@ -56,9 +56,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.ItemsModel;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
@@ -68,17 +70,16 @@ import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.CompoundXYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
@@ -401,7 +402,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowValue(int index) {
-                ProfilerXYItem item = models.generationsItemsModel().getItem(index);
+                SynchronousXYItem item = models.generationsItemsModel().getItem(index);
                 switch (index) {
                     case 0:
                         return INT_FORMATTER.format(item.getMaxYValue());
@@ -428,43 +429,47 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
     private PaintersModel createGenerationsPaintersModel() {
         // Surviving generations
-        ProfilerXYItemPainter survgenPainter =
-                ProfilerXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter survgenPainter =
+                SynchronousXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
                                                       GraphsUI.SURVGEN_PAINTER_LINE_COLOR,
                                                       GraphsUI.SURVGEN_PAINTER_FILL_COLOR);
-        ProfilerXYItemMarker survgenMarker =
-                 ProfilerXYItemMarker.absolutePainter(GraphsUI.SURVGEN_MARKER_RADIUS,
+        SynchronousXYItemMarker survgenMarker =
+                 SynchronousXYItemMarker.absolutePainter(GraphsUI.SURVGEN_MARKER_RADIUS,
                                                       GraphsUI.SURVGEN_MARKER_LINE1_WIDTH,
                                                       GraphsUI.SURVGEN_MARKER_LINE1_COLOR,
                                                       GraphsUI.SURVGEN_MARKER_LINE2_WIDTH,
                                                       GraphsUI.SURVGEN_MARKER_LINE2_COLOR,
                                                       GraphsUI.SURVGEN_MARKER_FILL_COLOR);
-        XYItemPainter sgp = new CompoundProfilerXYItemPainter(survgenPainter,
+        XYItemPainter sgp = new CompoundXYItemPainter(survgenPainter,
                                                       survgenMarker);
 
         // Relative time spent in GC
-        ProfilerXYItemPainter gcTimePainter =
-                ProfilerXYItemPainter.relativePainter(GraphsUI.GC_TIME_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter gcTimePainter =
+                SynchronousXYItemPainter.relativePainter(GraphsUI.GC_TIME_PAINTER_LINE_WIDTH,
                                                       GraphsUI.GC_TIME_PAINTER_LINE_COLOR,
                                                       GraphsUI.GC_TIME_PAINTER_FILL_COLOR,
                                                       10);
-        ProfilerXYItemMarker gcTimeMarker =
-                 ProfilerXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
+        SynchronousXYItemMarker gcTimeMarker =
+                 SynchronousXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
                                                       GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
                                                       GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
                                                       GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
                                                       GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
                                                       GraphsUI.GC_TIME_MARKER_FILL_COLOR,
                                                       10);
-        XYItemPainter gtp = new CompoundProfilerXYItemPainter(gcTimePainter,
+        XYItemPainter gtp = new CompoundXYItemPainter(gcTimePainter,
                                                       gcTimeMarker);
 
         // GC events painter
         XYItemPainter gep = ProfilerGCXYItemPainter.painter(GraphsUI.GC_ACTIVITY_FILL_COLOR);
 
         // Model
-        PaintersModel model = new ProfilerXYPaintersModel(
-                 new XYItemPainter[] { gep, sgp, gtp });
+        ItemsModel items = models.generationsItemsModel();
+        PaintersModel model = new PaintersModel.Default(
+                                            new ChartItem[] { items.getItem(0),
+                                                              items.getItem(1),
+                                                              items.getItem(2) },
+                                            new XYItemPainter[] { gep, sgp, gtp });
 
         return model;
     }
