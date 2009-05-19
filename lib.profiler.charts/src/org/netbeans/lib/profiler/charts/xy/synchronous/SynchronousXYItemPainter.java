@@ -23,14 +23,14 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.netbeans.lib.profiler.charts.xy.synchronous;
 
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import java.awt.BasicStroke;
@@ -46,42 +46,39 @@ import org.netbeans.lib.profiler.charts.xy.XYItem;
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
+public class SynchronousXYItemPainter extends XYItemPainter.Abstract {
 
-    static final int TYPE_ABSOLUTE = 0;
-    static final int TYPE_RELATIVE = 1;
+    protected final int lineWidth;
+    protected final Color lineColor;
+    protected final Color fillColor;
 
-    private final int lineWidth;
-    private final Color lineColor;
-    final Color fillColor;
+    protected final Stroke lineStroke;
 
-    private final Stroke lineStroke;
-
-    private final int type;
-    private final int maxValueOffset;
+    protected final int type;
+    protected final int maxValueOffset;
 
 
     // --- Constructor ---------------------------------------------------------
 
-    public static ProfilerXYItemPainter absolutePainter(float lineWidth,
+    public static SynchronousXYItemPainter absolutePainter(float lineWidth,
                                                        Color lineColor,
                                                        Color fillColor) {
         
-        return new ProfilerXYItemPainter(lineWidth, lineColor, fillColor,
+        return new SynchronousXYItemPainter(lineWidth, lineColor, fillColor,
                                          TYPE_ABSOLUTE, 0);
     }
 
-    public static ProfilerXYItemPainter relativePainter(float lineWidth,
+    public static SynchronousXYItemPainter relativePainter(float lineWidth,
                                                        Color lineColor,
                                                        Color fillColor,
                                                        int maxOffset) {
 
-        return new ProfilerXYItemPainter(lineWidth, lineColor, fillColor,
+        return new SynchronousXYItemPainter(lineWidth, lineColor, fillColor,
                                          TYPE_RELATIVE, maxOffset);
     }
 
 
-    ProfilerXYItemPainter(float lineWidth, Color lineColor, Color fillColor,
+    public SynchronousXYItemPainter(float lineWidth, Color lineColor, Color fillColor,
                           int type, int maxValueOffset) {
 
         if (lineColor == null && fillColor == null)
@@ -139,7 +136,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
                                 change.getNewValuesBounds());
     }
 
-    public boolean isAppearanceChange(ChartItemChange itemChange, ChartContext context) {
+    public boolean isAppearanceChange(ChartItemChange itemChange) {
 //        if (!(itemChange instanceof XYItemChange))
 //            throw new UnsupportedOperationException("Unsupported itemChange: " + itemChange);
         
@@ -234,7 +231,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 //            throw new UnsupportedOperationException("Unsupported context: " + context);
         
         paint((XYItem)item, highlighted, selected, g, dirtyArea,
-              (ProfilerXYChart.Context)context);
+              (SynchronousXYChartContext)context);
     }
 
 
@@ -292,7 +289,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     
     protected void paint(XYItem item, List<ItemSelection> highlighted,
                        List<ItemSelection> selected, Graphics2D g,
-                       Rectangle dirtyArea, ProfilerXYChart.Context context) {
+                       Rectangle dirtyArea, SynchronousXYChartContext context) {
 
         if (item.getValuesCount() < 2) return;
         if (context.getViewWidth() == 0 || context.getViewHeight() == 0) return;
@@ -306,7 +303,11 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
 
 //long start = System.nanoTime();
         if (fillColor != null) {
-            int zeroY = (int)context.getViewY(0);
+            int zeroY = Utils.checkedInt(context.getViewY(context.getDataOffsetY()));
+            zeroY = Math.max(Utils.checkedInt(context.getViewportOffsetY()), zeroY);
+            zeroY = Math.min(Utils.checkedInt(context.getViewportOffsetY() +
+                                                      context.getViewportHeight()), zeroY);
+
             Polygon polygon = new Polygon();
             polygon.xpoints = xPoints;
             polygon.ypoints = yPoints;
@@ -341,7 +342,7 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
     }
 
     private static int[][] createPoints(XYItem item, Rectangle dirtyArea,
-                                 ProfilerXYChart.Context context,
+                                 SynchronousXYChartContext context,
                                  int type, int maxValueOffset) {
 
         int valuesCount = item.getValuesCount();
@@ -360,6 +361,12 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
         if (lastIndex == -1) lastIndex = valuesCount - 1;
         if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
+
+//        System.err.println(">>> First: " + firstIndex + ", last: " + lastIndex);
+//        if (firstIndex > lastIndex) {
+//            System.err.println(">>> First: " + firstIndex + ", last: " + lastIndex);
+//            Thread.dumpStack();
+//        }
 
         int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
         if (itemsStep == 0) itemsStep = 1;
@@ -389,9 +396,9 @@ public class ProfilerXYItemPainter extends XYItemPainter.Abstract {
         for (int i = 0; i < visibleCount; i++) {
             int dataIndex = i == visibleCount - 1 ? lastIndex :
                                  firstIndex + i * itemsStep;
-            xPoints[i] = ChartContext.getCheckedIntValue(Math.ceil(
+            xPoints[i] = Utils.checkedInt(Math.ceil(
                          context.getViewX(item.getXValue(dataIndex))));
-            yPoints[i] = ChartContext.getCheckedIntValue(Math.ceil(
+            yPoints[i] = Utils.checkedInt(Math.ceil(
                          getYValue(item, dataIndex,
                          type, context, itemValueFactor)));
         }
