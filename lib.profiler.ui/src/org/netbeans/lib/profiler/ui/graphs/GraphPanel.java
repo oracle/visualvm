@@ -64,8 +64,8 @@ import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 
 
@@ -90,7 +90,7 @@ public abstract class GraphPanel extends JPanel {
     // 3 minutes to switch from Scale To Fit to Fixed Scale
     protected static final long SMALL_CHART_FIT_TO_WINDOW_PERIOD = 180000;
 
-    
+
     static {
         String format = MessageFormat.format(TimeAxisUtils.TIME_DATE_FORMAT,
                                              new Object[] { TimeAxisUtils.TIME_MSEC,
@@ -115,12 +115,14 @@ public abstract class GraphPanel extends JPanel {
 
     // --- Chart support -------------------------------------------------------
 
-    protected ProfilerXYChart createChart(ProfilerXYItemsModel itemsModel,
+    protected ProfilerXYChart createChart(SynchronousXYItemsModel itemsModel,
                                           PaintersModel paintersModel,
                                           final boolean smallPanel) {
 
+        ProfilerXYChart chart;
+
         if (smallPanel) {
-            ProfilerXYChart chart = new ProfilerXYChart(itemsModel, paintersModel) {
+            chart = new ProfilerXYChart(itemsModel, paintersModel) {
                 public JToolTip createToolTip() {
                     lastTooltip = new SmallTooltip(this);
                     return lastTooltip;
@@ -132,10 +134,12 @@ public abstract class GraphPanel extends JPanel {
             smallTooltipManager = new SmallTooltipManager(chart);
             chart.setToolTipText(NO_DATA_TOOLTIP); // Needed to enable the tooltip
             ToolTipManager.sharedInstance().registerComponent(chart);
-            return chart;
         } else {
-            return new ProfilerXYChart(itemsModel, paintersModel);
+            chart = new ProfilerXYChart(itemsModel, paintersModel);
         }
+
+        chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
+        return chart;
 
     }
 

@@ -95,6 +95,15 @@ public class Snapshot {
     }
 
     public JavaClass findClass(String name) {
+        try {
+            long classId;
+            if (name.startsWith("0x")) {
+                classId = Long.parseLong(name.substring(2), 16);
+            } else {
+                classId = Long.parseLong(name);
+            }
+            return delegate.getJavaClassByID(classId);
+        } catch (NumberFormatException e) {}
         return delegate.getJavaClassByName(preprocessClassName(name));
     }
 

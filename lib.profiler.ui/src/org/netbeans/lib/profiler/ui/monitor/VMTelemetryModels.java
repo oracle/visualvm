@@ -25,13 +25,13 @@
 
 package org.netbeans.lib.profiler.ui.monitor;
 
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.Timeline;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItem;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
 import org.netbeans.lib.profiler.ui.graphs.GraphsUI;
 
 /**
@@ -45,9 +45,9 @@ public final class VMTelemetryModels {
     private final VMTelemetryDataManager dataManager;
 
     private final Timeline timeline;
-    private final ProfilerXYItemsModel memoryItemsModel;
-    private final ProfilerXYItemsModel generationsItemsModel;
-    private final ProfilerXYItemsModel threadsItemsModel;
+    private final SynchronousXYItemsModel memoryItemsModel;
+    private final SynchronousXYItemsModel generationsItemsModel;
+    private final SynchronousXYItemsModel threadsItemsModel;
 
 
     // --- Constructor ---------------------------------------------------------
@@ -73,15 +73,15 @@ public final class VMTelemetryModels {
         return dataManager;
     }
 
-    public ProfilerXYItemsModel memoryItemsModel() {
+    public SynchronousXYItemsModel memoryItemsModel() {
         return memoryItemsModel;
     }
 
-    public ProfilerXYItemsModel generationsItemsModel() {
+    public SynchronousXYItemsModel generationsItemsModel() {
         return generationsItemsModel;
     }
 
-    public ProfilerXYItemsModel threadsItemsModel() {
+    public SynchronousXYItemsModel threadsItemsModel() {
         return threadsItemsModel;
     }
 
@@ -110,9 +110,9 @@ public final class VMTelemetryModels {
         };
     }
 
-    private ProfilerXYItemsModel createMemoryItemsModel(Timeline timeline) {
+    private SynchronousXYItemsModel createMemoryItemsModel(Timeline timeline) {
         // Heap size
-        ProfilerXYItem heapSizeItem = new ProfilerXYItem(GraphsUI.HEAP_SIZE_NAME, 0) {
+        SynchronousXYItem heapSizeItem = new SynchronousXYItem(GraphsUI.HEAP_SIZE_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.totalMemory[index];
             }
@@ -120,7 +120,7 @@ public final class VMTelemetryModels {
         heapSizeItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.HEAP_SIZE_INITIAL_VALUE));
 
         // Used heap
-        ProfilerXYItem usedHeapItem = new ProfilerXYItem(GraphsUI.USED_HEAP_NAME, 0) {
+        SynchronousXYItem usedHeapItem = new SynchronousXYItem(GraphsUI.USED_HEAP_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.usedMemory[index];
             }
@@ -128,15 +128,15 @@ public final class VMTelemetryModels {
         usedHeapItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.USED_HEAP_INITIAL_VALUE));
 
         // Model
-        ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
-                           new ProfilerXYItem[] { heapSizeItem, usedHeapItem });
+        SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
+                           new SynchronousXYItem[] { heapSizeItem, usedHeapItem });
 
         return model;
     }
 
-    private ProfilerXYItemsModel createGenerationsItemsModel(Timeline timeline) {
+    private SynchronousXYItemsModel createGenerationsItemsModel(Timeline timeline) {
         // Surviving generations
-        ProfilerXYItem survivingGenerationsItem = new ProfilerXYItem(GraphsUI.SURVGEN_NAME, 0) {
+        SynchronousXYItem survivingGenerationsItem = new SynchronousXYItem(GraphsUI.SURVGEN_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nSurvivingGenerations[index];
             }
@@ -144,7 +144,7 @@ public final class VMTelemetryModels {
         survivingGenerationsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.SURVGEN_INITIAL_VALUE));
 
         // Relative time spent in GC
-        ProfilerXYItem gcTimeItem = new ProfilerXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
+        SynchronousXYItem gcTimeItem = new SynchronousXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
             public long getYValue(int index) {
                 return dataManager.relativeGCTimeInPerMil[index];
             }
@@ -165,17 +165,17 @@ public final class VMTelemetryModels {
         };
 
         // Model
-        ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
-                 new ProfilerXYItem[] { gcIntervalsItem,
+        SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
+                 new SynchronousXYItem[] { gcIntervalsItem,
                                         survivingGenerationsItem,
                                         gcTimeItem });
 
         return model;
     }
 
-    private ProfilerXYItemsModel createThreadsItemsModel(Timeline timeline) {
+    private SynchronousXYItemsModel createThreadsItemsModel(Timeline timeline) {
         // Threads
-        ProfilerXYItem threadsItem = new ProfilerXYItem(GraphsUI.THREADS_NAME, 0) {
+        SynchronousXYItem threadsItem = new SynchronousXYItem(GraphsUI.THREADS_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nTotalThreads[index];
             }
@@ -183,7 +183,7 @@ public final class VMTelemetryModels {
         threadsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.THREADS_INITIAL_VALUE));
 
         // Loaded classes
-        ProfilerXYItem loadedClassesItem = new ProfilerXYItem(GraphsUI.LOADED_CLASSES_NAME, 0) {
+        SynchronousXYItem loadedClassesItem = new SynchronousXYItem(GraphsUI.LOADED_CLASSES_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.loadedClassesCount[index];
             }
@@ -191,8 +191,8 @@ public final class VMTelemetryModels {
         loadedClassesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.LOADED_CLASSES_INITIAL_VALUE));
 
         // Model
-        ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
-                       new ProfilerXYItem[] { threadsItem, loadedClassesItem });
+        SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
+                       new SynchronousXYItem[] { threadsItem, loadedClassesItem });
 
         return model;
     }
