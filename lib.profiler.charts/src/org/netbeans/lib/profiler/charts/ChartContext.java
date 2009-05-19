@@ -61,6 +61,13 @@ public interface ChartContext {
 
     public long getViewHeight();
 
+
+    // --- Viewport bounds -----------------------------------------------------
+
+    public long getViewportOffsetX();
+
+    public long getViewportOffsetY();
+
     public int getViewportWidth();
 
     public int getViewportHeight();
