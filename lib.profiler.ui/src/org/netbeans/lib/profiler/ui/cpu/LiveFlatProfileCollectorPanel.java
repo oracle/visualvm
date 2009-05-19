@@ -340,7 +340,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
     private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
             result.append("<th>"+columnNames[i]+"</th>"); //NOI18N
         }
@@ -348,14 +348,14 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
 
         eDD.dumpData(result);
-        for (int i=0; i < (flatProfileContainer.getNRows()-1); i++) {
+        for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>"); //NOI18N
             result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
             result.append("<td align=right>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>"); //NOI18N
             result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>"); //NOI18N
             eDD.dumpData(result);
         }
-        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>")); //NOI18N
+        eDD.dumpDataAndClose(new StringBuffer(" </TABLE></BODY></HTML>")); //NOI18N
     }
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
@@ -368,7 +368,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         result.append("  </TableHeader>"+newline+"  <TableBody>"+newline); //NOI18N
         eDD.dumpData(result);
 
-        for (int i=0; i < (flatProfileContainer.getNRows()); i++) {
+        for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+"]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline); //NOI18N
@@ -392,7 +392,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (flatProfileContainer.getNRows()); i++) {
+        for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer();
             result.append(quote+flatProfileContainer.getMethodNameAtRow(i)+quote+separator);
             result.append(quote+flatProfileContainer.getPercentAtRow(i)+quote+separator);

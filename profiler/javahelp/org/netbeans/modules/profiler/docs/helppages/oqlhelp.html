@@ -145,8 +145,10 @@ object has following properties:
 <li>fields - array of field objects. field object has name, signature
 properties.
 <li>loader - ClassLoader object that loaded this class.
+<!--
 <li><i>signers - signers that signed this class. (Not implemented in 6.7M2)</i>
 <li><i>protectionDomain - protection domain to which this class belongs. (Not implemented in 6.7M2)</i>
+-->
 </ul>
 Class objects have the following methods:
 <ul>
@@ -275,8 +277,11 @@ following properties:
 <li>fields - array of field objects. Field objects have name, signature
 properties.
 <li>loader - ClassLoader object that loaded this class.
+<!--
 <li>signers - signers that signed this class.
 <li>protectionDomain - protection domain to which this class belongs.
+-->
+
 </ul>
 Class objects have the following methods:
 <ul>
@@ -659,7 +664,7 @@ Examples:
 <li>find Vector instance that has the maximum length
 <pre>
 <code>
-    select min(heap.objects('java.util.Vector'), 'lhs.elementData.length < rhs.elementData.length')
+    select min(heap.objects('java.util.Vector'), 'lhs.elementData.length &lt; rhs.elementData.length')
 </code>
 </pre>
 </ul>
@@ -771,7 +776,7 @@ more than one String instance can share the same char[] for the content.
 <pre>
 <code>
    select <a href="#map">map</a>(<a href="#sort">sort</a>(map(heap.objects('java.lang.ClassLoader'), 
-   '{ loader: it, count: it.classes.elementCount }'), 'lhs.count < rhs.count'),
+   '{ loader: it, count: it.classes.elementCount }'), 'lhs.count &lt; rhs.count'),
    'toHtml(it) + "&lt;br&gt;"')
 </code>
 </pre>
@@ -809,7 +814,7 @@ and walk until parent is null using the callback function to map call.
 
 <pre>
 <code>
-   select <a href="#map">map</a>(<a href="#filter">filter(<a href="#findClass">heap.findClass</a>('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),
+   select <a href="#map">map</a>(<a href="#filter">filter</a>(<a href="#findClass">heap.findClass</a>('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),
             function (it) {
                 var res = it.key.toString() + ' = ' + it.value.toString();
                 return res;
