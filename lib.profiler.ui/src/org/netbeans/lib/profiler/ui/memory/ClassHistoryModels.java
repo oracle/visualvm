@@ -25,12 +25,12 @@
 
 package org.netbeans.lib.profiler.ui.memory;
 
-import org.netbeans.lib.profiler.charts.LongRect;
 import org.netbeans.lib.profiler.charts.Timeline;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemsModel;
 import org.netbeans.lib.profiler.ui.graphs.GraphsUI;
 
 /**
@@ -44,8 +44,8 @@ public final class ClassHistoryModels {
     private final ClassHistoryDataManager dataManager;
 
     private final Timeline timeline;
-    private final ProfilerXYItemsModel allocationsItemsModel;
-    private final ProfilerXYItemsModel livenessItemsModel;
+    private final SynchronousXYItemsModel allocationsItemsModel;
+    private final SynchronousXYItemsModel livenessItemsModel;
 
 
     // --- Constructor ---------------------------------------------------------
@@ -70,11 +70,11 @@ public final class ClassHistoryModels {
         return dataManager;
     }
 
-    public ProfilerXYItemsModel allocationsItemsModel() {
+    public SynchronousXYItemsModel allocationsItemsModel() {
         return allocationsItemsModel;
     }
 
-    public ProfilerXYItemsModel livenessItemsModel() {
+    public SynchronousXYItemsModel livenessItemsModel() {
         return livenessItemsModel;
     }
 
@@ -101,9 +101,9 @@ public final class ClassHistoryModels {
         };
     }
 
-    private ProfilerXYItemsModel createAllocationsItemsModel(Timeline timeline) {
+    private SynchronousXYItemsModel createAllocationsItemsModel(Timeline timeline) {
         // Objects Allocated
-        ProfilerXYItem allocObjectsItem = new ProfilerXYItem(GraphsUI.A_ALLOC_OBJECTS_NAME, 0) {
+        SynchronousXYItem allocObjectsItem = new SynchronousXYItem(GraphsUI.A_ALLOC_OBJECTS_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nTotalAllocObjects[index];
             }
@@ -111,7 +111,7 @@ public final class ClassHistoryModels {
         allocObjectsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.A_ALLOC_OBJECTS_INITIAL_VALUE));
 
         // Bytes Allocated
-        ProfilerXYItem allocBytesItem = new ProfilerXYItem(GraphsUI.A_ALLOC_BYTES_NAME, 0) {
+        SynchronousXYItem allocBytesItem = new SynchronousXYItem(GraphsUI.A_ALLOC_BYTES_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.totalAllocObjectsSize[index];
             }
@@ -119,15 +119,15 @@ public final class ClassHistoryModels {
         allocBytesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.A_ALLOC_BYTES_INITIAL_VALUE));
 
         // Model
-        ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
-                           new ProfilerXYItem[] { allocObjectsItem, allocBytesItem });
+        SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
+                           new SynchronousXYItem[] { allocObjectsItem, allocBytesItem });
 
         return model;
     }
 
-    private ProfilerXYItemsModel createLivenessItemsModel(Timeline timeline) {
+    private SynchronousXYItemsModel createLivenessItemsModel(Timeline timeline) {
         // Live Objects
-        ProfilerXYItem liveObjectsItem = new ProfilerXYItem(GraphsUI.L_LIVE_OBJECTS_NAME, 0) {
+        SynchronousXYItem liveObjectsItem = new SynchronousXYItem(GraphsUI.L_LIVE_OBJECTS_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nTrackedLiveObjects[index];
             }
@@ -135,7 +135,7 @@ public final class ClassHistoryModels {
         liveObjectsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.L_LIVE_OBJECTS_INITIAL_VALUE));
 
         // Live Bytes
-        ProfilerXYItem liveBytesItem = new ProfilerXYItem(GraphsUI.L_LIVE_BYTES_NAME, 0) {
+        SynchronousXYItem liveBytesItem = new SynchronousXYItem(GraphsUI.L_LIVE_BYTES_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.trackedLiveObjectsSize[index];
             }
@@ -143,7 +143,7 @@ public final class ClassHistoryModels {
         liveBytesItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.L_LIVE_BYTES_INITIAL_VALUE));
 
         // Objects Allocated
-        ProfilerXYItem allocObjectsItem = new ProfilerXYItem(GraphsUI.A_ALLOC_OBJECTS_NAME, 0) {
+        SynchronousXYItem allocObjectsItem = new SynchronousXYItem(GraphsUI.A_ALLOC_OBJECTS_NAME, 0) {
             public long getYValue(int index) {
                 return dataManager.nTotalAllocObjects[index];
             }
@@ -151,8 +151,8 @@ public final class ClassHistoryModels {
         allocObjectsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.A_ALLOC_OBJECTS_INITIAL_VALUE));
 
         // Model
-        ProfilerXYItemsModel model = new ProfilerXYItemsModel(timeline,
-                 new ProfilerXYItem[] { liveObjectsItem,
+        SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
+                 new SynchronousXYItem[] { liveObjectsItem,
                                         liveBytesItem,
                                         allocObjectsItem});
 

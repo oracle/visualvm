@@ -60,18 +60,23 @@ public abstract class AttachWizardPanel extends AbstractWizardScreen {
     }
 
     public final boolean canBack(WizardContext context) {
+        if (this.temporaryContext == null) return false;
+
         return canBack(this.temporaryContext);
     }
 
     public final boolean canFinish(WizardContext context) {
+        if (this.temporaryContext == null) return false;
         return canFinish(this.temporaryContext);
     }
 
     public final boolean canNext(WizardContext context) {
+        if (this.temporaryContext == null) return false;
         return canNext(this.temporaryContext);
     }
 
     public final boolean onCancel(WizardContext context) {
+        if (this.temporaryContext == null) return false;
         return onCancel(this.temporaryContext);
     }
 
@@ -81,11 +86,13 @@ public abstract class AttachWizardPanel extends AbstractWizardScreen {
     }
 
     public final void onExit(WizardContext context) {
+        if (this.temporaryContext == null) return;
         onExit(this.temporaryContext);
         this.temporaryContext = null;
     }
 
     public final void onFinish(WizardContext context) {
+        if (this.temporaryContext == null) return;
         onFinish(this.temporaryContext);
     }
 
