@@ -310,6 +310,8 @@ public class ProfilerXYItemMarker extends XYItemPainter.Abstract {
                        Rectangle dirtyArea, ProfilerXYChart.Context context) {
 
         if (highlighted.isEmpty()) return;
+        if (item.getValuesCount() < 1) return;
+        if (context.getViewWidth() == 0 || context.getViewHeight() == 0) return;
 
         double itemValueFactor = type == TYPE_RELATIVE ?
                                          getItemValueFactor(context, maxValueOffset,
