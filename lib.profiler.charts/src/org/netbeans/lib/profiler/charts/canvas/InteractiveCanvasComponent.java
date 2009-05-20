@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
+ * 
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- *
+ * 
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- *
+ * 
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
+ * 
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -43,6 +43,10 @@ import javax.swing.SwingUtilities;
  */
 public abstract class InteractiveCanvasComponent extends TransformableCanvasComponent {
 
+    public static final int ZOOM_ALL = 0;
+    public static final int ZOOM_X = 1;
+    public static final int ZOOM_Y = 2;
+    
     private ScrollBarManager hScrollBarManager;
     private ScrollBarManager vScrollBarManager;
 
@@ -50,6 +54,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
     private int mousePanningButton;
     private Cursor mousePanningCursor;
 
+    private int zoomMode;
     private double mouseZoomingFactor;
     private MouseZoomHandler mouseZoomHandler;
 
@@ -59,10 +64,11 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         mousePanningCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
         enableMousePanning();
 
+        zoomMode = ZOOM_ALL;
         mouseZoomingFactor = 1.05d;
         enableMouseZooming();
     }
-
+    
 
     public final void attachHorizontalScrollBar(JScrollBar scrollBar) {
         if (hScrollBarManager == null) hScrollBarManager = new ScrollBarManager();
@@ -83,8 +89,8 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         if (vScrollBarManager != null) vScrollBarManager.detachScrollBar();
         vScrollBarManager = null;
     }
-
-
+    
+    
     // --- Private implementation ----------------------------------------------
 
     private void updateScrollBars(boolean valueOnly) {
@@ -200,12 +206,18 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
             if (internalChange) return;
 
             boolean valueAdjusting = e.getValueIsAdjusting();
-            boolean offsetAdjusting = isOffsetAdjusting();
+            boolean offsetAdjusting;
 
-            if (valueAdjusting && !offsetAdjusting) offsetAdjustingStarted();
-
-            if (horizontal) setOffset(getValue(), getOffsetY());
-            else setOffset(getOffsetX(), getValue());
+            if (horizontal) {
+                offsetAdjusting = isHOffsetAdjusting();
+                if (valueAdjusting && !offsetAdjusting) hOffsetAdjustingStarted();
+                setOffset(getValue(), getOffsetY());
+            } else {
+                offsetAdjusting = isVOffsetAdjusting();
+                if (valueAdjusting && !offsetAdjusting) vOffsetAdjustingStarted();
+                setOffset(getOffsetX(), getValue());
+            }
+            
             repaintDirtyAccel();
             //            repaintDirty();
 
@@ -213,7 +225,8 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
                 // Bugfix #165020, process after all pending updates
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        offsetAdjustingFinished();
+                        if (horizontal) hOffsetAdjustingFinished();
+                        else vOffsetAdjustingFinished();
                         repaintDirty();
                     }
                 });
@@ -230,7 +243,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         private void updateFactor() {
             long maxOffsetX = getMaxOffsetX();
             long maxOffsetY = getMaxOffsetY();
-
+            
             if (horizontal) {
                 int width = getWidth();
                 scrollBarFactor = ((maxOffsetX + width) > Integer.MAX_VALUE) ?
@@ -371,9 +384,9 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
                                                     lastMouseDragX - mouseDragX;
                 int mouseDragDy = isBottomBased() ? mouseDragY - lastMouseDragY :
                                                     lastMouseDragY - mouseDragY;
-
+                
                 setOffset(oldOffsetX + mouseDragDx, oldOffsetY + mouseDragDy);
-
+                
                 repaintDirtyAccel();
 //                repaintDirty();
             }
@@ -387,6 +400,14 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
 
 
     // --- Generic zooming support ---------------------------------------------
+
+    public final void setZoomMode(int zoomMode) {
+        this.zoomMode = zoomMode;
+    }
+
+    public final int getZoomMode() {
+        return zoomMode;
+    }
 
     public final void zoom(int centerX, int centerY, double factor) {
 
@@ -405,9 +426,9 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         if (scaleX * scaleY == 0) return;
 
         // Compute new scale
-        double scaleRatio = fitsWidth || fitsHeight ? 1 : scaleY / scaleX;
-        double newScaleX = fitsWidth ? scaleX : scaleX * factor;
-        double newScaleY = fitsHeight ? scaleY : scaleY * factor * scaleRatio;
+        double scaleRatio = fitsWidth || fitsHeight || zoomMode != ZOOM_ALL ? 1 : scaleY / scaleX;
+        double newScaleX = zoomMode == ZOOM_Y ? scaleX : (fitsWidth ? scaleX : scaleX * factor);
+        double newScaleY = zoomMode == ZOOM_X ? scaleY : (fitsHeight ? scaleY : scaleY * factor * scaleRatio);
 
         // Cache data at zoom center
         double dataX = getDataX(centerX);
@@ -421,7 +442,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         long offsetY = getOffsetY();
 
         // Update x-offset to centerX if needed
-        if (!fitsWidth) {
+        if (!fitsWidth && zoomMode != ZOOM_Y) {
             double dataWidth = dataX - getDataOffsetX();
             long viewWidth = (long)Math.ceil(getViewWidth(dataWidth));
             offsetX = isRightBased() ?
@@ -429,7 +450,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         }
 
         // Update y-offset to centerY if needed
-        if (!fitsHeight) {
+        if (!fitsHeight && zoomMode != ZOOM_X) {
             double dataHeight = dataY - getDataOffsetY();
             long viewHeight = (long)Math.ceil(getViewHeight(dataHeight));
             offsetY = isBottomBased() ?
