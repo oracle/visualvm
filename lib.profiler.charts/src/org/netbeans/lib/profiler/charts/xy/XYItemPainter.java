@@ -34,6 +34,10 @@ import org.netbeans.lib.profiler.charts.ItemPainter;
  */
 public interface XYItemPainter extends ItemPainter {
 
+    public static final int TYPE_ABSOLUTE = 0;
+    public static final int TYPE_RELATIVE = 1;
+    
+
     public double getItemView(double dataY, XYItem item, ChartContext context);
 
     public double getItemValue(double viewY, XYItem item, ChartContext context);

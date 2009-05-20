@@ -23,20 +23,18 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.netbeans.lib.profiler.charts.xy;
 
 import org.netbeans.lib.profiler.charts.CompoundItemPainter;
 import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class CompoundProfilerXYItemPainter extends CompoundItemPainter implements XYItemPainter {
+public class CompoundXYItemPainter extends CompoundItemPainter implements XYItemPainter {
 
-    public CompoundProfilerXYItemPainter(XYItemPainter painter1, XYItemPainter painter2) {
+    public CompoundXYItemPainter(XYItemPainter painter1, XYItemPainter painter2) {
         super(painter1, painter2);
     }
 
