@@ -178,14 +178,14 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
 
     private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
-       StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+       StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < (columnNames.length); i++) {
             result.append("<th>"+columnNames[i]+"</th>");  // NOI18N
         }
         result.append("</tr>");  // NOI18N
         eDD.dumpData(result);
 
-        for (int i=0; i < (nTrackedItems); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
 
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(sortedClassNames[i])+"</td>");  // NOI18N
             result.append("<td align=\"right\">"+percentFormat.format(((double) totalAllocObjectsSize[i])/nTotalBytes)+"</td>");  // NOI18N
@@ -193,7 +193,7 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
             result.append("<td align=\"right\">"+nTotalAllocObjects[i]+"</td></tr>");  // NOI18N
             eDD.dumpData(result);
         }
-        eDD.dumpDataAndClose(new StringBuffer(" </Table></BODY></HTML>"));  // NOI18N
+        eDD.dumpDataAndClose(new StringBuffer(" </TABLE></BODY></HTML>"));  // NOI18N
     }
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
@@ -208,14 +208,14 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (nTrackedItems); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
             result = new StringBuffer("  <TableRow>"+newline+"   <TableColumn><![CDATA["+sortedClassNames[i]+"]]></TableColumn>"+newline);  // NOI18N
             result.append("   <TableColumn><![CDATA["+percentFormat.format(((double) totalAllocObjectsSize[i])/nTotalBytes)+"]]></TableColumn>"+newline);  // NOI18N
             result.append("   <TableColumn><![CDATA["+totalAllocObjectsSize[i]+"]]></TableColumn>"+newline);  // NOI18N
             result.append("   <TableColumn><![CDATA["+nTotalAllocObjects[i]+"]]></TableColumn>"+newline+"  </TableRow>"+newline);  // NOI18N
             eDD.dumpData(result);
         }
-        eDD.dumpDataAndClose(new StringBuffer(" </Table>"+newline+"</ExportedView>"));  // NOI18N
+        eDD.dumpDataAndClose(new StringBuffer(" </TableData>"+newline+"</ExportedView>"));  // NOI18N
     }
 
     private void exportCSV(String separator, ExportDataDumper eDD) {
@@ -232,7 +232,7 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
         eDD.dumpData(result);
 
         // Data
-        for (int i=0; i < (nTrackedItems); i++) {
+        for (int i=0; i < nTrackedItems; i++) {
             result = new StringBuffer();
             result.append(quote+sortedClassNames[i]+quote+separator);
             result.append(quote+percentFormat.format(((double) totalAllocObjectsSize[i])/nTotalBytes)+quote+separator);

@@ -25,11 +25,13 @@
 
 package org.netbeans.lib.profiler.ui.charts.xy;
 
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class ProfilerGCXYItem extends ProfilerXYItem {
+public abstract class ProfilerGCXYItem extends SynchronousXYItem {
 
     // --- Constructor ---------------------------------------------------------
 

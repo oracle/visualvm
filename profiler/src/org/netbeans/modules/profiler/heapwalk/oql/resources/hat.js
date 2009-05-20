@@ -335,7 +335,7 @@ function wrapJavaObject(thing) {
                     if (name == things.get(i).field.name) return true;
                 }
                 return name == 'clazz' || name == 'toString' ||
-                name == 'wrapped-object';
+                name == 'id' || name == 'wrapped-object';
             },
             __get__ : function(name) {
                 if (name == 'clazz') {
@@ -389,16 +389,21 @@ function wrapJavaObject(thing) {
                         return true;
                     }					
                 }
-                return theJavaClassProto[name] != undefined;
+                return name == 'id' || theJavaClassProto[name] != undefined;
             },
             __get__ : function(name) {
                 if (name == "toString") {
                     result = jclass.toString();
                 } else {
                     if (fldValueCache[name] == undefined) {
-                        var result = theJavaClassProto[name];
-                        if (result == null) {
-                            result = wrapJavaObject(jclass.getValueOfStaticField(name));
+                        var result;
+                        if (name == 'id') {
+                            result = jclass.javaClassId;
+                        } else {
+                            result = theJavaClassProto[name];
+                            if (result == null) {
+                                result = wrapJavaObject(jclass.getValueOfStaticField(name));
+                            }
                         }
                         fldValueCache[name] = result;
                     }
@@ -508,6 +513,9 @@ function wrapJavaObject(thing) {
                     return fldValueCache["len"];
                 } else if (name == 'toString') {
                     return function() { 
+                        if (array.javaClass.name == 'char[]') {
+                            return snapshot.valueString(array);
+                        }
                         return array.toString();
                     }
                 } else if (name == 'wrapped-object') {
@@ -1671,7 +1679,7 @@ function sum(array, code) {
 function unique(array, code) {
     array = wrapIterator(array);
     if (code == undefined) {
-        code = new Function("it", "return objectid(it);");
+        code = new Function("it", "var id = objectid(it);return id != undefined ? id : it;");
     } else if (typeof(code) == 'string') {
         code = new Function("it", "return " + code);
     }
