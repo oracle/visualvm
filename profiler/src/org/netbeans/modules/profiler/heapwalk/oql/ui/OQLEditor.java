@@ -58,6 +58,7 @@ import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Lookup;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -158,14 +159,15 @@ public class OQLEditor extends JPanel {
     private void init() {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
-            queryEditor = impl.getEditorPane();
-            impl.addPropertyChangeListener(VALIDITY_PROPERTY, new PropertyChangeListener() {
+            PropertyChangeListener l = new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
                     // capturing the lexer state
                     lexervalid = (Boolean) evt.getNewValue();
                 }
-            });
+            };
+            queryEditor = impl.getEditorPane();
+            impl.addPropertyChangeListener(VALIDITY_PROPERTY, WeakListeners.propertyChange(l,impl));
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N

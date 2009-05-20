@@ -25,6 +25,7 @@
 
 package org.netbeans.lib.profiler.charts;
 
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
@@ -48,7 +49,7 @@ public interface ItemPainter {
 
     public boolean isBoundsChange(ChartItemChange itemChange);
 
-    public boolean isAppearanceChange(ChartItemChange itemChange, ChartContext context);
+    public boolean isAppearanceChange(ChartItemChange itemChange);
 
     public LongRect getDirtyBounds(ChartItemChange itemChange, ChartContext context);
 

@@ -95,7 +95,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     private long dy;
 
     // Offset adjusting
-    private int offsetAdjustingCounter = 0;
+    private int hOffsetAdjustingCounter = 0;
+    private int vOffsetAdjustingCounter = 0;
 
 
     public TransformableCanvasComponent() {
@@ -347,11 +348,12 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
         return contentsHeight;
     }
 
-    public void setDataBounds(long dataOffsetX, long dataOffsetY, long dataWidth, long dataHeight) {
+    public final void setDataBounds(long dataOffsetX, long dataOffsetY, long dataWidth, long dataHeight) {
         if (this.dataOffsetX == dataOffsetX && this.dataOffsetY == dataOffsetY &&
             this.dataWidth == dataWidth && this.dataHeight == dataHeight) return;
 
-        if (isOffsetAdjusting()) {
+        if (isHOffsetAdjusting() && contentsWidth >= getWidth() && this.dataWidth != dataWidth ||
+            isVOffsetAdjusting() && contentsHeight >= getHeight() && this.dataHeight != dataHeight) {
             pendingDataOffsetX = dataOffsetX;
             pendingDataOffsetY = dataOffsetY;
             pendingDataWidth = dataWidth;
@@ -412,6 +414,11 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
             oldScaleX = scaleX;
             oldScaleY = scaleY;
+
+            pendingDataOffsetX = -1;
+            pendingDataOffsetY = -1;
+            pendingDataWidth = -1;
+            pendingDataHeight = -1;
         }
     }
 
@@ -426,7 +433,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     // --- Offset adjusting ----------------------------------------------------
 
     protected final void offsetAdjustingStarted() {
-        offsetAdjustingCounter++;
+        hOffsetAdjustingCounter++;
+        vOffsetAdjustingCounter++;
 
         pendingDataOffsetX = -1;
         pendingDataOffsetY = -1;
@@ -435,20 +443,58 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     }
 
     protected final void offsetAdjustingFinished() {
-        offsetAdjustingCounter--;
+        hOffsetAdjustingCounter--;
+        vOffsetAdjustingCounter--;
 
-        if (pendingDataWidth != -1) {
+        if (!isOffsetAdjusting() && (pendingDataWidth != -1 || pendingDataHeight != -1))
             setDataBounds(pendingDataOffsetX, pendingDataOffsetY,
                           pendingDataWidth, pendingDataHeight);
-            pendingDataOffsetX = -1;
-            pendingDataOffsetY = -1;
-            pendingDataWidth = -1;
-            pendingDataHeight = -1;
-        }
     }
 
     protected final boolean isOffsetAdjusting() {
-        return offsetAdjustingCounter > 0;
+        return isHOffsetAdjusting() || isVOffsetAdjusting();
+    }
+
+    protected final void hOffsetAdjustingStarted() {
+        hOffsetAdjustingCounter++;
+
+        pendingDataOffsetX = -1;
+        pendingDataOffsetY = -1;
+        pendingDataWidth = -1;
+        pendingDataHeight = -1;
+    }
+
+    protected final void hOffsetAdjustingFinished() {
+        hOffsetAdjustingCounter--;
+
+        if (!isOffsetAdjusting() && pendingDataWidth != -1)
+            setDataBounds(pendingDataOffsetX, pendingDataOffsetY,
+                          pendingDataWidth, pendingDataHeight);
+    }
+
+    protected final boolean isHOffsetAdjusting() {
+        return hOffsetAdjustingCounter > 0;
+    }
+
+    protected final void vOffsetAdjustingStarted() {
+        vOffsetAdjustingCounter++;
+
+        pendingDataOffsetX = -1;
+        pendingDataOffsetY = -1;
+        pendingDataWidth = -1;
+        pendingDataHeight = -1;
+    }
+
+    protected final void vOffsetAdjustingFinished() {
+        vOffsetAdjustingCounter--;
+
+        if (!isOffsetAdjusting() && pendingDataHeight != -1)
+            setDataBounds(pendingDataOffsetX, pendingDataOffsetY,
+                          pendingDataWidth, pendingDataHeight);
+    }
+
+    protected final boolean isVOffsetAdjusting() {
+        return vOffsetAdjustingCounter > 0;
     }
 
 
