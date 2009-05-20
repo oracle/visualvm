@@ -31,6 +31,7 @@ import org.netbeans.lib.profiler.charts.axis.AxisMark;
 import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
 import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.BytesMark;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 
 /**
  *
@@ -108,8 +109,8 @@ public class BytesXYItemMarksComputer extends XYItemMarksComputer {
                                            dataStart + iterIndex[0] * step;
 
                     iterIndex[0]++;
-                    int position = ChartContext.getCheckedIntValue(Math.floor(
-                                                painter.getItemView(value, item, context)));
+                    int position = Utils.checkedInt(Math.floor(
+                                         painter.getItemView(value, item, context)));
                     return new BytesMark(value, position, radix);
                 }
 

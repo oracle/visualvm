@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -83,7 +83,7 @@ public class TimeAxisUtils {
     };
 
     public static long getTimeUnits(double scale, int minDistance) {
-        if (scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
+        if (Double.isNaN(scale) || scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
 
         for (int i = 0; i < timeUnitsGrid.length; i++)
             if (timeUnitsGrid[i] * scale >= minDistance)
@@ -136,7 +136,7 @@ public class TimeAxisUtils {
             // 12:34:55.666
             else time = TIME_MSEC;
         }
-        
+
         // date necessary
         if (stepFlag > STEP_HOUR || rangeFlag != NTHNG_NEEDED) {
             // 2009

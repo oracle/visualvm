@@ -26,7 +26,7 @@
 package org.netbeans.lib.profiler.charts.xy;
 
 import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 
 /**
  *

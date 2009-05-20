@@ -193,7 +193,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
         }
 
         initInstrMethodData();
-        instrumentClinit = threadInCallGraph;
+        boolean instrumentClinit = threadInCallGraph;
 
         if (!clazz.isLoaded()) {
             clazz.setLoaded(true);
@@ -275,7 +275,6 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
         }
 
         initInstrMethodData();
-        instrumentClinit = true;
 
         methodName = methodName.intern();
         methodSignature = methodSignature.intern();
