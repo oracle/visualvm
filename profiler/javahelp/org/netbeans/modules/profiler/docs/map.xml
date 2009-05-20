@@ -130,5 +130,6 @@ made subject to such option by the copyright holder.
         <!--CSH ID for HeapWalker -->
         <mapID target="OQLControllerUI.HelpCtx" url="helppages/oqlhelp.html"/>
         <mapID target="text.x-oql" url="helppages/oqlhelp.html"/>
+        <mapID target="heapoql" url="helppages/oqlhelp.html"/>
         
     </map>
