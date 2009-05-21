@@ -52,7 +52,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import org.netbeans.lib.profiler.charts.LongRect;
+import org.netbeans.lib.profiler.charts.ChartItem;
+import org.netbeans.lib.profiler.charts.ItemsModel;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
@@ -61,19 +62,19 @@ import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
+import org.netbeans.lib.profiler.charts.xy.CompoundXYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
-import org.netbeans.lib.profiler.ui.charts.xy.CompoundProfilerXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemMarker;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYPaintersModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItem;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
@@ -338,7 +339,7 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowValue(int index) {
-                ProfilerXYItem item = models.livenessItemsModel().getItem(index);
+                SynchronousXYItem item = models.livenessItemsModel().getItem(index);
                 return INT_FORMATTER.format(item.getMaxYValue());
             }
 
@@ -351,57 +352,61 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
 
     private PaintersModel createLivenessPaintersModel() {
         // Live Objects
-        ProfilerXYItemPainter liveObjectsPainter =
-                ProfilerXYItemPainter.absolutePainter(GraphsUI.L_LIVE_OBJECTS_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter liveObjectsPainter =
+                SynchronousXYItemPainter.absolutePainter(GraphsUI.L_LIVE_OBJECTS_PAINTER_LINE_WIDTH,
                                                       GraphsUI.L_LIVE_OBJECTS_PAINTER_LINE_COLOR,
                                                       GraphsUI.L_LIVE_OBJECTS_PAINTER_FILL_COLOR);
-        ProfilerXYItemMarker liveObjectsMarker =
-                 ProfilerXYItemMarker.absolutePainter(GraphsUI.L_LIVE_OBJECTS_MARKER_RADIUS,
+        SynchronousXYItemMarker liveObjectsMarker =
+                 SynchronousXYItemMarker.absolutePainter(GraphsUI.L_LIVE_OBJECTS_MARKER_RADIUS,
                                                       GraphsUI.L_LIVE_OBJECTS_MARKER_LINE1_WIDTH,
                                                       GraphsUI.L_LIVE_OBJECTS_MARKER_LINE1_COLOR,
                                                       GraphsUI.L_LIVE_OBJECTS_MARKER_LINE2_WIDTH,
                                                       GraphsUI.L_LIVE_OBJECTS_MARKER_LINE2_COLOR,
                                                       GraphsUI.L_LIVE_OBJECTS_MARKER_FILL_COLOR);
-        XYItemPainter lop = new CompoundProfilerXYItemPainter(liveObjectsPainter,
+        XYItemPainter lop = new CompoundXYItemPainter(liveObjectsPainter,
                                                       liveObjectsMarker);
 
         // Live Bytes
-        ProfilerXYItemPainter liveBytesPainter =
-                ProfilerXYItemPainter.relativePainter(GraphsUI.L_LIVE_BYTES_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter liveBytesPainter =
+                SynchronousXYItemPainter.relativePainter(GraphsUI.L_LIVE_BYTES_PAINTER_LINE_WIDTH,
                                                       GraphsUI.L_LIVE_BYTES_PAINTER_LINE_COLOR,
                                                       GraphsUI.L_LIVE_BYTES_PAINTER_FILL_COLOR,
                                                       10);
-        ProfilerXYItemMarker liveBytesMarker =
-                 ProfilerXYItemMarker.relativePainter(GraphsUI.L_LIVE_BYTES_MARKER_RADIUS,
+        SynchronousXYItemMarker liveBytesMarker =
+                 SynchronousXYItemMarker.relativePainter(GraphsUI.L_LIVE_BYTES_MARKER_RADIUS,
                                                       GraphsUI.L_LIVE_BYTES_MARKER_LINE1_WIDTH,
                                                       GraphsUI.L_LIVE_BYTES_MARKER_LINE1_COLOR,
                                                       GraphsUI.L_LIVE_BYTES_MARKER_LINE2_WIDTH,
                                                       GraphsUI.L_LIVE_BYTES_MARKER_LINE2_COLOR,
                                                       GraphsUI.L_LIVE_BYTES_MARKER_FILL_COLOR,
                                                       10);
-        XYItemPainter lbp = new CompoundProfilerXYItemPainter(liveBytesPainter,
+        XYItemPainter lbp = new CompoundXYItemPainter(liveBytesPainter,
                                                       liveBytesMarker);
 
         // Allocated Objects
-        ProfilerXYItemPainter allocObjectsPainter =
-                ProfilerXYItemPainter.relativePainter(GraphsUI.L_ALLOC_OBJECTS_PAINTER_LINE_WIDTH,
+        SynchronousXYItemPainter allocObjectsPainter =
+                SynchronousXYItemPainter.relativePainter(GraphsUI.L_ALLOC_OBJECTS_PAINTER_LINE_WIDTH,
                                                       GraphsUI.L_ALLOC_OBJECTS_PAINTER_LINE_COLOR,
                                                       GraphsUI.L_ALLOC_OBJECTS_PAINTER_FILL_COLOR,
                                                       20);
-        ProfilerXYItemMarker allocObjectsMarker =
-                 ProfilerXYItemMarker.relativePainter(GraphsUI.L_ALLOC_OBJECTS_MARKER_RADIUS,
+        SynchronousXYItemMarker allocObjectsMarker =
+                 SynchronousXYItemMarker.relativePainter(GraphsUI.L_ALLOC_OBJECTS_MARKER_RADIUS,
                                                       GraphsUI.L_ALLOC_OBJECTS_MARKER_LINE1_WIDTH,
                                                       GraphsUI.L_ALLOC_OBJECTS_MARKER_LINE1_COLOR,
                                                       GraphsUI.L_ALLOC_OBJECTS_MARKER_LINE2_WIDTH,
                                                       GraphsUI.L_ALLOC_OBJECTS_MARKER_LINE2_COLOR,
                                                       GraphsUI.L_ALLOC_OBJECTS_MARKER_FILL_COLOR,
                                                       20);
-        XYItemPainter aop = new CompoundProfilerXYItemPainter(allocObjectsPainter,
+        XYItemPainter aop = new CompoundXYItemPainter(allocObjectsPainter,
                                                       allocObjectsMarker);
 
         // Model
-        ProfilerXYPaintersModel model = new ProfilerXYPaintersModel(
-           new XYItemPainter[] { lop, lbp, aop });
+        ItemsModel items = models.livenessItemsModel();
+        PaintersModel model = new PaintersModel.Default(
+                                            new ChartItem[] { items.getItem(0),
+                                                              items.getItem(1),
+                                                              items.getItem(2) },
+                                            new XYItemPainter[] { lop, lbp, aop });
 
         return model;
     }

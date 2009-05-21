@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package org.netbeans.lib.profiler.charts;
+package org.netbeans.lib.profiler.charts.swing;
 
 /**
  *

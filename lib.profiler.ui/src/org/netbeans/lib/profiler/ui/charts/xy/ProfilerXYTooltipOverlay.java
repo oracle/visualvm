@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -44,6 +44,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 import javax.swing.Timer;
+import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 
 /**
  *
@@ -67,7 +68,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
                                     ProfilerXYTooltipPainter tooltipPainter) {
         if (chart.getSelectionModel() == null)
             throw new NullPointerException("No ChartSelectionModel set for " + chart); // NOI18N
-        
+
         if (!Utils.forceSpeed()) {
             timer = new Timer(TOOLTIP_RESPONSE / ANIMATION_STEPS, this);
             timer.setInitialDelay(0);
@@ -140,7 +141,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
     public void actionPerformed(ActionEvent e) {
         Point currentPosition = tooltipPainter.getLocation();
-        
+
         currentPosition.x += (targetPosition.x - currentPosition.x) /
                              (ANIMATION_STEPS - currentStep);
         currentPosition.y += (targetPosition.y - currentPosition.y) /
@@ -152,10 +153,16 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
 
 
     private void updateTooltip(ChartComponent chart) {
+        if (mousePosition == null) return;
+
         List<ItemSelection> highlightedItems =
                 chart.getSelectionModel().getHighlightedItems();
 
-        if (highlightedItems.isEmpty()) {
+        XYItemSelection selection = highlightedItems.isEmpty() ? null :
+                                    (XYItemSelection)highlightedItems.get(0);
+
+        if (selection == null ||
+            selection.getItem().getValuesCount() <= selection.getValueIndex()) {
             setPosition(null);
         } else {
             tooltipPainter.update(highlightedItems);
@@ -170,7 +177,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
         for (ItemSelection selection : selectedItems) {
             ChartItem item = selection.getItem();
             ItemPainter painter = paintersModel.getPainter(item);
-            Rectangle bounds = ChartContext.getCheckedRectangle(
+            Rectangle bounds = Utils.checkedRectangle(
                                painter.getSelectionBounds(selection,
                                chartContext));
             if (tooltipX == -1) tooltipX += bounds.x + bounds.width / 2;
