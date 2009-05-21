@@ -44,6 +44,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 import javax.swing.Timer;
+import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 
 /**
  *
@@ -157,7 +158,11 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
         List<ItemSelection> highlightedItems =
                 chart.getSelectionModel().getHighlightedItems();
 
-        if (highlightedItems.isEmpty()) {
+        XYItemSelection selection = highlightedItems.isEmpty() ? null :
+                                    (XYItemSelection)highlightedItems.get(0);
+
+        if (selection == null ||
+            selection.getItem().getValuesCount() <= selection.getValueIndex()) {
             setPosition(null);
         } else {
             tooltipPainter.update(highlightedItems);
