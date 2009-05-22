@@ -102,8 +102,8 @@ public final class Histogram<T extends Histogram.Entry> {
         }
 
         private void doAdd(T entry) {
-            count += entry.count;
-            size += entry.size;
+            count += ((Entry)entry).count;
+            size += ((Entry)entry).size;
             add(entry);
         }
     }
@@ -122,23 +122,23 @@ public final class Histogram<T extends Histogram.Entry> {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static final <E extends Entry> Comparator<E> sortByCount() {
-        return new Comparator<E>() {
-                public int compare(E o1, E o2) {
+    public static final Comparator<Entry> sortByCount() {
+        return new Comparator<Entry>() {
+                public int compare(Entry o1, Entry o2) {
                     return o2.count - o1.count;
                 }
             };
     }
 
-    public static final <E extends Entry> Comparator<E> sortBySize() {
-        return new Comparator<E>() {
-                public int compare(E o1, E o2) {
+    public static final Comparator<Entry> sortBySize() {
+        return new Comparator<Entry>() {
+                public int compare(Entry o1, Entry o2) {
                     return o2.size - o1.size;
                 }
             };
     }
 
-    public SortedMap<String, T> getResults(final Comparator<T> comparator) {
+    public SortedMap<String, T> getResults(final Comparator<Entry> comparator) {
         SortedMap<String, T> sm = new TreeMap<String, T>(new Comparator<String>() {
                 public int compare(String o1, String o2) {
                     T t1 = map.get(o1);
@@ -161,7 +161,7 @@ public final class Histogram<T extends Histogram.Entry> {
         T current = map.get(key);
 
         if (current != null) {
-            current.doAdd(entry);
+            ((Entry)current).doAdd(entry);
         } else {
             map.put(key, entry);
         }
@@ -171,7 +171,7 @@ public final class Histogram<T extends Histogram.Entry> {
         StringBuffer result = new StringBuffer();
         int totalSize = 0;
         int totalCount = 0;
-        SortedMap<String, T> bySize = getResults(Histogram.<T>sortBySize());
+        SortedMap<String, T> bySize = getResults(Histogram.<Entry>sortBySize());
 
         for (Map.Entry<String, T> entry : bySize.entrySet()) {
             int size = entry.getValue().getSize();
