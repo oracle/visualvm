@@ -171,7 +171,7 @@ public final class Histogram<T extends Histogram.Entry> {
         StringBuffer result = new StringBuffer();
         int totalSize = 0;
         int totalCount = 0;
-        SortedMap<String, T> bySize = getResults(Histogram.<Entry>sortBySize());
+        SortedMap<String, T> bySize = getResults(sortBySize());
 
         for (Map.Entry<String, T> entry : bySize.entrySet()) {
             int size = entry.getValue().getSize();
