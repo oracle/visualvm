@@ -569,27 +569,19 @@ public class ChartComponent extends InteractiveCanvasComponent {
 
         // Update chart appearance
         if (appearanceChange) {
-            // Workaround for a bug caused by interference of updating chart
-            // (data) bounds with scrolling the view. Doesn't affect profiler
-            // charts which always fitsHeight().
-            if (!fitsWidth() && isVOffsetAdjusting() ||
-                !fitsHeight() && isHOffsetAdjusting()) {
-                invalidateImage();
-            } else {
-                LongRect uiBounds = null;
-                for (int i = 0; i < itemChanges.size(); i++) {
-                    ChartItemChange change = itemChanges.get(i);
-                    ChartItem item = change.getItem();
-                    ItemPainter painter = paintersModel.getPainter(item);
-                    if (painter.isAppearanceChange(change)) {
-                        if (uiBounds == null) uiBounds =
-                            new LongRect(painter.getDirtyBounds(change, getChartContext(item)));
-                        else
-                            LongRect.add(uiBounds, painter.getDirtyBounds(change, getChartContext(item)));
-                    }
+            LongRect uiBounds = null;
+            for (int i = 0; i < itemChanges.size(); i++) {
+                ChartItemChange change = itemChanges.get(i);
+                ChartItem item = change.getItem();
+                ItemPainter painter = paintersModel.getPainter(item);
+                if (painter.isAppearanceChange(change)) {
+                    if (uiBounds == null) uiBounds =
+                        new LongRect(painter.getDirtyBounds(change, getChartContext(item)));
+                    else
+                        LongRect.add(uiBounds, painter.getDirtyBounds(change, getChartContext(item)));
                 }
-                invalidateImage(Utils.checkedRectangle(uiBounds));
             }
+            invalidateImage(Utils.checkedRectangle(uiBounds));
             repaintDirtyAccel();
         } else {
             repaintDirty();
