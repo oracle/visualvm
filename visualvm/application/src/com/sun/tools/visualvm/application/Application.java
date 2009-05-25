@@ -50,7 +50,6 @@ public abstract class Application extends DataSource implements Stateful {
     public static final int UNKNOWN_PID = -1;
 
     private String id;
-    private int pid;
     private Host host;
     private int state = STATE_AVAILABLE;
     
@@ -63,7 +62,7 @@ public abstract class Application extends DataSource implements Stateful {
      */
     public Application(Host host, String id) {
         if (host == null) throw new IllegalArgumentException("Host cannot be null");    // NOI18N
-        if (id == null && pid == UNKNOWN_PID) throw new IllegalArgumentException("Either id or pid must be provided for the application");  // NOI18N
+        if (id == null) throw new IllegalArgumentException("Application id cannot be null");  // NOI18N
         this.host = host;
         this.id = id;
     }
