@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.modules.buffermonitor;
 
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -50,7 +49,7 @@ public class BufferMetricsChart extends Chart {
     }
     
     protected SynchronousXYChart createChart() {
-        return new SynchronousXYChart(SynchronousXYChart.TYPE_LINE, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
+        return new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
     }
     
     protected void setupChart(SynchronousXYChart xyChart) {

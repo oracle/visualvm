@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.modules.buffermonitor;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -41,19 +40,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.swing.Timer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -156,6 +149,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         private static final String TOTAL_CAPACITY = NbBundle.getMessage(BufferMonitorView.class, "LBL_Total_Capacity"); // NOI18N
         private static final NumberFormat formatter = NumberFormat.getNumberInstance();
         private Chart bufferMetricsChart;
+        private HTMLLabel countLabel;
         private HTMLLabel memoryUsedLabel;
         private HTMLLabel totalCapacityLabel;
         private final String TITLE;
@@ -179,6 +173,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         }
         
         public void refresh(long time) {
+            long count = 0;
             long memoryUsed = 0;
             long totalCapacity = 0;
             List attrs;
@@ -195,15 +190,18 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
                 Attribute attrib = (Attribute) attrIt.next();
                 String name = attrib.getName();
                 if ("Count".equals(name)) {
+                    count = ((Long)attrib.getValue()).longValue();
                 } else if ("MemoryUsed".equals(name)) {
                     memoryUsed = ((Long)attrib.getValue()).longValue();
                 } else if ("TotalCapacity".equals(name)) {
                     totalCapacity = ((Long)attrib.getValue()).longValue();
                }
             }
-            
+
+            String countString =  formatter.format(count);
             String meoryUsedString =  formatter.format(memoryUsed); 
             String totalCapacityString =   formatter.format(totalCapacity);
+            countLabel.setText("<nobr><b>"+"Count"+":</b> " + countString + "</nobr>");    // NOI18N
             memoryUsedLabel.setText("<nobr><b>"+MEMORY_USED+":</b> " + meoryUsedString + "</nobr>");    // NOI18N
             
             totalCapacityLabel.setText("<nobr><b>"+TOTAL_CAPACITY+":</b> " + totalCapacityString + "</nobr>");    // NOI18N
@@ -224,6 +222,13 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
             JComponent contents;
             
             // cpuMetricsPanel
+            countLabel = new HTMLLabel() {
+                public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
+                public Dimension getMinimumSize() { return getPreferredSize(); }
+                public Dimension getMaximumSize() { return getPreferredSize(); }
+            };
+            countLabel.setText("<nobr><b>"+"Count"+":</b> " + -1 + "</nobr>");  // NOI18N
+            countLabel.setOpaque(false);
             memoryUsedLabel = new HTMLLabel() {
                 public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
                 public Dimension getMinimumSize() { return getPreferredSize(); }
@@ -242,6 +247,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
             heapMetricsDataPanel.setOpaque(false);
             heapMetricsDataPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
             heapMetricsDataPanel.add(memoryUsedLabel);
+            heapMetricsDataPanel.add(countLabel);
             heapMetricsDataPanel.add(totalCapacityLabel);
             
             bufferMetricsChart = new BufferMetricsChart();

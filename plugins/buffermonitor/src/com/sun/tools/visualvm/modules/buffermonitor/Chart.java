@@ -64,7 +64,7 @@ public abstract class Chart extends GraphPanel implements ChartModelListener {
     protected BoundedDynamicXYChartModel createModel() {
         GlobalPreferences preferences = GlobalPreferences.sharedInstance();
         return new BoundedDynamicXYChartModel(preferences.getMonitoredDataCache() * 60 / preferences.getMonitoredDataPoll()) {
-            public  long    getMaxDisplayYValue(int seriesIndex)      { return getMaxYValue(1); }
+            public  long    getMaxDisplayYValue(int seriesIndex)      { return getMaxYValue(0); }
         };
     }
     
