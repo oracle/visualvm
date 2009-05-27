@@ -31,9 +31,7 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -91,6 +89,13 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     // VisualVM bugfix #279 - do not override FocusTraversalPolicy
 //    setFocusCycleRoot(true);
 //    setFocusTraversalPolicy(new CBTPPolicy());
+  }
+
+
+  public final boolean requestFocusInWindow() {
+      Component sel = getSelectedComponent();
+      if (sel != null) return sel.requestFocusInWindow();
+      else return super.requestFocusInWindow();
   }
   
   
@@ -564,6 +569,11 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
               caption.setBackground(Color.WHITE);
               add(caption, BorderLayout.NORTH);
           }
+      }
+
+      public final boolean requestFocusInWindow() {
+        if (getComponentCount() > 0) return getComponent(0).requestFocusInWindow();
+        else return super.requestFocusInWindow();
       }
       
       public DataSourceCaption getCaption() { return caption; }
