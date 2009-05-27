@@ -159,7 +159,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
 
     protected final void componentActivated() {
         super.componentActivated();
-        if (getComponentCount() > 0) getComponent(0).requestFocusInWindow();
+        if (singleViewContainer != null) singleViewContainer.requestFocusInWindow();
+        else if (getComponentCount() > 0) getComponent(0).requestFocusInWindow();
     }
     
     protected final void componentClosed() {
