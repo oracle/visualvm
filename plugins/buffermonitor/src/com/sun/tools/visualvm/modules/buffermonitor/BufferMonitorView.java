@@ -123,7 +123,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView(NbBundle.getMessage(BufferMonitorView.class, "LBL_Overview"), null, this);   // NOI18N
+            return new DataViewComponent.MasterView(NbBundle.getMessage(BufferMonitorView.class, "Buffer_Monitor"), null, this);   // NOI18N
         }
         
         
