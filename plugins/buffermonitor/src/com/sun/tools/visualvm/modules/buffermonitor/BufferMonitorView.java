@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.buffermonitor;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -52,7 +53,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
@@ -93,15 +93,14 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(title, true), DataViewComponent.TOP_RIGHT); 
         dvc.addDetailsView(mappedBufferViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         
-        timer = new Timer(2000, new ActionListener() {
+        timer = new Timer(GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 final long time = System.currentTimeMillis();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        directBufferViewSupport.refresh(time);
-                        mappedBufferViewSupport.refresh(time);
-                    }
-                });
+
+                if (application.getState() == Application.STATE_AVAILABLE) {
+                    directBufferViewSupport.refresh(time);
+                    mappedBufferViewSupport.refresh(time);
+                }
             }
         });
         timer.setInitialDelay(800);
