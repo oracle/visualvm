@@ -335,7 +335,7 @@ made subject to such option by the copyright holder.
         <folder name="Profile">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
             <file name="org-netbeans-modules-profiler-actions-AttachAction.instance">
-                <attr name="delegate" newvalue="org.netbeans.modules.profiler.actions.AttachAction"/>
+                <attr name="delegate" methodvalue="org.netbeans.modules.profiler.actions.AttachAction.getDefault"/>
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#LBL_AttachMainProjectAction"/>
                 <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/attach.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
