@@ -83,6 +83,8 @@
         <file name="Edit_hidden"/>
         <folder name="File">
             <file name="Separator2.instance_hidden"/>
+            <file name="org-netbeans-modules-print-action-PageSetupAction.shadow_hidden"/>
+            <file name="org-netbeans-modules-print-action-PrintAction.shadow_hidden"/>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance">
                 <attr name="position" intvalue="2150"/>
             </file>
@@ -127,11 +129,13 @@
             <file name="CloseAllButThisAction.shadow_hidden"/>
             <file name="CloseAllDocumentsAction.shadow_hidden"/>
             <file name="DocumentsAction.shadow_hidden"/>
+            <file name="Output_hidden"/>
             <file name="Profile_hidden"/>
             <file name="ProgressListAction.shadow_hidden"/>
             <file name="Separator4.instance_hidden"/>
             <file name="SwitchToRecentDocumentAction.shadow_hidden"/>
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.shadow_hidden"/>
+            <file name="org-netbeans-core-windows-actions-GlobalPropertiesAction.shadow_hidden"/>
         </folder>
     </folder>
     <folder name="OptionsDialog">

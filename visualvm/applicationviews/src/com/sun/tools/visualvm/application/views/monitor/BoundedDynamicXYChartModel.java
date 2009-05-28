@@ -26,88 +26,88 @@
 package com.sun.tools.visualvm.application.views.monitor;
 
 import java.awt.Color;
-import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
+//import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class BoundedDynamicXYChartModel extends DynamicSynchronousXYChartModel {    
+public class BoundedDynamicXYChartModel /*extends DynamicSynchronousXYChartModel*/ {
     
-    private int maxItemsCount;
-    
-    
-    public BoundedDynamicXYChartModel(int maxItemsCount) {
-        this.maxItemsCount = maxItemsCount;
-    }
-    
-    public void setupModel(String[] seriesNames, Color[] seriesColors) {
-        this.seriesNames = seriesNames;
-        this.seriesColors = seriesColors;
-
-        if (seriesNames.length != seriesColors.length) {
-            seriesCount = 0;
-            throw new RuntimeException("Counts of series names and series colors don't match."); // NOI18N
-        } else {
-            seriesCount = seriesNames.length;
-        }
-
-        itemCount = 0;
-
-        xValues = new long[maxItemsCount];
-        yValues = new long[maxItemsCount][];
-
-        minXValue = 0;
-        maxXValue = 0;
-
-        minYValues = new long[seriesCount];
-        maxYValues = new long[seriesCount];
-    }
-
-    public void addItemValues(long xValue, long[] yValues) {
-        // first data arrived, initialize min/max values
-        if (itemCount == 0) {
-            for (int i = 0; i < seriesCount; i++) {
-                minYValues[i] = yValues[i];
-                maxYValues[i] = yValues[i];
-            }
-        } else {
-            // check "timeline" consistency
-            if (xValues[itemCount - 1] >= xValue) {
-                throw new RuntimeException("New x-value not greater than previous x-value."); // NOI18N
-            }            
-
-            // check min/max for y values
-            for (int i = 0; i < seriesCount; i++) {
-                minYValues[i] = Math.min(minYValues[i], yValues[i]);
-                maxYValues[i] = Math.max(maxYValues[i], yValues[i]);
-            }
-        }
-        
-        if (itemCount == maxItemsCount) {
-            System.arraycopy(xValues, 1, xValues, 0, xValues.length - 1);
-            System.arraycopy(this.yValues, 1, this.yValues, 0, this.yValues.length - 1);
-            
-            // add new x value
-            xValues[itemCount - 1] = xValue;
-
-            // add new y values
-            this.yValues[itemCount - 1] = yValues;
-        } else {
-            // add new x value
-            xValues[itemCount] = xValue;
-
-            // add new y values
-            this.yValues[itemCount] = yValues;
-        }
-
-        // increment item counter
-        if (itemCount < maxItemsCount) itemCount++;
-        
-        minXValue = xValues[0];
-        maxXValue = xValue; // new values are always greater
-
-        fireChartDataChanged();
-    }
+//    private int maxItemsCount;
+//
+//
+//    public BoundedDynamicXYChartModel(int maxItemsCount) {
+//        this.maxItemsCount = maxItemsCount;
+//    }
+//
+//    public void setupModel(String[] seriesNames, Color[] seriesColors) {
+//        this.seriesNames = seriesNames;
+//        this.seriesColors = seriesColors;
+//
+//        if (seriesNames.length != seriesColors.length) {
+//            seriesCount = 0;
+//            throw new RuntimeException("Counts of series names and series colors don't match."); // NOI18N
+//        } else {
+//            seriesCount = seriesNames.length;
+//        }
+//
+//        itemCount = 0;
+//
+//        xValues = new long[maxItemsCount];
+//        yValues = new long[maxItemsCount][];
+//
+//        minXValue = 0;
+//        maxXValue = 0;
+//
+//        minYValues = new long[seriesCount];
+//        maxYValues = new long[seriesCount];
+//    }
+//
+//    public void addItemValues(long xValue, long[] yValues) {
+//        // first data arrived, initialize min/max values
+//        if (itemCount == 0) {
+//            for (int i = 0; i < seriesCount; i++) {
+//                minYValues[i] = yValues[i];
+//                maxYValues[i] = yValues[i];
+//            }
+//        } else {
+//            // check "timeline" consistency
+//            if (xValues[itemCount - 1] >= xValue) {
+//                throw new RuntimeException("New x-value not greater than previous x-value."); // NOI18N
+//            }
+//
+//            // check min/max for y values
+//            for (int i = 0; i < seriesCount; i++) {
+//                minYValues[i] = Math.min(minYValues[i], yValues[i]);
+//                maxYValues[i] = Math.max(maxYValues[i], yValues[i]);
+//            }
+//        }
+//
+//        if (itemCount == maxItemsCount) {
+//            System.arraycopy(xValues, 1, xValues, 0, xValues.length - 1);
+//            System.arraycopy(this.yValues, 1, this.yValues, 0, this.yValues.length - 1);
+//
+//            // add new x value
+//            xValues[itemCount - 1] = xValue;
+//
+//            // add new y values
+//            this.yValues[itemCount - 1] = yValues;
+//        } else {
+//            // add new x value
+//            xValues[itemCount] = xValue;
+//
+//            // add new y values
+//            this.yValues[itemCount] = yValues;
+//        }
+//
+//        // increment item counter
+//        if (itemCount < maxItemsCount) itemCount++;
+//
+//        minXValue = xValues[0];
+//        maxXValue = xValue; // new values are always greater
+//
+//        fireChartDataChanged();
+//    }
 }
