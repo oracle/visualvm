@@ -31,9 +31,7 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -87,38 +85,14 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     CloseButtonListener.install();
     //Bugfix #28263: Disable focus.
     setFocusable(false);
-    setFocusCycleRoot(true);
-    setFocusTraversalPolicy(new CBTPPolicy());
   }
   
-  private Component sel() {
-      Component c = getSelectedComponent();
-      return c == null ? this : c;
+  public final boolean requestFocusInWindow() {
+      Component sel = getSelectedComponent();
+      if (sel != null) return sel.requestFocusInWindow();
+      else return super.requestFocusInWindow();
   }
 
-  private class CBTPPolicy extends FocusTraversalPolicy {
-      public Component getComponentAfter(Container aContainer, Component aComponent) {
-          return sel();
-      }
-
-      public Component getComponentBefore(Container aContainer, Component aComponent) {
-          return sel();
-      }
-
-      public Component getFirstComponent(Container aContainer) {
-          return sel();
-      }
-
-      public Component getLastComponent(Container aContainer) {
-          return sel();
-      }
-
-      public Component getDefaultComponent(Container aContainer) {
-          return sel();
-      }
-  }
-  
-  
   private int pressedCloseButtonIndex = -1;
   private int mouseOverCloseButtonIndex = -1;
   private boolean draggedOut = false;
@@ -589,6 +563,11 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
               add(caption, BorderLayout.NORTH);
           }
       }
+      
+     public final boolean requestFocusInWindow() {
+       if (getComponentCount() > 0) return getComponent(0).requestFocusInWindow();
+       else return super.requestFocusInWindow();
+     }
       
       public DataSourceCaption getCaption() { return caption; }
       
