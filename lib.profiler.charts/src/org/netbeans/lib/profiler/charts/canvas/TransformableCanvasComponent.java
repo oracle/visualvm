@@ -95,7 +95,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     private long dy;
 
     // Offset adjusting
-    private int offsetAdjustingCounter = 0;
+    private int hOffsetAdjustingCounter = 0;
+    private int vOffsetAdjustingCounter = 0;
 
 
     public TransformableCanvasComponent() {
@@ -347,11 +348,12 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
         return contentsHeight;
     }
 
-    public void setDataBounds(long dataOffsetX, long dataOffsetY, long dataWidth, long dataHeight) {
+    public final void setDataBounds(long dataOffsetX, long dataOffsetY, long dataWidth, long dataHeight) {
         if (this.dataOffsetX == dataOffsetX && this.dataOffsetY == dataOffsetY &&
             this.dataWidth == dataWidth && this.dataHeight == dataHeight) return;
 
-        if (isOffsetAdjusting()) {
+        if (isHOffsetAdjusting() && contentsWidth >= getWidth() && this.dataWidth != dataWidth ||
+            isVOffsetAdjusting() && contentsHeight >= getHeight() && this.dataHeight != dataHeight) {
             pendingDataOffsetX = dataOffsetX;
             pendingDataOffsetY = dataOffsetY;
             pendingDataWidth = dataWidth;
@@ -402,13 +404,16 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
                 }
             }
 
+            long dxx = dx;
+            long dyy = dy;
+
             setOffset(newOffsetX, newOffsetY);
 
             dataBoundsChanged(dataOffsetX, dataOffsetY, dataWidth, dataHeight,
                               oldDataOffsetX, oldDataOffsetY, oldDataWidth, oldDataHeight);
 
-            dx = (oldContentsOffsetX - contentsOffsetX) - (offsetX - oldOffsetX);
-            dy = (oldContentsOffsetY - contentsOffsetY) - (offsetY - oldOffsetY);
+            dx = dxx + (oldContentsOffsetX - contentsOffsetX) - (offsetX - oldOffsetX);
+            dy = dyy + (oldContentsOffsetY - contentsOffsetY) - (offsetY - oldOffsetY);
 
             oldScaleX = scaleX;
             oldScaleY = scaleY;
@@ -431,7 +436,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     // --- Offset adjusting ----------------------------------------------------
 
     protected final void offsetAdjustingStarted() {
-        offsetAdjustingCounter++;
+        hOffsetAdjustingCounter++;
+        vOffsetAdjustingCounter++;
 
         pendingDataOffsetX = -1;
         pendingDataOffsetY = -1;
@@ -440,15 +446,58 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
     }
 
     protected final void offsetAdjustingFinished() {
-        offsetAdjustingCounter--;
+        hOffsetAdjustingCounter--;
+        vOffsetAdjustingCounter--;
+
+        if (!isOffsetAdjusting() && (pendingDataWidth != -1 || pendingDataHeight != -1))
+            setDataBounds(pendingDataOffsetX, pendingDataOffsetY,
+                          pendingDataWidth, pendingDataHeight);
+    }
+
+    protected final boolean isOffsetAdjusting() {
+        return isHOffsetAdjusting() || isVOffsetAdjusting();
+    }
+
+    protected final void hOffsetAdjustingStarted() {
+        hOffsetAdjustingCounter++;
+
+        pendingDataOffsetX = -1;
+        pendingDataOffsetY = -1;
+        pendingDataWidth = -1;
+        pendingDataHeight = -1;
+    }
+
+    protected final void hOffsetAdjustingFinished() {
+        hOffsetAdjustingCounter--;
 
         if (!isOffsetAdjusting() && pendingDataWidth != -1)
             setDataBounds(pendingDataOffsetX, pendingDataOffsetY,
                           pendingDataWidth, pendingDataHeight);
     }
 
-    protected final boolean isOffsetAdjusting() {
-        return offsetAdjustingCounter > 0;
+    protected final boolean isHOffsetAdjusting() {
+        return hOffsetAdjustingCounter > 0;
+    }
+
+    protected final void vOffsetAdjustingStarted() {
+        vOffsetAdjustingCounter++;
+
+        pendingDataOffsetX = -1;
+        pendingDataOffsetY = -1;
+        pendingDataWidth = -1;
+        pendingDataHeight = -1;
+    }
+
+    protected final void vOffsetAdjustingFinished() {
+        vOffsetAdjustingCounter--;
+
+        if (!isOffsetAdjusting() && pendingDataHeight != -1)
+            setDataBounds(pendingDataOffsetX, pendingDataOffsetY,
+                          pendingDataWidth, pendingDataHeight);
+    }
+
+    protected final boolean isVOffsetAdjusting() {
+        return vOffsetAdjustingCounter > 0;
     }
 
 

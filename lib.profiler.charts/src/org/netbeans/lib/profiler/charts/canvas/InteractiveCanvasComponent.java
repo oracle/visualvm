@@ -43,6 +43,10 @@ import javax.swing.SwingUtilities;
  */
 public abstract class InteractiveCanvasComponent extends TransformableCanvasComponent {
 
+    public static final int ZOOM_ALL = 0;
+    public static final int ZOOM_X = 1;
+    public static final int ZOOM_Y = 2;
+
     private ScrollBarManager hScrollBarManager;
     private ScrollBarManager vScrollBarManager;
 
@@ -50,6 +54,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
     private int mousePanningButton;
     private Cursor mousePanningCursor;
 
+    private int zoomMode;
     private double mouseZoomingFactor;
     private MouseZoomHandler mouseZoomHandler;
 
@@ -59,6 +64,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         mousePanningCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
         enableMousePanning();
 
+        zoomMode = ZOOM_ALL;
         mouseZoomingFactor = 1.05d;
         enableMouseZooming();
     }
@@ -200,12 +206,18 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
             if (internalChange) return;
 
             boolean valueAdjusting = e.getValueIsAdjusting();
-            boolean offsetAdjusting = isOffsetAdjusting();
+            boolean offsetAdjusting;
 
-            if (valueAdjusting && !offsetAdjusting) offsetAdjustingStarted();
+            if (horizontal) {
+                offsetAdjusting = isHOffsetAdjusting();
+                if (valueAdjusting && !offsetAdjusting) hOffsetAdjustingStarted();
+                setOffset(getValue(), getOffsetY());
+            } else {
+                offsetAdjusting = isVOffsetAdjusting();
+                if (valueAdjusting && !offsetAdjusting) vOffsetAdjustingStarted();
+                setOffset(getOffsetX(), getValue());
+            }
 
-            if (horizontal) setOffset(getValue(), getOffsetY());
-            else setOffset(getOffsetX(), getValue());
             repaintDirtyAccel();
             //            repaintDirty();
 
@@ -213,7 +225,8 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
                 // Bugfix #165020, process after all pending updates
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        offsetAdjustingFinished();
+                        if (horizontal) hOffsetAdjustingFinished();
+                        else vOffsetAdjustingFinished();
                         repaintDirty();
                     }
                 });
@@ -388,6 +401,14 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
 
     // --- Generic zooming support ---------------------------------------------
 
+    public final void setZoomMode(int zoomMode) {
+        this.zoomMode = zoomMode;
+    }
+
+    public final int getZoomMode() {
+        return zoomMode;
+    }
+
     public final void zoom(int centerX, int centerY, double factor) {
 
         // Cache current fitting
@@ -405,9 +426,8 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         if (scaleX * scaleY == 0) return;
 
         // Compute new scale
-        double scaleRatio = fitsWidth || fitsHeight ? 1 : scaleY / scaleX;
-        double newScaleX = fitsWidth ? scaleX : scaleX * factor;
-        double newScaleY = fitsHeight ? scaleY : scaleY * factor * scaleRatio;
+        double newScaleX = zoomMode == ZOOM_Y || fitsWidth ? scaleX : scaleX * factor;
+        double newScaleY = zoomMode == ZOOM_X || fitsHeight ? scaleY : scaleY * factor;
 
         // Cache data at zoom center
         double dataX = getDataX(centerX);
@@ -421,7 +441,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         long offsetY = getOffsetY();
 
         // Update x-offset to centerX if needed
-        if (!fitsWidth) {
+        if (!fitsWidth && zoomMode != ZOOM_Y) {
             double dataWidth = dataX - getDataOffsetX();
             long viewWidth = (long)Math.ceil(getViewWidth(dataWidth));
             offsetX = isRightBased() ?
@@ -429,7 +449,7 @@ public abstract class InteractiveCanvasComponent extends TransformableCanvasComp
         }
 
         // Update y-offset to centerY if needed
-        if (!fitsHeight) {
+        if (!fitsHeight && zoomMode != ZOOM_X) {
             double dataHeight = dataY - getDataOffsetY();
             long viewHeight = (long)Math.ceil(getViewHeight(dataHeight));
             offsetY = isBottomBased() ?

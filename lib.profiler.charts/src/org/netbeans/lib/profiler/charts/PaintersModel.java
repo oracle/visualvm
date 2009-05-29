@@ -26,7 +26,9 @@
 package org.netbeans.lib.profiler.charts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -67,6 +69,47 @@ public interface PaintersModel {
             if (listeners != null)
                 for (PaintersListener listener : listeners)
                     listener.paintersChanged(changedPainters);
+        }
+
+    }
+
+
+    public static class Default extends Abstract {
+
+        private final Map<ChartItem, ItemPainter> painters;
+
+
+        public Default() {
+            painters = new HashMap();
+        }
+
+        public Default(ChartItem[] items, ItemPainter[] painters) {
+            this();
+
+            if (items == null)
+                throw new IllegalArgumentException("Items cannot be null"); // NOI18N
+            if (painters == null)
+                throw new IllegalArgumentException("Painters cannot be null"); // NOI18N
+            if (items.length != painters.length)
+                throw new IllegalArgumentException("Items don't match painters"); // NOI18N
+
+            addPainters(items, painters);
+        }
+
+
+        public void addPainters(ChartItem[] addedItems, ItemPainter[] addedPainters) {
+            for (int i = 0; i < addedItems.length; i++)
+                painters.put(addedItems[i], addedPainters[i]);
+        }
+
+        public void removePainters(ChartItem[] removedItems) {
+            for (int i = 0; i < removedItems.length; i++)
+                painters.remove(removedItems[i]);
+        }
+
+
+        public ItemPainter getPainter(ChartItem item) {
+            return painters.get(item);
         }
 
     }

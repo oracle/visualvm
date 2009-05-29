@@ -6,13 +6,13 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Analysing a Heap Dump</title>
+    <title>Analysing a Heap Dump Using OQL</title>
     <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
 </head>
 <body>
-<h2>Object Query Language (OQL)</h2>
+<h2>Analyzing a Heap Dump Using Object Query Language (OQL)</h2>
 <p><small><a href="#seealso">See Also</a></small></p>
-        <object classid="java:com.sun.java.help.impl.JHSecondaryViewer">
+<p> A <object classid="java:com.sun.java.help.impl.JHSecondaryViewer">
                 <param name="content" value="glossary/heapdump.html">
                 <param name="viewerActivator" value="javax.help.LinkLabel">
                 <param name="viewerStyle" value="javax.help.Popup">
@@ -23,16 +23,18 @@
                 <param name="textFontStyle" value="italic">
                 <param name="textFontWeight" value="bold">
                 <param name="textColor" value="blue">
-        </object> captures profiling data at a specific point in time.
+</object> captures profiling data at a specific point in time.</p>
+
 <p>
-OQL is SQL-like query language to query Java heap. OQL allows to filter/select information
+OQL is a SQL-like query language to query Java heap. OQL allows to filter/select information
 wanted from Java heap. While pre-defined queries such as "show all instances of class X"
 are already supported by HAT, OQL adds more flexibility. OQL is based on JavaScript expression
 language.
 </p>
 
 <p>
-OQL query is of the form
+OQL query is of the following form:
+</p>
 
 <pre>
 <code>
@@ -41,7 +43,7 @@ OQL query is of the form
          [ <span class="key">where</span> &lt;JavaScript boolean expression to filter&gt; ] ]
 </code>
 </pre>
-where class name is fully qualified Java class name (example: java.net.URL) or array class name.
+<p>where class name is fully qualified Java class name (example: java.net.URL) or array class name.
 [C is char array name, [Ljava.io.File; is name of java.io.File[] and so on. 
 Note that fully qualified class name does not always uniquely identify a 
 Java class at runtime. There may be more than one Java class with the same 
@@ -71,12 +73,14 @@ bound to a JavaScript variable of the identifier name specified in <span class="
     select s from java.lang.String s where s.count >= 100
 </code>
 </pre>
+</li>
 <li>select all int arrays of length 256 or more
 <pre>
 <code>
     select a from int[] a where a.length >= 256
 </code>
 </pre>
+</li>
 <li>show content of Strings that match a regular expression
 <pre>
 <code>
@@ -84,12 +88,14 @@ bound to a JavaScript variable of the identifier name specified in <span class="
     where /java/(s.toString())
 </code>
 </pre>
+</li>
 <li>show path value of all File objects
 <pre>
 <code>
     select file.path.toString() from java.io.File file
 </code>
 </pre>
+</li>
 <li>show names of all ClassLoader classes
 <pre>
 <code>
@@ -97,6 +103,7 @@ bound to a JavaScript variable of the identifier name specified in <span class="
     from instanceof java.lang.ClassLoader cl
 </code>
 </pre>
+</li>
 <li>show instances of the Class identified by given id string
 <pre>
 <code>
@@ -105,13 +112,14 @@ bound to a JavaScript variable of the identifier name specified in <span class="
 </pre>
 Note that 0xd404b198 is id of a Class (in a session). This is found by
 looking at the id shown in that class's page.
+</li>
 </ul>
 
 <h2>OQL built-in objects, functions</h2>
 
 <h3>heap object</h3>
 
-The <b>heap</b> built-in object supports the following methods:
+<p>The <b>heap</b> built-in object supports the following methods:</p>
 
 <ul> 
 <li><b>heap.forEachClass</b> -- calls a callback function for each Java Class
@@ -120,6 +128,7 @@ The <b>heap</b> built-in object supports the following methods:
     heap.forEachClass(callback);
 </code>
 </pre>
+</li>
 <li><b>heap.forEachObject</b> -- calls a callback function for each Java object
 <pre>
 <code>
@@ -128,9 +137,9 @@ The <b>heap</b> built-in object supports the following methods:
 </pre>
 <code>clazz</code> is the class whose instances are selected. If not specified, defaults to java.lang.Object. <code>includeSubtypes</code> is a boolean flag 
 that specifies whether to include subtype instances or not. Default value of 
-this flag is true.
-<a name="findClass"></a>
-<li><b>heap.findClass</b> -- finds Java Class of given name
+this flag is true.</li>
+
+<li><a name="findClass"></a><b>heap.findClass</b> -- finds Java Class of given name
 <pre>
 <code>
     heap.findClass(className);
@@ -139,37 +148,38 @@ this flag is true.
 where <code>className</code> is name of the class to find. The resulting Class 
 object has following properties:
 <ul>
-<li>name - name of the class.
-<li>superclass - Class object for super class (or null if java.lang.Object).
-<li>statics - name, value pairs for static fields of the Class.
+<li>name - name of the class.</li>
+<li>superclass - Class object for super class (or null if java.lang.Object).</li>
+<li>statics - name, value pairs for static fields of the Class.</li>
 <li>fields - array of field objects. field object has name, signature
-properties.
-<li>loader - ClassLoader object that loaded this class.
+properties.</li>
+<li>loader - ClassLoader object that loaded this class.</li>
 <!--
 <li><i>signers - signers that signed this class. (Not implemented in 6.7M2)</i>
 <li><i>protectionDomain - protection domain to which this class belongs. (Not implemented in 6.7M2)</i>
 -->
 </ul>
-Class objects have the following methods:
+<p>Class objects have the following methods:</p>
 <ul>
 <li>isSubclassOf - tests whether given class is direct or indirect 
-subclass of this class or not.
+subclass of this class or not.</li>
 <li>isSuperclassOf - tests whether given Class is direct or indirect
-superclass of this class or not.
-<li>subclasses - returns array of direct and indirect subclasses.
-<li>superclasses - returns array of direct and indirect superclasses.
+superclass of this class or not.</li>
+<li>subclasses - returns array of direct and indirect subclasses.</li>
+<li>superclasses - returns array of direct and indirect superclasses.</li>
 </ul>
-<a name="findObject"></a>
-<li><b>heap.findObject</b> -- finds object from given object id
+
+</li>
+<li><a name="findObject"></a><b>heap.findObject</b> -- finds object from given object id
 <pre>
 <code>
     heap.findObject(stringIdOfObject);
 </code>
 </pre>
-<a name="classes"></a>
-<li><b>heap.classes</b> -- returns an enumeration of all Java classes
-<a name="objects"></a>
-<li><b>heap.objects</b> -- returns an enumeration of Java objects 
+</li>
+<li><a name="classes"></a><b>heap.classes</b> -- returns an enumeration of all Java classes
+</li>
+<li><a name="objects"></a><b>heap.objects</b> -- returns an enumeration of Java objects
 <pre>
 <code>
     heap.objects(clazz, [includeSubtypes], [filter])
@@ -179,9 +189,10 @@ superclass of this class or not.
 that specifies whether to include subtype instances or not. Default value of 
 this flag is true. This method accepts an optional filter expression to filter
 the result set of objects.
-<a name="finalizables"></a>
-<li><b>heap.finalizables</b> -- returns an enumeration of Java objects that are
+</li>
+<li><a name="finalizables"></a><b>heap.finalizables</b> -- returns an enumeration of Java objects that are
 pending to be finalized.
+</li>
 <li><b>heap.livepaths</b> -- return an array of paths by which a given object 
 is alive. This method accepts optional second parameter that is a boolean
 flag. This flag tells whether to include paths with weak reference(s) or not.
@@ -193,15 +204,17 @@ By default, paths with weak reference(s) are not included.
 </pre>
 Each element of this array itself is another array. The later array is 
 contains an objects that are in the 'reference chain' of the path.
+</li>
 <li><b>heap.roots</b> -- returns an Enumeration of Roots of the heap. 
 <a name="rootobj"></a>
 Each Root object has the following properties:
 <ul>
-<li>id - String id of the object that is referred by this root
-<li>type - descriptive type of Root (JNI Global, JNI Local, Java Static etc)
-<li>description - String description of the Root
-<li>referrer - Thread Object or Class object that is responsible for this root or null
+<li>id - String id of the object that is referred by this root</li>
+<li>type - descriptive type of Root (JNI Global, JNI Local, Java Static etc)</li>
+<li>description - String description of the Root</li>
+<li>referrer - Thread Object or Class object that is responsible for this root or null</li>
 </ul>
+</li>
 </ul>
 
 Examples:
@@ -839,5 +852,15 @@ notification! (implementation detail)</b>. But, using such queries on user
 classes may be safe - given that user has the control over the classes.
 </p>
 
-</body>
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="heapwalker.html">Browsing a Heap Dump</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+
+    </body>
 </html>

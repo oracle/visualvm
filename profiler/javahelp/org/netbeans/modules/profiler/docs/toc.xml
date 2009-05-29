@@ -80,7 +80,7 @@ made subject to such option by the copyright holder.
                 <tocitem text="Filtering Profiling Results" target="results_livefiltering" />
                 <tocitem text="Exploring Snapshots" target="snapshots" />
                 <tocitem text="Browsing a Heap Dump" target="heapwalking" />
-                <tocitem text="Analyzing a Heap Dump" target="heapoql"/>
+                <tocitem text="Analyzing a Heap Dump Using OQL" target="heapoql"/>
                 <tocitem text="Viewing Thread Activity" target="profile_threads" />
                 <tocitem text="Viewing VM Telemetry Results" target="results_telemetry" />
             </tocitem>
