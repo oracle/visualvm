@@ -38,15 +38,15 @@ import org.openide.util.Utilities;
  * @author Tomas Hurka
  */
 public final class AttachModelProvider extends AbstractModelProvider<AttachModel, Application>  {
-    
-    
+
+
     AttachModelProvider() {
     }
-    
+
     public AttachModel createModelFor(Application app) {
         if (Host.LOCALHOST.equals(app.getHost())) {
             JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
-            
+
             if (jvmstat != null && jvmstat.isAttachable()) {
                 if (Utilities.isWindows()) {
                     // on Windows Attach API attach to the process of the same
@@ -64,7 +64,7 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
         }
         return null;
     }
-    
+
     private static Boolean is64BitArchitecture(JvmJvmstatModel jvmstat) {
         String name = jvmstat.getVmName();
         if (name != null) {
@@ -72,12 +72,12 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
         }
         return null;
     }
-    
+
     private static Boolean is64BitArchitecture() {
         String thisArch = System.getProperty("sun.arch.data.model");    // NOI18N
         if (thisArch != null) {
             return Boolean.valueOf("64".equals(thisArch));  // NOI18N
-        }
+}
         return null;
     }
 }

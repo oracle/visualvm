@@ -37,12 +37,12 @@ import com.sun.tools.visualvm.core.model.ModelProvider;
  * @author Luis-Miguel Alventosa
  */
 public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,Application> implements ModelProvider<ApplicationType,Application> {
-    
+
     private static ApplicationTypeFactory appTypeFactory;
-    
+
     private ApplicationTypeFactory() {
     }
-    
+
     /**
      * Getter for the default version of the ApplicationTypeFactory.
      * @return instance of {@link ApplicationTypeFactory}.
@@ -55,25 +55,24 @@ public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,A
             appTypeFactory.registerProvider(new NetBeansApplicationTypeFactory());
             appTypeFactory.registerProvider(new JavaPluginApplicationTypeFactory());
             appTypeFactory.registerProvider(new JavaWebStartApplicationTypeFactory());
-            appTypeFactory.registerProvider(new JDeveloperApplicationTypeFactory());
         }
         return appTypeFactory;
     }
-    
+
     /**
      * Factory method for obtaining {@link ApplicationType} for {@link Application}. Note that there
      * is only one instance of {@link ApplicationType} for a concrete application. This {@link ApplicationType}
      * instance is cached.
-     * @param app application 
+     * @param app application
      * @return {@link ApplicationType} instance which describes application type.
      */
     public static ApplicationType getApplicationTypeFor(Application app) {
         return getDefault().getModel(app);
     }
-    
+
     /**
-     * Default {@link ApplicationType} implementation, which creates 
-     * generic {@link ApplicationType} instances. If you want to extend ApplicationTypeFactory use 
+     * Default {@link ApplicationType} implementation, which creates
+     * generic {@link ApplicationType} instances. If you want to extend ApplicationTypeFactory use
      * {@link ApplicationTypeFactory#registerProvider(ModelProvider )} to register the new instances
      * of {@link ModelProvider} for the different types of {@link Application}.
      * @param app application

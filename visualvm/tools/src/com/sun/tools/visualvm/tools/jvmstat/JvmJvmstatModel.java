@@ -36,19 +36,19 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 /**
- * 
+ *
  * This class encapsulates information available via Jvmstat counters.
- * It is preferred to use this class to get access to java home, 
- * total loaded classes, number of running threads etc. The advantage is 
+ * It is preferred to use this class to get access to java home,
+ * total loaded classes, number of running threads etc. The advantage is
  * that user code does not depend on particular counter name, which can be
  * different for different JVM.
  * @author Tomas Hurka
  */
 public abstract class JvmJvmstatModel extends Model {
     private static final Logger LOGGER = Logger.getLogger(JvmJvmstatModel.class.getName());
-    
+
     private static final String JAR_SUFFIX = ".jar";  // NOI18N
-    
+
     protected Application application;
     protected JvmstatModel jvmstat;
     protected MonitoredValue loadedClasses;
@@ -65,12 +65,12 @@ public abstract class JvmJvmstatModel extends Model {
     protected List<MonitoredValue> genCapacity;
     protected List<MonitoredValue> genUsed;
     protected long[] genMaxCapacity;
-    
+
     protected JvmJvmstatModel(Application app,JvmstatModel stat) {
         application = app;
         jvmstat = stat;
     }
-    
+
     /**
      * Returns the Java virtual machine command line.
      *
@@ -81,7 +81,7 @@ public abstract class JvmJvmstatModel extends Model {
     public String getCommandLine() {
         return jvmstat.findByName("sun.rt.javaCommand"); // NOI18N
     }
-    
+
     /**
      * Returns the Java virtual machine command line arguments.
      *
@@ -92,7 +92,7 @@ public abstract class JvmJvmstatModel extends Model {
     public String getJvmArgs() {
         return jvmstat.findByName("java.rt.vmArgs");    // NOI18N
     }
-    
+
     /**
      * Returns the Java virtual machine flags.
      *
@@ -102,11 +102,11 @@ public abstract class JvmJvmstatModel extends Model {
      */
     public String getJvmFlags() {
         return jvmstat.findByName("java.rt.vmFlags");   // NOI18N
-    }   
-    
+    }
+
    /**
-     * Returns the Java virtual machine home directory. 
-     * This method is equivalent to {@link System#getProperty 
+     * Returns the Java virtual machine home directory.
+     * This method is equivalent to {@link System#getProperty
      * System.getProperty("java.home")}.
      *
      * @return the Java virtual machine home directory.
@@ -116,10 +116,10 @@ public abstract class JvmJvmstatModel extends Model {
     public String getJavaHome() {
         return jvmstat.findByName("java.property.java.home");   // NOI18N
     }
-    
+
    /**
-     * Returns the Java virtual machine VM info. 
-     * This method is equivalent to {@link System#getProperty 
+     * Returns the Java virtual machine VM info.
+     * This method is equivalent to {@link System#getProperty
      * System.getProperty("java.vm.info")}.
      *
      * @return the Java virtual machine VM info.
@@ -129,10 +129,10 @@ public abstract class JvmJvmstatModel extends Model {
     public String getVmInfo() {
         return jvmstat.findByName("java.property.java.vm.info");    // NOI18N
     }
-    
+
     /**
-     * Returns the Java virtual machine implementation name. 
-     * This method is equivalent to {@link System#getProperty 
+     * Returns the Java virtual machine implementation name.
+     * This method is equivalent to {@link System#getProperty
      * System.getProperty("java.vm.name")}.
      *
      * @return the Java virtual machine implementation name.
@@ -142,10 +142,10 @@ public abstract class JvmJvmstatModel extends Model {
     public String getVmName() {
         return jvmstat.findByName("java.property.java.vm.name");    // NOI18N
     }
-    
+
     /**
-     * Returns the Java virtual machine implementation version. 
-     * This method is equivalent to {@link System#getProperty 
+     * Returns the Java virtual machine implementation version.
+     * This method is equivalent to {@link System#getProperty
      * System.getProperty("java.vm.version")}.
      *
      * @return the Java virtual machine implementation version.
@@ -155,10 +155,10 @@ public abstract class JvmJvmstatModel extends Model {
     public String getVmVersion() {
         return jvmstat.findByName("java.property.java.vm.version"); // NOI18N
     }
-    
+
     /**
-     * Returns the Java virtual machine implementation version. 
-     * This method is equivalent to {@link System#getProperty 
+     * Returns the Java virtual machine implementation version.
+     * This method is equivalent to {@link System#getProperty
      * System.getProperty("java.vm.vendor")}.
      *
      * @return the Java virtual machine vendor.
@@ -168,10 +168,10 @@ public abstract class JvmJvmstatModel extends Model {
     public String getVmVendor() {
         return jvmstat.findByName("java.property.java.vm.vendor");  // NOI18N
     }
-    
+
     /**
-     * Returns the Java virtual machine implementation version. 
-     * This method is equivalent to {@link System#getProperty 
+     * Returns the Java virtual machine implementation version.
+     * This method is equivalent to {@link System#getProperty
      * System.getProperty("java.class.path")}.
      *
      * @return the Java virtual machine classpath.
@@ -181,12 +181,11 @@ public abstract class JvmJvmstatModel extends Model {
     public String getClassPath() {
         return jvmstat.findByName("java.property.java.class.path"); // NOI18N
     }
-    
+
     /**
-     * Tests if target JVM supports
-     * <a href=http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>
-     * and that support is enabled in target JVM.
-     * @return <CODE>true</CODE> if JVM supports Attach API, <CODE>false</CODE> otherwise
+     * Returns true if the JVM supports attach-on-demand.
+     *
+     * @return true if JVM support attach-on-demand, false otherwise.
      */
     public boolean isAttachable() {
         String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");  // NOI18N
@@ -195,7 +194,7 @@ public abstract class JvmJvmstatModel extends Model {
         }
         return jvmCapabilities.charAt(0) == '1';
     }
-    
+
     /**
      * Return the arguments to the main class for the target Java application.
      * Returns the arguments to the main class. If the arguments can't be
@@ -216,7 +215,7 @@ public abstract class JvmJvmstatModel extends Model {
         }
         return null;
     }
-    
+
     /**
      * Return the main class for the target Java application.
      * Returns the main class, if the application started with the <em>-jar</em> option,
@@ -241,7 +240,7 @@ public abstract class JvmJvmstatModel extends Model {
                 }
             }
         }
-        
+
         if (mainClassName.endsWith(JAR_SUFFIX)) {
             mainClassName = mainClassName.replace('\\', '/');
             int index = mainClassName.lastIndexOf('/');
@@ -256,9 +255,9 @@ public abstract class JvmJvmstatModel extends Model {
     private String getFirstArgument() {
         String commandLine = getCommandLine();
         String mainClassName = null;
-        
+
         // search for jar file
-        int jarIndex = commandLine.indexOf(JAR_SUFFIX); 
+        int jarIndex = commandLine.indexOf(JAR_SUFFIX);
         if (jarIndex != -1) {
             String jarFile = commandLine.substring(0,jarIndex+JAR_SUFFIX.length());
             // if this is not end of commandLine check that jar file is separated by space from other arguments
@@ -282,7 +281,7 @@ public abstract class JvmJvmstatModel extends Model {
         return mainClassName;
     }
 
-    /** 
+    /**
      * Returns the total number of classes that have been loaded since
      * the Java virtual machine has started execution.
      *
@@ -292,8 +291,8 @@ public abstract class JvmJvmstatModel extends Model {
     public long getLoadedClasses() {
         return getLongValue(loadedClasses);
     }
-    
-    /** 
+
+    /**
      * Returns the total number of shared classes that have been loaded since
      * the Java virtual machine has started execution.
      *
@@ -303,8 +302,8 @@ public abstract class JvmJvmstatModel extends Model {
     public long getSharedLoadedClasses() {
         return getLongValue(sharedLoadedClasses);
     }
-    
-    /** 
+
+    /**
      * Returns the total number of shared classes unloaded since the Java virtual machine
      * has started execution.
      *
@@ -313,8 +312,8 @@ public abstract class JvmJvmstatModel extends Model {
     public long getSharedUnloadedClasses() {
         return getLongValue(sharedUnloadedClasses);
    }
-    
-    /** 
+
+    /**
      * Returns the total number of classes unloaded since the Java virtual machine
      * has started execution.
      *
@@ -323,7 +322,7 @@ public abstract class JvmJvmstatModel extends Model {
     public long getUnloadedClasses() {
         return getLongValue(unloadedClasses);
     }
-    
+
     /**
      * Returns the current number of live daemon threads.
      *
@@ -332,9 +331,9 @@ public abstract class JvmJvmstatModel extends Model {
     public long getThreadsDaemon() {
         return getLongValue(threadsDaemon);
     }
-    
+
     /**
-     * Returns the current number of live threads including both 
+     * Returns the current number of live threads including both
      * daemon and non-daemon threads.
      *
      * @return the current number of live threads.
@@ -342,9 +341,9 @@ public abstract class JvmJvmstatModel extends Model {
     public long getThreadsLive() {
         return getLongValue(threadsLive);
     }
-    
+
     /**
-     * Returns the peak live thread count since the Java virtual machine 
+     * Returns the peak live thread count since the Java virtual machine
      * started or peak was reset.
      *
      * @return the peak live thread count.
@@ -352,9 +351,9 @@ public abstract class JvmJvmstatModel extends Model {
     public long getThreadsLivePeak() {
         return getLongValue(threadsLivePeak);
     }
-    
+
     /**
-     * Returns the total number of threads created and also started 
+     * Returns the total number of threads created and also started
      * since the Java virtual machine started.
      *
      * @return the total number of threads started.
@@ -362,18 +361,18 @@ public abstract class JvmJvmstatModel extends Model {
     public long getThreadsStarted() {
         return getLongValue(threadsStarted);
     }
-    
+
     /**
      * Returns the total time of when application is running in OS ticks.
      * Application time is the uptime minus time spent in safe points.
-     * Note that this value is updated only at the beginning and e 
+     * Note that this value is updated only at the beginning and e
      * @return application time of the Java virtual machine in OS ticks.
      * @see JvmJvmstatModel#getOsFrequency()
      */
     public long getApplicationTime() {
         return getLongValue(applicationTime);
     }
-    
+
     /**
      * Returns the uptime of the Java virtual machine in OS ticks.
      * @return uptime of the Java virtual machine in OS ticks.
@@ -382,11 +381,11 @@ public abstract class JvmJvmstatModel extends Model {
     public long getUpTime() {
         return getLongValue(upTime);
     }
-    
-    /** 
+
+    /**
      * Returns the amount of memory in bytes that is committed for
      * the Java virtual machine to use.  This amount of memory is
-     * guaranteed for the Java virtual machine to use. 
+     * guaranteed for the Java virtual machine to use.
      *
      * @return long[0] - the amount of committed heap memory in bytes.
      *         long[1] - the amount of committed Perm Gen memory in bytes.
@@ -395,8 +394,8 @@ public abstract class JvmJvmstatModel extends Model {
     public long[] getGenCapacity() {
         return getGenerationSum(genCapacity);
     }
-    
-    /** 
+
+    /**
      * Returns the amount of used memory in bytes.
      *
      * @return long[0] - the amount of used heap memory in bytes.
@@ -406,19 +405,19 @@ public abstract class JvmJvmstatModel extends Model {
     public long[] getGenUsed() {
         return getGenerationSum(genUsed);
     }
-    
-    /** 
-     * Returns the maximum amount of memory in bytes that can be 
-     * used for memory management.  This method returns <tt>-1</tt> 
+
+    /**
+     * Returns the maximum amount of memory in bytes that can be
+     * used for memory management.  This method returns <tt>-1</tt>
      * if the maximum memory size is undefined.
-     * 
-     * @return long[0] - the maximum amount of heap memory in bytes; 
+     *
+     * @return long[0] - the maximum amount of heap memory in bytes;
      *         long[1] - the maximum amount of Perm Gen memory in bytes;
      */
     public long[] getGenMaxCapacity() {
         return genMaxCapacity;
     }
-    
+
     /**
      * Returns the number of OS ticks per second.
      *
@@ -427,7 +426,7 @@ public abstract class JvmJvmstatModel extends Model {
     public long getOsFrequency() {
         return osFrequency;
     }
-    
+
     protected abstract String getPermGenPrefix();
 
     protected long getLongValue(MonitoredValue val) {
@@ -436,11 +435,11 @@ public abstract class JvmJvmstatModel extends Model {
         }
         return 0;
     }
-    
+
     protected long[] getGenerationSum(List<MonitoredValue> values) {
         long[] results=new long[2];
         String prefix = getPermGenPrefix();
-        
+
         for (MonitoredValue value : values) {
             if (value != null) {
                 long val = ((Long)value.getValue()).longValue();

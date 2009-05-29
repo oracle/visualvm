@@ -43,10 +43,10 @@ import sun.jvmstat.monitor.VmIdentifier;
  */
 public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Application> {
     private final static Logger LOGGER = Logger.getLogger(JvmstatModelProvider.class.getName());
-    
+
     static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
         if (app.isRemoved() || app.getPid() == Application.UNKNOWN_PID) return null;
-        
+
         String vmId = "//" + app.getPid() + "?mode=r";  // NOI18N
         try {
             MonitoredHost monitoredHost = MonitoredHost.getMonitoredHost(app.getHost().getHostName());
@@ -55,14 +55,14 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         } catch (URISyntaxException ex) {
             LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
             return null;
-        } catch (Exception ex) { 
-            // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows, 
+        } catch (Exception ex) {
+            // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows,
             // when opening shared memory file (java.lang.Exception: Could not open PerfMemory)
             LOGGER.log(Level.FINER,"getMonitoredVm failed",ex);  // NOI18N
-            return null;            
+            return null;
         }
     }
-    
+
     public JvmstatModel createModelFor(Application app) {
         MonitoredVm vm = null;
         try {
@@ -85,5 +85,5 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         }
         return null;
     }
-    
+
 }

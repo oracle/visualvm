@@ -59,9 +59,9 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 public class HeapDumpProvider {
-    
+
     private final static Logger LOGGER = Logger.getLogger(HeapDumpProvider.class.getName());
-    
+
     public void createHeapDump(final Application application, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -74,7 +74,7 @@ public class HeapDumpProvider {
                     });
                     return;
                 }
-                
+
                 ProgressHandle pHandle = null;
                 try {
                     pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
@@ -104,7 +104,7 @@ public class HeapDumpProvider {
             }
         });
     }
-    
+
     public void createHeapDump(final CoreDump coreDump, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -140,13 +140,13 @@ public class HeapDumpProvider {
             }
         });
     }
-    
+
     public void initialize() {
         DataSourceRepository.sharedInstance().addDataChangeListener(new SnapshotListener(), Snapshot.class);
         DataSourceRepository.sharedInstance().addDataChangeListener(new ApplicationListener(), Application.class);
     }
-    
-    
+
+
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof HeapDumpImpl) return;
         File snapshotFile = snapshot.getFile();
@@ -158,7 +158,7 @@ public class HeapDumpProvider {
             snapshot.getRepository().addDataSources(heapDumps);
         }
     }
-    
+
     private void processNewApplication(Application application) {
         Storage storage = application.getStorage();
         if (storage.directoryExists()) {
@@ -169,7 +169,7 @@ public class HeapDumpProvider {
             application.getRepository().addDataSources(heapDumps);
         }
     }
-    
+
     private void notifyHeapDumpFailed(final DataSource dataSource) {
         final String displayName = DataSourceDescriptorFactory.getDescriptor(dataSource).getName();
         SwingUtilities.invokeLater(new Runnable() {
@@ -178,10 +178,10 @@ public class HeapDumpProvider {
             }
         });
     }
-    
-    
+
+
     private class SnapshotListener implements DataChangeListener<Snapshot> {
-        
+
         public void dataChanged(DataChangeEvent<Snapshot> event) {
             final Set<Snapshot> snapshots = event.getAdded();
             if (!snapshots.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
@@ -190,11 +190,11 @@ public class HeapDumpProvider {
                 }
             });
         }
-        
+
     }
-    
+
     private class ApplicationListener implements DataChangeListener<Application> {
-        
+
         public void dataChanged(DataChangeEvent<Application> event) {
             final Set<Application> applications = event.getAdded();
             if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
@@ -203,7 +203,7 @@ public class HeapDumpProvider {
                 }
             });
         }
-        
+
     }
-    
+
 }

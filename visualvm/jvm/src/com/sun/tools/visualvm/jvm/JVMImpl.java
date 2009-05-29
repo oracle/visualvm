@@ -65,9 +65,9 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     JvmJvmstatModel jvmstatModel;
     Set<MonitoredDataListener> listeners;
     JmxSupport jmxSupport;
-    
-    // static JVM data 
-    private boolean staticDataInitialized; 
+
+    // static JVM data
+    private boolean staticDataInitialized;
     private Object staticDataLock = new Object();
     private String commandLine;
     private String jvmArgs;
@@ -81,7 +81,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     private String vmName;
     private String vmVendor;
 
- 
+
     JVMImpl(Application app,JvmstatModel jvms) {
         application = app;
         monitoredVm = jvms;
@@ -89,77 +89,74 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         jmxSupport = new JmxSupport(app,this);
         listeners = new HashSet();
     }
-    
+
     JVMImpl(Application app) {
         application = app;
         jmxSupport = new JmxSupport(app,this);
         listeners = new HashSet();
     }
-    
+
     public boolean isAttachable() {
         if (jvmstatModel != null) {
-            if (!jvmstatModel.isAttachable()) {
-                return false;
-        }
-            return getAttach() != null;
+            return jvmstatModel.isAttachable();
         }
         return false;
     }
-    
+
     public boolean isBasicInfoSupported() {
         return true;
     }
-    
+
     public String getCommandLine() {
         initStaticData();
         return commandLine;
     }
-    
+
     public String getJvmArgs() {
         initStaticData();
         return jvmArgs;
     }
-    
+
     public String getJvmFlags() {
         initStaticData();
         return jvmFlags;
     }
-    
+
     public String getMainArgs() {
         initStaticData();
         return mainArgs;
     }
-    
+
     public String getMainClass() {
         initStaticData();
         return mainClass;
     }
-    
+
     public String getVmVersion() {
         initStaticData();
         return vmVersion;
     }
-    
+
     public String getJavaHome() {
         initStaticData();
         return javaHome;
     }
-    
+
     public String getVmInfo() {
         initStaticData();
         return vmInfo;
     }
-    
+
     public String getVmName() {
         initStaticData();
         return vmName;
     }
-    
+
     public String getVmVendor() {
         initStaticData();
         return vmVendor;
     }
-    
+
     public boolean is14() {
         String ver = getVmVersion();
         if (ver != null && ver.startsWith("1.4.")) {    // NOI18N
@@ -167,7 +164,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return false;
     }
-    
+
     public boolean is15() {
         String ver = getVmVersion();
         if (ver != null && ver.startsWith("1.5.")) {    // NOI18N
@@ -175,7 +172,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return false;
     }
-    
+
     public boolean is16() {
         String ver = getJavaVersion();
         if (ver == null) {
@@ -186,7 +183,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return false;
     }
-    
+
     public boolean is17() {
         String ver = getJavaVersion();
         if (ver == null) {
@@ -197,7 +194,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return false;
     }
-    
+
     public boolean isDumpOnOOMEnabled() {
         if (isDumpOnOOMEnabled == null) {
             AttachModel attach = getAttach();
@@ -224,7 +221,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return isDumpOnOOMEnabled.booleanValue();
     }
-    
+
     public void addMonitoredDataListener(MonitoredDataListener l) {
         synchronized (listeners) {
             if (listeners.add(l)) {
@@ -237,7 +234,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             }
         }
     }
-    
+
     public void removeMonitoredDataListener(MonitoredDataListener l) {
         synchronized (listeners) {
             if (listeners.remove(l)) {
@@ -251,31 +248,31 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             }
         }
     }
-    
+
     public boolean isMonitoringSupported() {
         return isClassMonitoringSupported() || isThreadMonitoringSupported() || isMemoryMonitoringSupported();
     }
-    
+
     public boolean isClassMonitoringSupported() {
         return monitoredVm != null || jmxSupport.getRuntime() != null;
     }
-    
+
     public boolean isThreadMonitoringSupported() {
         return (!is14() && monitoredVm != null) || jmxSupport.getRuntime() != null;
     }
-    
+
     public boolean isMemoryMonitoringSupported() {
         return monitoredVm != null || jmxSupport.getRuntime() != null;
     }
-    
+
     public boolean isGetSystemPropertiesSupported() {
         return getAttach() != null || jmxSupport.getRuntime() != null || getSAAgent() != null;
     }
-    
+
     public Properties getSystemProperties() {
         AttachModel attach = getAttach();
         Properties prop = null;
-        
+
         if (attach != null) {
             prop = attach.getSystemProperties();
         }
@@ -294,11 +291,11 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return null;
     }
-    
+
     public boolean isDumpOnOOMEnabledSupported() {
-        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
+        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null);
     }
-    
+
     public synchronized void setDumpOnOOMEnabled(boolean enabled) {
         if (!isDumpOnOOMEnabledSupported()) {
             throw new UnsupportedOperationException();
@@ -320,11 +317,11 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         isDumpOnOOMEnabled = Boolean.valueOf(enabled);
         firePropertyChange(PROPERTY_DUMP_OOME_ENABLED,oldVlue,isDumpOnOOMEnabled);
     }
-    
+
     public boolean isTakeHeapDumpSupported() {
-        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
+        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null);
     }
-    
+
     public File takeHeapDump() throws IOException {
         if (!isTakeHeapDumpSupported()) {
             throw new UnsupportedOperationException();
@@ -346,15 +343,15 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         return null;
     }
-    
+
     public boolean isTakeThreadDumpSupported() {
         return getAttach() != null || jmxSupport.getRuntime() != null || getSAAgent() != null;
     }
-    
+
     public File takeThreadDump() throws IOException {
         AttachModel attach = getAttach();
         String threadDump = null;
-        
+
         if (attach != null) {
             threadDump = attach.takeThreadDump();
         }
@@ -381,24 +378,24 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         os.close();
         return dumpFile;
     }
-    
+
     public boolean isCpuMonitoringSupported() {
         return jmxSupport.getOperationSystem() instanceof OperatingSystemMXBean;
     }
-    
+
     public boolean isCollectionTimeSupported() {
         Collection gcList = jmxSupport.getGarbageCollectorMXBeans();
         return gcList != null && !gcList.isEmpty();
     }
-    
+
     protected AttachModel getAttach() {
         return AttachModelFactory.getAttachFor(application);
     }
-    
+
     protected SaModel getSAAgent() {
         return SaModelFactory.getSAAgentFor(application);
     }
-    
+
     protected void initStaticData() {
         synchronized (staticDataLock) {
             if (staticDataInitialized) {
@@ -431,7 +428,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             staticDataInitialized = true;
         }
     }
-    
+
     private String getJvmArgsJvmstat() {
         String args = jvmstatModel.getJvmArgs();
         if (args.length() == 1024) {
@@ -453,11 +450,11 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         initStaticData();
         return javaVersion;
     }
-    
+
     public void dataChanged(JvmstatModel stat) {
         assert stat == monitoredVm;
         MonitoredData data = new MonitoredDataImpl(this,jvmstatModel,jmxSupport);
-        notifyListeners(data);        
+        notifyListeners(data);
     }
 
     void notifyListeners(final MonitoredData data) {
@@ -467,7 +464,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         for (MonitoredDataListener listener : listenersCopy) {
             listener.monitoredDataEvent(data);
-        }        
+        }
     }
 
 }

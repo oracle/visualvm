@@ -40,16 +40,16 @@ import java.util.logging.Logger;
  */
 public abstract class Jvm extends Model {
     protected static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
-    
+
     /**
-     * Propety name for {@link #isDumpOnOOMEnabled()}. 
+     * Propety name for {@link #isDumpOnOOMEnabled()}.
      * If property dumpOnOOMEnabled changes its state, property change is fired
      * with this property name.
      */
     public static final String PROPERTY_DUMP_OOME_ENABLED = "prop_oome";    // NOI18N
-    
+
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-    
+
     /**
      * Tests if target JVM is JRE 1.4.
      * @return <CODE>true</CODE> if JVM is JRE 1.4, <CODE>false</CODE> otherwise
@@ -75,9 +75,9 @@ public abstract class Jvm extends Model {
     public abstract boolean is17();
 
     /**
-     * Tests if VisualVM can attach to target JVM via
+     * Tests if target JVM supports
      * <a href=http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>.
-     * @return <CODE>true</CODE> if VisualVM can attach to target JVMvia Attach API, <CODE>false</CODE> otherwise
+     * @return <CODE>true</CODE> if JVM supports Attach API, <CODE>false</CODE> otherwise
      */
     public abstract boolean isAttachable();
 
@@ -149,7 +149,7 @@ public abstract class Jvm extends Model {
      * @return Returns java.vm.name property.
      */
     public abstract String getVmName();
-    
+
     /**
      * Returns the java.vm.vendor property for the target Java application.
      * java.vm.vendor property is Java Virtual Machine vendor name.
@@ -202,7 +202,7 @@ public abstract class Jvm extends Model {
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isCpuMonitoringSupported();
-    
+
     /**
      * Tests if target JVM supports Garbage collection time monitoring. If true,
      * methods getCollectionTime()
@@ -283,7 +283,7 @@ public abstract class Jvm extends Model {
      * @return Returns {@link String} of the thread dump from target JVM.
      */
     public abstract File takeThreadDump() throws IOException;
-    
+
     /**
      * Add a PropertyChangeListener to the listener list.
      * The listener is registered for all properties.
@@ -312,7 +312,7 @@ public abstract class Jvm extends Model {
     public final void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
     }
-    
+
     /**
      * Report a bound property update to any registered listeners.
      * No event is fired if old and new are equal and non-null.
@@ -325,5 +325,5 @@ public abstract class Jvm extends Model {
     protected final void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         changeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
-    
+
 }
