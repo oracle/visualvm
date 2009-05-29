@@ -55,6 +55,7 @@ public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,A
             appTypeFactory.registerProvider(new NetBeansApplicationTypeFactory());
             appTypeFactory.registerProvider(new JavaPluginApplicationTypeFactory());
             appTypeFactory.registerProvider(new JavaWebStartApplicationTypeFactory());
+            appTypeFactory.registerProvider(new JDeveloperApplicationTypeFactory());
         }
         return appTypeFactory;
     }

@@ -155,9 +155,9 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             return tabbedContainer.indexOfView(view);
         }
     }
-    
-    
-    protected final void componentActivated() { 
+
+
+    protected final void componentActivated() {
         super.componentActivated();
         if (singleViewContainer != null) singleViewContainer.requestFocusInWindow();
         else if (getComponentCount() > 0) getComponent(0).requestFocusInWindow();

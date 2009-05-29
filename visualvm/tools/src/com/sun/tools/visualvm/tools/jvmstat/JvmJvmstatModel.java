@@ -183,9 +183,10 @@ public abstract class JvmJvmstatModel extends Model {
     }
     
     /**
-     * Returns true if the JVM supports attach-on-demand. 
-     * 
-     * @return true if JVM support attach-on-demand, false otherwise.
+     * Tests if target JVM supports
+     * <a href=http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>
+     * and that support is enabled in target JVM.
+     * @return <CODE>true</CODE> if JVM supports Attach API, <CODE>false</CODE> otherwise
      */
     public boolean isAttachable() {
         String jvmCapabilities = jvmstat.findByName("sun.rt.jvmCapabilities");  // NOI18N

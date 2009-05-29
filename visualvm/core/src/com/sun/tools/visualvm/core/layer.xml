@@ -55,6 +55,12 @@
             </file>
         </folder>
     </folder>
+
+    <folder name="Shortcuts">
+        <file name="DELETE.shadow">
+            <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+        </file>
+    </folder>
     
     <folder name="Menu">
         

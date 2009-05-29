@@ -85,14 +85,17 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     CloseButtonListener.install();
     //Bugfix #28263: Disable focus.
     setFocusable(false);
+    // VisualVM bugfix #279 - do not override FocusTraversalPolicy
+    //    setFocusCycleRoot(true);
+    //    setFocusTraversalPolicy(new CBTPPolicy());
   }
-  
+
   public final boolean requestFocusInWindow() {
       Component sel = getSelectedComponent();
       if (sel != null) return sel.requestFocusInWindow();
       else return super.requestFocusInWindow();
   }
-
+  
   private int pressedCloseButtonIndex = -1;
   private int mouseOverCloseButtonIndex = -1;
   private boolean draggedOut = false;
@@ -555,6 +558,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
           setLayout(new BorderLayout());
           setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
           setBackground(Color.WHITE);
+//          setFocusable(false);
           
           add(viewComponent, BorderLayout.CENTER);
           if (caption != null) {
@@ -563,11 +567,11 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
               add(caption, BorderLayout.NORTH);
           }
       }
-      
-     public final boolean requestFocusInWindow() {
-       if (getComponentCount() > 0) return getComponent(0).requestFocusInWindow();
-       else return super.requestFocusInWindow();
-     }
+
+      public final boolean requestFocusInWindow() {
+        if (getComponentCount() > 0) return getComponent(0).requestFocusInWindow();
+        else return super.requestFocusInWindow();
+      }
       
       public DataSourceCaption getCaption() { return caption; }
       

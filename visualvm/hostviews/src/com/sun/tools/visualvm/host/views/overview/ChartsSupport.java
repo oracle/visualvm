@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.charts.ChartModelListener;
-import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
+//import org.netbeans.lib.profiler.ui.charts.SynchronousXYChart;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.BorderFactory;
@@ -47,177 +47,177 @@ import org.openide.util.NbBundle;
  */
 class ChartsSupport {
     
-  public static final int MINIMUM_CHART_HEIGHT = 275;
-
-  public static abstract class Chart extends GraphPanel implements ChartModelListener {
-
-    private SynchronousXYChart xyChart;
-    private BoundedDynamicXYChartModel xyChartModel;
-    private JPanel bigLegendPanel;
-    private JPanel smallLegendPanel;
-    
-    public Chart() {
-      long time = System.currentTimeMillis();
-      
-      setLayout(new BorderLayout());
-      setOpaque(true);
-      setBackground(Color.WHITE);
-      
-      GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-      xyChartModel = new BoundedDynamicXYChartModel(preferences.getMonitoredHostCache() * 60 / preferences.getMonitoredHostPoll()) {
-        public  long    getMaxDisplayYValue(int seriesIndex)      { return getMaxYValue(0); }
-      };
-      setupModel(xyChartModel);
-      
-      xyChart = createChart();
-      xyChart.setBackgroundPaint(getBackground());
-      xyChart.setModel(xyChartModel);
-      xyChart.setFitToWindow();
-      xyChart.setupInitialAppearance(time, time + 1200, 0, 2);
-      add(xyChart, BorderLayout.CENTER);
-      
-      bigLegendPanel = createBigLegend();
-      smallLegendPanel = createSmallLegend();
-      
-      ToolTipManager.sharedInstance().registerComponent(xyChart);
-      
-//      xyChartModel.addChartModelListener(this);
-    }
-    
-    protected abstract SynchronousXYChart createChart();
-    protected abstract void setupModel(BoundedDynamicXYChartModel xyChartModel);
-    protected abstract JPanel createBigLegend();
-    protected abstract JPanel createSmallLegend();
-    
-    public SynchronousXYChart getChart() {
-      return xyChart;
-    };
-    
-    public BoundedDynamicXYChartModel getModel() {
-      return xyChartModel;
-    }
-    
-    public JPanel getBigLegendPanel() {
-      return bigLegendPanel;
-    };
-    
-    public JPanel getSmallLegendPanel() {
-      return smallLegendPanel;
-    }
-    
-    public void chartDataChanged() {
-//      if (xyChart.isFitToWindow() && xyChartModel.getMaxXValue() - xyChartModel.getMinXValue() >= chartTimeLength) { // after 3 minutes switch from fitToWindow to trackingEnd
-//        xyChart.setTrackingEnd();
-//      }
-    }
-    
-    public void setToolTipText(String toolTipText) {
-        super.setToolTipText(toolTipText);
-        xyChart.setToolTipText(toolTipText);
-    }
-    
-  }
-  
-  public static class CPUMetricsChart extends Chart {
-    
-    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Load_average")}, new Color[] { new Color(255, 127, 127)} );   // NOI18N
-    }
-
-    protected SynchronousXYChart createChart() {
-      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
-      xyChart.setVerticalAxisValueDivider(1000);
-      xyChart.setVerticalAxisValueString(""); // NOI18N
-      xyChart.setTopChartMargin(20);
-      xyChart.denySelection();
-      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
-      return xyChart;
-    }
-
-    protected JPanel createBigLegend() {
-      JLabel liveThreads = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
-      liveThreads.setOpaque(false);
-      liveThreads.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-      JPanel legendPanel = new JPanel();
-      legendPanel.setOpaque(false);
-      legendPanel.add(liveThreads);
-      
-      return legendPanel;
-    }
-
-    protected JPanel createSmallLegend() {
-      return null;
-    }
-    
-  }  
-  
-  public static class PhysicalMemoryMetricsChart extends Chart {
-    
-    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Used_memory")}, new Color[] { new Color(255, 127, 127)} );    // NOI18N
-    }
-
-    protected SynchronousXYChart createChart() {
-      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
-      xyChart.setVerticalAxisValueDivider(1024*1024);
-      xyChart.setVerticalAxisValueString("M"); // NOI18N
-      xyChart.setTopChartMargin(20);
-      xyChart.denySelection();
-      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
-      return xyChart;
-    }
-
-    protected JPanel createBigLegend() {
-      JLabel liveThreads = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
-      liveThreads.setOpaque(false);
-      liveThreads.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-      JPanel legendPanel = new JPanel();
-      legendPanel.setOpaque(false);
-      legendPanel.add(liveThreads);
-      
-      return legendPanel;
-    }
-
-    protected JPanel createSmallLegend() {
-      return null;
-    }
-    
-  }
-  
-  public static class SwapMemoryMetricsChart extends Chart {
-    
-    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
-      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Used_swap")}, new Color[] { new Color(255, 127, 127)} );  // NOI18N
-    }
-
-    protected SynchronousXYChart createChart() {
-      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
-      xyChart.setVerticalAxisValueDivider(1024*1024);
-      xyChart.setVerticalAxisValueString("M"); // NOI18N
-      xyChart.setTopChartMargin(20);
-      xyChart.denySelection();
-      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
-      return xyChart;
-    }
-
-    protected JPanel createBigLegend() {
-      JLabel liveThreads = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
-      liveThreads.setOpaque(false);
-      liveThreads.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-      JPanel legendPanel = new JPanel();
-      legendPanel.setOpaque(false);
-      legendPanel.add(liveThreads);
-      
-      return legendPanel;
-    }
-
-    protected JPanel createSmallLegend() {
-      return null;
-    }
-    
-  }
+//  public static final int MINIMUM_CHART_HEIGHT = 275;
+//
+//  public static abstract class Chart extends GraphPanel implements ChartModelListener {
+//
+//    private SynchronousXYChart xyChart;
+//    private BoundedDynamicXYChartModel xyChartModel;
+//    private JPanel bigLegendPanel;
+//    private JPanel smallLegendPanel;
+//
+//    public Chart() {
+//      long time = System.currentTimeMillis();
+//
+//      setLayout(new BorderLayout());
+//      setOpaque(true);
+//      setBackground(Color.WHITE);
+//
+//      GlobalPreferences preferences = GlobalPreferences.sharedInstance();
+//      xyChartModel = new BoundedDynamicXYChartModel(preferences.getMonitoredHostCache() * 60 / preferences.getMonitoredHostPoll()) {
+//        public  long    getMaxDisplayYValue(int seriesIndex)      { return getMaxYValue(0); }
+//      };
+//      setupModel(xyChartModel);
+//
+//      xyChart = createChart();
+//      xyChart.setBackgroundPaint(getBackground());
+//      xyChart.setModel(xyChartModel);
+//      xyChart.setFitToWindow();
+//      xyChart.setupInitialAppearance(time, time + 1200, 0, 2);
+//      add(xyChart, BorderLayout.CENTER);
+//
+//      bigLegendPanel = createBigLegend();
+//      smallLegendPanel = createSmallLegend();
+//
+//      ToolTipManager.sharedInstance().registerComponent(xyChart);
+//
+////      xyChartModel.addChartModelListener(this);
+//    }
+//
+//    protected abstract SynchronousXYChart createChart();
+//    protected abstract void setupModel(BoundedDynamicXYChartModel xyChartModel);
+//    protected abstract JPanel createBigLegend();
+//    protected abstract JPanel createSmallLegend();
+//
+//    public SynchronousXYChart getChart() {
+//      return xyChart;
+//    };
+//
+//    public BoundedDynamicXYChartModel getModel() {
+//      return xyChartModel;
+//    }
+//
+//    public JPanel getBigLegendPanel() {
+//      return bigLegendPanel;
+//    };
+//
+//    public JPanel getSmallLegendPanel() {
+//      return smallLegendPanel;
+//    }
+//
+//    public void chartDataChanged() {
+////      if (xyChart.isFitToWindow() && xyChartModel.getMaxXValue() - xyChartModel.getMinXValue() >= chartTimeLength) { // after 3 minutes switch from fitToWindow to trackingEnd
+////        xyChart.setTrackingEnd();
+////      }
+//    }
+//
+//    public void setToolTipText(String toolTipText) {
+//        super.setToolTipText(toolTipText);
+//        xyChart.setToolTipText(toolTipText);
+//    }
+//
+//  }
+//
+//  public static class CPUMetricsChart extends Chart {
+//
+//    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
+//      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Load_average")}, new Color[] { new Color(255, 127, 127)} );   // NOI18N
+//    }
+//
+//    protected SynchronousXYChart createChart() {
+//      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
+//      xyChart.setVerticalAxisValueDivider(1000);
+//      xyChart.setVerticalAxisValueString(""); // NOI18N
+//      xyChart.setTopChartMargin(20);
+//      xyChart.denySelection();
+//      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
+//      return xyChart;
+//    }
+//
+//    protected JPanel createBigLegend() {
+//      JLabel liveThreads = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
+//      liveThreads.setOpaque(false);
+//      liveThreads.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+//
+//      JPanel legendPanel = new JPanel();
+//      legendPanel.setOpaque(false);
+//      legendPanel.add(liveThreads);
+//
+//      return legendPanel;
+//    }
+//
+//    protected JPanel createSmallLegend() {
+//      return null;
+//    }
+//
+//  }
+//
+//  public static class PhysicalMemoryMetricsChart extends Chart {
+//
+//    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
+//      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Used_memory")}, new Color[] { new Color(255, 127, 127)} );    // NOI18N
+//    }
+//
+//    protected SynchronousXYChart createChart() {
+//      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
+//      xyChart.setVerticalAxisValueDivider(1024*1024);
+//      xyChart.setVerticalAxisValueString("M"); // NOI18N
+//      xyChart.setTopChartMargin(20);
+//      xyChart.denySelection();
+//      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
+//      return xyChart;
+//    }
+//
+//    protected JPanel createBigLegend() {
+//      JLabel liveThreads = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
+//      liveThreads.setOpaque(false);
+//      liveThreads.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+//
+//      JPanel legendPanel = new JPanel();
+//      legendPanel.setOpaque(false);
+//      legendPanel.add(liveThreads);
+//
+//      return legendPanel;
+//    }
+//
+//    protected JPanel createSmallLegend() {
+//      return null;
+//    }
+//
+//  }
+//
+//  public static class SwapMemoryMetricsChart extends Chart {
+//
+//    protected void setupModel(BoundedDynamicXYChartModel xyChartModel) {
+//      xyChartModel.setupModel(new String[] {NbBundle.getMessage(ChartsSupport.class, "LBL_Used_swap")}, new Color[] { new Color(255, 127, 127)} );  // NOI18N
+//    }
+//
+//    protected SynchronousXYChart createChart() {
+//      SynchronousXYChart xyChart = new SynchronousXYChart(SynchronousXYChart.TYPE_FILL, SynchronousXYChart.VALUES_INTERPOLATED, 0.01);
+//      xyChart.setVerticalAxisValueDivider(1024*1024);
+//      xyChart.setVerticalAxisValueString("M"); // NOI18N
+//      xyChart.setTopChartMargin(20);
+//      xyChart.denySelection();
+//      xyChart.setMinimumVerticalMarksDistance(UIManager.getFont("Panel.font").getSize() + 8); // NOI18N
+//      return xyChart;
+//    }
+//
+//    protected JPanel createBigLegend() {
+//      JLabel liveThreads = new JLabel(getModel().getSeriesName(0), new ColorIcon(getModel().getSeriesColor(0), Color.BLACK, 18, 9), SwingConstants.LEADING);
+//      liveThreads.setOpaque(false);
+//      liveThreads.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+//
+//      JPanel legendPanel = new JPanel();
+//      legendPanel.setOpaque(false);
+//      legendPanel.add(liveThreads);
+//
+//      return legendPanel;
+//    }
+//
+//    protected JPanel createSmallLegend() {
+//      return null;
+//    }
+//
+//  }
   
 }
