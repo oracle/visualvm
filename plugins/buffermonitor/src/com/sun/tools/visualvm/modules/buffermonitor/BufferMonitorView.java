@@ -69,7 +69,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
     private Application application;
     
     public BufferMonitorView(Application application) {
-        super(application, NbBundle.getMessage(BufferMonitorView.class, "Buffer_Monitor"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false); // NOI18N
+        super(application, NbBundle.getMessage(BufferMonitorView.class, "Buffer_Pools"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false); // NOI18N
         this.application = application;
     }
     
@@ -122,7 +122,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView(NbBundle.getMessage(BufferMonitorView.class, "Buffer_Monitor"), null, this);   // NOI18N
+            return new DataViewComponent.MasterView(NbBundle.getMessage(BufferMonitorView.class, "Buffer_Pools"), null, this);   // NOI18N
         }
         
         
