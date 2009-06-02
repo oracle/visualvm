@@ -351,9 +351,9 @@ class ChartSelectionManager implements ChartSelectionModel {
         public void mousePressed(MouseEvent e) {
             mousePanningBackup = chart.isMousePanningEnabled();
 
+            setSelectionMode(dragMode);
             if (selectionMode != SELECTION_NONE) {
                 chart.disableMousePanning();
-                setSelectionMode(dragMode);
                 setSelectionBounds(e.getX(), e.getY(), 0, 0);
             }
         }
@@ -362,10 +362,9 @@ class ChartSelectionManager implements ChartSelectionModel {
             // Clear previous selection
             setSelectionBounds(null);
 
+            setSelectionMode(moveMode);
             if (selectionMode == SELECTION_NONE)
                 chart.setMousePanningEnabled(mousePanningBackup);
-
-            setSelectionMode(moveMode);
 
             // Refresh selection if needed
             if (selectionMode != SELECTION_NONE)
