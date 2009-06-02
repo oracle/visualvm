@@ -172,7 +172,7 @@ public class OQLEditor extends JPanel {
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
-            queryEditor.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            queryEditor.setFont(new Font("Monospaced", Font.PLAIN, 12));
             lexervalid = true; // no lexer info available; assume the lexing info is valid
         }
 
