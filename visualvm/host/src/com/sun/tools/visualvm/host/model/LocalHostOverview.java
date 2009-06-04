@@ -44,7 +44,7 @@ class LocalHostOverview extends HostOverview  {
 
   LocalHostOverview() {
     osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-    loadAverageAvailable = !Utilities.isMac() && osMXBean.getSystemLoadAverage() >= 0;
+    loadAverageAvailable = osMXBean.getSystemLoadAverage() >= 0;
   }
 
   public String getName() {
