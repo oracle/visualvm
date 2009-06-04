@@ -149,6 +149,14 @@ public class OQLEditor extends JPanel {
         }
     };
 
+    final private PropertyChangeListener lexerChangeListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            // capturing the lexer state
+            lexervalid = (Boolean) evt.getNewValue();
+            validateScript();
+        }
+    };
+
     private Color lastBgColor = null;
     private Caret lastCaret = null;
 
@@ -160,15 +168,8 @@ public class OQLEditor extends JPanel {
     private void init() {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
-            PropertyChangeListener l = new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    // capturing the lexer state
-                    lexervalid = (Boolean) evt.getNewValue();
-                }
-            };
             queryEditor = impl.getEditorPane();
-            impl.addPropertyChangeListener(VALIDITY_PROPERTY, WeakListeners.propertyChange(l,impl));
+            impl.addPropertyChangeListener(VALIDITY_PROPERTY, WeakListeners.propertyChange(lexerChangeListener,impl));
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
@@ -267,3 +268,5 @@ public class OQLEditor extends JPanel {
         return queryEditor.isEditable();
     }
 }
+
+
