@@ -40,6 +40,7 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.beans.PropertyChangeEvent;
@@ -171,6 +172,8 @@ public class OQLEditor extends JPanel {
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
+            queryEditor.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            lexervalid = true; // no lexer info available; assume the lexing info is valid
         }
 
         queryEditor.getDocument().addDocumentListener(new DocumentListener() {
