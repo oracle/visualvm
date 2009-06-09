@@ -11,7 +11,6 @@
     </target>
     <target name="-post-build-launchers">
         <copy file="launcher/visualvm.exe" overwrite="true" todir="${build.launcher.dir}/bin/"/>
-        <copy file="launcher/visualvm_w.exe" overwrite="true" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm" overwrite="true" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm.conf" overwrite="true" todir="${build.launcher.dir}/etc/"/>
     </target>
@@ -53,7 +52,6 @@
         <mkdir dir="${build.launcher.dir}/etc"/>
         <mkdir dir="${build.launcher.dir}/bin"/>
         <copy file="${harness.dir}/launchers/app.exe" tofile="${build.launcher.dir}/bin/${app.name}.exe"/>
-        <copy file="${harness.dir}/launchers/app_w.exe" tofile="${build.launcher.dir}/bin/${app.name}_w.exe"/>
         <copy file="${harness.dir}/launchers/app.sh" tofile="${build.launcher.dir}/bin/${app.name}"/>
         <copy file="${harness.dir}/etc/app.conf" tofile="${build.launcher.dir}/etc/${app.name}.conf"/>
         <echo message="${app.name}" file="${build.launcher.dir}/etc/${app.name}.clusters"/>
