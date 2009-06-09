@@ -56,6 +56,21 @@ public class HeapHistogramImpl {
     private static final char FLOAT_CODE = 'F'; // NOI18N
     private static final char DOUBLE_CODE = 'D'; // NOI18N
     private static final char OBJECT_CODE = 'L'; // NOI18N
+    private static final Map<String,String> permGenNames = new HashMap();    
+    static {
+        permGenNames.put("<constMethodKlass>","Read-Only Method Metadata");
+        permGenNames.put("<methodKlass>","Read-Write Method Metadata");
+        permGenNames.put("<constantPoolKlass>","Constant Pool Metadata");
+        permGenNames.put("<instanceKlassKlass>","Instance Class Metadata");
+        permGenNames.put("<constantPoolCacheKlass>","Class Resolution Optimization Metadata");
+        permGenNames.put("<symbolKlass>","VM Symbol Metadata");
+        permGenNames.put("<methodDataKlass>","Method Optimization Metadata");
+        permGenNames.put("<objArrayKlassKlass>","Object Array Class Metadata");
+        permGenNames.put("<typeArrayKlassKlass>","Scalar Array Class Metadata");
+        permGenNames.put("<klassKlass>","Base Class Metadata");
+        permGenNames.put("<arrayKlassKlass>","Base Array Class Metadata");
+        permGenNames.put("<compiledICHolderKlass>","Optimized Virtual Call Metadata");
+    }
     private final Set<ClassInfoImpl> classes;
     private final Set<ClassInfoImpl> permGenClasses;
     private final Date time;
@@ -195,7 +210,7 @@ public class HeapHistogramImpl {
         }
         
         private String convertJVMName(String jvmName) {
-            String name;
+            String name = null;
             int index = jvmName.lastIndexOf('[');
             
             if (index != -1) {
@@ -228,13 +243,16 @@ public class HeapHistogramImpl {
                         name=jvmName.substring(index+2,jvmName.length()-1);
                         break;
                     default:
-                        System.out.println("Uknown name "+jvmName);
+                        System.err.println("Uknown name "+jvmName);
                         name = jvmName;
                 }
                 for (int i=0;i<=index;i++) {
                     name+="[]";
                 }
-            } else {
+            } else if (isPermGen()) {
+                name = permGenNames.get(jvmName);
+            }
+            if (name == null) {
                 name = jvmName;
             }
             return name.intern();
