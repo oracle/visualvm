@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.LoggingMXBean;
@@ -382,6 +383,8 @@ public final class JvmMXBeansFactory {
                     return newPlatformMXBeanProxy(mbsc, objectNameStr, interfaceClass);
                 } catch (IOException e) {
                     LOGGER.throwing(JvmMXBeansImpl.class.getName(), "getMXBean", e); // NOI18N
+                } catch (IllegalArgumentException iae) {
+                    LOGGER.log(Level.INFO, JvmMXBeansImpl.class.getName()+".getMXBean()", iae); // NOI18N                    
                 }
             }
             return null;
