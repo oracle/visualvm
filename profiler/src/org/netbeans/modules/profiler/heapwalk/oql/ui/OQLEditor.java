@@ -43,8 +43,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -59,7 +57,6 @@ import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
 import org.netbeans.modules.profiler.spi.OQLEditorImpl;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Lookup;
-import org.openide.util.WeakListeners;
 
 /**
  *
@@ -149,14 +146,6 @@ public class OQLEditor extends JPanel {
         }
     };
 
-    final private PropertyChangeListener lexerChangeListener = new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-            // capturing the lexer state
-            lexervalid = (Boolean) evt.getNewValue();
-            validateScript();
-        }
-    };
-
     private Color lastBgColor = null;
     private Caret lastCaret = null;
 
@@ -169,8 +158,14 @@ public class OQLEditor extends JPanel {
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
             queryEditor = impl.getEditorPane();
-            impl.addPropertyChangeListener(VALIDITY_PROPERTY, WeakListeners.propertyChange(lexerChangeListener,impl));
             queryEditor.getDocument().putProperty(OQLEngine.class, engine);
+            queryEditor.getDocument().putProperty(OQLEditorImpl.ValidationCallback.class, new OQLEditorImpl.ValidationCallback() {
+
+                public void callback(boolean lexingResult) {
+                    lexervalid = lexingResult;
+                    validateScript();
+                }
+            });
         } else {
             queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
             queryEditor.setFont(new Font("Monospaced", Font.PLAIN, 12));
