@@ -40,14 +40,17 @@ import java.lang.management.RuntimeMXBean;
  * @author Tomas Hurka
  */
 public class JRockitJvmProvider extends JvmProvider {
-
+    private static final String JROCKIT_VM_NAME = "BEA JRockit(R)"; // NOI18N
+    private static final String VM_NAME = "java.property.java.vm.name"; // NOI18N
+    
     @Override
     public Jvm createModelFor(Application app) {
+        Jvm jvm = null;
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
-        JRockitJVMImpl jvm = null;
+
         if (jvmstat != null) {
-            String vmName = jvmstat.findByName("java.property.java.vm.name"); // NOI18N
-            if (vmName != null && "BEA JRockit(R)".equals(vmName)) { // NOI18N
+            String vmName = jvmstat.findByName(VM_NAME);
+            if (JROCKIT_VM_NAME.equals(vmName)) {
                 jvm = new JRockitJVMImpl(app, jvmstat);
             }
         } else {
@@ -56,7 +59,7 @@ public class JRockitJvmProvider extends JvmProvider {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                 if (mxbeans != null) {
                     RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
-                    if (runtime != null && runtime.getVmName().equals("BEA JRockit(R)")) {  // NOI18N
+                    if (runtime != null && JROCKIT_VM_NAME.equals(runtime.getVmName())) {
                         jvm = new JRockitJVMImpl(app);
                     }
                 }
