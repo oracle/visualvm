@@ -54,8 +54,14 @@ import javax.swing.*;
 public final class AttachAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public AttachAction() {
+    private AttachAction() {
+        putValue(Action.NAME, NbBundle.getMessage(AttachAction.class, "LBL_AttachMainProjectAction")); // NOI18N
         putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(AttachAction.class, "HINT_AttachMainProjectAction")); // NOI18N
+    }
+
+    private static final AttachAction DEF = new AttachAction();
+    public static AttachAction getDefault() {
+        return DEF;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
