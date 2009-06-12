@@ -42,13 +42,18 @@ import java.awt.AWTEvent;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.DataOutputStream;
+import java.nio.channels.WritableByteChannel;
 import java.util.Collections;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
@@ -56,6 +61,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -74,12 +80,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     private static final String ACTION_NAME_STOP = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionNameStop");
 //    private static final String ACTION_DESCR = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionDescription");
     private static final String THREAD_NAME = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ThreadName");
-    private StackTraceSnapshotBuilder builder;
-    private ThreadFactory threadFactory;
-    private ScheduledExecutorService executor;
-
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-    private long startTime;
+    private final AtomicReference<Controller> RUNNING = new AtomicReference<Controller>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private SelfSamplerAction() {
@@ -101,24 +102,6 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    /**
-     * @return the builder
-     */
-    private synchronized StackTraceSnapshotBuilder getBuilder() {
-        if (builder == null) {
-            builder = new StackTraceSnapshotBuilder();
-            threadFactory = new ThreadFactory() {
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, THREAD_NAME);
-                }
-            };
-            builder.setIgnoredThreads(Collections.singleton(THREAD_NAME));
-        }
-        return builder;
-    }
-
-
-
     @Override
     public boolean isEnabled() {
         return true;
@@ -128,42 +111,23 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        if (isRunning.compareAndSet(false, true)) {
+        Controller c;
+        if (RUNNING.compareAndSet(null, c = new Controller(THREAD_NAME))) {
             putValue(Action.NAME, ACTION_NAME_STOP);
             putValue(Action.SMALL_ICON,
                 ImageUtilities.loadImageIcon(
                     "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png" //NOI18N
-            , false)
+                , false)
             );
-            final StackTraceSnapshotBuilder b = getBuilder();
-            executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
-            startTime = System.currentTimeMillis();
-            executor.scheduleAtFixedRate(new Runnable() {
-                public void run() {
-                    b.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
-                }
-            }, 10, 10, TimeUnit.MILLISECONDS);
-        } else if (isRunning.compareAndSet(true, false)) {
+            c.run();
+        } else if ((c = RUNNING.getAndSet(null)) != null) {
             putValue(Action.NAME, ACTION_NAME_START);
             putValue(Action.SMALL_ICON,
                     ImageUtilities.loadImageIcon(
                     "org/netbeans/modules/profiler/actions/resources/openSnapshot.png" //NOI18N
-            , false)
+                    , false)
             );
-            try {
-                executor.shutdown();
-                executor.awaitTermination(100, TimeUnit.MILLISECONDS);
-                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
-                LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
-                loadedSnapshot.setSaved(true);
-                ResultsManager.getDefault().openSnapshot(loadedSnapshot);
-                getBuilder().reset();
-
-            } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
+            c.actionPerformed(new ActionEvent(this, 0, "show")); // NOI18N
         }
 
     }
@@ -176,5 +140,75 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         }
     }
 
+    @Override
+    public Object getValue(String key) {
+        Object o = super.getValue(key);
+        if (o == null && key.startsWith("logger-")) { // NOI18N
+            return new Controller(key);
+        }
+        return o;
+    }
 
+
+
+    private static final class Controller implements Runnable, ActionListener {
+        private final String name;
+        private StackTraceSnapshotBuilder builder;
+        private ThreadFactory threadFactory;
+        private ScheduledExecutorService executor;
+        private long startTime;
+
+        public Controller(String n) {
+            name = n;
+        }
+        /**
+         * @return the builder
+         */
+        private synchronized StackTraceSnapshotBuilder getBuilder() {
+            if (builder == null) {
+                builder = new StackTraceSnapshotBuilder();
+                threadFactory = new ThreadFactory() {
+                    public Thread newThread(Runnable r) {
+                        return new Thread(r, name);
+                    }
+                };
+                builder.setIgnoredThreads(Collections.singleton(name));
+            }
+            return builder;
+        }
+
+        public void run() {
+            final StackTraceSnapshotBuilder b = getBuilder();
+            executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
+            startTime = System.currentTimeMillis();
+            executor.scheduleAtFixedRate(new Runnable() {
+                public void run() {
+                    b.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
+                }
+            }, 10, 10, TimeUnit.MILLISECONDS);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                executor.shutdown();
+                executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+                if ("cancel".equals(e.getActionCommand())) {
+                    return;
+                }
+                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
+                LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+                if ("write".equals(e.getActionCommand())) {
+                    DataOutputStream dos = (DataOutputStream)e.getSource();
+                    loadedSnapshot.save(dos);
+                    return;
+                }
+                loadedSnapshot.setSaved(true);
+                ResultsManager.getDefault().openSnapshot(loadedSnapshot);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            } finally {
+                getBuilder().reset();
+            }
+        }
+    }
 }
