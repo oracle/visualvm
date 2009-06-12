@@ -204,6 +204,8 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                 }
                 loadedSnapshot.setSaved(true);
                 ResultsManager.getDefault().openSnapshot(loadedSnapshot);
+            } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
+                return;
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             } finally {
