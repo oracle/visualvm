@@ -54,6 +54,7 @@ made subject to such option by the copyright holder.
         <folder name="Profiler_Actions_temporary">
             <file name="org-netbeans-modules-profiler-actions-ProfileProjectActionPopup.instance">
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileProjectPopup"/>
+                <attr name="misplaced.action.allowed" boolvalue="true"/>
             </file>
         </folder>
     </folder>
@@ -81,6 +82,7 @@ made subject to such option by the copyright holder.
                     <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance">
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSinglePopup"/>
                         <attr name="position" intvalue="660"/>
+                        <attr name="misplaced.action.allowed" boolvalue="true"/>
                     </file>
                 </folder>
             </folder>
