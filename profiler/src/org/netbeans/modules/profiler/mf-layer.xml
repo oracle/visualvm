@@ -175,7 +175,8 @@ made subject to such option by the copyright holder.
                     <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
                     <attr name="position" intvalue="500"/>
                 </file>
-                <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance">
+                <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
                     <attr name="position" intvalue="200"/>
                 </file>
                 <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow">
@@ -298,8 +299,9 @@ made subject to such option by the copyright holder.
                     <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     <attr name="position" intvalue="400"/>
                 </file>
-                <file name="org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.instance">
+                <file name="org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.shadow">
                     <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.unintegrateProfiler"/>
+                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.instance"/>
                     <attr name="position" intvalue="500"/>
                 </file>
                 <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
@@ -432,6 +434,10 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.unintegrateProfiler"/>
+            </file>
+            <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
         </folder>
     </folder>
 
