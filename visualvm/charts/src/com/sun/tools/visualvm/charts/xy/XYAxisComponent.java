@@ -54,6 +54,8 @@ public class XYAxisComponent extends AxisComponent {
     private static final int AXIS_BASIS_EXTENT = 2;
     private static final Color AXIS_LINE_COLOR = new Color(90, 90, 90);
 
+    private static boolean WORKAROUND_OPENJDK_BUG = false;
+
 
     private final AxisMarksComputer marksComputer;
 
@@ -75,13 +77,25 @@ public class XYAxisComponent extends AxisComponent {
         Iterator<AxisMark> marks = marksComputer.marksIterator(
                                  chartMask.y, chartMask.y + chartMask.height);
 
+        if (WORKAROUND_OPENJDK_BUG) return;
+
+        g.setPaint(VERTICAL_MESH_COLOR);
+        g.setStroke(VERTICAL_MESH_STROKE);
+
         while (marks.hasNext()) {
             AxisMark mark = marks.next();
             int y = mark.getPosition();
 
-            g.setPaint(VERTICAL_MESH_COLOR);
-            g.setStroke(VERTICAL_MESH_STROKE);
-            g.drawLine(chartMask.x, y, chartMask.x + chartMask.width, y);
+            try {
+                // Workaround for a bug on OpenJDK - when tooltip is displayed
+                // over the chart on mouseMove 'java.lang.ArithmeticException: / by zero'
+                // at 'sun.java2d.pisces.Dasher.lineTo' exception is thrown.
+                g.drawLine(chartMask.x + 2, y, chartMask.x + chartMask.width - 2, y);
+            } catch (ArithmeticException e) {
+                WORKAROUND_OPENJDK_BUG = true;
+                System.err.println("'java.lang.ArithmeticException: / by zero' detected in XYAxisComponent.paintVerticalMesh, applying workaround"); // NOI18N
+                break;
+            }
         }
     }
 
