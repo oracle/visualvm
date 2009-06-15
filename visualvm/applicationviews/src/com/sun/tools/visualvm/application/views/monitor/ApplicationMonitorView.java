@@ -52,7 +52,6 @@ import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.management.MemoryMXBean;
-import java.text.Format;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -453,7 +452,7 @@ class ApplicationMonitorView extends DataSourceView {
                                                             lineWidths, lineColors,
                                                             fillColors1, fillColors2, 0,
                                                             SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            true, itemsCount, detailsItems);
+                                                            false, itemsCount, detailsItems);
         }
 
         private void initComponents() {
