@@ -133,6 +133,12 @@
                 <include name="*com/sun/tools/visualvm/application/views/*.java"/>
             </fileset>
 
+            <!--group title="VisualVM-Charts" packages="ccom.sun.tools.visualvm.charts*"/-->
+            <fileset dir="charts/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/charts/xy/*.java"/>
+            </fileset>
+
             <!--group title="VisualVM-Core" packages="com.sun.tools.visualvm.core*"/-->
             <fileset dir="core/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
