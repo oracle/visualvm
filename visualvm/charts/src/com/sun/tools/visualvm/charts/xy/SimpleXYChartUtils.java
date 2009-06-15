@@ -414,11 +414,7 @@ public class SimpleXYChartUtils {
     }
 
     public static Font smallerFont(Font font) {
-        if (UIUtils.isWindowsLookAndFeel())
-            return new Font(font.getName(), font.getStyle(), font.getSize() - 1);
-        else
-
-            return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
+        return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
     }
 
 
