@@ -514,7 +514,11 @@ public class SimpleXYChartUtils {
 
 
         private static int getCheckBoxOffset() {
-            return 3;
+            if (UIUtils.isWindowsLookAndFeel()) return 3;
+            else if (UIUtils.isNimbusLookAndFeel()) return -3;
+            else if (UIUtils.isMetalLookAndFeel()) return 3;
+            else if (UIUtils.isAquaLookAndFeel()) return 6;
+            else return 0;
         }
 
     }
