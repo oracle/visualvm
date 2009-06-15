@@ -101,8 +101,7 @@ public class XYTooltipPainter extends JPanel {
 
         caption = new JLabel();
         defaultFontSize = caption.getFont().getSize2D();
-        caption.setFont(caption.getFont().deriveFont(
-                        defaultFontSize - 1));
+        caption.setFont(SimpleXYChartUtils.smallerFont(caption.getFont()));
         caption.setForeground(Color.WHITE);
         caption.setOpaque(false);
         constraints = new GridBagConstraints();
@@ -120,8 +119,7 @@ public class XYTooltipPainter extends JPanel {
 
             JLabel itemLabel = new JLabel();
             itemLabel.setText(model.getRowName(i));
-            itemLabel.setFont(caption.getFont().deriveFont(
-                        defaultFontSize - 1));
+            itemLabel.setFont(SimpleXYChartUtils.smallerFont(itemLabel.getFont()));
             itemLabel.setForeground(Color.WHITE);
             itemLabel.setOpaque(false);
             constraints = new GridBagConstraints();
@@ -134,8 +132,7 @@ public class XYTooltipPainter extends JPanel {
 
             JLabel valueLabel = new JLabel();
             valuePainters[i] = valueLabel;
-            valueLabel.setFont(caption.getFont().deriveFont(
-                               Font.BOLD, defaultFontSize - 1));
+            valueLabel.setFont(SimpleXYChartUtils.smallerFont(valueLabel.getFont()));
             valueLabel.setForeground(Color.WHITE);
             valueLabel.setOpaque(false);
             constraints = new GridBagConstraints();

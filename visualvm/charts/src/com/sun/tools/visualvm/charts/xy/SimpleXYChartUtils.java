@@ -69,6 +69,7 @@ import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.graphs.GraphsUI;
@@ -388,8 +389,7 @@ public class SimpleXYChartUtils {
 
     public static AxisMarksPainter customizeMarksPainter(AxisMarksPainter.Abstract painter) {
         painter.setForeground(AXIS_FONT_COLOR);
-        Font f = painter.getFont();
-        painter.setFont(f.deriveFont(f.getSize2D() - 1));
+        painter.setFont(smallerFont(painter.getFont()));
         return painter;
     }
 
@@ -411,6 +411,14 @@ public class SimpleXYChartUtils {
         long time = System.currentTimeMillis();
         String formatString = TimeAxisUtils.getFormatString(1000, startTime, endTime);
         return getFormat(formatString).format(new Date(timestamp));
+    }
+
+    public static Font smallerFont(Font font) {
+        if (UIUtils.isWindowsLookAndFeel())
+            return new Font(font.getName(), font.getStyle(), font.getSize() - 1);
+        else
+
+            return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
     }
 
 
