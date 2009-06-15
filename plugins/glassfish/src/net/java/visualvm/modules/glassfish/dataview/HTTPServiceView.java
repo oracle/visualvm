@@ -4,25 +4,23 @@ import com.sun.appserv.management.monitor.ConnectionQueueMonitor;
 import com.sun.appserv.management.monitor.FileCacheMonitor;
 import com.sun.appserv.management.monitor.HTTPServiceMonitor;
 import com.sun.appserv.management.monitor.KeepAliveMonitor;
-import com.sun.appserv.management.monitor.statistics.ConnectionQueueStats;
-import com.sun.appserv.management.monitor.statistics.FileCacheStats;
 import com.sun.appserv.management.monitor.statistics.KeepAliveStats;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.charts.ChartFactory;
+import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.awt.Color;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import net.java.visualvm.modules.glassfish.ui.ConnectionQueuePanel;
-import net.java.visualvm.modules.glassfish.ui.FileCachePanel;
-import net.java.visualvm.modules.glassfish.ui.GenericModel.RangedLong;
-import net.java.visualvm.modules.glassfish.ui.KeepAlivePanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 
@@ -47,81 +45,95 @@ class HTTPServiceView extends DataSourceView {
         return dvc;
     }
 
+    private SimpleXYChartSupport connectionQueueChart;
+
     private void configureConnectionQueueVisualizer() {
-        ConnectionQueuePanel cqp = new ConnectionQueuePanel();
-        final ConnectionQueuePanel.Model model = new ConnectionQueuePanel.Model() {
+        final ConnectionQueueMonitor cqm = monitor.getConnectionQueueMonitor();
+        connectionQueueChart = ChartFactory.createSimpleDecimalXYChart(15,
+                            new String[] {"1 min", "5 mins", "15 mins"},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
+                            new float[]{2f, 2f, 2f},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
+                            null,
+                            null,
+                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
+                            null);
+//        ConnectionQueuePanel cqp = new ConnectionQueuePanel();
+//        final ConnectionQueuePanel.Model model = new ConnectionQueuePanel.Model() {
+//
+//            ConnectionQueueMonitor queueMonitor = null;
+//            {
+//                if (monitor != null) {
+//                    queueMonitor = monitor.getConnectionQueueMonitor();
+//                }
+//            }
+//
+//            @Override
+//            public RangedLong getUtilization() {
+//                if (queueMonitor == null) {
+//                    return RangedLong.ZERO;
+//                }
+//                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
+//                long max = stats.getMaxQueued().getCount();
+//                long current = stats.getCountQueued().getCount();
+//                return new RangedLong(0L, max, current);
+//            }
+//
+//            @Override
+//            public int getRefusalRate() {
+//                if (queueMonitor == null) {
+//                    return 0;
+//                }
+//                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
+//
+//                if (stats.getCountTotalQueued().getCount() == 0) {
+//                    return 0;
+//                }
+//
+//                return Math.round(((float) stats.getCountOverflows().getCount() / (float) stats.getCountTotalConnections().getCount()) * 100.0F);
+//            }
+//
+//            @Override
+//            public long getAverage1min() {
+//                if (queueMonitor == null) {
+//                    return 0L;
+//                }
+//                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
+//
+//                return stats.getCountQueued1MinuteAverage().getCount();
+//            }
+//
+//            @Override
+//            public long getAverage5min() {
+//                if (queueMonitor == null) {
+//                    return 0L;
+//                }
+//                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
+//
+//                return stats.getCountQueued5MinuteAverage().getCount();
+//            }
+//
+//            @Override
+//            public long getAverage15min() {
+//                if (queueMonitor == null) {
+//                    return 0L;
+//                }
+//                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
+//
+//                return stats.getCountQueued15MinuteAverage().getCount();
+//            }
+//        };
 
-            ConnectionQueueMonitor queueMonitor = null;
-            {
-                if (monitor != null) {
-                    queueMonitor = monitor.getConnectionQueueMonitor();
-                }
-            }
-
-            @Override
-            public RangedLong getUtilization() {
-                if (queueMonitor == null) {
-                    return RangedLong.ZERO;
-                }
-                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
-                long max = stats.getMaxQueued().getCount();
-                long current = stats.getCountQueued().getCount();
-                return new RangedLong(0L, max, current);
-            }
-
-            @Override
-            public int getRefusalRate() {
-                if (queueMonitor == null) {
-                    return 0;
-                }
-                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
-
-                if (stats.getCountTotalQueued().getCount() == 0) {
-                    return 0;
-                }
-
-                return Math.round(((float) stats.getCountOverflows().getCount() / (float) stats.getCountTotalConnections().getCount()) * 100.0F);
-            }
-
-            @Override
-            public long getAverage1min() {
-                if (queueMonitor == null) {
-                    return 0L;
-                }
-                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
-
-                return stats.getCountQueued1MinuteAverage().getCount();
-            }
-
-            @Override
-            public long getAverage5min() {
-                if (queueMonitor == null) {
-                    return 0L;
-                }
-                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
-
-                return stats.getCountQueued5MinuteAverage().getCount();
-            }
-
-            @Override
-            public long getAverage15min() {
-                if (queueMonitor == null) {
-                    return 0L;
-                }
-                ConnectionQueueStats stats = queueMonitor.getConnectionQueueStats();
-
-                return stats.getCountQueued15MinuteAverage().getCount();
-            }
-        };
-
-        cqp.setModel(model);
+//        cqp.setModel(model);
         queueRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {
                 try {
-                    model.refresh(timeStamp);
-                    model.notifyObservers();
+                    connectionQueueChart.addValues(timeStamp,
+                            new long[] {cqm.getConnectionQueueStats().getCountQueued1MinuteAverage().getCount(),
+                                        cqm.getConnectionQueueStats().getCountQueued5MinuteAverage().getCount(),
+                                        cqm.getConnectionQueueStats().getCountQueued15MinuteAverage().getCount()});
                 } catch (Exception e) {
                     if (!(e instanceof UndeclaredThrowableException)) {
                         LOGGER.log(Level.INFO,"onSchedule",e);
@@ -134,68 +146,94 @@ class HTTPServiceView extends DataSourceView {
         }, Quantum.seconds(1));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Connection Queue", true), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView("Connection Queue", null, 10, cqp, null), DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("Connection Queue", null, 10, connectionQueueChart.getChart(), null), DataViewComponent.TOP_LEFT);
     }
 
+    private SimpleXYChartSupport fileCacheChart;
+
     private void configureFileCacheVisualizer() {
-        FileCachePanel fcp = new FileCachePanel();
-        final FileCachePanel.Model model = new FileCachePanel.Model() {
+        fileCacheChart = ChartFactory.createSimplePercentXYChart(
+                            new String[] {"Min", "Max", "Current"},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
+                            new float[]{2f, 2f, 2f},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), null},
+                            null,
+                            true, 500,
+                            null);
 
-            FileCacheMonitor cacheMonitor = null;
-            {
-                if (monitor != null) {
-                    cacheMonitor = monitor.getFileCacheMonitor();
-                }
-            }
+        final FileCacheMonitor fcm = monitor.getFileCacheMonitor();
 
-            @Override
-            public RangedLong getUtilizationHeap() {
-                if (cacheMonitor == null) {
-                    return RangedLong.ZERO;
-                }
-                FileCacheStats stats = cacheMonitor.getFileCacheStats();
-                return new RangedLong(0L, stats.getMaxHeapCacheSize().getCount(), stats.getSizeHeapCache().getCount());
-            }
+//        FileCachePanel fcp = new FileCachePanel();
+//        final FileCachePanel.Model model = new FileCachePanel.Model() {
+//
+//            FileCacheMonitor cacheMonitor = null;
+//            {
+//                if (monitor != null) {
+//                    cacheMonitor = monitor.getFileCacheMonitor();
+//                }
+//            }
+//
+//            @Override
+//            public RangedLong getUtilizationHeap() {
+//                if (cacheMonitor == null) {
+//                    return RangedLong.ZERO;
+//                }
+//                FileCacheStats stats = cacheMonitor.getFileCacheStats();
+//                return new RangedLong(0L, stats.getMaxHeapCacheSize().getCount(), stats.getSizeHeapCache().getCount());
+//            }
+//
+//            @Override
+//            public RangedLong getUtilizationAll() {
+//                if (cacheMonitor == null) {
+//                    return RangedLong.ZERO;
+//                }
+//                FileCacheStats stats = cacheMonitor.getFileCacheStats();
+//                return new RangedLong(0L, stats.getMaxEntries().getCount(), stats.getMaxEntries().getCount());
+//            }
+//
+//            @Override
+//            public RangedLong getUtilizationOpen() {
+//                if (cacheMonitor == null) {
+//                    return RangedLong.ZERO;
+//                }
+//                FileCacheStats stats = cacheMonitor.getFileCacheStats();
+//                return new RangedLong(0L, stats.getMaxOpenEntries().getCount(), stats.getCountOpenEntries().getCount());
+//            }
+//
+//            @Override
+//            public RangedLong getHitRatio() {
+//                if (cacheMonitor == null) {
+//                    return RangedLong.ZERO;
+//                }
+//                FileCacheStats stats = cacheMonitor.getFileCacheStats();
+//
+//                long hits = stats.getCountContentHits().getCount();
+//                long misses = stats.getCountContentMisses().getCount();
+//                return new RangedLong(0L, hits + misses, misses);
+//            }
+//        };
+//
+//        fcp.setModel(model);
+        final long[] minmax = new long[]{Long.MAX_VALUE, 0L};
 
-            @Override
-            public RangedLong getUtilizationAll() {
-                if (cacheMonitor == null) {
-                    return RangedLong.ZERO;
-                }
-                FileCacheStats stats = cacheMonitor.getFileCacheStats();
-                return new RangedLong(0L, stats.getMaxEntries().getCount(), stats.getMaxEntries().getCount());
-            }
-
-            @Override
-            public RangedLong getUtilizationOpen() {
-                if (cacheMonitor == null) {
-                    return RangedLong.ZERO;
-                }
-                FileCacheStats stats = cacheMonitor.getFileCacheStats();
-                return new RangedLong(0L, stats.getMaxOpenEntries().getCount(), stats.getCountOpenEntries().getCount());
-            }
-
-            @Override
-            public RangedLong getHitRatio() {
-                if (cacheMonitor == null) {
-                    return RangedLong.ZERO;
-                }
-                FileCacheStats stats = cacheMonitor.getFileCacheStats();
-
-                long hits = stats.getCountContentHits().getCount();
-                long misses = stats.getCountContentMisses().getCount();
-                return new RangedLong(0L, hits + misses, misses);
-            }
-        };
-
-        fcp.setModel(model);
         cacheRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {
                 try {
-                model.refresh(timeStamp);
-                model.notifyObservers();
+                    long hits = fcm.getFileCacheStats().getCountContentHits().getCount();
+                    long misses = fcm.getFileCacheStats().getCountContentMisses().getCount();
+                    long percent = (hits + misses > 0) ? (hits * 100) / (hits + misses) : 0L;
+                    if (percent > minmax[1]) {
+                        minmax[1] = percent;
+                    }
+                    if (percent < minmax[0]) {
+                        minmax[0] = percent;
+                    }
+                    fileCacheChart.addValues(timeStamp, new long[] {
+                        minmax[0], minmax[1], percent
+                    });
                 } catch (Exception e) {
                     if (!(e instanceof UndeclaredThrowableException)) {
                         LOGGER.log(Level.INFO,"onSchedule",e);
@@ -208,7 +246,7 @@ class HTTPServiceView extends DataSourceView {
         }, Quantum.seconds(1));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("File Cache", true), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView("File Cache", null, 10, fcp, null), DataViewComponent.BOTTOM_LEFT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("File Cache Hits", null, 10, fileCacheChart.getChart(), null), DataViewComponent.BOTTOM_LEFT);
     }
 
     private void configureHttpServiceVisualizer() {
@@ -217,65 +255,28 @@ class HTTPServiceView extends DataSourceView {
         configureKeepAliveVisualizer();
     }
 
+    private SimpleXYChartSupport keepAliveChart;
+
     private void configureKeepAliveVisualizer() {
-        KeepAlivePanel kap = new KeepAlivePanel();
-        final KeepAlivePanel.Model model = new KeepAlivePanel.Model() {
+        final KeepAliveMonitor kaMonitor = monitor.getKeepAliveMonitor();
+        keepAliveChart = ChartFactory.createSimpleDecimalXYChart(15,
+                            new String[] {"Refused", "Flushed", "Timed Out"},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
+                            new float[]{2f, 2f, 2f},
+                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
+                            null,
+                            null,
+                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
+                            null);
 
-            KeepAliveMonitor kaMonitor = null;
-            {
-                if (monitor != null) {
-                    kaMonitor = monitor.getKeepAliveMonitor();
-                }
-            }
-
-            @Override
-            public long getClosed() {
-                if (kaMonitor == null) {
-                    return 0;
-                }
-                KeepAliveStats stats = kaMonitor.getKeepAliveStats();
-
-                return stats.getCountFlushes().getCount();
-            }
-
-            @Override
-            public long getRejected() {
-                if (kaMonitor == null) {
-                    return 0;
-                }
-                KeepAliveStats stats = kaMonitor.getKeepAliveStats();
-
-                return stats.getCountRefusals().getCount();
-            }
-
-            @Override
-            public long getTimedOut() {
-                if (kaMonitor == null) {
-                    return 0;
-                }
-                KeepAliveStats stats = kaMonitor.getKeepAliveStats();
-
-                return stats.getCountTimeouts().getCount();
-            }
-
-            @Override
-            public RangedLong getUtilization() {
-                if (kaMonitor == null) {
-                    return RangedLong.ZERO;
-                }
-                KeepAliveStats stats = kaMonitor.getKeepAliveStats();
-                return new RangedLong(0L, stats.getMaxConnections().getCount(), stats.getCountConnections().getCount());
-            }
-        };
-
-        kap.setModel(model);
         kaRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {
                 try {
-                model.refresh(timeStamp);
-                model.notifyObservers();
+                    KeepAliveStats stats = kaMonitor.getKeepAliveStats();
+                    keepAliveChart.addValues(timeStamp, 
+                            new long[] {stats.getCountRefusals().getCount(), stats.getCountFlushes().getCount(), stats.getCountTimeouts().getCount()});
                 } catch (Exception e) {
                     if (!(e instanceof UndeclaredThrowableException)) {
                         LOGGER.log(Level.INFO,"onSchedule",e);
@@ -288,7 +289,7 @@ class HTTPServiceView extends DataSourceView {
         }, Quantum.seconds(1));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Keep Alive", true), DataViewComponent.BOTTOM_RIGHT);
-        dvc.addDetailsView(new DataViewComponent.DetailsView("Keep Alive", null, 10, kap, null), DataViewComponent.BOTTOM_RIGHT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("Keep Alive", null, 10, keepAliveChart.getChart(), null), DataViewComponent.BOTTOM_RIGHT);
     }
 
     private void initComponents() {

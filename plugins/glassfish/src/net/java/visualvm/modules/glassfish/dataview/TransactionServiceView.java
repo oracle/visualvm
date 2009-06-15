@@ -3,18 +3,21 @@ package net.java.visualvm.modules.glassfish.dataview;
 import com.sun.appserv.management.monitor.TransactionServiceMonitor;
 import com.sun.appserv.management.monitor.statistics.TransactionServiceStats;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.charts.ChartFactory;
+import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.awt.Color;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import net.java.visualvm.modules.glassfish.ui.TransactionsPanel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 
@@ -37,47 +40,29 @@ class TransactionServiceView extends DataSourceView {
         return dvc;
     }
 
+    private SimpleXYChartSupport transactionalServiceChart;
+
     private void configureTransactionalServiceVisualizer() {
+        transactionalServiceChart = ChartFactory.createSimpleDecimalXYChart(15,
+                            new String[] {"Count", "Maximum Time"},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE)},
+                            new float[]{2f, 2f},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE)},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE)},
+                            new Color[]{ColorFactory.checkedColor(Color.CYAN)},
+                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
+                            null);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Transactional Service", false), DataViewComponent.BOTTOM_RIGHT);
-        final TransactionsPanel.Model model = new TransactionsPanel.Model() {
 
-            @Override
-            public int getCommitsPercent() {
-                if (monitor == null) {
-                    return 0;
-                }
-                try {
-                    TransactionServiceStats stats = monitor.getTransactionServiceStats();
+        final TransactionServiceStats tss = monitor.getTransactionServiceStats();
 
-                    return Math.round(((float) stats.getCommittedCount().getCount() / (float) (stats.getCommittedCount().getCount() + stats.getRolledbackCount().getCount())) * 100.0F);
-                } catch (RuntimeException e) {
-                    return 0;
-                }
-            }
-
-            @Override
-            public long getActive() {
-                if (monitor == null) {
-                    return 0;
-                }
-                try {
-                    TransactionServiceStats stats = monitor.getTransactionServiceStats();
-
-                    return stats.getActiveCount().getCount();
-                } catch (RuntimeException e) {
-                    return 0;
-                }
-            }
-        };
-        TransactionsPanel panel = new TransactionsPanel();
-        panel.setModel(model);
         transRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 
             @Override
             public void onSchedule(long timeStamp) {
                 try {
-                model.refresh(timeStamp);
-                model.notifyObservers();
+                    transactionalServiceChart.addValues(timeStamp,
+                            new long[]{tss.getActiveCount().getCount()});
                 } catch (Exception e) {
                     if (!(e instanceof UndeclaredThrowableException)) {
                         Logger.getLogger(TransactionServiceView.class.getName()).log(Level.INFO,"onSchedule",e);
@@ -88,7 +73,7 @@ class TransactionServiceView extends DataSourceView {
                 }
             }
         }, Quantum.seconds(1));
-        dvc.addDetailsView(new DataViewComponent.DetailsView("Transactional Service", null, 10, panel, null), DataViewComponent.BOTTOM_RIGHT);
+        dvc.addDetailsView(new DataViewComponent.DetailsView("Transactional Service", null, 10, transactionalServiceChart.getChart(), null), DataViewComponent.BOTTOM_RIGHT);
     }
 
     private void initComponents() {

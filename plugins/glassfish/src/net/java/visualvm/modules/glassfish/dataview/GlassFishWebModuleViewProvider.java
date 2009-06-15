@@ -35,6 +35,9 @@ import javax.management.ReflectionException;
 import net.java.visualvm.modules.glassfish.ui.StatsTable;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats;
+import com.sun.tools.visualvm.charts.ChartFactory;
+import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
@@ -47,10 +50,9 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
-import net.java.visualvm.modules.glassfish.ui.Chart;
+
 import org.openide.util.ImageUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -88,9 +90,9 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private Chart activeSessionsChart;
-        private Chart jspChart;
-        private Chart totalSessionsChart;
+        private SimpleXYChartSupport activeSessionsChart;
+        private SimpleXYChartSupport jspChart;
+        private SimpleXYChartSupport totalSessionsChart;
         private DataViewComponent dvc;
         private TableModel servletsModel;
         private TableModel wsModel;
@@ -103,7 +105,6 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
             super(webModule, "Overview", NODE_ICON, 0, true);
 
             module = webModule;
-
             JPanel masterPanel = new JPanel(new BorderLayout());
             masterPanel.setOpaque(false);
             
@@ -124,41 +125,30 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
             };
             masterPanel.add(generalDataScroll, BorderLayout.CENTER);
             masterPanel.add(appLink, BorderLayout.NORTH);
-            
-            JPanel chartActiveSessionsPanel = new JPanel(new BorderLayout());
-            chartActiveSessionsPanel.setOpaque(false);
-            activeSessionsChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Current", "Maximum" }, new Color[] { Color.BLUE, Color.RED });
-                    }
-                };
-            chartActiveSessionsPanel.add(activeSessionsChart, BorderLayout.CENTER);
-            chartActiveSessionsPanel.add(activeSessionsChart.getBigLegendPanel(), BorderLayout.SOUTH);
 
-            JPanel chartTotalSessionsPanel = new JPanel(new BorderLayout());
-            chartTotalSessionsPanel.setOpaque(false);
-            totalSessionsChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Created", "Expired", "Rejected" },
-                                                new Color[] { Color.BLUE, Color.GREEN, Color.RED });
-                    }
-                };
-            chartTotalSessionsPanel.add(totalSessionsChart, BorderLayout.CENTER);
-            chartTotalSessionsPanel.add(totalSessionsChart.getBigLegendPanel(), BorderLayout.SOUTH);
+            activeSessionsChart = ChartFactory.createSimpleDecimalXYChart(15,
+                    new String[]{"Current", "Maximum"},
+                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
+                    new float[]{2.0f, 2.0f},
+                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
+                    null, null, SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false,
+                    500, null);
 
-            JPanel chartJspPanel = new JPanel(new BorderLayout());
-            chartJspPanel.setOpaque(false);
-            jspChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Count", "Reloads", "Errors" },
-                                                new Color[] { Color.BLUE, Color.GREEN, Color.RED });
-                    }
-                };
-            chartJspPanel.add(jspChart, BorderLayout.CENTER);
-            chartJspPanel.add(jspChart.getBigLegendPanel(), BorderLayout.SOUTH);
+            totalSessionsChart = ChartFactory.createSimpleDecimalXYChart(15,
+                    new String[]{"Created", "Expired", "Rejected"},
+                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
+                    new float[]{2.0f, 2.0f, 2.0f},
+                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
+                    null, null, SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false,
+                    500, null);
+
+            jspChart = ChartFactory.createSimpleDecimalXYChart(15,
+                    new String[]{"Count", "Reloads", "Errors"},
+                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
+                    new float[]{2.0f, 2.0f, 2.0f},
+                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
+                    null, null, SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false,
+                    500, null);
 
             JPanel servletsPanel = new JPanel(new BorderLayout());
             servletsPanel.setOpaque(false);
@@ -190,13 +180,13 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
             DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
             dvc = new DataViewComponent(masterView, masterConfiguration);
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Sessions", true), DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Active", null, 10, chartActiveSessionsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Active", null, 10, activeSessionsChart.getChart(), null),
                                DataViewComponent.TOP_LEFT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Total", null, 20, chartTotalSessionsPanel, null),
+            dvc.addDetailsView(new DataViewComponent.DetailsView("Sessions Total", null, 20, totalSessionsChart.getChart(), null),
                                DataViewComponent.TOP_LEFT);
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("JSPs", true), DataViewComponent.TOP_RIGHT);
-            dvc.addDetailsView(new DataViewComponent.DetailsView("JSPs", null, 10, chartJspPanel, null), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new DataViewComponent.DetailsView("JSPs", null, 10, jspChart.getChart(), null), DataViewComponent.TOP_RIGHT);
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Runtime", true),
                                      DataViewComponent.BOTTOM_LEFT);
@@ -263,20 +253,17 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
         private void refreshData(long sampleTime) {
             WebModuleVirtualServerMonitor monitor = module.getMonitor();
             WebModuleVirtualServerStats stats = monitor.getWebModuleVirtualServerStats();
-            activeSessionsChart.getModel()
-                               .addItemValues(sampleTime,
+            activeSessionsChart.addValues(sampleTime,
                                               new long[] {
                                                   stats.getActiveSessionsCurrent().getCount(),
                                                   stats.getActiveSessionsHigh().getCount()
                                               });
-            totalSessionsChart.getModel()
-                              .addItemValues(sampleTime,
+            totalSessionsChart.addValues(sampleTime,
                                              new long[] {
                                                  stats.getSessionsTotal().getCount(), stats.getExpiredSessionsTotal().getCount(),
                                                  stats.getRejectedSessionsTotal().getCount()
                                              });
-            jspChart.getModel()
-                    .addItemValues(sampleTime,
+            jspChart.addValues(sampleTime,
                                    new long[] {
                                        stats.getJSPCount().getCount(), stats.getJSPReloadCount().getCount(),
                                        stats.getJSPErrorCount().getCount()

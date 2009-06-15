@@ -26,6 +26,9 @@ package net.java.visualvm.modules.glassfish.dataview;
 
 import com.sun.appserv.management.monitor.ServletMonitor;
 import com.sun.appserv.management.monitor.statistics.AltServletStats;
+import com.sun.tools.visualvm.charts.ChartFactory;
+import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
 import com.sun.tools.visualvm.core.scheduler.Scheduler;
@@ -36,7 +39,6 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.lang.reflect.UndeclaredThrowableException;
-import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
 import org.openide.util.ImageUtilities;
@@ -46,7 +48,6 @@ import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import net.java.visualvm.modules.glassfish.ui.Chart;
 
 
 /**
@@ -67,8 +68,8 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private Chart reqsChart;
-        private Chart timesChart;
+        private SimpleXYChartSupport reqsChart;
+        private SimpleXYChartSupport timesChart;
         private DataViewComponent dvc;
         private GlassFishServlet servlet;
 
@@ -85,27 +86,30 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
 
             JPanel chartTimesPanel = new JPanel(new BorderLayout());
             chartTimesPanel.setOpaque(false);
-            timesChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Average Time", "Maximum Time" },
-                                                new Color[] { Color.BLUE, Color.RED });
-                    }
-                };
-            chartTimesPanel.add(timesChart, BorderLayout.CENTER);
-            chartTimesPanel.add(timesChart.getBigLegendPanel(), BorderLayout.SOUTH);
+            timesChart = ChartFactory.createSimpleDecimalXYChart(15,
+                            new String[] {"Average Time", "Maximum Time"},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
+                            new float[]{2f, 2f},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
+                            null,
+                            null,
+                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
+                            null);
+
+            chartTimesPanel.add(timesChart.getChart(), BorderLayout.CENTER);
 
             JPanel chartReqsPanel = new JPanel(new BorderLayout());
             chartReqsPanel.setOpaque(false);
-            reqsChart = new Chart() {
-                    @Override
-                    protected void setupModel(DynamicSynchronousXYChartModel xyChartModel) {
-                        xyChartModel.setupModel(new String[] { "Request Count", "Error Count" },
-                                                new Color[] { Color.BLUE, Color.RED });
-                    }
-                };
-            chartReqsPanel.add(reqsChart, BorderLayout.CENTER);
-            chartReqsPanel.add(reqsChart.getBigLegendPanel(), BorderLayout.SOUTH);
+            reqsChart = ChartFactory.createSimpleDecimalXYChart(15,
+                            new String[] {"Request Count", "Error Count"},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
+                            new float[]{2f, 2f},
+                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
+                            null,
+                            null,
+                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
+                            null);
+            chartReqsPanel.add(reqsChart.getChart(), BorderLayout.CENTER);
 
             DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Overview", null, generalDataArea);
             DataViewComponent.MasterViewConfiguration masterConfiguration = new DataViewComponent.MasterViewConfiguration(false);
@@ -148,15 +152,13 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
         private void refreshData(long sampleTime) {
             ServletMonitor monitor = servlet.getMonitor();
             AltServletStats stats = monitor.getAltServletStats();
-            timesChart.getModel()
-                      .addItemValues(sampleTime,
+            timesChart.addValues(sampleTime,
                                      new long[] {
                                          Math.round((double) stats.getProcessingTime().getCount() / (double) stats.getRequestCount()
                                                                                                                   .getCount()),
                                          stats.getMaxTime().getCount()
                                      });
-            reqsChart.getModel()
-                     .addItemValues(sampleTime,
+            reqsChart.addValues(sampleTime,
                                     new long[] { stats.getRequestCount().getCount(), stats.getErrorCount().getCount() });
         }
     }
