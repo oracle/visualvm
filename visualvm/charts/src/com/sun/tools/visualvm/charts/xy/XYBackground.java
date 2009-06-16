@@ -45,11 +45,11 @@ public class XYBackground implements ChartDecorator {
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
         if (Utils.forceSpeed()) g.setPaint(GRADIENT_BOTTOM);
-        g.setPaint(new GradientPaint(
-                       new Point(0, Utils.checkedInt(context.getViewportOffsetY())),
-                       GRADIENT_TOP,
-                       new Point(0, context.getViewportHeight()),
-                       GRADIENT_BOTTOM));
+        else g.setPaint(new GradientPaint(
+                        new Point(0, Utils.checkedInt(context.getViewportOffsetY())),
+                        GRADIENT_TOP,
+                        new Point(0, context.getViewportHeight()),
+                        GRADIENT_BOTTOM));
         g.fill(dirtyArea);
     }
 
