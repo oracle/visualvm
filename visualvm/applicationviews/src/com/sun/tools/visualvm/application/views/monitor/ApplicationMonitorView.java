@@ -397,7 +397,9 @@ class ApplicationMonitorView extends DataSourceView {
         private boolean memoryMonitoringSupported;
 
         private static final String HEAP_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size"); // NOI18N
+        private static final String HEAP_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size_leg"); // NOI18N
         private static final String USED_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap"); // NOI18N
+        private static final String USED_HEAP_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap_leg"); // NOI18N
         private static final String MAX_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_Heap");   // NOI18N
 
         private SimpleXYChartSupport chartSupport;
@@ -426,7 +428,7 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         private void initModels() {
-            String[] itemNames = new String[] { HEAP_SIZE, USED_HEAP };
+            String[] itemNames = new String[] { HEAP_SIZE_LEG, USED_HEAP_LEG };
 
             Iterator<Color> colors = ColorFactory.predefinedColors();
             Color[] itemColors = new Color[] { colors.next(), colors.next() };
@@ -477,7 +479,9 @@ class ApplicationMonitorView extends DataSourceView {
         private boolean memoryMonitoringSupported;
         
         private static final String PERM_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size");  // NOI18N
+        private static final String PERM_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size_leg");  // NOI18N
         private static final String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
+        private static final String USED_PERM_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen_leg");  // NOI18N
         private static final String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
 
         private SimpleXYChartSupport chartSupport;
@@ -506,7 +510,7 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         private void initModels() {
-            String[] itemNames = new String[] { PERM_SIZE, USED_PERM };
+            String[] itemNames = new String[] { PERM_SIZE_LEG, USED_PERM_LEG };
 
             Iterator<Color> colors = ColorFactory.predefinedColors();
             Color[] itemColors = new Color[] { colors.next(), colors.next() };
@@ -557,7 +561,9 @@ class ApplicationMonitorView extends DataSourceView {
         private boolean classMonitoringSupported;
         
         private static final String TOTAL_LOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_loaded_classes");   // NOI18N
+        private static final String TOTAL_LOADED_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_loaded_classes_leg");   // NOI18N
         private static final String SHARED_LOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Shared_loaded_classes"); // NOI18N
+        private static final String SHARED_LOADED_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Shared_loaded_classes_leg"); // NOI18N
         private static final String TOTAL_UNLOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_unloaded_classes");   // NOI18N
         private static final String SHARED_UNLOADED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Shared_unloaded_classes"); // NOI18N
 
@@ -589,7 +595,7 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         private void initModels() {
-            String[] itemNames = new String[] { TOTAL_LOADED, SHARED_LOADED };
+            String[] itemNames = new String[] { TOTAL_LOADED_LEG, SHARED_LOADED_LEG };
 
             Iterator<Color> colors = ColorFactory.predefinedColors();
             Color[] itemColors = new Color[] { colors.next(), colors.next() };
@@ -635,7 +641,9 @@ class ApplicationMonitorView extends DataSourceView {
         private boolean threadsMonitoringSupported;
 
         private static final String LIVE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Live_threads");   // NOI18N
+        private static final String LIVE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Live_threads_leg");   // NOI18N
         private static final String DAEMON = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Daemon_threads");// NOI18N
+        private static final String DAEMON_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Daemon_threads_leg");// NOI18N
         private static final String PEAK = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Live_threads_peak");  // NOI18N
         private static final String STARTED = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Started_threads_total");   // NOI18N
 
@@ -667,7 +675,7 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         private void initModels() {
-            String[] itemNames = new String[] { LIVE, DAEMON };
+            String[] itemNames = new String[] { LIVE_LEG, DAEMON_LEG };
 
             Iterator<Color> colors = ColorFactory.predefinedColors();
             Color[] itemColors = new Color[] { colors.next(), colors.next() };

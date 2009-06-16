@@ -252,6 +252,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     private static class PhysicalMemoryViewSupport extends JPanel  {
 
         private static String USED_MEMORY = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_memory"); // NOI18N
+        private static String USED_MEMORY_LEG = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_memory_leg"); // NOI18N
         private static String TOTAL_MEMORY = NbBundle.getMessage(HostOverviewView.class, "LBL_Total_memory");   // NOI18N
 
         private SimpleXYChartSupport chartSupport;
@@ -275,7 +276,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         }
 
         private void initModels() {
-            String[] itemNames = new String[] { USED_MEMORY };
+            String[] itemNames = new String[] { USED_MEMORY_LEG };
 
             Iterator<Color> colors = ColorFactory.predefinedColors();
             Color[] itemColors = new Color[] { colors.next() };
@@ -319,6 +320,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     private static class SwapMemoryViewSupport extends JPanel  {
 
         private static final String USED_SWAP = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_swap");   // NOI18N
+        private static final String USED_SWAP_LEG = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_swap_leg");   // NOI18N
         private static final String TOTAL_SWAP = NbBundle.getMessage(HostOverviewView.class, "LBL_Total_swap"); // NOI18N
 
         private SimpleXYChartSupport chartSupport;
@@ -342,7 +344,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         }
 
         private void initModels() {
-            String[] itemNames = new String[] { USED_SWAP };
+            String[] itemNames = new String[] { USED_SWAP_LEG };
 
             Iterator<Color> colors = ColorFactory.predefinedColors();
             Color[] itemColors = new Color[] { colors.next() };
