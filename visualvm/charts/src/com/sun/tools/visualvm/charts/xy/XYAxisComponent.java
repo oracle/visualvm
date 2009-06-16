@@ -50,6 +50,9 @@ public class XYAxisComponent extends AxisComponent {
                                                         BasicStroke.CAP_SQUARE,
                                                         BasicStroke.JOIN_BEVEL, 0,
                                                         new float[] {0, 2}, 0);
+    private static final Stroke VERTICAL_MESH_STROKE_PERF = new BasicStroke(1,
+                                                        BasicStroke.CAP_SQUARE,
+                                                        BasicStroke.JOIN_BEVEL);
 
     private static final int AXIS_BASIS_EXTENT = 2;
     private static final Color AXIS_LINE_COLOR = new Color(90, 90, 90);
@@ -80,7 +83,8 @@ public class XYAxisComponent extends AxisComponent {
         if (WORKAROUND_OPENJDK_BUG) return;
 
         g.setPaint(VERTICAL_MESH_COLOR);
-        g.setStroke(VERTICAL_MESH_STROKE);
+        g.setStroke(Utils.forceSpeed() ? VERTICAL_MESH_STROKE_PERF :
+                                         VERTICAL_MESH_STROKE);
 
         while (marks.hasNext()) {
             AxisMark mark = marks.next();
