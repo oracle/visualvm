@@ -94,7 +94,7 @@ public class XYAxisComponent extends AxisComponent {
                 // Workaround for a bug on OpenJDK - when tooltip is displayed
                 // over the chart on mouseMove 'java.lang.ArithmeticException: / by zero'
                 // at 'sun.java2d.pisces.Dasher.lineTo' exception is thrown.
-                g.drawLine(chartMask.x + 2, y, chartMask.x + chartMask.width - 2, y);
+                g.drawLine(chartMask.x, y, chartMask.x + chartMask.width, y);
             } catch (ArithmeticException e) {
                 WORKAROUND_OPENJDK_BUG = true;
                 System.err.println("'java.lang.ArithmeticException: / by zero' detected in XYAxisComponent.paintVerticalMesh, applying workaround"); // NOI18N
