@@ -120,7 +120,8 @@ public class EventBufferDumpedCommand extends Command {
         out.writeBoolean(buffer != null);
         if (buffer != null) {
             Deflater compressor = new Deflater();
-            byte[] compressedBytes = new byte[bufSize];
+            // for small buffers, the compressed size can be somewhat larger than the original  
+            byte[] compressedBytes = new byte[bufSize + 32]; 
             int compressedSize;
             
             compressor.setInput(buffer,startPos,bufSize);
