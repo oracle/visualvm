@@ -67,7 +67,7 @@ class DisplayAreaSupport {
     static final Color BACKGROUND_COLOR_NORMAL = new Color(245, 245, 245);
     static final Color BACKGROUND_COLOR_HIGHLIGHT = new Color(235, 235, 235);
     
-    static final Color COLOR_NONE = new Color(0, 0, 0, 0);
+    static final Color COLOR_NONE = new Color(0, 0, 0);
     static final Color TABS_SEPARATOR = new Color(UIManager.getColor("Label.foreground").getRGB()); // NOI18N
     
     static final int TABBUTTON_MARGIN_TOP = 3;
@@ -178,7 +178,7 @@ class DisplayAreaSupport {
         public boolean isBorderOpaque() { return true; }
 
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            if (COLOR_LEFT != null) {
+            if (COLOR_LEFT != null && COLOR_LEFT != COLOR_NONE) {
                 g.setColor(COLOR_LEFT);
                 if (COLOR_LEFT == TABS_SEPARATOR) {
                     g.drawLine(x, y + TABBUTTON_MARGIN_TOP + 2, x, y + height - TABBUTTON_MARGIN_BOTTOM - 4);
@@ -186,7 +186,7 @@ class DisplayAreaSupport {
                     g.drawLine(x, y, x, y + height - 1);
                 }
             }
-            if (COLOR_RIGHT != null) {
+            if (COLOR_RIGHT != null && COLOR_RIGHT != COLOR_NONE) {
                 g.setColor(COLOR_RIGHT);
                 if (COLOR_RIGHT == TABS_SEPARATOR) {
                     g.drawLine(x + width - 1, y + TABBUTTON_MARGIN_TOP + 2, x + width - 1, y + height - TABBUTTON_MARGIN_BOTTOM - 4);
@@ -194,11 +194,11 @@ class DisplayAreaSupport {
                     g.drawLine(x + width - 1, y, x + width - 1, y + height - 1);
                 }
             }
-            if (COLOR_TOP != null) {
+            if (COLOR_TOP != null && COLOR_TOP != COLOR_NONE) {
                 g.setColor(COLOR_TOP);
                 g.drawLine(x, y, x + width - 1, y);
             }
-            if (COLOR_BOTTOM != null) {
+            if (COLOR_BOTTOM != null && COLOR_BOTTOM != COLOR_NONE) {
                 g.setColor(COLOR_BOTTOM);
                 g.drawLine(x, y + height - 1, x + width - 1, y + height - 1);
             }
