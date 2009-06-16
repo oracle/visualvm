@@ -164,7 +164,7 @@ public class XYPainter extends SynchronousXYItemPainter {
             polygon.xpoints[npoints - 1] = xPoints[0];
             polygon.ypoints[npoints - 1] = zeroY;
             
-            if (fillColor2 == null) g.setPaint(fillColor);
+            if (fillColor2 == null || Utils.forceSpeed()) g.setPaint(fillColor);
             else g.setPaint(new GradientPaint(0, context.getViewportOffsetY(),
                            fillColor, 0, context.getViewportOffsetY() +
                            context.getViewportHeight(), fillColor2));

@@ -44,6 +44,7 @@ public class XYBackground implements ChartDecorator {
     private static final Color GRADIENT_BOTTOM = new Color(250, 250, 250);
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
+        if (Utils.forceSpeed()) g.setPaint(GRADIENT_BOTTOM);
         g.setPaint(new GradientPaint(
                        new Point(0, Utils.checkedInt(context.getViewportOffsetY())),
                        GRADIENT_TOP,
