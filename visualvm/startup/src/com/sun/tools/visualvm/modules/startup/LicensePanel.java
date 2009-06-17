@@ -25,11 +25,13 @@
 
 package com.sun.tools.visualvm.modules.startup;
 
+import java.awt.Font;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import java.util.logging.Logger;
+import javax.swing.UIManager;
 import org.openide.util.NbBundle;
 
 /**
@@ -84,7 +86,7 @@ final class LicensePanel extends javax.swing.JPanel {
         jTextAreaTop.setBackground(getBackground());
         jTextAreaTop.setColumns(20);
         jTextAreaTop.setEditable(false);
-        jTextAreaTop.setFont(jTextAreaTop.getFont().deriveFont(jTextAreaTop.getFont().getStyle() | java.awt.Font.BOLD));
+        jTextAreaTop.setFont(UIManager.getFont("Label.font").deriveFont(Font.BOLD));
         jTextAreaTop.setLineWrap(true);
         jTextAreaTop.setRows(1);
         jTextAreaTop.setText(bundle.getString("MSG_LicenseDlgLabelTop"));
@@ -96,7 +98,6 @@ final class LicensePanel extends javax.swing.JPanel {
         jTextAreaTop.setRequestFocusEnabled(false);
         add(jTextAreaTop);
 
-        jEditorPane1.setBackground(javax.swing.UIManager.getDefaults().getColor("Tree.textBackground"));
         jEditorPane1.setEditable(false);
         jEditorPane1.setPreferredSize(new java.awt.Dimension(500, 500));
         jScrollPane1.setViewportView(jEditorPane1);
@@ -106,7 +107,7 @@ final class LicensePanel extends javax.swing.JPanel {
         jTextAreaBottom.setBackground(getBackground());
         jTextAreaBottom.setColumns(20);
         jTextAreaBottom.setEditable(false);
-        jTextAreaBottom.setFont(jTextAreaBottom.getFont().deriveFont(jTextAreaBottom.getFont().getStyle() | java.awt.Font.BOLD));
+        jTextAreaBottom.setFont(UIManager.getFont("Label.font").deriveFont(Font.BOLD));
         jTextAreaBottom.setLineWrap(true);
         jTextAreaBottom.setRows(2);
         jTextAreaBottom.setText(bundle.getString("MSG_LicenseDlgLabelBottom"));
