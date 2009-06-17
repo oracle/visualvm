@@ -98,8 +98,9 @@ final class LicensePanel extends javax.swing.JPanel {
         jTextAreaTop.setRequestFocusEnabled(false);
         add(jTextAreaTop);
 
-        jEditorPane1.setBackground(javax.swing.UIManager.getDefaults().getColor("Tree.textBackground"));
+        jEditorPane1.setBackground(UIManager.getDefaults().getColor("Tree.textBackground"));
         jEditorPane1.setEditable(false);
+        jEditorPane1.setForeground(UIManager.getDefaults().getColor("Tree.textForeground"));
         jEditorPane1.setPreferredSize(new java.awt.Dimension(500, 500));
         jScrollPane1.setViewportView(jEditorPane1);
 
