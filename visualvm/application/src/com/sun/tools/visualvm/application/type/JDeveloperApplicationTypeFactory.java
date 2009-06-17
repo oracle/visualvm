@@ -34,8 +34,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * Factory which recognizes NetBeans IDE, NetBeans Platform based
- * application and VisualVM itself
+ * Factory which recognizes JDeveloper 11g and 10g.
  * @author Tomas Hurka
  */
 public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFactory {
@@ -68,14 +67,11 @@ public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFa
     
     
     /**
-     * Detects NetBeans IDE, NetBeans Platform based
-     * application and VisualVM itself. It returns
-     * {@link VisualVMApplicationType} for VisualVM,
-     * {@link NetBeansApplicationType} for NetBeans 4.0 and newer and
-     * {@link NetBeans3xApplicationType} for NetBeans 3.x
+     * Detects JDeveloper IDE. It returns
+     * {@link JDeveloperApplicationType} for JDeveloper 11g and 10g.
      *
      * @return {@link ApplicationType} subclass or <code>null</code> if
-     * this application is not NetBeans
+     * this application is not JDeveloper IDE
      */
     public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
         String version = getJDeveloperVersion(jvm,mainClass);
