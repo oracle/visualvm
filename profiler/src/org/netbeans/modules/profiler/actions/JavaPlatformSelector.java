@@ -206,8 +206,8 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
             return null;
         }
 
-        noteLabel.setText(CANNOT_USE_PLATFORM_MSG + "<br>" // NOI18N
-                          + SELECT_PLATFORM_PROFILE_MSG);
+        noteLabel.setText("<html>"+CANNOT_USE_PLATFORM_MSG + "<br>" // NOI18N
+                          + SELECT_PLATFORM_PROFILE_MSG+"</html>"); // NOI18N
         noteLabel.getAccessibleContext().setAccessibleName(CANNOT_USE_PLATFORM_MSG + SELECT_PLATFORM_PROFILE_MSG);
         list.getAccessibleContext().setAccessibleDescription(CANNOT_USE_PLATFORM_MSG + SELECT_PLATFORM_PROFILE_MSG);
         list.setModel(new JPListModel(platforms));
