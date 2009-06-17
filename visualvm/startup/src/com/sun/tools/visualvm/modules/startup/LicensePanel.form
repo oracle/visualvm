@@ -60,6 +60,9 @@
       <SubComponents>
         <Component class="javax.swing.JEditorPane" name="jEditorPane1">
           <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" id="Tree.textBackground" palette="3" red="ff" type="palette"/>
+            </Property>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[500, 500]"/>
