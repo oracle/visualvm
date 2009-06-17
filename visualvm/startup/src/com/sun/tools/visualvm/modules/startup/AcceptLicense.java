@@ -42,7 +42,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-////import org.netbeans.util.Util;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 /**
@@ -50,10 +49,14 @@ import org.openide.util.Utilities;
  * if user does not accept license UserCancelException is thrown.
  *
  * @author  Marek Slama
+ * @author Jiri Sedlacek
  */
 
 public final class AcceptLicense {
     private static final Logger LOGGER = Logger.getLogger(AcceptLicense.class.getName());
+
+    private static final String YES_AC = "yes"; // NOI18N
+    private static final String NO_AC  = "no" ; // NOI18N
     
     private static JDialog d;
     private static String command;
@@ -65,8 +68,8 @@ public final class AcceptLicense {
         URL url = AcceptLicense.class.getResource("LICENSE.txt"); // NOI18N
         LicensePanel licensePanel = new LicensePanel(url);
         ResourceBundle bundle = NbBundle.getBundle(AcceptLicense.class);
-        String yesLabel = bundle.getString("MSG_LicenseYesButton");
-        String noLabel = bundle.getString("MSG_LicenseNoButton");
+        String yesLabel = bundle.getString("MSG_LicenseYesButton"); // NOI18N
+        String noLabel = bundle.getString("MSG_LicenseNoButton"); // NOI18N
         JButton yesButton = new JButton();
         JButton noButton = new JButton();
         setLocalizedText(yesButton,yesLabel);
@@ -81,26 +84,26 @@ public final class AcceptLicense {
         yesButton.addActionListener(listener);
         noButton.addActionListener(listener);
         
-        yesButton.setActionCommand("yes"); // NOI18N
-        noButton.setActionCommand("no"); // NOI18N
+        yesButton.setActionCommand(YES_AC);
+        noButton.setActionCommand(NO_AC);
         
-        yesButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_AcceptButton"));
-        yesButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSD_AcceptButton"));
+        yesButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_AcceptButton")); // NOI18N
+        yesButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSD_AcceptButton")); // NOI18N
         
-        noButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_RejectButton"));
-        noButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSD_RejectButton"));
+        noButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_RejectButton")); // NOI18N
+        noButton.getAccessibleContext().setAccessibleName(bundle.getString("ACSD_RejectButton")); // NOI18N
         
         Dimension yesPF = yesButton.getPreferredSize();
         Dimension noPF = noButton.getPreferredSize();
-        int maxWidth = Math.max(yesButton.getPreferredSize().width, noButton.getPreferredSize().width);
-        int maxHeight = Math.max(yesButton.getPreferredSize().height, noButton.getPreferredSize().height);
+        int maxWidth = Math.max(yesPF.width, noPF.width);
+        int maxHeight = Math.max(yesPF.height, noPF.height);
         yesButton.setPreferredSize(new Dimension(maxWidth, maxHeight));
         noButton.setPreferredSize(new Dimension(maxWidth, maxHeight));
         
-        d = new JDialog((Frame) null,bundle.getString("MSG_LicenseDlgTitle"),true);
+        d = new JDialog((Frame) null,bundle.getString("MSG_LicenseDlgTitle"),true); // NOI18N
         
-        d.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_LicenseDlg"));
-        d.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_LicenseDlg"));
+        d.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_LicenseDlg")); // NOI18N
+        d.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_LicenseDlg")); // NOI18N
         
         d.getContentPane().add(licensePanel,BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
@@ -117,7 +120,7 @@ public final class AcceptLicense {
         d.setLocationRelativeTo(null);
         d.setVisible(true);
         
-        if ("yes".equals(command)) {  // NOI18N
+        if (YES_AC.equals(command)) {
             return;
         } else {
             throw new org.openide.util.UserCancelException();
@@ -184,15 +187,15 @@ public final class AcceptLicense {
 
         do {
             // searching for the next ampersand
-            i = text.indexOf('&', i + 1);
+            i = text.indexOf('&', i + 1); // NOI18N
 
             if ((i >= 0) && ((i + 1) < text.length())) {
                 // before ' '
-                if (text.charAt(i + 1) == ' ') {
+                if (text.charAt(i + 1) == ' ') { // NOI18N
                     continue;
 
                     // before ', and after '
-                } else if ((text.charAt(i + 1) == '\'') && (i > 0) && (text.charAt(i - 1) == '\'')) {
+                } else if ((text.charAt(i + 1) == '\'') && (i > 0) && (text.charAt(i - 1) == '\'')) { // NOI18N
                     continue;
                 }
 
@@ -205,51 +208,17 @@ public final class AcceptLicense {
     }
     
     
-    // COPIED FROM org.netbeans.util.Util
-    /** Tries to set default L&F according to platform.
-     * Uses:
-     *   Metal L&F on Linux and Solaris
-     *   Windows L&F on Windows
-     *   Aqua L&F on Mac OS X
-     *   System L&F on other OS
+    /**
+     * Tries to set default L&F according to platform.
      */
     public static void setDefaultLookAndFeel () {
-        String uiClassName;
-        if (isWindowsOS()) {
-            uiClassName = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel"; //NOI18N
-        } else if (isMacOSX()) {
-            uiClassName = "apple.laf.AquaLookAndFeel"; //NOI18N
-        } else if (isLinuxOS() || isSunOS()) {
-            uiClassName = "javax.swing.plaf.metal.MetalLookAndFeel"; //NOI18N
-        } else {
-            uiClassName = UIManager.getSystemLookAndFeelClassName();
-        }
-        if (uiClassName.equals(UIManager.getLookAndFeel().getClass().getName())) {
-            //Desired L&F is already set
-            return;
-        }
+        String lafClassName = "<System LaF>"; // NOI18N
         try {
-            UIManager.setLookAndFeel(uiClassName);
+            lafClassName = UIManager.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(lafClassName);
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Cannot set L&F " + uiClassName, ex); //NOI18N
+            LOGGER.log(Level.SEVERE, "Cannot set L&F " + lafClassName, ex); // NOI18N
         }
     }
-    
-    private static boolean isWindowsOS() {
-        return System.getProperty("os.name").startsWith("Windows"); //NOI18N
-    }
-    
-    private static boolean isLinuxOS() {
-        return System.getProperty("os.name").startsWith("Lin"); //NOI18N
-    }
-    
-    private static boolean isSunOS() {
-        return System.getProperty("os.name").startsWith("Sun"); //NOI18N
-    }
-    
-    private static boolean isMacOSX() {
-        return System.getProperty("os.name").startsWith("Mac OS X"); //NOI18N
-    }
-    
     
 }
