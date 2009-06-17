@@ -45,6 +45,7 @@ public final class ChartFactory {
                                                             Color[] fillColors2,
                                                             long minValue,
                                                             long maxValue,
+                                                            double chartFactor,
                                                             boolean hideItems,
                                                             int valuesBuffer,
                                                             String[] detailsItems) {
@@ -52,7 +53,7 @@ public final class ChartFactory {
         return new SimpleXYChartSupport(SimpleXYChartUtils.TYPE_DECIMAL,
                                         initialYMargin, itemNames, itemColors,
                                         lineWidths, lineColors, fillColors1,
-                                        fillColors2, minValue, maxValue,
+                                        fillColors2, minValue, maxValue, chartFactor,
                                         hideItems, valuesBuffer, detailsItems);
     }
 
@@ -73,7 +74,7 @@ public final class ChartFactory {
         return new SimpleXYChartSupport(SimpleXYChartUtils.TYPE_BYTES,
                                         initialYMargin, itemNames, itemColors,
                                         lineWidths, lineColors, fillColors1,
-                                        fillColors2, minValue, maxValue,
+                                        fillColors2, minValue, maxValue, 1d,
                                         hideItems, valuesBuffer, detailsItems);
     }
 
@@ -84,6 +85,7 @@ public final class ChartFactory {
                                                             Color[] lineColors,
                                                             Color[] fillColors1,
                                                             Color[] fillColors2,
+                                                            double chartFactor,
                                                             boolean hideItems,
                                                             int valuesBuffer,
                                                             String[] detailsItems) {
@@ -91,7 +93,8 @@ public final class ChartFactory {
         return new SimpleXYChartSupport(SimpleXYChartUtils.TYPE_PERCENT,
                                         1000, itemNames, itemColors,
                                         lineWidths, lineColors, fillColors1,
-                                        fillColors2, 0, 1000,
+                                        fillColors2, 0, (long)Math.ceil(100 /
+                                        chartFactor), chartFactor,
                                         hideItems, valuesBuffer, detailsItems);
     }
 

@@ -371,7 +371,7 @@ class ApplicationMonitorView extends DataSourceView {
             chartSupport = ChartFactory.createSimplePercentXYChart(
                                                             itemNames, itemColors,
                                                             lineWidths, lineColors,
-                                                            null, null, false,
+                                                            null, null, 0.1d, false,
                                                             itemsCount, detailsItems);
         }
 
@@ -616,7 +616,7 @@ class ApplicationMonitorView extends DataSourceView {
                                                             lineWidths, lineColors,
                                                             null, null, 0,
                                                             SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+                                                            1d, false, itemsCount, detailsItems);
         }
 
         private void initComponents() {
@@ -696,7 +696,7 @@ class ApplicationMonitorView extends DataSourceView {
                                                             lineWidths, lineColors,
                                                             null, null, 0,
                                                             SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+                                                            1d, false, itemsCount, detailsItems);
         }
 
         private void initComponents() {

@@ -201,10 +201,10 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         public void refresh(HostOverview hostOverview, long time) {
             if (cpuMonitoringSupported) {
-                double load = hostOverview.getSystemLoadAverage();
-
-                chartSupport.addValues(time, new long[] { (long)(load * 1000) });
-                chartSupport.updateDetails(new String[] { chartSupport.formatDecimal((long)load) });
+                long load = (long)(hostOverview.getSystemLoadAverage() * 1000);
+                
+                chartSupport.addValues(time, new long[] { load });
+                chartSupport.updateDetails(new String[] { chartSupport.formatDecimal(load) });
             }
         }
 
@@ -229,7 +229,8 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                                                             lineWidths, lineColors,
                                                             null, null, 0,
                                                             SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+                                                            0.001d, false, itemsCount,
+                                                            detailsItems);
         }
 
         private void initComponents() {

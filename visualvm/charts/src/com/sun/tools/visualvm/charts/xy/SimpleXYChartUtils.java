@@ -56,8 +56,6 @@ import org.netbeans.lib.profiler.charts.ItemsModel;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.axis.AxisMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.PercentLongMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
@@ -90,7 +88,7 @@ public class SimpleXYChartUtils {
 
     // --- Private constants ---------------------------------------------------
 
-    private static final NumberFormat INT_FORMATTER;
+    private static final NumberFormat DECIMAL_FORMATTER;
     private static final NumberFormat PERCENT_FORMATTER;
 
     private static final int DEFAULT_BUFFER_STEP;
@@ -108,8 +106,9 @@ public class SimpleXYChartUtils {
     // --- Static initializer --------------------------------------------------
 
     static {
-        INT_FORMATTER = NumberFormat.getIntegerInstance();
-        INT_FORMATTER.setGroupingUsed(true);
+        DECIMAL_FORMATTER = NumberFormat.getNumberInstance();
+        DECIMAL_FORMATTER.setGroupingUsed(true);
+        DECIMAL_FORMATTER.setMaximumFractionDigits(2);
 
         PERCENT_FORMATTER = NumberFormat.getPercentInstance();
         PERCENT_FORMATTER.setMinimumFractionDigits(1);
@@ -168,7 +167,7 @@ public class SimpleXYChartUtils {
 
     public static JComponent createChartUI(int chartType, Color[] itemColors,
                                             long initialYMargin, boolean hideItems,
-                                            XYStorage storage,
+                                            double chartFactor, XYStorage storage,
                                             SynchronousXYItemsModel itemsModel,
                                             XYPaintersModel paintersModel) {
 
@@ -205,8 +204,8 @@ public class SimpleXYChartUtils {
                 protected int getMinMarksDistance() { return VALUES_SPACING; }
             };
             vAxis = new XYAxisComponent(chart, vComputer, customizeMarksPainter(
-                         new PercentLongMarksPainter(0, 1000)), SwingConstants.WEST,
-                         AxisComponent.MESH_FOREGROUND);
+                         new XYPercentMarksPainter(0, 100, chartFactor)),
+                         SwingConstants.WEST, AxisComponent.MESH_FOREGROUND);
         } else if (chartType == TYPE_BYTES) {
             SynchronousXYItem item = itemsModel.getItem(0);
             XYItemPainter painter = (XYItemPainter)paintersModel.getPainter(item);
@@ -227,14 +226,15 @@ public class SimpleXYChartUtils {
                 protected int getMinMarksDistance() { return VALUES_SPACING; }
             };
             vAxis = new XYAxisComponent(chart, vComputer, customizeMarksPainter(
-                         new SimpleLongMarksPainter()), SwingConstants.WEST,
-                         AxisComponent.MESH_FOREGROUND);
+                         new XYDecimalMarksPainter(chartFactor, DECIMAL_FORMATTER)),
+                         SwingConstants.WEST, AxisComponent.MESH_FOREGROUND);
         }
 
         // Tooltip support
         XYTooltipPainter tooltipPainter = new XYTooltipPainter(createTooltipModel(
                                                                chartType,
                                                                itemColors,
+                                                               chartFactor,
                                                                storage,
                                                                itemsModel));
         chart.addOverlayComponent(new XYTooltipOverlay(chart, tooltipPainter));
@@ -292,7 +292,6 @@ public class SimpleXYChartUtils {
                     int selStart = detailsArea.getSelectionStart();
                     int selEnd   = detailsArea.getSelectionEnd();
                     detailsArea.setText(createDetailsString(detailsItems, details));
-//                    detailsArea.setCaretPosition(0);
                     detailsArea.select(selStart, selEnd);
                 } catch (Exception e) {}
             }
@@ -352,6 +351,7 @@ public class SimpleXYChartUtils {
 
     public static XYTooltipModel createTooltipModel(final int chartType,
                                                     final Color[] itemColors,
+                                                    final double chartFactor,
                                                     final XYStorage storage,
                                                     final SynchronousXYItemsModel itemsModel) {
 
@@ -377,10 +377,11 @@ public class SimpleXYChartUtils {
             }
 
             public String getRowValue(int index, long itemValue) {
+                double value = itemValue * chartFactor;
                 switch (chartType) {
-                    case TYPE_BYTES  : return formatBytes(itemValue);
-                    case TYPE_PERCENT: return formatPercent(itemValue);
-                    default:           return formatDecimal(itemValue);
+                    case TYPE_BYTES  : return formatBytes((int)value);
+                    case TYPE_PERCENT: return formatPercent(value);
+                    default:           return formatDecimal(value);
                 }
             }
 
@@ -393,8 +394,8 @@ public class SimpleXYChartUtils {
         return painter;
     }
 
-    public static String formatDecimal(long value) {
-        return INT_FORMATTER.format(value);
+    public static String formatDecimal(double value) {
+        return DECIMAL_FORMATTER.format(value);
     }
 
     public static String formatBytes(long value) {
@@ -403,8 +404,8 @@ public class SimpleXYChartUtils {
         return MessageFormat.format(bytesFormat, new Object[] { formatDecimal(value) });
     }
 
-    public static String formatPercent(long value) {
-        return PERCENT_FORMATTER.format(value / 1000f);
+    public static String formatPercent(double value) {
+        return PERCENT_FORMATTER.format(value / 100);
     }
 
     public static String formatTime(long timestamp, long startTime, long endTime) {
