@@ -63,13 +63,11 @@ public class DefaultApplicationType extends ApplicationType  {
             if (jvm.isBasicInfoSupported()) {
                 mainClassName = jvm.getMainClass();
             }
-            String applicationName;
             if (mainClassName != null && mainClassName.length() > 0) {
-                applicationName = mainClassName;
+                name = mainClassName;
             } else {
-                applicationName = NbBundle.getMessage(DefaultApplicationType.class, "LBL_Unknown_Application"); // NOI18N
+                name = NbBundle.getMessage(DefaultApplicationType.class, "LBL_Unknown_Application"); // NOI18N
             }
-            name = applicationName;
         }
         return name;
     }
