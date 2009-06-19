@@ -26,15 +26,13 @@
 package com.sun.tools.visualvm.charts;
 
 import java.awt.Color;
-import java.util.Iterator;
-import org.netbeans.lib.profiler.charts.swing.Utils;
 
 /**
  * Utility class to access colors predefined for VisualVM.
  *
  * @author Jiri Sedlacek
  */
-public final class ColorFactory {
+final class ColorFactory {
     
     private static final Color[] PREDEFINED_COLORS = new Color[] {
                                                 new Color(241, 154,  42),
@@ -49,64 +47,47 @@ public final class ColorFactory {
         new Color[] { new Color(200, 163, 248), new Color(242, 232, 255) },
         new Color[] { new Color(212, 211, 131), new Color(244, 243, 217) }
     };
-
+    
 
     /**
-     * If VisualVM is running in simple-graphics mode (remote X server session)
-     * returns a fully opaque color, otherwise returns the provided color.
+     * Returns number of colors predefined for VisualVM charts.
+     * Always contains at least 4 colors.
      *
-     * @param color Color to be checked
-     * @return fully opaque color for simple-graphics mode, original Color otherwise
+     * @return number of colors predefined for VisualVM charts
      */
-    public static Color checkedColor(Color color) {
-        if (!Utils.forceSpeed()) return color;
-        return new Color(color.getRed(), color.getGreen(), color.getBlue());
+    public static int getPredefinedColorsCount() {
+        return PREDEFINED_COLORS.length;
     }
 
     /**
-     * Returns iterator for colors predefined for VisualVM.
+     * Returns a color predefined for VisualVM charts.
      *
-     * @return iterator for colors predefined for VisualVM
+     * @param index index of the predefined color
+     * @return color predefined for VisualVM charts
      */
-    public static Iterator<Color> predefinedColors() {
-        return new Iterator<Color>() {
-            private int index = 0;
-            public boolean hasNext() {
-                return index < PREDEFINED_COLORS.length;
-            }
-            public Color next() {
-                return hasNext() ? PREDEFINED_COLORS[index++] : null;
-            }
-            public void remove() {
-                throw new UnsupportedOperationException(
-                        "predefinedColors().remove() not supported."); // NOI18N
-            }
-        };
+    public static Color getPredefinedColor(int index) {
+        return PREDEFINED_COLORS[index];
     }
 
 
     /**
-     * Returns iterator for gradient colors predefined for VisualVM. The iterator
-     * returns a two-items array of Color (Color[2]): the first color in the array
-     * represents the start (top) of the gradient, the second color represents the
-     * end (bottom) of the gradient.
+     * Returns number of color pairs predefined for VisualVM charts gradients.
+     * Always contains at least 4 color pairs.
      *
-     * @return iterator for gradient colors predefined for VisualVM
+     * @return number of color pairs predefined for VisualVM charts gradients
      */
-    public static Iterator<Color[]> predefinedGradients() {
-        return new Iterator<Color[]>() {
-            private int index = 0;
-            public boolean hasNext() {
-                return index < PREDEFINED_GRADIENTS.length;
-            }
-            public Color[] next() {
-                return hasNext() ? PREDEFINED_GRADIENTS[index++] : null;
-            }
-            public void remove() {
-                throw new UnsupportedOperationException(
-                        "predefinedGradients().remove() not supported."); // NOI18N
-            }
-        };
+    public static int getPredefinedGradientsCount() {
+        return PREDEFINED_GRADIENTS.length;
+    }
+
+    /**
+     * Returns a color pair predefined for VisualVM charts gradients.
+     *
+     * @param index index of the predefined color pair
+     * @return color pair predefined for VisualVM charts gradients
+     */
+    public static Color[] getPredefinedGradient(int index) {
+        return PREDEFINED_GRADIENTS[index];
     }
 
 }

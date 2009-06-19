@@ -25,9 +25,7 @@
 
 package com.sun.tools.visualvm.charts.xy;
 
-import com.sun.tools.visualvm.charts.ColorFactory;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -37,6 +35,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.charts.ItemSelection;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 
 /**
@@ -45,8 +44,9 @@ import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
  */
 public class XYTooltipPainter extends JPanel {
 
-//    private static Color BACKGROUND_COLOR = new Color(80, 80, 80);
-    private static Color BACKGROUND_COLOR = ColorFactory.checkedColor(new Color(0, 0, 0, 170));
+    private static Color BACKGROUND_COLOR = Utils.forceSpeed() ?
+                                            new Color(80, 80, 80) :
+                                            new Color(0, 0, 0, 170);
 
     private JLabel caption;
     private JLabel[] valuePainters;

@@ -25,9 +25,6 @@
 
 package com.sun.tools.visualvm.charts;
 
-import com.sun.tools.visualvm.charts.xy.SimpleXYChartUtils;
-import java.awt.Color;
-
 /**
  * Factory class to create custom charts.
  *
@@ -35,67 +32,27 @@ import java.awt.Color;
  */
 public final class ChartFactory {
 
-    public static SimpleXYChartSupport createSimpleDecimalXYChart(
-                                                            long initialYMargin,
-                                                            String[] itemNames,
-                                                            Color[] itemColors,
-                                                            float[] lineWidths,
-                                                            Color[] lineColors,
-                                                            Color[] fillColors1,
-                                                            Color[] fillColors2,
-                                                            long minValue,
-                                                            long maxValue,
-                                                            double chartFactor,
-                                                            boolean hideItems,
-                                                            int valuesBuffer,
-                                                            String[] detailsItems) {
-
-        return new SimpleXYChartSupport(SimpleXYChartUtils.TYPE_DECIMAL,
-                                        initialYMargin, itemNames, itemColors,
-                                        lineWidths, lineColors, fillColors1,
-                                        fillColors2, minValue, maxValue, chartFactor,
-                                        hideItems, valuesBuffer, detailsItems);
-    }
-
-    public static SimpleXYChartSupport createSimpleBytesXYChart(
-                                                            long initialYMargin,
-                                                            String[] itemNames,
-                                                            Color[] itemColors,
-                                                            float[] lineWidths,
-                                                            Color[] lineColors,
-                                                            Color[] fillColors1,
-                                                            Color[] fillColors2,
-                                                            long minValue,
-                                                            long maxValue,
-                                                            boolean hideItems,
-                                                            int valuesBuffer,
-                                                            String[] detailsItems) {
-
-        return new SimpleXYChartSupport(SimpleXYChartUtils.TYPE_BYTES,
-                                        initialYMargin, itemNames, itemColors,
-                                        lineWidths, lineColors, fillColors1,
-                                        fillColors2, minValue, maxValue, 1d,
-                                        hideItems, valuesBuffer, detailsItems);
-    }
-
-    public static SimpleXYChartSupport createSimplePercentXYChart(
-                                                            String[] itemNames,
-                                                            Color[] itemColors,
-                                                            float[] lineWidths,
-                                                            Color[] lineColors,
-                                                            Color[] fillColors1,
-                                                            Color[] fillColors2,
-                                                            double chartFactor,
-                                                            boolean hideItems,
-                                                            int valuesBuffer,
-                                                            String[] detailsItems) {
-        
-        return new SimpleXYChartSupport(SimpleXYChartUtils.TYPE_PERCENT,
-                                        1000, itemNames, itemColors,
-                                        lineWidths, lineColors, fillColors1,
-                                        fillColors2, 0, (long)Math.ceil(100 /
-                                        chartFactor), chartFactor,
-                                        hideItems, valuesBuffer, detailsItems);
+    /**
+     * Creates an instance of SimpleXYChartSupport representing a simple XY chart.
+     *
+     * @param descriptor chart descriptor
+     * @return instance of SimpleXYChartSupport representing a simple XY chart
+     */
+    public static SimpleXYChartSupport createSimpleXYChart(SimpleXYChartDescriptor descriptor) {
+        return new SimpleXYChartSupport(descriptor.getChartType(),
+                                        descriptor.getInitialYMargin(),
+                                        descriptor.getItemNames(),
+                                        descriptor.getItemColors(),
+                                        descriptor.getLineWidths(),
+                                        descriptor.getLineColors(),
+                                        descriptor.getFillColors1(),
+                                        descriptor.getFillColors2(),
+                                        descriptor.getMinValue(),
+                                        descriptor.getMaxValue(),
+                                        descriptor.getChartFactor(),
+                                        descriptor.areItemsHideable(),
+                                        descriptor.getValuesBuffer(),
+                                        descriptor.getDetailsItems());
     }
 
 }

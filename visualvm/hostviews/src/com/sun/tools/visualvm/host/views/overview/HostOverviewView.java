@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.host.views.overview;
 
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
@@ -37,12 +37,9 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.Format;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -82,21 +79,25 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
     
     protected DataViewComponent createComponent() {
+        GlobalPreferences preferences = GlobalPreferences.sharedInstance();
+        int chartCache = preferences.getMonitoredHostCache() * 60 /
+                         preferences.getMonitoredHostPoll();
+
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport((Host)getDataSource()).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
 
         boolean cpuSupported = hostOverview.getSystemLoadAverage() >= 0;
-        final CpuLoadViewSupport cpuLoadViewSupport = new CpuLoadViewSupport(hostOverview, cpuSupported);
+        final CpuLoadViewSupport cpuLoadViewSupport = new CpuLoadViewSupport(hostOverview, cpuSupported, chartCache);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(HostOverviewView.class, "LBL_CPU"), true), DataViewComponent.TOP_LEFT); // NOI18N
         dvc.addDetailsView(cpuLoadViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         if (!cpuSupported) dvc.hideDetailsArea(DataViewComponent.TOP_LEFT);
 
-        final PhysicalMemoryViewSupport physicalMemoryViewSupport = new PhysicalMemoryViewSupport();
+        final PhysicalMemoryViewSupport physicalMemoryViewSupport = new PhysicalMemoryViewSupport(chartCache);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(HostOverviewView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT); // NOI18N
         dvc.addDetailsView(physicalMemoryViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
-        final SwapMemoryViewSupport swapMemoryViewSupport = new SwapMemoryViewSupport();
+        final SwapMemoryViewSupport swapMemoryViewSupport = new SwapMemoryViewSupport(chartCache);
         dvc.addDetailsView(swapMemoryViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
         timer = new Timer(2000, new ActionListener() {
@@ -121,7 +122,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel  {
+    private static class MasterViewSupport extends JPanel {
         
         public MasterViewSupport(Host host) {
             initComponents(host);
@@ -181,7 +182,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
     // --- CPU load ------------------------------------------------------------
 
-    private static class CpuLoadViewSupport extends JPanel  {
+    private static class CpuLoadViewSupport extends JPanel {
 
         private boolean cpuMonitoringSupported;
         
@@ -189,9 +190,9 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         private SimpleXYChartSupport chartSupport;
 
-        public CpuLoadViewSupport(HostOverview hostOverview, boolean cpuSupported) {
+        public CpuLoadViewSupport(HostOverview hostOverview, boolean cpuSupported, int chartCache) {
             cpuMonitoringSupported = cpuSupported;
-            initModels();
+            initModels(chartCache);
             initComponents();
         }
 
@@ -208,29 +209,13 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             }
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { LOAD_AVERAGE };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.decimal(1, 0.001d, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next() };
+            chartDescriptor.addLineItem(LOAD_AVERAGE);
 
-            float[] lineWidths = new float[] { 2f };
-
-            Color[] lineColors = new Color[] { itemColors[0] };
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredHostCache() * 60 /
-                             preferences.getMonitoredHostPoll();
-
-            String[] detailsItems = new String[] { LOAD_AVERAGE };
-
-            chartSupport = ChartFactory.createSimpleDecimalXYChart(1,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            null, null, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            0.001d, false, itemsCount,
-                                                            detailsItems);
+            chartDescriptor.setDetailsItems(new String[] { LOAD_AVERAGE });
         }
 
         private void initComponents() {
@@ -250,7 +235,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
     // --- Physical memory -----------------------------------------------------
 
-    private static class PhysicalMemoryViewSupport extends JPanel  {
+    private static class PhysicalMemoryViewSupport extends JPanel {
 
         private static String USED_MEMORY = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_memory"); // NOI18N
         private static String USED_MEMORY_LEG = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_memory_leg"); // NOI18N
@@ -258,8 +243,8 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         private SimpleXYChartSupport chartSupport;
 
-        public PhysicalMemoryViewSupport() {
-            initModels();
+        public PhysicalMemoryViewSupport(int chartCache) {
+            initModels(chartCache);
             initComponents();
         }
 
@@ -276,34 +261,15 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                                                       chartSupport.formatBytes(memoryMax) });
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { USED_MEMORY_LEG };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.bytes(128 * 1024 * 1024, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next() };
+            chartDescriptor.addLineFillItem(USED_MEMORY_LEG);
 
-            float[] lineWidths = new float[] { 2f };
+            chartDescriptor.setDetailsItems(new String[] { USED_MEMORY, TOTAL_MEMORY });
 
-            Color[] lineColors = new Color[] { itemColors[0] };
-
-            Iterator<Color[]> fills = ColorFactory.predefinedGradients();
-            Color[] grads1 = fills.next();
-            Color[] grads2 = fills.next();
-            Color[] fillColors1 = new Color[] {grads1[0], grads2[0]};
-            Color[] fillColors2 = new Color[] {grads1[1], grads2[1]};
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredHostCache() * 60 /
-                             preferences.getMonitoredHostPoll();
-
-            String[] detailsItems = new String[] { USED_MEMORY, TOTAL_MEMORY };
-
-            chartSupport = ChartFactory.createSimpleBytesXYChart(128 * 1024 * 1024,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            fillColors1, fillColors2, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {
@@ -318,7 +284,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
     // --- Swap memory ---------------------------------------------------------
 
-    private static class SwapMemoryViewSupport extends JPanel  {
+    private static class SwapMemoryViewSupport extends JPanel {
 
         private static final String USED_SWAP = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_swap");   // NOI18N
         private static final String USED_SWAP_LEG = NbBundle.getMessage(HostOverviewView.class, "LBL_Used_swap_leg");   // NOI18N
@@ -326,8 +292,8 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         private SimpleXYChartSupport chartSupport;
 
-        public SwapMemoryViewSupport() {
-            initModels();
+        public SwapMemoryViewSupport(int chartCache) {
+            initModels(chartCache);
             initComponents();
         }
 
@@ -344,34 +310,15 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                                                       chartSupport.formatBytes(memorySwapMax) });
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { USED_SWAP_LEG };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.bytes(128 * 1024 * 1024, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next() };
+            chartDescriptor.addLineFillItem(USED_SWAP_LEG);
 
-            float[] lineWidths = new float[] { 2f };
+            chartDescriptor.setDetailsItems(new String[] { USED_SWAP, TOTAL_SWAP });
 
-            Color[] lineColors = new Color[] { itemColors[0] };
-
-            Iterator<Color[]> fills = ColorFactory.predefinedGradients();
-            Color[] grads1 = fills.next();
-            Color[] grads2 = fills.next();
-            Color[] fillColors1 = new Color[] {grads1[0], grads2[0]};
-            Color[] fillColors2 = new Color[] {grads1[1], grads2[1]};
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredHostCache() * 60 /
-                             preferences.getMonitoredHostPoll();
-
-            String[] detailsItems = new String[] { USED_SWAP, TOTAL_SWAP };
-
-            chartSupport = ChartFactory.createSimpleBytesXYChart(128 * 1024 * 1024,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            fillColors1, fillColors2, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {

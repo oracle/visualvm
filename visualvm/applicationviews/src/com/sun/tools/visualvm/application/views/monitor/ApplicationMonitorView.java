@@ -32,7 +32,7 @@ import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
@@ -46,13 +46,11 @@ import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.management.MemoryMXBean;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -103,27 +101,31 @@ class ApplicationMonitorView extends DataSourceView {
     }
     
     protected DataViewComponent createComponent() {
+        GlobalPreferences preferences = GlobalPreferences.sharedInstance();
+        int chartCache = preferences.getMonitoredDataCache() * 60 /
+                         preferences.getMonitoredDataPoll();
+
         Application application = (Application)getDataSource();
         final MasterViewSupport masterViewSupport = new MasterViewSupport(application, jvm, memoryMXBean);
         DataViewComponent dvc = new DataViewComponent(
                 masterViewSupport.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        final CpuViewSupport cpuViewSupport = new CpuViewSupport(application, jvm);
+        final CpuViewSupport cpuViewSupport = new CpuViewSupport(application, jvm, chartCache);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu"), true), DataViewComponent.TOP_LEFT);  // NOI18N
         dvc.addDetailsView(cpuViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
 
-        final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm);
-        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(jvm);
+        final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm, chartCache);
+        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(jvm, chartCache);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
         dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
-        final ClassesViewSupport classesViewSupport = new ClassesViewSupport(jvm);
+        final ClassesViewSupport classesViewSupport = new ClassesViewSupport(jvm, chartCache);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Classes"), true), DataViewComponent.BOTTOM_LEFT);    // NOI18N
         dvc.addDetailsView(classesViewSupport.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
 
-        final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(jvm);
+        final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(jvm, chartCache);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Threads"), true), DataViewComponent.BOTTOM_RIGHT);   // NOI18N
         dvc.addDetailsView(threadsViewSupport.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
 
@@ -287,7 +289,7 @@ class ApplicationMonitorView extends DataSourceView {
         private long lastProcessGcTime = -1;
         private int processors = 1;
 
-        public CpuViewSupport(Application app, Jvm jvm) {
+        public CpuViewSupport(Application app, Jvm jvm, int chartCache) {
             cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
             gcMonitoringSupported = jvm.isCollectionTimeSupported();
             if (cpuMonitoringSupported || gcMonitoringSupported) {
@@ -300,7 +302,7 @@ class ApplicationMonitorView extends DataSourceView {
                         processors = mxbeans.getOperatingSystemMXBean().getAvailableProcessors();
                 }
             }
-            initModels();
+            initModels(chartCache);
             initComponents();
         }
 
@@ -352,27 +354,16 @@ class ApplicationMonitorView extends DataSourceView {
             }
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { CPU_USAGE, GC_USAGE };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.percent(false, 0.1d, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next(), colors.next() };
+            chartDescriptor.addLineItem(CPU_USAGE);
+            chartDescriptor.addLineItem(GC_USAGE);
 
-            float[] lineWidths = new float[] { 2f, 2f};
+            chartDescriptor.setDetailsItems(new String[] { CPU_USAGE, GC_USAGE });
 
-            Color[] lineColors = new Color[] { itemColors[0], itemColors[1] };
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredDataCache() * 60 /
-                             preferences.getMonitoredDataPoll();
-
-            String[] detailsItems = new String[] { CPU_USAGE, GC_USAGE };
-
-            chartSupport = ChartFactory.createSimplePercentXYChart(
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            null, null, 0.1d, false,
-                                                            itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {
@@ -404,9 +395,9 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public HeapViewSupport(Jvm jvm) {
+        public HeapViewSupport(Jvm jvm, int chartCache) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
-            initModels();
+            initModels(chartCache);
             initComponents();
         }
 
@@ -427,34 +418,16 @@ class ApplicationMonitorView extends DataSourceView {
             }
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { HEAP_SIZE_LEG, USED_HEAP_LEG };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next(), colors.next() };
+            chartDescriptor.addLineFillItem(HEAP_SIZE_LEG);
+            chartDescriptor.addLineFillItem(USED_HEAP_LEG);
 
-            float[] lineWidths = new float[] { 2f, 2f};
+            chartDescriptor.setDetailsItems(new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP });
 
-            Color[] lineColors = new Color[] { itemColors[0], itemColors[1] };
-
-            Iterator<Color[]> fills = ColorFactory.predefinedGradients();
-            Color[] grads1 = fills.next();
-            Color[] grads2 = fills.next();
-            Color[] fillColors1 = new Color[] {grads1[0], grads2[0]};
-            Color[] fillColors2 = new Color[] {grads1[1], grads2[1]};
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredDataCache() * 60 /
-                             preferences.getMonitoredDataPoll();
-
-            String[] detailsItems = new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP };
-
-            chartSupport = ChartFactory.createSimpleBytesXYChart(10 * 1024 * 1024,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            fillColors1, fillColors2, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {
@@ -486,9 +459,9 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public PermGenViewSupport(Jvm jvm) {
+        public PermGenViewSupport(Jvm jvm, int chartCache) {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
-            initModels();
+            initModels(chartCache);
             initComponents();
         }
 
@@ -509,34 +482,16 @@ class ApplicationMonitorView extends DataSourceView {
             }
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { PERM_SIZE_LEG, USED_PERM_LEG };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next(), colors.next() };
+            chartDescriptor.addLineFillItem(PERM_SIZE_LEG);
+            chartDescriptor.addLineFillItem(USED_PERM_LEG);
 
-            float[] lineWidths = new float[] { 2f, 2f};
+            chartDescriptor.setDetailsItems(new String[] { PERM_SIZE, USED_PERM, MAX_PERM });
 
-            Color[] lineColors = new Color[] { itemColors[0], itemColors[1] };
-
-            Iterator<Color[]> fills = ColorFactory.predefinedGradients();
-            Color[] grads1 = fills.next();
-            Color[] grads2 = fills.next();
-            Color[] fillColors1 = new Color[] {grads1[0], grads2[0]};
-            Color[] fillColors2 = new Color[] {grads1[1], grads2[1]};
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredDataCache() * 60 /
-                             preferences.getMonitoredDataPoll();
-
-            String[] detailsItems = new String[] { PERM_SIZE, USED_PERM, MAX_PERM };
-
-            chartSupport = ChartFactory.createSimpleBytesXYChart(10 * 1024 * 1024,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            fillColors1, fillColors2, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            false, itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {
@@ -569,9 +524,9 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public ClassesViewSupport(Jvm jvm) {
+        public ClassesViewSupport(Jvm jvm, int chartCache) {
             classMonitoringSupported = jvm.isClassMonitoringSupported();
-            initModels();
+            initModels(chartCache);
             initComponents();
         }
 
@@ -594,29 +549,17 @@ class ApplicationMonitorView extends DataSourceView {
             }
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { TOTAL_LOADED_LEG, SHARED_LOADED_LEG };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.decimal(100, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next(), colors.next() };
+            chartDescriptor.addLineItem(TOTAL_LOADED_LEG);
+            chartDescriptor.addLineItem(SHARED_LOADED_LEG);
 
-            float[] lineWidths = new float[] { 2f, 2f};
+            chartDescriptor.setDetailsItems(new String[] { TOTAL_LOADED, SHARED_LOADED,
+                                                           TOTAL_UNLOADED, SHARED_UNLOADED });
 
-            Color[] lineColors = new Color[] { itemColors[0], itemColors[1] };
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredDataCache() * 60 /
-                             preferences.getMonitoredDataPoll();
-
-            String[] detailsItems = new String[] { TOTAL_LOADED, SHARED_LOADED,
-                                                   TOTAL_UNLOADED, SHARED_UNLOADED };
-
-            chartSupport = ChartFactory.createSimpleDecimalXYChart(100,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            null, null, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            1d, false, itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {
@@ -649,9 +592,9 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public ThreadsViewSupport(Jvm jvm) {
+        public ThreadsViewSupport(Jvm jvm, int chartCache) {
             threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
-            initModels();
+            initModels(chartCache);
             initComponents();
         }
 
@@ -674,29 +617,17 @@ class ApplicationMonitorView extends DataSourceView {
             }
         }
 
-        private void initModels() {
-            String[] itemNames = new String[] { LIVE_LEG, DAEMON_LEG };
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.decimal(3, false, chartCache);
 
-            Iterator<Color> colors = ColorFactory.predefinedColors();
-            Color[] itemColors = new Color[] { colors.next(), colors.next() };
+            chartDescriptor.addLineItem(LIVE_LEG);
+            chartDescriptor.addLineItem(DAEMON_LEG);
 
-            float[] lineWidths = new float[] { 2f, 2f};
+            chartDescriptor.setDetailsItems(new String[] { LIVE, DAEMON,
+                                                           PEAK, STARTED });
 
-            Color[] lineColors = new Color[] { itemColors[0], itemColors[1] };
-
-            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
-            int itemsCount = preferences.getMonitoredDataCache() * 60 /
-                             preferences.getMonitoredDataPoll();
-
-            String[] detailsItems = new String[] { LIVE, DAEMON,
-                                                   PEAK, STARTED };
-
-            chartSupport = ChartFactory.createSimpleDecimalXYChart(3,
-                                                            itemNames, itemColors,
-                                                            lineWidths, lineColors,
-                                                            null, null, 0,
-                                                            SimpleXYChartSupport.MAX_UNDEFINED,
-                                                            1d, false, itemsCount, detailsItems);
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {

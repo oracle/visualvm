@@ -27,6 +27,7 @@ package test;
 
 import com.sun.tools.visualvm.charts.ChartFactory;
 import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import java.awt.Color;
 import java.util.Iterator;
@@ -51,37 +52,16 @@ public class Demo implements Runnable {
 
 
     private void createModels() {
-        String[] itemNames = new String[ITEMS_COUNT];
-        for (int i = 0; i < ITEMS_COUNT; i++) itemNames[i] = "Item " + i;
+        SimpleXYChartDescriptor descriptor =
+                SimpleXYChartDescriptor.bytes(1000, true, VALUES_LIMIT);
 
-        Iterator<Color> colors = ColorFactory.predefinedColors();
-        Color[] itemColors = new Color[ITEMS_COUNT];
-        for (int i = 0; i < ITEMS_COUNT; i++) itemColors[i] = colors.next();
+        for (int i = 0; i < ITEMS_COUNT; i++)
+            descriptor.addLineFillItem("Item " + i);
 
-        float[] lineWidths = new float[ITEMS_COUNT];
-        for (int i = 0; i < ITEMS_COUNT; i++) lineWidths[i] = 2f;
+        descriptor.setDetailsItems(new String[] { "Detail 1", "Detail 2", "Detail 3" } );
 
-        Color[] lineColors = new Color[ITEMS_COUNT];
-        for (int i = 0; i < ITEMS_COUNT; i++) lineColors[i] = itemColors[i];
-
-        Color[] fillColors1 = new Color[ITEMS_COUNT];
-        Color[] fillColors2 = new Color[ITEMS_COUNT];
-        Iterator<Color[]> fills = ColorFactory.predefinedGradients();
-        for (int i = 0; i < ITEMS_COUNT; i++) {
-            Color[] grads = fills.next();
-            fillColors1[i] = grads[0];
-            fillColors2[i] = grads[1];
-        }
-
-        String[] detailsItems = new String[] { "Detail 1", "Detail 2", "Detail 3" };
-
-        support = ChartFactory.createSimpleDecimalXYChart(
-                                                   1000,
-                                                   itemNames, itemColors,
-                                                   lineWidths, lineColors,
-                                                   fillColors1, fillColors2, 0,
-                                                   SimpleXYChartSupport.MAX_UNDEFINED,
-                                                   true, VALUES_LIMIT, detailsItems);
+        support = ChartFactory.createSimpleXYChart(descriptor);
+        
         new Generator(support).start();
     }
 

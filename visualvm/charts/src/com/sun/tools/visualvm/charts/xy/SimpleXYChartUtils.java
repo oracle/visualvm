@@ -156,9 +156,9 @@ public class SimpleXYChartUtils {
         for (int i = 0; i < items.length; i++)
             items[i] = itemsModel.getItem(i);
 
-        ItemPainter[] painters = new ItemPainter[lineWidths.length];
+        ItemPainter[] painters = new ItemPainter[items.length];
         for (int i = 0; i < painters.length; i++)
-            painters[i] = XYPainter.absolutePainter(lineWidths[i],
+            painters[i] = XYPainter.absolutePainter(lineWidths  == null ? null : lineWidths[i],
                                                     lineColors  == null ? null : lineColors[i],
                                                     fillColors1 == null ? null : fillColors1[i],
                                                     fillColors2 == null ? null : fillColors2[i]);
