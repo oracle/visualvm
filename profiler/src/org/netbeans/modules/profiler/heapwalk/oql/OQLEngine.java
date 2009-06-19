@@ -52,7 +52,6 @@ import javax.script.ScriptEngineManager;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
-import org.openide.util.Exceptions;
 
 /**
  * This is Object Query Language Interpreter
@@ -72,8 +71,8 @@ public class OQLEngine {
             Object engine = manager.getEngineByName("JavaScript"); // NOI18N
 
             oqlSupported = engine != null;
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+        } catch (Throwable ex) {
+            LOGGER.log(Level.INFO,"OQLEngine init",ex); // NOI18N
             oqlSupported = false;
         }
     }
