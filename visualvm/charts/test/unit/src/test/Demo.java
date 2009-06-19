@@ -26,11 +26,8 @@
 package test;
 
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
 import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
-import java.awt.Color;
-import java.util.Iterator;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -45,7 +42,7 @@ public class Demo implements Runnable {
 
     private static final long SLEEP_TIME = 500;
     private static final int VALUES_LIMIT = 150;
-    private static final int ITEMS_COUNT = 2;
+    private static final int ITEMS_COUNT = 8;
 
 
     private SimpleXYChartSupport support;

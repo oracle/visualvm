@@ -155,7 +155,7 @@ public final class SimpleXYChartDescriptor {
         Color color = null;
 
         if (newItemIndex >= colorsCount) {
-            color = ColorFactory.getPredefinedColor(colorsCount % newItemIndex);
+            color = ColorFactory.getPredefinedColor(newItemIndex % colorsCount);
             int darkerFactor = newItemIndex / colorsCount;
             while (darkerFactor-- > 0) color = color.darker();
         } else {
@@ -171,7 +171,7 @@ public final class SimpleXYChartDescriptor {
         Color[] color = null;
 
         if (newItemIndex >= colorsCount) {
-            color = ColorFactory.getPredefinedGradient(colorsCount % newItemIndex);
+            color = ColorFactory.getPredefinedGradient(newItemIndex % colorsCount);
             int darkerFactor = newItemIndex / colorsCount;
             while (darkerFactor-- > 0) {
                 color[0] = color[0].darker();
