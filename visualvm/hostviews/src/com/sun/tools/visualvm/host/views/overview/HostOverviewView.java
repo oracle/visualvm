@@ -216,6 +216,8 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             chartDescriptor.addLineItem(LOAD_AVERAGE);
 
             chartDescriptor.setDetailsItems(new String[] { LOAD_AVERAGE });
+
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
 
         private void initComponents() {
