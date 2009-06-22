@@ -159,12 +159,15 @@ public class StackTraceSnapshotBuilder {
 
         @Override
         protected long getDumpAbsTimeStamp() {
-            return currentDumpTimeStamp.get();
+            synchronized(stampLock) {
+                return currentDumpTimeStamp;
+            }
         }
     };
     final ReadWriteLock lock = new ReentrantReadWriteLock();
-    final AtomicLong currentDumpTimeStamp = new AtomicLong(-1);
-    final AtomicLong firstDumpTimeStamp = new AtomicLong(-1);
+    final Object stampLock = new Object();
+    // @GuardedBy stampLock
+    long currentDumpTimeStamp = -1L;
     final AtomicReference<Map<Thread, StackTraceElement[]>> lastStackTrace = new AtomicReference<Map<Thread, StackTraceElement[]>>(Collections.EMPTY_MAP);
     int stackTraceCount = 0;
     final Map<Thread, Thread.State> lastThreadStates = new WeakHashMap<Thread, Thread.State>();
@@ -185,63 +188,61 @@ public class StackTraceSnapshotBuilder {
     }
 
     final public void addStacktrace(Map<Thread, StackTraceElement[]> stackTrace, long dumpTimeStamp) throws IllegalStateException {
-        long timestamp = Math.min(dumpTimeStamp, currentDumpTimeStamp.get());
-
-        if (currentDumpTimeStamp.compareAndSet(timestamp, dumpTimeStamp)) {
-            try {
-                lock.writeLock().lock();
-                Map<Thread, Thread.State> states = new HashMap<Thread, Thread.State>();
-
-                timestamp = dumpTimeStamp;
-
-                for (Map.Entry<Thread, StackTraceElement[]> entry : stackTrace.entrySet()) {
-                    Thread thread = entry.getKey();
-                    if (ignoredThreadNames.contains(thread.getName())) continue;
-
-                    long threadId = thread.getId();
-                    if (!threadIds.contains(threadId)) {
-                        threadIds.add(threadId);
-                        threadNames.add(thread.getName());
-                        ccgb.newThread((int) threadId, thread.getName(), thread.getClass().getName());
-                    }
-
-                    StackTraceElement[] newElements = entry.getValue();
-                    StackTraceElement[] oldElements = lastStackTrace.get().get(thread);
-
-                    Thread.State oldState = lastThreadStates.get(thread);
-                    Thread.State newState = thread.getState();
-                    states.put(thread, newState);
-
-                    processDiffs((int) threadId, oldElements, newElements, timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
-                }
-
-                for (Map.Entry<Thread, StackTraceElement[]> entry : lastStackTrace.get().entrySet()) {
-                    Thread key = entry.getKey();
-                    if (ignoredThreadNames.contains(key.getName())) continue;
-                    
-                    if (!stackTrace.containsKey(key)) {
-                        Thread.State oldState = key.getState();
-                        Thread.State newState = states.get(key);
-                        processDiffs((int) key.getId(), entry.getValue(), new StackTraceElement[0], timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
-                    }
-                }
-
-                lastStackTrace.set(stackTrace);
-
-                currentDumpTimeStamp.set(dumpTimeStamp);
-
-                firstDumpTimeStamp.compareAndSet(-1L, dumpTimeStamp);
-                stackTraceCount++;
-                lastThreadStates.clear();
-                lastThreadStates.putAll(states);
-            } finally {
-                lock.writeLock().unlock();
+        long timestamp = -1L;
+        synchronized(stampLock) {
+            timestamp = Math.min(dumpTimeStamp, currentDumpTimeStamp);
+            if (timestamp != currentDumpTimeStamp) {
+                throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
             }
-
-        } else {
-            throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp.get() + " has been added");
+            currentDumpTimeStamp = timestamp;
         }
 
+        try {
+            lock.writeLock().lock();
+            Map<Thread, Thread.State> states = new HashMap<Thread, Thread.State>();
+
+            timestamp = dumpTimeStamp;
+
+            for (Map.Entry<Thread, StackTraceElement[]> entry : stackTrace.entrySet()) {
+                Thread thread = entry.getKey();
+                if (ignoredThreadNames.contains(thread.getName())) continue;
+
+                long threadId = thread.getId();
+                if (!threadIds.contains(threadId)) {
+                    threadIds.add(threadId);
+                    threadNames.add(thread.getName());
+                    ccgb.newThread((int) threadId, thread.getName(), thread.getClass().getName());
+                }
+
+                StackTraceElement[] newElements = entry.getValue();
+                StackTraceElement[] oldElements = lastStackTrace.get().get(thread);
+
+                Thread.State oldState = lastThreadStates.get(thread);
+                Thread.State newState = thread.getState();
+                states.put(thread, newState);
+
+                processDiffs((int) threadId, oldElements, newElements, timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
+            }
+
+            for (Map.Entry<Thread, StackTraceElement[]> entry : lastStackTrace.get().entrySet()) {
+                Thread key = entry.getKey();
+                if (ignoredThreadNames.contains(key.getName())) continue;
+
+                if (!stackTrace.containsKey(key)) {
+                    Thread.State oldState = key.getState();
+                    Thread.State newState = states.get(key);
+                    processDiffs((int) key.getId(), entry.getValue(), new StackTraceElement[0], timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
+                }
+            }
+
+            lastStackTrace.set(stackTrace);
+
+            stackTraceCount++;
+            lastThreadStates.clear();
+            lastThreadStates.putAll(states);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     final private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, Thread.State oldState, Thread.State newState) throws IllegalStateException {
@@ -453,13 +454,14 @@ public class StackTraceSnapshotBuilder {
             methodInfos.clear();
             threadIds.clear();
             threadNames.clear();
-            firstDumpTimeStamp.set(-1);
-            currentDumpTimeStamp.set(-1);
             stackTraceCount = 0;
             lastThreadStates.clear();
             lastStackTrace.set(Collections.EMPTY_MAP);
         } finally {
             lock.writeLock().unlock();
+            synchronized(stampLock) {
+                currentDumpTimeStamp = -1L;
+            }
         }
     }
 }
