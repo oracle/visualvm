@@ -7,7 +7,7 @@ import com.sun.appserv.management.monitor.KeepAliveMonitor;
 import com.sun.appserv.management.monitor.statistics.KeepAliveStats;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
@@ -15,7 +15,6 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import java.awt.Color;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,15 +48,12 @@ class HTTPServiceView extends DataSourceView {
 
     private void configureConnectionQueueVisualizer() {
         final ConnectionQueueMonitor cqm = monitor.getConnectionQueueMonitor();
-        connectionQueueChart = ChartFactory.createSimpleDecimalXYChart(15,
-                            new String[] {"1 min", "5 mins", "15 mins"},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
-                            new float[]{2f, 2f, 2f},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
-                            null,
-                            null,
-                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
-                            null);
+        SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, true, 500);
+        desc.addLineItem("1min");
+        desc.addLineItem("5min");
+        desc.addLineItem("15min");
+        connectionQueueChart = ChartFactory.createSimpleXYChart(desc);
+
 //        ConnectionQueuePanel cqp = new ConnectionQueuePanel();
 //        final ConnectionQueuePanel.Model model = new ConnectionQueuePanel.Model() {
 //
@@ -152,15 +148,11 @@ class HTTPServiceView extends DataSourceView {
     private SimpleXYChartSupport fileCacheChart;
 
     private void configureFileCacheVisualizer() {
-        fileCacheChart = ChartFactory.createSimplePercentXYChart(
-                            new String[] {"Min", "Max", "Current"},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
-                            new float[]{2f, 2f, 2f},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), null},
-                            null,
-                            true, 500,
-                            null);
+        SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+        desc.addLineFillItem("Min");
+        desc.addLineItem("Max");
+        desc.addLineItem("Current");
+        fileCacheChart = ChartFactory.createSimpleXYChart(desc);
 
         final FileCacheMonitor fcm = monitor.getFileCacheMonitor();
 
@@ -259,15 +251,11 @@ class HTTPServiceView extends DataSourceView {
 
     private void configureKeepAliveVisualizer() {
         final KeepAliveMonitor kaMonitor = monitor.getKeepAliveMonitor();
-        keepAliveChart = ChartFactory.createSimpleDecimalXYChart(15,
-                            new String[] {"Refused", "Flushed", "Timed Out"},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
-                            new float[]{2f, 2f, 2f},
-                            new Color[]{ColorFactory.checkedColor(Color.RED), ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN)},
-                            null,
-                            null,
-                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
-                            null);
+        SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+        desc.addLineItem("Refused");
+        desc.addLineItem("Flushed");
+        desc.addLineItem("Timed Out");
+        keepAliveChart = ChartFactory.createSimpleXYChart(desc);
 
         kaRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
 

@@ -36,7 +36,7 @@ import net.java.visualvm.modules.glassfish.ui.StatsTable;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.appserv.management.monitor.statistics.WebModuleVirtualServerStats;
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
@@ -126,29 +126,23 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
             masterPanel.add(generalDataScroll, BorderLayout.CENTER);
             masterPanel.add(appLink, BorderLayout.NORTH);
 
-            activeSessionsChart = ChartFactory.createSimpleDecimalXYChart(15,
-                    new String[]{"Current", "Maximum"},
-                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
-                    new float[]{2.0f, 2.0f},
-                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
-                    null, null, SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false,
-                    500, null);
+            SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+            desc.addLineItem("Current");
+            desc.addLineItem("Maximum");
 
-            totalSessionsChart = ChartFactory.createSimpleDecimalXYChart(15,
-                    new String[]{"Created", "Expired", "Rejected"},
-                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
-                    new float[]{2.0f, 2.0f, 2.0f},
-                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
-                    null, null, SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false,
-                    500, null);
+            activeSessionsChart = ChartFactory.createSimpleXYChart(desc);
 
-            jspChart = ChartFactory.createSimpleDecimalXYChart(15,
-                    new String[]{"Count", "Reloads", "Errors"},
-                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
-                    new float[]{2.0f, 2.0f, 2.0f},
-                    new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.GREEN), ColorFactory.checkedColor(Color.RED)},
-                    null, null, SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false,
-                    500, null);
+            desc = SimpleXYChartDescriptor.decimal(10, true, 500);
+            desc.addLineItem("Created");
+            desc.addLineItem("Expired");
+            desc.addLineItem("Rejected");
+            totalSessionsChart = ChartFactory.createSimpleXYChart(desc);
+
+            desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+            desc.addLineItem("Count");
+            desc.addLineItem("Reloads");
+            desc.addLineItem("Errors");
+            jspChart = ChartFactory.createSimpleXYChart(desc);
 
             JPanel servletsPanel = new JPanel(new BorderLayout());
             servletsPanel.setOpaque(false);

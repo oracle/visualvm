@@ -4,7 +4,7 @@ import com.sun.appserv.management.monitor.TransactionServiceMonitor;
 import com.sun.appserv.management.monitor.statistics.TransactionServiceStats;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
@@ -43,15 +43,10 @@ class TransactionServiceView extends DataSourceView {
     private SimpleXYChartSupport transactionalServiceChart;
 
     private void configureTransactionalServiceVisualizer() {
-        transactionalServiceChart = ChartFactory.createSimpleDecimalXYChart(15,
-                            new String[] {"Count", "Maximum Time"},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE)},
-                            new float[]{2f, 2f},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE)},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE)},
-                            new Color[]{ColorFactory.checkedColor(Color.CYAN)},
-                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
-                            null);
+        SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+        desc.addFillItem("Count");
+        desc.addLineItem("Maximum Time");
+        transactionalServiceChart = ChartFactory.createSimpleXYChart(desc);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Transactional Service", false), DataViewComponent.BOTTOM_RIGHT);
 
         final TransactionServiceStats tss = monitor.getTransactionServiceStats();

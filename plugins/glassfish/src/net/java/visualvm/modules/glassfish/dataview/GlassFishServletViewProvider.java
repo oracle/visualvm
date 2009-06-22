@@ -27,7 +27,7 @@ package net.java.visualvm.modules.glassfish.dataview;
 import com.sun.appserv.management.monitor.ServletMonitor;
 import com.sun.appserv.management.monitor.statistics.AltServletStats;
 import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.ColorFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
 import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.scheduler.Quantum;
 import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
@@ -43,7 +43,6 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishServlet;
 import org.openide.util.ImageUtilities;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,29 +85,19 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
 
             JPanel chartTimesPanel = new JPanel(new BorderLayout());
             chartTimesPanel.setOpaque(false);
-            timesChart = ChartFactory.createSimpleDecimalXYChart(15,
-                            new String[] {"Average Time", "Maximum Time"},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
-                            new float[]{2f, 2f},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
-                            null,
-                            null,
-                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
-                            null);
+            SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+            desc.addLineItem("Average Time");
+            desc.addLineItem("Maximum Time");
+            timesChart = ChartFactory.createSimpleXYChart(desc);
 
             chartTimesPanel.add(timesChart.getChart(), BorderLayout.CENTER);
 
             JPanel chartReqsPanel = new JPanel(new BorderLayout());
             chartReqsPanel.setOpaque(false);
-            reqsChart = ChartFactory.createSimpleDecimalXYChart(15,
-                            new String[] {"Request Count", "Error Count"},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
-                            new float[]{2f, 2f},
-                            new Color[]{ColorFactory.checkedColor(Color.BLUE), ColorFactory.checkedColor(Color.RED)},
-                            null,
-                            null,
-                            SimpleXYChartSupport.MIN_UNDEFINED, SimpleXYChartSupport.MAX_UNDEFINED, false, 500,
-                            null);
+            desc = SimpleXYChartDescriptor.decimal(10, false, 500);
+            desc.addLineItem("Request Count");
+            desc.addLineItem("Error Count");
+            reqsChart = ChartFactory.createSimpleXYChart(desc);
             chartReqsPanel.add(reqsChart.getChart(), BorderLayout.CENTER);
 
             DataViewComponent.MasterView masterView = new DataViewComponent.MasterView("Overview", null, generalDataArea);
