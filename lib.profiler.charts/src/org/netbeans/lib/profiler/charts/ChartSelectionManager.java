@@ -200,7 +200,7 @@ class ChartSelectionManager implements ChartSelectionModel {
         if (selectedSelection == null) {
             if (items.isEmpty()) return;
             selectedSelection = new ArrayList(items);
-            fireHighlightedItemsChanged(items, items, Collections.EMPTY_LIST);
+            fireSelectedItemsChanged(items, items, Collections.EMPTY_LIST);
         } else {
             List<ItemSelection> addedItems = new ArrayList();
             List<ItemSelection> removedItems = new ArrayList();
@@ -263,16 +263,16 @@ class ChartSelectionManager implements ChartSelectionModel {
 
 
     private void updateHighlightedItems() {
-        if (hoverMode == HOVER_NONE || !inChart) {
-            setHighlightedItems(Collections.EMPTY_LIST);
-            return;
-        }
-
         final int x = mouseX;
         final int y = mouseY;
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                if (hoverMode == HOVER_NONE || !inChart) {
+                    setHighlightedItems(Collections.EMPTY_LIST);
+                    return;
+                }
+
                 ItemsModel itemsModel = chart.getItemsModel();
                 PaintersModel paintersModel = chart.getPaintersModel();
 
@@ -351,9 +351,9 @@ class ChartSelectionManager implements ChartSelectionModel {
         public void mousePressed(MouseEvent e) {
             mousePanningBackup = chart.isMousePanningEnabled();
 
+            setSelectionMode(dragMode);
             if (selectionMode != SELECTION_NONE) {
                 chart.disableMousePanning();
-                setSelectionMode(dragMode);
                 setSelectionBounds(e.getX(), e.getY(), 0, 0);
             }
         }
@@ -362,10 +362,9 @@ class ChartSelectionManager implements ChartSelectionModel {
             // Clear previous selection
             setSelectionBounds(null);
 
+            setSelectionMode(moveMode);
             if (selectionMode == SELECTION_NONE)
                 chart.setMousePanningEnabled(mousePanningBackup);
-
-            setSelectionMode(moveMode);
 
             // Refresh selection if needed
             if (selectionMode != SELECTION_NONE)
