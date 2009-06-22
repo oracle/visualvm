@@ -358,9 +358,7 @@ class ApplicationMonitorView extends DataSourceView {
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.percent(false, 0.1d, chartCache);
 
-            chartDescriptor.addLineItem(CPU_USAGE);
-            chartDescriptor.addLineItem(GC_USAGE);
-
+            chartDescriptor.addLineItems(CPU_USAGE, GC_USAGE);
             chartDescriptor.setDetailsItems(new String[] { CPU_USAGE, GC_USAGE });
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
@@ -422,9 +420,7 @@ class ApplicationMonitorView extends DataSourceView {
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, chartCache);
 
-            chartDescriptor.addLineFillItem(HEAP_SIZE_LEG);
-            chartDescriptor.addLineFillItem(USED_HEAP_LEG);
-
+            chartDescriptor.addLineFillItems(HEAP_SIZE_LEG, USED_HEAP_LEG);
             chartDescriptor.setDetailsItems(new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP });
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
@@ -486,9 +482,7 @@ class ApplicationMonitorView extends DataSourceView {
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, chartCache);
 
-            chartDescriptor.addLineFillItem(PERM_SIZE_LEG);
-            chartDescriptor.addLineFillItem(USED_PERM_LEG);
-
+            chartDescriptor.addLineFillItems(PERM_SIZE_LEG, USED_PERM_LEG);
             chartDescriptor.setDetailsItems(new String[] { PERM_SIZE, USED_PERM, MAX_PERM });
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
@@ -553,9 +547,7 @@ class ApplicationMonitorView extends DataSourceView {
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.decimal(100, false, chartCache);
 
-            chartDescriptor.addLineItem(TOTAL_LOADED_LEG);
-            chartDescriptor.addLineItem(SHARED_LOADED_LEG);
-
+            chartDescriptor.addLineItems(TOTAL_LOADED_LEG, SHARED_LOADED_LEG);
             chartDescriptor.setDetailsItems(new String[] { TOTAL_LOADED, SHARED_LOADED,
                                                            TOTAL_UNLOADED, SHARED_UNLOADED });
 
@@ -621,9 +613,7 @@ class ApplicationMonitorView extends DataSourceView {
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.decimal(3, false, chartCache);
 
-            chartDescriptor.addLineItem(LIVE_LEG);
-            chartDescriptor.addLineItem(DAEMON_LEG);
-
+            chartDescriptor.addLineItems(LIVE_LEG, DAEMON_LEG);
             chartDescriptor.setDetailsItems(new String[] { LIVE, DAEMON,
                                                            PEAK, STARTED });
 

@@ -121,20 +121,26 @@ public final class SimpleXYChartDescriptor {
 
     // --- Items definition ----------------------------------------------------
 
-    public void addLineItem(String itemName) {
-        Color color = getNextItemColor();
-        addItem(itemName, color, 2f, color, null, null);
+    public void addLineItems(String... itemNames) {
+        for (String itemName : itemNames) {
+            Color color = getNextItemColor();
+            addItem(itemName, color, 2f, color, null, null);
+        }
     }
 
-    public void addFillItem(String itemName) {
-        Color[] gradients = getNextItemGradient();
-        addItem(itemName, gradients[0], 2f, null, gradients[0], gradients[1]);
+    public void addFillItems(String... itemNames) {
+        for (String itemName : itemNames) {
+            Color[] gradients = getNextItemGradient();
+            addItem(itemName, gradients[0], 2f, null, gradients[0], gradients[1]);
+        }
     }
 
-    public void addLineFillItem(String itemName) {
-        Color color = getNextItemColor();
-        Color[] gradients = getNextItemGradient();
-        addItem(itemName, color, 2f, color, gradients[0], gradients[1]);
+    public void addLineFillItems(String... itemNames) {
+        for (String itemName : itemNames) {
+            Color color = getNextItemColor();
+            Color[] gradients = getNextItemGradient();
+            addItem(itemName, color, 2f, color, gradients[0], gradients[1]);
+        }
     }
 
 

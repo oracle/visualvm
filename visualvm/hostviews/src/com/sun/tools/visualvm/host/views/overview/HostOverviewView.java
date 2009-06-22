@@ -213,8 +213,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.decimal(1, 0.001d, false, chartCache);
 
-            chartDescriptor.addLineItem(LOAD_AVERAGE);
-
+            chartDescriptor.addLineItems(LOAD_AVERAGE);
             chartDescriptor.setDetailsItems(new String[] { LOAD_AVERAGE });
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
@@ -267,8 +266,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.bytes(128 * 1024 * 1024, false, chartCache);
 
-            chartDescriptor.addLineFillItem(USED_MEMORY_LEG);
-
+            chartDescriptor.addLineFillItems(USED_MEMORY_LEG);
             chartDescriptor.setDetailsItems(new String[] { USED_MEMORY, TOTAL_MEMORY });
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
@@ -316,8 +314,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.bytes(128 * 1024 * 1024, false, chartCache);
 
-            chartDescriptor.addLineFillItem(USED_SWAP_LEG);
-
+            chartDescriptor.addLineFillItems(USED_SWAP_LEG);
             chartDescriptor.setDetailsItems(new String[] { USED_SWAP, TOTAL_SWAP });
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);

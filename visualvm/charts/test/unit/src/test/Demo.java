@@ -53,7 +53,7 @@ public class Demo implements Runnable {
                 SimpleXYChartDescriptor.bytes(1000, true, VALUES_LIMIT);
 
         for (int i = 0; i < ITEMS_COUNT; i++)
-            descriptor.addLineFillItem("Item " + i);
+            descriptor.addLineFillItems("Item " + i);
 
         descriptor.setDetailsItems(new String[] { "Detail 1", "Detail 2", "Detail 3" } );
 
