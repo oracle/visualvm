@@ -198,6 +198,21 @@ public final class SimpleXYChartDescriptor {
     }
 
 
+    // --- Axes description ----------------------------------------------------
+
+    public void setChartTitle(String chartTitle) {
+        this.chartTitle = chartTitle;
+    }
+
+    public void setXAxisDescription(String xAxisDescription) {
+        this.xAxisDescription = xAxisDescription;
+    }
+
+    public void setYAxisDescription(String yAxisDescription) {
+        this.yAxisDescription = yAxisDescription;
+    }
+
+
     // --- Internal interface --------------------------------------------------
 
     int getChartType() { return chartType; }
@@ -249,16 +264,28 @@ public final class SimpleXYChartDescriptor {
         return detailNames;
     }
 
+    String getChartTitle() {
+        return chartTitle;
+    }
+
+    String getXAxisDescription() {
+        return xAxisDescription;
+    }
+
+    String getYAxisDescription() {
+        return yAxisDescription;
+    }
+
 
     // --- Private implementation ----------------------------------------------
 
-    private final int chartType;
-    private final long minValue;
-    private final long maxValue;
-    private final long initialYMargin;
-    private final boolean hideableItems;
-    private final double chartFactor;
-    private final int valuesBuffer;
+    private final int          chartType;
+    private final long         minValue;
+    private final long         maxValue;
+    private final long         initialYMargin;
+    private final boolean      hideableItems;
+    private final double       chartFactor;
+    private final int          valuesBuffer;
 
     private final List<String> itemNames  = new ArrayList();
     private final List<Color>  itemColors = new ArrayList();
@@ -267,6 +294,10 @@ public final class SimpleXYChartDescriptor {
     private final List<Color>  fillColors1 = new ArrayList();
     private final List<Color>  fillColors2 = new ArrayList();
     private       String[]     detailNames;
+
+    private       String       chartTitle;
+    private       String       xAxisDescription;
+    private       String       yAxisDescription;
 
 
     private SimpleXYChartDescriptor(int chartType,

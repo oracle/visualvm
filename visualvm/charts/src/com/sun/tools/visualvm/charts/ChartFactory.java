@@ -39,7 +39,10 @@ public final class ChartFactory {
      * @return instance of SimpleXYChartSupport representing a simple XY chart
      */
     public static SimpleXYChartSupport createSimpleXYChart(SimpleXYChartDescriptor descriptor) {
-        return new SimpleXYChartSupport(descriptor.getChartType(),
+        return new SimpleXYChartSupport(descriptor.getChartTitle(),
+                                        descriptor.getXAxisDescription(),
+                                        descriptor.getYAxisDescription(),
+                                        descriptor.getChartType(),
                                         descriptor.getInitialYMargin(),
                                         descriptor.getItemNames(),
                                         descriptor.getItemColors(),

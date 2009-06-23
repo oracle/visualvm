@@ -49,6 +49,10 @@ public final class SimpleXYChartSupport {
 
     // --- Instance variables --------------------------------------------------
 
+    private final String chartTitle;
+    private final String xAxisDescription;
+    private final String yAxisDescription;
+
     private final int chartType;
     private final boolean hideItems;
     private final Color[] itemColors;
@@ -74,7 +78,8 @@ public final class SimpleXYChartSupport {
      */
     public JComponent getChart() {
         if (chartUI == null) {
-            chartUI = SimpleXYChartUtils.createChartUI(chartType,
+            chartUI = SimpleXYChartUtils.createChartUI(chartTitle, xAxisDescription,
+                                                     yAxisDescription, chartType,
                                                      itemColors, initialYMargin,
                                                      hideItems, chartFactor, storage,
                                                      itemsModel, paintersModel);
@@ -177,10 +182,15 @@ public final class SimpleXYChartSupport {
 
     // --- Internal constructors -----------------------------------------------
 
-    SimpleXYChartSupport(int chartType, long initialYMargin, String[] itemNames, Color[] itemColors,
+    SimpleXYChartSupport(String chartTitle, String xAxisDescription, String yAxisDescription,
+                         int chartType, long initialYMargin, String[] itemNames, Color[] itemColors,
                          float[] lineWidths, Color[] lineColors, Color[] fillColors1, Color[] fillColors2,
                          long minValue, long maxValue, double chartFactor, boolean hideItems,
                          int valuesBuffer, String[] detailsItems) {
+
+        this.chartTitle = chartTitle;
+        this.xAxisDescription = xAxisDescription;
+        this.yAxisDescription = yAxisDescription;
 
         this.chartType = chartType;
         this.hideItems = hideItems;

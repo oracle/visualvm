@@ -50,12 +50,15 @@ public class Demo implements Runnable {
 
     private void createModels() {
         SimpleXYChartDescriptor descriptor =
-                SimpleXYChartDescriptor.bytes(1000, true, VALUES_LIMIT);
+                SimpleXYChartDescriptor.decimal(0, 1000, 1000, 1d, true, VALUES_LIMIT);
 
         for (int i = 0; i < ITEMS_COUNT; i++)
             descriptor.addLineFillItems("Item " + i);
 
         descriptor.setDetailsItems(new String[] { "Detail 1", "Detail 2", "Detail 3" } );
+        descriptor.setChartTitle("<html><font size='+1'><b>Demo Chart</b></font></html>");
+        descriptor.setXAxisDescription("<html>X Axis <i>[time]</i></html>");
+        descriptor.setYAxisDescription("<html>Y Axis <i>[units]</i></html>");
 
         support = ChartFactory.createSimpleXYChart(descriptor);
         
@@ -83,9 +86,10 @@ public class Demo implements Runnable {
         
         public void run() {
             while(true) try {
-                support.addValues(System.currentTimeMillis(), new long[] {
-                    (long)(1000 * Math.random()), (long)(1000 * Math.random())
-                });
+                long[] values = new long[ITEMS_COUNT];
+                for (int i = 0; i < values.length; i++)
+                    values[i] = (long)(1000 * Math.random());
+                support.addValues(System.currentTimeMillis(), values);
                 support.updateDetails(new String[] { 1000 * Math.random() + "",
                                                      1000 * Math.random() + "",
                                                      1000 * Math.random() + ""});

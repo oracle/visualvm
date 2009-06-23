@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.charts.xy;
 
+import com.sun.tools.visualvm.charts.swing.RotateLabelUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -49,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.LabelUI;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemPainter;
@@ -165,11 +167,13 @@ public class SimpleXYChartUtils {
         return new XYPaintersModel(items, painters);
     }
 
-    public static JComponent createChartUI(int chartType, Color[] itemColors,
-                                            long initialYMargin, boolean hideItems,
-                                            double chartFactor, XYStorage storage,
-                                            SynchronousXYItemsModel itemsModel,
-                                            XYPaintersModel paintersModel) {
+    public static JComponent createChartUI(String chartTitle, String xAxisDescription,
+                                           String yAxisDescription,
+                                           int chartType, Color[] itemColors,
+                                           long initialYMargin, boolean hideItems,
+                                           double chartFactor, XYStorage storage,
+                                           SynchronousXYItemsModel itemsModel,
+                                           XYPaintersModel paintersModel) {
 
         // Chart
         SynchronousXYChart chart = new SynchronousXYChart(itemsModel, paintersModel);
@@ -248,25 +252,45 @@ public class SimpleXYChartUtils {
 
         // Chart panel
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
-        chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
-        chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
         chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(vAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
 
+        // Chart container
+        boolean hasAxisLabel = chartTitle != null || xAxisDescription != null ||
+                               yAxisDescription != null;
+        JPanel chartContainer = hasAxisLabel ? new JPanel(new BorderLayout()) :
+                                chartPanel;
+
+        if (hasAxisLabel) {
+            chartPanel.setOpaque(false);
+
+            if (chartTitle != null)
+                chartContainer.add(createTitleLabel(chartTitle), BorderLayout.NORTH);
+            if (xAxisDescription != null)
+                chartContainer.add(createXAxisLabel(xAxisDescription), BorderLayout.SOUTH);
+            if (yAxisDescription != null)
+                chartContainer.add(createYAxisLabel(yAxisDescription), BorderLayout.WEST);
+
+            chartContainer.add(chartPanel, BorderLayout.CENTER);
+        }
+
+        chartContainer.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
+        chartContainer.setBorder(BorderFactory.createMatteBorder(
+                                 10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+
         // Legend panel
         JComponent legendPanel = createLegendPanel(itemColors, hideItems,
                                                    itemsModel, paintersModel);
 
-        // Chart container
-        JPanel chartContainer = new JPanel(new BorderLayout());
-        chartContainer.add(chartPanel, BorderLayout.CENTER);
-        chartContainer.add(legendPanel, BorderLayout.SOUTH);
+        // Chart view
+        JPanel chartView = new JPanel(new BorderLayout());
+        chartView.add(chartContainer, BorderLayout.CENTER);
+        chartView.add(legendPanel, BorderLayout.SOUTH);
 
-        return chartContainer;
+        return chartView;
     }
 
     public static DetailsHandle createDetailsArea(final String[] detailsItems,
@@ -409,13 +433,16 @@ public class SimpleXYChartUtils {
     }
 
     public static String formatTime(long timestamp, long startTime, long endTime) {
-        long time = System.currentTimeMillis();
         String formatString = TimeAxisUtils.getFormatString(1000, startTime, endTime);
         return getFormat(formatString).format(new Date(timestamp));
     }
 
     public static Font smallerFont(Font font) {
         return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
+    }
+
+    public static Font boldFont(Font font) {
+        return new Font(font.getName(), Font.BOLD, font.getSize());
     }
 
 
@@ -458,6 +485,31 @@ public class SimpleXYChartUtils {
             LEGEND_HEIGHT = Math.max(new JLabel("X").getPreferredSize().height, // NOI18N
                                      new JCheckBox("X").getPreferredSize().height); // NOI18N
         return LEGEND_HEIGHT;
+    }
+
+    private static JLabel createTitleLabel(String text) {
+        JLabel label = createRotatedLabel(text, RotateLabelUI.R0);
+        label.setBorder(BorderFactory.createEmptyBorder(5, 3, 5, 3));
+        label.setFont(boldFont(label.getFont()));
+        return label;
+    }
+
+    private static JLabel createXAxisLabel(String text) {
+        JLabel label = createRotatedLabel(text, RotateLabelUI.R0);
+        label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return label;
+    }
+
+    private static JLabel createYAxisLabel(String text) {
+        JLabel label = createRotatedLabel(text, RotateLabelUI.R270);
+        label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        return label;
+    }
+
+    private static JLabel createRotatedLabel(String text, final LabelUI labelUI) {
+        return new JLabel(text, SwingConstants.CENTER) {
+            public void updateUI() { if (getUI() != labelUI) setUI(labelUI); }
+        };
     }
 
 
