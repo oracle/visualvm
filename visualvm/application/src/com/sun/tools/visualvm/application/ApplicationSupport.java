@@ -70,7 +70,9 @@ final class ApplicationSupport {
     }
 
     private ApplicationSupport() {
-        DataSourceDescriptorFactory.getDefault().registerProvider(new ApplicationDescriptorProvider());
+        DataSourceDescriptorFactory descriptorFactory = DataSourceDescriptorFactory.getDefault();
+        descriptorFactory.registerProvider(new ApplicationDescriptorProvider());
+        descriptorFactory.registerProvider(new UserNameDescriptorProvider());
         initCurrentApplication();
     }
 
