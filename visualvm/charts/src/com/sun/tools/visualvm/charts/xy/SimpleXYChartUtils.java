@@ -72,7 +72,6 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.graphs.GraphsUI;
 import org.openide.util.NbBundle;
 
 /**
@@ -96,6 +95,7 @@ public class SimpleXYChartUtils {
     private static final int DEFAULT_BUFFER_STEP;
 
     private static final Color AXIS_FONT_COLOR;
+    private static final Color BACKGROUND_COLOR;
 
     private static final int VALUES_SPACING;
     private static final int TIMELINE_SPACING;
@@ -119,6 +119,7 @@ public class SimpleXYChartUtils {
         DEFAULT_BUFFER_STEP = 50;
 
         AXIS_FONT_COLOR = new Color(90, 90, 90);
+        BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
 
         VALUES_SPACING = Math.max(new TimeMarksPainter().getFont().getSize(), 15) + 10;
         TIMELINE_SPACING = 80;
@@ -259,16 +260,13 @@ public class SimpleXYChartUtils {
                                               SwingConstants.SOUTH_WEST });
 
         // Chart container
-        boolean hasAxisLabel = chartTitle != null || xAxisDescription != null ||
-                               yAxisDescription != null;
+        boolean hasAxisLabel = xAxisDescription != null || yAxisDescription != null;
         JPanel chartContainer = hasAxisLabel ? new JPanel(new BorderLayout()) :
-                                chartPanel;
+                                               chartPanel;
 
         if (hasAxisLabel) {
             chartPanel.setOpaque(false);
 
-            if (chartTitle != null)
-                chartContainer.add(createTitleLabel(chartTitle), BorderLayout.NORTH);
             if (xAxisDescription != null)
                 chartContainer.add(createXAxisLabel(xAxisDescription), BorderLayout.SOUTH);
             if (yAxisDescription != null)
@@ -277,9 +275,14 @@ public class SimpleXYChartUtils {
             chartContainer.add(chartPanel, BorderLayout.CENTER);
         }
 
-        chartContainer.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
-        chartContainer.setBorder(BorderFactory.createMatteBorder(
-                                 10, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+        chartContainer.setBackground(BACKGROUND_COLOR);
+        chartContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+
+        // Caption panel
+        JPanel captionPanel = new JPanel(new BorderLayout());
+        captionPanel.setBackground(BACKGROUND_COLOR);
+        if (chartTitle != null) captionPanel.add(createTitleLabel(chartTitle),
+                                                 BorderLayout.NORTH);
 
         // Legend panel
         JComponent legendPanel = createLegendPanel(itemColors, hideItems,
@@ -287,6 +290,8 @@ public class SimpleXYChartUtils {
 
         // Chart view
         JPanel chartView = new JPanel(new BorderLayout());
+        chartView.setBackground(BACKGROUND_COLOR);
+        chartView.add(captionPanel, BorderLayout.NORTH);
         chartView.add(chartContainer, BorderLayout.CENTER);
         chartView.add(legendPanel, BorderLayout.SOUTH);
 
@@ -294,19 +299,26 @@ public class SimpleXYChartUtils {
     }
 
     public static DetailsHandle createDetailsArea(final String[] detailsItems,
-                                                  JComponent chartContainer) {
-        final JPanel detailsContainer = new JPanel(new BorderLayout());
-        detailsContainer.setBorder(BorderFactory.createMatteBorder(
-                             8, 10, 0, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                                                  JComponent chartContainer) {        
         final HTMLTextArea detailsArea = new HTMLTextArea();
+        detailsArea.setBorder(BorderFactory.createEmptyBorder(8, 10, 0, 10));
         detailsArea.setText(createDetailsString(detailsItems, null));
-        detailsContainer.add(detailsArea, BorderLayout.CENTER);
-        chartContainer.add(detailsContainer, BorderLayout.NORTH);
+
+        BorderLayout containerLayout = (BorderLayout)chartContainer.getLayout();
+        JComponent containerNorth = (JComponent)containerLayout.
+                                    getLayoutComponent(BorderLayout.NORTH);
+        containerNorth.add(detailsArea, BorderLayout.CENTER);
+
+        final JComponent containerCenter = (JComponent)containerLayout.
+                                           getLayoutComponent(BorderLayout.CENTER);
+        containerCenter.setBorder(BorderFactory.createEmptyBorder(6, 10, 0, 10));
 
         chartContainer.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                detailsContainer.setVisible(e.getComponent().getHeight() >
-                                            DETAILS_HEIGHT_THRESHOLD);
+                boolean visible = e.getComponent().getHeight() > DETAILS_HEIGHT_THRESHOLD;
+                detailsArea.setVisible(visible);
+                containerCenter.setBorder(BorderFactory.createEmptyBorder(
+                                          visible ? 6 : 10, 10, 0, 10));
             }
         });
 
@@ -326,7 +338,7 @@ public class SimpleXYChartUtils {
                                                SynchronousXYItemsModel itemsModel,
                                                final XYPaintersModel paintersModel) {
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, hideItems ? 5 : 10, 0));
-        legendPanel.setOpaque(false);
+        legendPanel.setBackground(BACKGROUND_COLOR);
         
         for (int i = 0; i < itemColors.length; i++) {
             final SynchronousXYItem item = itemsModel.getItem(i);
@@ -363,10 +375,10 @@ public class SimpleXYChartUtils {
 
         JPanel legendContainer = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
         legendContainer.setOpaque(true);
-        legendContainer.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
+        legendContainer.setBackground(BACKGROUND_COLOR);
         legendContainer.setBorder(BorderFactory.createCompoundBorder(
                                   BorderFactory.createMatteBorder(
-                                  0, 10, 0, 0, GraphsUI.CHART_BACKGROUND_COLOR),
+                                  0, 10, 0, 0, BACKGROUND_COLOR),
                                   BorderFactory.createLineBorder(Color.WHITE)));
         legendContainer.add(legendPanel);
 
@@ -489,7 +501,7 @@ public class SimpleXYChartUtils {
 
     private static JLabel createTitleLabel(String text) {
         JLabel label = createRotatedLabel(text, RotateLabelUI.R0);
-        label.setBorder(BorderFactory.createEmptyBorder(5, 3, 5, 3));
+        label.setBorder(BorderFactory.createEmptyBorder(8, 3, 0, 3));
         label.setFont(boldFont(label.getFont()));
         return label;
     }
