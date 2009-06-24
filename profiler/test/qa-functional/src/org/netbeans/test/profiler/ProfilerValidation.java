@@ -48,7 +48,7 @@ import org.netbeans.jellytools.JavaProjectsTabOperator;
 import org.netbeans.jellytools.JellyTestCase;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.NbDialogOperator;
-import org.netbeans.jellytools.NewProjectNameLocationStepOperator;
+import org.netbeans.jellytools.NewJavaProjectNameLocationStepOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OptionsOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
@@ -232,7 +232,7 @@ public class ProfilerValidation extends JellyTestCase {
         npwo.selectProject( Bundle.getStringTrimmed( "org.netbeans.modules.java.examples.Bundle",
                             "Templates/Project/Samples/Standard/anagrams.zip") ); //"Anagram Game"
         npwo.next();
-        NewProjectNameLocationStepOperator npnlso = new NewProjectNameLocationStepOperator();
+        NewJavaProjectNameLocationStepOperator npnlso = new NewJavaProjectNameLocationStepOperator();
         anagramGamePrName = npnlso.txtProjectName().getText();
         npnlso.txtProjectLocation().setText(System.getProperty("netbeans.user")); // NOI18N
         npnlso.finish();
