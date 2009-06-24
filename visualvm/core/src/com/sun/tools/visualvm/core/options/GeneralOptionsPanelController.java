@@ -35,6 +35,7 @@ import org.openide.util.Lookup;
 final class GeneralOptionsPanelController extends OptionsPanelController {
 
     private GeneralOptionsPanel panel;
+    private JComponent component;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private boolean changed;
 
@@ -66,7 +67,7 @@ final class GeneralOptionsPanelController extends OptionsPanelController {
     }
 
     public JComponent getComponent(Lookup masterLookup) {
-        return getPanel();
+        return getComponent();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -82,6 +83,13 @@ final class GeneralOptionsPanelController extends OptionsPanelController {
             panel = new GeneralOptionsPanel(this);
         }
         return panel;
+    }
+
+    private JComponent getComponent() {
+        if (component == null) {
+            component = new ScrollableContents(getPanel());
+        }
+        return component;
     }
 
     void changed() {
