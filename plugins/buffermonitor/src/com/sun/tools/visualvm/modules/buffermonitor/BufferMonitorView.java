@@ -26,6 +26,9 @@
 package com.sun.tools.visualvm.modules.buffermonitor;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.charts.ChartFactory;
+import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
+import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -33,28 +36,19 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 import javax.management.Attribute;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.swing.JLabel;
 import javax.swing.Timer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -129,11 +123,6 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         private void initComponents(Application app) {
             setLayout(new BorderLayout());
             setOpaque(false);
-            
-            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralInfo(app) + "</nobr>");  // NOI18N
-            area.setBorder(BorderFactory.createEmptyBorder(7, 8, 7, 8));
-            
-            add(area, BorderLayout.CENTER);
         }
         
         String getGeneralInfo(Application app) {
@@ -143,20 +132,19 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
     }
     private static class BufferMonitorViewSupport extends JPanel  {
         
-        private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
         private static final String MEMORY_USED = NbBundle.getMessage(BufferMonitorView.class, "LBL_Memory_Used"); // NOI18N
         private static final String TOTAL_CAPACITY = NbBundle.getMessage(BufferMonitorView.class, "LBL_Total_Capacity"); // NOI18N
-        private static final NumberFormat formatter = NumberFormat.getNumberInstance();
-        private Chart bufferMetricsChart;
-        private HTMLLabel countLabel;
-        private HTMLLabel memoryUsedLabel;
-        private HTMLLabel totalCapacityLabel;
+        private static final String COUNT = NbBundle.getMessage(BufferMonitorView.class, "LBL_Count"); // NOI18N
+        private SimpleXYChartSupport chartSupport;
         private final String TITLE;
         private ObjectName bufferObjectName;
         private final MBeanServerConnection conn;
         private final String[] attributes = {"Count","MemoryUsed","TotalCapacity"}; // NOI18N
         
         public BufferMonitorViewSupport(JmxModel jmx, String title, String bufferName) {
+            GlobalPreferences preferences = GlobalPreferences.sharedInstance();
+            int chartCache = preferences.getMonitoredDataCache() * 60 /
+                         preferences.getMonitoredDataPoll();
             conn = jmx.getMBeanServerConnection();
             try {
                 bufferObjectName = new ObjectName(bufferName);
@@ -164,6 +152,7 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
                 ex.printStackTrace();
             }
             TITLE = title;
+            initModels(chartCache);
             initComponents();
         }
         
@@ -188,98 +177,35 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
             while(attrIt.hasNext()) {
                 Attribute attrib = (Attribute) attrIt.next();
                 String name = attrib.getName();
-                if ("Count".equals(name)) {
+                if (attributes[0].equals(name)) {
                     count = ((Long)attrib.getValue()).longValue();
-                } else if ("MemoryUsed".equals(name)) {
+                } else if (attributes[1].equals(name)) {
                     memoryUsed = ((Long)attrib.getValue()).longValue();
-                } else if ("TotalCapacity".equals(name)) {
+                } else if (attributes[2].equals(name)) {
                     totalCapacity = ((Long)attrib.getValue()).longValue();
                }
             }
+            chartSupport.addValues(time, new long[] { memoryUsed, totalCapacity });
+            chartSupport.updateDetails(new String[] { chartSupport.formatBytes(memoryUsed),
+                                                      chartSupport.formatBytes(totalCapacity),
+                                                      chartSupport.formatDecimal(count)});
+        }
+        
+        private void initModels(int chartCache) {
+            SimpleXYChartDescriptor chartDescriptor =
+                    SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, chartCache);
 
-            String countString =  formatter.format(count);
-            String meoryUsedString =  formatter.format(memoryUsed); 
-            String totalCapacityString =   formatter.format(totalCapacity);
-            countLabel.setText("<nobr><b>"+"Count"+":</b> " + countString + "</nobr>");    // NOI18N
-            memoryUsedLabel.setText("<nobr><b>"+MEMORY_USED+":</b> " + meoryUsedString + "</nobr>");    // NOI18N
-            
-            totalCapacityLabel.setText("<nobr><b>"+TOTAL_CAPACITY+":</b> " + totalCapacityString + "</nobr>");    // NOI18N
-            
-            bufferMetricsChart.getModel().addItemValues(time, new long[] { memoryUsed, totalCapacity });
-            
-            
-            bufferMetricsChart.setToolTipText(
-                    "<html><nobr><b>"+MEMORY_USED+":</b> " + meoryUsedString + " </nobr>" + "<br>" +   // NOI18N
-                    "<html><nobr><b>"+TOTAL_CAPACITY+":</b> " + totalCapacityString + " </nobr></html>"); // NOI18N
-            
+            chartDescriptor.addLineFillItems(MEMORY_USED, TOTAL_CAPACITY);
+            chartDescriptor.setDetailsItems(new String[] { MEMORY_USED, TOTAL_CAPACITY, COUNT });
+
+            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
         }
         
         private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            JComponent contents;
-            
-            // cpuMetricsPanel
-            countLabel = new HTMLLabel() {
-                public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
-                public Dimension getMinimumSize() { return getPreferredSize(); }
-                public Dimension getMaximumSize() { return getPreferredSize(); }
-            };
-            countLabel.setText("<nobr><b>"+"Count"+":</b> " + -1 + "</nobr>");  // NOI18N
-            countLabel.setOpaque(false);
-            memoryUsedLabel = new HTMLLabel() {
-                public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
-                public Dimension getMinimumSize() { return getPreferredSize(); }
-                public Dimension getMaximumSize() { return getPreferredSize(); }
-            };
-            memoryUsedLabel.setText("<nobr><b>"+MEMORY_USED+":</b> " + -1 + "</nobr>");  // NOI18N
-            memoryUsedLabel.setOpaque(false);
-            totalCapacityLabel = new HTMLLabel() {
-                public Dimension getPreferredSize() { return new Dimension(super.getPreferredSize().width, refLabelHeight); }
-                public Dimension getMinimumSize() { return getPreferredSize(); }
-                public Dimension getMaximumSize() { return getPreferredSize(); }
-            };
-            totalCapacityLabel.setText("<nobr><b>"+TOTAL_CAPACITY+":</b> " + -1 + "</nobr>");  // NOI18N
-            totalCapacityLabel.setOpaque(false);
-            final JPanel heapMetricsDataPanel = new JPanel(new GridLayout(2, 2));
-            heapMetricsDataPanel.setOpaque(false);
-            heapMetricsDataPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-            heapMetricsDataPanel.add(memoryUsedLabel);
-            heapMetricsDataPanel.add(countLabel);
-            heapMetricsDataPanel.add(totalCapacityLabel);
-            
-            bufferMetricsChart = new BufferMetricsChart();
-            bufferMetricsChart.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20), bufferMetricsChart.getBorder()));
-            JPanel heapMetricsLegendContainer = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-            heapMetricsLegendContainer.setOpaque(false);
-            heapMetricsLegendContainer.add(bufferMetricsChart.getBigLegendPanel());
-            final JPanel heapMetricsPanel = new JPanel(new BorderLayout());
-            heapMetricsPanel.setOpaque(true);
-            heapMetricsPanel.setBackground(Color.WHITE);
-            heapMetricsPanel.add(heapMetricsDataPanel, BorderLayout.NORTH);
-            heapMetricsPanel.add(bufferMetricsChart, BorderLayout.CENTER);
-            heapMetricsPanel.add(heapMetricsLegendContainer, BorderLayout.SOUTH);
-            
-            final boolean[] heapMetricsPanelResizing = new boolean[] { false };
-            heapMetricsPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
-            heapMetricsPanel.addComponentListener(new ComponentAdapter() {
-                public void componentResized(ComponentEvent e) {
-                    if (heapMetricsPanelResizing[0] == true) {
-                        heapMetricsPanelResizing[0] = false;
-                        return;
-                    }
-                    
-                    boolean shouldBeVisible = heapMetricsPanel.getSize().height > 275;
-                    if (shouldBeVisible == heapMetricsDataPanel.isVisible()) return;
-                    
-                    heapMetricsPanelResizing[0] = true;
-                    heapMetricsDataPanel.setVisible(shouldBeVisible);
-                }
-            });
-            contents = heapMetricsPanel;
-            
-            add(contents, BorderLayout.CENTER);
+            add(chartSupport.getChart(), BorderLayout.CENTER);
         }
         
     }
