@@ -56,20 +56,20 @@ public class HeapHistogramImpl {
     private static final char FLOAT_CODE = 'F'; // NOI18N
     private static final char DOUBLE_CODE = 'D'; // NOI18N
     private static final char OBJECT_CODE = 'L'; // NOI18N
-    private static final Map<String,String> permGenNames = new HashMap();    
+    private static final Map<String,String> permGenNames = new HashMap();
     static {
-        permGenNames.put("<constMethodKlass>","Read-Only Method Metadata");
         permGenNames.put("<methodKlass>","Read-Write Method Metadata");
+        permGenNames.put("<constMethodKlass>","Read-Only Method Metadata");
+        permGenNames.put("<methodDataKlass>","Method Profiling Information");
         permGenNames.put("<constantPoolKlass>","Constant Pool Metadata");
-        permGenNames.put("<instanceKlassKlass>","Instance Class Metadata");
         permGenNames.put("<constantPoolCacheKlass>","Class Resolution Optimization Metadata");
         permGenNames.put("<symbolKlass>","VM Symbol Metadata");
-        permGenNames.put("<methodDataKlass>","Method Optimization Metadata");
+        permGenNames.put("<compiledICHolderKlass>","Inline Cache Metadata");
+        permGenNames.put("<instanceKlassKlass>","Instance Class Metadata");
         permGenNames.put("<objArrayKlassKlass>","Object Array Class Metadata");
         permGenNames.put("<typeArrayKlassKlass>","Scalar Array Class Metadata");
         permGenNames.put("<klassKlass>","Base Class Metadata");
         permGenNames.put("<arrayKlassKlass>","Base Array Class Metadata");
-        permGenNames.put("<compiledICHolderKlass>","Optimized Virtual Call Metadata");
     }
     private final Set<ClassInfoImpl> classes;
     private final Set<ClassInfoImpl> permGenClasses;
