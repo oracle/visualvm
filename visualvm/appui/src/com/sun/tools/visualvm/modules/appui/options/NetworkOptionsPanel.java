@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
-import com.sun.tools.visualvm.core.options.OptionsSectionSeparator;
+import com.sun.tools.visualvm.core.options.SectionSeparator;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -174,7 +174,7 @@ class NetworkOptionsPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        OptionsSectionSeparator sectionSeparator = new OptionsSectionSeparator(
+        SectionSeparator sectionSeparator = new SectionSeparator(
                 NbBundle.getMessage(NetworkOptionsPanel.class, "NetworkOptionsPanel_ProxySettingsCaption"));
         c = new GridBagConstraints();
         c.gridy = 0;

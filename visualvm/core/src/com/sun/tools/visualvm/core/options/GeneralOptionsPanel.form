@@ -340,21 +340,21 @@
     </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel1.add(new OptionsSectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, &quot;LBL_Polling&quot;)), java.awt.BorderLayout.CENTER);"/>
+        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel1.add(new com.sun.tools.visualvm.core.options.SectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, &quot;LBL_Polling&quot;)), java.awt.BorderLayout.CENTER);"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel2">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel2.add(new OptionsSectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, &quot;LBL_Charts_Cache&quot;)), java.awt.BorderLayout.CENTER);"/>
+        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel2.add(new com.sun.tools.visualvm.core.options.SectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, &quot;LBL_Charts_Cache&quot;)), java.awt.BorderLayout.CENTER);"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel3">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel3.add(new OptionsSectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, &quot;LBL_Profiler&quot;)), java.awt.BorderLayout.CENTER);"/>
+        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel3.add(new com.sun.tools.visualvm.core.options.SectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, &quot;LBL_Profiler&quot;)), java.awt.BorderLayout.CENTER);"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>

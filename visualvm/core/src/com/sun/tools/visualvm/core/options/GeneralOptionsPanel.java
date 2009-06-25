@@ -154,9 +154,9 @@ final class GeneralOptionsPanel extends javax.swing.JPanel {
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.add(new OptionsSectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Polling")), java.awt.BorderLayout.CENTER);
-        jPanel2.add(new OptionsSectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Charts_Cache")), java.awt.BorderLayout.CENTER);
-        jPanel3.add(new OptionsSectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Profiler")), java.awt.BorderLayout.CENTER);
+        jPanel1.add(new SectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Polling")), java.awt.BorderLayout.CENTER);
+        jPanel2.add(new SectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Charts_Cache")), java.awt.BorderLayout.CENTER);
+        jPanel3.add(new SectionSeparator(org.openide.util.NbBundle.getMessage(GeneralOptionsPanel.class, "LBL_Profiler")), java.awt.BorderLayout.CENTER);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

@@ -41,14 +41,14 @@ import javax.swing.JSeparator;
  *
  * @author Jiri Sedlacek
  */
-public final class OptionsSectionSeparator extends JPanel {
+public final class SectionSeparator extends JPanel {
 
     /**
-     * Creates new instance of OptionsSectionSeparator.
+     * Creates new instance of SectionSeparator.
      *
      * @param text separator caption
      */
-    public OptionsSectionSeparator(String text) {
+    public SectionSeparator(String text) {
         initComponents(text);
     }
 
