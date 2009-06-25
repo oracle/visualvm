@@ -252,19 +252,25 @@ class ApplicationMonitorView extends DataSourceView {
         public static String getTime(long millis) {
             // Hours
             long hours = millis / 3600000;
-            String sHours = (hours == 0 ? "" : "" + hours + " hrs "); // NOI18N
+            String sHours = (hours == 0 ? "" : "" + hours); // NOI18N
             millis = millis % 3600000;
             
             // Minutes
             long minutes = millis / 60000;
-            String sMinutes = (((hours > 0) && (minutes < 10)) ? "0" + minutes : "" + minutes) + " min "; // NOI18N
+            String sMinutes = (((hours > 0) && (minutes < 10)) ? "0" + minutes : "" + minutes); // NOI18N
             millis = millis % 60000;
             
             // Seconds
             long seconds = millis / 1000;
-            String sSeconds = ((seconds < 10) ? "0" + seconds : "" + seconds) + " sec"; // NOI18N
-
-            return sHours + sMinutes + sSeconds;
+            String sSeconds = ((seconds < 10) ? "0" + seconds : "" + seconds); // NOI18N
+            
+            if (sHours.length() == 0) {
+                 return NbBundle.getMessage(ApplicationMonitorView.class, "FORMAT_ms", // NOI18N
+                                            new Object[] { sMinutes, sSeconds });
+            } else {
+                return NbBundle.getMessage(ApplicationMonitorView.class, "FORMAT_hms", // NOI18N
+                                            new Object[] { sHours, sMinutes, sSeconds });
+            }
         }
         
     }
