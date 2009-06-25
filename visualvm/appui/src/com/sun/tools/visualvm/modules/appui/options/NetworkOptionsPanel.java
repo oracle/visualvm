@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
+import com.sun.tools.visualvm.core.options.OptionsSectionSeparator;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -173,27 +174,14 @@ class NetworkOptionsPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        JLabel proxySettingsLabel = new JLabel();
-        Mnemonics.setLocalizedText(proxySettingsLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
-                                   "NetworkOptionsPanel_ProxySettingsCaption")); // NOI18N
+        OptionsSectionSeparator sectionSeparator = new OptionsSectionSeparator(
+                NbBundle.getMessage(NetworkOptionsPanel.class, "NetworkOptionsPanel_ProxySettingsCaption"));
         c = new GridBagConstraints();
-        c.gridx = 0;
         c.gridy = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 0, 5, 0);
-        add(proxySettingsLabel, c);
-
-        JSeparator proxySettingsSeparator = new JSeparator() {
-            public Dimension getMinimumSize() { return getPreferredSize(); }
-        };
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 0;
-        c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 5, 2, 0);
-        add(proxySettingsSeparator, c);
+        c.insets = new Insets(0, 0, 5, 0);
+        add(sectionSeparator, c);
 
         noProxyRadio = new JRadioButton();
         Mnemonics.setLocalizedText(noProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
@@ -201,7 +189,6 @@ class NetworkOptionsPanel extends JPanel {
         radiosGroup.add(noProxyRadio);
         c = new GridBagConstraints();
         c.gridy = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(0, 10, 0, 0);
         add(noProxyRadio, c);
@@ -212,7 +199,6 @@ class NetworkOptionsPanel extends JPanel {
         radiosGroup.add(systemProxyRadio);
         c = new GridBagConstraints();
         c.gridy = 2;
-        c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(0, 10, 0, 0);
         add(systemProxyRadio, c);
@@ -223,7 +209,6 @@ class NetworkOptionsPanel extends JPanel {
         radiosGroup.add(manualProxyRadio);
         c = new GridBagConstraints();
         c.gridy = 3;
-        c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(0, 10, 0, 0);
         add(manualProxyRadio, c);
@@ -478,7 +463,6 @@ class NetworkOptionsPanel extends JPanel {
 
         c = new GridBagConstraints();
         c.gridy = 4;
-        c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 1;
         c.weighty = 1;
         c.anchor = GridBagConstraints.NORTHWEST;
