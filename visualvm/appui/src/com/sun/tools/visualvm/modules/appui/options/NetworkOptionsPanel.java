@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -35,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
@@ -44,6 +46,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
+import org.openide.awt.Mnemonics;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -75,7 +79,7 @@ class NetworkOptionsPanel extends JPanel {
                 manualProxyRadio.setSelected(true);
                 break;
             default:
-                throw new IllegalArgumentException("Vole!");
+                throw new IllegalArgumentException("Unknown proxy configuration"); // NOI18N
         }
 
         httpProxyField.setText(model.getHttpHost());
@@ -105,7 +109,7 @@ class NetworkOptionsPanel extends JPanel {
         } else if (manualProxyRadio.isSelected()) {
             model.setProxyType(NetworkOptionsModel.MANUAL_SET_PROXY);
         } else {
-            throw new IllegalArgumentException("Vole!");
+            throw new IllegalArgumentException("Unknown proxy configuration"); // NOI18N
         }
 
         model.setHttpHost(httpProxyField.getText());
@@ -169,47 +173,80 @@ class NetworkOptionsPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        noProxyRadio = new JRadioButton();
-        noProxyRadio.setText("No proxy");
-        radiosGroup.add(noProxyRadio);
+        JLabel proxySettingsLabel = new JLabel();
+        Mnemonics.setLocalizedText(proxySettingsLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_ProxySettingsCaption")); // NOI18N
         c = new GridBagConstraints();
+        c.gridx = 0;
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(0, 0, 5, 0);
+        add(proxySettingsLabel, c);
+
+        JSeparator proxySettingsSeparator = new JSeparator() {
+            public Dimension getMinimumSize() { return getPreferredSize(); }
+        };
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 0;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(0, 5, 2, 0);
+        add(proxySettingsSeparator, c);
+
+        noProxyRadio = new JRadioButton();
+        Mnemonics.setLocalizedText(noProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_NoProxyRadio")); // NOI18N
+        radiosGroup.add(noProxyRadio);
+        c = new GridBagConstraints();
+        c.gridy = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(0, 10, 0, 0);
         add(noProxyRadio, c);
 
         systemProxyRadio = new JRadioButton();
-        systemProxyRadio.setText("Use system proxy settings");
+        Mnemonics.setLocalizedText(systemProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_SystemProxyRadio")); // NOI18N
         radiosGroup.add(systemProxyRadio);
         c = new GridBagConstraints();
-        c.gridy = 1;
+        c.gridy = 2;
+        c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(0, 10, 0, 0);
         add(systemProxyRadio, c);
 
         manualProxyRadio = new JRadioButton();
-        manualProxyRadio.setText("Manual proxy settings:");
+        Mnemonics.setLocalizedText(manualProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_ManualProxyRadio")); // NOI18N
         radiosGroup.add(manualProxyRadio);
         c = new GridBagConstraints();
-        c.gridy = 2;
+        c.gridy = 3;
+        c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(0, 10, 0, 0);
         add(manualProxyRadio, c);
 
         // --- Manual settings -------------------------------------------------
 
         JPanel manualSettingsPanel = new JPanel(new GridBagLayout());
-        manualSettingsPanel.setBorder(BorderFactory.createEmptyBorder(5, 30, 0, 0));
+        manualSettingsPanel.setBorder(BorderFactory.createEmptyBorder(5, 40, 0, 0));
 
         // --- Http proxy ---
 
         httpProxyLabel = new JLabel();
-        httpProxyLabel.setText("HTTP Proxy:");
+        Mnemonics.setLocalizedText(httpProxyLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_HttpProxy")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 0, 0, 5);
+        c.insets = new Insets(3, 0, 3, 5);
         manualSettingsPanel.add(httpProxyLabel, c);
 
         httpProxyField = new JTextField();
+        httpProxyLabel.setLabelFor(httpProxyField);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 0;
@@ -220,16 +257,18 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(httpProxyField, c);
 
         httpProxyPortLabel = new JLabel();
-        httpProxyPortLabel.setText("Port:");
+        Mnemonics.setLocalizedText(httpProxyPortLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_HttpProxyPort")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 8, 0, 5);
+        c.insets = new Insets(3, 8, 3, 5);
         manualSettingsPanel.add(httpProxyPortLabel, c);
 
         httpProxySpinnerModel = new SpinnerNumberModel(0, 0, 65535, 1);
         httpProxyPortSpinner = new JExtendedSpinner(httpProxySpinnerModel);
+        httpProxyPortLabel.setLabelFor(httpProxyPortSpinner);
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 0;
@@ -240,7 +279,8 @@ class NetworkOptionsPanel extends JPanel {
         // --- Use same settings ---
 
         sameSettingsCheckBox = new JCheckBox();
-        sameSettingsCheckBox.setText("Use the same proxy settings for all protocols");
+        Mnemonics.setLocalizedText(sameSettingsCheckBox, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_SameSettingsCheckbox")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 1;
@@ -251,15 +291,17 @@ class NetworkOptionsPanel extends JPanel {
         // --- Https proxy ---
 
         httpsProxyLabel = new JLabel();
-        httpsProxyLabel.setText("HTTPS Proxy:");
+        Mnemonics.setLocalizedText(httpsProxyLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_HttpsProxy")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 0, 0, 5);
+        c.insets = new Insets(3, 0, 3, 5);
         manualSettingsPanel.add(httpsProxyLabel, c);
 
         httpsProxyField = new JTextField();
+        httpsProxyLabel.setLabelFor(httpsProxyField);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 2;
@@ -270,16 +312,18 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(httpsProxyField, c);
 
         httpsProxyPortLabel = new JLabel();
-        httpsProxyPortLabel.setText("Port:");
+        Mnemonics.setLocalizedText(httpsProxyPortLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_HttpsProxyPort")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 8, 0, 5);
+        c.insets = new Insets(3, 8, 3, 5);
         manualSettingsPanel.add(httpsProxyPortLabel, c);
 
         httpsProxySpinnerModel = new SpinnerNumberModel(0, 0, 65535, 1);
         httpsProxyPortSpinner = new JExtendedSpinner(httpsProxySpinnerModel);
+        httpsProxyPortLabel.setLabelFor(httpsProxyPortSpinner);
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 2;
@@ -290,15 +334,17 @@ class NetworkOptionsPanel extends JPanel {
         // --- Socks proxy ---
 
         socksProxyLabel = new JLabel();
-        socksProxyLabel.setText("SOCKS Proxy:");
+        Mnemonics.setLocalizedText(socksProxyLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_SocksProxy")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 3;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 0, 0, 5);
+        c.insets = new Insets(3, 0, 3, 5);
         manualSettingsPanel.add(socksProxyLabel, c);
 
         socksProxyField = new JTextField();
+        socksProxyLabel.setLabelFor(socksProxyField);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 3;
@@ -309,16 +355,18 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(socksProxyField, c);
 
         socksProxyPortLabel = new JLabel();
-        socksProxyPortLabel.setText("Port:");
+        Mnemonics.setLocalizedText(socksProxyPortLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_SocksProxyPort")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 3;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 8, 0, 5);
+        c.insets = new Insets(3, 8, 3, 5);
         manualSettingsPanel.add(socksProxyPortLabel, c);
 
         socksProxySpinnerModel = new SpinnerNumberModel(0, 0, 65535, 1);
         socksProxyPortSpinner = new JExtendedSpinner(socksProxySpinnerModel);
+        socksProxyPortLabel.setLabelFor(socksProxyPortSpinner);
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 3;
@@ -329,15 +377,17 @@ class NetworkOptionsPanel extends JPanel {
         // --- No proxy ---
 
         noProxyLabel = new JLabel();
-        noProxyLabel.setText("No Proxy hosts:");
+        Mnemonics.setLocalizedText(noProxyLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_NoProxyHosts")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 4;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 0, 0, 5);
+        c.insets = new Insets(10, 0, 3, 5);
         manualSettingsPanel.add(noProxyLabel, c);
 
         noProxyField = new JTextField();
+        noProxyLabel.setLabelFor(noProxyField);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 4;
@@ -347,20 +397,22 @@ class NetworkOptionsPanel extends JPanel {
         c.insets = new Insets(10, 0, 3, 0);
         manualSettingsPanel.add(noProxyField, c);
 
-        JLabel sameSettingsLabel = new JLabel();
-        sameSettingsLabel.setText("(e.g. localhost, *.dev.java.net, 127.0.0.1)");
-        sameSettingsLabel.setEnabled(false);
+        JLabel noProxyHintLabel = new JLabel();
+        Mnemonics.setLocalizedText(noProxyHintLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_NoProxyHint")); // NOI18N
+        noProxyHintLabel.setEnabled(false);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 5;
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        manualSettingsPanel.add(sameSettingsLabel, c);
+        manualSettingsPanel.add(noProxyHintLabel, c);
 
         // --- Authentication ---
 
         authenticationCheckBox = new JCheckBox();
-        authenticationCheckBox.setText("Proxy requires authentication:");
+        Mnemonics.setLocalizedText(authenticationCheckBox, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_AuthCheckbox")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 6;
@@ -370,15 +422,17 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(authenticationCheckBox, c);
         
         usernameLabel = new JLabel();
-        usernameLabel.setText("Username:");
+        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_Username")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 7;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 30, 0, 5);
+        c.insets = new Insets(3, 30, 3, 5);
         manualSettingsPanel.add(usernameLabel, c);
 
         usernameField = new JTextField();
+        usernameLabel.setLabelFor(usernameField);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 7;
@@ -389,15 +443,17 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(usernameField, c);
 
         passwordLabel = new JLabel();
-        passwordLabel.setText("Password:");
+        Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_Password")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 8;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 30, 0, 5);
+        c.insets = new Insets(3, 30, 3, 5);
         manualSettingsPanel.add(passwordLabel, c);
 
         passwordField = new JPasswordField();
+        passwordLabel.setLabelFor(passwordField);
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 8;
@@ -421,7 +477,8 @@ class NetworkOptionsPanel extends JPanel {
 
 
         c = new GridBagConstraints();
-        c.gridy = 3;
+        c.gridy = 4;
+        c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 1;
         c.weighty = 1;
         c.anchor = GridBagConstraints.NORTHWEST;
