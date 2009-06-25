@@ -57,6 +57,7 @@ public final class ScrollableContents extends JScrollPane {
         setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 5));
+        getViewport().setOpaque(false);
     }
 
 
