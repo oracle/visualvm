@@ -72,7 +72,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>0-1</release-version>
+                        <release-version>1</release-version>
                         <specification-version>1.5.1</specification-version>
                     </run-dependency>
                 </dependency>
