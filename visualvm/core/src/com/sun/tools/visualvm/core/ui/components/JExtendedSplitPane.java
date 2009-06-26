@@ -69,8 +69,8 @@ class JExtendedSplitPane extends JSplitPane {
     
     public Dimension getSize() {
         Dimension size = super.getSize();
-        
-        if (size.width > 0 && size.height > 0 && requestedDividerLocation != -1) {
+
+        if (isShowing() && requestedDividerLocation != -1) {
             setDividerLocation(requestedDividerLocation);
             requestedDividerLocation = -1;
             updateVisibility();
