@@ -555,18 +555,20 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       private DataViewComponent viewComponent;
       
       public ViewContainer(DataSourceCaption caption, DataSourceView view) {
+          Color backgroundColor = UIUtils.getProfilerResultsBackground();
+
           this.caption = caption;
           this.view = view;
           this.viewComponent = view.getView();
           setLayout(new BorderLayout());
-          setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
-          setBackground(Color.WHITE);
+          setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, backgroundColor));
+          setBackground(backgroundColor);
           setFocusable(false);
           
           add(viewComponent, BorderLayout.CENTER);
           if (caption != null) {
               caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-              caption.setBackground(Color.WHITE);
+              caption.setBackground(backgroundColor);
               add(caption, BorderLayout.NORTH);
           }
       }

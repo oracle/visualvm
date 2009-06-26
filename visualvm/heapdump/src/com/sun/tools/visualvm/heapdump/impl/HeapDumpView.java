@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,9 +98,10 @@ class HeapDumpView extends DataSourceView {
         
             contentsPanel = new JPanel(new BorderLayout());
             contentsPanel.add(progressLabel, BorderLayout.CENTER);
-            contentsPanel.setBackground(Color.WHITE);
+            contentsPanel.setOpaque(false);
             
             add(contentsPanel, BorderLayout.CENTER);
+            setOpaque(false);
         }
         
         private void loadHeap(final File file) {

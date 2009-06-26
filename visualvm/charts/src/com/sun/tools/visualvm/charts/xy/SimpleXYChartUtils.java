@@ -376,10 +376,8 @@ public class SimpleXYChartUtils {
         JPanel legendContainer = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
         legendContainer.setOpaque(true);
         legendContainer.setBackground(BACKGROUND_COLOR);
-        legendContainer.setBorder(BorderFactory.createCompoundBorder(
-                                  BorderFactory.createMatteBorder(
-                                  0, 10, 0, 0, BACKGROUND_COLOR),
-                                  BorderFactory.createLineBorder(Color.WHITE)));
+        legendContainer.setBorder(BorderFactory.createMatteBorder(
+                                  0, 10, 0, 0, BACKGROUND_COLOR));
         legendContainer.add(legendPanel);
 
         return legendContainer;

@@ -2,7 +2,6 @@ package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
@@ -27,7 +26,6 @@ class ProfilingResultsSupport extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        setOpaque(true);
-        setBackground(Color.WHITE);
+        setOpaque(false);
     }
 }

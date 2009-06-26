@@ -99,9 +99,10 @@ class ThreadDumpView extends DataSourceView {
         
             contentsPanel = new JPanel(new BorderLayout());
             contentsPanel.add(progressLabel, BorderLayout.CENTER);
-            contentsPanel.setBackground(Color.WHITE);
+            contentsPanel.setOpaque(false);
             
             add(contentsPanel, BorderLayout.CENTER);
+            setOpaque(false);
         }
 
         private static String htmlize(String value) {

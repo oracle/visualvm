@@ -26,8 +26,6 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -35,7 +33,6 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -70,7 +67,6 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
 
 /**
@@ -654,8 +650,7 @@ class ApplicationProfilerView extends DataSourceView {
               stopButton.setPreferredSize(maxD);
               stopButton.setMinimumSize(maxD);
             
-              setOpaque(true);
-              setBackground(Color.WHITE);
+              setOpaque(false);
               
               setLayout(new BorderLayout());
               setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

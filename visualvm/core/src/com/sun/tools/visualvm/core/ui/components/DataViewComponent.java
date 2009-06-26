@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  * UI component displaying single subtab for opened DataSource.
@@ -75,6 +76,23 @@ public final class DataViewComponent extends JPanel {
     private DisplayArea detailsTopRightArea;
     private DisplayArea detailsBottomLeftArea;
     private DisplayArea detailsBottomRightArea;
+
+    private static final Color BACKGROUND_COLOR;
+    private static final Color HIGHLIGHT_BACKGROUND;
+
+
+    static {
+        BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
+
+        int darkerR = BACKGROUND_COLOR.getRed() - 20;
+        if (darkerR < 0) darkerR += 40;
+        int darkerG = BACKGROUND_COLOR.getGreen() - 20;
+        if (darkerG < 0) darkerG += 40;
+        int darkerB = BACKGROUND_COLOR.getBlue() - 20;
+        if (darkerB < 0) darkerB += 40;
+
+        HIGHLIGHT_BACKGROUND = new Color(darkerR, darkerG, darkerB);
+    }
     
     
     /**
@@ -231,16 +249,16 @@ public final class DataViewComponent extends JPanel {
                     setContinuousLayout(true);
 
                     final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
-                    divider.setBackground(Color.WHITE);
+                    divider.setBackground(BACKGROUND_COLOR);
                     divider.setBorder(null);
 
                     divider.addMouseListener(new MouseAdapter() {
                         public void mouseEntered(MouseEvent e) {
-                            divider.setBackground(new Color(235, 235, 235));
+                            divider.setBackground(HIGHLIGHT_BACKGROUND);
                             divider.repaint();
                         }
                         public void mouseExited(MouseEvent e) {
-                            divider.setBackground(Color.WHITE);
+                            divider.setBackground(BACKGROUND_COLOR);
                             divider.repaint();
                         }
                     });
@@ -293,7 +311,7 @@ public final class DataViewComponent extends JPanel {
     
 
     private void initComponents() {
-        
+
         // Top details area
 
         detailsTopLeftArea = new DisplayArea();
@@ -320,16 +338,16 @@ public final class DataViewComponent extends JPanel {
                 setContinuousLayout(true);
 
                 final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
-                divider.setBackground(Color.WHITE);
+                divider.setBackground(BACKGROUND_COLOR);
                 divider.setBorder(null);
                 
                 divider.addMouseListener(new MouseAdapter() {
                     public void mouseEntered(MouseEvent e) {
-                        divider.setBackground(new Color(235, 235, 235));
+                        divider.setBackground(HIGHLIGHT_BACKGROUND);
                         divider.repaint();
                     }
                     public void mouseExited(MouseEvent e) {
-                        divider.setBackground(Color.WHITE);
+                        divider.setBackground(BACKGROUND_COLOR);
                         divider.repaint();
                     }
                 });
@@ -366,16 +384,16 @@ public final class DataViewComponent extends JPanel {
                 setContinuousLayout(true);
 
                 final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
-                divider.setBackground(Color.WHITE);
+                divider.setBackground(BACKGROUND_COLOR);
                 divider.setBorder(null);
                 
                 divider.addMouseListener(new MouseAdapter() {
                     public void mouseEntered(MouseEvent e) {
-                        divider.setBackground(new Color(235, 235, 235));
+                        divider.setBackground(HIGHLIGHT_BACKGROUND);
                         divider.repaint();
                     }
                     public void mouseExited(MouseEvent e) {
-                        divider.setBackground(Color.WHITE);
+                        divider.setBackground(BACKGROUND_COLOR);
                         divider.repaint();
                     }
                 });
@@ -410,16 +428,16 @@ public final class DataViewComponent extends JPanel {
                 setContinuousLayout(true);
 
                 final BasicSplitPaneDivider divider = ((BasicSplitPaneUI) getUI()).getDivider();
-                divider.setBackground(Color.WHITE);
+                divider.setBackground(BACKGROUND_COLOR);
                 divider.setBorder(null);
                 
                 divider.addMouseListener(new MouseAdapter() {
                     public void mouseEntered(MouseEvent e) {
-                        divider.setBackground(new Color(235, 235, 235));
+                        divider.setBackground(HIGHLIGHT_BACKGROUND);
                         divider.repaint();
                     }
                     public void mouseExited(MouseEvent e) {
-                        divider.setBackground(Color.WHITE);
+                        divider.setBackground(BACKGROUND_COLOR);
                         divider.repaint();
                     }
                 });
@@ -444,7 +462,7 @@ public final class DataViewComponent extends JPanel {
         // DataView
         
         setOpaque(true);
-        setBackground(Color.WHITE);
+        setBackground(BACKGROUND_COLOR);
         setLayout(new BorderLayout());
     }
     
