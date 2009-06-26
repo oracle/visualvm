@@ -29,6 +29,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -38,7 +40,9 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -79,6 +83,7 @@ public class TextBrowser {
         dialog.pack();
         closeButton.requestFocusInWindow();
         dialog.setLocationRelativeTo(null);
+        dialog.setResizable(true);
         dialog.setVisible(true);
     }
     
@@ -86,10 +91,14 @@ public class TextBrowser {
         htmlTextDisplayer.setText(text);
         displayerScrollPane.setViewportView(htmlTextDisplayer);
         try { htmlTextDisplayer.setCaretPosition(0); } catch (Exception e) {}
-        displayerScrollPane.setPreferredSize(preferredSize);
+        Dimension htmlSize = htmlTextDisplayer.getPreferredSize();
+        htmlSize.width = Math.min(htmlSize.width, 700);
+        htmlSize.height = Math.min(htmlSize.height, 500);
+        displayerScrollPane.setPreferredSize(htmlSize);
         dialog.pack();
         closeButton.requestFocusInWindow();
         dialog.setLocationRelativeTo(null);
+        dialog.setResizable(false);
         dialog.setVisible(true);
     }
     
@@ -144,6 +153,8 @@ public class TextBrowser {
             }
         };
         displayerScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        displayerScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        displayerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
         
         textDisplayer.setForeground(htmlTextDisplayer.getForeground());
         textDisplayer.setBackground(htmlTextDisplayer.getBackground());
@@ -156,9 +167,7 @@ public class TextBrowser {
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        close();
-                    }
+                    public void run() { close(); }
                 });
             }
         });
@@ -166,9 +175,26 @@ public class TextBrowser {
         buttonsContainer = new JPanel(new BorderLayout());
         buttonsContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 6, 10));
         buttonsContainer.add(closeButton, BorderLayout.EAST);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        final JSeparator separator = new JSeparator() {
+            public Dimension getMinimumSize() { return getPreferredSize(); }
+            public Dimension getMaximumSize() { return getPreferredSize(); }
+        };
+        bottomPanel.add(separator, BorderLayout.NORTH);
+        bottomPanel.add(buttonsContainer, BorderLayout.CENTER);
+
+        final JScrollBar horizontalScroll = displayerScrollPane.getHorizontalScrollBar();
+        if (horizontalScroll != null) horizontalScroll.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    separator.setVisible(!horizontalScroll.isShowing());
+                }
+            }
+        });
         
         contentPane.add(displayerScrollPane, BorderLayout.CENTER);
-        contentPane.add(buttonsContainer, BorderLayout.SOUTH);
+        contentPane.add(bottomPanel, BorderLayout.SOUTH);
         
         dialog.getRootPane().setDefaultButton(closeButton);
         dialog.setResizable(true);
