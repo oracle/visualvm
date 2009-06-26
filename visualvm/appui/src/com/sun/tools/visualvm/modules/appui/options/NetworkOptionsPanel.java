@@ -432,7 +432,7 @@ class NetworkOptionsPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 8;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(3, 30, 3, 5);
+        c.insets = new Insets(3, 30, 0, 5);
         manualSettingsPanel.add(passwordLabel, c);
 
         passwordField = new JPasswordField();
@@ -443,7 +443,7 @@ class NetworkOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        c.insets = new Insets(3, 0, 3, 0);
+        c.insets = new Insets(3, 0, 0, 0);
         manualSettingsPanel.add(passwordField, c);
 
         // --- Filler ---
