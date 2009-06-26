@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.modules.appui.options;
 
 import com.sun.tools.visualvm.core.options.SectionSeparator;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -37,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
@@ -190,7 +188,7 @@ class NetworkOptionsPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridy = 1;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 10, 0, 0);
+        c.insets = new Insets(3, 10, 3, 0);
         add(noProxyRadio, c);
 
         systemProxyRadio = new JRadioButton();
@@ -200,7 +198,7 @@ class NetworkOptionsPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 10, 0, 0);
+        c.insets = new Insets(3, 10, 3, 0);
         add(systemProxyRadio, c);
 
         manualProxyRadio = new JRadioButton();
@@ -210,7 +208,7 @@ class NetworkOptionsPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridy = 3;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(0, 10, 0, 0);
+        c.insets = new Insets(3, 10, 3, 0);
         add(manualProxyRadio, c);
 
         // --- Manual settings -------------------------------------------------
