@@ -188,7 +188,7 @@ class NetworkOptionsPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridy = 1;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(3, 10, 3, 0);
+        c.insets = new Insets(2, 10, 2, 0);
         add(noProxyRadio, c);
 
         systemProxyRadio = new JRadioButton();
@@ -198,7 +198,7 @@ class NetworkOptionsPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(3, 10, 3, 0);
+        c.insets = new Insets(2, 10, 2, 0);
         add(systemProxyRadio, c);
 
         manualProxyRadio = new JRadioButton();
@@ -208,7 +208,7 @@ class NetworkOptionsPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridy = 3;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(3, 10, 3, 0);
+        c.insets = new Insets(2, 10, 2, 0);
         add(manualProxyRadio, c);
 
         // --- Manual settings -------------------------------------------------
