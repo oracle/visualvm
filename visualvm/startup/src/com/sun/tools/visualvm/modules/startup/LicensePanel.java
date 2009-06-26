@@ -91,7 +91,7 @@ final class LicensePanel extends javax.swing.JPanel {
         jTextAreaTop.setRows(1);
         jTextAreaTop.setText(bundle.getString("MSG_LicenseDlgLabelTop"));
         jTextAreaTop.setWrapStyleWord(true);
-        jTextAreaTop.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 7, 0));
+        jTextAreaTop.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 3, 0));
         jTextAreaTop.setFocusable(false);
         jTextAreaTop.setMargin(new java.awt.Insets(0, 0, 2, 0));
         jTextAreaTop.setOpaque(false);
@@ -114,7 +114,7 @@ final class LicensePanel extends javax.swing.JPanel {
         jTextAreaBottom.setRows(2);
         jTextAreaBottom.setText(bundle.getString("MSG_LicenseDlgLabelBottom"));
         jTextAreaBottom.setWrapStyleWord(true);
-        jTextAreaBottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 0, 0, 0));
+        jTextAreaBottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
         jTextAreaBottom.setFocusable(false);
         jTextAreaBottom.setOpaque(false);
         jTextAreaBottom.setRequestFocusEnabled(false);

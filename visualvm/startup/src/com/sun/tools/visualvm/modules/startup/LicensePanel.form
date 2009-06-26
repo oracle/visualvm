@@ -40,7 +40,7 @@
         <Property name="wrapStyleWord" type="boolean" value="true"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-            <EmptyBorder bottom="7" left="0" right="0" top="0"/>
+            <EmptyBorder bottom="3" left="0" right="0" top="0"/>
           </Border>
         </Property>
         <Property name="focusable" type="boolean" value="false"/>
@@ -90,7 +90,7 @@
         <Property name="wrapStyleWord" type="boolean" value="true"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-            <EmptyBorder bottom="0" left="0" right="0" top="7"/>
+            <EmptyBorder bottom="0" left="0" right="0" top="3"/>
           </Border>
         </Property>
         <Property name="focusable" type="boolean" value="false"/>
