@@ -172,8 +172,8 @@ class NetworkOptionsPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        SectionSeparator sectionSeparator = new SectionSeparator(
-                NbBundle.getMessage(NetworkOptionsPanel.class, "NetworkOptionsPanel_ProxySettingsCaption"));
+        SectionSeparator sectionSeparator = new SectionSeparator(NbBundle.getMessage(NetworkOptionsPanel.class,
+                                                                 "NetworkOptionsPanel_ProxySettingsCaption")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
