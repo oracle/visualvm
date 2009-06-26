@@ -143,7 +143,7 @@
         <folder name="General.instance_hidden"/>
         <file name="Network.instance">
             <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.appui.options.NetworkOptionsCategory.instance"/>
-            <attr name="position" intvalue="800"/>
+            <attr name="position" intvalue="795"/>
         </file>
     </folder>
     <folder name="Services">
