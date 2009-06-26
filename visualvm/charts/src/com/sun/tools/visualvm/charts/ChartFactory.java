@@ -58,4 +58,7 @@ public final class ChartFactory {
                                         descriptor.getDetailsItems());
     }
 
+    
+    private ChartFactory() {}
+
 }
