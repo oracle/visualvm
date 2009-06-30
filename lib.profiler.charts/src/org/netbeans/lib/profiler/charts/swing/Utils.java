@@ -52,7 +52,7 @@ public final class Utils {
 
     public static Color checkedColor(Color color) {
         if (color == null) return null;
-        if (!forceSpeed || color.getAlpha() == 0) return color;
+        if (!forceSpeed || color.getAlpha() == 255) return color;
         return new Color(color.getRed(), color.getGreen(), color.getBlue());
     }
 
