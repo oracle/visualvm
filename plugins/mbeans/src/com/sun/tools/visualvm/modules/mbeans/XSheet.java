@@ -210,19 +210,20 @@ class XSheet extends JPanel
             return;
         }
         mbean = (XMBean) uo.getData();
+        final XMBean xmb = mbean; 
         SwingWorker<MBeanInfo,Void> sw = new SwingWorker<MBeanInfo,Void>() {
             @Override
             public MBeanInfo doInBackground() throws InstanceNotFoundException,
                     IntrospectionException, ReflectionException, IOException {
-                return mbean.getMBeanInfo();
+                return xmb.getMBeanInfo();
             }
             @Override
             protected void done() {
                 try {
                     MBeanInfo mbi = get();
-                    if (mbi != null) {
+                    if (xmb == mbean && mbi != null) {
                         if (!isSelectedNode(node, currentNode)) return;
-                        mbeanInfo.loadMBeanInfo(mbean, mbi);
+                        mbeanInfo.loadMBeanInfo(xmb, mbi);
                         invalidate();
                         topPanelMetadata.removeAll();
                         mbeansTab.getButtonAt(3).setEnabled(true);
@@ -238,7 +239,7 @@ class XSheet extends JPanel
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
                     LOGGER.log(Level.SEVERE, "Couldn't get MBeanInfo for MBean [" + // NOI18N
-                            mbean.getObjectName() + "]", t); // NOI18N
+                            xmb.getObjectName() + "]", t); // NOI18N
 
                     showErrorDialog(t.toString(),
                             Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
@@ -268,7 +269,7 @@ class XSheet extends JPanel
                 try {
                     MBeanInfo mbi = get();
                     mbeanAttributes.loadAttributes(xmb, mbi);
-                    if (mbi != null && mbi.getAttributes() != null && mbi.getAttributes().length > 0) {
+                    if (xmb == mbean && mbi != null && mbi.getAttributes() != null && mbi.getAttributes().length > 0) {
                         if (!isSelectedNode(node, currentNode)) return;
                         invalidate();
                         topPanelAttributes.removeAll();
@@ -311,19 +312,20 @@ class XSheet extends JPanel
             return;
         }
         mbean = (XMBean) uo.getData();
+        final XMBean xmb = mbean; 
         SwingWorker<MBeanInfo,Void> sw = new SwingWorker<MBeanInfo,Void>() {
             @Override
             public MBeanInfo doInBackground() throws InstanceNotFoundException,
                     IntrospectionException, ReflectionException, IOException {
-                return mbean.getMBeanInfo();
+                return xmb.getMBeanInfo();
             }
             @Override
             protected void done() {
                 try {
                     MBeanInfo mbi = get();
-                    if (mbi != null && mbi.getOperations() != null && mbi.getOperations().length > 0) {
+                    if (xmb == mbean && mbi != null && mbi.getOperations() != null && mbi.getOperations().length > 0) {
                         if (!isSelectedNode(node, currentNode)) return;
-                        mbeanOperations.loadOperations(mbean, mbi);
+                        mbeanOperations.loadOperations(xmb, mbi);
                         invalidate();
                         topPanelOperations.removeAll();
                         mbeansTab.getButtonAt(1).setEnabled(true);
@@ -344,7 +346,7 @@ class XSheet extends JPanel
                     Throwable t = Utils.getActualException(e);
                     LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
                             "operations for MBean [" + // NOI18N
-                            mbean.getObjectName() + "]", t); // NOI18N
+                            xmb.getObjectName() + "]", t); // NOI18N
                     showErrorDialog(t.toString(),
                             Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
                 }
@@ -360,18 +362,19 @@ class XSheet extends JPanel
             return;
         }
         mbean = (XMBean) uo.getData();
+        final XMBean xmb = mbean; 
         SwingWorker<Boolean,Void> sw = new SwingWorker<Boolean,Void>() {
             @Override
             public Boolean doInBackground() {
-                return mbean.isBroadcaster();
+                return xmb.isBroadcaster();
             }
             @Override
             protected void done() {
                 try {
                     Boolean isBroadcaster = get();
-                    if (isBroadcaster != null && isBroadcaster.booleanValue()) {
+                    if (xmb == mbean && isBroadcaster != null && isBroadcaster.booleanValue()) {
                         if (!isSelectedNode(node, currentNode)) return;
-                        mbeanNotifications.loadNotifications(mbean);
+                        mbeanNotifications.loadNotifications(xmb);
                         updateNotifications();
                         invalidate();
                         topPanelNotifications.removeAll();
@@ -401,7 +404,7 @@ class XSheet extends JPanel
                     Throwable t = Utils.getActualException(e);
                     LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
                             "notifications for MBean [" + // NOI18N
-                            mbean.getObjectName() + "]", t); // NOI18N
+                            xmb.getObjectName() + "]", t); // NOI18N
                     showErrorDialog(t.toString(),
                             Resources.getText("LBL_ProblemDisplayingMBean")); // NOI18N
                 }
