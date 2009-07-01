@@ -328,6 +328,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void queryStarted(final BoundedRangeModel model) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    updateUIState();
                     progressLabel.setText(EXECUTING_QUERY_MSG); // NOI18N
                     progressBar.setModel(model);
                     progressBar.setMaximumSize(new Dimension(progressBar.getMaximumSize().width,
@@ -337,7 +338,6 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     progressPanel.invalidate();
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
-                    updateUIState();
                 }
             });
         }
