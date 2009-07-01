@@ -127,21 +127,16 @@ public class GlassFishWebModuleViewProvider extends DataSourceViewProvider<Glass
             masterPanel.add(appLink, BorderLayout.NORTH);
 
             SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-            desc.addLineItem("Current");
-            desc.addLineItem("Maximum");
+            desc.addLineItems("Current","Maximum");
 
             activeSessionsChart = ChartFactory.createSimpleXYChart(desc);
 
             desc = SimpleXYChartDescriptor.decimal(10, true, 500);
-            desc.addLineItem("Created");
-            desc.addLineItem("Expired");
-            desc.addLineItem("Rejected");
+            desc.addLineItems("Created","Expired","Rejected");
             totalSessionsChart = ChartFactory.createSimpleXYChart(desc);
 
             desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-            desc.addLineItem("Count");
-            desc.addLineItem("Reloads");
-            desc.addLineItem("Errors");
+            desc.addLineItems("Count","Reloads","Errors");
             jspChart = ChartFactory.createSimpleXYChart(desc);
 
             JPanel servletsPanel = new JPanel(new BorderLayout());

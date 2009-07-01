@@ -44,8 +44,7 @@ class TransactionServiceView extends DataSourceView {
 
     private void configureTransactionalServiceVisualizer() {
         SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-        desc.addFillItem("Count");
-        desc.addLineItem("Maximum Time");
+        desc.addFillItems("Count","Maximum Time");
         transactionalServiceChart = ChartFactory.createSimpleXYChart(desc);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Transactional Service", false), DataViewComponent.BOTTOM_RIGHT);
 

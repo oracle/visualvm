@@ -86,8 +86,7 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
             JPanel chartTimesPanel = new JPanel(new BorderLayout());
             chartTimesPanel.setOpaque(false);
             SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-            desc.addLineItem("Average Time");
-            desc.addLineItem("Maximum Time");
+            desc.addLineItems("Average Time","Maximum Time");
             timesChart = ChartFactory.createSimpleXYChart(desc);
 
             chartTimesPanel.add(timesChart.getChart(), BorderLayout.CENTER);
@@ -95,8 +94,7 @@ public class GlassFishServletViewProvider extends DataSourceViewProvider<GlassFi
             JPanel chartReqsPanel = new JPanel(new BorderLayout());
             chartReqsPanel.setOpaque(false);
             desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-            desc.addLineItem("Request Count");
-            desc.addLineItem("Error Count");
+            desc.addLineItems("Request Count","Error Count");
             reqsChart = ChartFactory.createSimpleXYChart(desc);
             chartReqsPanel.add(reqsChart.getChart(), BorderLayout.CENTER);
 

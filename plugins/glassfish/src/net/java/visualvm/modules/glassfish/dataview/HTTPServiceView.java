@@ -49,9 +49,7 @@ class HTTPServiceView extends DataSourceView {
     private void configureConnectionQueueVisualizer() {
         final ConnectionQueueMonitor cqm = monitor.getConnectionQueueMonitor();
         SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, true, 500);
-        desc.addLineItem("1min");
-        desc.addLineItem("5min");
-        desc.addLineItem("15min");
+        desc.addLineItems("1min","5min","15min");
         connectionQueueChart = ChartFactory.createSimpleXYChart(desc);
 
 //        ConnectionQueuePanel cqp = new ConnectionQueuePanel();
@@ -149,9 +147,8 @@ class HTTPServiceView extends DataSourceView {
 
     private void configureFileCacheVisualizer() {
         SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-        desc.addLineFillItem("Min");
-        desc.addLineItem("Max");
-        desc.addLineItem("Current");
+        desc.addLineFillItems("Min");
+        desc.addLineItems("Max","Current");
         fileCacheChart = ChartFactory.createSimpleXYChart(desc);
 
         final FileCacheMonitor fcm = monitor.getFileCacheMonitor();
@@ -252,9 +249,7 @@ class HTTPServiceView extends DataSourceView {
     private void configureKeepAliveVisualizer() {
         final KeepAliveMonitor kaMonitor = monitor.getKeepAliveMonitor();
         SimpleXYChartDescriptor desc = SimpleXYChartDescriptor.decimal(10, false, 500);
-        desc.addLineItem("Refused");
-        desc.addLineItem("Flushed");
-        desc.addLineItem("Timed Out");
+        desc.addLineItems("Refused","Flushed","Timed Out");
         keepAliveChart = ChartFactory.createSimpleXYChart(desc);
 
         kaRefreshTask = Scheduler.sharedInstance().schedule(new SchedulerTask() {
