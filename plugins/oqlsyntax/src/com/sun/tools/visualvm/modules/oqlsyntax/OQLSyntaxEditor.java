@@ -9,29 +9,31 @@ import javax.swing.JEditorPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.spi.*;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
+@ServiceProvider(service=OQLEditorImpl.class)
 public class OQLSyntaxEditor extends OQLEditorImpl {
 
     private class DocumentListenerEx implements DocumentListener {
         @Override
         public void insertUpdate(DocumentEvent e) {
             if (e.getDocument().getLength() > 0) {
-                pcs.firePropertyChange(VALIDITY_PROPERTY, false, true);
+                getValidationCallback(e.getDocument()).callback(true);
             } else {
-                pcs.firePropertyChange(VALIDITY_PROPERTY, true, false);
+                getValidationCallback(e.getDocument()).callback(false);
             }
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
             if (e.getDocument().getLength() > 0) {
-                pcs.firePropertyChange(VALIDITY_PROPERTY, false, true);
+                getValidationCallback(e.getDocument()).callback(true);
             } else {
-                pcs.firePropertyChange(VALIDITY_PROPERTY, true, false);
+                getValidationCallback(e.getDocument()).callback(false);
             }
         }
 
@@ -48,5 +50,4 @@ public class OQLSyntaxEditor extends OQLEditorImpl {
         pane.getDocument().addDocumentListener(new DocumentListenerEx());
         return pane;
     }
-
 }
