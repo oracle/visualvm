@@ -256,8 +256,8 @@ public class StackTraceSnapshotBuilderTest {
         assertTrue(instance.methodInfos.size() == elements0.length);
         assertTrue(instance.threadIds.size() == stack0.size());
         assertTrue(instance.threadNames.size() == stack0.size());
-        assertFalse(-1L == instance.currentDumpTimeStamp.get());
-        assertFalse(-1L == instance.firstDumpTimeStamp.get());
+        assertFalse(-1L == instance.currentDumpTimeStamp);
+        //assertFalse(-1L == instance.firstDumpTimeStamp);
     }
 
     @Test
@@ -269,13 +269,13 @@ public class StackTraceSnapshotBuilderTest {
 
         int miSize = instance.methodInfos.size();
         int tIdSize = instance.threadIds.size();
-        long timestamp = instance.currentDumpTimeStamp.get();
+        long timestamp = instance.currentDumpTimeStamp;
 
         instance.addStacktrace(stack0, stamp);
 
         assertEquals(tIdSize, instance.threadIds.size());
         assertEquals(miSize, instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -306,7 +306,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -322,7 +322,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -339,7 +339,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -354,7 +354,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -369,7 +369,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -385,7 +385,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -401,7 +401,7 @@ public class StackTraceSnapshotBuilderTest {
 
         assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -425,7 +425,7 @@ public class StackTraceSnapshotBuilderTest {
                 fail();
             }
         }
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -452,7 +452,7 @@ public class StackTraceSnapshotBuilderTest {
                 fail();
             }
         }
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -485,7 +485,7 @@ public class StackTraceSnapshotBuilderTest {
                 fail();
             }
         }
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -518,7 +518,7 @@ public class StackTraceSnapshotBuilderTest {
                 fail();
             }
         }
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -544,7 +544,7 @@ public class StackTraceSnapshotBuilderTest {
                 fail();
             }
         }
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -570,7 +570,7 @@ public class StackTraceSnapshotBuilderTest {
                 fail();
             }
         }
-        assertEquals(timestamp, instance.currentDumpTimeStamp.get());
+        assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
     @Test
@@ -608,7 +608,7 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.RUNNABLE, instance.lastThreadStates.get(thread0));
     }
 
@@ -620,7 +620,7 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
     }
 
@@ -632,7 +632,7 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.TIMED_WAITING, instance.lastThreadStates.get(thread0));
     }
 
@@ -644,7 +644,7 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.BLOCKED, instance.lastThreadStates.get(thread0));
     }
 
@@ -656,7 +656,7 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.TERMINATED, instance.lastThreadStates.get(thread0));
     }
 
@@ -669,13 +669,13 @@ public class StackTraceSnapshotBuilderTest {
         
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
 
         thread0.setState(Thread.State.RUNNABLE);
         instance.addStacktrace(stack0, 1000000);
 
-        assertEquals(1000000, instance.currentDumpTimeStamp.get());
+        assertEquals(1000000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.RUNNABLE, instance.lastThreadStates.get(thread0));
     }
 
@@ -688,11 +688,11 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
         instance.addStacktrace(stack0, 1000000);
 
-        assertEquals(1000000, instance.currentDumpTimeStamp.get());
+        assertEquals(1000000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
     }
 
@@ -705,12 +705,12 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.addStacktrace(stack0, 500000);
 
-        assertEquals(500000, instance.currentDumpTimeStamp.get());
+        assertEquals(500000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
         thread0.setState(Thread.State.BLOCKED);
         instance.addStacktrace(stack0, 1000000);
 
-        assertEquals(1000000, instance.currentDumpTimeStamp.get());
+        assertEquals(1000000, instance.currentDumpTimeStamp);
         assertEquals(Thread.State.BLOCKED, instance.lastThreadStates.get(thread0));
     }
 
@@ -727,8 +727,8 @@ public class StackTraceSnapshotBuilderTest {
         assertTrue(instance.methodInfos.size() == 0);
         assertTrue(instance.threadIds.size() == 0);
         assertTrue(instance.threadNames.size() == 0);
-        assertEquals(-1L, instance.currentDumpTimeStamp.get());
-        assertEquals(-1L, instance.firstDumpTimeStamp.get());
+        assertEquals(-1L, instance.currentDumpTimeStamp);
+        //assertEquals(-1L, instance.firstDumpTimeStamp);
         assertEquals(0, instance.stackTraceCount);
 
         try {
