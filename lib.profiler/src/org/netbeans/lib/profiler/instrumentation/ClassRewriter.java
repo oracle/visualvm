@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import java.io.IOException;
@@ -133,6 +134,10 @@ public class ClassRewriter {
     }
 
     public static void saveToDisk(String name, byte[] classBytes) {
+        if (Platform.getJDKVersionNumber() == Platform.JDK_CVM) {
+            // No room on device to do this
+            return;
+        }
         name = name.replace('/', '_'); // NOI18N
 
         try {
