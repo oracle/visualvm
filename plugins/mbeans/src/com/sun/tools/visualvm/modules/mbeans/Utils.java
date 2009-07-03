@@ -300,7 +300,7 @@ class Utils {
     /**
      * Try to convert a string value into a numerical value.
      */
-    private static Number createNumberFromStringValue(String value)
+    private static Number createNumberFromStringValue(String type, String value)
     throws NumberFormatException {
         final String suffix = value.substring(value.length() - 1);
         if ("L".equalsIgnoreCase(suffix)) { // NOI18N
@@ -311,6 +311,11 @@ class Utils {
         }
         if ("D".equalsIgnoreCase(suffix)) { // NOI18N
             return Double.valueOf(value.substring(0, value.length() - 1));
+        }
+        try {
+            return (Number) newStringConstructor(type, value);
+        } catch (Exception ex) {
+            // OK: Ignore exception...
         }
         try {
             return Integer.valueOf(value);
@@ -351,7 +356,7 @@ class Utils {
         } else if (type.equals(Character.class.getName())) {
             result = new Character(value.charAt(0));
         } else if (Number.class.isAssignableFrom(Utils.getClass(type))) {
-            result = createNumberFromStringValue(value);
+            result = createNumberFromStringValue(type, value);
         } else if (value == null || value.toString().equals("null")) { // NOI18N
             // hack for null value
             result = null;
