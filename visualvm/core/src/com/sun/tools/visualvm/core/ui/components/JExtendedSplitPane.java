@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.ui.components;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -66,18 +65,7 @@ class JExtendedSplitPane extends JSplitPane {
     private double dividerLocation;
     private int customDividerSize;
     private double requestedDividerLocation = -1;
-    
-    public Dimension getSize() {
-        Dimension size = super.getSize();
 
-        if (isShowing() && requestedDividerLocation != -1) {
-            setDividerLocation(requestedDividerLocation);
-            requestedDividerLocation = -1;
-            updateVisibility();
-        }
-        
-        return size;
-    }
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     
@@ -155,6 +143,18 @@ class JExtendedSplitPane extends JSplitPane {
 
     public void setTopComponent(Component comp) {
         setLeftComponent(comp);
+    }
+
+    public void reshape(int x, int y, int width, int height) {
+        super.reshape(x, y, width, height);
+        if (width > 0 && height > 0 && requestedDividerLocation != -1) {
+            super.setDividerLocation(requestedDividerLocation);
+            // SplitPaneUI.paint() needs to be invoked here to set the
+            // BasicSplitPaneUI.painted flag to enable resizing the divider
+            // even if the component hasn't been shown yet.
+            ((BasicSplitPaneUI)getUI()).paint(getGraphics(), this);
+            requestedDividerLocation = -1;
+        }
     }
 
     private Component getDivider() {
