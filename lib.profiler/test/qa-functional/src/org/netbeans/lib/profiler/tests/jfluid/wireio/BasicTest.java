@@ -117,7 +117,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new MethodInvokedFirstTimeCommand(0);
+            cmd = new MethodInvokedFirstTimeCommand('\0');
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
@@ -129,7 +129,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new EventBufferDumpedCommand(1024);
+            cmd = new EventBufferDumpedCommand(1024, null, -1);
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 

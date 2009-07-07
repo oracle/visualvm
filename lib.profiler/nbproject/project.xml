@@ -85,10 +85,16 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.wireprotocol</package>
             </friend-packages>
             <extra-compilation-unit>
-                <package-root>src-jdk15</package-root>
-                <classpath>${src.cp}</classpath>
-                <built-to>build/jdk15</built-to>
-                <built-to>${cluster}/lib/jfluid-server-15.jar</built-to>
+                <package-root>${src15.dir}</package-root>
+                <classpath>${build.classes.dir}</classpath>
+                <built-to>${build15.classes.dir}</built-to>
+                <built-to>${cluster}/${jfluid.server.15.jar}</built-to>
+            </extra-compilation-unit>
+            <extra-compilation-unit>
+                <package-root>${srccvm.dir}</package-root>
+                <classpath/>
+                <built-to>${buildcvm.classes.dir}</built-to>
+                <built-to>${cluster}/${jfluid.server.cvm.jar}</built-to>
             </extra-compilation-unit>
         </data>
     </configuration>
