@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.netbeans.lib.profiler.global.Platform;
 
 
 /**
@@ -71,6 +72,10 @@ public class ClassBytesLoader {
         URL classUrl = ClassLoader.getSystemResource(resourceName);
         // in case the classname is a synthetic class there is no resource defining its bytecode
         if (classUrl == null) {
+            if (Platform.getJDKVersionNumber() == Platform.JDK_CVM) {
+                // No room on device to do this
+                return null;
+            }
             System.err.println("***Profiler agent warning: could not get .class file for a synthetic class " + className
                                + " in ClassBytesLoader.getClassFileBytes"); // NOI18N
             return null;
