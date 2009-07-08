@@ -513,15 +513,8 @@ public class OQLController extends AbstractTopLevelController
                 if (filtersFO == null) {
                     FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config"); // NOI18N
                     if (configFolder != null && configFolder.isValid()) {
-                        Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
-
-                        while (suffixesIterator.hasNext() && (filtersFO == null)) {
-                            // find and use localized bundled filters definition
-                            filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
-                                                                   DEFAULT_FILE_SUFFIX +
-                                                                   suffixesIterator.next(),
-                                                                   "xml"); // NOI18N
-                        }
+                        filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
+                                                                   DEFAULT_FILE_SUFFIX,"xml"); // NOI18N
                     }
                 }
 
