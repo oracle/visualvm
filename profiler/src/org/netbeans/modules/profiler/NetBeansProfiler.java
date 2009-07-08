@@ -1898,12 +1898,7 @@ public final class NetBeansProfiler extends Profiler {
             }
 
             if ((filtersFO == null) && (configFolder != null) && configFolder.isValid()) {
-                Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
-
-                while (suffixesIterator.hasNext() && (filtersFO == null)) {
-                    filtersFO = configFolder.getFileObject(GLOBAL_FILTERS_FILENAME + DEFAULT_FILE_SUFFIX
-                                                             + suffixesIterator.next(), "xml"); //NOI18N // find and use localized bundled filters definition
-                }
+                filtersFO = configFolder.getFileObject(GLOBAL_FILTERS_FILENAME + DEFAULT_FILE_SUFFIX, "xml"); //NOI18N
             }
 
             if (filtersFO != null) {
@@ -1924,12 +1919,7 @@ public final class NetBeansProfiler extends Profiler {
             }
 
             if ((filterSetsFO == null) && (configFolder != null) && configFolder.isValid()) {
-                Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
-
-                while (suffixesIterator.hasNext() && (filterSetsFO == null)) {
-                    filterSetsFO = configFolder.getFileObject(DEFINED_FILTERSETS_FILENAME + DEFAULT_FILE_SUFFIX
-                                                                + suffixesIterator.next(), "xml"); //NOI18N // find and use localized bundled filtersets definition
-                }
+                filterSetsFO = configFolder.getFileObject(DEFINED_FILTERSETS_FILENAME + DEFAULT_FILE_SUFFIX, "xml"); //NOI18N
             }
 
             if (filterSetsFO != null) {
