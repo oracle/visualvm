@@ -37,6 +37,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -52,19 +53,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.RMIClientSocketFactory;
-import java.rmi.server.RemoteObject;
-import java.rmi.server.RemoteObjectInvocationHandler;
-import java.rmi.server.RemoteRef;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,12 +71,8 @@ import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.management.remote.rmi.RMIConnector;
-import javax.management.remote.rmi.RMIServer;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import org.openide.util.RequestProcessor;
-import sun.rmi.server.UnicastRef2;
-import sun.rmi.transport.LiveRef;
 
 /**
  * This class encapsulates the JMX functionality of the target Java application.
@@ -116,6 +104,7 @@ import sun.rmi.transport.LiveRef;
  * {@link JmxModel#getConnectionState()}.
  *
  * @author Luis-Miguel Alventosa
+ * @author Jiri Sedlacek
  */
 class JmxModelImpl extends JmxModel {
     private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
@@ -137,7 +126,7 @@ class JmxModelImpl extends JmxModel {
             ProxyClient proxyClient = null;
             if (Application.CURRENT_APPLICATION.equals(application)) {
                 // Monitor self
-                proxyClient = new ProxyClient(this, "localhost", 0, null, null); // NOI18N
+                proxyClient = new ProxyClient(this);
             } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvmstat.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
@@ -150,7 +139,7 @@ class JmxModelImpl extends JmxModel {
                         if (LOGGER.isLoggable(Level.WARNING)) {
                             LOGGER.warning("The JMX management agent " +    // NOI18N
                                     "cannot be enabled in this application (pid " + // NOI18N
-                                    application.getPid() + ")"); 
+                                    application.getPid() + ")");  // NOI18N
                         }
                     }
                 } else {
@@ -179,13 +168,13 @@ class JmxModelImpl extends JmxModel {
                     while (st.hasMoreTokens()) {
                         String token = st.nextToken();
                         if (token.startsWith("-Dcom.sun.management.jmxremote.port=")) { // NOI18N
-                            port = Integer.parseInt(token.substring(token.indexOf("=") + 1));
+                            port = Integer.parseInt(token.substring(token.indexOf("=") + 1)); // NOI18N
                         } else if (token.equals("-Dcom.sun.management.jmxremote.authenticate=true")) { // NOI18N
                             authenticate = true;
                         }
                     }
                     if (port != -1) {
-                        proxyClient = new ProxyClient(this, application.getHost().getHostName(), port, null, null);
+                        proxyClient = new ProxyClient(this, application.getHost(), port, null, null);
                         if (authenticate) {
                             supplyCredentials(application, proxyClient);
                         }
@@ -215,7 +204,7 @@ class JmxModelImpl extends JmxModel {
             String username = application.getUsername();
             String password = application.getPassword();
             final ProxyClient proxyClient =
-                    new ProxyClient(this, url.toString(), username, password);
+                    new ProxyClient(this, url, username, password);
             client = proxyClient;
             removedListener = new ApplicationRemovedListener();
             availabilityListener = new ApplicationAvailabilityListener();
@@ -254,7 +243,7 @@ class JmxModelImpl extends JmxModel {
         ApplicationSecurityConfigurator jsc =
                 ApplicationSecurityConfigurator.supplyCredentials(displayName);
         if (jsc != null) {
-            proxyClient.setParameters(proxyClient.getUrl(), jsc.getUsername(), jsc.getPassword());
+            proxyClient.setCredentials(jsc.getUsername(), jsc.getPassword());
             if (application instanceof JmxApplication && ((JmxApplication) application).getSaveCredentialsFlag()) {
                 Storage storage = application.getStorage();
                 storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
@@ -308,7 +297,7 @@ class JmxModelImpl extends JmxModel {
     /**
      * Disconnect from JMX agent when the application is removed.
      */
-    class ApplicationRemovedListener implements DataRemovedListener<Application> {
+    private class ApplicationRemovedListener implements DataRemovedListener<Application> {
 
         public void dataRemoved(Application application) {
             RequestProcessor.getDefault().post(new Runnable() {
@@ -320,7 +309,7 @@ class JmxModelImpl extends JmxModel {
         }
     }
     
-    class ApplicationAvailabilityListener implements PropertyChangeListener {
+    private class ApplicationAvailabilityListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (!evt.getNewValue().equals(Stateful.STATE_AVAILABLE)) {
@@ -332,210 +321,69 @@ class JmxModelImpl extends JmxModel {
         }
     }
     
-    static class ProxyClient implements NotificationListener {
+    private static class ProxyClient implements NotificationListener {
+
+        private static final int MODE_SELF = 0;
+        private static final int MODE_LOCAL = 1;
+        private static final int MODE_GENERIC = 2;
+
+        private final int mode;
 
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;
         private volatile boolean isDead = true;
-        private String hostName = null;
-        private int port = 0;
         private String userName = null;
         private String password = null;
         private LocalVirtualMachine lvm;
         private JMXServiceURL jmxUrl = null;
         private MBeanServerConnection conn = null;
         private JMXConnector jmxc = null;
-        private RMIServer stub = null;
         private static final SslRMIClientSocketFactory sslRMIClientSocketFactory =
                 new SslRMIClientSocketFactory();
-        private String registryHostName = null;
-        private int registryPort = 0;
-        private boolean vmConnector = false;
-        private boolean sslRegistry = false;
-        private boolean sslStub = false;
-        private final String connectionName;
-        private final String displayName;
         private final JmxModelImpl model;
 
-        public ProxyClient(JmxModelImpl model, String hostName, int port,
-                String userName, String password) throws IOException {
+
+        // Self attach
+        public ProxyClient(JmxModelImpl model) throws IOException {
+            this.mode = MODE_SELF;
             this.model = model;
-            this.connectionName = getConnectionName(hostName, port, userName);
-            this.displayName = connectionName;
-            if (hostName.equals("localhost") && port == 0) {    // NOI18N
-                // Monitor self
-                this.hostName = hostName;
-                this.port = port;
-            } else {
-                // Create an RMI connector client and connect it to
-                // the RMI connector server
-                final String urlPath = "/jndi/rmi://" + hostName + ":" + port + // NOI18N
-                        "/jmxrmi";  // NOI18N
-                JMXServiceURL url = new JMXServiceURL("rmi", "", 0, urlPath);   // NOI18N
-                setParameters(url, userName, password);
-                vmConnector = true;
-                registryHostName = hostName;
-                registryPort = port;
-                checkSslConfig();
-            }
         }
 
-        public ProxyClient(JmxModelImpl model, String url,
-                String userName, String password) throws IOException {
-            this.model = model;
-            this.connectionName = getConnectionName(url, userName);
-            this.displayName = connectionName;
-            setParameters(new JMXServiceURL(url), userName, password);
-        }
-
-        public ProxyClient(JmxModelImpl model, LocalVirtualMachine lvm)
-                throws IOException {
+        // Local attach
+        public ProxyClient(JmxModelImpl model, LocalVirtualMachine lvm) throws IOException {
+            this.mode = MODE_LOCAL;
             this.model = model;
             this.lvm = lvm;
-            this.connectionName = getConnectionName(lvm);
-            this.displayName = "pid: " + lvm.vmid();
         }
 
-        private void setParameters(JMXServiceURL url,
-                String userName, String password) {
+        // Generic attach - host/port
+        public ProxyClient(JmxModelImpl model, Host host, int port,
+                           String userName, String password) throws IOException {
+            this(model, new JMXServiceURL("rmi", "", 0, createUrl(host.getHostName(), // NOI18N
+                                          port)), userName, password);
+        }
+
+        // Generic attach - connection string
+        public ProxyClient(JmxModelImpl model, String url,
+                           String userName, String password) throws IOException {
+            this(model, new JMXServiceURL(url), userName, password);
+        }
+
+        // Generic attach - JMXServiceURL
+        public ProxyClient(JmxModelImpl model, JMXServiceURL url,
+                           String userName, String password) throws IOException {
+            this.mode = MODE_GENERIC;
+            this.model = model;
             this.jmxUrl = url;
-            if (jmxUrl != null) {
-                this.hostName = jmxUrl.getHost();
-                this.port = jmxUrl.getPort();
-            }
+            setCredentials(userName, password);
+        }
+
+        public void setCredentials(String userName, String password) {
             this.userName = userName;
             this.password = password;
         }
 
-        private static void checkStub(Remote stub,
-                Class<? extends Remote> stubClass) {
-            // Check remote stub is from the expected class.
-            //
-            if (stub.getClass() != stubClass) {
-                if (!Proxy.isProxyClass(stub.getClass())) {
-                    throw new SecurityException(
-                            "Expecting a " + stubClass.getName() + " stub!");   // NOI18N
-                } else {
-                    InvocationHandler handler = Proxy.getInvocationHandler(stub);
-                    if (handler.getClass() != RemoteObjectInvocationHandler.class) {
-                        throw new SecurityException(
-                                "Expecting a dynamic proxy instance with a " +  // NOI18N
-                                RemoteObjectInvocationHandler.class.getName() +
-                                " invocation handler!");    // NOI18N
-                    } else {
-                        stub = (Remote) handler;
-                    }
-                }
-            }
-            // Check RemoteRef in stub is from the expected class
-            // "sun.rmi.server.UnicastRef2".
-            //
-            RemoteRef ref = ((RemoteObject) stub).getRef();
-            if (ref.getClass() != UnicastRef2.class) {
-                throw new SecurityException(
-                        "Expecting a " + UnicastRef2.class.getName() +  // NOI18N
-                        " remote reference in stub!");  // NOI18N
-            }
-            // Check RMIClientSocketFactory in stub is from the expected class
-            // "javax.rmi.ssl.SslRMIClientSocketFactory".
-            //
-            LiveRef liveRef = ((UnicastRef2) ref).getLiveRef();
-            RMIClientSocketFactory csf = liveRef.getClientSocketFactory();
-            if (csf == null || csf.getClass() != SslRMIClientSocketFactory.class) {
-                throw new SecurityException(
-                        "Expecting a " + SslRMIClientSocketFactory.class.getName() +    // NOI18N
-                        " RMI client socket factory in stub!"); // NOI18N
-            }
-        }
-        private static final String rmiServerImplStubClassName =
-                "javax.management.remote.rmi.RMIServerImpl_Stub";   // NOI18N
-        private static final Class<? extends Remote> rmiServerImplStubClass;
-        
-
-        static {
-            Class<? extends Remote> serverStubClass = null;
-            try {
-                serverStubClass = Class.forName(
-                        rmiServerImplStubClassName).asSubclass(Remote.class);
-            } catch (ClassNotFoundException e) {
-                // should never reach here
-                throw (InternalError) new InternalError(e.getMessage()).initCause(e);
-            }
-            rmiServerImplStubClass = serverStubClass;
-        }
-
-        private void checkSslConfig() throws IOException {
-            // Get the reference to the RMI Registry and lookup RMIServer stub
-            //
-            Registry registry;
-            try {
-                registry = LocateRegistry.getRegistry(registryHostName,
-                        registryPort, sslRMIClientSocketFactory);
-                try {
-                    stub = (RMIServer) registry.lookup("jmxrmi");   // NOI18N
-                } catch (NotBoundException nbe) {
-                    throw (IOException) new IOException(nbe.getMessage()).initCause(nbe);
-                }
-                sslRegistry = true;
-            } catch (IOException e) {
-                registry =
-                        LocateRegistry.getRegistry(registryHostName, registryPort);
-                try {
-                    stub = (RMIServer) registry.lookup("jmxrmi");   // NOI18N
-                } catch (NotBoundException nbe) {
-                    throw (IOException) new IOException(nbe.getMessage()).initCause(nbe);
-                }
-                sslRegistry = false;
-            }
-            // Perform the checks for secure stub
-            //
-            try {
-                checkStub(stub, rmiServerImplStubClass);
-                sslStub = true;
-            } catch (SecurityException e) {
-                sslStub = false;
-            }
-        }
-
-        /**
-         * Returns true if the underlying RMI registry is SSL-protected.
-         *
-         * @exception UnsupportedOperationException If this {@code ProxyClient}
-         * does not denote a JMX connector for a JMX VM agent.
-         */
-        public boolean isSslRmiRegistry() {
-            // Check for VM connector
-            //
-            if (!isVmConnector()) {
-                throw new UnsupportedOperationException(
-                        "ProxyClient.isSslRmiRegistry() is only supported if this " +   // NOI18N
-                        "ProxyClient is a JMX connector for a JMX VM agent");   // NOI18N
-            }
-            return sslRegistry;
-        }
-
-        /**
-         * Returns true if the retrieved RMI stub is SSL-protected.
-         *
-         * @exception UnsupportedOperationException If this {@code ProxyClient}
-         * does not denote a JMX connector for a JMX VM agent.
-         */
-        public boolean isSslRmiStub() {
-            // Check for VM connector
-            //
-            if (!isVmConnector()) {
-                throw new UnsupportedOperationException(
-                        "ProxyClient.isSslRmiStub() is only supported if this " +   // NOI18N
-                        "ProxyClient is a JMX connector for a JMX VM agent");   // NOI18N
-            }
-            return sslStub;
-        }
-
-        /**
-         * Returns true if this {@code ProxyClient} denotes
-         * a JMX connector for a JMX VM agent.
-         */
-        public boolean isVmConnector() {
-            return vmConnector;
+        private static String createUrl(String hostName, int port) {
+            return "/jndi/rmi://" + hostName + ":" + port + "/jmxrmi";  // NOI18N
         }
 
         private void setConnectionState(ConnectionState state) {
@@ -568,19 +416,19 @@ class JmxModelImpl extends JmxModel {
                     //    Use PID when attach was used to connect,
                     //    Use JMXServiceURL otherwise...
                     final String param = 
-                            (lvm != null)?String.valueOf(lvm.vmid())
-                            :((jmxUrl != null)?jmxUrl.toString():"");
-                    LOGGER.log(Level.INFO,"connect("+param+")", e);
+                            (lvm != null) ? String.valueOf(lvm.vmid())
+                            : ((jmxUrl != null) ? jmxUrl.toString() : ""); // NOI18N
+                    LOGGER.log(Level.INFO, "connect(" + param + ")", e); // NOI18N
                 }
             }
         }
 
         private void tryConnect() throws IOException {
-            if (jmxUrl == null && "localhost".equals(hostName) && port == 0) {  // NOI18N
+            if (mode == MODE_SELF) {
                 jmxc = null;
                 conn = ManagementFactory.getPlatformMBeanServer();
             } else {
-                if (lvm != null) {
+                if (mode == MODE_LOCAL) {
                     if (!lvm.isManageable()) {
                         lvm.startManagementAgent();
                         if (!lvm.isManageable()) {
@@ -592,77 +440,30 @@ class JmxModelImpl extends JmxModel {
                         jmxUrl = new JMXServiceURL(lvm.connectorAddress());
                     }
                 }
-                // Need to pass in credentials ?
-                if (userName == null && password == null) {
-                    if (isVmConnector()) {
-                        // Check for SSL config on reconnection only
-                        if (stub == null) {
-                            checkSslConfig();
-                        }
-                        jmxc = new RMIConnector(stub, null);
-                        jmxc.addConnectionNotificationListener(this, null, null);
-                        jmxc.connect();
-                    } else {
-                        jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, null);
-                        jmxc.addConnectionNotificationListener(this, null, null);
-                        jmxc.connect();
-                    }
-                } else {
-                    Map<String, String[]> env = new HashMap<String, String[]>();
+
+                Map<String, Object> env = new HashMap();
+                if (userName != null || password != null)
                     env.put(JMXConnector.CREDENTIALS,
-                            new String[]{userName, password});
-                    if (isVmConnector()) {
-                        // Check for SSL config on reconnection only
-                        if (stub == null) {
-                            checkSslConfig();
-                        }
-                        jmxc = new RMIConnector(stub, null);
-                        jmxc.addConnectionNotificationListener(this, null, null);
+                            new String[]{ userName, password });
+
+                jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
+                jmxc.addConnectionNotificationListener(this, null, null);
+                try {
+                    jmxc.connect(env);
+                } catch (java.io.IOException e) {
+                    // Likely a SSL-protected RMI registry
+                    if ("rmi".equals(jmxUrl.getProtocol())) { // NOI18N
+                        env.put("com.sun.jndi.rmi.factory.socket", sslRMIClientSocketFactory); // NOI18N
                         jmxc.connect(env);
                     } else {
-                        jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
-                        jmxc.addConnectionNotificationListener(this, null, null);
-                        jmxc.connect(env);
+                        throw e;
                     }
                 }
+                
                 MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
                 conn = Checker.newChecker(this, mbsc);
             }
             isDead = false;
-        }
-
-        public static String getConnectionName(LocalVirtualMachine lvm) {
-            return Integer.toString(lvm.vmid());
-        }
-
-        public static String getConnectionName(String url, String userName) {
-            if (userName != null && userName.length() > 0) {
-                return userName + "@" + url;
-            } else {
-                return url;
-            }
-        }
-
-        public static String getConnectionName(String hostName, int port, String userName) {
-            String name = hostName + ":" + port;
-            if (userName != null && userName.length() > 0) {
-                return userName + "@" + name;
-            } else {
-                return name;
-            }
-        }
-
-        public String connectionName() {
-            return connectionName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
         }
 
         public MBeanServerConnection getMBeanServerConnection() {
@@ -672,34 +473,12 @@ class JmxModelImpl extends JmxModel {
         public JMXServiceURL getUrl() {
             return jmxUrl;
         }
-
-        public String getHostName() {
-            return hostName;
-        }
-
-        public int getPort() {
-            return port;
-        }
-
-        public int getVmid() {
-            return (lvm != null) ? lvm.vmid() : 0;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public String getPassword() {
-            return password;
-        }
         
         public void disconnect() {
             disconnectImpl(true);
         }
 
         private synchronized void disconnectImpl(boolean sendClose) {
-            // Reset remote stub
-            stub = null;
             // Close MBeanServer connection
             if (jmxc != null) {
                 try {
@@ -743,35 +522,7 @@ class JmxModelImpl extends JmxModel {
         }
     }
 
-    /**
-     * The PropertyChangeListener is handled via a WeakReference
-     * so as not to pin down the listener.
-     */
-    class WeakPCL extends WeakReference<PropertyChangeListener>
-            implements PropertyChangeListener {
-
-        WeakPCL(PropertyChangeListener referent) {
-            super(referent);
-        }
-
-        public void propertyChange(PropertyChangeEvent pce) {
-            PropertyChangeListener pcl = get();
-
-            if (pcl == null) {
-                // The referent listener was GC'ed, we're no longer
-                // interested in PropertyChanges, remove the listener.
-                dispose();
-            } else {
-                pcl.propertyChange(pce);
-            }
-        }
-
-        private void dispose() {
-            JmxModelImpl.this.removePropertyChangeListener(this);
-        }
-    }
-
-    static class Checker {
+    private static class Checker {
 
         private Checker() {
         }
@@ -786,7 +537,7 @@ class JmxModelImpl extends JmxModel {
         }
     }
 
-    static class CheckerInvocationHandler implements InvocationHandler {
+    private static class CheckerInvocationHandler implements InvocationHandler {
 
         private final MBeanServerConnection conn;
 
@@ -823,7 +574,7 @@ class JmxModelImpl extends JmxModel {
         }
     }
 
-    static class LocalVirtualMachine {
+    private static class LocalVirtualMachine {
 
         private int vmid;
         private boolean isAttachSupported;
