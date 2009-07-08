@@ -59,6 +59,7 @@ import java.util.Set;
  */
 public class JVMImpl extends Jvm implements JvmstatListener {
     private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";   // NOI18N
+    private static final String HEAP_DUMP_PATH = "HeapDumpPath";   // NOI18N
     Application application;
     Boolean isDumpOnOOMEnabled;
     JvmstatModel monitoredVm;
@@ -307,13 +308,13 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         if (attach!=null) {
             attach.setFlag(HEAP_DUMP_ON_OOME,enabled?"1":"0");  // NOI18N
             if (enabled) {
-                attach.setFlag("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath());   // NOI18N
+                attach.setFlag(HEAP_DUMP_PATH,application.getStorage().getDirectory().getAbsolutePath());
             }
         } else {
             HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-            hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,enabled?"true":"false"); // NOI18N
+            hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,Boolean.toString(enabled));
             if (enabled) {
-                hsDiagnostic.setVMOption("HeapDumpPath",application.getStorage().getDirectory().getAbsolutePath()); // NOI18N
+                hsDiagnostic.setVMOption(HEAP_DUMP_PATH,application.getStorage().getDirectory().getAbsolutePath());
             }
         }
         Boolean oldVlue = isDumpOnOOMEnabled;
