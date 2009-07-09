@@ -128,7 +128,7 @@ public class OQLController extends AbstractTopLevelController
     }
 
     public void cancelQuery() {
-        analysisRunning.compareAndSet(true, false);
+        finalizeQuery();
     }
 
     public boolean isQueryRunning() {
@@ -251,9 +251,8 @@ public class OQLController extends AbstractTopLevelController
 
                             sb.append("</table>"); // NOI18N
 
-                            analysisRunning.compareAndSet(true, false);
-                            queryController.queryFinished();
                             resultsController.setResult(sb.toString());
+                            finalizeQuery();
                         } catch (OQLException oQLException) {
                             StringBuilder errorMessage = new StringBuilder();
                             errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
@@ -261,13 +260,18 @@ public class OQLController extends AbstractTopLevelController
                             errorMessage.append("<hr>"); // noi18n
                             errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
                             resultsController.setResult(errorMessage.toString());
-                            queryController.queryFinished();
-                            cancelQuery();
+                            finalizeQuery();
                         }
                     }
+
                 });
             }
         });
+    }
+
+    private void finalizeQuery() {
+        analysisRunning.compareAndSet(true, false);
+        queryController.queryFinished();
     }
 
     private void dump(Object o, StringBuilder sb) {
@@ -433,7 +437,6 @@ public class OQLController extends AbstractTopLevelController
 
     
     public static class QueryController extends AbstractController {
-
         private OQLController oqlController;
 
 
@@ -510,15 +513,8 @@ public class OQLController extends AbstractTopLevelController
                 if (filtersFO == null) {
                     FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config"); // NOI18N
                     if (configFolder != null && configFolder.isValid()) {
-                        Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
-
-                        while (suffixesIterator.hasNext() && (filtersFO == null)) {
-                            // find and use localized bundled filters definition
-                            filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
-                                                                   DEFAULT_FILE_SUFFIX +
-                                                                   suffixesIterator.next(),
-                                                                   "xml"); // NOI18N
-                        }
+                        filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
+                                                                   DEFAULT_FILE_SUFFIX,"xml"); // NOI18N
                     }
                 }
 
