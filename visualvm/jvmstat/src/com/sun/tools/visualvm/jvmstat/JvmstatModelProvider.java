@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jvmstat;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
+import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -49,7 +50,7 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         
         String vmId = "//" + app.getPid() + "?mode=r";  // NOI18N
         try {
-            MonitoredHost monitoredHost = MonitoredHost.getMonitoredHost(app.getHost().getHostName());
+            MonitoredHost monitoredHost = JvmstatApplicationProvider.findMonitoredHost(app);
             int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
             return monitoredHost.getMonitoredVm(new VmIdentifier(vmId),refreshInterval);
         } catch (URISyntaxException ex) {

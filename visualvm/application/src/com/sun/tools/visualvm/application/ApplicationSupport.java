@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.application;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
@@ -51,10 +50,7 @@ final class ApplicationSupport {
     Application createCurrentApplication() {
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
         final int selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
-        CurrentApplication currentApplication = new CurrentApplication(selfPid, Host.LOCALHOST, Host.LOCALHOST.getHostName() + "-" + selfPid);
-        // precompute JVM
-        currentApplication.jvm = JvmFactory.getJVMFor(currentApplication);
-        return currentApplication;
+        return new CurrentApplication(selfPid, Host.LOCALHOST, Host.LOCALHOST.getHostName() + "-" + selfPid);
     }
     
     private void initCurrentApplication() {

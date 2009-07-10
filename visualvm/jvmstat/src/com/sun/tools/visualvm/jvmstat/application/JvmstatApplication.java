@@ -28,21 +28,25 @@ package com.sun.tools.visualvm.jvmstat.application;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.host.Host;
+import sun.jvmstat.monitor.HostIdentifier;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 final class JvmstatApplication extends Application {   
     
-    private int pid;
+    final private int pid;
+    final HostIdentifier hostId;
     // since getting JVM for the first time can take a long time
     // hard reference jvm from application so we are sure that it is not garbage collected
     Jvm jvm;
 
-    JvmstatApplication(Host host, String id, int pid) {
+    JvmstatApplication(Host host, HostIdentifier hostId, String id, int pid) {
         super(host, id);
         this.pid = pid;
+        this.hostId = hostId;
     }
     
     
@@ -61,4 +65,7 @@ final class JvmstatApplication extends Application {
         setState(newState);
     }
 
+    HostIdentifier getHostIdentifier() {
+       return hostId; 
+    }
 }
