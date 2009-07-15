@@ -52,6 +52,7 @@ import org.netbeans.modules.profiler.oql.engine.api.impl.Snapshot;
 public class OQLEngine {
     final private static Logger LOGGER = Logger.getLogger(OQLEngine.class.getName());
     final private OQLEngineImpl delegate;
+    final private Heap heap;
 
     /**
      * This represents a parsed OQL query
@@ -90,10 +91,11 @@ public class OQLEngine {
 
     public OQLEngine(Heap heap) {
         delegate = new OQLEngineImpl(new Snapshot(heap));
+        this.heap = heap;
     }
 
-    public Snapshot getHeapHelper() {
-        return delegate.getHeapHelper();
+    public Heap getHeap() {
+        return heap;
     }
 
     /**
