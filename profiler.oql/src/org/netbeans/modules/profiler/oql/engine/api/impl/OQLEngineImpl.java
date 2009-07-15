@@ -136,7 +136,7 @@ public class OQLEngineImpl {
                 return null;
             }
         } else {
-            throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_SELECT_CLAUSE"));
+            throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_SELECT_CLAUSE"));
         }
 
         String selectExpr = ""; // NOI18N
@@ -151,7 +151,7 @@ public class OQLEngineImpl {
         }
 
         if (selectExpr.equals("")) { // NOI18N
-            throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_SELECT"));
+            throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_SELECT"));
         }
 
         String className = null;
@@ -165,25 +165,25 @@ public class OQLEngineImpl {
                 if (tmp.equals("instanceof")) { // NOI18N
                     isInstanceOf = true;
                     if (!st.hasMoreTokens()) {
-                        throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_INSTANCEOF_NO_CLASSNAME"));
+                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_INSTANCEOF_NO_CLASSNAME"));
                     }
                     className = st.nextToken();
                 } else {
                     className = tmp;
                 }
             } else {
-                throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_FROM_NO_CLASSNAME"));
+                throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_FROM_NO_CLASSNAME"));
             }
 
             if (st.hasMoreTokens()) {
                 identifier = st.nextToken();
                 if (identifier.equals("where")) { // NOI18N
-                    throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_IDENTIFIER"));
+                    throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_IDENTIFIER"));
                 }
                 if (st.hasMoreTokens()) {
                     String tmp = st.nextToken();
                     if (!tmp.equals("where")) { // NOI18N
-                        throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EXPECTING_WHERE"));
+                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EXPECTING_WHERE"));
                     }
 
                     whereExpr = "";  // NOI18N
@@ -191,11 +191,11 @@ public class OQLEngineImpl {
                         whereExpr += " " + st.nextToken(); // NOI18N
                     }
                     if (whereExpr.equals("")) { // NOI18N
-                        throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_WHERE"));
+                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_WHERE"));
                     }
                 }
             } else {
-                throw new OQLException(java.util.ResourceBundle.getBundle("/org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_IDENTIFIER"));
+                throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_IDENTIFIER"));
             }
         }
         return new OQLQueryImpl(selectExpr, isInstanceOf, className, identifier, whereExpr);
