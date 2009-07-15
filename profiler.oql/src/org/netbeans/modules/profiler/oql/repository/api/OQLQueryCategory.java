@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,29 +34,53 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.heapwalk.oql;
+package org.netbeans.modules.profiler.oql.repository.api;
+
+import java.util.List;
+import org.netbeans.api.annotations.common.NonNull;
 
 /**
- * This represents a parsed OQL query
- *
- * @author A. Sundararajan
+ * Value object for an OQL query category<br/>
+ * Use {@linkplain OQLQueryRepository#listCategories()} or its variants
+ * to obtain this class instances.
+ * @author Jaroslav Bachorik
  */
-public class OQLQuery {
-    OQLQuery(String selectExpr, boolean isInstanceOf, 
-             String className, String identifier, String whereExpr) {
-        this.selectExpr = selectExpr;
-        this.isInstanceOf = isInstanceOf;
-        this.className = className;
-        this.identifier = identifier;
-        this.whereExpr = whereExpr;
+final public class OQLQueryCategory {
+    private String id;
+    private String name;
+    private OQLQueryRepository repository;
+    
+    OQLQueryCategory(@NonNull OQLQueryRepository repository, @NonNull String id, @NonNull String name) {
+        this.id = id;
+        this.name = name;
+        this.repository = repository;
     }
 
-    String   selectExpr;
-    boolean  isInstanceOf;
-    String   className;
-    String   identifier;
-    String   whereExpr;
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    @NonNull
+    String getID() {
+        return id;
+    }
+
+    @NonNull
+    public List<? extends OQLQueryDefinition> listQueries() {
+        return repository.listQueries(this);
+    }
+
+    @NonNull
+    public List<? extends OQLQueryDefinition> listQueries(@NonNull String pattern) {
+        return repository.listQueries(this, pattern);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,31 +34,51 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.heapwalk.oql;
+package org.netbeans.modules.profiler.oql.repository.api;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.netbeans.api.annotations.common.NonNull;
 
 /**
- * This visitor is supplied to OQLEngine.executeQuery
- * to receive result set objects one by one.
- *
- * @author A. Sundararajan
- * @author J. Bachorik
+ * Value object for OQL query definition<br/>
+ * @author Jaroslav Bachorik
  */
-public interface ObjectVisitor {
-    // return true to terminate the result set callback earlier
-    public boolean visit(Object o);
+final public class OQLQueryDefinition {
+    private String name;
+    private String description;
+    private String content;
 
-    public static final ObjectVisitor DEFAULT = new ObjectVisitor() {
-        final private Logger LOGGER = Logger.getLogger(ObjectVisitor.class.getName());
-        public boolean visit(Object o) {
-            if (o != null && LOGGER.isLoggable(Level.FINEST)) LOGGER.finest(o.toString());
+    /**
+     * The constructor taking all necessary information
+     * @param name The query name - as being displayed by a browser
+     * @param description The query description
+     * @param content The query content
+     */
+    public OQLQueryDefinition(@NonNull String name, @NonNull String description, @NonNull String content) {
+        this.name = name;
+        this.description = description;
+        this.content = content;
+    }
 
-            return true; // prevent calling "visit" for the rest of the result set
-        }
-    };
+    @NonNull
+    public String getContent() {
+        return content;
+    }
+
+    @NonNull
+    public String getDescription() {
+        return description;
+    }
+
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
