@@ -36,7 +36,7 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.oql.model;
+package org.netbeans.modules.profiler.oql.engine.api;
 
 import org.netbeans.lib.profiler.heap.Instance;
 
@@ -45,7 +45,7 @@ import org.netbeans.lib.profiler.heap.Instance;
  *
  * @author      Bill Foote
  */
-public class ReferenceChain {
+final public class ReferenceChain {
 
     Instance obj;	// Object referred to
     ReferenceChain next;	// Next in chain

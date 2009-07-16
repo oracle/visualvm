@@ -36,8 +36,9 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.oql.model;
+package org.netbeans.modules.profiler.oql.engine.api.impl;
 
+import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.ArrayList;
