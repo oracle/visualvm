@@ -1,0 +1,4 @@
+select map(
+    top(heap.objects("java.lang.String", false, '(2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset))) > 0'),
+        '((2 * rhs.offset) + (2 * (rhs.value.length - (1*rhs.count + 1*rhs.offset)))) - ((2 * lhs.offset) + (2 * (lhs.value.length - (1*lhs.count + 1*lhs.offset))))'),
+    'toHtml(it) + " wasting " + ((2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset)))) + "b"')

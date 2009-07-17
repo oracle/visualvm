@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: false
+OpenIDE-Module: org.netbeans.modules.profiler.oql/0
+OpenIDE-Module-Layer: org/netbeans/modules/profiler/oql/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/oql/Bundle.properties
+OpenIDE-Module-Specification-Version: 0.1
+
