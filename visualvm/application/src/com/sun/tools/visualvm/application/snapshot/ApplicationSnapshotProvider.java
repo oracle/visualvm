@@ -77,8 +77,6 @@ class ApplicationSnapshotProvider {
     }
     
     void createSnapshot(final Application application, final boolean interactive) {
-        // TODO: open snapshot if interactive
-        
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
@@ -102,8 +100,10 @@ class ApplicationSnapshotProvider {
         if (snapshots.isEmpty() && !DataSourceViewsManager.sharedInstance().canSaveViewsFor(application, ApplicationSnapshot.class)) return;
         
         File snapshotDirectory = null;
-        synchronized(ApplicationSnapshotProvider.this) {
-            snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(), ApplicationSnapshotsSupport.getInstance().getCategory().createFileName());
+        synchronized (ApplicationSnapshotProvider.this) {
+            snapshotDirectory = Utils.getUniqueFile(ApplicationSnapshotsSupport.getStorageDirectory(),
+                                                    ApplicationSnapshotsSupport.getInstance().
+                                                    getCategory().createFileName());
             if (!Utils.prepareDirectory(snapshotDirectory))
                 throw new IllegalStateException("Cannot save datasource snapshot " + snapshotDirectory);    // NOI18N
         }
@@ -115,8 +115,10 @@ class ApplicationSnapshotProvider {
                 LOGGER.log(Level.SEVERE, "Error saving snapshot to application snapshot", e);   // NOI18N
             }
         }
-        
-        ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
+
+        // See #299
+//        ApplicationType applicationType = ApplicationTypeFactory.getApplicationTypeFor(application);
+        DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(application);
         String[] propNames = new String[] {
             SNAPSHOT_VERSION,
             DataSourceDescriptor.PROPERTY_NAME,
@@ -124,8 +126,8 @@ class ApplicationSnapshotProvider {
         };
         String[] propValues = new String[] {
             CURRENT_SNAPSHOT_VERSION,
-            applicationType.getName() + getDisplayNameSuffix(application),
-            Utils.imageToString(applicationType.getIcon(), "png")   // NOI18N
+            descriptor.getName() + getDisplayNameSuffix(application),
+            Utils.imageToString(descriptor.getIcon(), "png")   // NOI18N
         };
         
         Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
@@ -140,12 +142,14 @@ class ApplicationSnapshotProvider {
     }
     
     private static String getDisplayNameSuffix(Application application) {
-        StringBuilder builder = new StringBuilder(" (");    // NOI18N
-        int pid = application.getPid();
-        if (pid != Application.UNKNOWN_PID) builder.append("pid " + pid + ", ");    // NOI18N
-        builder.append(SnapshotsSupport.getInstance().getTimeStamp(System.currentTimeMillis()));
-        builder.append(")");    // NOI18N
-        return builder.toString();
+        return ", " + SnapshotsSupport.getInstance().getTimeStamp(System.currentTimeMillis()); // NOI18N
+        // See #299
+//        StringBuilder builder = new StringBuilder(" (");    // NOI18N
+//        int pid = application.getPid();
+//        if (pid != Application.UNKNOWN_PID) builder.append("pid " + pid + ", ");
+//        builder.append(SnapshotsSupport.getInstance().getTimeStamp(System.currentTimeMillis()));
+//        builder.append(")");    // NOI18N
+//        return builder.toString();
     }
     
     void addSnapshotArchive(final File archive, final boolean deleteArchive) {
