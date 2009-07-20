@@ -37,7 +37,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.heapwalk.oql;
+package org.netbeans.modules.profiler.oql.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,9 +54,9 @@ import org.junit.Test;
 import org.netbeans.lib.profiler.heap.HeapFactory;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.heapwalk.OQLController;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 import static org.junit.Assert.*;
-import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
 
 /**
  *
@@ -79,7 +79,7 @@ public class OQLEngineTest {
     @Before
     public void setUp() throws IOException, URISyntaxException {
         URL url = getClass().getResource("small_heap.bin");
-        instance = new OQLEngine(new Snapshot(HeapFactory.createHeap(new File(url.toURI()))));
+        instance = new OQLEngine(HeapFactory.createHeap(new File(url.toURI())));
     }
 
     @After
@@ -469,7 +469,7 @@ public class OQLEngineTest {
                 return false;
             }
         });
-        assertEquals(8, counter[0]);
+        assertEquals(2, counter[0]); // although there is 8 subclasses of ClassLoader only 2 of them have instances
     }
 
     @Test
