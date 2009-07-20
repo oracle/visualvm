@@ -37,7 +37,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-var hatPkg = Packages.org.netbeans.modules.profiler.heapwalk.oql;
+var hatPkg = Packages.org.netbeans.modules.profiler.oql.engine.api.impl;
 var snapshot;
 
 /**
@@ -588,36 +588,6 @@ function unwrapArray(jsobject) {
 }
 
 /**
- * readHeapDump parses a heap dump file and returns script wrapper object.
- *
- * @param file  Heap dump file name
- * @param stack flag to tell if allocation site traces are available
- * @param refs  flag to tell if backward references are needed or not
- * @param debug debug level for HAT
- * @return heap as a JavaScript object
- */
-function readHeapDump(file, stack, refs, debug) {
-
-    // default value of debug is 0
-    if (!debug) debug = 0;
-
-    // by default, we assume no stack traces
-    if (!stack) stack = false;
-
-    // by default, backward references are resolved
-    if (!refs) refs = true;
-
-    // read the heap dump 
-    var heap = hatPkg.parser.HprofReader.readFile(file, stack, debug);
-
-    // resolve it
-    heap.resolve(refs);
-
-    // wrap Snapshot as convenient script object
-    return wrapHeapSnapshot(heap);
-}
-
-/**
  * The result object supports the following methods:
  * 
  *  forEachClass  -- calls a callback for each Java Class
@@ -1054,7 +1024,7 @@ function reachables(jobject, excludes) {
             excludedFields[excludedFields.length] = st.nextToken().trim();
         }
         if (excludedFields.length > 0) { 
-            excludes = new hatPkg.model.ReachableExcludes() {
+            excludes = new hatPkg.ReachableExcludes() {
                 isExcluded: function (field) {
                     for (var index in excludedFields) {
                         if (field.equals(excludedFields[index])) {
@@ -1068,12 +1038,12 @@ function reachables(jobject, excludes) {
             // nothing to filter...
             excludes = null;
         }
-    } else if (! (excludes instanceof hatPkg.model.ReachableExcludes)) {
+    } else if (! (excludes instanceof hatPkg.ReachableExcludes)) {
         excludes = null;
     }
 
     jobject = unwrapJavaObject(jobject);
-    var ro = new hatPkg.model.ReachableObjects(jobject, excludes);  
+    var ro = new hatPkg.ReachableObjects(jobject, excludes);  
     return wrapIterator(ro.reachables, true);
 }
 
