@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.cache;
+package com.sun.tools.visualvm.api.caching;
 
 /**
  * Generic key/value persistor

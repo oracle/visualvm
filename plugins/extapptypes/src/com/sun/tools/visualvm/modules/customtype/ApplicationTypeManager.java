@@ -24,8 +24,11 @@
  */
 package com.sun.tools.visualvm.modules.customtype;
 
-import com.sun.tools.visualvm.modules.customtype.cache.AbstractCache;
-import com.sun.tools.visualvm.modules.customtype.cache.Entry;
+
+import com.sun.tools.visualvm.api.caching.Cache;
+import com.sun.tools.visualvm.api.caching.CacheFactory;
+import com.sun.tools.visualvm.api.caching.Entry;
+import com.sun.tools.visualvm.api.caching.EntryFactory;
 import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -52,10 +55,10 @@ public class ApplicationTypeManager {
 
     final private Random random = new Random(System.currentTimeMillis());
     final private FileObject defRepository;
-    final private AbstractCache<String, ApplicationType> appTypeCache = new AbstractCache<String, ApplicationType>() {
+    final private EntryFactory<String, ApplicationType> appTypeResolver = new EntryFactory<String, ApplicationType>() {
 
         @Override
-        protected Entry<ApplicationType> cacheMiss(String key) {
+        public Entry<ApplicationType> createEntry(String key) {
             Enumeration<? extends FileObject> defs = defRepository.getFolders(false);
             while (defs.hasMoreElements()) {
                 FileObject def = defs.nextElement();
@@ -63,7 +66,8 @@ public class ApplicationTypeManager {
                     String defMainClass = (String) def.getAttribute("mainClass"); // NOI18N
                     if (defMainClass != null && defMainClass.equals(key)) {
                         String name = (String) def.getAttribute("displayName"); // NOI18N
-                        String description = (String) def.getAttribute("descritpion"); // NOI18N
+                        String description = (String) def.getAttribute("description"); // NOI18N
+                        description = description.replaceAll("\\s\\s+", " ");
                         String iconPath = (String) def.getAttribute("icon"); // NOI18N
                         String urlPath = (String) def.getAttribute("url"); // NOI18N
 
@@ -81,13 +85,14 @@ public class ApplicationTypeManager {
                         }
                         ApplicationType at = new ApplicationType(key, name, "", description, iconUrl, infoUrl);
                         at.setDefName(def.getNameExt());
-                        return new Entry(at);
+                        return new Entry<ApplicationType>(at);
                     }
                 }
             }
             return null;
         }
     };
+    final private Cache<String, ApplicationType> appTypeCache = CacheFactory.getInstance().softMapCache(appTypeResolver);
 
     final private static class Singleton {
 

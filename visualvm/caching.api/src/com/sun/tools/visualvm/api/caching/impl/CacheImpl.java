@@ -23,31 +23,81 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.cache;
+package com.sun.tools.visualvm.api.caching.impl;
 
+
+import com.sun.tools.visualvm.api.caching.Cache;
+import com.sun.tools.visualvm.api.caching.Entry;
+import com.sun.tools.visualvm.api.caching.EntryFactory;
+import com.sun.tools.visualvm.api.caching.Persistor;
+import java.lang.ref.Reference;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Abstract cache manager - should be used as a base for caching functionality
+ * Default class implementation - should be used as a base for caching functionality
  * @author Jaroslav Bachorik
  */
-abstract public class AbstractCache<K, V> {
-    final private Map<K, Entry<V>> objectCache = new HashMap<K, Entry<V>>();
+final class CacheImpl<K, V> extends Cache<K,V> {
+    final private Map<Reference<K>, Entry<V>> objectCache = new HashMap<Reference<K>, Entry<V>>();
 
     private long update_interval = 60480000; // 7 days in milliseconds
 
     private Persistor<K, V> persistor = Persistor.DEFAULT;
+    private KeyFactory<K> keyFactory = KeyFactory.DEFAULT;
+    private EntryFactory<K,V> resolver = EntryFactory.DEFAULT;
+
+    CacheImpl() {};
+
+    CacheImpl(EntryFactory<K,V> resolver) {
+        this.resolver = resolver;
+    }
+
+    CacheImpl(Persistor<K,V> persistor) {
+        this.persistor = persistor;
+    }
+
+    CacheImpl(KeyFactory<K> keyFactory) {
+        this.keyFactory = keyFactory;
+    }
+
+    CacheImpl(EntryFactory<K,V> resolver, Persistor<K,V> persistor) {
+        this.resolver = resolver;
+        this.persistor = persistor;
+    }
+
+    CacheImpl(EntryFactory<K,V> resolver, KeyFactory<K> keyFactory) {
+        this.resolver = resolver;
+        this.keyFactory = keyFactory;
+    }
+
+    CacheImpl(KeyFactory<K> keyFactory, Persistor<K,V> persistor) {
+        this.persistor = persistor;
+        this.keyFactory = keyFactory;
+    }
+
+    CacheImpl(EntryFactory<K,V> resolver, KeyFactory<K> keyFactory, Persistor<K,V> persistor) {
+        this.resolver = resolver;
+        this.persistor = persistor;
+        this.keyFactory = keyFactory;
+    }
 
     /**
      * Retrieves an object from the cache by the given key
-     * If there is no cached version of the object {@linkplain #cacheMiss(java.lang.Object) } is invoked
+     * <p>
+     * If there is no cached version then a registered instance of {@linkplain EntryFactory}
+     * is used to invoke its {@linkplain EntryFactory#createEntry(java.lang.Object)} method.<br/>
+     * Also, a {@linkplain Persistor} instance is used to retrieve and store the cached value in
+     * a dedicated storage.
+     * </p>
      * @param key The key identifying the object to be retrieved
      * @return Returns the cached object or NULL
      */
-    public V retrieveObject(K key) {
+    @Override
+    final public V retrieveObject(K key) {
+        Reference<K> softKey = keyFactory.createKey(key);
         synchronized(objectCache) {
-            Entry<V> entry = objectCache.get(key);
+            Entry<V> entry = objectCache.get(softKey);
             if (entry == null) {
                 entry = persistor.retrieve(key);
             }
@@ -55,7 +105,7 @@ abstract public class AbstractCache<K, V> {
                 entry = cacheMiss(key);
                 if (entry != null && entry.getContent() != null) {
                     persistor.store(key, entry);
-                    objectCache.put(key, entry);
+                    objectCache.put(softKey, entry);
                 }
             } else {
                 long timestamp = System.currentTimeMillis();
@@ -63,7 +113,7 @@ abstract public class AbstractCache<K, V> {
                     Entry<V> newEntry = cacheMiss(key);
                     if (newEntry != null && newEntry.getContent() != null) {
                         persistor.store(key, entry);
-                        objectCache.put(key, newEntry);
+                        objectCache.put(softKey, newEntry);
                         entry = newEntry;
                     }
                 }
@@ -72,33 +122,21 @@ abstract public class AbstractCache<K, V> {
         }
     }
     
-    public V invalidateObject(K key) {
+    @Override
+    final public V invalidateObject(K key) {
+        Reference<K> softKey = keyFactory.createKey(key);
         synchronized(objectCache) {
-            Entry<V> entry = objectCache.remove(key);
+            Entry<V> entry = objectCache.remove(softKey);
             return entry != null ? entry.getContent() : null;
         }
-    }
-    /**
-     * Property getter
-     * @return Returns {@linkplain Persistor} instance used by the cache
-     */
-    public Persistor<K, V> getPersistor() {
-        return persistor;
-    }
-
-    /**
-     * Property setter
-     * @param persistor Sets the {@linkplain Persistor} instance to be used
-     */
-    public void setPersistor(Persistor<K, V> persistor) {
-        this.persistor = persistor;
     }
 
     /**
      * Property getter
      * @return Returns TTL interval in milliseconds
      */
-    public long getTTL() {
+    @Override
+    final public long getTTL() {
         return update_interval;
     }
 
@@ -106,16 +144,18 @@ abstract public class AbstractCache<K, V> {
      * Property setter
      * @param ttl TTL interval in milliseconds
      */
-    public void setTTL(long ttl) {
+    @Override
+    final public void setTTL(long ttl) {
         this.update_interval = ttl;
     }
 
     /**
      * This method is called in case of cache-miss
-     * The subclass should take care of resolving the missing instance
      * It can return NULL if it's not possible to resolve the missing instance
      * @param key The key of the missing object
      * @return Returns the resolved object or NULL
      */
-    abstract protected Entry<V> cacheMiss(K key);
+    private Entry<V> cacheMiss(K key) {
+        return resolver.createEntry(key);
+    }
 }

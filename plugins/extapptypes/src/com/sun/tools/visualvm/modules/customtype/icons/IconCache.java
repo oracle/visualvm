@@ -25,9 +25,11 @@
 
 package com.sun.tools.visualvm.modules.customtype.icons;
 
-import com.sun.tools.visualvm.modules.customtype.cache.AbstractCache;
-import com.sun.tools.visualvm.modules.customtype.cache.Entry;
-import com.sun.tools.visualvm.modules.customtype.cache.Persistor;
+import com.sun.tools.visualvm.api.caching.Cache;
+import com.sun.tools.visualvm.api.caching.CacheFactory;
+import com.sun.tools.visualvm.api.caching.Entry;
+import com.sun.tools.visualvm.api.caching.EntryFactory;
+import com.sun.tools.visualvm.api.caching.Persistor;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
@@ -35,8 +37,9 @@ import java.net.URL;
  *
  * @author Jaroslav Bachorik
  */
-public class IconCache extends AbstractCache<URL, BufferedImage> {
+public class IconCache implements Cache<URL, BufferedImage> {
     final private IconResolver resolver = new IconResolver();
+    final private Cache<URL, BufferedImage> delegate;
 
     final private static class Singleton {
 
@@ -48,19 +51,43 @@ public class IconCache extends AbstractCache<URL, BufferedImage> {
     }
 
     private IconCache() {
+        Persistor<URL, BufferedImage> persistor;
         try {
-            setPersistor(new FileImagePersistor());
+            persistor = new FileImagePersistor();
+            
         } catch (InstantiationException e) {
-            setPersistor(Persistor.DEFAULT);
+            persistor = Persistor.DEFAULT;
         }
+        delegate = CacheFactory.getInstance().softMapCache(new EntryFactory<URL, BufferedImage>() {
+            @Override
+            public Entry<BufferedImage> createEntry(URL key) {
+                BufferedImage img = resolver.resolveIcon(key);
+                if (img != null) {
+                    img = ImageUtils.resizeImage(img, 16, 16);
+                }
+                return new Entry<BufferedImage>(resolver.resolveIcon(key));
+            }
+        }, persistor);
+
     }
 
     @Override
-    protected Entry<BufferedImage> cacheMiss(URL key) {
-        BufferedImage img = resolver.resolveIcon(key);
-        if (img != null) {
-            img = ImageUtils.resizeImage(img, 16, 16);
-        }
-        return new Entry<BufferedImage>(resolver.resolveIcon(key));
+    public long getTTL() {
+        return delegate.getTTL();
+    }
+
+    @Override
+    public BufferedImage invalidateObject(URL key) {
+        return delegate.invalidateObject(key);
+    }
+
+    @Override
+    public BufferedImage retrieveObject(URL key) {
+        return delegate.retrieveObject(key);
+    }
+
+    @Override
+    public void setTTL(long ttl) {
+        delegate.setTTL(ttl);
     }
 }

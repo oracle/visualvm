@@ -24,8 +24,8 @@
  */
 package com.sun.tools.visualvm.modules.customtype.icons;
 
-import com.sun.tools.visualvm.modules.customtype.cache.Persistor;
-import com.sun.tools.visualvm.modules.customtype.cache.Entry;
+import com.sun.tools.visualvm.api.caching.Entry;
+import com.sun.tools.visualvm.api.caching.Persistor;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import java.awt.image.BufferedImage;
 import java.io.IOException;

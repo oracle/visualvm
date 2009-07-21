@@ -176,7 +176,10 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         descriptionLabel.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.descriptionLabel.text")); // NOI18N
 
         appTypeDescription.setColumns(20);
+        appTypeDescription.setLineWrap(true);
         appTypeDescription.setRows(5);
+        appTypeDescription.setTabSize(4);
+        appTypeDescription.setWrapStyleWord(true);
         appTypeDescription.setNextFocusableComponent(appTypeName);
         appTypeDescription.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
