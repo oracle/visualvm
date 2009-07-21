@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,32 +34,25 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2009 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.spi;
-
-import javax.swing.JEditorPane;
-import javax.swing.text.Document;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+package org.netbeans.modules.profiler.oql.engine.api;
 
 /**
+ * OQLException is thrown if OQL execution results in error
  *
- * @author Jaroslav Bachorik
  */
-abstract public class OQLEditorImpl {
-    public final static String VALIDITY_PROPERTY = "document#valid";
-    public static interface ValidationCallback {
-        void callback(boolean lexingResult);
+final public class OQLException extends Exception {
+    public OQLException(String msg) {
+        super(msg);
     }
 
-    final static protected ValidationCallback getValidationCallback(Document document) {
-        return (ValidationCallback)document.getProperty(ValidationCallback.class);
+    public OQLException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
-    final static protected OQLEngine getEngine(Document document) {
-        return (OQLEngine)document.getProperty(OQLEngine.class);
+    public OQLException(Throwable cause) {
+        super(cause);
     }
-
-    public abstract JEditorPane getEditorPane();
 }

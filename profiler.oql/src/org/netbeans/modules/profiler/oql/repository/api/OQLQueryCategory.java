@@ -37,29 +37,50 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.oql.repository.api;
 
-import javax.swing.JEditorPane;
-import javax.swing.text.Document;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import java.util.List;
+import org.netbeans.api.annotations.common.NonNull;
 
 /**
- *
+ * Value object for an OQL query category<br/>
+ * Use {@linkplain OQLQueryRepository#listCategories()} or its variants
+ * to obtain this class instances.
  * @author Jaroslav Bachorik
  */
-abstract public class OQLEditorImpl {
-    public final static String VALIDITY_PROPERTY = "document#valid";
-    public static interface ValidationCallback {
-        void callback(boolean lexingResult);
+final public class OQLQueryCategory {
+    private String id;
+    private String name;
+    private OQLQueryRepository repository;
+    
+    OQLQueryCategory(@NonNull OQLQueryRepository repository, @NonNull String id, @NonNull String name) {
+        this.id = id;
+        this.name = name;
+        this.repository = repository;
     }
 
-    final static protected ValidationCallback getValidationCallback(Document document) {
-        return (ValidationCallback)document.getProperty(ValidationCallback.class);
+    @NonNull
+    public String getName() {
+        return name;
     }
 
-    final static protected OQLEngine getEngine(Document document) {
-        return (OQLEngine)document.getProperty(OQLEngine.class);
+    @NonNull
+    String getID() {
+        return id;
     }
 
-    public abstract JEditorPane getEditorPane();
+    @NonNull
+    public List<? extends OQLQueryDefinition> listQueries() {
+        return repository.listQueries(this);
+    }
+
+    @NonNull
+    public List<? extends OQLQueryDefinition> listQueries(@NonNull String pattern) {
+        return repository.listQueries(this, pattern);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

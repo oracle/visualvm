@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,32 +34,42 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2009 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.oql.engine.api;
 
-package org.netbeans.modules.profiler.spi;
-
-import javax.swing.JEditorPane;
-import javax.swing.text.Document;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
+ * Represents a chain of references to some target object
  *
- * @author Jaroslav Bachorik
+ * @author      Bill Foote
  */
-abstract public class OQLEditorImpl {
-    public final static String VALIDITY_PROPERTY = "document#valid";
-    public static interface ValidationCallback {
-        void callback(boolean lexingResult);
+final public class ReferenceChain {
+
+    Instance obj;	// Object referred to
+    ReferenceChain next;	// Next in chain
+
+    public ReferenceChain(Instance obj, ReferenceChain next) {
+        this.obj = obj;
+        this.next = next;
     }
 
-    final static protected ValidationCallback getValidationCallback(Document document) {
-        return (ValidationCallback)document.getProperty(ValidationCallback.class);
+    public Instance getObj() {
+        return obj;
     }
 
-    final static protected OQLEngine getEngine(Document document) {
-        return (OQLEngine)document.getProperty(OQLEngine.class);
+    public ReferenceChain getNext() {
+        return next;
     }
 
-    public abstract JEditorPane getEditorPane();
+    public int getDepth() {
+        int count = 1;
+        ReferenceChain tmp = next;
+        while (tmp != null) {
+            count++;
+            tmp = tmp.next;
+        }
+        return count;
+    }
 }

@@ -37,29 +37,48 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.oql.repository.api;
 
-import javax.swing.JEditorPane;
-import javax.swing.text.Document;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.api.annotations.common.NonNull;
 
 /**
- *
+ * Value object for OQL query definition<br/>
  * @author Jaroslav Bachorik
  */
-abstract public class OQLEditorImpl {
-    public final static String VALIDITY_PROPERTY = "document#valid";
-    public static interface ValidationCallback {
-        void callback(boolean lexingResult);
+final public class OQLQueryDefinition {
+    private String name;
+    private String description;
+    private String content;
+
+    /**
+     * The constructor taking all necessary information
+     * @param name The query name - as being displayed by a browser
+     * @param description The query description
+     * @param content The query content
+     */
+    public OQLQueryDefinition(@NonNull String name, @NonNull String description, @NonNull String content) {
+        this.name = name;
+        this.description = description;
+        this.content = content;
     }
 
-    final static protected ValidationCallback getValidationCallback(Document document) {
-        return (ValidationCallback)document.getProperty(ValidationCallback.class);
+    @NonNull
+    public String getContent() {
+        return content;
     }
 
-    final static protected OQLEngine getEngine(Document document) {
-        return (OQLEngine)document.getProperty(OQLEngine.class);
+    @NonNull
+    public String getDescription() {
+        return description;
     }
 
-    public abstract JEditorPane getEditorPane();
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
