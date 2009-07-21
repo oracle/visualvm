@@ -23,11 +23,12 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.jmx.application;
+package com.sun.tools.visualvm.jmx.impl;
 
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
+import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -43,7 +44,7 @@ import org.openide.util.RequestProcessor;
  */
 class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/jmx/application/resources/addJmxApplication.png";   // NOI18N
+    private static final String ICON_PATH = "com/sun/tools/visualvm/jmx/resources/addJmxApplication.png";   // NOI18N
     private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;
@@ -71,15 +72,13 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     
     protected void actionPerformed(Host host, ActionEvent actionEvent) {
-        final JmxApplicationConfigurator appConfig =
-                JmxApplicationConfigurator.addJmxConnection();
-        if (appConfig != null) {
+        final JmxConnectionCustomizer.Setup setup = JmxConnectionConfigurator.getSetup();
+        if (setup != null) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     JmxApplicationsSupport.getInstance().createJmxApplicationInteractive(
-                            appConfig.getConnection(), appConfig.getDisplayName(),
-                            appConfig.getUsername(), appConfig.getPassword(),
-                            appConfig.getSaveCredentialsFlag(), true);
+                            setup.getConnectionString(), setup.getDisplayName(),
+                            setup.getEnvironmentProvider(), setup.isConnectionPersistent());
                 }
             });
         }

@@ -121,6 +121,7 @@
             </module-dependencies>
             <public-packages>
                 <package>com.sun.tools.visualvm.jmx</package>
+                <package>com.sun.tools.visualvm.jmx.env</package>
             </public-packages>
         </data>
     </configuration>

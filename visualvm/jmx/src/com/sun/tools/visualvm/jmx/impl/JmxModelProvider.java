@@ -23,10 +23,10 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package com.sun.tools.visualvm.jmx.impl;
 
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.jmx.application.JmxApplication;
+import com.sun.tools.visualvm.jmx.impl.JmxApplication;
 import com.sun.tools.visualvm.core.model.ModelProvider;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -39,7 +39,7 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
  *
  * @author Luis-Miguel Alventosa
  */
-class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
+public class JmxModelProvider extends AbstractModelProvider<JmxModel, Application> {
     
     
     /**

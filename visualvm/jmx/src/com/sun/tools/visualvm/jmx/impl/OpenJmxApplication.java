@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package com.sun.tools.visualvm.jmx.application;
+package com.sun.tools.visualvm.jmx.impl;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
@@ -46,7 +46,7 @@ public final class OpenJmxApplication extends OptionProcessor {
     private Option openjmx = Option.requiredArgument(Option.NO_SHORT_NAME, "openjmx"); // NOI18N
 
     public OpenJmxApplication() {
-        openjmx = Option.shortDescription(openjmx, "com.sun.tools.visualvm.jmx.application.Bundle","MSG_OPENJMX");
+        openjmx = Option.shortDescription(openjmx, "com.sun.tools.visualvm.jmx.impl.Bundle","MSG_OPENJMX");
     }
     
     protected Set<Option> getOptions() {

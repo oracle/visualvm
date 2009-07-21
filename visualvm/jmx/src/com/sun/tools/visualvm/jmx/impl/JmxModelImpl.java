@@ -23,20 +23,20 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package com.sun.tools.visualvm.jmx.impl;
 
+import com.sun.tools.visualvm.jmx.EnvironmentProvider;
+import com.sun.tools.visualvm.jmx.*;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.visualvm.jmx.application.ApplicationSecurityConfigurator;
-import com.sun.tools.visualvm.jmx.application.JmxApplication;
+import com.sun.tools.visualvm.jmx.impl.CredentialsConfigurator;
+import com.sun.tools.visualvm.jmx.impl.JmxApplication;
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
@@ -107,8 +107,8 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 class JmxModelImpl extends JmxModel {
-    private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
-    private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
+//    private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
+//    private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
     private final static Logger LOGGER = Logger.getLogger(JmxModelImpl.class.getName());
     private ProxyClient client;
     private ApplicationRemovedListener removedListener;
@@ -119,7 +119,7 @@ class JmxModelImpl extends JmxModel {
      *
      * @param application the {@link JvmstatApplication}.
      */
-    public JmxModelImpl(Application application,JvmstatModel jvmstat) {
+    public JmxModelImpl(Application application, JvmstatModel jvmstat) {
         try {
             JvmJvmstatModel jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(application);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
@@ -152,7 +152,7 @@ class JmxModelImpl extends JmxModel {
                 List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
                 if (urls.size() != 0) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
-                    proxyClient = new ProxyClient(this, urls.get(0), null, null);
+                    proxyClient = new ProxyClient(this, urls.get(0));
                     if ("true".equals(auths.get(0))) {  // NOI18N
                         supplyCredentials(application, proxyClient);
                     }
@@ -174,7 +174,7 @@ class JmxModelImpl extends JmxModel {
                         }
                     }
                     if (port != -1) {
-                        proxyClient = new ProxyClient(this, application.getHost(), port, null, null);
+                        proxyClient = new ProxyClient(this, application.getHost(), port);
                         if (authenticate) {
                             supplyCredentials(application, proxyClient);
                         }
@@ -200,11 +200,7 @@ class JmxModelImpl extends JmxModel {
      */
     public JmxModelImpl(JmxApplication application) {
         try {
-            JMXServiceURL url = application.getJMXServiceURL();
-            String username = application.getUsername();
-            String password = application.getPassword();
-            final ProxyClient proxyClient =
-                    new ProxyClient(this, url, username, password);
+            final ProxyClient proxyClient = new ProxyClient(this, application);
             client = proxyClient;
             removedListener = new ApplicationRemovedListener();
             availabilityListener = new ApplicationAvailabilityListener();
@@ -234,22 +230,14 @@ class JmxModelImpl extends JmxModel {
     /**
      *  Ask for security credentials.
      */
-    private ApplicationSecurityConfigurator supplyCredentials(
+    private CredentialsConfigurator supplyCredentials(
             Application application, ProxyClient proxyClient) {
         String displayName = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
-        if (displayName == null) {
-            displayName = proxyClient.getUrl().toString();
-        }
-        ApplicationSecurityConfigurator jsc =
-                ApplicationSecurityConfigurator.supplyCredentials(displayName);
-        if (jsc != null) {
+        if (displayName == null) displayName = proxyClient.getUrl().toString();
+        CredentialsConfigurator jsc =
+                CredentialsConfigurator.supplyCredentials(displayName);
+        if (jsc != null)
             proxyClient.setCredentials(jsc.getUsername(), jsc.getPassword());
-            if (application instanceof JmxApplication && ((JmxApplication) application).getSaveCredentialsFlag()) {
-                Storage storage = application.getStorage();
-                storage.setCustomProperty(PROPERTY_USERNAME, jsc.getUsername());
-                storage.setCustomProperty(PROPERTY_PASSWORD, Utils.encodePassword(jsc.getPassword()));
-            }
-        }
         return jsc;
     }
 
@@ -335,6 +323,8 @@ class JmxModelImpl extends JmxModel {
         private String password = null;
         private LocalVirtualMachine lvm;
         private JMXServiceURL jmxUrl = null;
+        private Application app;
+        private EnvironmentProvider envProvider = null;
         private MBeanServerConnection conn = null;
         private JMXConnector jmxc = null;
         private static final SslRMIClientSocketFactory sslRMIClientSocketFactory =
@@ -356,25 +346,29 @@ class JmxModelImpl extends JmxModel {
         }
 
         // Generic attach - host/port
-        public ProxyClient(JmxModelImpl model, Host host, int port,
-                           String userName, String password) throws IOException {
+        public ProxyClient(JmxModelImpl model, Host host, int port) throws IOException {
             this(model, new JMXServiceURL("rmi", "", 0, createUrl(host.getHostName(), // NOI18N
-                                          port)), userName, password);
+                                          port)), null, null);
         }
 
         // Generic attach - connection string
-        public ProxyClient(JmxModelImpl model, String url,
-                           String userName, String password) throws IOException {
-            this(model, new JMXServiceURL(url), userName, password);
+        public ProxyClient(JmxModelImpl model, String url) throws IOException {
+            this(model, new JMXServiceURL(url), null, null);
+        }
+
+        // Generic attach - JmxApplication
+        public ProxyClient(JmxModelImpl model, JmxApplication jmxApp) throws IOException {
+            this(model, jmxApp.getJMXServiceURL(), jmxApp, jmxApp.getEnvironmentProvider());
         }
 
         // Generic attach - JMXServiceURL
-        public ProxyClient(JmxModelImpl model, JMXServiceURL url,
-                           String userName, String password) throws IOException {
+        private ProxyClient(JmxModelImpl model, JMXServiceURL url, Application app,
+                           EnvironmentProvider envProvider) throws IOException {
             this.mode = MODE_GENERIC;
             this.model = model;
             this.jmxUrl = url;
-            setCredentials(userName, password);
+            this.app = app;
+            this.envProvider = envProvider;
         }
 
         public void setCredentials(String userName, String password) {
@@ -442,9 +436,11 @@ class JmxModelImpl extends JmxModel {
                 }
 
                 Map<String, Object> env = new HashMap();
+                if (envProvider != null)
+                    env.putAll(envProvider.getEnvironment(app));
                 if (userName != null || password != null)
                     env.put(JMXConnector.CREDENTIALS,
-                            new String[]{ userName, password });
+                            new String[] { userName, password });
 
                 jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
                 jmxc.addConnectionNotificationListener(this, null, null);

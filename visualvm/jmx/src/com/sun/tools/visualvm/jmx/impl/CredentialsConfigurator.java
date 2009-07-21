@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jmx.application;
+package com.sun.tools.visualvm.jmx.impl;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -48,13 +48,13 @@ import org.openide.util.NbBundle;
  *
  * @author Luis-Miguel Alventosa
  */
-public final class ApplicationSecurityConfigurator extends JPanel {
+public final class CredentialsConfigurator extends JPanel {
 
-    public static ApplicationSecurityConfigurator supplyCredentials(String url) {
-        ApplicationSecurityConfigurator asc = new ApplicationSecurityConfigurator();
+    public static CredentialsConfigurator supplyCredentials(String url) {
+        CredentialsConfigurator asc = new CredentialsConfigurator();
         asc.setupDefineCredentials();
 
-        final String title = NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Supply_Security_Credentials") + url;   // NOI18N
+        final String title = NbBundle.getMessage(CredentialsConfigurator.class, "LBL_Supply_Security_Credentials") + url;   // NOI18N
         final DialogDescriptor dd = new DialogDescriptor(
                 asc, title, true,
                 new Object[]{asc.okButton, DialogDescriptor.CANCEL_OPTION},
@@ -78,7 +78,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         return new String(passwordField.getPassword());
     }
 
-    private ApplicationSecurityConfigurator() {
+    private CredentialsConfigurator() {
         initComponents();
         update();
     }
@@ -106,7 +106,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
 
         // usernameLabel
         usernameLabel = new JLabel(); // NOI18N
-        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Username")); // NOI18N
+        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_Username")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -143,7 +143,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
 
         // passwordLabel
         passwordLabel = new JLabel(); // NOI18N
-        Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_Password")); // NOI18N
+        Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_Password")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -192,7 +192,7 @@ public final class ApplicationSecurityConfigurator extends JPanel {
         add(spacer, constraints);
 
         // okButton
-        okButton = new JButton(NbBundle.getMessage(ApplicationSecurityConfigurator.class, "LBL_OK"));   // NOI18N
+        okButton = new JButton(NbBundle.getMessage(CredentialsConfigurator.class, "LBL_OK"));   // NOI18N
     }
 
     private JLabel usernameLabel;

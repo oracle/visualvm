@@ -23,9 +23,10 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jmx.application;
+package com.sun.tools.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
+import com.sun.tools.visualvm.jmx.CredentialsProvider;
+import com.sun.tools.visualvm.jmx.EnvironmentProvider;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
@@ -38,6 +39,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.jmx.JmxApplicationException;
+import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -74,16 +76,16 @@ public class JmxApplicationProvider {
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "1";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION =
-            CURRENT_SNAPSHOT_VERSION_MAJOR +
-            SNAPSHOT_VERSION_DIVIDER +
-            CURRENT_SNAPSHOT_VERSION_MINOR;
+                                                CURRENT_SNAPSHOT_VERSION_MAJOR +
+                                                SNAPSHOT_VERSION_DIVIDER +
+                                                CURRENT_SNAPSHOT_VERSION_MINOR;
     
     private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
-    private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
-    private static final String PROPERTY_PASSWORD = "prop_password";    // NOI18N
+    private static final String PROPERTY_ENVIRONMENT_PROVIDER = "prop_env_provider"; // NOI18N
+    
     
     private static final String PROPERTIES_FILE = "jmxapplication" + Storage.DEFAULT_PROPERTIES_EXT;  // NOI18N
     static final String JMX_SUFFIX = ".jmx";  // NOI18N
@@ -139,7 +141,7 @@ public class JmxApplicationProvider {
     }
 
     public JmxApplication createJmxApplication(String connectionName, String displayName,
-            String username, String password, boolean saveCredentials, boolean persistent) throws JmxApplicationException {
+            EnvironmentProvider provider, boolean persistent) throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionName);
         final JMXServiceURL serviceURL;
@@ -161,39 +163,29 @@ public class JmxApplicationProvider {
             Utils.prepareDirectory(storageDirectory);
             storage = new Storage(storageDirectory, PROPERTIES_FILE);
 
-            String[] keys = new String[]{
+            String[] keys = new String[] {
                 SNAPSHOT_VERSION,
                 PROPERTY_CONNECTION_STRING,
-                PROPERTY_USERNAME,
-                PROPERTY_PASSWORD,
                 DataSourceDescriptor.PROPERTY_NAME
             };
 
-            String user = ""; // NOI18N
-            String passwd = ""; // NOI18N
-            if (saveCredentials) {
-                user = username;
-                passwd = password;
-            }
-            String[] values = new String[]{
+            String[] values = new String[] {
                 CURRENT_SNAPSHOT_VERSION,
                 normalizedConnectionName,
-                user,
-                Utils.encodePassword(passwd),
                 displayName
             };
 
             storage.setCustomProperties(keys, values);
         }
 
-        return addJmxApplication(serviceURL, normalizedConnectionName, displayName,
-                           hostName, username, password, saveCredentials, storage);
+        return addJmxApplication(true, serviceURL, normalizedConnectionName,
+                                 displayName, hostName, provider, storage);
     }
 
-    private JmxApplication addJmxApplication(JMXServiceURL serviceURL,
+    private JmxApplication addJmxApplication(boolean newApp, JMXServiceURL serviceURL,
             String connectionName, String displayName, String hostName,
-            String username, String password, boolean saveCredentials,
-            Storage storage) throws JmxApplicationException {
+            EnvironmentProvider provider, Storage storage) throws JmxApplicationException {
+
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) {
             try {
@@ -204,9 +196,10 @@ public class JmxApplicationProvider {
                     if (appStorage.isDirectory()) Utils.delete(appStorage, true);
                 }
                 throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                    "MSG_Invalid_JMX_connection",connectionName),ex); // NOI18N
+                                    "MSG_Invalid_JMX_connection", connectionName), ex); // NOI18N
             }
         }
+
         // Resolve existing Host or create new Host, finish if Host cannot be resolved
         Set<Host> hosts = DataSourceRepository.sharedInstance().getDataSources(Host.class);
         Host host = null;
@@ -219,14 +212,30 @@ public class JmxApplicationProvider {
             }
             cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                       "MSG_Cannot_resolve_host",hostName),e); // NOI18N
+                                       "MSG_Cannot_resolve_host", hostName), e); // NOI18N
         }
-        // Create the JmxApplication
-        if (storage != null)
-            storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
 
-        final JmxApplication application =
-                new JmxApplication(host, serviceURL, username, password, saveCredentials, storage);
+        // Update persistent storage and EnvironmentProvider
+        if (storage != null) {
+            if (newApp) {
+                storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
+                storage.setCustomProperty(PROPERTY_ENVIRONMENT_PROVIDER, provider.getClass().getName());
+                if (provider != null) provider.savePersistentData(storage);
+            } else {
+                if (provider != null) provider.loadPersistentData(storage);
+            }
+        }
+
+        // Create the JmxApplication
+        final JmxApplication application = new JmxApplication(host, serviceURL, provider, storage);
+
+        // Update display name and new EnvironmentProvider for non-persistent storage
+        if (storage == null) {
+            Storage s = application.getStorage();
+            s.setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
+            if (provider != null) provider.savePersistentData(s);
+        }
+        
         // Check if the given JmxApplication has been already added to the application tree
         final Set<JmxApplication> jmxapps = host.getRepository().getDataSources(JmxApplication.class);
         if (jmxapps.contains(application)) {
@@ -242,10 +251,12 @@ public class JmxApplicationProvider {
                 }
             }
             cleanupCreatedHost(hosts, host);
-            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_JMX_connection") +   // NOI18N
-                                application.getId() + NbBundle.getMessage(JmxApplicationProvider.class, "MSG_already_exists") + // NOI18N
-                                DataSourceDescriptorFactory.getDescriptor(tempapp).getName());
+            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                                              "MSG_connection_already_exists", new Object[] { // NOI18N
+                                              application.getId(), DataSourceDescriptorFactory.
+                                              getDescriptor(tempapp).getName() }));
         }
+
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
@@ -256,8 +267,11 @@ public class JmxApplicationProvider {
             }
             cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                       "MSG_Cannot_connect_using") + connectionName); // NOI18N
+                                       "MSG_Cannot_connect_using", new Object[] { displayName, // NOI18N
+                                       connectionName }));
         }
+
+        // Update application state according to the connection state
         model.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getNewValue() == ConnectionState.CONNECTED) {
@@ -267,11 +281,10 @@ public class JmxApplicationProvider {
                 }
             }
         });
-        // set displayname if not peristent (already set for such case)
-        if (storage == null)
-            application.getStorage().setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
+
         // precompute JVM
         application.jvm = JvmFactory.getJVMFor(application);
+
         // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
 
@@ -368,8 +381,7 @@ public class JmxApplicationProvider {
                         String[] keys = new String[] {
                             PROPERTY_CONNECTION_STRING,
                             PROPERTY_HOSTNAME,
-                            PROPERTY_USERNAME,
-                            PROPERTY_PASSWORD
+                            PROPERTY_ENVIRONMENT_PROVIDER
                         };
 
                         for (final Storage storage : storageSet) {
@@ -377,8 +389,16 @@ public class JmxApplicationProvider {
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
                                     try {
-                                        addJmxApplication(null, values[0], null, values[1], values[2],
-                                               Utils.decodePassword(values[3]), false, storage);
+                                        String epc = values[2];
+                                        if (epc == null) {
+                                            // Check for ver 1.0 which didn't support PROPERTY_ENVIRONMENT_PROVIDER
+                                            String sv = storage.getCustomProperty(SNAPSHOT_VERSION);
+                                            if ("1.0".equals(sv)) epc = CredentialsProvider.class.getName(); // NOI18N
+                                        }
+                                        EnvironmentProvider ep = epc == null ? null :
+                                                                 JmxEnvironmentSupportImpl.
+                                                                 createProviderImpl(epc, null);
+                                        addJmxApplication(false, null, values[0], null, values[1], ep, storage);
                                     } catch (final JmxApplicationException e) {
                                         SwingUtilities.invokeLater(new Runnable() {
                                             public void run() {

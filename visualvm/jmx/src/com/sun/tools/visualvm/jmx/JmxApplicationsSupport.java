@@ -27,10 +27,8 @@ package com.sun.tools.visualvm.jmx;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.jmx.application.JmxApplicationDescriptorProvider;
-import com.sun.tools.visualvm.jmx.application.JmxApplicationProvider;
+import com.sun.tools.visualvm.jmx.impl.JmxApplicationProvider;
 import java.io.File;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -39,7 +37,7 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.NbBundle;
 
 /**
- * Support for JMX applications in VisualVM.
+ * Support for creating JMX applications in VisualVM.
  *
  * @since 1.1
  * @author Jiri Sedlacek
@@ -120,8 +118,31 @@ public final class JmxApplicationsSupport {
         if (displayName == null)
             displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
 
-        return this.createJmxApplicationImpl(connectionString, displayName, username,
-                                    password, saveCredentials, persistent);
+        EnvironmentProvider epr = JmxEnvironmentSupport.getInstance().
+                createCredentialsProvider(username, password.toCharArray(), saveCredentials);
+        return this.createJmxApplicationImpl(connectionString, displayName, epr, persistent);
+    }
+
+    /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Throws a JmxApplicationException if the application
+     * cannot be created.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param provider JMX EnvironmentProvider for the Application
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @return created JMX application
+     * @throws JmxApplicationException if creating the application failed
+     *
+     * @since 1.2
+     */
+    public Application createJmxApplication(String connectionString,
+                                            String displayName,
+                                            EnvironmentProvider provider,
+                                            boolean persistent) throws JmxApplicationException {
+
+        return this.createJmxApplicationImpl(connectionString, displayName, provider, persistent);
     }
 
     /**
@@ -186,8 +207,59 @@ public final class JmxApplicationsSupport {
                         pHandle[0].start();
                     }
                 });
+            EnvironmentProvider epr = JmxEnvironmentSupport.getInstance().
+                createCredentialsProvider(username, password.toCharArray(), saveCredentials);
             return createJmxApplicationImpl(connectionString, displayName,
-                            username, password, saveCredentials, persistent);
+                                            epr, persistent);
+        } catch (JmxApplicationException e) {
+            NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
+        } finally {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (pHandle[0] != null) {
+                        pHandle[0].finish();
+                    }
+                }
+            });
+        }
+        return null;
+    }
+
+    /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Displays progress during application creation and
+     * opens an error dialog if creating the application failed.
+     *
+     * Note that even if the created application isn't persistent for another
+     * VisualVM sessions, the host created for this application will be restored.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param provider JMX EnvironmentProvider for the Application
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @return created JMX application or null if creating the application failed
+     *
+     * @since 1.2
+     */
+    public Application createJmxApplicationInteractive(String connectionString,
+                                            String displayName,
+                                            EnvironmentProvider provider,
+                                            boolean persistent) {
+
+        final ProgressHandle[] pHandle = new ProgressHandle[1];
+        try {
+            final String displayNameF = displayName;
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        pHandle[0] = ProgressHandleFactory.createHandle(
+                                NbBundle.getMessage(JmxApplicationsSupport.class,
+                                                    "LBL_Adding", displayNameF)); // NOI18N
+                        pHandle[0].setInitialDelay(0);
+                        pHandle[0].start();
+                    }
+                });
+            return createJmxApplicationImpl(connectionString, displayName,
+                                            provider, persistent);
         } catch (JmxApplicationException e) {
             NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
         } finally {
@@ -203,13 +275,13 @@ public final class JmxApplicationsSupport {
     }
 
     private Application createJmxApplicationImpl(String connectionString,
-                                            String displayName, String username,
-                                            String password, boolean saveCredentials,
+                                            String displayName,
+                                            EnvironmentProvider provider,
                                             boolean persistent)
                                             throws JmxApplicationException {
 
         return applicationProvider.createJmxApplication(connectionString,
-               displayName, username, password, saveCredentials, persistent);
+                                            displayName, provider, persistent);
     }
     
     
@@ -253,7 +325,6 @@ public final class JmxApplicationsSupport {
 
 
     private JmxApplicationsSupport() {
-        DataSourceDescriptorFactory.getDefault().registerProvider(new JmxApplicationDescriptorProvider());
         applicationProvider.initialize();
     }
 }
