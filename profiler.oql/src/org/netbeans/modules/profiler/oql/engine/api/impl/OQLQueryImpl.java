@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,32 +34,31 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2009 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.oql.engine.api.impl;
 
-import javax.swing.JEditorPane;
-import javax.swing.text.Document;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
 
 /**
+ * This represents a parsed OQL query
  *
- * @author Jaroslav Bachorik
+ * @author A. Sundararajan
  */
-abstract public class OQLEditorImpl {
-    public final static String VALIDITY_PROPERTY = "document#valid";
-    public static interface ValidationCallback {
-        void callback(boolean lexingResult);
+public class OQLQueryImpl extends OQLQuery {
+    OQLQueryImpl(String selectExpr, boolean isInstanceOf, 
+             String className, String identifier, String whereExpr) {
+        this.selectExpr = selectExpr;
+        this.isInstanceOf = isInstanceOf;
+        this.className = className;
+        this.identifier = identifier;
+        this.whereExpr = whereExpr;
     }
 
-    final static protected ValidationCallback getValidationCallback(Document document) {
-        return (ValidationCallback)document.getProperty(ValidationCallback.class);
-    }
-
-    final static protected OQLEngine getEngine(Document document) {
-        return (OQLEngine)document.getProperty(OQLEngine.class);
-    }
-
-    public abstract JEditorPane getEditorPane();
+    String   selectExpr;
+    boolean  isInstanceOf;
+    String   className;
+    String   identifier;
+    String   whereExpr;
 }
