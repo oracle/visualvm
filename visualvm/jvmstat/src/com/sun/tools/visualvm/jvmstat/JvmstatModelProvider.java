@@ -51,17 +51,18 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         String vmId = "//" + app.getPid() + "?mode=r";  // NOI18N
         try {
             MonitoredHost monitoredHost = JvmstatApplicationProvider.findMonitoredHost(app);
-            int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
-            return monitoredHost.getMonitoredVm(new VmIdentifier(vmId),refreshInterval);
+            if (monitoredHost != null) {
+                int refreshInterval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
+                return monitoredHost.getMonitoredVm(new VmIdentifier(vmId),refreshInterval);
+            }
         } catch (URISyntaxException ex) {
             LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-            return null;
         } catch (Exception ex) { 
             // MonitoredHostProvider.getMonitoredVm can throw java.lang.Exception on Windows, 
             // when opening shared memory file (java.lang.Exception: Could not open PerfMemory)
             LOGGER.log(Level.INFO,"getMonitoredVm failed",ex);  // NOI18N
-            return null;            
         }
+        return null;
     }
     
     public JvmstatModel createModelFor(Application app) {
