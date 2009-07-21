@@ -72,6 +72,7 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  */
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     private static final Logger LOGGER = Logger.getLogger(JvmstatApplicationProvider.class.getName());
+    private static final String HOST_ID_KEY = "jvmstat.hostid";
     
     private static JvmstatApplicationProvider instance;
     
@@ -154,16 +155,21 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private void processNewApplicationsByPids(Host host, HostIdentifier hostId, Set<Integer> applicationPids) {
         Set<JvmstatApplication> newApplications = new HashSet();
+        String hostIdString = hostId.getURI().toString();
         
         for (int applicationPid : applicationPids) {
             // Do not provide instance for Application.CURRENT_APPLICATION
-            if (Application.CURRENT_APPLICATION.getPid() == applicationPid && Host.LOCALHOST.equals(host)) continue;
+            if (Application.CURRENT_APPLICATION.getPid() == applicationPid && Host.LOCALHOST.equals(host)) {
+                Application.CURRENT_APPLICATION.getStorage().setCustomProperty(HOST_ID_KEY,hostIdString);
+                continue;
+            }
             
             String appId = createId(host, applicationPid);
             JvmstatApplication application = new JvmstatApplication(host, hostId, appId, applicationPid);
             if (!applications.containsKey(appId)) {
                 // precompute JVM 
                 application.jvm = JvmFactory.getJVMFor(application);
+                application.getStorage().setCustomProperty(HOST_ID_KEY,hostIdString);
                 applications.put(appId, application);
                 newApplications.add(application);
             }
