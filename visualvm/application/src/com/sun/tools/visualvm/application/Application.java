@@ -140,8 +140,18 @@ public abstract class Application extends DataSource implements Stateful {
     // <system_temp>/visualvm.dat/<application_id>
     @Override
     protected Storage createStorage() {
-        File directory = new File(Storage.getTemporaryStorageDirectoryString() + File.separator + getId());
+        File directory = new File(Storage.getTemporaryStorageDirectoryString() +
+                                  File.separator + validFileName(getId()));
         return new Storage(directory);
+    }
+
+    private static String validFileName(String fileName) {
+        char[] fileNameCh = fileName.toCharArray();
+        StringBuilder validFileName = new StringBuilder();
+        for (char ch : fileNameCh)
+            if (Character.isLetterOrDigit(ch)) validFileName.append(ch);
+            else validFileName.append('_'); // NOI18N
+        return validFileName.toString();
     }
 
 }
