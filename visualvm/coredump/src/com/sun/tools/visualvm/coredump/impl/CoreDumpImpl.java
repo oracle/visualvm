@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.coredump.CoreDump;
