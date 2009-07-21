@@ -128,8 +128,10 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         synchronized (hostsListeners) {
             Map<HostIdentifier,JvmstatConnection> hostListeners = hostsListeners.get(host);
             
-            for (JvmstatConnection listener : hostListeners.values()) {
-                processDisconnectedJvmstat(host, listener);
+            if (hostListeners != null) {
+                for (JvmstatConnection listener : hostListeners.values()) {
+                    processDisconnectedJvmstat(host, listener);
+                }
             }
         }
     } 
