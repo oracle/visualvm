@@ -306,8 +306,6 @@ class JmxConnectionConfigurator extends JPanel {
         customizerPanelScroll = new ScrollableContents(customizerPanel);
         customizerPanelScroll.setViewportBorder(BorderFactory.
                                                 createEmptyBorder(0, 0, 0, 0));
-        customizerPanelScroll.getViewport().setOpaque(true);
-        customizerPanelScroll.setOpaque(true);
         add(customizerPanelScroll, BorderLayout.CENTER);
     }
 
