@@ -117,7 +117,7 @@ class JmxConnectionConfigurator extends JPanel {
         connectionTypeLabel.setVisible(selectorVisible);
         connectionTypeScroll.setVisible(selectorVisible);
         customizerPanelScroll.setBorder(selectorVisible ?
-            BorderFactory.createEmptyBorder(5, 5, 0, 5) :
+            BorderFactory.createEmptyBorder(5, 8, 0, 5) :
             BorderFactory.createEmptyBorder(15, 5, 0, 5));
 
         // Register selection listener
