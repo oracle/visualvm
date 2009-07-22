@@ -75,6 +75,8 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         {"sun.tools.javap.Main","Javap","com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
         {"sun.security.tools.JarSigner","JarSigner","com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
         {"com.sun.tools.apt.Main","APT","com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.applet.Main","Applet Viewer","com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.applet.AppletViewer","Applet Viewer","com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
         
         // Java DB
         {"org.apache.derby.drda.NetworkServerControl", "JavaDB", "com/sun/tools/visualvm/application/type/resources/JavaDB.png"},   // NOI18N
