@@ -74,7 +74,7 @@ class JmxConnectionConfigurator extends JPanel {
         configurator.warmup();
 
         final DialogDescriptor dd = new DialogDescriptor(configurator,
-                NbBundle.getMessage(JmxApplicationConfigurator.class, "Title_Add_JMX_Connection"),   // NOI18N
+                NbBundle.getMessage(JmxConnectionConfigurator.class, "Title_Add_JMX_Connection"),   // NOI18N
                 true, new Object[]{ configurator.okButton, DialogDescriptor.CANCEL_OPTION},
                 configurator.okButton, 0, null, null);
         dd.setAdditionalOptions(new Object[] { configurator.hintLabel });
@@ -161,7 +161,7 @@ class JmxConnectionConfigurator extends JPanel {
 
     public void updateWindowTitle(Window w) {
         if (singleCustomizer) return;
-        String title = NbBundle.getMessage(JmxApplicationConfigurator.class,
+        String title = NbBundle.getMessage(JmxConnectionConfigurator.class,
                 "Title_Add_JMX_Connection") + " - " + // NOI18N
                 selectedCustomizer.getCustomizerName();
         if (w instanceof Dialog) ((Dialog)w).setTitle(title);
