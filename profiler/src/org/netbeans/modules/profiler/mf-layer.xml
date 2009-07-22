@@ -461,9 +461,8 @@ made subject to such option by the copyright holder.
 
     <folder name="NBProfiler">
         <folder name="Config">
-            <file name="filters-default.xml" url="filters-default.xml"/>
-            <file name="filtersets-default.xml" url="filtersets-default.xml"/>
-            <file name="oqlqueries-default.xml" url="heapwalk/oqlqueries-default.xml"/>
+            <file name="filters-default.xml" url="nbresloc:/org/netbeans/modules/profiler/filters-default.xml"/>
+            <file name="filtersets-default.xml" url="nbresloc:/org/netbeans/modules/profiler/filtersets-default.xml"/>
         </folder>
     </folder>
 

@@ -58,7 +58,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 
 
 /**
