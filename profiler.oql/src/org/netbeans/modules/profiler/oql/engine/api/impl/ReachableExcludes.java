@@ -37,22 +37,22 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.heapwalk.oql;
+package org.netbeans.modules.profiler.oql.engine.api.impl;
+
 
 /**
- * OQLException is thrown if OQL execution results in error
+ * This represents a set of data members that should be excluded from the
+ * reachable objects query. This is useful to exclude observers from the
+ * transitive closure of objects reachable from a given object, allowing
+ * some kind of real determination of the "size" of that object.
  *
+ * @author    A. Sundararajan
  */
-public class OQLException extends Exception {
-    public OQLException(String msg) {
-        super(msg);
-    }
 
-    public OQLException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    public OQLException(Throwable cause) {
-        super(cause);
-    }
+public interface ReachableExcludes {
+    /**
+     * @return true if the given field is on the hitlist of excluded
+     * 		fields.
+     */
+    public boolean isExcluded(String fieldName);
 }
