@@ -38,6 +38,7 @@ public class JavaPluginApplicationTypeFactory
         extends AbstractModelProvider<ApplicationType, Application> {
 
     private static final String JAVA_PLUGIN = "-Djavaplugin.version=";  // NOI18N
+    private static final String JAVA_PLUGIN2_MAIN = "sun.plugin2.main.client.PluginMain"; // NOI18N
 
     /**
      * Detects Java-Plugin application.
@@ -61,6 +62,9 @@ public class JavaPluginApplicationTypeFactory
                     version = args.substring(version_index);
                 }
                 return new JavaPluginApplicationType(version);
+            }
+            if (JAVA_PLUGIN2_MAIN.equals(jvm.getMainClass())) { // detect Java Plugin2
+                return new JavaPluginApplicationType("2");  // NOI18N              
             }
         }
         return null;
