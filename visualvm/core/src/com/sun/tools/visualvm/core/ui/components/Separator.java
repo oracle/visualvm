@@ -46,6 +46,8 @@ final class Separator extends JSeparator {
     private static final String MAC_OS_X_SEPARATOR_UI_NB =
             "org.netbeans.swing.plaf.aqua.AquaSeparatorUI"; // NOI18N
     private static Class<SeparatorUI> MAC_OS_X_SEPARATOR_UI_CLASS;
+    private static final String MAC_OS_X_SEPARATOR_COLOR_KEY =
+            "InternalFrame.inactiveTitleForeground"; // NOI18N
 
     private boolean separatorUIInitialized = false;
     private SeparatorUI macOsXSeparatorUI;
@@ -81,8 +83,12 @@ final class Separator extends JSeparator {
             }
         }
 
-        if (macOsXSeparatorUI == null) super.setUI(ui);
-        else super.setUI(macOsXSeparatorUI);
+        if (macOsXSeparatorUI == null) {
+            super.setUI(ui);
+        } else {
+            super.setUI(macOsXSeparatorUI);
+            setForeground(UIManager.getColor(MAC_OS_X_SEPARATOR_COLOR_KEY));
+        }
     }
 
     public Dimension getMinimumSize() {
