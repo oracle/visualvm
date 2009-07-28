@@ -57,7 +57,7 @@ final class Separator extends JSeparator {
             try {
                 MAC_OS_X_SEPARATOR_UI_CLASS =
                         (Class<SeparatorUI>)Class.forName(MAC_OS_X_SEPARATOR_UI);
-            } catch (ClassNotFoundException e) {
+            } catch (Throwable e) {
                 MAC_OS_X_SEPARATOR_UI_CLASS = null;
             }
         }
@@ -96,7 +96,7 @@ final class Separator extends JSeparator {
                 Method m = MAC_OS_X_SEPARATOR_UI_CLASS.getDeclaredMethod(
                            "createUI", JComponent.class); // NOI18N
                 return (SeparatorUI)m.invoke(null, separator);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 return null;
             }
         } else {
