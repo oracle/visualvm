@@ -87,7 +87,7 @@ final class GeneralOptionsPanelController extends OptionsPanelController {
 
     private JComponent getComponent() {
         if (component == null) {
-            component = new ScrollableContents(getPanel());
+            component = UISupport.createScrollableContainer(getPanel());
         }
         return component;
     }

@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.security;
 
-import com.sun.tools.visualvm.core.options.ScrollableContents;
+import com.sun.tools.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
@@ -134,7 +134,7 @@ class SecurityOptionsPanelController extends OptionsPanelController {
 
     private JComponent getComponent() {
         if (component == null) {
-            component = new ScrollableContents(getPanel());
+            component = UISupport.createScrollableContainer(getPanel());
         }
         return component;
     }

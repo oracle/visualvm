@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
-import com.sun.tools.visualvm.core.options.ScrollableContents;
+import com.sun.tools.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.JComponent;
@@ -95,7 +95,7 @@ class NetworkOptionsPanelController extends OptionsPanelController {
 
     private JComponent getComponent() {
         if (component == null) {
-            component = new ScrollableContents(getPanel());
+            component = UISupport.createScrollableContainer(getPanel());
         }
         return component;
     }

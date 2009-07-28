@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.options.ScrollableContents;
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -303,9 +303,8 @@ class JmxConnectionConfigurator extends JPanel {
 
         customizerPanel = new JPanel(new BorderLayout());
         customizerPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        customizerPanelScroll = new ScrollableContents(customizerPanel);
-        customizerPanelScroll.setViewportBorder(BorderFactory.
-                                                createEmptyBorder(0, 0, 0, 0));
+        customizerPanelScroll = new ScrollableContainer(customizerPanel);
+        customizerPanelScroll.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 5));
         add(customizerPanelScroll, BorderLayout.CENTER);
     }
 
@@ -347,7 +346,7 @@ class JmxConnectionConfigurator extends JPanel {
     private JList connectionTypeList;
     private JScrollPane connectionTypeScroll;
     private JPanel customizerPanel;
-    private ScrollableContents customizerPanelScroll;
+    private ScrollableContainer customizerPanelScroll;
 
     private static JmxConnectionConfigurator INSTANCE;
 

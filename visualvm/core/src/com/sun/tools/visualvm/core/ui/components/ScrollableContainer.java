@@ -25,9 +25,14 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
 
 /**
  * Predefined JScrollPane to be used for details views. Scrollbars are displayed
@@ -43,21 +48,55 @@ public final class ScrollableContainer extends JScrollPane {
      * @param view component to be displayed.
      */
     public ScrollableContainer(JComponent view) {
-        setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
+        this(view, VERTICAL_SCROLLBAR_AS_NEEDED,
+             HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
 
-        setOpaque(false);
+    public ScrollableContainer(JComponent view, int vsbPolicy, int hsbPolicy) {
+        setViewportView(new ScrollableContents(view));
+
+        setVerticalScrollBarPolicy(vsbPolicy);
+        setHorizontalScrollBarPolicy(hsbPolicy);
+
         setBorder(BorderFactory.createEmptyBorder());
+        setViewportBorder(BorderFactory.createEmptyBorder());
 
         getViewport().setOpaque(false);
-        setViewportBorder(BorderFactory.createEmptyBorder());
-        
-        getVerticalScrollBar().setUnitIncrement(20);
-        getVerticalScrollBar().setBlockIncrement(50);
-        getHorizontalScrollBar().setUnitIncrement(20);
-        getHorizontalScrollBar().setBlockIncrement(50);
+        setOpaque(false);
+    }
 
-        setViewportView(view);
+
+    // --- Scrollable container ------------------------------------------------
+
+    private class ScrollableContents extends JPanel implements Scrollable {
+
+        public ScrollableContents(JComponent contents) {
+            super(new BorderLayout());
+            add(contents, BorderLayout.CENTER);
+        }
+
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        public int getScrollableUnitIncrement(Rectangle visibleRect,
+                                              int orientation, int direction) {
+            return 20;
+        }
+
+        public int getScrollableBlockIncrement(Rectangle visibleRect,
+                                               int orientation, int direction) {
+            return (int)(visibleRect.height * 0.9d);
+        }
+
+        public boolean getScrollableTracksViewportWidth() {
+            return getHorizontalScrollBarPolicy() == HORIZONTAL_SCROLLBAR_NEVER;
+        }
+
+        public boolean getScrollableTracksViewportHeight() {
+            return getVerticalScrollBarPolicy() == VERTICAL_SCROLLBAR_NEVER;
+        }
+
     }
 
 }
