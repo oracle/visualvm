@@ -25,16 +25,11 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import org.netbeans.spi.options.OptionsCategory;
 import org.netbeans.spi.options.OptionsPanelController;
-import org.openide.DialogDescriptor;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -52,11 +47,6 @@ class NetworkOptionsCategory extends OptionsCategory {
     }
 
     public String getCategoryName() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                removeExportImport();
-            }
-        });
         return NbBundle.getMessage(NetworkOptionsCategory.class, "OptionsCategory_Name_Network");  // NOI18N
     }
 
@@ -70,21 +60,4 @@ class NetworkOptionsCategory extends OptionsCategory {
 
     private NetworkOptionsCategory() {}
 
-    private void removeExportImport() {
-        try {
-            ClassLoader globalCL = Lookup.getDefault().lookup(ClassLoader.class);
-            Class OptionsDisplayerImpl = globalCL.loadClass("org.netbeans.modules.options.OptionsDisplayerImpl");   // NOI18N
-            Field descriptorRef = OptionsDisplayerImpl.getDeclaredField("descriptorRef");  // NOI18N
-            descriptorRef.setAccessible(true);
-            WeakReference<DialogDescriptor> ref = (WeakReference) descriptorRef.get(null);
-            DialogDescriptor descriptor = ref.get();
-            
-            if (descriptor != null) {
-                descriptor.setAdditionalOptions(null);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        
-    }
 }
