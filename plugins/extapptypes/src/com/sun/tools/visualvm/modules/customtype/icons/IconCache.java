@@ -37,7 +37,7 @@ import java.net.URL;
  *
  * @author Jaroslav Bachorik
  */
-public class IconCache implements Cache<URL, BufferedImage> {
+public class IconCache extends Cache<URL, BufferedImage> {
     final private IconResolver resolver = new IconResolver();
     final private Cache<URL, BufferedImage> delegate;
 
