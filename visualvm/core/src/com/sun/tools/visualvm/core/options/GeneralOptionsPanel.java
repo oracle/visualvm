@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.options;
 
+import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

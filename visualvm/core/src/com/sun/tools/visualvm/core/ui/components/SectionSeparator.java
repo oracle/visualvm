@@ -23,9 +23,10 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.options;
+package com.sun.tools.visualvm.core.ui.components;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -35,30 +36,45 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 /**
- * Predefined component to be used as a separator for named sections displayed
- * in the same Options panel. Should be used rather than a TitledBorder to keep
- * the UI simple.
+ * Separator-like component to be used instead of TitledBorder to keep the UI
+ * lightweight. Should be used in Options panel to separate various sections
+ * displayed in the same panel.
  *
  * @author Jiri Sedlacek
  */
 public final class SectionSeparator extends JPanel {
 
     /**
-     * Creates new instance of SectionSeparator.
+     * Creates new instance of SectionSeparator. Uses bold font by default.
      *
-     * @param text separator caption
+     * @param text separator text
      */
     public SectionSeparator(String text) {
-        initComponents(text);
+        this(text, null);
     }
 
-    private void initComponents(String text) {
+    /**
+     * Creates new instance of SectionSeparator. Uses the provided font or default
+     * font for null value.
+     *
+     * @param text separator text
+     * @param font font for the caption text or null for default font
+     */
+    public SectionSeparator(String text, Font font) {
+        if (text == null) throw new IllegalArgumentException("Text cannot be null"); // NOI18N
+        initComponents(text, font);
+    }
+
+    private void initComponents(String text, Font font) {
         setBorder(BorderFactory.createEmptyBorder());
         setLayout(new GridBagLayout());
 
+        JLabel label = new JLabel(text);
+        if (font != null) label.setFont(font);
+        else label.setFont(label.getFont().deriveFont(Font.BOLD));
         GridBagConstraints c1 = new GridBagConstraints();
         c1.weighty = 1d;
-        add(new JLabel(text), c1);
+        add(label, c1);
 
         GridBagConstraints c2 = new GridBagConstraints();
         c2.weightx = 1d;

@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
-import com.sun.tools.visualvm.core.options.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;

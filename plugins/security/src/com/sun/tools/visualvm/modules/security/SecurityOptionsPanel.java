@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.modules.security;
 
-import com.sun.tools.visualvm.core.options.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -52,7 +52,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.openide.LifecycleManager;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
