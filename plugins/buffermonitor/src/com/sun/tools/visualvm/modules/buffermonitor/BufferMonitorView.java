@@ -40,6 +40,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.management.Attribute;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -51,6 +52,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  * @author Tomas Hurka
@@ -58,9 +60,11 @@ import org.openide.util.NbBundle;
 class BufferMonitorView extends DataSourceView implements DataRemovedListener<Application> {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/buffermonitor/resources/monitor.png"; // NOI18N
+    private static final Logger LOGGER = Logger.getLogger(BufferMonitorView.class.getName());
     
     private Timer timer;
     private Application application;
+    private boolean refreshRunning;
     
     public BufferMonitorView(Application application) {
         super(application, NbBundle.getMessage(BufferMonitorView.class, "Buffer_Pools"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false); // NOI18N
@@ -89,12 +93,26 @@ class BufferMonitorView extends DataSourceView implements DataRemovedListener<Ap
         
         timer = new Timer(GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final long time = System.currentTimeMillis();
-
-                if (application.getState() == Application.STATE_AVAILABLE) {
-                    directBufferViewSupport.refresh(time);
-                    mappedBufferViewSupport.refresh(time);
+                if (refreshRunning) {
+                    return;
                 }
+                refreshRunning = true;
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        try {
+                            if (application.getState() == Application.STATE_AVAILABLE) {
+                                final long time = System.currentTimeMillis();
+                                directBufferViewSupport.refresh(time);
+                                mappedBufferViewSupport.refresh(time);
+                            }
+                        } catch (Exception ex) {
+                            LOGGER.throwing(BufferMonitorView.class.getName(), "refresh", ex); // NOI18N
+                        } finally {
+                            refreshRunning = false;
+                        }
+                    }
+                });
+
             }
         });
         timer.setInitialDelay(800);
