@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,7 +32,6 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 
 /**
  * Separator-like component to be used instead of TitledBorder to keep the UI
@@ -80,9 +78,7 @@ public final class SectionSeparator extends JPanel {
         c2.weightx = 1d;
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(0, 4, 0, 0);
-        add(new JSeparator() {
-                public Dimension getMinimumSize() { return getPreferredSize(); }
-            }, c2);
+        add(new Separator(), c2);
     }
 
 }
