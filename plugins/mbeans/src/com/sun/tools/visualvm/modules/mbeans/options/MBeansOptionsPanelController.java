@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.mbeans.options;
 
+import com.sun.tools.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.JComponent;
@@ -39,6 +40,7 @@ import org.openide.util.Lookup;
 final class MBeansOptionsPanelController extends OptionsPanelController {
 
     private MBeansOptionsPanel panel;
+    private JComponent component;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private boolean changed;
 
@@ -69,7 +71,7 @@ final class MBeansOptionsPanelController extends OptionsPanelController {
     }
 
     public JComponent getComponent(Lookup masterLookup) {
-        return getPanel();
+        return getComponent();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -85,6 +87,13 @@ final class MBeansOptionsPanelController extends OptionsPanelController {
             panel = new MBeansOptionsPanel(this);
         }
         return panel;
+    }
+
+    private JComponent getComponent() {
+        if (component == null) {
+            component = UISupport.createScrollableContainer(getPanel());
+        }
+        return component;
     }
 
     void changed() {
