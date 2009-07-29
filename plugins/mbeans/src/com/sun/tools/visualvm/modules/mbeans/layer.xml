@@ -28,7 +28,7 @@
 <filesystem>
     <folder name="OptionsDialog">
         <file name="com-sun-tools-visualvm-modules-mbeans-options-MBeansOptionsCategory.instance">
-            <attr name="position" intvalue="800"/>
+            <attr name="position" intvalue="4000"/>
         </file>
     </folder>
 </filesystem>

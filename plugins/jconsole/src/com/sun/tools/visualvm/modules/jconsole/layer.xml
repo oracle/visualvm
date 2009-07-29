@@ -28,7 +28,7 @@
 <filesystem>
     <folder name="OptionsDialog">
         <file name="com-sun-tools-visualvm-modules-jconsole-options-JConsoleOptionsCategory.instance">
-            <attr name="position" intvalue="900"/>
+            <attr name="position" intvalue="6000"/>
         </file>
     </folder>
 </filesystem>

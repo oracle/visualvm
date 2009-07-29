@@ -4,7 +4,7 @@
     <folder name="OptionsDialog">
         <file name="Security.instance">
             <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.security.SecurityOptionsCategory.instance"/>
-            <attr name="position" intvalue="855"/>
+            <attr name="position" intvalue="3000"/>
         </file>
     </folder>
 </filesystem>
