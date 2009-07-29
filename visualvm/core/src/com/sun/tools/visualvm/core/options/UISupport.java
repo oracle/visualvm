@@ -32,17 +32,32 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 /**
- * Helper class to create UI for the Options dialog.
+ * Helper class to create UI components for the Options dialog.
  *
  * @author Jiri Sedlacek
  */
 public final class UISupport {
 
-    public static JComponent createSectionSeparator(String caption) {
+    /**
+     * Creates preformated instance of SectionSeparator to be used in Options
+     * dialog.
+     *
+     * @param caption section name
+     * @return preformated instance of SectionSeparator
+     */
+    public static SectionSeparator createSectionSeparator(String caption) {
         return new SectionSeparator(caption);
     }
 
-    public static JComponent createScrollableContainer(JComponent contents) {
+    /**
+     * Creates preformatted instance of ScrollableContainer to be used in Options
+     * dialog. All insets are already initialized to defaults, the client components
+     * should have zero outer insets.
+     * 
+     * @param contents component to be displayed
+     * @return preformatted instance of ScrollableContainer
+     */
+    public static ScrollableContainer createScrollableContainer(JComponent contents) {
         ScrollableContainer container = new ScrollableContainer(contents,
                                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

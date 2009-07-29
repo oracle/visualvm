@@ -35,8 +35,8 @@ import javax.swing.JPanel;
 
 /**
  * Separator-like component to be used instead of TitledBorder to keep the UI
- * lightweight. Should be used in Options panel to separate various sections
- * displayed in the same panel.
+ * lightweight. Use UISupport.createSectionSeparator() method instead of instantiating
+ * this class directly if creating sections for the Options panel.
  *
  * @author Jiri Sedlacek
  */
@@ -53,7 +53,7 @@ public final class SectionSeparator extends JPanel {
 
     /**
      * Creates new instance of SectionSeparator. Uses the provided font or default
-     * font for null value.
+     * font if no font is provided.
      *
      * @param text separator text
      * @param font font for the caption text or null for default font

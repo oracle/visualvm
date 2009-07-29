@@ -35,8 +35,9 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 
 /**
- * Predefined JScrollPane to be used for details views. Scrollbars are displayed
- * only when needed.
+ * Predefined JScrollPane to be used in VisualVM, for example in details views.
+ * Use UISupport.createScrollableContainer() method instead of instantiating
+ * this class directly if creating scrollable container for the Options panel.
  *
  * @author Jiri Sedlacek
  */
@@ -45,13 +46,20 @@ public final class ScrollableContainer extends JScrollPane {
     /**
      * Creates new instance of ScrollableContainer.
      * 
-     * @param view component to be displayed.
+     * @param view component to be displayed
      */
     public ScrollableContainer(JComponent view) {
         this(view, VERTICAL_SCROLLBAR_AS_NEEDED,
              HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
+    /**
+     * Creates new instance of ScrollableContainer.
+     *
+     * @param view component to be displayed
+     * @param vsbPolicy policy flag for the vertical scrollbar
+     * @param hsbPolicy policy flag for the horizontal scrollbar
+     */
     public ScrollableContainer(JComponent view, int vsbPolicy, int hsbPolicy) {
         setViewportView(new ScrollableContents(view));
 
