@@ -82,8 +82,8 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.JTitledPanel;
 import org.netbeans.modules.profiler.heapwalk.OQLController;
-import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
 import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
@@ -328,6 +328,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void queryStarted(final BoundedRangeModel model) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    updateUIState();
                     progressLabel.setText(EXECUTING_QUERY_MSG); // NOI18N
                     progressBar.setModel(model);
                     progressBar.setMaximumSize(new Dimension(progressBar.getMaximumSize().width,
@@ -337,7 +338,6 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     progressPanel.invalidate();
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
-                    updateUIState();
                 }
             });
         }

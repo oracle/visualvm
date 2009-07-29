@@ -45,7 +45,6 @@ import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectManager;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -63,6 +62,7 @@ import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.InstalledFileLocator;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
@@ -75,13 +75,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.ProjectManager;
+import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
+import org.openide.filesystems.URLMapper;
 
 
 /**
@@ -112,7 +117,7 @@ public final class IDEUtils {
     private static final String LIST_ACCESS_NAME = NbBundle.getMessage(IDEUtils.class, "IDEUtils_ListAccessName"); //NOI18N
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(IDEUtils.class, "IDEUtils_OkButtonText"); //NOI18N
                                                                                                                // -----
-    public static final String SETTINGS_DIR = "org-netbeans-modules-profiler"; //NOI18N
+    private static final String SETTINGS_FOR_ATTR = "settingsFor";
     private static final RequestProcessor profilerRequestProcessor = new RequestProcessor("Profiler Request Processor", 1); // NOI18N
     private static final ErrorManager profilerErrorManager = ErrorManager.getDefault().getInstance("org.netbeans.modules.profiler"); // NOI18N
 
@@ -282,33 +287,26 @@ public final class IDEUtils {
     }
 
     public static Project getProjectFromSettingsFolder(FileObject settingsFolder) {
-        if ((settingsFolder == null) || !settingsFolder.getName().equals("profiler")) {
-            return null; // NOI18N
+        Object o = settingsFolder.getAttribute(SETTINGS_FOR_ATTR);
+        if (o instanceof URL) {
+            FileObject d = URLMapper.findFileObject((URL) o);
+            if (d != null && d.isFolder()) {
+                try {
+                    return ProjectManager.getDefault().findProject(d);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
         }
-
-        FileObject privateFolder = settingsFolder.getParent();
-
-        if ((privateFolder == null) || !privateFolder.getName().equals("private")) {
-            return null; // NOI18N
-        }
-
-        FileObject nbprojectFolder = privateFolder.getParent();
-
-        if ((nbprojectFolder == null) || !nbprojectFolder.getName().equals("nbproject")) {
-            return null; // NOI18N
-        }
-
-        FileObject projectFolder = nbprojectFolder.getParent();
-
-        if (projectFolder == null) {
-            return null;
-        }
-
+        Project p = FileOwnerQuery.getOwner(settingsFolder);
         try {
-            return ProjectManager.getDefault().findProject(projectFolder);
-        } catch (IOException e) {
-            return null;
+            if (p != null && getProjectSettingsFolder(p, false) == settingsFolder) {
+                return p;
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
+        return null;
     }
 
     public static FileObject getProjectSettingsFolder(Project project, boolean create)
@@ -319,34 +317,18 @@ public final class IDEUtils {
         } else {
             // resolve 'nbproject'
             FileObject nbproject = project.getProjectDirectory().getFileObject("nbproject"); // NOI18N
-
-            if ((nbproject == null) && create) {
-                nbproject = project.getProjectDirectory().createFolder("nbproject"); // NOI18N
+            FileObject d;
+            if (nbproject != null) {
+                // For compatibility, continue to use nbproject/private/profiler for Ant-based projects.
+                d = create ? FileUtil.createFolder(nbproject, "private/profiler") : nbproject.getFileObject("private/profiler"); // NOI18N
+            } else {
+                // Maven projects, autoprojects, etc.
+                d = ProjectUtils.getCacheDirectory(project, IDEUtils.class);
             }
-
-            if (nbproject == null) {
-                return null;
+            if (d != null) {
+                d.setAttribute(SETTINGS_FOR_ATTR, project.getProjectDirectory().getURL()); // NOI18N
             }
-
-            // resolve 'private'
-            FileObject privateFolder = nbproject.getFileObject("private"); // NOI18N
-
-            if ((privateFolder == null) && create) {
-                privateFolder = nbproject.createFolder("private"); // NOI18N
-            }
-
-            if (privateFolder == null) {
-                return null;
-            }
-
-            // resolve 'profiler'
-            FileObject prof = privateFolder.getFileObject("profiler"); // NOI18N
-
-            if ((prof == null) && create) {
-                prof = privateFolder.createFolder("profiler"); // NOI18N
-            }
-
-            return prof;
+            return d;
         }
     }
 
