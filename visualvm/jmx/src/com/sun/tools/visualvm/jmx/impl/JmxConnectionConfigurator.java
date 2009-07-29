@@ -303,7 +303,9 @@ class JmxConnectionConfigurator extends JPanel {
 
         customizerPanel = new JPanel(new BorderLayout());
         customizerPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        customizerPanelScroll = new ScrollableContainer(customizerPanel);
+        customizerPanelScroll = new ScrollableContainer(customizerPanel,
+                ScrollableContainer.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollableContainer.HORIZONTAL_SCROLLBAR_NEVER);
         customizerPanelScroll.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 5));
         add(customizerPanelScroll, BorderLayout.CENTER);
     }
