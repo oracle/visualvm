@@ -80,7 +80,7 @@ final class GeneralOptionsPanel extends JPanel {
 
         // --- Polling ---
 
-        SectionSeparator pollingSection = new SectionSeparator(NbBundle.getMessage
+        SectionSeparator pollingSection = UISupport.createSectionSeparator(NbBundle.getMessage
                                           (GeneralOptionsPanel.class, "LBL_Polling")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 0;
@@ -182,7 +182,7 @@ final class GeneralOptionsPanel extends JPanel {
 
         // --- Charts cache ---
 
-        SectionSeparator chartsCacheSection = new SectionSeparator(NbBundle.getMessage
+        SectionSeparator chartsCacheSection = UISupport.createSectionSeparator(NbBundle.getMessage
                                           (GeneralOptionsPanel.class, "LBL_Charts_Cache")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 4;
@@ -254,7 +254,7 @@ final class GeneralOptionsPanel extends JPanel {
 
         // --- Profiler ---
 
-        SectionSeparator profilerSection = new SectionSeparator(NbBundle.getMessage
+        SectionSeparator profilerSection = UISupport.createSectionSeparator(NbBundle.getMessage
                                           (GeneralOptionsPanel.class, "LBL_Profiler")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 7;

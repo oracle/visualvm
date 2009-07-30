@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.security;
 
+import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -264,7 +265,7 @@ class SecurityOptionsPanel extends JPanel {
         // --- KeyStore --------------------------------------------------------
 
         // keyStoreSeparator
-        SectionSeparator keyStoreSeparator = new SectionSeparator(
+        SectionSeparator keyStoreSeparator = UISupport.createSectionSeparator(
                 NbBundle.getMessage(SecurityOptionsPanel.class, "SEP_Certificates")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 1;
@@ -598,7 +599,7 @@ class SecurityOptionsPanel extends JPanel {
         // --- Protocols -------------------------------------------------------
 
         // protocolsSeparator
-        SectionSeparator protocolsSeparator = new SectionSeparator(
+        SectionSeparator protocolsSeparator = UISupport.createSectionSeparator(
                 NbBundle.getMessage(SecurityOptionsPanel.class, "SEP_Protocols")); // NOI18N
         c = new GridBagConstraints();
         c = new GridBagConstraints();
@@ -749,7 +750,7 @@ class SecurityOptionsPanel extends JPanel {
         // --- Export / Import -----------------------------------------------------
 
         // exportImportSeparator
-        SectionSeparator exportImportSeparator = new SectionSeparator(
+        SectionSeparator exportImportSeparator = UISupport.createSectionSeparator(
                 NbBundle.getMessage(SecurityOptionsPanel.class, "SEP_ExportImport")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 10;
