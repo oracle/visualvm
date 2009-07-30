@@ -46,8 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -56,7 +54,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jaroslav Bachorik, Tomas Hurka
  */
 public class StackTraceSnapshotBuilder {
 
@@ -168,9 +166,8 @@ public class StackTraceSnapshotBuilder {
     final Object stampLock = new Object();
     // @GuardedBy stampLock
     long currentDumpTimeStamp = -1L;
-    final AtomicReference<Map<Thread, StackTraceElement[]>> lastStackTrace = new AtomicReference<Map<Thread, StackTraceElement[]>>(Collections.EMPTY_MAP);
+    final AtomicReference<Map<Long, java.lang.management.ThreadInfo>> lastStackTrace = new AtomicReference<Map<Long, java.lang.management.ThreadInfo>>(Collections.EMPTY_MAP);
     int stackTraceCount = 0;
-    final Map<Thread, Thread.State> lastThreadStates = new WeakHashMap<Thread, Thread.State>();
     final Set<String> ignoredThreadNames = new HashSet<String>();
 
     public StackTraceSnapshotBuilder() {
@@ -187,59 +184,61 @@ public class StackTraceSnapshotBuilder {
         }
     }
 
-    final public void addStacktrace(Map<Thread, StackTraceElement[]> stackTrace, long dumpTimeStamp) throws IllegalStateException {
-        long timestamp = -1L;
+    final public void addStacktrace(java.lang.management.ThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
         synchronized(stampLock) {
-            timestamp = Math.min(dumpTimeStamp, currentDumpTimeStamp);
-            if (timestamp != currentDumpTimeStamp) {
+            if (dumpTimeStamp <= currentDumpTimeStamp) {
                 throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
             }
-            currentDumpTimeStamp = timestamp;
+            currentDumpTimeStamp = dumpTimeStamp;
         }
 
         try {
             lock.writeLock().lock();
-            Map<Thread, Thread.State> states = new HashMap<Thread, Thread.State>();
+            Map<Long,java.lang.management.ThreadInfo> tinfoMap = new HashMap();
 
-            timestamp = dumpTimeStamp;
+            for (java.lang.management.ThreadInfo tinfo : threads) {
+                if (tinfo != null) {
+                    tinfoMap.put(tinfo.getThreadId(),tinfo);
+                }
+            }
 
-            for (Map.Entry<Thread, StackTraceElement[]> entry : stackTrace.entrySet()) {
-                Thread thread = entry.getKey();
-                if (ignoredThreadNames.contains(thread.getName())) continue;
+            for (java.lang.management.ThreadInfo tinfo : tinfoMap.values()) {
+                String tname = tinfo.getThreadName();
+                
+                if (ignoredThreadNames.contains(tname)) continue;
 
-                long threadId = thread.getId();
+                long threadId = tinfo.getThreadId();
                 if (!threadIds.contains(threadId)) {
                     threadIds.add(threadId);
-                    threadNames.add(thread.getName());
-                    ccgb.newThread((int) threadId, thread.getName(), thread.getClass().getName());
+                    threadNames.add(tname);
+                    ccgb.newThread((int) threadId, tname, "<none>");
                 }
-
-                StackTraceElement[] newElements = entry.getValue();
-                StackTraceElement[] oldElements = lastStackTrace.get().get(thread);
-
-                Thread.State oldState = lastThreadStates.get(thread);
-                Thread.State newState = thread.getState();
-                states.put(thread, newState);
-
-                processDiffs((int) threadId, oldElements, newElements, timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
+                StackTraceElement[] newElements = tinfo.getStackTrace();
+                Thread.State newState = tinfo.getThreadState();
+                java.lang.management.ThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
+                StackTraceElement[] oldElements = null;
+                Thread.State oldState = null;
+                
+                if (oldTinfo != null) {
+                    oldElements = oldTinfo.getStackTrace();
+                    oldState = oldTinfo.getThreadState();
+                }
+                processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
             }
 
-            for (Map.Entry<Thread, StackTraceElement[]> entry : lastStackTrace.get().entrySet()) {
-                Thread key = entry.getKey();
-                if (ignoredThreadNames.contains(key.getName())) continue;
+            for (java.lang.management.ThreadInfo oldTinfo : lastStackTrace.get().values()) {
+                if (ignoredThreadNames.contains(oldTinfo.getThreadName())) continue;
 
-                if (!stackTrace.containsKey(key)) {
-                    Thread.State oldState = key.getState();
-                    Thread.State newState = states.get(key);
-                    processDiffs((int) key.getId(), entry.getValue(), new StackTraceElement[0], timestamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
+                if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
+                    Thread.State oldState = oldTinfo.getThreadState();
+                    Thread.State newState = Thread.State.TERMINATED;
+                    processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), new StackTraceElement[0], dumpTimeStamp, oldState != null ? oldState : Thread.State.NEW, newState);
                 }
             }
 
-            lastStackTrace.set(stackTrace);
+            lastStackTrace.set(tinfoMap);
 
             stackTraceCount++;
-            lastThreadStates.clear();
-            lastThreadStates.putAll(states);
         } finally {
             lock.writeLock().unlock();
         }
@@ -264,65 +263,30 @@ public class StackTraceSnapshotBuilder {
 //                break;
             }
             case RUNNABLE: {
-                processDiffs(threadId, oldElements, newElements, timestamp);
-                switch (newState) {
-                    case BLOCKED: {
-                        ccgb.monitorEntry(threadId, timestamp, 0);
-                        break;
-                    }
-                    case WAITING:
-                    case TIMED_WAITING: {
-                        ccgb.waitEntry(threadId, timestamp, 0);
-                        break;
-                    }
-                }
                 break;
             }
             case WAITING:
             case TIMED_WAITING: {
-                switch (newState) {
-                    case RUNNABLE: {
-                        ccgb.waitExit(threadId, timestamp, 0);
-                        processDiffs(threadId, oldElements, newElements, timestamp);
-                        break;
-                    }
-                    case WAITING:
-                    case TIMED_WAITING: {
-                        ccgb.waitExit(threadId, timestamp, 0);
-                        processDiffs(threadId, oldElements, newElements, timestamp);
-                        ccgb.waitEntry(threadId, timestamp, 0);
-                        break;
-                    }
-                    case BLOCKED: {
-                        ccgb.waitExit(threadId, timestamp, 0);
-                        processDiffs(threadId, oldElements, newElements, timestamp);
-                        ccgb.monitorEntry(threadId, timestamp, 0);
-                        break;
-                    }
-                }
+                ccgb.waitExit(threadId, timestamp, 0);
                 break;
             }
             case BLOCKED: {
-                switch (newState) {
-                    case RUNNABLE: {
-                        ccgb.monitorExit(threadId, timestamp, 0);
-                        processDiffs(threadId, oldElements, newElements, timestamp);
-                        break;
-                    }
-                    case WAITING:
-                    case TIMED_WAITING: {
-                        ccgb.monitorExit(threadId, timestamp, 0);
-                        processDiffs(threadId, oldElements, newElements, timestamp);
-                        ccgb.waitEntry(threadId, timestamp, 0);
-                        break;
-                    }
-                    case BLOCKED: {
-                        ccgb.monitorExit(threadId, timestamp, 0);
-                        processDiffs(threadId, oldElements, newElements, timestamp);
-                        ccgb.monitorEntry(threadId, timestamp, 0);
-                        break;
-                    }
-                }
+                ccgb.monitorExit(threadId, timestamp, 0);
+                break;
+            }
+        }
+        processDiffs(threadId, oldElements, newElements, timestamp);
+        switch (newState) {
+            case RUNNABLE: {
+                break;
+            }
+            case WAITING:
+            case TIMED_WAITING: {
+                ccgb.waitEntry(threadId, timestamp, 0);
+                break;
+            }
+            case BLOCKED: {
+                ccgb.monitorEntry(threadId, timestamp, 0);
                 break;
             }
         }
@@ -415,7 +379,7 @@ public class StackTraceSnapshotBuilder {
     }
 
     public final CPUResultsSnapshot createSnapshot(
-            long since, long atTime) throws CPUResultsSnapshot.NoDataAvailableException {
+            long since) throws CPUResultsSnapshot.NoDataAvailableException {
         if (stackTraceCount < 1) {
             throw new CPUResultsSnapshot.NoDataAvailableException();
         }
@@ -442,7 +406,7 @@ public class StackTraceSnapshotBuilder {
             lock.readLock().unlock();
         }
 
-        addStacktrace(Collections.EMPTY_MAP, atTime);
+        addStacktrace(new java.lang.management.ThreadInfo[0], currentDumpTimeStamp+1);
 
         return new CPUResultsSnapshot(since, System.currentTimeMillis(), ccgb, false, instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
     }
@@ -455,7 +419,6 @@ public class StackTraceSnapshotBuilder {
             threadIds.clear();
             threadNames.clear();
             stackTraceCount = 0;
-            lastThreadStates.clear();
             lastStackTrace.set(Collections.EMPTY_MAP);
         } finally {
             lock.writeLock().unlock();
