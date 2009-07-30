@@ -37,6 +37,10 @@ import org.openide.util.NbBundle;
  */
 public final class JConsoleOptionsCategory extends OptionsCategory {
 
+    public static JConsoleOptionsCategory instance() {
+        return new JConsoleOptionsCategory();
+    }
+
     public String getCategoryName() {
         return NbBundle.getMessage(JConsoleOptionsCategory.class, "OptionsCategory_Name_JConsole"); // NOI18N
     }
@@ -52,4 +56,6 @@ public final class JConsoleOptionsCategory extends OptionsCategory {
     public OptionsPanelController create() {
         return new JConsoleOptionsPanelController();
     }
+
+    private JConsoleOptionsCategory() {}
 }

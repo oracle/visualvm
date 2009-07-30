@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.jconsole.options;
 
+import com.sun.tools.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.JComponent;
@@ -38,6 +39,7 @@ import org.openide.util.Lookup;
 final class JConsoleOptionsPanelController extends OptionsPanelController {
 
     private JConsoleCustomizer panel;
+    private JComponent component;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private boolean changed;
 
@@ -68,7 +70,7 @@ final class JConsoleOptionsPanelController extends OptionsPanelController {
     }
 
     public JComponent getComponent(Lookup masterLookup) {
-        return getPanel();
+        return getComponent();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -84,6 +86,13 @@ final class JConsoleOptionsPanelController extends OptionsPanelController {
             panel = new JConsoleCustomizer(this);
         }
         return panel;
+    }
+
+    private JComponent getComponent() {
+        if (component == null) {
+            component = UISupport.createScrollableContainer(getPanel());
+        }
+        return component;
     }
 
     void changed() {

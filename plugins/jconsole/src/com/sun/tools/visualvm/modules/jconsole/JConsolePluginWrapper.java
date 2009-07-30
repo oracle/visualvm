@@ -34,7 +34,10 @@ import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -55,6 +58,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,6 +67,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.event.SwingPropertyChangeSupport;
+import org.netbeans.api.options.OptionsDisplayer;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -89,18 +95,68 @@ class JConsolePluginWrapper {
                 vmPanel = new VMPanel(application, this, new ProxyClient(jmxModel));
                 vmPanel.connect();
                 JPanel panel = new JPanel(new BorderLayout());
-                panel.setBackground(Color.WHITE);
+                panel.setOpaque(false);
                 panel.add(new JLabel(" "), BorderLayout.NORTH); // NOI18N
                 panel.add(vmPanel, BorderLayout.CENTER);
                 jconsoleView = panel;
             } else {
-                JTextArea textArea = new JTextArea();
-                textArea.setBorder(BorderFactory.createEmptyBorder(25, 9, 9, 9));
-                textArea.setEditable(false);
-                textArea.setLineWrap(true);
-                textArea.setWrapStyleWord(true);
-                textArea.setText(NbBundle.getMessage(JConsolePluginWrapper.class, "PluginPath_Not_Available")); // NOI18N
-                jconsoleView = textArea;
+                GridBagConstraints c;
+
+                JPanel hintPanel = new JPanel(new GridBagLayout());
+                hintPanel.setOpaque(false);
+                hintPanel.setBorder(BorderFactory.createEmptyBorder(25, 9, 9, 9));
+
+                JLabel hintLabel = new JLabel(NbBundle.getMessage(
+                        JConsolePluginWrapper.class, "NoPluginInstalled")); // NOI18N
+                hintLabel.setFont(hintLabel.getFont().deriveFont(Font.BOLD));
+                c = new GridBagConstraints();
+                c.gridy = 0;
+                c.anchor = GridBagConstraints.WEST;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(0, 0, 0, 0);
+                hintPanel.add(hintLabel, c);
+
+                JTextArea hintArea = new JTextArea();
+                hintArea.setEnabled(false);
+                hintArea.setEditable(false);
+                hintArea.setLineWrap(true);
+                hintArea.setWrapStyleWord(true);
+                hintArea.setDisabledTextColor(hintArea.getForeground());
+                hintArea.setText(NbBundle.getMessage(
+                        JConsolePluginWrapper.class, "InstallPluginHint")); // NOI18N
+                c = new GridBagConstraints();
+                c.gridy = 1;
+                c.weightx = 1;
+                c.anchor = GridBagConstraints.WEST;
+                c.fill = GridBagConstraints.HORIZONTAL;
+                c.insets = new Insets(5, 0, 0, 0);
+                hintPanel.add(hintArea, c);
+
+                JButton optionsButton = new JButton() {
+                    protected void fireActionPerformed(ActionEvent event) {
+                        OptionsDisplayer.getDefault().open("JConsoleOptions"); // NOI18N
+                    }
+                };
+                Mnemonics.setLocalizedText(optionsButton, NbBundle.getMessage(
+                        JConsolePluginWrapper.class, "ConfigurePlugins")); // NOI18N
+                c = new GridBagConstraints();
+                c.gridy = 2;
+                c.anchor = GridBagConstraints.EAST;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(10, 0, 0, 0);
+                hintPanel.add(optionsButton, c);
+
+                JPanel fillerPanel = new JPanel(null);
+                fillerPanel.setOpaque(false);
+                c = new GridBagConstraints();
+                c.gridy = 3;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.NORTHWEST;
+                c.fill = GridBagConstraints.BOTH;
+                c.gridwidth = GridBagConstraints.REMAINDER;
+                hintPanel.add(fillerPanel, c);
+
+                jconsoleView = hintPanel;
             }
         }
     }
