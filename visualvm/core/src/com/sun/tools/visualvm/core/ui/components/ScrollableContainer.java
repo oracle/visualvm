@@ -80,6 +80,7 @@ public final class ScrollableContainer extends JScrollPane {
 
         public ScrollableContents(JComponent contents) {
             super(new BorderLayout());
+            setOpaque(false);
             add(contents, BorderLayout.CENTER);
         }
 
