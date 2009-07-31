@@ -41,7 +41,7 @@ package org.netbeans.modules.profiler.spi;
 
 import javax.swing.JEditorPane;
 import javax.swing.text.Document;
-import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 
 /**
  *
