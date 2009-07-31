@@ -43,7 +43,6 @@ import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.Repository;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
-import org.openide.util.NbBundle;
 
 /**
  * Class responsible for building explorer context menu.
@@ -117,8 +116,10 @@ final class ExplorerContextMenuFactory {
     }
         
     private List<Action>[] getActions() {
-        if (ExplorerSupport.sharedInstance().getSelectedDataSources().isEmpty()) return getNoSelectionActions();
-        else return getSelectionActions();
+        if (ExplorerSupport.sharedInstance().getSelectedDataSources().isEmpty())
+            return getNoSelectionActions();
+        else
+            return getSelectionActions();
     }
         
     private List<Action>[] getSelectionActions() {
@@ -126,7 +127,7 @@ final class ExplorerContextMenuFactory {
         FileSystem defaultFS = Repository.getDefault().getDefaultFileSystem();
         FileObject actionsFO = defaultFS.getRoot().getFileObject(SELECTION_ACTIONS_FILE);
         return getActions(actionsFO, true);
-        }
+    }
         
     private List<Action>[] getNoSelectionActions() {
         // Find entrypoint into layer
@@ -205,7 +206,7 @@ final class ExplorerContextMenuFactory {
             } else {
                 cleanActions.add(action);
                 leadingNull = false;
-    }
+            }
             lastAction = action;
         }
     
@@ -220,7 +221,6 @@ final class ExplorerContextMenuFactory {
     
     
     private static class DataSourceItem extends JMenuItem {
-        
         public DataSourceItem(Action action) {
             super(action);
             setIcon(null);
