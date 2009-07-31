@@ -44,10 +44,11 @@ import java.awt.Container;
 import javax.swing.JCheckBox;
 import junit.textui.TestRunner;
 import org.netbeans.jellytools.Bundle;
+import org.netbeans.jellytools.JavaProjectsTabOperator;
 import org.netbeans.jellytools.JellyTestCase;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.NbDialogOperator;
-import org.netbeans.jellytools.NewProjectNameLocationStepOperator;
+import org.netbeans.jellytools.NewJavaProjectNameLocationStepOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OptionsOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
@@ -55,6 +56,7 @@ import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.actions.Action;
 import org.netbeans.jellytools.actions.ActionNoBlock;
 import org.netbeans.jellytools.actions.OptionsViewAction;
+import org.netbeans.jellytools.nodes.JavaProjectRootNode;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jellytools.nodes.ProjectRootNode;
 import org.netbeans.jemmy.EventTool;
@@ -230,7 +232,7 @@ public class ProfilerValidation extends JellyTestCase {
         npwo.selectProject( Bundle.getStringTrimmed( "org.netbeans.modules.java.examples.Bundle",
                             "Templates/Project/Samples/Standard/anagrams.zip") ); //"Anagram Game"
         npwo.next();
-        NewProjectNameLocationStepOperator npnlso = new NewProjectNameLocationStepOperator();
+        NewJavaProjectNameLocationStepOperator npnlso = new NewJavaProjectNameLocationStepOperator();
         anagramGamePrName = npnlso.txtProjectName().getText();
         npnlso.txtProjectLocation().setText(System.getProperty("netbeans.user")); // NOI18N
         npnlso.finish();
@@ -256,7 +258,7 @@ public class ProfilerValidation extends JellyTestCase {
         // confirm properties dialog
         propertiesDialogOper.ok();
         
-        ProjectRootNode projectNode = new ProjectsTabOperator().getProjectRootNode(anagramGamePrName);
+        JavaProjectRootNode projectNode = new JavaProjectsTabOperator().getJavaProjectRootNode(anagramGamePrName);
         //wait classpath scanning finished
         WatchProjects.waitScanFinished();
         projectNode.buildProject();

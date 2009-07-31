@@ -45,7 +45,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -67,16 +68,16 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Utils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.oql.OQLEngine;
-import org.netbeans.modules.profiler.heapwalk.oql.OQLException;
-import org.netbeans.modules.profiler.heapwalk.oql.ObjectVisitor;
-import org.netbeans.modules.profiler.heapwalk.oql.model.ReferenceChain;
-import org.netbeans.modules.profiler.heapwalk.oql.model.Snapshot;
 import org.netbeans.modules.profiler.heapwalk.ui.OQLControllerUI;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
+import org.netbeans.modules.profiler.oql.engine.api.OQLException;
+import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
+import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
+import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 
 /**
@@ -112,7 +113,7 @@ public class OQLController extends AbstractTopLevelController
         this.heapFragmentWalker = heapFragmentWalker;
 
         if (OQLEngine.isOQLSupported()) {
-            engine = new OQLEngine(new Snapshot(heapFragmentWalker.getHeapFragment()));
+            engine = new OQLEngine(heapFragmentWalker.getHeapFragment());
 
             resultsController = new ResultsController(this);
             queryController = new QueryController(this);
@@ -128,7 +129,7 @@ public class OQLController extends AbstractTopLevelController
     }
 
     public void cancelQuery() {
-        analysisRunning.compareAndSet(true, false);
+        finalizeQuery();
     }
 
     public boolean isQueryRunning() {
@@ -251,9 +252,8 @@ public class OQLController extends AbstractTopLevelController
 
                             sb.append("</table>"); // NOI18N
 
-                            analysisRunning.compareAndSet(true, false);
-                            queryController.queryFinished();
                             resultsController.setResult(sb.toString());
+                            finalizeQuery();
                         } catch (OQLException oQLException) {
                             StringBuilder errorMessage = new StringBuilder();
                             errorMessage.append("<h2>").append(NbBundle.getMessage(OQLController.class, "OQL_QUERY_ERROR")).append("</h2>"); // NOI18N
@@ -261,13 +261,18 @@ public class OQLController extends AbstractTopLevelController
                             errorMessage.append("<hr>"); // noi18n
                             errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
                             resultsController.setResult(errorMessage.toString());
-                            queryController.queryFinished();
-                            cancelQuery();
+                            finalizeQuery();
                         }
                     }
+
                 });
             }
         });
+    }
+
+    private void finalizeQuery() {
+        analysisRunning.compareAndSet(true, false);
+        queryController.queryFinished();
     }
 
     private void dump(Object o, StringBuilder sb) {
@@ -433,7 +438,6 @@ public class OQLController extends AbstractTopLevelController
 
     
     public static class QueryController extends AbstractController {
-
         private OQLController oqlController;
 
 
@@ -508,18 +512,23 @@ public class OQLController extends AbstractTopLevelController
                 }
 
                 if (filtersFO == null) {
-                    FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config"); // NOI18N
-                    if (configFolder != null && configFolder.isValid()) {
-                        Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
+                    OQLQueryRepository repository = OQLQueryRepository.getInstance();
+                    List<? extends OQLQueryDefinition> qDefs = repository.listQueries();
+                    Collections.sort(qDefs, new Comparator<OQLQueryDefinition>() {
 
-                        while (suffixesIterator.hasNext() && (filtersFO == null)) {
-                            // find and use localized bundled filters definition
-                            filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
-                                                                   DEFAULT_FILE_SUFFIX +
-                                                                   suffixesIterator.next(),
-                                                                   "xml"); // NOI18N
+                        public int compare(OQLQueryDefinition o1, OQLQueryDefinition o2) {
+                            return o1.getName().compareTo(o2.getName());
                         }
+                    });
+                    for(OQLQueryDefinition qDef : qDefs) {
+                        model.addElement(new Query(qDef.getContent(), qDef.getName(), qDef.getDescription()));
                     }
+                    return;
+//                    FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config"); // NOI18N
+//                    if (configFolder != null && configFolder.isValid()) {
+//                        filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
+//                                                                   DEFAULT_FILE_SUFFIX,"xml"); // NOI18N
+//                    }
                 }
 
                 if (filtersFO != null) {
