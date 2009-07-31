@@ -45,14 +45,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.DataOutputStream;
-import java.nio.channels.WritableByteChannel;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.Collections;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -67,7 +66,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jaroslav Bachorik, Tomas Hurka
  */
 public class SelfSamplerAction extends AbstractAction implements AWTEventListener {
     final private static class Singleton {
@@ -179,11 +178,16 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
 
         public void run() {
             final StackTraceSnapshotBuilder b = getBuilder();
+            final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
             executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
             startTime = System.currentTimeMillis();
             executor.scheduleAtFixedRate(new Runnable() {
                 public void run() {
-                    b.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
+                    try {
+                        b.addStacktrace(threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE), System.nanoTime());
+                    } catch (Throwable ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
                 }
             }, 10, 10, TimeUnit.MILLISECONDS);
         }
@@ -195,7 +199,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                 if ("cancel".equals(e.getActionCommand())) {
                     return;
                 }
-                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
+                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime);
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                 if ("write".equals(e.getActionCommand())) {
                     DataOutputStream dos = (DataOutputStream)e.getSource();

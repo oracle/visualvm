@@ -38,37 +38,32 @@
  */
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.lang.Thread.State;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.management.openmbean.CompositeData;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import sun.management.ThreadInfoCompositeData;
 import static org.junit.Assert.*;
+
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jaroslav Bachorik, Tomas Hurka
  */
 public class StackTraceSnapshotBuilderTest {
-    private static class ThreadEx extends Thread {
-        private State adjustableState = State.RUNNABLE;
 
-        public ThreadEx(String name) {
-            super(name);
-        }
-
-        @Override
-        public State getState() {
-            return adjustableState;
-        }
-
-        public void setState(State state) {
-            adjustableState = state;
-        }
-    }
     private StackTraceSnapshotBuilder instance;
 
     private final StackTraceElement[] elements0 = new StackTraceElement[] {
@@ -96,17 +91,14 @@ public class StackTraceSnapshotBuilderTest {
         new StackTraceElement("test.Class1", "method1", "Class1.java", 10)
     };
 
-    private ThreadEx thread0;
-    private ThreadEx thread1;
-    private ThreadEx thread2;
+    private Thread thread0;
+    private Thread thread1;
+    private Thread thread2;
 
-    private Map<Thread, StackTraceElement[]> stack0;
-
-    private Map<Thread, StackTraceElement[]> stackPlus;
-
-    private Map<Thread, StackTraceElement[]> stackMinus;
-
-    private Map<Thread, StackTraceElement[]> stackDif;
+    private java.lang.management.ThreadInfo[] stack0;
+    private java.lang.management.ThreadInfo[] stackPlus;
+    private java.lang.management.ThreadInfo[] stackMinus;
+    private java.lang.management.ThreadInfo[] stackDif;
     
 
     public StackTraceSnapshotBuilderTest() {
@@ -124,36 +116,29 @@ public class StackTraceSnapshotBuilderTest {
     public void setUp() {
         instance = new StackTraceSnapshotBuilder();
 
-        thread0 = new ThreadEx("Test thread 0");
-        thread1 = new ThreadEx("Test thread 1");
-        thread2 = new ThreadEx("Test thread 2");
+        thread0 = new Thread("Test thread 0");
+        thread1 = new Thread("Test thread 1");
+        thread2 = new Thread("Test thread 2");
         
-        stack0 = new HashMap<Thread, StackTraceElement[]>() {
-            {
-                put(thread0, elements0);
-                put(thread1, elements0);
-            }
+        stack0 = new java.lang.management.ThreadInfo[] {
+                createThreadInfo(thread0, elements0),
+                createThreadInfo(thread1, elements0)
         };
 
-        stackPlus = new HashMap<Thread, StackTraceElement[]>() {
-            {
-                put(thread0, elementsPlus);
-                put(thread1, elements0);
-                put(thread2, elements0);
-            }
+        stackPlus = new java.lang.management.ThreadInfo[] {
+                createThreadInfo(thread0, elementsPlus),
+                createThreadInfo(thread1, elements0),
+                createThreadInfo(thread2, elements0)
         };
 
-        stackMinus = new HashMap<Thread, StackTraceElement[]>() {
-            {
-                put(thread0, elementsMinus);
-            }
+        stackMinus = new java.lang.management.ThreadInfo[] {
+                createThreadInfo(thread0, elementsMinus)
         };
 
-        stackDif = new HashMap<Thread, StackTraceElement[]>() {
-            {
-                put(thread0, elementsDif);
-            }
+        stackDif = new java.lang.management.ThreadInfo[] {
+                createThreadInfo(thread0, elementsDif)
         };
+
     }
 
     @After
@@ -170,7 +155,7 @@ public class StackTraceSnapshotBuilderTest {
         System.out.println("create snapshot : empty");
 
         try {
-            instance.createSnapshot(System.currentTimeMillis(), 0);
+            instance.createSnapshot(System.currentTimeMillis());
             fail("Attempt to create an empty snapshot should throw NoDataAvailableException");
         } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
         }
@@ -180,8 +165,8 @@ public class StackTraceSnapshotBuilderTest {
     public void testCreateSnapshotOneSample() throws CPUResultsSnapshot.NoDataAvailableException {
         System.out.println("create snapshot : one sample");
 
-        instance.addStacktrace(stack0, 0);
-        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis(), 500000);
+        addStacktrace(stack0, 0);
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
@@ -190,10 +175,10 @@ public class StackTraceSnapshotBuilderTest {
     public void testCreateSnapshotNoChanges() throws CPUResultsSnapshot.NoDataAvailableException {
         System.out.println("create snapshot : two samples");
 
-        instance.addStacktrace(stack0, 0);
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 0);
+        addStacktrace(stack0, 500000);
 
-        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis(), 1000000);
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
@@ -202,10 +187,10 @@ public class StackTraceSnapshotBuilderTest {
     public void testCreateSnapshotMinus() throws CPUResultsSnapshot.NoDataAvailableException {
         System.out.println("create snapshot : minus");
 
-        instance.addStacktrace(stack0, 0);
-        instance.addStacktrace(stackMinus, 500000);
+        addStacktrace(stack0, 0);
+        addStacktrace(stackMinus, 500000);
 
-        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis(), 1000000);
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
@@ -214,10 +199,10 @@ public class StackTraceSnapshotBuilderTest {
     public void testCreateSnapshotPlus() throws CPUResultsSnapshot.NoDataAvailableException {
         System.out.println("create snapshot : plus");
 
-        instance.addStacktrace(stack0, 0);
-        instance.addStacktrace(stackPlus, 500000);
+        addStacktrace(stack0, 0);
+        addStacktrace(stackPlus, 500000);
 
-        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis(), 1000000);
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
@@ -226,11 +211,11 @@ public class StackTraceSnapshotBuilderTest {
     public void testCreateSnapshotPlusMinus() throws CPUResultsSnapshot.NoDataAvailableException {
         System.out.println("create snapshot : plus->minus");
 
-        instance.addStacktrace(stack0, 0);
-        instance.addStacktrace(stackPlus, 500000);
-        instance.addStacktrace(stackMinus, 1000000);
+        addStacktrace(stack0, 0);
+        addStacktrace(stackPlus, 500000);
+        addStacktrace(stackMinus, 1000000);
 
-        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis(), 1500000);
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
@@ -239,11 +224,11 @@ public class StackTraceSnapshotBuilderTest {
     public void testCreateSnapshotMinusPlus() throws CPUResultsSnapshot.NoDataAvailableException {
         System.out.println("create snapshot : minus->plus");
 
-        instance.addStacktrace(stack0, 0);
-        instance.addStacktrace(stackMinus, 500000);
-        instance.addStacktrace(stackPlus, 1000000);
+        addStacktrace(stack0, 0);
+        addStacktrace(stackMinus, 500000);
+        addStacktrace(stackPlus, 1000000);
 
-        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis(), 1500000);
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
@@ -252,12 +237,11 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktrace() {
         System.out.println("add stacktrace");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
         assertTrue(instance.methodInfos.size() == elements0.length);
-        assertTrue(instance.threadIds.size() == stack0.size());
-        assertTrue(instance.threadNames.size() == stack0.size());
+        assertTrue(instance.threadIds.size() == stack0.length);
+        assertTrue(instance.threadNames.size() == stack0.length);
         assertFalse(-1L == instance.currentDumpTimeStamp);
-        //assertFalse(-1L == instance.firstDumpTimeStamp);
     }
 
     @Test
@@ -265,30 +249,31 @@ public class StackTraceSnapshotBuilderTest {
         System.out.println("add stacktrace : duplicate");
 
         long stamp = 0;
-        instance.addStacktrace(stack0, stamp);
+        addStacktrace(stack0, stamp);
 
         int miSize = instance.methodInfos.size();
         int tIdSize = instance.threadIds.size();
         long timestamp = instance.currentDumpTimeStamp;
 
-        instance.addStacktrace(stack0, stamp);
-
-        assertEquals(tIdSize, instance.threadIds.size());
-        assertEquals(miSize, instance.methodInfos.size());
-        assertEquals(timestamp, instance.currentDumpTimeStamp);
+        try {
+            addStacktrace(stack0, stamp);
+            fail();
+        } catch (IllegalStateException ex) {
+            // ok
+        }
     }
 
     @Test
     public void testAddStacktracePlus() {
         System.out.println("add stacktrace : plus");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
 
-        instance.addStacktrace(stackPlus, timestamp);
+        addStacktrace(stackPlus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -297,14 +282,14 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktracePlusWaiting() {
         System.out.println("add stacktrace : plus/waiting");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.WAITING);
+        setState(stackPlus[0],Thread.State.WAITING);
 
-        instance.addStacktrace(stackPlus, timestamp);
+        addStacktrace(stackPlus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -313,14 +298,14 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktracePlusWaitingThread() {
         System.out.println("add stacktrace : plus/waiting; additional thread");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread2.setState(Thread.State.WAITING);
+        setState(stackPlus[2],Thread.State.WAITING);
 
-        instance.addStacktrace(stackPlus, timestamp);
+        addStacktrace(stackPlus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -329,15 +314,15 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceWaitingPlus() {
         System.out.println("add stacktrace : waiting/plus");
 
-        thread0.setState(Thread.State.WAITING);
-        instance.addStacktrace(stack0, 0);
+        setState(stack0[0],Thread.State.WAITING);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.RUNNABLE);
+        setState(stackPlus[2],Thread.State.RUNNABLE);
 
-        instance.addStacktrace(stackPlus, timestamp);
+        addStacktrace(stackPlus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackPlus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -346,13 +331,13 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceMinus() {
         System.out.println("add stacktrace : minus");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
 
-        instance.addStacktrace(stackMinus, timestamp);
+        addStacktrace(stackMinus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -361,13 +346,13 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceMinusWaiting() {
         System.out.println("add stacktrace : minus/waiting");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.WAITING);
-        instance.addStacktrace(stackMinus, timestamp);
+        setState(stackMinus[0], Thread.State.WAITING);
+        addStacktrace(stackMinus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -376,14 +361,14 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceMinusWaitingThread() {
         System.out.println("add stacktrace : minus/waiting; additional thread");
 
-        thread1.setState(Thread.State.WAITING);
-        instance.addStacktrace(stack0, 0);
+        setState(stack0[1], Thread.State.WAITING);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.WAITING);
-        instance.addStacktrace(stackMinus, timestamp);
+        setState(stackMinus[0], Thread.State.WAITING);
+        addStacktrace(stackMinus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -392,14 +377,14 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceWaitingMinus() {
         System.out.println("add stacktrace : waiting/minus");
 
-        thread0.setState(Thread.State.WAITING);
-        instance.addStacktrace(stack0, 0);
+        setState(stack0[0], Thread.State.WAITING);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.RUNNABLE);
-        instance.addStacktrace(stackMinus, timestamp);
+        setState(stackMinus[0], Thread.State.RUNNABLE);
+        addStacktrace(stackMinus, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackMinus.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
         assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
@@ -408,13 +393,13 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceDif() {
         System.out.println("add stacktrace : diff");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
 
-        instance.addStacktrace(stackDif, timestamp);
+        addStacktrace(stackDif, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackDif.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackDif.length), instance.threadIds.size());
         for(StackTraceElement element : elements0) {
             if (!instance.methodInfos.contains(new StackTraceSnapshotBuilder.MethodInfo(element))) {
                 fail();
@@ -432,16 +417,16 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceDifWaiting() {
         System.out.println("add stacktrace : diff/waiting");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.WAITING);
+        setState(stackDif[0], Thread.State.WAITING);
         
-        instance.addStacktrace(stackDif, timestamp);
+        addStacktrace(stackDif, timestamp);
 
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
 
-        assertEquals(Math.max(stack0.size(), stackDif.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackDif.length), instance.threadIds.size());
         for(StackTraceElement element : elements0) {
             if (!instance.methodInfos.contains(new StackTraceSnapshotBuilder.MethodInfo(element))) {
                 fail();
@@ -459,22 +444,22 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceDifWaitingBlocked() {
         System.out.println("add stacktrace : diff/waiting/blocked");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.WAITING);
+        setState(stackDif[0], Thread.State.WAITING);
 
-        instance.addStacktrace(stackDif, timestamp);
+        addStacktrace(stackDif, timestamp);
 
-        thread0.setState(Thread.State.BLOCKED);
+        setState(stack0[0], Thread.State.BLOCKED);
 
         timestamp += 500000;
 
-        instance.addStacktrace(stack0, timestamp);
+        addStacktrace(stack0, timestamp);
 
-        assertEquals(Thread.State.BLOCKED, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.BLOCKED, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
 
-        assertEquals(Math.max(stack0.size(), stackDif.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackDif.length), instance.threadIds.size());
         for(StackTraceElement element : elements0) {
             if (!instance.methodInfos.contains(new StackTraceSnapshotBuilder.MethodInfo(element))) {
                 fail();
@@ -492,22 +477,22 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceDifBlockedWaiting() {
         System.out.println("add stacktrace : diff/blocked/waiting");
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
-        thread0.setState(Thread.State.BLOCKED);
+        setState(stackDif[0], Thread.State.BLOCKED);
 
-        instance.addStacktrace(stackDif, timestamp);
+        addStacktrace(stackDif, timestamp);
 
-        thread0.setState(Thread.State.WAITING);
+        setState(stack0[0], Thread.State.WAITING);
 
         timestamp += 500000;
 
-        instance.addStacktrace(stack0, timestamp);
+        addStacktrace(stack0, timestamp);
 
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
 
-        assertEquals(Math.max(stack0.size(), stackDif.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackDif.length), instance.threadIds.size());
         for(StackTraceElement element : elements0) {
             if (!instance.methodInfos.contains(new StackTraceSnapshotBuilder.MethodInfo(element))) {
                 fail();
@@ -525,15 +510,15 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceWaitingDif() {
         System.out.println("add stacktrace : waiting/diff");
 
-        thread0.setState(Thread.State.WAITING);
-        instance.addStacktrace(stack0, 0);
+        setState(stack0[0], Thread.State.WAITING);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
 
 
-        instance.addStacktrace(stackDif, timestamp);
+        addStacktrace(stackDif, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackDif.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackDif.length), instance.threadIds.size());
         for(StackTraceElement element : elements0) {
             if (!instance.methodInfos.contains(new StackTraceSnapshotBuilder.MethodInfo(element))) {
                 fail();
@@ -551,15 +536,15 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStacktraceWaitingDifRunnable() {
         System.out.println("add stacktrace : waiting/diff/runnable");
 
-        thread0.setState(Thread.State.WAITING);
-        instance.addStacktrace(stack0, 0);
+        setState(stack0[0], Thread.State.WAITING);
+        addStacktrace(stack0, 0);
 
         long timestamp = 500000;
 
-        thread0.setState(Thread.State.RUNNABLE);
-        instance.addStacktrace(stackDif, timestamp);
+        setState(stackDif[0], Thread.State.RUNNABLE);
+        addStacktrace(stackDif, timestamp);
 
-        assertEquals(Math.max(stack0.size(), stackDif.size()), instance.threadIds.size());
+        assertEquals(Math.max(stack0.length, stackDif.length), instance.threadIds.size());
         for(StackTraceElement element : elements0) {
             if (!instance.methodInfos.contains(new StackTraceSnapshotBuilder.MethodInfo(element))) {
                 fail();
@@ -577,10 +562,10 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStackTraceNew() {
         System.out.println("add stacktrace : new");
 
-        thread0.setState(Thread.State.NEW);
+        setState(stack0[0], Thread.State.NEW);
 
         try {
-            instance.addStacktrace(stack0, 500000);
+            addStacktrace(stack0, 500000);
             fail();
         } catch (IllegalStateException ex) {}
     }
@@ -589,12 +574,12 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStackTraceWasTerminated() {
         System.out.println("add stacktrace : terminated->runnable");
 
-        thread0.setState(Thread.State.TERMINATED);
+        setState(stack0[0], Thread.State.TERMINATED);
 
         try {
-            instance.addStacktrace(stack0, 0);
-            thread0.setState(Thread.State.RUNNABLE);
-            instance.addStacktrace(stack0, 500000);
+            addStacktrace(stack0, 0);
+            setState(stack0[0], Thread.State.RUNNABLE);
+            addStacktrace(stack0, 500000);
             fail();
         } catch (IllegalStateException ex) {}
     }
@@ -604,114 +589,114 @@ public class StackTraceSnapshotBuilderTest {
     public void testAddStackTraceRunnable() {
         System.out.println("add stacktrace : runnable");
 
-        thread0.setState(Thread.State.RUNNABLE);
+        setState(stack0[0], Thread.State.RUNNABLE);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.RUNNABLE, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.RUNNABLE, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceWaiting() {
         System.out.println("add stacktrace : waiting");
 
-        thread0.setState(Thread.State.WAITING);
+        setState(stack0[0], Thread.State.WAITING);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceTimedWaiting() {
         System.out.println("add stacktrace : timed waiting");
 
-        thread0.setState(Thread.State.TIMED_WAITING);
+        setState(stack0[0], Thread.State.TIMED_WAITING);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.TIMED_WAITING, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.TIMED_WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceBlocked() {
         System.out.println("add stacktrace : blocked");
 
-        thread0.setState(Thread.State.BLOCKED);
+        setState(stack0[0], Thread.State.BLOCKED);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.BLOCKED, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.BLOCKED, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceTerminated() {
         System.out.println("add stacktrace : terminated");
 
-        thread0.setState(Thread.State.TERMINATED);
+        setState(stack0[0], Thread.State.TERMINATED);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.TERMINATED, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.TERMINATED, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceWaitRun() {
         System.out.println("add stacktrace : wait->run");
 
-        instance.addStacktrace(stack0, 0);
-        thread0.setState(Thread.State.WAITING);
+        addStacktrace(stack0, 0);
+        setState(stack0[0], Thread.State.WAITING);
         
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
 
-        thread0.setState(Thread.State.RUNNABLE);
-        instance.addStacktrace(stack0, 1000000);
+        setState(stack0[0], Thread.State.RUNNABLE);
+        addStacktrace(stack0, 1000000);
 
         assertEquals(1000000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.RUNNABLE, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.RUNNABLE, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceWaitWait() {
         System.out.println("add stacktrace : wait->wait");
 
-        instance.addStacktrace(stack0, 0);
-        thread0.setState(Thread.State.WAITING);
+        addStacktrace(stack0, 0);
+        setState(stack0[0], Thread.State.WAITING);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
-        instance.addStacktrace(stack0, 1000000);
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
+        addStacktrace(stack0, 1000000);
 
         assertEquals(1000000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
     @Test
     public void testAddStackTraceWaitBlocked() {
         System.out.println("add stacktrace : wait->blocked");
 
-        instance.addStacktrace(stack0, 0);
-        thread0.setState(Thread.State.WAITING);
+        addStacktrace(stack0, 0);
+        setState(stack0[0], Thread.State.WAITING);
 
-        instance.addStacktrace(stack0, 500000);
+        addStacktrace(stack0, 500000);
 
         assertEquals(500000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.WAITING, instance.lastThreadStates.get(thread0));
-        thread0.setState(Thread.State.BLOCKED);
-        instance.addStacktrace(stack0, 1000000);
+        assertEquals(Thread.State.WAITING, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
+        setState(stack0[0], Thread.State.BLOCKED);
+        addStacktrace(stack0, 1000000);
 
         assertEquals(1000000, instance.currentDumpTimeStamp);
-        assertEquals(Thread.State.BLOCKED, instance.lastThreadStates.get(thread0));
+        assertEquals(Thread.State.BLOCKED, instance.lastStackTrace.get().get(thread0.getId()).getThreadState());
     }
 
 
@@ -719,9 +704,9 @@ public class StackTraceSnapshotBuilderTest {
     @Test
     public void testReset() {
         System.out.println("reset");
-
-        instance.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
-        instance.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
+        ThreadMXBean tbean = ManagementFactory.getThreadMXBean();
+        addStacktrace(tbean.getThreadInfo(tbean.getAllThreadIds(), Integer.MAX_VALUE), System.nanoTime());
+        addStacktrace(tbean.getThreadInfo(tbean.getAllThreadIds(), Integer.MAX_VALUE), System.nanoTime());
 
         instance.reset();
         assertTrue(instance.methodInfos.size() == 0);
@@ -732,7 +717,7 @@ public class StackTraceSnapshotBuilderTest {
         assertEquals(0, instance.stackTraceCount);
 
         try {
-            instance.createSnapshot(System.currentTimeMillis(), 0);
+            instance.createSnapshot(System.currentTimeMillis());
             fail();
         } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
         }
@@ -745,7 +730,51 @@ public class StackTraceSnapshotBuilderTest {
         String ignoredThread = "Thread 0";
         instance.setIgnoredThreads(Collections.singleton(ignoredThread));
 
-        instance.addStacktrace(stack0, 0);
+        addStacktrace(stack0, 0);
         assertFalse(instance.threadNames.contains(ignoredThread));
+    }
+
+    private java.lang.management.ThreadInfo createThreadInfo(Thread t, StackTraceElement[] stack) {
+        Constructor tinfoConstructor = java.lang.management.ThreadInfo.class.getDeclaredConstructors()[0];
+        tinfoConstructor.setAccessible(true);
+        try {
+            ThreadInfo tinfo =  (ThreadInfo) tinfoConstructor.newInstance(t,0,null,null,0,0,0,0,stack);
+            setState(tinfo,State.RUNNABLE);
+            return tinfo;
+        } catch (InstantiationException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private void setState(java.lang.management.ThreadInfo tinfo, State s) {
+        try {
+            Field tstateField = tinfo.getClass().getDeclaredField("threadState");
+            tstateField.setAccessible(true);
+            tstateField.set(tinfo, s);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchFieldException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void addStacktrace(java.lang.management.ThreadInfo[] tinfos, long time) {
+        java.lang.management.ThreadInfo[] newInfo = new java.lang.management.ThreadInfo[tinfos.length];
+        int i = 0;
+
+        for (java.lang.management.ThreadInfo tinfo : tinfos) {
+            CompositeData aaa = ThreadInfoCompositeData.toCompositeData(tinfo);
+            newInfo[i++] = ThreadInfo.from(aaa);
+        }
+        instance.addStacktrace(newInfo, time);
     }
 }
