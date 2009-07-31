@@ -136,10 +136,12 @@ public final class ProjectsRootNode extends AbstractNode {
         }
 
         // Children.Keys impl --------------------------------------------------
+        @Override
         public void addNotify() {
             setKeys(getKeys());
         }
 
+        @Override
         public void removeNotify() {
             for (Iterator it = sources2projects.keySet().iterator(); it.hasNext();) {
                 final Sources sources = (Sources) it.next();
@@ -229,6 +231,7 @@ public final class ProjectsRootNode extends AbstractNode {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public Action[] getActions(final boolean context) {
         if (context) {
             return NO_ACTIONS;
@@ -241,18 +244,22 @@ public final class ProjectsRootNode extends AbstractNode {
         }
     }
 
+    @Override
     public String getDisplayName() {
         return OPEN_PROJECTS_NODE_NAME;
     }
 
+    @Override
     public Node.Handle getHandle() {
         return handle;
     }
 
+    @Override
     public String getName() {
         return ("OpenProjects"); // NOI18N
     }
 
+    @Override
     public boolean canRename() {
         return false;
     }

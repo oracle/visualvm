@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="NBProfiler">
+        <folder name="Config">
+            <folder name="OQL">
+                <folder name="samples">
+                    <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samples"/>
+                    <file name="AllFiles.oql" url="repository/resources/AllFiles.oql">
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#AllFiles.oql"/>
+                        <attr name="desc" stringvalue="Sample OQL query to list all instances of java.io.File allocated on the heap."/>
+                    </file>
+                    <file name="OverallocatedStrings.oql" url="repository/resources/OverallocatedStrings.oql">
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStrings.oql"/>
+                        <attr name="desc" stringvalue="Computes overhead of Strings that have their backing char[] larger than necessary (for example result of String.substring())."/>
+                    </file>
+                    <file name="OverallocatedStringsJS.oql" url="repository/resources/OverallocatedStringsJS.oql">
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.oql"/>
+                        <attr name="desc" stringvalue="Computes overhead of Strings that have their backing char[] larger than necessary (for example result of String.substring()). This time it uses JavaScript functions."/>
+                    </file>
+                    <file name="TooManyBooleans.oql" url="repository/resources/TooManyBooleans.oql">
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#TooManyBooleans.oql"/>
+                        <attr name="desc" stringvalue="Checks if there are more than two instances of Boolean on the heap (only Boolean.TRUE and Boolean.FALSE are necessary)."/>
+                    </file>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

@@ -72,6 +72,12 @@ public class HintsController extends AbstractController {
             "AnalysisController_CannotResolveClassMsg"); // NOI18N
     private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
             "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
+    private static final String NO_DATA_MSG = NbBundle.getMessage(HintsController.class,
+            "HintsController_NoData"); // NOI18N
+    private static final String CLASS_NAME_MSG = NbBundle.getMessage(HintsController.class,
+            "HintsController_ClassName"); // NOI18N
+    private static final String RETAINED_SIZE_MSG = NbBundle.getMessage(HintsController.class,
+            "HintsController_RetainedSize"); // NOI18N
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
@@ -141,7 +147,7 @@ public class HintsController extends AbstractController {
 
                 final String result = retainedSizesState == HeapFragmentWalker.
                                       RETAINED_SIZES_COMPUTED ?
-                                      findBiggestObjects(number) : "&lt;No Data&gt;";
+                                      findBiggestObjects(number) : NO_DATA_MSG;
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -170,8 +176,8 @@ public class HintsController extends AbstractController {
         output.append("<table border='0' width='100%'>");  // NOI18N
         output.append("<tr style='background-color:");  // NOI18N
         output.append(oddRowBackgroundString + ";'>");  // NOI18N
-        addHeading(output,"Class Name");
-        addHeading(output,"Retained Size");
+        addHeading(output, CLASS_NAME_MSG);
+        addHeading(output, RETAINED_SIZE_MSG);
         output.append("</tr>"); // NOI18N
         for(Instance in : bigObjects) {
             output.append(oddRow[0] ? "<tr style='background-color: " + // NOI18N
