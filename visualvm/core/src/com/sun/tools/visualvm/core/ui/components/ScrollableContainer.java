@@ -26,12 +26,14 @@
 package com.sun.tools.visualvm.core.ui.components;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.Scrollable;
 
 /**
@@ -99,11 +101,21 @@ public final class ScrollableContainer extends JScrollPane {
         }
 
         public boolean getScrollableTracksViewportWidth() {
-            return getHorizontalScrollBarPolicy() == HORIZONTAL_SCROLLBAR_NEVER;
+            if (getHorizontalScrollBarPolicy() == HORIZONTAL_SCROLLBAR_NEVER)
+                return true;
+
+            Container parent = getParent();
+            if ((parent == null) || !(parent instanceof JViewport)) return false;
+            return getPreferredSize().width < ((JViewport)parent).getWidth();
         }
 
         public boolean getScrollableTracksViewportHeight() {
-            return getVerticalScrollBarPolicy() == VERTICAL_SCROLLBAR_NEVER;
+            if (getVerticalScrollBarPolicy() == VERTICAL_SCROLLBAR_NEVER)
+                return true;
+
+            Container parent = getParent();
+            if ((parent == null) || !(parent instanceof JViewport)) return false;
+            return getPreferredSize().height < ((JViewport)parent).getHeight();
         }
 
     }
