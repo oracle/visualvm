@@ -110,12 +110,12 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       final boolean closable = view.isClosable();
       
       if (UIUtils.isGTKLookAndFeel()) {
-          setTitleAt(getComponentCount() - 1, view.getName());
+          setTitleAt(getComponentCount() - 1, view.getName() + (closable ? "" : " "));  // NOI18N
           super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()) {
-              public int getIconWidth() { return super.getIconWidth() + 12; }
+              public int getIconWidth() { return super.getIconWidth() + (closable ? 15 : 8); }
           });
       } else if (UIUtils.isNimbusLookAndFeel()) {
-          setTitleAt(getComponentCount() - 1, view.getName() + (closable ? "" : "  "));
+          setTitleAt(getComponentCount() - 1, view.getName() + (closable ? "" : "  "));  // NOI18N
           super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()) {
               public int getIconWidth() { return super.getIconWidth() + (closable ? 10 : 0); }
           });
