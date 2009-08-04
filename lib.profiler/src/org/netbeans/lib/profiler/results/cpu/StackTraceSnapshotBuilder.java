@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -57,6 +58,8 @@ import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
  * @author Jaroslav Bachorik, Tomas Hurka
  */
 public class StackTraceSnapshotBuilder {
+
+    private static final StackTraceElement[] NO_STACK_TRACE = new StackTraceElement[0];
 
     static class MethodInfo {
 
@@ -78,6 +81,9 @@ public class StackTraceSnapshotBuilder {
 
         @Override
         public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
             if (obj == null) {
                 return false;
             }
@@ -216,14 +222,14 @@ public class StackTraceSnapshotBuilder {
                 StackTraceElement[] newElements = tinfo.getStackTrace();
                 Thread.State newState = tinfo.getThreadState();
                 java.lang.management.ThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
-                StackTraceElement[] oldElements = null;
-                Thread.State oldState = null;
+                StackTraceElement[] oldElements = NO_STACK_TRACE;
+                Thread.State oldState = Thread.State.NEW;
                 
                 if (oldTinfo != null) {
                     oldElements = oldTinfo.getStackTrace();
                     oldState = oldTinfo.getThreadState();
                 }
-                processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, oldState != null ? oldState : Thread.State.NEW, newState != null ? newState : Thread.State.TERMINATED);
+                processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, oldState, newState);
             }
 
             for (java.lang.management.ThreadInfo oldTinfo : lastStackTrace.get().values()) {
@@ -232,7 +238,7 @@ public class StackTraceSnapshotBuilder {
                 if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
                     Thread.State oldState = oldTinfo.getThreadState();
                     Thread.State newState = Thread.State.TERMINATED;
-                    processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), new StackTraceElement[0], dumpTimeStamp, oldState != null ? oldState : Thread.State.NEW, newState);
+                    processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), NO_STACK_TRACE, dumpTimeStamp, oldState, newState);
                 }
             }
 
@@ -244,7 +250,7 @@ public class StackTraceSnapshotBuilder {
         }
     }
 
-    final private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, Thread.State oldState, Thread.State newState) throws IllegalStateException {
+    private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, Thread.State oldState, Thread.State newState) throws IllegalStateException {
         if (newState == Thread.State.NEW) {
             throw new IllegalStateException("Invalid thread state " + Thread.State.NEW.name() + " for taking a stack trace");
         }
@@ -292,38 +298,34 @@ public class StackTraceSnapshotBuilder {
         }
     }
 
-    final private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp) throws IllegalStateException {
-        if ((oldElements == null || oldElements.length == 0) && (newElements == null || newElements.length == 0)) {
+    private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp) throws IllegalStateException {
+        if (oldElements.length == 0 && newElements.length == 0) {
             return;
         }
 
-        int newMax = newElements != null ? newElements.length - 1 : -1;
-        int oldMax = oldElements != null ? oldElements.length - 1 : -1;
+        int newMax = newElements.length - 1;
+        int oldMax = oldElements.length - 1;
         int globalMax = Math.max(oldMax, newMax);
 
-        List<StackTraceElement> newElementsList = new ArrayList<StackTraceElement>();
-        List<StackTraceElement> oldElementsList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> newElementsList = Collections.EMPTY_LIST;
+        List<StackTraceElement> oldElementsList = Collections.EMPTY_LIST;
 
-        for (int iteratorIndex = 0; iteratorIndex <=
-                globalMax; iteratorIndex++) {
+        for (int iteratorIndex = 0; iteratorIndex <= globalMax; iteratorIndex++) {
             StackTraceElement oldElement = oldMax >= iteratorIndex ? oldElements[oldMax - iteratorIndex] : null;
             StackTraceElement newElement = newMax >= iteratorIndex ? newElements[newMax - iteratorIndex] : null;
 
             if (oldElement != null && newElement != null) {
                 if (!oldElement.equals(newElement)) {
-                    newElementsList.addAll(Arrays.asList(newElements).subList(0, newMax - iteratorIndex + 1));
-                    oldElementsList.addAll(Arrays.asList(oldElements).subList(0, oldMax - iteratorIndex + 1));
+                    newElementsList = Arrays.asList(newElements).subList(0, newMax - iteratorIndex + 1);
+                    oldElementsList = Arrays.asList(oldElements).subList(0, oldMax - iteratorIndex + 1);
                     break;
-
                 }
-
-
             } else if (oldElement == null && newElement != null) {
-                newElementsList.addAll(Arrays.asList(newElements).subList(0, newMax - iteratorIndex + 1));
+                newElementsList = Arrays.asList(newElements).subList(0, newMax - iteratorIndex + 1);
                 break;
 
             } else if (oldElement != null && newElement == null) {
-                oldElementsList.addAll(Arrays.asList(oldElements).subList(0, oldMax - iteratorIndex + 1));
+                oldElementsList = Arrays.asList(oldElements).subList(0, oldMax - iteratorIndex + 1);
                 break;
 
             }
@@ -331,14 +333,16 @@ public class StackTraceSnapshotBuilder {
 
         // !!! The order is important - first we need to exit from the
         // already entered methods and only then we can enter the new ones !!!
-        addMethodExits(threadId, oldElementsList, timestamp, newElements == null || newElements.length == 0);
-        addMethodEntries(threadId, newElementsList, timestamp, oldElements == null || oldElements.length == 0);
+        addMethodExits(threadId, oldElementsList, timestamp, newElements.length == 0);
+        addMethodEntries(threadId, newElementsList, timestamp, oldElements.length == 0);
     }
 
-    final private void addMethodEntries(int threadId, List<StackTraceElement> elements, long timestamp, boolean asRoot) throws IllegalStateException {
+    private void addMethodEntries(int threadId, List<StackTraceElement> elements, long timestamp, boolean asRoot) throws IllegalStateException {
         boolean inRoot = false;
-        Collections.reverse(elements);
-        for (StackTraceElement element : elements) {
+        ListIterator<StackTraceElement> reverseIt = elements.listIterator(elements.size());
+        
+        while(reverseIt.hasPrevious()) {
+            StackTraceElement element = reverseIt.previous();
             MethodInfo mi = new MethodInfo(element);
             if (!methodInfos.contains(mi)) {
                 methodInfos.add(mi);
@@ -359,7 +363,7 @@ public class StackTraceSnapshotBuilder {
         }
     }
 
-    final private void addMethodExits(int threadId, List<StackTraceElement> elements, long timestamp, boolean asRoot) throws IllegalStateException {
+    private void addMethodExits(int threadId, List<StackTraceElement> elements, long timestamp, boolean asRoot) throws IllegalStateException {
         int rootIndex = elements.size();
         for (StackTraceElement element : elements) {
             MethodInfo mi = new MethodInfo(element);
