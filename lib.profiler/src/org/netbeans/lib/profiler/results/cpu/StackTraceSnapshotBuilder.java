@@ -316,6 +316,9 @@ public class StackTraceSnapshotBuilder {
 
             if (oldElement != null && newElement != null) {
                 if (!oldElement.equals(newElement)) {
+                    if (hasSameMethodInfo(oldElement,newElement)) {
+                        iteratorIndex++;
+                    }
                     newElementsList = Arrays.asList(newElements).subList(0, newMax - iteratorIndex + 1);
                     oldElementsList = Arrays.asList(oldElements).subList(0, oldMax - iteratorIndex + 1);
                     break;
@@ -382,6 +385,13 @@ public class StackTraceSnapshotBuilder {
         }
     }
 
+    private boolean hasSameMethodInfo(StackTraceElement oldElement, StackTraceElement newElement) {
+        MethodInfo oldMethodInfo = new MethodInfo(oldElement);
+        MethodInfo newMethodInfo = new MethodInfo(newElement);
+        
+        return oldMethodInfo.equals(newMethodInfo);
+    }
+    
     public final CPUResultsSnapshot createSnapshot(
             long since) throws CPUResultsSnapshot.NoDataAvailableException {
         if (stackTraceCount < 1) {

@@ -54,6 +54,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.netbeans.lib.profiler.results.CCTNode;
 import sun.management.ThreadInfoCompositeData;
 import static org.junit.Assert.*;
 
@@ -91,6 +92,12 @@ public class StackTraceSnapshotBuilderTest {
         new StackTraceElement("test.Class1", "method1", "Class1.java", 10)
     };
 
+    private final StackTraceElement[] elementsDup = new StackTraceElement[] {
+        new StackTraceElement("test.Class1", "method3", "Class1.java", 30),
+        new StackTraceElement("test.Class1", "method2", "Class1.java", 21),
+        new StackTraceElement("test.Class1", "method1", "Class1.java", 10)
+    };
+
     private Thread thread0;
     private Thread thread1;
     private Thread thread2;
@@ -99,6 +106,7 @@ public class StackTraceSnapshotBuilderTest {
     private java.lang.management.ThreadInfo[] stackPlus;
     private java.lang.management.ThreadInfo[] stackMinus;
     private java.lang.management.ThreadInfo[] stackDif;
+    private java.lang.management.ThreadInfo[] stackDup;
     
 
     public StackTraceSnapshotBuilderTest() {
@@ -137,6 +145,11 @@ public class StackTraceSnapshotBuilderTest {
 
         stackDif = new java.lang.management.ThreadInfo[] {
                 createThreadInfo(thread0, elementsDif)
+        };
+
+        stackDup = new java.lang.management.ThreadInfo[] {
+                createThreadInfo(thread0, elementsDup),
+                createThreadInfo(thread1, elements0)
         };
 
     }
@@ -231,6 +244,43 @@ public class StackTraceSnapshotBuilderTest {
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
         assertFalse(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
+    }
+
+    @Test
+    public void testCreateSnapshotDup() throws CPUResultsSnapshot.NoDataAvailableException {
+        System.out.println("create snapshot : dup");
+
+        addStacktrace(stack0, 0);
+        addStacktrace(stackDup, 500000);
+
+        CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
+        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
+        CPUCCTContainer container = snapshot.getContainerForThread((int) stack0[0].getThreadId(), CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+        assertEquals(container.getThreadName(),thread0.getName());
+        PrestimeCPUCCTNode root = container.getRootNode();
+        assertEquals(1, root.getNCalls());
+        CCTNode[] childrens = root.getChildren();
+        assertEquals(1, childrens.length);
+        PrestimeCPUCCTNode ch = (PrestimeCPUCCTNode) childrens[0];
+        assertEquals("test.Class1.method1()", ch.getNodeName());
+        assertEquals(1, ch.getNCalls());
+        CCTNode[] childrens1 = ch.getChildren();
+        assertEquals(2, childrens1.length);
+        PrestimeCPUCCTNode ch1 = (PrestimeCPUCCTNode) childrens1[0];
+        if (ch1.isSelfTimeNode()) {
+            ch1 = (PrestimeCPUCCTNode) childrens1[1];
+        }
+        assertEquals("test.Class1.method2()", ch1.getNodeName());
+        assertEquals(1, ch1.getNCalls());
+        CCTNode[] childrens2 = ch1.getChildren();
+        assertEquals(2, childrens2.length);
+        PrestimeCPUCCTNode ch2 = (PrestimeCPUCCTNode) childrens2[0];
+        if (ch2.isSelfTimeNode()) {
+            ch2 = (PrestimeCPUCCTNode) childrens2[1];
+        }
+        assertEquals("test.Class1.method3()", ch2.getNodeName());
+        assertEquals(2, ch2.getNCalls());
     }
 
     @Test
