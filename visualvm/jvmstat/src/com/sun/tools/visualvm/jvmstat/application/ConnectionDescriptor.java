@@ -1,52 +1,73 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
+ * 
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- *
+ * 
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- *
+ * 
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
+ * 
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jvmstat;
+package com.sun.tools.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.jvmstat.application.HostPropertiesProvider;
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import org.openide.modules.ModuleInstall;
+import java.rmi.registry.Registry;
 
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
+ *
+ * @author Jiri Sedlacek
  */
-public class Installer extends ModuleInstall {
-    
-    public void restored() {
-        HostPropertiesProvider.initializeLocalhost();
-        JvmstatModelFactory.getDefault().registerProvider(new JvmstatModelProvider());
-        JvmJvmstatModelFactory.getDefault().registerProvider(new JvmJvmstatModelProvider());
-        JvmJvmstatModelFactory.getDefault().registerProvider(new JRockitJvmJvmstatModelProvider());
-        JvmstatApplicationProvider.register();
-        PropertiesSupport.sharedInstance().registerPropertiesProvider(
-                new HostPropertiesProvider(), Host.class);
+class ConnectionDescriptor {
+
+    private int port;
+    private int refreshRate;
+
+
+    public ConnectionDescriptor(int port, int refreshRate) {
+        setPort(port);
+        setRefreshRate(refreshRate);
     }
-    
+
+
+    public static ConnectionDescriptor createDefault() {
+        return new ConnectionDescriptor(Registry.REGISTRY_PORT, 1);
+    }
+
+
+    public final void setPort(int port) { this.port = port; }
+
+    public final int getPort() { return port; }
+
+    public final void setRefreshRate(int refreshRate) { this.refreshRate = refreshRate; }
+
+    public final int getRefreshRate() { return refreshRate; }
+
+
+    public boolean equals(Object o) {
+        if (!(o instanceof ConnectionDescriptor)) return false;
+        return port == ((ConnectionDescriptor)o).port;
+    }
+
+    public int hashCode() {
+        return port;
+    }
+
+    public String toString() {
+        return "Port: " + port + "   Refresh Rate: " + refreshRate; // NOI18N
+    }
+
 }
