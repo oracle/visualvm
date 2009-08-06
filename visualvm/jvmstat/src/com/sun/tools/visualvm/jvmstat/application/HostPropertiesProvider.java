@@ -79,8 +79,8 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
     }
 
 
-    static List<ConnectionDescriptor> getDescriptors(Host host) {
-        List<ConnectionDescriptor> list = new ArrayList();
+    static Set<ConnectionDescriptor> getDescriptors(Host host) {
+        Set<ConnectionDescriptor> set = new HashSet();
 
         if (host != null) {
             Storage storage = host.getStorage();
@@ -89,7 +89,7 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
             while (port != null) {
                 String refresh = storage.getCustomProperty(PROP_JSTATD_REFRESH + "." + index); // NOI18N
                 try {
-                    list.add(new ConnectionDescriptor(Integer.parseInt(port), Integer.parseInt(refresh)));
+                    set.add(new ConnectionDescriptor(Integer.parseInt(port), Integer.parseInt(refresh)));
                 } catch (NumberFormatException e) {
                     // TODO: log it
                 }
@@ -97,30 +97,31 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
             }
         }
 
-        return list;
+        return set;
     }
 
-    private static List<ConnectionDescriptor> getDescriptorsEx(Host host) {
-        List<ConnectionDescriptor> list = getDescriptors(host);
-        if (host == null) list.add(ConnectionDescriptor.createDefault());
-        return list;
+    private static Set<ConnectionDescriptor> getDescriptorsEx(Host host) {
+        Set<ConnectionDescriptor> set = getDescriptors(host);
+        if (host == null) set.add(ConnectionDescriptor.createDefault());
+        return set;
     }
 
-    private static void setDescriptors(Host host, List<ConnectionDescriptor> descriptors) {
+    private static void setDescriptors(Host host, Set<ConnectionDescriptor> descriptors) {
         Storage storage = host.getStorage();
         clearDescriptors(storage);
-        for (int i = 0; i < descriptors.size(); i++) {
-            ConnectionDescriptor descriptor = descriptors.get(i);
-            storage.setCustomProperty(PROP_JSTATD_PORT + "." + i, // NOI18N
+        int index = 0;
+        for (ConnectionDescriptor descriptor : descriptors) {
+            storage.setCustomProperty(PROP_JSTATD_PORT + "." + index, // NOI18N
                     Integer.toString(descriptor.getPort()));
-            storage.setCustomProperty(PROP_JSTATD_REFRESH + "." + i, // NOI18N
+            storage.setCustomProperty(PROP_JSTATD_REFRESH + "." + index, // NOI18N
                     Integer.toString(descriptor.getRefreshRate()));
+            index++;
         }
     }
 
-    private static void setDescriptorsEx(Host host, List<ConnectionDescriptor> newDescriptors) {
+    private static void setDescriptorsEx(Host host, Set<ConnectionDescriptor> newDescriptors) {
         // Cache old descriptors
-        List<ConnectionDescriptor> oldDescriptors = getDescriptorsEx(host);
+        List<ConnectionDescriptor> oldDescriptors = new ArrayList(getDescriptorsEx(host));
 
         // Set new descriptors
         setDescriptors(host, newDescriptors);
@@ -140,10 +141,14 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         while (iterator.hasNext()) {
             ConnectionDescriptor descriptor1 = iterator.next();
             ConnectionDescriptor descriptor2 = oldDescriptors.get(
-                    newDescriptors.indexOf(descriptor1));
+                    oldDescriptors.indexOf(descriptor1));
             if (descriptor1.getRefreshRate() == descriptor2.getRefreshRate())
                 iterator.remove();
         }
+
+//        System.err.println(">>> added:   " + added);
+//        System.err.println(">>> removed: " + removed);
+//        System.err.println(">>> changed: " + changed);
 
         // TODO: implement JvmstatApplicationProvider.connectionsChanged:
 //        if (!added.isEmpty() || !removed.isEmpty() || !changed.isEmpty())

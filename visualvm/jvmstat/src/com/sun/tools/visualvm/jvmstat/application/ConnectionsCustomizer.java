@@ -39,10 +39,8 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -85,7 +83,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private final DefaultTableModel model;
 
 
-    public ConnectionsCustomizer(List<ConnectionDescriptor> descriptors) {
+    public ConnectionsCustomizer(Set<ConnectionDescriptor> descriptors) {
         this.model = getModel(descriptors);
         initComponents();
         update();
@@ -99,20 +97,20 @@ class ConnectionsCustomizer extends PropertiesPanel {
     }
 
 
-    public List<ConnectionDescriptor> getDescriptors() {
+    public Set<ConnectionDescriptor> getDescriptors() {
         return getDescriptors(model);
     }
 
 
-    private static DefaultTableModel getModel(List<ConnectionDescriptor> descriptors) {
+    private static DefaultTableModel getModel(Set<ConnectionDescriptor> descriptors) {
         DefaultTableModel model = new DefaultTableModel(new Object[] { "Connections" }, 0); // NOI18N
         for (ConnectionDescriptor descriptor : descriptors)
                 model.addRow(new Object[] { descriptor });
         return model;
     }
 
-    private static List<ConnectionDescriptor> getDescriptors(DefaultTableModel model) {
-        List<ConnectionDescriptor> descriptors = new ArrayList();
+    private static Set<ConnectionDescriptor> getDescriptors(DefaultTableModel model) {
+        Set<ConnectionDescriptor> descriptors = new HashSet();
         for (int i = 0; i < model.getRowCount(); i++)
             descriptors.add((ConnectionDescriptor)model.getValueAt(i, 0));
         return descriptors;
