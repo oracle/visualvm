@@ -140,9 +140,10 @@ public final class Storage {
     
     /**
      * Sets persistent custom property.
+     * Since VisualVM 1.2 clears the property for null value.
      * 
      * @param key property name.
-     * @param value property value.
+     * @param value property value or (since VisualVM 1.2) null
      */
     public void setCustomProperty(String key, String value) {
         setCustomProperties(new String[] { key }, new String[] { value });
@@ -150,13 +151,38 @@ public final class Storage {
     
     /**
      * Sets persistent custom properties.
+     * Since VisualVM 1.2 a property is cleared for null value.
      * 
      * @param keys property names.
      * @param values property values.
      */
     public synchronized void setCustomProperties(String[] keys, String[] values) {
         Properties prop = getCustomProperties();
-        for (int i = 0; i < keys.length; i++) prop.put(keys[i], values[i]);
+        for (int i = 0; i < keys.length; i++)
+            if (values[i] != null) prop.put(keys[i], values[i]);
+            else prop.remove(keys[i]);
+        storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
+    }
+
+    /**
+     * Clears custom property.
+     *
+     * @param key property name
+     * @since VisualVM 1.2
+     */
+    public void clearCustomProperty(String key) {
+        clearCustomProperties(new String[] { key });
+    }
+
+    /**
+     * Clears custom properties.
+     *
+     * @param keys property names
+     * @since VisualVM 1.2
+     */
+    public synchronized void clearCustomProperties(String[] keys) {
+        Properties prop = getCustomProperties();
+        for (int i = 0; i < keys.length; i++) prop.remove(keys[i]);
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
     }
     
