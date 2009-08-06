@@ -75,7 +75,7 @@ public final class HostsSupport {
      * @return new host from provided hostname or null if the hostname could not be resolved.
      */
     public Host createHost(String hostname) {
-        return hostProvider.createHost(new HostProperties(hostname, hostname), true, true);
+        return createHost(new HostProperties(hostname, hostname, null), true, true);
     }
     
     /**
@@ -87,7 +87,7 @@ public final class HostsSupport {
      * @return new host from provided hostname or null if the hostname could not be resolved.
      */
     public Host createHost(String hostname, String displayname) {
-        return hostProvider.createHost(new HostProperties(hostname, displayname), true, true);
+        return createHost(new HostProperties(hostname, displayname, null), true, true);
     }
 
     /**
@@ -98,7 +98,11 @@ public final class HostsSupport {
      * @return an existing or a newly created Host
      */
     public Host getOrCreateHost(String hostname, boolean interactive) {
-        return hostProvider.createHost(new HostProperties(hostname, hostname), false, interactive);
+        return createHost(new HostProperties(hostname, hostname, null), false, interactive);
+    }
+
+    Host createHost(HostProperties properties, boolean createOnly, boolean interactive) {
+        return hostProvider.createHost(properties, createOnly, interactive);
     }
     
     /**

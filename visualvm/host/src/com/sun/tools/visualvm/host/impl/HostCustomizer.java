@@ -25,20 +25,29 @@
 
 package com.sun.tools.visualvm.host.impl;
 
+import com.sun.tools.visualvm.core.properties.PropertiesCustomizer;
+import com.sun.tools.visualvm.core.properties.PropertiesSupport;
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.host.Host;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
@@ -50,22 +59,41 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class HostCustomizer extends JPanel {
+public class HostCustomizer extends JPanel {
+
+  private static Dimension MIN_PROPERTIES_SIZE = new Dimension(400, 200);
+  private static Dimension MAX_PROPERTIES_SIZE = new Dimension(700, 400);
 
   private boolean internalChange = false;
 
+  
   public static HostProperties defineHost() {
     HostCustomizer hc = getInstance();
-    hc.setupDefineHost();
+    hc.setup();
+
+    ScrollableContainer sc = new ScrollableContainer(hc,
+            ScrollableContainer.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollableContainer.HORIZONTAL_SCROLLBAR_NEVER);
+    sc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    sc.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     
-    final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(HostCustomizer.class, "Title_Add_Remote_Host"), true, new Object[] {   // NOI18N
-      hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
+    final DialogDescriptor dd = new DialogDescriptor(sc, NbBundle.getMessage(
+            HostCustomizer.class, "Title_Add_Remote_Host"), true, new Object[] {   // NOI18N
+            hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
+    dd.setAdditionalOptions(new Object[] { hc.settingsButton });
     final Dialog d = ProfilerDialogs.createDialog(dd);
     d.pack();
     d.setVisible(true);
-    
-    if (dd.getValue() == hc.okButton) return new HostProperties(hc.getHostName(), hc.getDisplayName());
-    else return null;
+
+    if (dd.getValue() == hc.okButton) {
+        HostProperties hp = new HostProperties(hc.getHostName(), hc.getDisplayName(),
+                                               hc.getPropertiesCustomizer());
+        hc.accepted();
+        return hp;
+    } else {
+        hc.cancelled();
+        return null;
+    }
   }
   
   
@@ -88,13 +116,41 @@ class HostCustomizer extends JPanel {
   private String getDisplayName() {
       return displaynameField.getText().trim();
   }
+
+  private PropertiesCustomizer getPropertiesCustomizer() {
+      return settingsPanel;
+  }
   
-  private void setupDefineHost() {
+  private void setup() {
     hostnameField.setEnabled(true);
     displaynameCheckbox.setSelected(false);
     displaynameCheckbox.setEnabled(true);
-    hostnameField.setText("");
-    displaynameField.setText("");
+    hostnameField.setText(""); // NOI18N
+    displaynameField.setText(""); // NOI18N
+    
+    settingsPanel = PropertiesSupport.sharedInstance().
+                    getCustomizer(Host.class);
+    settingsPanel.addChangeListener(listener);
+    settingsButton.setVisible(settingsPanel.hasProperties());
+    if (!settingsButton.isVisible()) settingsButton.setSelected(false);
+    else settingsButton.setSelected(!settingsPanel.settingsValid());
+
+    updateSettings();
+  }
+
+  private void accepted() {
+      cleanup();
+  }
+
+  private void cancelled() {
+      settingsPanel.settingsCancelled();
+      cleanup();
+  }
+
+  private void cleanup() {
+      settingsPanel.removeChangeListener(listener);
+      settingsContainer.removeAll();
+      settingsPanel = null;
   }
   
   private void update() {
@@ -111,10 +167,40 @@ class HostCustomizer extends JPanel {
         
         String displayname = getDisplayName();
         displaynameField.setEnabled(displaynameCheckbox.isSelected());
+
+        boolean hostValid = hostname.length() > 0 && displayname.length() > 0;
+        boolean settingsValid = settingsPanel == null ? true :
+                                settingsPanel.settingsValid();
         
-        okButton.setEnabled(hostname.length() > 0 && displayname.length() > 0);
+        okButton.setEnabled(hostValid && settingsValid);
       }
     });
+  }
+
+  private void updateSettings() {
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+              if (settingsButton.isSelected()) {
+                  settingsContainer.add(settingsPanel, BorderLayout.CENTER);
+                  settingsContainer.setBorder(BorderFactory.
+                          createEmptyBorder(10, 0, 0, 0));
+
+                  Dimension prefSize = settingsPanel.getPreferredSize();
+//                  prefSize.width = Math.max(prefSize.width, MIN_PROPERTIES_SIZE.width);
+//                  prefSize.width = Math.min(prefSize.width, MAX_PROPERTIES_SIZE.width);
+                  prefSize.height = Math.max(prefSize.height, MIN_PROPERTIES_SIZE.height);
+                  prefSize.height = Math.min(prefSize.height, MAX_PROPERTIES_SIZE.height);
+                  settingsPanel.setPreferredSize(prefSize);
+
+              } else {
+                  settingsContainer.removeAll();
+                  settingsContainer.setBorder(BorderFactory.createEmptyBorder());
+              }
+              Window w = SwingUtilities.getWindowAncestor(HostCustomizer.this);
+              if (w != null) w.pack();
+              update();
+          }
+      });
   }
   
   private void initComponents() {
@@ -130,7 +216,7 @@ class HostCustomizer extends JPanel {
     constraints.gridwidth = 1;
     constraints.fill = GridBagConstraints.NONE;
     constraints.anchor = GridBagConstraints.EAST;
-    constraints.insets = new Insets(15, 10, 0, 0);
+    constraints.insets = new Insets(5, 0, 0, 0);
     add(hostnameLabel, constraints);
     
     // hostnameField
@@ -148,7 +234,7 @@ class HostCustomizer extends JPanel {
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.anchor = GridBagConstraints.WEST;
-    constraints.insets = new Insets(15, 5, 0, 10);
+    constraints.insets = new Insets(5, 5, 0, 0);
     add(hostnameField, constraints);
     
     // displaynameCheckbox
@@ -163,7 +249,7 @@ class HostCustomizer extends JPanel {
     constraints.gridwidth = 1;
     constraints.fill = GridBagConstraints.NONE;
     constraints.anchor = GridBagConstraints.EAST;
-    constraints.insets = new Insets(8, 10, 0, 0);
+    constraints.insets = new Insets(8, 0, 5, 0);
     add(displaynameCheckbox, constraints);
     
     // displaynameField
@@ -180,11 +266,12 @@ class HostCustomizer extends JPanel {
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.anchor = GridBagConstraints.WEST;
-    constraints.insets = new Insets(8, 5, 0, 10);
+    constraints.insets = new Insets(8, 5, 5, 0);
     add(displaynameField, constraints);
     
     // spacer
-    JPanel spacer = new JPanel(new BorderLayout(0, 0));
+    settingsContainer = new JPanel(new BorderLayout(0, 0));
+    settingsContainer.setOpaque(false);
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 2;
@@ -193,12 +280,21 @@ class HostCustomizer extends JPanel {
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.BOTH;
     constraints.anchor = GridBagConstraints.NORTHWEST;
-    constraints.insets = new Insets(0, 0, 15, 0);
-    add(spacer, constraints);
+    constraints.insets = new Insets(0, 0, 0, 0);
+    add(settingsContainer, constraints);
     
     // okButton
     okButton = new JButton();
-    Mnemonics.setLocalizedText(okButton, NbBundle.getMessage(HostCustomizer.class, "LBL_OK")); // NOI18N
+    Mnemonics.setLocalizedText(okButton, NbBundle.getMessage(
+            HostCustomizer.class, "LBL_OK")); // NOI18N
+
+    settingsButton = new JToggleButton() {
+        protected void fireActionPerformed(ActionEvent e) {
+            updateSettings();
+        }
+    };
+    Mnemonics.setLocalizedText(settingsButton, NbBundle.getMessage(
+            HostCustomizer.class, "BTN_AdavancedSettings")); // NOI18N
     
     // UI tweaks
     displaynameCheckbox.setBorder(hostnameLabel.getBorder());
@@ -208,7 +304,15 @@ class HostCustomizer extends JPanel {
   private JTextField hostnameField;
   private JCheckBox displaynameCheckbox;
   private JTextField displaynameField;
+  private JPanel settingsContainer;
+
+  private PropertiesCustomizer settingsPanel;
   
   private JButton okButton;
+  private JToggleButton settingsButton;
+
+  private final ChangeListener listener = new ChangeListener() {
+                    public void stateChanged(ChangeEvent e) { update(); }
+                };
   
 }

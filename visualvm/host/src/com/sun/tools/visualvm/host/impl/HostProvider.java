@@ -83,7 +83,6 @@ public class HostProvider {
 
     
     public Host createHost(final HostProperties hostDescriptor, final boolean createOnly, final boolean interactive) {
-
         try {
 
             lockHosts();
@@ -152,6 +151,8 @@ public class HostProvider {
                     }
 
                     if (newHost != null) {
+                        if (hostDescriptor.getPropertiesCustomizer() != null)
+                            hostDescriptor.getPropertiesCustomizer().settingsDefined(newHost);
                         RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
                     }
                     return newHost;

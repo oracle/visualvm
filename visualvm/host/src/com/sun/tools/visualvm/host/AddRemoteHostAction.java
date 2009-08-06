@@ -22,11 +22,11 @@
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
-package com.sun.tools.visualvm.host.impl;
+package com.sun.tools.visualvm.host;
 
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
-import com.sun.tools.visualvm.host.HostsSupport;
-import com.sun.tools.visualvm.host.RemoteHostsContainer;
+import com.sun.tools.visualvm.host.impl.HostCustomizer;
+import com.sun.tools.visualvm.host.impl.HostProperties;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -74,7 +74,7 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
         if (hostDescriptor != null) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    HostsSupport.getInstance().createHost(hostDescriptor.getHostName(), hostDescriptor.getDisplayName());
+                    HostsSupport.getInstance().createHost(hostDescriptor, true, true);
                 }
             });
         }

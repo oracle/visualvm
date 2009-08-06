@@ -25,28 +25,31 @@
 
 package com.sun.tools.visualvm.host.impl;
 
+import com.sun.tools.visualvm.core.properties.PropertiesCustomizer;
+
 /**
  *
  * @author Jiri Sedlacek
  */
 public class HostProperties {
 
-    private String hostName;
-    private String displayName;
+    private final String hostName;
+    private final String displayName;
+    private final PropertiesCustomizer customizer;
 
 
-    public HostProperties(String hostName, String displayName) {
+    public HostProperties(String hostName, String displayName,
+                          PropertiesCustomizer customizer) {
+        this.customizer = customizer;
         this.hostName = hostName;
         this.displayName = displayName;
     }
 
 
-    public String getHostName() {
-        return hostName;
-    }
+    public String getHostName() { return hostName; }
 
-    public String getDisplayName() {
-        return displayName;
-    }
+    public String getDisplayName() { return displayName; }
+
+    public PropertiesCustomizer getPropertiesCustomizer() { return customizer; }
 
 }
