@@ -47,6 +47,9 @@
             <file name="com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RemoveDataSourceAction.instance"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-properties-EditPropertiesAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.properties.EditPropertiesAction.instance"/>
+            </file>
         </folder>
         <folder name="Window">
             <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
@@ -170,6 +173,16 @@
             <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
                 <attr name="position" intvalue="2300"/>
+            </file>
+
+            <file name="ExplorerPopupSelection-Separator-9999.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="9999"/>
+            </file>
+
+            <file name="com-sun-tools-visualvm-core-properties-EditPropertiesAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-properties-EditPropertiesAction.instance"/>
+                <attr name="position" intvalue="10000"/>
             </file>
             
         </folder>
