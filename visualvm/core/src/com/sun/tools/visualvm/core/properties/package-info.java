@@ -25,5 +25,7 @@
 
 /**
  * Support for defining and editing custom properties for DataSources.
+ *
+ * @since VisualVM 1.2
  */
 package com.sun.tools.visualvm.core.properties;

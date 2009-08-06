@@ -44,7 +44,7 @@ import javax.management.remote.JMXConnector;
  * user-provided credentials are correct they will override the credentials
  * defined by this provider. The user-provided credentials are never persisted.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public class CredentialsProvider extends EnvironmentProvider {

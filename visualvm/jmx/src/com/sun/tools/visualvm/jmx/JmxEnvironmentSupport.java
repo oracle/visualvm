@@ -32,7 +32,7 @@ import com.sun.tools.visualvm.jmx.impl.JmxEnvironmentSupportImpl;
  * registering custom EnvironmentProviderFactories and creating EnvironmentProvider
  * instances.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class JmxEnvironmentSupport {

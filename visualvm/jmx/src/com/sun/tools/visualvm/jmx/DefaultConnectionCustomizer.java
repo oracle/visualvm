@@ -54,7 +54,7 @@ import sun.net.util.IPAddressUtil;
  * JmxConnectionCustomizer providing the default JMX Connection dialog to enter
  * JMX connection url and optional credentials.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
@@ -154,7 +154,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
      * optional credentials and selecting whether the credentials should be
      * persistent or transient.
      *
-     * @since 1.2
+     * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
     public static class DefaultPanel extends Panel {

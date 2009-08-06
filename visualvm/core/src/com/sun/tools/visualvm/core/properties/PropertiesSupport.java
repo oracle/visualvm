@@ -40,7 +40,7 @@ import java.util.Set;
  * and unregisterPropertiesProvider methods. Dialog providers displaying the
  * properties should use getPropertiesProviders method to list the providers.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class PropertiesSupport {

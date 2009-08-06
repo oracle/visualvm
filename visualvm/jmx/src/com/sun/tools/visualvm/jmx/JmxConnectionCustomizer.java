@@ -42,7 +42,7 @@ import javax.swing.event.ChangeListener;
  * connection type extends the default one by adding new settings and it's not
  * desired to present both types to the user.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class JmxConnectionCustomizer implements Positionable {

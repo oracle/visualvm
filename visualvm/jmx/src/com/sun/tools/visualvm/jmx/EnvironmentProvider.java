@@ -36,7 +36,7 @@ import java.util.Map;
  * constructor. This ensures that the EnvironmentProviderFactory will be correctly
  * registered to create provider instances for persistent JMX connections.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class EnvironmentProvider {

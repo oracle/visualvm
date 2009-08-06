@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.jmx;
 /**
  * Exception being thrown when creating new JMX Application fails.
  *
- * @since 1.1
+ * @since VisualVM 1.1
  * @author Jiri Sedlacek
  */
 public final class JmxApplicationException extends Exception {

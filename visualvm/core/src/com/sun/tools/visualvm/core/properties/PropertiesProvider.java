@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.core.datasupport.Positionable;
 /**
  * A provider to provide user-customizable properties for DataSources.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class PropertiesProvider<X extends DataSource> implements Positionable {

@@ -32,7 +32,7 @@ package com.sun.tools.visualvm.jmx;
  * that the EnvironmentProvider instances can be correctly created for persistent
  * JMX connections.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class EnvironmentProviderFactory<T extends EnvironmentProvider> {

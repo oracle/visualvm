@@ -39,7 +39,7 @@ import org.openide.util.NbBundle;
 /**
  * Support for creating JMX applications in VisualVM.
  *
- * @since 1.1
+ * @since VisualVM 1.1
  * @author Jiri Sedlacek
  */
 public final class JmxApplicationsSupport {
@@ -135,7 +135,7 @@ public final class JmxApplicationsSupport {
      * @return created JMX application
      * @throws JmxApplicationException if creating the application failed
      *
-     * @since 1.2
+     * @since VisualVM 1.2
      */
     public Application createJmxApplication(String connectionString,
                                             String displayName,
@@ -239,7 +239,7 @@ public final class JmxApplicationsSupport {
      * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
      * @return created JMX application or null if creating the application failed
      *
-     * @since 1.2
+     * @since VisualVM 1.2
      */
     public Application createJmxApplicationInteractive(String connectionString,
                                             String displayName,

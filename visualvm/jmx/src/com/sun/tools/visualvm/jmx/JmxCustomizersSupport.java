@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.jmx.impl.JmxCustomizersSupportImpl;
 /**
  * Support for custom JMX connection types.
  *
- * @since 1.2
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class JmxCustomizersSupport {
