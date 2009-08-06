@@ -60,7 +60,6 @@ public abstract class EnvironmentProvider {
     public abstract Map<String, ?> getEnvironment(Application application);
 
 
-
     /**
      * Returns an unique identificator of the provided environment which helps
      * to differentiate JMX connections defined by the same connection string

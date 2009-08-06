@@ -25,19 +25,16 @@
 
 package com.sun.tools.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.jmx.EnvironmentProvider;
-import com.sun.tools.visualvm.jmx.*;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.visualvm.jmx.impl.CredentialsConfigurator;
-import com.sun.tools.visualvm.jmx.impl.JmxApplication;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.jmx.EnvironmentProvider;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
