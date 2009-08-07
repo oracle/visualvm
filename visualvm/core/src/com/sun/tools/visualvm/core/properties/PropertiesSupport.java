@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.properties;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,6 +96,30 @@ public final class PropertiesSupport {
     }
 
 
+    public <X extends DataSource> void loadProperties(X dataSource, Storage storage) {
+        List<PropertiesProvider<X>> p =
+                getProviders(dataSource, (Class<X>)dataSource.getClass());
+        for (PropertiesProvider<X> provider : p)
+            try {
+                provider.loadProperties(dataSource, storage);
+            } catch (Throwable t) {
+                // TODO: log it
+            }
+
+    }
+
+    public <X extends DataSource> void saveProperties(X dataSource, Storage storage) {
+        List<PropertiesProvider<X>> p =
+                getProviders(dataSource, (Class<X>)dataSource.getClass());
+        for (PropertiesProvider<X> provider : p)
+            try {
+                provider.saveProperties(dataSource, storage);
+            } catch (Throwable t) {
+                // TODO: log it
+            }
+    }
+
+
     <X extends DataSource> boolean hasProperties(X dataSource) {
         return hasProperties(dataSource, (Class<X>)dataSource.getClass());
     }
@@ -104,14 +129,6 @@ public final class PropertiesSupport {
     }
 
 
-    /**
-     * Returns sorted list of PropertiesProvider instances supporting the provided
-     * DataSource.
-     *
-     * @param <X> any DataSource type
-     * @param dataSource DataSource for which to get the list of PropertiesProvider instances
-     * @return sorted list of PropertiesProvider instances supporting the provided DataSource
-     */
     <X extends DataSource> List<PropertiesProvider<X>> getProviders(X dataSource, Class<X> type) {
         Map<PropertiesProvider, Class<? extends DataSource>> providersCopy = new HashMap();
         synchronized(providers) { providersCopy.putAll(providers); }

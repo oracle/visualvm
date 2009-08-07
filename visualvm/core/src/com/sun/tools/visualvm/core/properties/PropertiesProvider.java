@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.properties;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 
 /**
@@ -134,5 +135,10 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
      * @param dataSource DataSource for which the panel has been cancelled or null if no DataSource has been created
      */
     public abstract void propertiesCancelled(PropertiesPanel panel, X dataSource);
+
+
+    public abstract void loadProperties(X dataSource, Storage storage);
+
+    public abstract void saveProperties(X dataSource, Storage storage);
 
 }
