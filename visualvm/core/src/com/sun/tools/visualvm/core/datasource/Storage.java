@@ -189,6 +189,17 @@ public final class Storage {
                 prop.remove(keys[i]);
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
     }
+
+    /**
+     * Returns true if the Storage contains any custom properties, false otherwise.
+     *
+     * @return true if the Storage contains any custom properties, false otherwise
+     * @since VisualVM 1.2
+     */
+    public synchronized boolean hasCustomProperties() {
+        Properties prop = getCustomProperties(false);
+        return prop == null || prop.isEmpty();
+    }
     
     /**
      * Saves persistent custom properties to a file.
@@ -200,7 +211,7 @@ public final class Storage {
         if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);    // NOI18N
         
         Properties prop = getCustomProperties(false);
-        if (prop != null) storeProperties(prop, file);
+        if (prop != null && !prop.isEmpty()) storeProperties(prop, file);
     }
     
     /**
