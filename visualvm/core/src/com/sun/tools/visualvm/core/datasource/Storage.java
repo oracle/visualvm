@@ -133,8 +133,10 @@ public final class Storage {
      */
     public synchronized String[] getCustomProperties(String[] keys) {
         String[] values = new String[keys.length];
-        Properties prop = getCustomProperties();
-        for (int i = 0; i < keys.length; i++) values[i] = prop.getProperty(keys[i]);
+        Properties prop = getCustomProperties(false);
+        if (prop != null)
+            for (int i = 0; i < keys.length; i++)
+                    values[i] = prop.getProperty(keys[i]);
         return values;
     }
     
@@ -157,7 +159,7 @@ public final class Storage {
      * @param values property values.
      */
     public synchronized void setCustomProperties(String[] keys, String[] values) {
-        Properties prop = getCustomProperties();
+        Properties prop = getCustomProperties(true);
         for (int i = 0; i < keys.length; i++)
             if (values[i] != null) prop.put(keys[i], values[i]);
             else prop.remove(keys[i]);
@@ -181,8 +183,10 @@ public final class Storage {
      * @since VisualVM 1.2
      */
     public synchronized void clearCustomProperties(String[] keys) {
-        Properties prop = getCustomProperties();
-        for (int i = 0; i < keys.length; i++) prop.remove(keys[i]);
+        Properties prop = getCustomProperties(false);
+        if (prop != null)
+            for (int i = 0; i < keys.length; i++)
+                prop.remove(keys[i]);
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
     }
     
@@ -195,8 +199,8 @@ public final class Storage {
         if (file == null) throw new NullPointerException("File cannot be null");    // NOI18N
         if (file.isDirectory()) throw new IllegalArgumentException("Not a valid file: " + file);    // NOI18N
         
-        Properties prop = getCustomProperties();
-        if (!prop.isEmpty()) storeProperties(prop, file);
+        Properties prop = getCustomProperties(false);
+        if (prop != null) storeProperties(prop, file);
     }
     
     /**
@@ -291,9 +295,9 @@ public final class Storage {
         if (properties != null && propertiesFile != null) storeProperties(properties, propertiesFile);
     }
     
-    private Properties getCustomProperties() {
+    private Properties getCustomProperties(boolean createEmpty) {
         if (properties == null && propertiesFile != null) properties = loadProperties(propertiesFile);
-        if (properties == null) properties = new Properties();
+        if (properties == null && createEmpty) properties = new Properties();
         return properties;
     }
     
