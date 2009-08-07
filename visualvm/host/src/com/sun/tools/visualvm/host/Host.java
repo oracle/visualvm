@@ -64,7 +64,7 @@ public abstract class Host extends DataSource implements Stateful {
     }
 
     /**
-     * Creates new instance of Host defined by hostName, displayName and InetAddress instance for the host.
+     * Creates new instance of Host defined by hostName and InetAddress instance for the host.
      * 
      * @param hostName name or IP of the host,
      * @param inetAddress InetAddress instance for the host.
