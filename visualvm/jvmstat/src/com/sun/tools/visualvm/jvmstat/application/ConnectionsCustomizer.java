@@ -172,7 +172,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
         Set<Integer> ports = new HashSet();
         for (int i = 0; i < table.getRowCount(); i++)
             ports.add(((ConnectionDescriptor)table.getValueAt(i, 0)).getPort());
-        for (int i = ConnectionDescriptor.createDefault().getPort(); i < 65536; i++)
+        for (int i = ConnectionDescriptor.createDefault().getPort() + 1; i < 65536; i++)
             if (!ports.contains(i)) return i;
         return -1;
     }
@@ -465,7 +465,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
             refreshLabel = new JLabel("Refresh interval:");
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
-            refreshSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+            refreshSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 9999, 1));
             refreshLabel.setLabelFor(refreshSpinner);
             refreshUnitsLabel = new JLabel("sec.");
 
