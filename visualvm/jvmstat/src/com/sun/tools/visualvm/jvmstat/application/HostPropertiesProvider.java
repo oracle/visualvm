@@ -72,12 +72,10 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         // Nothing to do
     }
 
-
     public static void initializeLocalhost() {
         Host host = Host.LOCALHOST;
         setDescriptors(host, getDescriptorsEx(null)); // TODO: handle customizations!
     }
-
 
     static Set<ConnectionDescriptor> getDescriptors(Host host) {
         Set<ConnectionDescriptor> set = new HashSet();
@@ -89,7 +87,7 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
             while (port != null) {
                 String refresh = storage.getCustomProperty(PROP_JSTATD_REFRESH + "." + index); // NOI18N
                 try {
-                    set.add(new ConnectionDescriptor(Integer.parseInt(port), Integer.parseInt(refresh)));
+                    set.add(new ConnectionDescriptor(Integer.parseInt(port), Double.parseDouble(refresh)));
                 } catch (NumberFormatException e) {
                     // TODO: log it
                 }
@@ -114,7 +112,7 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
             storage.setCustomProperty(PROP_JSTATD_PORT + "." + index, // NOI18N
                     Integer.toString(descriptor.getPort()));
             storage.setCustomProperty(PROP_JSTATD_REFRESH + "." + index, // NOI18N
-                    Integer.toString(descriptor.getRefreshRate()));
+                    Double.toString(descriptor.getRefreshRate()));
             index++;
         }
     }
@@ -140,10 +138,11 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         Iterator<ConnectionDescriptor> iterator = changed.iterator();
         while (iterator.hasNext()) {
             ConnectionDescriptor descriptor1 = iterator.next();
-            ConnectionDescriptor descriptor2 = oldDescriptors.get(
-                    oldDescriptors.indexOf(descriptor1));
-            if (descriptor1.getRefreshRate() == descriptor2.getRefreshRate())
+            ConnectionDescriptor descriptor2 = oldDescriptors.get(oldDescriptors.indexOf(descriptor1));
+
+            if (Math.abs(descriptor1.getRefreshRate() - descriptor2.getRefreshRate()) < 0.001) {
                 iterator.remove();
+            }
         }
 
 //        System.err.println(">>> added:   " + added);

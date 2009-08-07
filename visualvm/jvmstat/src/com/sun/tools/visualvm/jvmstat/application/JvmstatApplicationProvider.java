@@ -36,11 +36,11 @@ import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.ConnectException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.rmi.registry.Registry;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,6 +54,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import sun.jvmstat.monitor.MonitorException;
@@ -114,11 +115,12 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     private void processNewHost(final Host host) {
         if (host == Host.UNKNOWN_HOST) return;
         
-        Collection<Integer> ports = Arrays.asList(1099); // get ports from host
+        Set<ConnectionDescriptor> descrs = HostPropertiesProvider.getDescriptors(host);
         
-        for (Integer port : ports) {
-            HostIdentifier hostId = getHostIdentifier(host,port);
-            registerJvmstatConnection(host,hostId);
+        for (ConnectionDescriptor descr : descrs) {
+            int interval = (int)(descr.getRefreshRate()*1000);
+            HostIdentifier hostId = getHostIdentifier(host,descr);
+            registerJvmstatConnection(host,hostId,interval);
         }
     }
     
@@ -129,7 +131,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             Map<HostIdentifier,JvmstatConnection> hostListeners = hostsListeners.get(host);
             
             if (hostListeners != null) {
-                for (JvmstatConnection listener : hostListeners.values()) {
+                for (JvmstatConnection listener : new ArrayList<JvmstatConnection>(hostListeners.values())) {
                     processDisconnectedJvmstat(host, listener);
                 }
             }
@@ -140,7 +142,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         HostIdentifier hostId = listener.hostId;
         MonitoredHost monitoredHost = getMonitoredHost(hostId);
         try { monitoredHost.removeHostListener(listener); } catch (MonitorException ex) {}
-        removeHostListener(host,hostId);
+        unregisterHostListener(host,hostId);
         Set<JvmstatApplication> jvmstatApplications = host.getRepository().getDataSources(JvmstatApplication.class);
         Iterator<JvmstatApplication> appIt = jvmstatApplications.iterator();
         while (appIt.hasNext()) {
@@ -198,7 +200,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         host.getRepository().removeDataSources(finishedApplications);
     }
     
-    private void addHostListener(Host host,HostIdentifier hostId,JvmstatConnection hostListener) {
+    private void registerHostListener(Host host,HostIdentifier hostId,JvmstatConnection hostListener) {
         synchronized (hostsListeners) {
             Map<HostIdentifier,JvmstatConnection> hostListeners = hostsListeners.get(host);
 
@@ -210,7 +212,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
     }
 
-    private void removeHostListener(Host host,HostIdentifier hostId) {
+    private void unregisterHostListener(Host host,HostIdentifier hostId) {
         synchronized (hostsListeners) {
             Map<HostIdentifier,JvmstatConnection> hostListeners = hostsListeners.get(host);
 
@@ -219,7 +221,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
     }
     
-    private void registerJvmstatConnection(Host host, HostIdentifier hostId) {
+    private void registerJvmstatConnection(Host host, HostIdentifier hostId, int interval) {
         // Monitor the Host for new/finished Applications
         // NOTE: the code relies on the fact that the provider is the first listener registered in MonitoredHost of the Host
         // in which case the first obtained event contains all applications already running on the Host
@@ -229,21 +231,24 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         final MonitoredHost monitoredHost = getMonitoredHost(hostId);
         
         if (monitoredHost == null) { // monitored host not available reschedule
-            rescheduleProcessNewHost(host,hostId);
+            rescheduleProcessNewHost(host,hostId,interval);
             return;
         }
-        monitoredHost.setInterval(GlobalPreferences.sharedInstance().getMonitoredHostPoll() * 1000);
+        hostId = monitoredHost.getHostIdentifier();
+        monitoredHost.setInterval(interval);
         if (host == Host.LOCALHOST) checkForBrokenJps(monitoredHost);
         try {
             // Fetch already running applications on the host
-            processNewApplicationsByPids(host, monitoredHost.getHostIdentifier(), monitoredHost.activeVms());
-            
+            processNewApplicationsByPids(host, hostId, monitoredHost.activeVms()); 
             hostListener = new JvmstatConnection(host, monitoredHost);
             monitoredHost.addHostListener(hostListener);
-            addHostListener(host,monitoredHost.getHostIdentifier(),hostListener);
+            registerHostListener(host, hostId, hostListener);
         } catch (MonitorException e) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,e);
-            rescheduleProcessNewHost(host,hostId);
+            Throwable t = e.getCause();
+            if (!(t instanceof ConnectException)) {
+                Exceptions.printStackTrace(e);
+            }
+            rescheduleProcessNewHost(host,hostId,interval);
         }        
     }
     
@@ -299,15 +304,16 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         });
     }
     
-    private HostIdentifier getHostIdentifier(Host host, int port) {
+    private HostIdentifier getHostIdentifier(Host host, ConnectionDescriptor desc) {
         try {
+            int port = desc.getPort();
             String hostIdString = host.getHostName();
             if (port != Registry.REGISTRY_PORT) {
                 hostIdString +=":"+port;
             }
             return new HostIdentifier(hostIdString);
         } catch (URISyntaxException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            Exceptions.printStackTrace(ex);
         }
         return null;
     }
@@ -329,7 +335,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             return getMonitoredHost(new HostIdentifier(hostIdString));
         } catch (URISyntaxException ex) {
             // TODO: Host should't be scheduled for later MonitoredHost resolving if URISyntaxException
-            ErrorManager.getDefault().notify(ErrorManager.USER,ex);
+            Exceptions.printStackTrace(ex);
         }
         return null;
     }
@@ -362,14 +368,14 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         return null;
     }
     
-    private void rescheduleProcessNewHost(final Host host,final HostIdentifier hostId) {
-        int interval = GlobalPreferences.sharedInstance().getMonitoredHostPoll();
-        Timer timer = new Timer(interval*1000, new ActionListener() {
+    private void rescheduleProcessNewHost(final Host host,final HostIdentifier hostId,final int interval) {
+        int timerInterval = GlobalPreferences.sharedInstance().getMonitoredHostPoll();
+        Timer timer = new Timer(timerInterval*1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // do not block EQ - use request processor, processNewHost() can take a long time
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
-                        if (!host.isRemoved()) registerJvmstatConnection(host,hostId);
+                        if (!host.isRemoved()) registerJvmstatConnection(host,hostId,interval);
                     }
                 });
             }
@@ -392,11 +398,13 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         private boolean firstEvent = true;
         private Host host;
         private HostIdentifier hostId;
-
+        private int interval;
+        
         private JvmstatConnection(Host host, MonitoredHost monitoredHost) {
             this.firstEvent = firstEvent;
             this.host = host;
             hostId = monitoredHost.getHostIdentifier();
+            interval = monitoredHost.getInterval();
         }
 
         public void vmStatusChanged(final VmStatusChangeEvent e) {            
@@ -414,7 +422,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
 
         public void disconnected(HostEvent e) {
             processDisconnectedJvmstat(host, this);
-            rescheduleProcessNewHost(host,hostId);
+            rescheduleProcessNewHost(host,hostId,interval);
         }
     }
 

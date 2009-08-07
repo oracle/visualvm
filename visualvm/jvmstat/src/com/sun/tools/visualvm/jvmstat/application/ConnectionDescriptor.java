@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import java.rmi.registry.Registry;
 
 /**
@@ -34,27 +35,31 @@ import java.rmi.registry.Registry;
 class ConnectionDescriptor {
 
     private int port;
-    private int refreshRate;
+    private double refreshRate;
 
 
-    public ConnectionDescriptor(int port, int refreshRate) {
+    ConnectionDescriptor(int port, double refreshRate) {
         setPort(port);
         setRefreshRate(refreshRate);
     }
 
 
-    public static ConnectionDescriptor createDefault() {
-        return new ConnectionDescriptor(Registry.REGISTRY_PORT, 1);
+    static ConnectionDescriptor createDefault() {
+        return new ConnectionDescriptor(Registry.REGISTRY_PORT, GlobalPreferences.sharedInstance().getMonitoredHostPoll());
     }
 
 
-    public final void setPort(int port) { this.port = port; }
+    final void setPort(int port) { this.port = port; }
 
-    public final int getPort() { return port; }
+    final int getPort() { return port; }
 
-    public final void setRefreshRate(int refreshRate) { this.refreshRate = refreshRate; }
+    final void setRefreshRate(double refreshRate) { this.refreshRate = refreshRate; }
 
-    public final int getRefreshRate() { return refreshRate; }
+    /**
+     * monitored host refresh rate
+     * @return refresh rate in seconds
+     */ 
+    final double getRefreshRate() { return refreshRate; }
 
 
     public boolean equals(Object o) {

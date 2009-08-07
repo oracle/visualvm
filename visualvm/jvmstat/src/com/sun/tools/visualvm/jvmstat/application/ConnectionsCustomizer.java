@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.Color;
@@ -137,7 +138,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     }
 
     private void addCustom() {
-        ConnectionDescriptor d = new ConnectionDescriptor(getUnusedPort(), 3);
+        ConnectionDescriptor d = new ConnectionDescriptor(getUnusedPort(), GlobalPreferences.sharedInstance().getMonitoredHostPoll());
         model.addRow(new Object[] { d });
         int row = table.getRowCount() - 1;
         table.getSelectionModel().setSelectionInterval(row, row);
