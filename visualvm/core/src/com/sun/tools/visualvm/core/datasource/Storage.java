@@ -198,7 +198,7 @@ public final class Storage {
      */
     public synchronized boolean hasCustomProperties() {
         Properties prop = getCustomProperties(false);
-        return prop == null || prop.isEmpty();
+        return prop != null && !prop.isEmpty();
     }
     
     /**
