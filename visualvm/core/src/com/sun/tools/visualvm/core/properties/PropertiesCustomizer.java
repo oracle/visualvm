@@ -36,7 +36,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * UI component for presenting user-customizable properties of a DataSource.
+ * This class is to be used by DataSource providers supporting defining the
+ * initial DataSource properties. Use PropertiesSupport.getCustomizer(Class)
+ * method to get an instance of PropertiesCustomizer for a concrete DataSource
+ * type.
  *
+ * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class PropertiesCustomizer<X extends DataSource> extends PropertiesPanel {
@@ -63,11 +69,16 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     }
 
 
-    public boolean hasProperties() {
-        return !providers.isEmpty();
-    }
-
-    public void settingsDefined(X dataSource) {
+    /**
+     * Invokes PropertiesProvider.propertiesDefined method for every
+     * PropertiesProvider supporting the provided DataSource. To be called by
+     * DataSource providers when the New DataSource dialog displaying editable
+     * properties has been accepted by the user and new DataSource has been
+     * created.
+     *
+     * @param dataSource newly created DataSource
+     */
+    public void propertiesDefined(X dataSource) {
         unregisterListeners();
         for (int i = 0; i < providers.size(); i++) {
             PropertiesProvider<X> provider = providers.get(i);
@@ -76,21 +87,29 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
         }
     }
 
-    void settingsChanged() {
-        unregisterListeners();
-        for (int i = 0; i < providers.size(); i++) {
-            PropertiesProvider<X> provider = providers.get(i);
-            PropertiesPanel panel = panels.get(i);
-            provider.propertiesChanged(panel, dataSource);
-        }
-    }
-
-    public void settingsCancelled() {
+    /**
+     * Invokes PropertiesProvider.propertiesCancelled method for every
+     * PropertiesProvider supporting the DataSource type defined for this
+     * PropertiesCustomizer. To be called by DataSource providers when the New
+     * DataSource dialog displaying editable properites has been cancelled and
+     * no DataSource has been created.
+     */
+    public void propertiesCancelled() {
         unregisterListeners();
         for (int i = 0; i < providers.size(); i++) {
             PropertiesProvider<X> provider = providers.get(i);
             PropertiesPanel panel = panels.get(i);
             provider.propertiesCancelled(panel, dataSource);
+        }
+    }
+    
+
+    void propertiesChanged() {
+        unregisterListeners();
+        for (int i = 0; i < providers.size(); i++) {
+            PropertiesProvider<X> provider = providers.get(i);
+            PropertiesPanel panel = panels.get(i);
+            provider.propertiesChanged(panel, dataSource);
         }
     }
 

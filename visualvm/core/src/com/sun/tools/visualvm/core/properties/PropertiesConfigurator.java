@@ -73,8 +73,8 @@ class PropertiesConfigurator extends JPanel {
         SAVED_SIZES.put(className, pc.getSize());
         pc.cleanup();
 
-        if (dd.getValue() == pc.okButton) customizer.settingsChanged();
-        else customizer.settingsCancelled();
+        if (dd.getValue() == pc.okButton) customizer.propertiesChanged();
+        else customizer.propertiesCancelled();
     }
     
   

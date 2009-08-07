@@ -156,7 +156,7 @@ public class HostProvider {
 
                     if (newHost != null) {
                         if (hostDescriptor.getPropertiesCustomizer() != null)
-                            hostDescriptor.getPropertiesCustomizer().settingsDefined(newHost);
+                            hostDescriptor.getPropertiesCustomizer().propertiesDefined(newHost);
                         RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
                     }
                     return newHost;

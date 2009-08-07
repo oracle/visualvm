@@ -24,7 +24,7 @@
  */
 
 /**
- * Support for defining and editing custom properties for DataSources.
+ * Support for user-customizable properties for DataSources.
  *
  * @since VisualVM 1.2
  */

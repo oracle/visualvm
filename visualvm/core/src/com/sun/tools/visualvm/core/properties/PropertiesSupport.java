@@ -38,8 +38,12 @@ import java.util.Set;
 /**
  * Entrypoint for customization of DataSource properties. PropertiesProvider
  * instances should be registered/unregistered using the registerPropertiesProvider
- * and unregisterPropertiesProvider methods. Dialog providers displaying the
- * properties should use getPropertiesProviders method to list the providers.
+ * and unregisterPropertiesProvider methods.
+ * 
+ * DataSource providers displaying a dialog supporting user-customizable properties
+ * should use getCustomizer(Class) method to get the properties UI. The loadProperties
+ * and saveProperties methods should be used when persisting or restoring persistent
+ * DataSources.
  *
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
@@ -87,36 +91,62 @@ public final class PropertiesSupport {
     }
 
 
+    /**
+     * Returns true if there's at least one PropertiesProvider providing properties
+     * for the DataSource type, false otherwise.
+     *
+     * @param <X> any DataSource type
+     * @param type type of the DataSource to be checked
+     * @return true if there's at least one PropertiesProvider providing properties for the DataSource type, false otherwise
+     */
     public <X extends DataSource> boolean hasProperties(Class<X> type) {
         return hasProperties(null, type);
     }
 
+    /**
+     * Returns an UI component to display user-customizable properties for the
+     * provided DataSource type. Use hasProperties(Class) method to check if there
+     * are any customizable properties for the given DataSource type. For no
+     * properties available the created PropertiesCustomizer is empty.
+     *
+     * @param <X> any DataSource type
+     * @param type type of the DataSource to customize
+     * @return UI component to display user-customizable properties for the provided DataSource type
+     */
     public <X extends DataSource> PropertiesCustomizer<X> getCustomizer(Class<X> type) {
         return getCustomizer(null, type);
     }
 
 
+    /**
+     * Invokes PropertiesProvider.loadProperties(DataSource, Storage) method for
+     * every PropertiesProvider supporting the provided DataSource.
+     *
+     * @param <X> any DataSource type
+     * @param dataSource DataSource being restored
+     * @param storage Storage from which the DataSource is being restored
+     */
     public <X extends DataSource> void loadProperties(X dataSource, Storage storage) {
         List<PropertiesProvider<X>> p =
-                getProviders(dataSource, (Class<X>)dataSource.getClass());
+            getProviders(dataSource, (Class<X>)dataSource.getClass());
         for (PropertiesProvider<X> provider : p)
-            try {
-                provider.loadProperties(dataSource, storage);
-            } catch (Throwable t) {
-                // TODO: log it
-            }
+            provider.loadProperties(dataSource, storage);
 
     }
 
+    /**
+     * Invokes PropertiesProvider.saveProperties(DataSource, Storage) method for
+     * every PropertiesProvider supporting the provided DataSource.
+     *
+     * @param <X> any DataSource type
+     * @param dataSource DataSource being saved
+     * @param storage Storage to which the DataSource is being saved
+     */
     public <X extends DataSource> void saveProperties(X dataSource, Storage storage) {
         List<PropertiesProvider<X>> p =
-                getProviders(dataSource, (Class<X>)dataSource.getClass());
+            getProviders(dataSource, (Class<X>)dataSource.getClass());
         for (PropertiesProvider<X> provider : p)
-            try {
-                provider.saveProperties(dataSource, storage);
-            } catch (Throwable t) {
-                // TODO: log it
-            }
+            provider.saveProperties(dataSource, storage);
     }
 
 

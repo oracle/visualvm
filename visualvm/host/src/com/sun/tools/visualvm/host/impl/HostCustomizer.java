@@ -127,11 +127,12 @@ public class HostCustomizer extends JPanel {
     displaynameCheckbox.setEnabled(true);
     hostnameField.setText(""); // NOI18N
     displaynameField.setText(""); // NOI18N
-    
-    settingsPanel = PropertiesSupport.sharedInstance().
-                    getCustomizer(Host.class);
-    settingsPanel.addChangeListener(listener);
-    settingsButton.setVisible(settingsPanel.hasProperties());
+
+    PropertiesSupport support = PropertiesSupport.sharedInstance();
+    settingsPanel = !support.hasProperties(Host.class) ? null :
+                     support.getCustomizer(Host.class);
+    if (settingsPanel != null) settingsPanel.addChangeListener(listener);
+    settingsButton.setVisible(settingsPanel != null);
     if (!settingsButton.isVisible()) settingsButton.setSelected(false);
     else settingsButton.setSelected(!settingsPanel.settingsValid());
 
@@ -143,12 +144,12 @@ public class HostCustomizer extends JPanel {
   }
 
   private void cancelled() {
-      settingsPanel.settingsCancelled();
+      if (settingsPanel != null) settingsPanel.propertiesCancelled();
       cleanup();
   }
 
   private void cleanup() {
-      settingsPanel.removeChangeListener(listener);
+      if (settingsPanel != null) settingsPanel.removeChangeListener(listener);
       settingsContainer.removeAll();
       settingsPanel = null;
   }
