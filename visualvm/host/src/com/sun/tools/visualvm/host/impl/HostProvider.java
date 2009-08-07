@@ -37,6 +37,7 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -75,9 +76,12 @@ public class HostProvider {
     private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
+    private static final String LOCALHOST_PROPERTIES_FILENAME = "localhost" + Storage.DEFAULT_PROPERTIES_EXT; // NOI18N
+    
     private static final String PROPERTY_HOSTNAME = "prop_hostname";    // NOI18N
     
     private static InetAddress localhostAddress2;
+    private static Storage localhostStorage;
     
     private Semaphore hostsLockedSemaphore = new Semaphore(1);
 
@@ -209,7 +213,15 @@ public class HostProvider {
     
     public Host createLocalHost() {
         try {
-            return new Host("localhost") {};    // NOI18N
+            Host localhost = new Host("localhost") {}; // NOI18N
+            if (HostsSupport.storageDirectoryExists()) {
+                File localhostProperties = new File(HostsSupport.getStorageDirectory(),
+                                                    LOCALHOST_PROPERTIES_FILENAME);
+                if (localhostProperties.isFile())
+                    localhostStorage = new Storage(HostsSupport.getStorageDirectory(),
+                                                LOCALHOST_PROPERTIES_FILENAME);
+            }
+            return localhost;
         } catch (UnknownHostException e) {
             LOGGER.severe("Critical failure: cannot resolve localhost");    // NOI18N
             return null;
@@ -230,7 +242,12 @@ public class HostProvider {
             localhostAddress2 = InetAddress.getLocalHost();
         } catch (java.net.UnknownHostException e) {}
         Host localhost = Host.LOCALHOST;
-        if (localhost != null) DataSource.ROOT.getRepository().addDataSource(localhost);
+        if (localhost != null) {
+            if (localhostStorage != null)
+                PropertiesSupport.sharedInstance().loadProperties(localhost,
+                                                                  localhostStorage);
+            DataSource.ROOT.getRepository().addDataSource(localhost);
+        }
     }
     
     private void initUnknownHost() {
@@ -258,6 +275,7 @@ public class HostProvider {
             
             Set<HostImpl> hosts = new HashSet();
             for (File file : files) {
+                if (LOCALHOST_PROPERTIES_FILENAME.equals(file.getName())) continue;
                 Storage storage = new Storage(file.getParentFile(), file.getName());
                 String hostName = storage.getCustomProperty(PROPERTY_HOSTNAME);
 
@@ -270,7 +288,11 @@ public class HostProvider {
                     unresolvedHostsS.add(hostName);
                 }
 
-                if (persistedHost != null) hosts.add(persistedHost);
+                if (persistedHost != null) {
+                    hosts.add(persistedHost);
+                    PropertiesSupport.sharedInstance().loadProperties(
+                            persistedHost, storage);
+                }
             }
             
             if (!unresolvedHostsF.isEmpty()) notifyUnresolvedHosts(unresolvedHostsF, unresolvedHostsS);
@@ -327,6 +349,24 @@ public class HostProvider {
                 });
             }
         });
+    }
+
+    public static void shutdown() {
+        // Persist localhost
+        Storage storage = localhostStorage == null ?
+            new Storage(Storage.getTemporaryStorageDirectory()) : localhostStorage;
+        PropertiesSupport.sharedInstance().saveProperties(Host.LOCALHOST, storage);
+        if (localhostStorage != null && !storage.hasCustomProperties())
+            localhostStorage.deleteCustomPropertiesStorage();
+        if (localhostStorage == null && storage.hasCustomProperties())
+            storage.saveCustomPropertiesTo(new File(HostsSupport.getStorageDirectory(),
+                                                    LOCALHOST_PROPERTIES_FILENAME));
+        
+        // Persist other hosts
+        Set<HostImpl> hosts = DataSourceRepository.sharedInstance().
+                getDataSources(HostImpl.class);
+        for (HostImpl host : hosts)
+            PropertiesSupport.sharedInstance().saveProperties(host, host.getStorage());
     }
     
     public HostProvider() {

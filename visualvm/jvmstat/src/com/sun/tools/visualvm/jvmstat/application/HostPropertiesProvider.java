@@ -43,6 +43,9 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
 
     private static final String PROP_JSTATD_PORT = "prop_jstatd_port"; // NOI18N
     private static final String PROP_JSTATD_REFRESH = "prop_jstatd_refresh"; // NOI18N
+    
+    private static final ConnectionDescriptor DISABLED_LOCALHOST_JSTATD =
+            new ConnectionDescriptor(-1, -1);
 
 
     public HostPropertiesProvider() {
@@ -72,16 +75,43 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         // Nothing to do
     }
 
+    public void loadProperties(Host host, Storage storage) {
+        Storage hostStorage = host.getStorage();
+        if (storage == hostStorage) return;
+        
+        Set<ConnectionDescriptor> descriptors = getDescriptors(storage);
+        if (Host.LOCALHOST.equals(host) && descriptors.size() == 1)
+            descriptors.remove(DISABLED_LOCALHOST_JSTATD);
+        setDescriptors(host, descriptors);
+    }
+
+    public void saveProperties(Host host, Storage storage) {
+        Storage hostStorage = host.getStorage();
+        if (storage == hostStorage) return;
+
+        Set<ConnectionDescriptor> descriptors = getDescriptors(host);
+        if (Host.LOCALHOST.equals(host)) {
+            if (descriptors.isEmpty()) descriptors.add(DISABLED_LOCALHOST_JSTATD);
+            else descriptors.remove(ConnectionDescriptor.createDefault());
+        }
+        setDescriptors(storage, descriptors);
+    }
+
+
     public static void initializeLocalhost() {
         Host host = Host.LOCALHOST;
         setDescriptors(host, getDescriptorsEx(null)); // TODO: handle customizations!
     }
 
     static Set<ConnectionDescriptor> getDescriptors(Host host) {
+        Storage storage = host == null ? null : host.getStorage();
+        return getDescriptors(storage);
+    }
+
+    private static Set<ConnectionDescriptor> getDescriptors(Storage storage) {
         Set<ConnectionDescriptor> set = new HashSet();
 
-        if (host != null) {
-            Storage storage = host.getStorage();
+        if (storage != null) {
             int index = 0;
             String port = storage.getCustomProperty(PROP_JSTATD_PORT + "." + index); // NOI18N
             while (port != null) {
@@ -105,7 +135,10 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
     }
 
     private static void setDescriptors(Host host, Set<ConnectionDescriptor> descriptors) {
-        Storage storage = host.getStorage();
+        setDescriptors(host.getStorage(), descriptors);
+    }
+
+    private static void setDescriptors(Storage storage, Set<ConnectionDescriptor> descriptors) {
         clearDescriptors(storage);
         int index = 0;
         for (ConnectionDescriptor descriptor : descriptors) {
