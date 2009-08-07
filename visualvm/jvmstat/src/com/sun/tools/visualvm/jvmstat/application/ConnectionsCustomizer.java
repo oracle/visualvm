@@ -311,7 +311,15 @@ class ConnectionsCustomizer extends PropertiesPanel {
         private void initComponents() {
             portLabel = new JLabel("Port:");
             portLabel.setFont(portLabel.getFont().deriveFont(Font.BOLD));
-            portValueLabel = new JLabel();
+            final int w = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 0)).
+                    getPreferredSize().width;
+            portValueLabel = new JLabel() {
+                public Dimension getPreferredSize() {
+                    Dimension ps = super.getPreferredSize();
+                    ps.width = w;
+                    return ps;
+                }
+            };
 
             refreshLabel = new JLabel("Refresh interval:");
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
