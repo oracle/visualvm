@@ -353,8 +353,7 @@ public class HostProvider {
 
     public static void shutdown() {
         // Persist localhost
-        Storage storage = localhostStorage == null ?
-            new Storage(Storage.getTemporaryStorageDirectory()) : localhostStorage;
+        Storage storage = localhostStorage == null ? new Storage() : localhostStorage;
         PropertiesSupport.sharedInstance().saveProperties(Host.LOCALHOST, storage);
         if (localhostStorage != null && !storage.hasCustomProperties())
             localhostStorage.deleteCustomPropertiesStorage();

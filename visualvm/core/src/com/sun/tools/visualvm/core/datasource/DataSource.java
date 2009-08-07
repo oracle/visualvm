@@ -292,7 +292,7 @@ public abstract class DataSource {
      * @return Storage instance for this DataSource.
      */
     protected Storage createStorage() {
-        return new Storage(Storage.getTemporaryStorageDirectory());
+        return new Storage();
     }
     
     /**

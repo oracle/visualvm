@@ -71,7 +71,17 @@ public final class Storage {
     private final File propertiesFile;
     
     private Properties properties;
-    
+
+
+    /**
+     * Creates new instance of Storage for storing temporary data. The Storage
+     * directory is initialized by getTemporaryStorageDirectory() value.
+     *
+     * @since VisualVM 1.2
+     */
+    public Storage() {
+        this(getTemporaryStorageDirectory());
+    }
     
     /**
      * Creates new instance of Storage.
