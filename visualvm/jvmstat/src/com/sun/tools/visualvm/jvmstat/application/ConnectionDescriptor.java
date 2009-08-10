@@ -94,7 +94,7 @@ class ConnectionDescriptor {
     }
 
     public String toString() {
-        return "Port: " + port + "   Refresh Rate: " + refreshRate; // NOI18N
+        return "Port: " + port + ", Refresh Rate: " + refreshRate; // NOI18N
     }
 
 }
