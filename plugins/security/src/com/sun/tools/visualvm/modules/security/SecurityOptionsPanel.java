@@ -827,6 +827,18 @@ class SecurityOptionsPanel extends JPanel {
         c.insets = new Insets(0, 0, 0, 0);
         hintPanel.add(hintLabel, c);
 
+        // --- Filler ---
+        JPanel fillerPanel = new JPanel(null);
+        fillerPanel.setOpaque(false);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 12;
+        c.weighty = 1;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        add(fillerPanel, c);
+
         // Requires org.openide.util >= 7.25
 //        // restartButton
 //        JButton restartButton = new JButton();
@@ -855,7 +867,7 @@ class SecurityOptionsPanel extends JPanel {
 //        hintPanel.add(restartButton, c);
 
         c = new GridBagConstraints();
-        c.gridy = 12;
+        c.gridy = 13;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
