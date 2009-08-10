@@ -43,9 +43,6 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
 
     private static final String PROP_JSTATD_PORT = "prop_jstatd_port"; // NOI18N
     private static final String PROP_JSTATD_REFRESH = "prop_jstatd_refresh"; // NOI18N
-    
-    private static final ConnectionDescriptor DISABLED_LOCALHOST_JSTATD =
-            new ConnectionDescriptor(-1, -1);
 
 
     public HostPropertiesProvider() {
@@ -76,34 +73,33 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
     }
 
     public void loadProperties(Host host, Storage storage) {
-        Storage hostStorage = host.getStorage();
-        if (storage == hostStorage) return;
-        
-        Set<ConnectionDescriptor> descriptors = getDescriptors(storage);
-        if (Host.LOCALHOST.equals(host) && descriptors.size() == 1)
-            descriptors.remove(DISABLED_LOCALHOST_JSTATD);
-        setDescriptors(host, descriptors);
+        if (storage == host.getStorage()) return;
+        setDescriptors(host, getDescriptors(storage));
     }
 
     public void saveProperties(Host host, Storage storage) {
-        Storage hostStorage = host.getStorage();
-        if (storage == hostStorage) return;
+        if (storage == host.getStorage()) return;
+        setDescriptors(storage, getDescriptors(host));
+    }
 
+
+    static Set<ConnectionDescriptor> descriptorsForHost(Host host) {
         Set<ConnectionDescriptor> descriptors = getDescriptors(host);
-        if (Host.LOCALHOST.equals(host)) {
-            if (descriptors.isEmpty()) descriptors.add(DISABLED_LOCALHOST_JSTATD);
-            else descriptors.remove(ConnectionDescriptor.createDefault());
-        }
-        setDescriptors(storage, descriptors);
+        if (Host.LOCALHOST.equals(host))
+            descriptors.add(ConnectionDescriptor.DEFAULT_LOCAL_DESCRIPTOR);
+        return cleanup(host, descriptors);
     }
 
-
-    public static void initializeLocalhost() {
-        Host host = Host.LOCALHOST;
-        setDescriptors(host, getDescriptorsEx(null)); // TODO: handle customizations!
+    private static Set<ConnectionDescriptor> cleanup(Host h, Set<ConnectionDescriptor> d) {
+        Set<ConnectionDescriptor> descriptors = new HashSet(d);
+        Iterator<ConnectionDescriptor> iterator = descriptors.iterator();
+        while (iterator.hasNext())
+            if (iterator.next().createHostIdentifier(h) == null)
+                iterator.remove();
+        return descriptors;
     }
 
-    static Set<ConnectionDescriptor> getDescriptors(Host host) {
+    private static Set<ConnectionDescriptor> getDescriptors(Host host) {
         Storage storage = host == null ? null : host.getStorage();
         return getDescriptors(storage);
     }
@@ -185,7 +181,8 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         // TODO: implement JvmstatApplicationProvider.connectionsChanged:
 //        if (!added.isEmpty() || !removed.isEmpty() || !changed.isEmpty())
 //            JvmstatApplicationProvider.sharedInstance().connectionsChanged(
-//                    host, added, removed, changed);
+//                    host, cleanup(host, added), cleanup(host, removed),
+//                    cleanup(host, changed));
     }
 
     private static void clearDescriptors(Storage storage) {

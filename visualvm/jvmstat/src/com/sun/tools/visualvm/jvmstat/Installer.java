@@ -40,7 +40,6 @@ import org.openide.modules.ModuleInstall;
 public class Installer extends ModuleInstall {
     
     public void restored() {
-        HostPropertiesProvider.initializeLocalhost();
         JvmstatModelFactory.getDefault().registerProvider(new JvmstatModelProvider());
         JvmJvmstatModelFactory.getDefault().registerProvider(new JvmJvmstatModelProvider());
         JvmJvmstatModelFactory.getDefault().registerProvider(new JRockitJvmJvmstatModelProvider());

@@ -26,13 +26,20 @@
 package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
+import com.sun.tools.visualvm.host.Host;
+import java.net.URISyntaxException;
 import java.rmi.registry.Registry;
+import sun.jvmstat.monitor.HostIdentifier;
+import org.openide.util.Exceptions;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 class ConnectionDescriptor {
+
+    static final ConnectionDescriptor DEFAULT_LOCAL_DESCRIPTOR =
+            new ConnectionDescriptor(-1, GlobalPreferences.sharedInstance().getMonitoredHostPoll());
 
     private int port;
     private double refreshRate;
@@ -60,6 +67,21 @@ class ConnectionDescriptor {
      * @return refresh rate in seconds
      */ 
     final double getRefreshRate() { return refreshRate; }
+
+
+    final HostIdentifier createHostIdentifier(Host host) {
+        String hostId = null;
+        if (this != DEFAULT_LOCAL_DESCRIPTOR) {
+            hostId = "rmi://" + host.getHostName(); // NOI18N
+            if (port != Registry.REGISTRY_PORT) hostId += ":" + port; // NOI18N
+        }
+        try {
+            return new HostIdentifier(hostId);
+        } catch (URISyntaxException e) {
+            Exceptions.printStackTrace(e);
+            return null;
+        }
+    }
 
 
     public boolean equals(Object o) {
