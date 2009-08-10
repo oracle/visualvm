@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jvmstat.application;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -80,6 +81,9 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private static final Border EMPTY_BORDER = emptyBorder(SELECTED_BORDER);
     private static final ConnectionDescriptor DEFAULT_CONNECTION =
             ConnectionDescriptor.createDefault();
+
+    private static final String DATA_VIEW = "DATA_VIEW"; // NOI18N
+    private static final String NO_DATA_VIEW = "NO_DATA_VIEW"; // NOI18N
 
     private static int TABLE_WIDTH = -1;
     private static int ROW_HEIGHT  = -1;
@@ -159,6 +163,8 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private void update() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                CardLayout cl = (CardLayout)viewPanel.getLayout();
+                cl.show(viewPanel, model.getRowCount() > 0 ? DATA_VIEW : NO_DATA_VIEW);
                 addDefault.setEnabled(!containsConnection(DEFAULT_CONNECTION));
                 remove.setEnabled(table.getSelectedRow() != -1);
             }
@@ -233,6 +239,17 @@ class ConnectionsCustomizer extends PropertiesPanel {
         scroll.setBorder(impl.getBorder());
         scroll.setViewportBorder(impl.getViewportBorder());
         scroll.setPreferredSize(new Dimension(TABLE_WIDTH + 20, 1));
+
+        viewPanel = new JPanel(new CardLayout());
+        JLabel noConnection = new JLabel(NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_NoConnection"), JLabel.CENTER); // NOI18N
+        noConnection.setEnabled(false);
+        noConnection.setBorder(impl.getBorder() != null ? impl.getBorder() :
+                               impl.getViewportBorder());
+        noConnection.setMinimumSize(new Dimension());
+        viewPanel.setOpaque(false);
+        viewPanel.add(noConnection, NO_DATA_VIEW);
+        viewPanel.add(scroll, DATA_VIEW);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -243,7 +260,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(0, 0, 0, 10);
-        add(scroll, c);
+        add(viewPanel, c);
 
         addDefault = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
@@ -292,6 +309,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
     }
 
+    private JPanel viewPanel;
     private ConnectionsTable table;
     private JButton addDefault;
     private JButton remove;
