@@ -486,7 +486,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
             portSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 1));
             portLabel.setLabelFor(portSpinner);
 
-            refreshLabel = new JLabel("Refresh interval:");
+            refreshLabel = new JLabel();
             Mnemonics.setLocalizedText(refreshLabel, NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_Refresh2")); // NOI18N
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
