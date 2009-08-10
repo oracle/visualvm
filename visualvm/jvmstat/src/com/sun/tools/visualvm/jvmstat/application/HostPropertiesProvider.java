@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -46,7 +47,8 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
 
 
     public HostPropertiesProvider() {
-        super("jstatd", "Configures jvmstat connections to the Host", 10);
+        super("jstatd", NbBundle.getMessage(HostPropertiesProvider.class, // NOI18N
+                "MSG_JstatdDescr"), 10); // NOI18N
     }
 
 

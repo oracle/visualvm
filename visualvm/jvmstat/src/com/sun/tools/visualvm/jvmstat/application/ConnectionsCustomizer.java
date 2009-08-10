@@ -66,6 +66,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import org.openide.awt.Mnemonics;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -242,11 +244,13 @@ class ConnectionsCustomizer extends PropertiesPanel {
         c.insets = new Insets(0, 0, 0, 10);
         add(scroll, c);
 
-        addDefault = new JButton("Add Default") {
+        addDefault = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
                 addDefault();
             }
         };
+        Mnemonics.setLocalizedText(addDefault, NbBundle.getMessage(
+                ConnectionsCustomizer.class, "BTN_AddDefault")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 0;
@@ -255,11 +259,13 @@ class ConnectionsCustomizer extends PropertiesPanel {
         c.insets = new Insets(0, 0, 3, 0);
         add(addDefault, c);
 
-        JButton addCustom = new JButton("Add Custom") {
+        JButton addCustom = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
                 addCustom();
             }
         };
+        Mnemonics.setLocalizedText(addCustom, NbBundle.getMessage(
+                ConnectionsCustomizer.class, "BTN_AddCustom")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 1;
@@ -268,11 +274,13 @@ class ConnectionsCustomizer extends PropertiesPanel {
         c.insets = new Insets(3, 0, 3, 0);
         add(addCustom, c);
 
-        remove = new JButton("Remove") {
+        remove = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
                 removeSelected();
             }
         };
+        Mnemonics.setLocalizedText(remove, NbBundle.getMessage(
+                ConnectionsCustomizer.class, "BTN_Remove")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 2;
@@ -309,7 +317,8 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
 
         private void initComponents() {
-            portLabel = new JLabel("Port:");
+            portLabel = new JLabel(NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_Port1")); // NOI18N
             portLabel.setFont(portLabel.getFont().deriveFont(Font.BOLD));
             final int w = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 0)).
                     getPreferredSize().width;
@@ -321,10 +330,12 @@ class ConnectionsCustomizer extends PropertiesPanel {
                 }
             };
 
-            refreshLabel = new JLabel("Refresh interval:");
+            refreshLabel = new JLabel(NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_Refresh1")); // NOI18N
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
             refreshValueLabel = new JLabel();
-            refreshUnitsLabel = new JLabel("sec.");
+            refreshUnitsLabel = new JLabel(NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_RefreshUnits")); // NOI18N
 
             setLayout(new GridBagLayout());
             GridBagConstraints c;
@@ -467,16 +478,21 @@ class ConnectionsCustomizer extends PropertiesPanel {
         }
 
         private void initComponents() {
-            portLabel = new JLabel("Port:");
+            portLabel = new JLabel();
+            Mnemonics.setLocalizedText(portLabel, NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_Port2")); // NOI18N
             portLabel.setFont(portLabel.getFont().deriveFont(Font.BOLD));
             portSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 1));
             portLabel.setLabelFor(portSpinner);
 
             refreshLabel = new JLabel("Refresh interval:");
+            Mnemonics.setLocalizedText(refreshLabel, NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_Refresh2")); // NOI18N
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
             refreshSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 9999, 1));
             refreshLabel.setLabelFor(refreshSpinner);
-            refreshUnitsLabel = new JLabel("sec.");
+            refreshUnitsLabel = new JLabel(NbBundle.getMessage(
+                ConnectionsCustomizer.class, "LBL_RefreshUnits")); // NOI18N
 
             setLayout(new GridBagLayout());
             GridBagConstraints c;
