@@ -398,7 +398,7 @@ abstract class ValuesCustomizer extends JPanel {
 
             if (value instanceof Boolean)
                 // Workaround strange selection behavior for newly selected checkbox
-                isSelected = hasFocus;
+                isSelected = isSelected || hasFocus;
             else if (value instanceof String)
                 // Improve spacing of the text
                 value = " " + value + " "; // NOI18N
