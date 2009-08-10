@@ -46,6 +46,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -559,7 +560,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
             JComponent portEditor = portSpinner.getEditor();
             if (portEditor instanceof JSpinner.DefaultEditor) {
-                final JTextField tf = ((JSpinner.DefaultEditor)portEditor).getTextField();
+                final JFormattedTextField tf = ((JSpinner.DefaultEditor)portEditor).getTextField();
                 tf.getDocument().addDocumentListener(new DocumentListener() {
                     public void insertUpdate(DocumentEvent e) { commitEdit(); }
                     public void removeUpdate(DocumentEvent e) { commitEdit(); }
@@ -569,7 +570,8 @@ class ConnectionsCustomizer extends PropertiesPanel {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 try {
-                                    int val = Integer.parseInt(tf.getText());
+                                    int val = (Integer)tf.getFormatter().
+                                            stringToValue(tf.getText().trim());
                                     if (cd != null) {
                                         cd.setPort(val);
                                         updater.run();
@@ -589,7 +591,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
             JComponent refreshEditor = refreshSpinner.getEditor();
             if (refreshEditor instanceof JSpinner.DefaultEditor) {
-                final JTextField tf = ((JSpinner.DefaultEditor)refreshEditor).getTextField();
+                final JFormattedTextField tf = ((JSpinner.DefaultEditor)refreshEditor).getTextField();
                 tf.getDocument().addDocumentListener(new DocumentListener() {
                     public void insertUpdate(DocumentEvent e) { commitEdit(); }
                     public void removeUpdate(DocumentEvent e) { commitEdit(); }
@@ -599,7 +601,8 @@ class ConnectionsCustomizer extends PropertiesPanel {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 try {
-                                    int val = Integer.parseInt(tf.getText());
+                                    int val = (Integer)tf.getFormatter().
+                                            stringToValue(tf.getText().trim());
                                     if (cd != null) cd.setRefreshRate(val);
                                 } catch (Exception ex) {}
                             }
