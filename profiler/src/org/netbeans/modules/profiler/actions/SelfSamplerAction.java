@@ -45,15 +45,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.DataOutputStream;
-import java.nio.channels.WritableByteChannel;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.lang.management.ThreadMXBean;
 import java.util.Collections;
-import java.util.concurrent.Callable;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
@@ -67,7 +70,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jaroslav Bachorik, Tomas Hurka
  */
 public class SelfSamplerAction extends AbstractAction implements AWTEventListener {
     final private static class Singleton {
@@ -80,7 +83,11 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     private static final String ACTION_NAME_STOP = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionNameStop");
 //    private static final String ACTION_DESCR = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ActionDescription");
     private static final String THREAD_NAME = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ThreadName");
+    private static final String DEBUG_ARG = "-Xdebug"; // NOI18N
+    private static final Logger LOGGER = Logger.getLogger(SelfSamplerAction.class.getName());
+
     private final AtomicReference<Controller> RUNNING = new AtomicReference<Controller>();
+    private Boolean runMode;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private SelfSamplerAction() {
@@ -143,12 +150,31 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     @Override
     public Object getValue(String key) {
         Object o = super.getValue(key);
-        if (o == null && key.startsWith("logger-")) { // NOI18N
+        if (o == null && key.startsWith("logger-") && isRunMode()) { // NOI18N
             return new Controller(key);
         }
         return o;
     }
 
+    private synchronized boolean isRunMode() {
+        if (runMode == null) {
+            runMode = Boolean.TRUE;
+            String reason = null;
+
+            // check if we are debugged
+            RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+            List<String> args = runtime.getInputArguments();
+            if (args.contains(DEBUG_ARG)) {
+                reason = "running in debug mode";   // NOI18N
+                runMode = Boolean.FALSE;
+            }
+            
+            if (!runMode.booleanValue()) {
+                LOGGER.log(Level.INFO,"Slowness detector disabled - "+ reason); // NOI18N
+            }
+        }
+        return runMode.booleanValue();
+    }
 
 
     private static final class Controller implements Runnable, ActionListener {
@@ -179,11 +205,16 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
 
         public void run() {
             final StackTraceSnapshotBuilder b = getBuilder();
+            final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
             executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
             startTime = System.currentTimeMillis();
             executor.scheduleAtFixedRate(new Runnable() {
                 public void run() {
-                    b.addStacktrace(Thread.getAllStackTraces(), System.nanoTime());
+                    try {
+                        b.addStacktrace(threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE), System.nanoTime());
+                    } catch (Throwable ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
                 }
             }, 10, 10, TimeUnit.MILLISECONDS);
         }
@@ -195,7 +226,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                 if ("cancel".equals(e.getActionCommand())) {
                     return;
                 }
-                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime, System.nanoTime());
+                CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime);
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                 if ("write".equals(e.getActionCommand())) {
                     DataOutputStream dos = (DataOutputStream)e.getSource();

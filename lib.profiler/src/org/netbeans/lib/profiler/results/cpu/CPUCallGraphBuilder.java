@@ -362,7 +362,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1) {
-        waitEntry(threadId, timeStamp0, timeStamp1);
+        waitExit(threadId, timeStamp0, timeStamp1);
         batchNotEmpty = true;
     }
 
