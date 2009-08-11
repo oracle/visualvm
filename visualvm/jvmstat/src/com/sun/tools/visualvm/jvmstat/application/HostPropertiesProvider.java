@@ -181,10 +181,10 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
 //        System.err.println(">>> changed: " + changed);
 
         // TODO: implement JvmstatApplicationProvider.connectionsChanged:
-//        if (!added.isEmpty() || !removed.isEmpty() || !changed.isEmpty())
-//            JvmstatApplicationProvider.sharedInstance().connectionsChanged(
-//                    host, cleanup(host, added), cleanup(host, removed),
-//                    cleanup(host, changed));
+        if (!added.isEmpty() || !removed.isEmpty() || !changed.isEmpty())
+            JvmstatApplicationProvider.sharedInstance().connectionsChanged(
+                    host, cleanup(host, added), cleanup(host, removed),
+                    cleanup(host, changed));
     }
 
     private static void clearDescriptors(Storage storage) {
