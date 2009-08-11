@@ -50,6 +50,16 @@ public abstract class EnvironmentProvider {
     protected EnvironmentProvider() {}
 
     /**
+     * Returns an unique String identifying the EnvironmentProvider. The return
+     * value is used for persistency purposes and must be constant for providers
+     * supporting persistent JMX connections. Default implementation returns
+     * getClass().getName().
+     *
+     * @return unique String identifying the EnvironmentProvider
+     */
+    public String getId() { return getClass().getName(); }
+
+    /**
      * Returns the JMX environment for the provided Application. Use
      * application.getStorage() to access the Storage where persistent data
      * were previously stored using the savePersistentData(Storage) method.
@@ -81,7 +91,7 @@ public abstract class EnvironmentProvider {
      *
      * @param storage Storage to store the provider's settings
      */
-    public void savePersistentData(Storage storage) {}
+    public void saveEnvironment(Storage storage) {}
 
     /**
      * Gives the EnvironmentProvider a possibility to load saved settings from
@@ -96,13 +106,6 @@ public abstract class EnvironmentProvider {
      *
      * @param storage Storage containing the provider's settings
      */
-    public void loadPersistentData(Storage storage) {}
-
-
-    /**
-     * A context required to create the EnvironmentProvider. It's provided to
-     * the JmxEnvironmentSupport to create an instance of the EnvironmentProvider.
-     */
-    public static abstract class Context {}
+    public void loadEnvironment(Storage storage) {}
 
 }

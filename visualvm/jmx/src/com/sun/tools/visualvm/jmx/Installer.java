@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.jmx;
 import com.sun.tools.visualvm.jmx.impl.JmxModelProvider;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.jmx.impl.JmxApplicationDescriptorProvider;
-import com.sun.tools.visualvm.jmx.impl.JmxCustomizersSupportImpl;
+import com.sun.tools.visualvm.jmx.impl.JmxConnectionSupportImpl;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import org.openide.modules.ModuleInstall;
 
@@ -40,10 +40,10 @@ final class Installer extends ModuleInstall {
     public void restored() {
         JmxModelFactory.getDefault().registerProvider(new JmxModelProvider());
         DataSourceDescriptorFactory.getDefault().registerProvider(new JmxApplicationDescriptorProvider());
-        JmxEnvironmentSupport.getInstance().registerFactory(new CredentialsProviderFactory());
+        JmxConnectionSupport.getInstance().registerProvider(CredentialsProvider.persistent());
         DefaultConnectionCustomizer dcc = new DefaultConnectionCustomizer();
-        JmxCustomizersSupport.getInstance().registerCustomizer(dcc);
-        JmxCustomizersSupportImpl.setDefaultCustomizer(dcc);
+        JmxConnectionSupport.getInstance().registerCustomizer(dcc);
+        JmxConnectionSupportImpl.setDefaultCustomizer(dcc);
 
         JmxApplicationsSupport.getInstance();
     }

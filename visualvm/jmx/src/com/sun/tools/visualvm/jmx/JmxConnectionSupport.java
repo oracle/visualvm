@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -25,26 +25,48 @@
 
 package com.sun.tools.visualvm.jmx;
 
-import com.sun.tools.visualvm.jmx.impl.JmxCustomizersSupportImpl;
+import com.sun.tools.visualvm.jmx.impl.JmxConnectionSupportImpl;
 
 /**
- * Support for custom JMX connection types.
+ * Support for customizing JMX environment map in VisualVM. An entrypoint for
+ * registering custom EnvironmentProviderFactories and creating EnvironmentProvider
+ * instances.
  *
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
-public final class JmxCustomizersSupport {
+public final class JmxConnectionSupport {
 
-    private static JmxCustomizersSupport INSTANCE;
+    private static JmxConnectionSupport INSTANCE;
+
+    
+    /**
+     * Returns singleton instance of JmxConnectionSupport.
+     * 
+     * @return singleton instance of JmxConnectionSupport
+     */
+    public synchronized static JmxConnectionSupport getInstance() {
+        if (INSTANCE == null) INSTANCE = new JmxConnectionSupport();
+        return INSTANCE;
+    }
+    
 
     /**
-     * Returns singleton instance of JmxCustomizersSupport.
-     *
-     * @return singleton instance of JmxCustomizersSupport
+     * Registers an EnvironmentProviderFactory using the provided name.
+     * 
+     * @param category EnvironmentProviderFactory to be registered
      */
-    public synchronized static JmxCustomizersSupport getInstance() {
-        if (INSTANCE == null) INSTANCE = new JmxCustomizersSupport();
-        return INSTANCE;
+    public void registerProvider(EnvironmentProvider provider) {
+        JmxConnectionSupportImpl.registerProviderImpl(provider);
+    }
+
+    /**
+     * Unregisters an EnvironmentProviderFactory registered using the provided name.
+     * 
+     * @param category EnvironmentProviderFactory to unregister
+     */
+    public void unregisterProvider(EnvironmentProvider provider) {
+        JmxConnectionSupportImpl.unregisterProviderImpl(provider);
     }
 
 
@@ -54,7 +76,7 @@ public final class JmxCustomizersSupport {
      * @param customizer JmxConnectionCustomizer to be registered
      */
     public void registerCustomizer(JmxConnectionCustomizer customizer) {
-        JmxCustomizersSupportImpl.registerCustomizer(customizer);
+        JmxConnectionSupportImpl.registerCustomizer(customizer);
     }
 
     /**
@@ -63,7 +85,10 @@ public final class JmxCustomizersSupport {
      * @param customizer JmxConnectionCustomizer to unregister
      */
     public void unregisterCustomizer(JmxConnectionCustomizer customizer) {
-        JmxCustomizersSupportImpl.unregisterCustomizer(customizer);
+        JmxConnectionSupportImpl.unregisterCustomizer(customizer);
     }
+    
+    
+    private JmxConnectionSupport() {}
 
 }

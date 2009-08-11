@@ -74,7 +74,7 @@ public class JmxApplicationProvider {
     private static final Logger LOGGER = Logger.getLogger(JmxApplicationProvider.class.getName());
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
-    private static final String SNAPSHOT_VERSION_DIVIDER = ".";
+    private static final String SNAPSHOT_VERSION_DIVIDER = ".";         // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "1";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION =
@@ -84,7 +84,7 @@ public class JmxApplicationProvider {
     
     private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
-    private static final String PROPERTY_ENVIRONMENT_PROVIDER = "prop_env_provider"; // NOI18N
+    private static final String PROPERTY_ENV_PROVIDER_ID = "prop_env_provider_id"; // NOI18N
     
     
     private static final String PROPERTIES_FILE = "jmxapplication" + Storage.DEFAULT_PROPERTIES_EXT;  // NOI18N
@@ -219,10 +219,10 @@ public class JmxApplicationProvider {
         if (storage != null) {
             if (newApp) {
                 storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
-                storage.setCustomProperty(PROPERTY_ENVIRONMENT_PROVIDER, provider.getClass().getName());
-                if (provider != null) provider.savePersistentData(storage);
+                storage.setCustomProperty(PROPERTY_ENV_PROVIDER_ID, provider.getId());
+                if (provider != null) provider.saveEnvironment(storage);
             } else {
-                if (provider != null) provider.loadPersistentData(storage);
+                if (provider != null) provider.loadEnvironment(storage);
             }
         }
 
@@ -233,7 +233,7 @@ public class JmxApplicationProvider {
         if (storage == null) {
             Storage s = application.getStorage();
             s.setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
-            if (provider != null) provider.savePersistentData(s);
+            if (provider != null) provider.saveEnvironment(s);
         }
         
         // Check if the given JmxApplication has been already added to the application tree
@@ -316,9 +316,9 @@ public class JmxApplicationProvider {
                     serviceURL.getURLPath().startsWith("/jndi/rmi://")) {   // NOI18N
                 String urlPath =
                         serviceURL.getURLPath().substring("/jndi/rmi://".length()); // NOI18N
-                if ('/' == urlPath.charAt(0)) {
+                if ('/' == urlPath.charAt(0)) { // NOI18N
                     hostname = "localhost"; // NOI18N
-                } else if ('[' == urlPath.charAt(0)) { // IPv6 address
+                } else if ('[' == urlPath.charAt(0)) { // IPv6 address  // NOI18N
                     int closingSquareBracketIndex = urlPath.indexOf("]"); // NOI18N
                     if (closingSquareBracketIndex == -1) {
                         hostname = null;
@@ -326,8 +326,8 @@ public class JmxApplicationProvider {
                         hostname = urlPath.substring(0, closingSquareBracketIndex + 1);
                     }
                 } else {
-                    int colonIndex = urlPath.indexOf(":");
-                    int slashIndex = urlPath.indexOf("/");
+                    int colonIndex = urlPath.indexOf(":"); // NOI18N
+                    int slashIndex = urlPath.indexOf("/"); // NOI18N
                     int min = Math.min(colonIndex, slashIndex); // NOTE: can be -1!!!
                     if (min == -1) {
                         min = 0;
@@ -381,7 +381,7 @@ public class JmxApplicationProvider {
                         String[] keys = new String[] {
                             PROPERTY_CONNECTION_STRING,
                             PROPERTY_HOSTNAME,
-                            PROPERTY_ENVIRONMENT_PROVIDER
+                            PROPERTY_ENV_PROVIDER_ID
                         };
 
                         for (final Storage storage : storageSet) {
@@ -389,15 +389,15 @@ public class JmxApplicationProvider {
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
                                     try {
-                                        String epc = values[2];
-                                        if (epc == null) {
+                                        String epid = values[2];
+                                        if (epid == null) {
                                             // Check for ver 1.0 which didn't support PROPERTY_ENVIRONMENT_PROVIDER
                                             String sv = storage.getCustomProperty(SNAPSHOT_VERSION);
-                                            if ("1.0".equals(sv)) epc = CredentialsProvider.class.getName(); // NOI18N
+                                            if ("1.0".equals(sv)) epid = CredentialsProvider.class.getName(); // NOI18N
                                         }
-                                        EnvironmentProvider ep = epc == null ? null :
-                                                                 JmxEnvironmentSupportImpl.
-                                                                 createProviderImpl(epc, null);
+                                        EnvironmentProvider ep = epid == null ? null :
+                                                                 JmxConnectionSupportImpl.
+                                                                 getProvider(epid);
                                         addJmxApplication(false, null, values[0], null, values[1], ep, storage);
                                     } catch (final JmxApplicationException e) {
                                         SwingUtilities.invokeLater(new Runnable() {

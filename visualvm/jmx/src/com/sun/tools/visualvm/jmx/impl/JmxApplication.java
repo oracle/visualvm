@@ -142,6 +142,6 @@ public final class JmxApplication extends Application {
 
         // Defined environmentID -> use 'environmentID-url.toString()'
         // Typically 'username-service:jmx:rmi:///jndi/rmi://hostName:portNum/jmxrmi'
-        return envId + "@" + urlId; // NOI18N
+        return envId + "-" + urlId; // NOI18N
     }
 }

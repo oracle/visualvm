@@ -118,8 +118,8 @@ public final class JmxApplicationsSupport {
         if (displayName == null)
             displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
 
-        EnvironmentProvider epr = JmxEnvironmentSupport.getInstance().
-                createCredentialsProvider(username, password.toCharArray(), saveCredentials);
+        EnvironmentProvider epr = new CredentialsProvider.Custom(username,
+                password.toCharArray(), saveCredentials);
         return this.createJmxApplicationImpl(connectionString, displayName, epr, persistent);
     }
 
@@ -207,8 +207,8 @@ public final class JmxApplicationsSupport {
                         pHandle[0].start();
                     }
                 });
-            EnvironmentProvider epr = JmxEnvironmentSupport.getInstance().
-                createCredentialsProvider(username, password.toCharArray(), saveCredentials);
+            EnvironmentProvider epr = new CredentialsProvider.Custom(username,
+                password.toCharArray(), saveCredentials);
             return createJmxApplicationImpl(connectionString, displayName,
                                             epr, persistent);
         } catch (JmxApplicationException e) {

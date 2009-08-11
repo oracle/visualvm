@@ -77,9 +77,8 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
         String connectionString = panel.getConnectionString();
         String displayName = panel.getDisplayName();
-        EnvironmentProvider provider = JmxEnvironmentSupport.getInstance().
-                createCredentialsProvider(panel.getUsername(), panel.getPassword(),
-                                          panel.getSaveCredentials());
+        EnvironmentProvider provider = new CredentialsProvider.Custom(
+                panel.getUsername(), panel.getPassword(), panel.getSaveCredentials());
         boolean persistent = true;
 
         return new JmxConnectionCustomizer.Setup(connectionString, displayName,

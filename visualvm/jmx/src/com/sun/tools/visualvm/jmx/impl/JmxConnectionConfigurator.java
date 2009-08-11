@@ -101,7 +101,7 @@ class JmxConnectionConfigurator extends JPanel {
 
     public void warmup() {
         // Resolve customizers
-        List<JmxConnectionCustomizer> customizers = JmxCustomizersSupportImpl.getCustomizers();
+        List<JmxConnectionCustomizer> customizers = JmxConnectionSupportImpl.getCustomizers();
         singleCustomizer = customizers.size() == 1;
 
         // Populate list, initialize panels

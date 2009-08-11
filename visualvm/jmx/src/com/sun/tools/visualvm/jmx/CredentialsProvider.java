@@ -47,68 +47,81 @@ import javax.management.remote.JMXConnector;
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
-public class CredentialsProvider extends EnvironmentProvider {
+public abstract class CredentialsProvider extends EnvironmentProvider {
 
-    private static final String PROPERTY_USERNAME = "prop_username"; // NOI18N
-    private static final String PROPERTY_PASSWORD = "prop_password"; // NOI18N
+    private static final String PROPERTY_USERNAME = "prop_credentials_username"; // NOI18N
+    private static final String PROPERTY_PASSWORD = "prop_credentials_password"; // NOI18N
 
-    static final CredentialsProvider PERSISTENT_RESTORED =
-            new CredentialsProvider(null);
-
-    private String username;
-    private char[] password;
-    private boolean persistent;
+    private static Persistent PERSISTENT_PROVIDER;
 
 
-    protected CredentialsProvider(Context context) {
-        if (context == null) {
-            username = null;
-            password = null;
-            persistent = true;
-        } else {
-            username = context.getUsername();
-            password = encodePassword(context.getPassword());
-            persistent = context.isPersistent();
-        }
+    static synchronized Persistent persistent() {
+        if (PERSISTENT_PROVIDER == null) PERSISTENT_PROVIDER = new Persistent();
+        return PERSISTENT_PROVIDER;
     }
 
 
-    public Map<String, ?> getEnvironment(Application application) {
-        String unm = null;
-        String pwd = null;
+    /**
+     * Returns an unique String identifying the CredentialsProvider. Must be
+     * overriden to return a different identificator when subclassing the
+     * CredentialsProvider.
+     *
+     * @return unique String identifying the CredentialsProvider
+     */
+    public String getId() {
+        return CredentialsProvider.class.getName();
+    }
 
-        if (persistent) {
+
+    public static class Custom extends CredentialsProvider {
+
+        private final String username;
+        private final char[] password;
+        private final boolean persistent;
+
+
+        public Custom(String username, char[] password, boolean persistent) {
+            this.username = username;
+            this.password = encodePassword(password);
+            this.persistent = persistent;
+        }
+
+
+        public Map<String, ?> getEnvironment(Application application) {
+            return createMap(username, password != null ? new String(password) : null);
+        }
+
+        public String getEnvironmentId(Storage storage) {
+            if (username != null) return username;
+            return super.getEnvironmentId(storage);
+        }
+
+        public void saveEnvironment(Storage storage) {
+            if (!persistent) return;
+            storage.setCustomProperty(PROPERTY_USERNAME, username);
+            storage.setCustomProperty(PROPERTY_PASSWORD, new String(password));
+        }
+
+    }
+
+
+    public static class Persistent extends CredentialsProvider {
+
+        public Map<String, ?> getEnvironment(Application application) {
             Storage storage = application.getStorage();
-            unm = storage.getCustomProperty(PROPERTY_USERNAME);
-            pwd = storage.getCustomProperty(PROPERTY_PASSWORD);
-        } else {
-            unm = username;
-            pwd = new String(password);
+            String username = storage.getCustomProperty(PROPERTY_USERNAME);
+            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+            return createMap(username, password);
         }
 
-        return createMap(unm, pwd);
-    }
-
-    public String getEnvironmentId(Storage storage) {
-        if (username != null) return username;
-        if (persistent && storage != null) {
-            String unm = storage.getCustomProperty(PROPERTY_USERNAME);
-            if (unm != null) return unm;
-        }
-        return super.getEnvironmentId(storage);
-    }
-
-    public void savePersistentData(Storage storage) {
-        if (persistent) {
-            if (username != null) {
-                storage.setCustomProperty(PROPERTY_USERNAME, username);
-                username = null;
+        public String getEnvironmentId(Storage storage) {
+            if (storage != null) {
+                String username = storage.getCustomProperty(PROPERTY_USERNAME);
+                if (username != null) return username;
             }
-            if (password != null) {
-                storage.setCustomProperty(PROPERTY_PASSWORD, new String(password));
-                password = null;
-            }
+            return super.getEnvironmentId(storage);
         }
+
     }
 
 
@@ -132,33 +145,6 @@ public class CredentialsProvider extends EnvironmentProvider {
     private static String decodePassword(String password) {
         if (password == null) return null;
         return Utils.decodePassword(password);
-    }
-
-
-    // --- Provider's context --------------------------------------------------
-
-    /**
-     * A context required to create the CredentialsProvider. The persistent flag
-     * controls whether the username and password will be stored into a Storage
-     * or just kept in the CredentialsProvider (in such case the credentials won't
-     * be restored for another VisualVM session).
-     */
-    public static class Context extends EnvironmentProvider.Context {
-
-        private final String username;
-        private final char[] password;
-        private final boolean persistent;
-
-        public Context(String username, char[] password, boolean persistent) {
-            this.username = username;
-            this.password = password;
-            this.persistent = persistent;
-        }
-
-        private String getUsername() { return username; }
-        private char[] getPassword() { return password; }
-        private boolean isPersistent() { return persistent; }
-
     }
 
 }
