@@ -158,10 +158,12 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         // Resolve added descriptors
         Set<ConnectionDescriptor> added = new HashSet(newDescriptors);
         added.removeAll(oldDescriptors);
+        added = cleanup(host, added);
 
         // Resolve removed descriptors
         Set<ConnectionDescriptor> removed = new HashSet(oldDescriptors);
         removed.removeAll(newDescriptors);
+        removed = cleanup(host, removed);
 
         // Resolve changed descriptors
         Set<ConnectionDescriptor> changed = new HashSet(newDescriptors);
@@ -169,22 +171,21 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         Iterator<ConnectionDescriptor> iterator = changed.iterator();
         while (iterator.hasNext()) {
             ConnectionDescriptor descriptor1 = iterator.next();
-            ConnectionDescriptor descriptor2 = oldDescriptors.get(oldDescriptors.indexOf(descriptor1));
-
-            if (Math.abs(descriptor1.getRefreshRate() - descriptor2.getRefreshRate()) < 0.001) {
+            ConnectionDescriptor descriptor2 = oldDescriptors.get(
+                    oldDescriptors.indexOf(descriptor1));
+            if (Math.abs(descriptor1.getRefreshRate() -
+                         descriptor2.getRefreshRate()) < 0.001)
                 iterator.remove();
-            }
         }
+        changed = cleanup(host, changed);
 
 //        System.err.println(">>> added:   " + added);
 //        System.err.println(">>> removed: " + removed);
 //        System.err.println(">>> changed: " + changed);
 
-        // TODO: implement JvmstatApplicationProvider.connectionsChanged:
         if (!added.isEmpty() || !removed.isEmpty() || !changed.isEmpty())
             JvmstatApplicationProvider.sharedInstance().connectionsChanged(
-                    host, cleanup(host, added), cleanup(host, removed),
-                    cleanup(host, changed));
+                    host, added, removed, changed);
     }
 
     private static void clearDescriptors(Storage storage) {
