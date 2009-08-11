@@ -26,11 +26,7 @@
 package com.sun.tools.visualvm.jmx;
 
 import com.sun.tools.visualvm.core.datasupport.Positionable;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 
 /**
  * Provider of a special JMX connection type. By registering the customizer
@@ -81,7 +77,7 @@ public abstract class JmxConnectionCustomizer implements Positionable {
      *
      * @return UI component used as a customizer for the new JMX connection
      */
-    public abstract Panel createPanel();
+    public abstract PropertiesPanel createPanel();
 
     /**
      * Returns the Setup defining the JMX connection to be created.
@@ -89,7 +85,7 @@ public abstract class JmxConnectionCustomizer implements Positionable {
      * @param customizerPanel Panel with the user-defined settings
      * @return Setup defining the JMX connection to be created
      */
-    public abstract Setup getConnectionSetup(Panel customizerPanel);
+    public abstract Setup getConnectionSetup(PropertiesPanel customizerPanel);
 
 
     /**
@@ -121,68 +117,6 @@ public abstract class JmxConnectionCustomizer implements Positionable {
     public final boolean hidesDefault() { return hidesDefault; }
 
     public final String toString() { return getCustomizerName(); }
-
-
-    /**
-     * UI component presented to the user to set up the JMX connection. Provides
-     * a validity notification support to correctly handle current state of the
-     * user-provided data - valid or invalid.
-     */
-    public static class Panel extends JPanel {
-
-        private boolean settingsValid = true;
-        private List<ChangeListener> listeners = new ArrayList();
-
-
-        /**
-         * Returns true if settings defined by this Panel are valid.
-         * To be called in EDT.
-         *
-         * @return true if settings defined by this Panel are valid
-         */
-        public final boolean settingsValid() {
-            return settingsValid;
-        }
-
-        /**
-         * Add a ChangeListener. Use settingsValid() method to read the state.
-         * To be called in EDT.
-         *
-         * @param listener ChangeListener
-         */
-        public final void addChangeListener(ChangeListener listener) {
-            if (!listeners.contains(listener)) listeners.add(listener);
-        }
-
-        /**
-         * Remove a ChangeListener. To be called in EDT.
-         * @param listener ChangeListener
-         */
-        public final void removeChangeListener(ChangeListener listener) {
-            listeners.remove(listener);
-        }
-
-
-        /**
-         * Notifies the Panel that validity of the user-provided data changed.
-         * To be called in EDT.
-         * 
-         * @param valid
-         */
-        protected final void setSettingsValid(boolean valid) {
-            if (settingsValid != valid) {
-                settingsValid = valid;
-                fireStateChanged();
-            }
-        }
-
-
-        private void fireStateChanged() {
-            for (ChangeListener listener : listeners)
-                listener.stateChanged(new ChangeEvent(this));
-        }
-
-    }
 
 
     /**

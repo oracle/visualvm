@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.impl;
 
+import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
 import java.awt.BorderLayout;
@@ -209,7 +210,7 @@ class JmxConnectionConfigurator extends JPanel {
 
     private void initializePreferredSize() {
         Dimension preferredSize = new Dimension();
-        for (JmxConnectionCustomizer.Panel panel : customizerPanels) {
+        for (PropertiesPanel panel : customizerPanels) {
             Dimension panelPref = panel.getPreferredSize();
             preferredSize.width = Math.max(preferredSize.width, panelPref.width);
             preferredSize.height = Math.max(preferredSize.height, panelPref.height);
@@ -257,7 +258,7 @@ class JmxConnectionConfigurator extends JPanel {
                 return d;
             }
         };
-        hintLabel.setForeground(UIManager.getColor("Label.disabledForeground"));
+        hintLabel.setForeground(UIManager.getColor("Label.disabledForeground")); // NOI18N
 
         setLayout(new BorderLayout());
 
@@ -330,8 +331,8 @@ class JmxConnectionConfigurator extends JPanel {
     private boolean singleCustomizer;
 
     private JmxConnectionCustomizer selectedCustomizer;
-    private JmxConnectionCustomizer.Panel displayedPanel;
-    private List<JmxConnectionCustomizer.Panel> customizerPanels = new ArrayList();
+    private PropertiesPanel displayedPanel;
+    private List<PropertiesPanel> customizerPanels = new ArrayList();
 
     private SelectionListener selectionListener = new SelectionListener();
     private ValidityListener validityListener = new ValidityListener();

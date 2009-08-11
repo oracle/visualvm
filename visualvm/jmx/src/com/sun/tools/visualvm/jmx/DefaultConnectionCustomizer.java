@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jmx;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -69,7 +70,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
         return new DefaultPanel();
     }
 
-    public Setup getConnectionSetup(Panel customizerPanel) {
+    public Setup getConnectionSetup(PropertiesPanel customizerPanel) {
         if (!(customizerPanel instanceof DefaultPanel))
             throw new IllegalArgumentException("Panel must be DefaultPanel"); // NOI18N
         DefaultPanel panel = (DefaultPanel)customizerPanel;
@@ -157,7 +158,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
      * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
-    public static class DefaultPanel extends Panel {
+    public static class DefaultPanel extends PropertiesPanel {
 
         /**
          * Creates new instance of DefaultPanel.
