@@ -71,18 +71,18 @@ public abstract class JmxConnectionCustomizer implements Positionable {
     }
 
     /**
-     * Returns an UI component used as a customizer for the new JMX connection.
-     * A new Panel instance should be created for each method invocation.
+     * Returns PropertiesPanel used as a customizer for the new JMX connection.
+     * A new PropertiesPanel instance should be created for each method invocation.
      * Providing some default values and/or hints is always a good idea!
      *
-     * @return UI component used as a customizer for the new JMX connection
+     * @return PropertiesPanel used as a customizer for the new JMX connection
      */
     public abstract PropertiesPanel createPanel();
 
     /**
      * Returns the Setup defining the JMX connection to be created.
      * 
-     * @param customizerPanel Panel with the user-defined settings
+     * @param customizerPanel PropertiesPanel with the user-defined settings
      * @return Setup defining the JMX connection to be created
      */
     public abstract Setup getConnectionSetup(PropertiesPanel customizerPanel);
@@ -122,6 +122,9 @@ public abstract class JmxConnectionCustomizer implements Positionable {
     /**
      * Setup based on the user-provided settings in the Panel defining the JMX
      * connection to be created.
+     *
+     * @since VisualVM 1.2
+     * @author Jiri Sedlacek
      */
     public static final class Setup {
 
@@ -154,9 +157,32 @@ public abstract class JmxConnectionCustomizer implements Positionable {
         }
 
 
+        /**
+         * Returns the JMX connection string defining the connection to be created.
+         *
+         * @return JMX connection string defining the connection to be created
+         */
         public String getConnectionString() { return connectionString; }
+
+        /**
+         * Returns the display name of the JMX connection to be created.
+         *
+         * @return display name of the JMX connection to be created
+         */
         public String getDisplayName() { return displayName; }
+
+        /**
+         * Returns the EnvironmentProvider for the JMX connection to be created or null.
+         *
+         * @return EnvironmentProvider for the JMX connection to be created or null
+         */
         public EnvironmentProvider getEnvironmentProvider() { return environmentProvider; }
+
+        /**
+         * Returns true if the JMX connection to be created should be restored for another VisualVM sessions, false otherwise
+         *
+         * @return true if the JMX connection to be created should be restored for another VisualVM sessions, false otherwise
+         */
         public boolean isConnectionPersistent() { return persistentConnection; }
         
     }

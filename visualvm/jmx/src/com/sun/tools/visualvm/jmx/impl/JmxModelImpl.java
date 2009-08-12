@@ -434,7 +434,7 @@ class JmxModelImpl extends JmxModel {
 
                 Map<String, Object> env = new HashMap();
                 if (envProvider != null)
-                    env.putAll(envProvider.getEnvironment(app));
+                    env.putAll(envProvider.getEnvironment(app, app.getStorage()));
                 if (userName != null || password != null)
                     env.put(JMXConnector.CREDENTIALS,
                             new String[] { userName, password });

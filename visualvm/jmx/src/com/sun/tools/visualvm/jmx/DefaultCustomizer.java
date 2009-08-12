@@ -58,22 +58,22 @@ import sun.net.util.IPAddressUtil;
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
-public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
+public class DefaultCustomizer extends JmxConnectionCustomizer {
 
-    DefaultConnectionCustomizer() {
-        super(NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Default_jmx_connection_name"), // NOI18N
-              NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Default_jmx_connection_descr"), // NOI18N
+    DefaultCustomizer() {
+        super(NbBundle.getMessage(DefaultCustomizer.class, "LBL_Default_jmx_connection_name"), // NOI18N
+              NbBundle.getMessage(DefaultCustomizer.class, "LBL_Default_jmx_connection_descr"), // NOI18N
               1, false);
     }
 
-    public DefaultPanel createPanel() {
-        return new DefaultPanel();
+    public Panel createPanel() {
+        return new Panel();
     }
 
     public Setup getConnectionSetup(PropertiesPanel customizerPanel) {
-        if (!(customizerPanel instanceof DefaultPanel))
-            throw new IllegalArgumentException("Panel must be DefaultPanel"); // NOI18N
-        DefaultPanel panel = (DefaultPanel)customizerPanel;
+        if (!(customizerPanel instanceof Panel))
+            throw new IllegalArgumentException("Panel must be DefaultCustomizer.Panel"); // NOI18N
+        Panel panel = (Panel)customizerPanel;
 
         String connectionString = panel.getConnectionString();
         String displayName = panel.getDisplayName();
@@ -150,19 +150,19 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
 
     /**
-     * Implementation of JmxConnectionCustomizer.Panel for entering the JMX url,
-     * optional credentials and selecting whether the credentials should be
-     * persistent or transient.
+     * Implementation of PropertiesPanel for entering the JMX url, optional
+     * credentials and selecting whether the credentials should be persistent or
+     * transient.
      *
      * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
-    public static class DefaultPanel extends PropertiesPanel {
+    public static class Panel extends PropertiesPanel {
 
         /**
          * Creates new instance of DefaultPanel.
          */
-        public DefaultPanel() {
+        public Panel() {
             initComponents();
             initDefaults();
             update();
@@ -205,10 +205,10 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
         }
 
         /**
-         * Returns true if the panel request to persist username and password,
-         * false otherwise
+         * Returns true if the panel requests to persist username and password,
+         * false otherwise.
          *
-         * @return true if the panel request to persist username and password, false otherwise
+         * @return true if the panel requests to persist username and password, false otherwise
          */
         public final boolean getSaveCredentials() {
             return saveCheckbox.isSelected();
@@ -259,7 +259,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
             // connectionLabel
             connectionLabel = new JLabel();
-            Mnemonics.setLocalizedText(connectionLabel, NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Connection")); // NOI18N
+            Mnemonics.setLocalizedText(connectionLabel, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Connection")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 0;
@@ -298,7 +298,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
             Font normalLabelFont = connectionLabel.getFont();
             Font smallLabelFont =
                     normalLabelFont.deriveFont(normalLabelFont.getSize2D() - 1);
-            usageLabel = new JLabel(NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Usage"));    // NOI18N
+            usageLabel = new JLabel(NbBundle.getMessage(DefaultCustomizer.class, "LBL_Usage"));    // NOI18N
             usageLabel.setFont(smallLabelFont);
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
@@ -311,7 +311,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
             // displaynameCheckbox
             displaynameCheckbox = new JCheckBox();
-            Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Display_name")); // NOI18N
+            Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Display_name")); // NOI18N
             displaynameCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
@@ -352,7 +352,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
             // securityCheckbox
             securityCheckbox = new JCheckBox();
-            Mnemonics.setLocalizedText(securityCheckbox, NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Use_security_credentials")); // NOI18N
+            Mnemonics.setLocalizedText(securityCheckbox, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Use_security_credentials")); // NOI18N
             securityCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
@@ -369,7 +369,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
             // usernameLabel
             usernameLabel = new JLabel();
-            Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Username")); // NOI18N
+            Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Username")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 4;
@@ -406,7 +406,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
             // passwordLabel
             passwordLabel = new JLabel();
-            Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Password")); // NOI18N
+            Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Password")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 5;
@@ -443,7 +443,7 @@ public class DefaultConnectionCustomizer extends JmxConnectionCustomizer {
 
             // saveCheckbox
             saveCheckbox = new JCheckBox();   // NOI18N
-            Mnemonics.setLocalizedText(saveCheckbox, NbBundle.getMessage(DefaultConnectionCustomizer.class, "LBL_Save_security_credentials")); // NOI18N
+            Mnemonics.setLocalizedText(saveCheckbox, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Save_security_credentials")); // NOI18N
             saveCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();

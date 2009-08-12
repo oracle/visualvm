@@ -31,17 +31,13 @@ import com.sun.tools.visualvm.jmx.impl.JmxConnectionSupportImpl;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import org.openide.modules.ModuleInstall;
 
-/**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
- */
 final class Installer extends ModuleInstall {
 
     public void restored() {
         JmxModelFactory.getDefault().registerProvider(new JmxModelProvider());
         DataSourceDescriptorFactory.getDefault().registerProvider(new JmxApplicationDescriptorProvider());
         JmxConnectionSupport.getInstance().registerProvider(CredentialsProvider.persistent());
-        DefaultConnectionCustomizer dcc = new DefaultConnectionCustomizer();
+        DefaultCustomizer dcc = new DefaultCustomizer();
         JmxConnectionSupport.getInstance().registerCustomizer(dcc);
         JmxConnectionSupportImpl.setDefaultCustomizer(dcc);
 

@@ -28,9 +28,8 @@ package com.sun.tools.visualvm.jmx;
 import com.sun.tools.visualvm.jmx.impl.JmxConnectionSupportImpl;
 
 /**
- * Support for customizing JMX environment map in VisualVM. An entrypoint for
- * registering custom EnvironmentProviderFactories and creating EnvironmentProvider
- * instances.
+ * Support for customizing JMX connections in VisualVM. An entrypoint for
+ * registering custom EnvironmentProviders and JmxConectionCustomizers.
  *
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
@@ -52,18 +51,18 @@ public final class JmxConnectionSupport {
     
 
     /**
-     * Registers an EnvironmentProviderFactory using the provided name.
+     * Registers new EnvironmentProvider.
      * 
-     * @param category EnvironmentProviderFactory to be registered
+     * @param category EnvironmentProvider to be registered
      */
     public void registerProvider(EnvironmentProvider provider) {
         JmxConnectionSupportImpl.registerProviderImpl(provider);
     }
 
     /**
-     * Unregisters an EnvironmentProviderFactory registered using the provided name.
+     * Unregisters the EnvironmentProvider.
      * 
-     * @param category EnvironmentProviderFactory to unregister
+     * @param category EnvironmentProvider to unregister
      */
     public void unregisterProvider(EnvironmentProvider provider) {
         JmxConnectionSupportImpl.unregisterProviderImpl(provider);
@@ -80,7 +79,7 @@ public final class JmxConnectionSupport {
     }
 
     /**
-     * Unregisters JmxConnectionCustomizer.
+     * Unregisters the JmxConnectionCustomizer.
      *
      * @param customizer JmxConnectionCustomizer to unregister
      */

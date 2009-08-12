@@ -24,6 +24,6 @@
  */
 
 /**
- * JMX applications support in VisualVM.
+ * JMX connections support in VisualVM.
  */
 package com.sun.tools.visualvm.jmx;

@@ -30,11 +30,7 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import java.util.Map;
 
 /**
- * Provider for the JMX environment for each JMX connection. The provider instance
- * should preferably be created using JmxEnvironmentSupport (which accesses the
- * appropriate registered EnvironmentProviderFactory) and not directly by a public
- * constructor. This ensures that the EnvironmentProviderFactory will be correctly
- * registered to create provider instances for persistent JMX connections.
+ * Provider of the JMX environment for each JMX connection.
  *
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
@@ -42,32 +38,25 @@ import java.util.Map;
 public abstract class EnvironmentProvider {
 
     /**
-     * Protected constructor to not allow creating new instances of the provider
-     * directly. Preferably only the JmxEnvironmentSupport (which accesses the
-     * appropriate registered EnvironmentProviderFactory) should create the
-     * provider instances.
-     */
-    protected EnvironmentProvider() {}
-
-    /**
      * Returns an unique String identifying the EnvironmentProvider. The return
      * value is used for persistency purposes and must be constant for providers
      * supporting persistent JMX connections. Default implementation returns
-     * getClass().getName().
+     * this.getClass().getName().
      *
      * @return unique String identifying the EnvironmentProvider
      */
     public String getId() { return getClass().getName(); }
 
     /**
-     * Returns the JMX environment for the provided Application. Use
-     * application.getStorage() to access the Storage where persistent data
-     * were previously stored using the savePersistentData(Storage) method.
+     * Returns the JMX environment for the provided Application. The Storage
+     * contains the data which may have been previously saved using the
+     * saveEnvironment(Storage) method. Typically application.getStorage == storage.
      *
      * @param application Application for which to create the JMX environment
+     * @param storage the Storage where the settings may have been previously saved using the saveEnvironment(Storage) method, typically it is application.getStorage()
      * @return JMX environment for the provided Application
      */
-    public abstract Map<String, ?> getEnvironment(Application application);
+    public abstract Map<String, ?> getEnvironment(Application application, Storage storage);
 
 
     /**
@@ -83,6 +72,7 @@ public abstract class EnvironmentProvider {
      * @return unique identificator of the provided environment
      */
     public String getEnvironmentId(Storage storage) { return ""; } // NOI18N
+    
     /**
      * Gives the EnvironmentProvider a possibility to save it's settings into
      * a Storage. This method is called by the framework as soon as the Storage

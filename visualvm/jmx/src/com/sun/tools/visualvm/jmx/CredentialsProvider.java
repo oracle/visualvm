@@ -34,10 +34,12 @@ import javax.management.remote.JMXConnector;
 
 /**
  * EnvironmentProvider adding the JMXConnector.CREDENTIALS property to the JMX
- * environment map. The provider can either store the username and password in
- * it's instance variables (won't be restored for another VisualVM session) or
- * can save it into a persistent Storage (will be restored when persistent JMX
- * connection is restored for another VisualVM session).
+ * environment map.
+ *
+ * There are two subclasses of EnvironmentProvider available, typically you want
+ * to use the EnvironmentProvider.Custom class to provide a custom credentials
+ * for a JMX connection. The EnvironmentProvider.Persistent class is used for
+ * handling credentials for persisted connections.
  *
  * Note that if the credentials provided by this provider are incorrect a dialog
  * requesting new credentials will be displayed by the framework. If the
@@ -73,6 +75,12 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     }
 
 
+    /**
+     * CredentialsProvider to provide custom settings.
+     *
+     * @since VisualVM 1.2
+     * @author Jiri Sedlacek
+     */
     public static class Custom extends CredentialsProvider {
 
         private final String username;
@@ -80,6 +88,13 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
         private final boolean persistent;
 
 
+        /**
+         * Creates new instance of CredentialsProvider.Custom.
+         *
+         * @param username username
+         * @param password password
+         * @param persistent true if the credentials should be persisted for another VisualVM sessions, false otherwise
+         */
         public Custom(String username, char[] password, boolean persistent) {
             this.username = username;
             this.password = encodePassword(password);
@@ -87,7 +102,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
         }
 
 
-        public Map<String, ?> getEnvironment(Application application) {
+        public Map<String, ?> getEnvironment(Application application, Storage storage) {
             return createMap(username, password != null ? new String(password) : null);
         }
 
@@ -105,10 +120,15 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     }
 
 
+    /**
+     * CredentialsProvider to provide custom settings.
+     *
+     * @since VisualVM 1.2
+     * @author Jiri Sedlacek
+     */
     public static class Persistent extends CredentialsProvider {
 
-        public Map<String, ?> getEnvironment(Application application) {
-            Storage storage = application.getStorage();
+        public Map<String, ?> getEnvironment(Application application, Storage storage) {
             String username = storage.getCustomProperty(PROPERTY_USERNAME);
             String password = storage.getCustomProperty(PROPERTY_PASSWORD);
             return createMap(username, password);
