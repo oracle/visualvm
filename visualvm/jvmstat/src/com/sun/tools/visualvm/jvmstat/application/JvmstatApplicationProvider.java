@@ -269,7 +269,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             if (!(t instanceof ConnectException)) {
                 Exceptions.printStackTrace(e);
             }
-//            monitoredHost.setLastException(e);
+            monitoredHost.setLastException(e);
             rescheduleProcessNewHost(host,hostId);
         }        
     }
