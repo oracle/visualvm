@@ -160,9 +160,8 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     } 
     
     private void processDisconnectedJvmstat(Host host, JvmstatConnection listener) {
-        HostIdentifier hostId = listener.hostId;
-        MonitoredHost monitoredHost = getMonitoredHost(hostId);
-        try { monitoredHost.removeHostListener(listener); } catch (MonitorException ex) {}
+        HostIdentifier hostId = listener.monitoredHost.getHostIdentifier();
+        try { listener.monitoredHost.removeHostListener(listener); } catch (MonitorException ex) {}
         unregisterHostListener(host,hostId);
         Set<JvmstatApplication> jvmstatApplications = host.getRepository().getDataSources(JvmstatApplication.class);
         Iterator<JvmstatApplication> appIt = jvmstatApplications.iterator();
@@ -410,11 +409,11 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         // Flag for determining first MonitoredHost event
         private boolean firstEvent = true;
         private Host host;
-        private HostIdentifier hostId;
+        private MonitoredHost monitoredHost;
         
-        private JvmstatConnection(Host host, MonitoredHost monitoredHost) {
+        private JvmstatConnection(Host host, MonitoredHost mHost) {
             this.host = host;
-            hostId = monitoredHost.getHostIdentifier();
+            monitoredHost = mHost;
         }
 
         public void vmStatusChanged(final VmStatusChangeEvent e) {            
@@ -423,16 +422,16 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                     LOGGER.finer("Monitored Host (" + host.getHostName() + ") status changed - adding all active applications");
                 }
                 firstEvent = false;
-                processNewApplicationsByPids(host, hostId, e.getActive());
+                processNewApplicationsByPids(host, monitoredHost.getHostIdentifier(), e.getActive());
             } else {
-                processNewApplicationsByPids(host, hostId, e.getStarted());
+                processNewApplicationsByPids(host, monitoredHost.getHostIdentifier(), e.getStarted());
                 processTerminatedApplicationsByPids(host, e.getTerminated());
             }
         }
 
         public void disconnected(HostEvent e) {
             processDisconnectedJvmstat(host, this);
-            rescheduleProcessNewHost(host,hostId);
+            rescheduleProcessNewHost(host,monitoredHost.getHostIdentifier());
         }
     }
 
