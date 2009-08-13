@@ -66,6 +66,7 @@ public final class SectionSeparator extends JPanel {
     private void initComponents(String text, Font font) {
         setBorder(BorderFactory.createEmptyBorder());
         setLayout(new GridBagLayout());
+        setOpaque(false);
 
         JLabel label = new JLabel(text);
         if (font != null) label.setFont(font);
