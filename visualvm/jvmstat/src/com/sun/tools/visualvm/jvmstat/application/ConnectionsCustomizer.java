@@ -508,7 +508,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
             Mnemonics.setLocalizedText(refreshLabel, NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_Refresh2")); // NOI18N
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
-            refreshSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 9999, 1));
+            refreshSpinner = new JSpinner(new SpinnerNumberModel(3.0, 1.0, 9999.0, 1.0));
             refreshLabel.setLabelFor(refreshSpinner);
             refreshUnitsLabel = new JLabel(NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_RefreshUnits")); // NOI18N
