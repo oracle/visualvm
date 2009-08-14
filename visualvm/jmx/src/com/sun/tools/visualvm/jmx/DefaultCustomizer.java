@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -208,7 +208,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
          * @return username defined by the panel
          */
         public final String getUsername() {
-            return usernameField.getText().trim();
+            return !securityCheckbox.isSelected() ? null :
+                usernameField.getText().trim();
         }
 
         /**
@@ -217,7 +218,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
          * @return password defined by the panel
          */
         public final char[] getPassword() {
-            return passwordField.getPassword();
+            return !securityCheckbox.isSelected() ? null :
+                passwordField.getPassword();
         }
 
         /**
@@ -227,7 +229,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
          * @return true if the panel requests to persist username and password, false otherwise
          */
         public final boolean getSaveCredentials() {
-            return saveCheckbox.isSelected();
+            return !securityCheckbox.isSelected() ? false :
+                saveCheckbox.isSelected();
         }
 
 
@@ -243,7 +246,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
         private void update() {
             if (internalChange) return;
-            
+
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     String username = getUsername();
@@ -268,7 +271,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                 }
             });
         }
-        
+
         private void initComponents() {
             setLayout(new GridBagLayout());
             GridBagConstraints constraints;
@@ -492,7 +495,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.insets = new Insets(10, 0, 0, 0);
             add(spacer, constraints);
-            
+
             // UI tweaks
             displaynameCheckbox.setBorder(connectionLabel.getBorder());
         }
@@ -701,7 +704,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         private JLabel passwordLabel;
         private JPasswordField passwordField;
         private JCheckBox saveCheckbox;
-        
+
     }
 
 }
