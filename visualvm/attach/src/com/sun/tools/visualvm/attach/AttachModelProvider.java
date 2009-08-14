@@ -39,6 +39,7 @@ import org.openide.util.Utilities;
  */
 public final class AttachModelProvider extends AbstractModelProvider<AttachModel, Application>  {
     
+    private static final String HOST_ID_KEY = "jvmstat.hostid";
     
     AttachModelProvider() {
     }
@@ -49,7 +50,7 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
             
             if (jvmstat != null && jvmstat.isAttachable()) {
                 if (Utilities.isWindows()) {
-                    // on Windows Attach API attach to the process of the same
+                    // on Windows Attach API can only attach to the process of the same
                     // architecture ( 32bit / 64bit )
                     Boolean this64bitArch = is64BitArchitecture();
                     Boolean app64bitArch = is64BitArchitecture(jvmstat);
@@ -58,6 +59,12 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
                             return null;
                         }
                     }
+                }
+                // check that application is runnung under the same users as VisualVM
+                String currentAppId = Application.CURRENT_APPLICATION.getStorage().getCustomProperty(HOST_ID_KEY);
+                String appId = app.getStorage().getCustomProperty(HOST_ID_KEY);
+                if (!currentAppId.equals(appId)) {
+                    return null;
                 }
                 return new AttachModelImpl(app);
             }
