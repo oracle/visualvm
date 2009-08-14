@@ -154,7 +154,9 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             
             if (hostListeners != null) {
                 JvmstatConnection listener = hostListeners.get(hostId);
-                processDisconnectedJvmstat(host, listener);
+                if (listener != null) {
+                    processDisconnectedJvmstat(host, listener);
+                }
             }
         }
     } 
