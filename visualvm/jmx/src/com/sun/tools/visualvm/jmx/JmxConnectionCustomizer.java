@@ -25,8 +25,10 @@
 
 package com.sun.tools.visualvm.jmx;
 
-import com.sun.tools.visualvm.core.datasupport.Positionable;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
+import com.sun.tools.visualvm.core.properties.PropertiesProvider;
 
 /**
  * Provider of a special JMX connection type. By registering the customizer
@@ -41,11 +43,8 @@ import com.sun.tools.visualvm.core.properties.PropertiesPanel;
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
-public abstract class JmxConnectionCustomizer implements Positionable {
+public abstract class JmxConnectionCustomizer extends PropertiesProvider<Application> {
     
-    private final String customizerName;
-    private final String customizerDescription;
-    private final int preferredPosition;
     private final boolean hidesDefault;
 
 
@@ -61,23 +60,21 @@ public abstract class JmxConnectionCustomizer implements Positionable {
      */
     public JmxConnectionCustomizer(String customizerName, String customizerDescription,
                                    int preferredPosition, boolean hidesDefault) {
+        super(customizerName, customizerDescription, preferredPosition);
         if (customizerName == null)
-            throw new IllegalArgumentException("customizerName cannot be null");
-        
-        this.customizerName = customizerName;
-        this.customizerDescription = customizerDescription;
-        this.preferredPosition = preferredPosition;
+            throw new IllegalArgumentException("customizerName cannot be null"); // NOI18N
         this.hidesDefault = hidesDefault;
     }
 
     /**
-     * Returns PropertiesPanel used as a customizer for the new JMX connection.
-     * A new PropertiesPanel instance should be created for each method invocation.
-     * Providing some default values and/or hints is always a good idea!
+     * Returns an unique String identifying the JmxConnectionCustomizer. The return
+     * value is used for persistency purposes and must be constant for customizers
+     * customizing persistent JMX connections. Default implementation returns
+     * this.getClass().getName().
      *
-     * @return PropertiesPanel used as a customizer for the new JMX connection
+     * @return unique String identifying the JmxConnectionCustomizer
      */
-    public abstract PropertiesPanel createPanel();
+    public String getId() { return getClass().getName(); }
 
     /**
      * Returns the Setup defining the JMX connection to be created.
@@ -87,27 +84,15 @@ public abstract class JmxConnectionCustomizer implements Positionable {
      */
     public abstract Setup getConnectionSetup(PropertiesPanel customizerPanel);
 
-
     /**
-     * Returns name of the customizer.
+     * Returns true if the JmxConnectionCustomizer works as a PropertiesProvider
+     * for the provided Application, false otherwise.
      *
-     * @return name of the customizer
+     * @param application Application for which to provide the properties (never null)
+     * @return true if the JmxConnectionCustomizer works as a PropertiesProvider for the provided Application, false otherwise
      */
-    public final String getCustomizerName() { return customizerName; }
+    public boolean providesProperties(Application application) { return true; }
 
-    /**
-     * Returns optional description of the customizer, may be null.
-     *
-     * @return description of the customizer or null
-     */
-    public final String getCustomizerDescription() { return customizerDescription; }
-
-    /**
-     * Returns preferred position of the customizer in UI.
-     *
-     * @return preferred position of the customizer in UI
-     */
-    public final int getPreferredPosition() { return preferredPosition; }
 
     /**
      * Returns true if the default connection type should be hidden by this customizer, false otherwise.
@@ -116,7 +101,33 @@ public abstract class JmxConnectionCustomizer implements Positionable {
      */
     public final boolean hidesDefault() { return hidesDefault; }
 
-    public final String toString() { return getCustomizerName(); }
+
+    /**
+     * Default implementation of the PropertiesProvider.supportsDataSource method,
+     * cannot be further overriden. JmxConnectionCustomizer always supports providing
+     * initial properties for a JMX application being created. Use the providesProperties
+     * method to control whether to provide a properties category for an existing
+     * application or not.
+     * 
+     * @param application Application for which to provide the properites
+     * @return true for null Application, providesProperties(application) result otherwise
+     */
+    public final boolean supportsDataSource(Application application) {
+        return application == null ? true : providesProperties(application);
+    }
+
+    public void propertiesDefined(PropertiesPanel panel, Application application) {};
+
+    public void propertiesChanged(PropertiesPanel panel, Application application) {};
+
+    public void propertiesCancelled(PropertiesPanel panel, Application application) {};
+
+    public void loadProperties(Application application, Storage storage) {};
+
+    public void saveProperties(Application application, Storage storage) {};
+
+
+    public final String toString() { return getPropertiesName(); }
 
 
     /**

@@ -26,10 +26,15 @@
 package com.sun.tools.visualvm.jmx;
 
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.jmx.impl.JmxApplication;
+import com.sun.tools.visualvm.jmx.impl.JmxApplicationProvider;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -38,12 +43,14 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.ui.stp.Utils;
@@ -66,14 +73,23 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
               1, false);
     }
 
-    public Panel createPanel() {
-        return new Panel();
+
+    public boolean providesProperties(Application application) {
+        if (!(application instanceof JmxApplication)) return false;
+        EnvironmentProvider provider = ((JmxApplication)application).
+                getEnvironmentProvider();
+        return provider != null && provider instanceof CredentialsProvider;
+    }
+
+    public PropertiesPanel createPanel(Application application) {
+        if (application == null) return new CustomizerUI();
+        else return new PropertiesUI(application);
     }
 
     public Setup getConnectionSetup(PropertiesPanel customizerPanel) {
-        if (!(customizerPanel instanceof Panel))
-            throw new IllegalArgumentException("Panel must be DefaultCustomizer.Panel"); // NOI18N
-        Panel panel = (Panel)customizerPanel;
+        if (!(customizerPanel instanceof CustomizerUI))
+            throw new IllegalArgumentException("Panel must be DefaultCustomizer.CustomizerUI"); // NOI18N
+        CustomizerUI panel = (CustomizerUI)customizerPanel;
 
         String connectionString = panel.getConnectionString();
         String displayName = panel.getDisplayName();
@@ -157,12 +173,12 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
      * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
-    public static class Panel extends PropertiesPanel {
+    public static class CustomizerUI extends PropertiesPanel {
 
         /**
-         * Creates new instance of DefaultPanel.
+         * Creates new instance of CustomizerUI.
          */
-        public Panel() {
+        public CustomizerUI() {
             initComponents();
             initDefaults();
             update();
@@ -235,8 +251,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
                     if (!displaynameCheckbox.isSelected()) {
                         internalChange = true;
-                        displaynameField.setText(
-                                (username.isEmpty() ? "" : username + "@") + url); // NOI18N
+                        displaynameField.setText((username == null || username.isEmpty() ?
+                            "" : username + "@") + url); // NOI18N
                         internalChange = false;
                     }
 
@@ -259,7 +275,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
             // connectionLabel
             connectionLabel = new JLabel();
-            Mnemonics.setLocalizedText(connectionLabel, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Connection")); // NOI18N
+            Mnemonics.setLocalizedText(connectionLabel, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Connection")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 0;
@@ -311,7 +328,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
             // displaynameCheckbox
             displaynameCheckbox = new JCheckBox();
-            Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Display_name")); // NOI18N
+            Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Display_name")); // NOI18N
             displaynameCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
@@ -352,7 +370,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
             // securityCheckbox
             securityCheckbox = new JCheckBox();
-            Mnemonics.setLocalizedText(securityCheckbox, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Use_security_credentials")); // NOI18N
+            Mnemonics.setLocalizedText(securityCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Use_security_credentials")); // NOI18N
             securityCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
@@ -369,7 +388,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
             // usernameLabel
             usernameLabel = new JLabel();
-            Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Username")); // NOI18N
+            Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Username")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 4;
@@ -406,7 +426,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
             // passwordLabel
             passwordLabel = new JLabel();
-            Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Password")); // NOI18N
+            Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Password")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 5;
@@ -443,7 +464,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
 
             // saveCheckbox
             saveCheckbox = new JCheckBox();   // NOI18N
-            Mnemonics.setLocalizedText(saveCheckbox, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Save_security_credentials")); // NOI18N
+            Mnemonics.setLocalizedText(saveCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Save_security_credentials")); // NOI18N
             saveCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
@@ -489,6 +511,197 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         private JLabel passwordLabel;
         private JPasswordField passwordField;
         private JCheckBox saveCheckbox;
+    }
+
+
+    /**
+     * Implementation of PropertiesPanel for viewing the JMX connection properties
+     * defined when creating the connection.
+     *
+     * @since VisualVM 1.2
+     * @author Jiri Sedlacek
+     */
+    public static class PropertiesUI extends PropertiesPanel {
+
+        /**
+         * Creates new instance of PropertiesUI to display properties of the
+         * provided Application.
+         *
+         * @param application Application for which to display the properties
+         */
+        public PropertiesUI(Application application) {
+            initComponents();
+            setValues(application);
+        }
+
+
+        private void setValues(Application application) {
+            JmxApplication app = (JmxApplication)application;
+            String connectionString = JmxApplicationProvider.getConnectionString(app);
+
+            Storage storage = application.getStorage();
+            CredentialsProvider provider = (CredentialsProvider)app.getEnvironmentProvider();
+            String username = provider.getUsername(storage);
+            boolean password = provider.hasPassword(storage);
+            boolean persistent = provider.isPersistent(storage);
+
+            connectionField.setText(connectionString);
+            securityCheckbox.setSelected(username != null || password);
+            usernameField.setText(username);
+            passwordField.setText(password ? "----------" : ""); // NOI18N
+            saveCheckbox.setSelected(persistent);
+
+        }
+
+        private void initComponents() {
+            setLayout(new GridBagLayout());
+            GridBagConstraints constraints;
+
+            Color checkboxForeground = UIManager.getColor("CheckBox.foreground"); // NOI18N
+            Color checkboxText = new Color(checkboxForeground.getRGB());
+
+            // connectionLabel
+            connectionLabel = new JLabel();
+            Mnemonics.setLocalizedText(connectionLabel, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Connection")); // NOI18N
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridwidth = 1;
+            constraints.fill = GridBagConstraints.NONE;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(0, 0, 3, 0);
+            add(connectionLabel, constraints);
+
+            // connectionField
+            connectionField = new JTextField();
+            connectionLabel.setLabelFor(connectionField);
+            connectionField.setEditable(false);
+            connectionField.setPreferredSize(
+                    new Dimension(250, connectionField.getPreferredSize().height));
+            constraints = new GridBagConstraints();
+            constraints.gridx = 1;
+            constraints.gridy = 0;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(0, 5, 3, 0);
+            add(connectionField, constraints);
+
+            // securityCheckbox
+            securityCheckbox = new JCheckBox();
+            Mnemonics.setLocalizedText(securityCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Use_security_credentials")); // NOI18N
+            securityCheckbox.setEnabled(false);
+            securityCheckbox.setOpaque(false);
+            securityCheckbox.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+            securityCheckbox.setForeground(checkboxText);
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 3;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.NONE;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(15, 0, 3, 0);
+            add(securityCheckbox, constraints);
+
+            // usernameLabel
+            usernameLabel = new JLabel();
+            Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Username")); // NOI18N
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 4;
+            constraints.gridwidth = 1;
+            constraints.fill = GridBagConstraints.NONE;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(3, 20, 3, 0);
+            add(usernameLabel, constraints);
+
+            // usernameField
+            usernameField = new JTextField();
+            usernameLabel.setLabelFor(usernameField);
+            usernameField.setEditable(false);
+            usernameField.setPreferredSize(
+                    new Dimension(320, usernameField.getPreferredSize().height));
+            constraints = new GridBagConstraints();
+            constraints.gridx = 1;
+            constraints.gridy = 4;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(3, 5, 3, 0);
+            add(usernameField, constraints);
+
+            // passwordLabel
+            passwordLabel = new JLabel();
+            Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Password")); // NOI18N
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 5;
+            constraints.gridwidth = 1;
+            constraints.fill = GridBagConstraints.NONE;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(3, 20, 3, 0);
+            add(passwordLabel, constraints);
+
+            // passwordField
+            passwordField = new JPasswordField();
+            passwordLabel.setLabelFor(passwordField);
+            passwordField.setEditable(false);
+            passwordField.setFocusable(false);
+            passwordField.setPreferredSize(
+                    new Dimension(200, passwordField.getPreferredSize().height));
+            constraints = new GridBagConstraints();
+            constraints.gridx = 1;
+            constraints.gridy = 5;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(3, 5, 3, 0);
+            add(passwordField, constraints);
+
+            // saveCheckbox
+            saveCheckbox = new JCheckBox();   // NOI18N
+            Mnemonics.setLocalizedText(saveCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Save_security_credentials")); // NOI18N
+            saveCheckbox.setEnabled(false);
+            saveCheckbox.setOpaque(false);
+            saveCheckbox.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 3));
+            saveCheckbox.setForeground(checkboxText);
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 6;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(3, 20, 3, 0);
+            add(saveCheckbox, constraints);
+
+            // spacer
+            JPanel spacer = Utils.createFillerPanel();
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 7;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.anchor = GridBagConstraints.NORTHWEST;
+            constraints.insets = new Insets(0, 0, 0, 0);
+            add(spacer, constraints);
+        }
+
+        private JLabel connectionLabel;
+        private JTextField connectionField;
+        private JCheckBox securityCheckbox;
+        private JLabel usernameLabel;
+        private JTextField usernameField;
+        private JLabel passwordLabel;
+        private JPasswordField passwordField;
+        private JCheckBox saveCheckbox;
+        
     }
 
 }

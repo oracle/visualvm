@@ -140,6 +140,10 @@ public class JmxApplicationProvider {
         return Host.UNKNOWN_HOST;
     }
 
+    public static String getConnectionString(JmxApplication application) {
+        return application.getStorage().getCustomProperty(PROPERTY_CONNECTION_STRING);
+    }
+
     public JmxApplication createJmxApplication(String connectionName, String displayName,
             EnvironmentProvider provider, boolean persistent) throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
@@ -381,6 +385,7 @@ public class JmxApplicationProvider {
                         String[] keys = new String[] {
                             PROPERTY_CONNECTION_STRING,
                             PROPERTY_HOSTNAME,
+                            DataSourceDescriptor.PROPERTY_NAME,
                             PROPERTY_ENV_PROVIDER_ID
                         };
 
@@ -389,7 +394,7 @@ public class JmxApplicationProvider {
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
                                     try {
-                                        String epid = values[2];
+                                        String epid = values[3];
                                         if (epid == null) {
                                             // Check for ver 1.0 which didn't support PROPERTY_ENVIRONMENT_PROVIDER
                                             String sv = storage.getCustomProperty(SNAPSHOT_VERSION);
@@ -398,7 +403,7 @@ public class JmxApplicationProvider {
                                         EnvironmentProvider ep = epid == null ? null :
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
-                                        addJmxApplication(false, null, values[0], null, values[1], ep, storage);
+                                        addJmxApplication(false, null, values[0], values[2], values[1], ep, storage);
                                     } catch (final JmxApplicationException e) {
                                         SwingUtilities.invokeLater(new Runnable() {
                                             public void run() {

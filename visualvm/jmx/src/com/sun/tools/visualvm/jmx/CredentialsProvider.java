@@ -73,6 +73,13 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     public String getId() {
         return CredentialsProvider.class.getName();
     }
+    
+    
+    abstract String getUsername(Storage storage);
+    
+    abstract boolean hasPassword(Storage storage);
+
+    abstract boolean isPersistent(Storage storage);
 
 
     /**
@@ -116,6 +123,14 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
             storage.setCustomProperty(PROPERTY_USERNAME, username);
             storage.setCustomProperty(PROPERTY_PASSWORD, new String(password));
         }
+        
+        
+        String getUsername(Storage storage) { return username; }
+    
+        boolean hasPassword(Storage storage) { return password != null &&
+                                               password.length > 0; }
+
+        boolean isPersistent(Storage storage) { return persistent; }
 
     }
 
@@ -140,6 +155,19 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
                 if (username != null) return username;
             }
             return super.getEnvironmentId(storage);
+        }
+
+
+        String getUsername(Storage storage) { return storage.getCustomProperty(
+                                                     PROPERTY_USERNAME); }
+
+        boolean hasPassword(Storage storage) {
+            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
+            return password != null && password.length() > 0;
+        }
+
+        boolean isPersistent(Storage storage) {
+            return getUsername(storage) != null || hasPassword(storage);
         }
 
     }

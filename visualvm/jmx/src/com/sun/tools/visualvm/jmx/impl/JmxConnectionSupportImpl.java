@@ -31,18 +31,16 @@ import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class JmxConnectionSupportImpl {
 
     private static final Map<String, EnvironmentProvider> providers =
             Collections.synchronizedMap(new HashMap());
 
-    private static final Set<JmxConnectionCustomizer> customizers =
-            Collections.synchronizedSet(new HashSet());
+    private static final Map<String, JmxConnectionCustomizer> customizers =
+            Collections.synchronizedMap(new HashMap());
 
     private static JmxConnectionCustomizer defaultCustomizer;
     private static boolean defaultHidden = false;
@@ -59,7 +57,7 @@ public final class JmxConnectionSupportImpl {
     }
 
     public static void unregisterProviderImpl(EnvironmentProvider provider) {
-        providers.remove(provider.getClass().getName());
+        providers.remove(provider.getId());
     }
 
     public static EnvironmentProvider getProvider(String providerId) {
@@ -70,24 +68,30 @@ public final class JmxConnectionSupportImpl {
     // --- JmxConnectionCustomizer stuff ---------------------------------------
 
     public static void registerCustomizer(JmxConnectionCustomizer customizer) {
+        String customizerId = customizer.getId();
+        if (customizers.containsKey(customizerId))
+            throw new UnsupportedOperationException("Customizer with id '" + customizerId + // NOI18N
+                                                    "' already registered"); // NOI18N
+        customizers.put(customizerId, customizer);
         defaultHidden = defaultHidden || customizer.hidesDefault();
-        customizers.add(customizer);
     }
 
     public static void unregisterCustomizer(JmxConnectionCustomizer customizer) {
-        customizers.remove(customizer);
+        customizers.remove(customizer.getId());
         if (customizer.hidesDefault()) updateDefaultHidden();
     }
 
+    public static JmxConnectionCustomizer getCustomizer(String customizerId) {
+        return customizers.get(customizerId);
+    }
 
-    static List<JmxConnectionCustomizer> getCustomizers() {
-        List<JmxConnectionCustomizer> list = new ArrayList(customizers);
+    public static List<JmxConnectionCustomizer> getCustomizers() {
+        List<JmxConnectionCustomizer> list = customizers();
         if (defaultHidden && defaultCustomizer != null)
             list.remove(defaultCustomizer);
         Collections.sort(list, Positionable.COMPARATOR);
         return list;
     }
-
 
     public static void setDefaultCustomizer(JmxConnectionCustomizer customizer) {
         if (defaultCustomizer != null)
@@ -96,15 +100,20 @@ public final class JmxConnectionSupportImpl {
     }
 
 
+    private static List<JmxConnectionCustomizer> customizers() {
+        List<JmxConnectionCustomizer> list = new ArrayList();
+        synchronized(customizers) { list.addAll(customizers.values()); }
+        return list;
+    }
+
     private static void updateDefaultHidden() {
         boolean newDefaultHidden = false;
-        synchronized(customizers) {
-            for (JmxConnectionCustomizer customizer : customizers)
-                if (customizer.hidesDefault()) {
-                    newDefaultHidden = true;
-                    break;
-                }
-        }
+        List<JmxConnectionCustomizer> list = customizers();
+        for (JmxConnectionCustomizer customizer : list)
+            if (customizer.hidesDefault()) {
+                newDefaultHidden = true;
+                break;
+            }
         defaultHidden = newDefaultHidden;
     }
 

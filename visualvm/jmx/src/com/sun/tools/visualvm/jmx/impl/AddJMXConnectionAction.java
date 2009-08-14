@@ -72,15 +72,21 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
     
     protected void actionPerformed(Host host, ActionEvent actionEvent) {
-        final JmxConnectionCustomizer.Setup setup = JmxConnectionConfigurator.getSetup();
+        final JmxConnectionConfigurator.Result result = JmxConnectionConfigurator.getResult();
+        final JmxConnectionCustomizer.Setup setup = result.getSetup();
         if (setup != null) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    JmxApplicationsSupport.getInstance().createJmxApplicationInteractive(
+                    JmxApplication application = (JmxApplication)JmxApplicationsSupport.
+                            getInstance().createJmxApplicationInteractive(
                             setup.getConnectionString(), setup.getDisplayName(),
                             setup.getEnvironmentProvider(), setup.isConnectionPersistent());
+                    if (application == null) result.cancelled();
+                    else result.accepted(application);
                 }
             });
+        } else {
+            result.cancelled();
         }
     }
     

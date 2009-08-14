@@ -70,13 +70,13 @@ import org.openide.util.NbBundle;
  */
 class JmxConnectionConfigurator extends JPanel {
 
-    static JmxConnectionCustomizer.Setup getSetup() {
+    static Result getResult() {
         JmxConnectionConfigurator configurator = instance();
         configurator.warmup();
 
         final DialogDescriptor dd = new DialogDescriptor(configurator,
                 NbBundle.getMessage(JmxConnectionConfigurator.class, "Title_Add_JMX_Connection"),   // NOI18N
-                true, new Object[]{ configurator.okButton, DialogDescriptor.CANCEL_OPTION},
+                true, new Object[] { configurator.okButton, DialogDescriptor.CANCEL_OPTION},
                 configurator.okButton, 0, null, null);
         dd.setAdditionalOptions(new Object[] { configurator.hintLabel });
         final Dialog d = ProfilerDialogs.createDialog(dd);
@@ -84,11 +84,10 @@ class JmxConnectionConfigurator extends JPanel {
         d.pack();
         d.setVisible(true);
 
-        JmxConnectionCustomizer.Setup setup =
-                dd.getValue() == configurator.okButton ? configurator.get() : null;
+        Result result = configurator.get(dd.getValue() == configurator.okButton);
         configurator.cleanup();
 
-        return setup;
+        return result;
     }
 
 
@@ -101,14 +100,14 @@ class JmxConnectionConfigurator extends JPanel {
 
     public void warmup() {
         // Resolve customizers
-        List<JmxConnectionCustomizer> customizers = JmxConnectionSupportImpl.getCustomizers();
+        customizers.addAll(JmxConnectionSupportImpl.getCustomizers());
         singleCustomizer = customizers.size() == 1;
 
         // Populate list, initialize panels
         JmxConnectionCustomizer itemToSelect = null;
         for (JmxConnectionCustomizer customizer : customizers) {
             connectionTypeListModel.addElement(customizer);
-            customizerPanels.add(customizer.createPanel());
+            customizerPanels.add(customizer.createPanel(null));
             if (customizer.toString().equals(lastSelectedItem))
                 itemToSelect = customizer;
         }
@@ -136,9 +135,11 @@ class JmxConnectionConfigurator extends JPanel {
         else initializePreferredSize();
     }
 
-    public JmxConnectionCustomizer.Setup get() {
-        return selectedCustomizer == null || displayedPanel == null ? null :
-            selectedCustomizer.getConnectionSetup(displayedPanel);
+    public Result get(boolean accepted) {
+        JmxConnectionCustomizer.Setup setup = null;
+        if (accepted && selectedCustomizer != null && displayedPanel != null)
+            setup = selectedCustomizer.getConnectionSetup(displayedPanel);
+        return new Result(setup, selectedCustomizer, customizers, customizerPanels);
     }
 
     public void cleanup() {
@@ -154,6 +155,7 @@ class JmxConnectionConfigurator extends JPanel {
         lastSize = customizerPanelScroll.getSize();
 
         // Clear state
+        customizers.clear();
         customizerPanels.clear();
         customizerPanel.removeAll();
         connectionTypeListModel.clear();
@@ -164,7 +166,7 @@ class JmxConnectionConfigurator extends JPanel {
         if (singleCustomizer) return;
         String title = NbBundle.getMessage(JmxConnectionConfigurator.class,
                 "Title_Add_JMX_Connection") + " - " + // NOI18N
-                selectedCustomizer.getCustomizerName();
+                selectedCustomizer.getPropertiesName();
         if (w instanceof Dialog) ((Dialog)w).setTitle(title);
         else if (w instanceof Frame) ((Frame)w).setTitle(title);
     }
@@ -198,7 +200,7 @@ class JmxConnectionConfigurator extends JPanel {
 
     private void updateHint() {
         String hintText = selectedCustomizer == null ? null :
-                          selectedCustomizer.getCustomizerDescription();
+                          selectedCustomizer.getPropertiesDescription();
         if (hintText != null && !singleCustomizer) {
             hintLabel.setIcon(INFO_ICON);
             hintLabel.setText(hintText);
@@ -272,7 +274,7 @@ class JmxConnectionConfigurator extends JPanel {
         connectionTypeList = new JList(connectionTypeListModel) {
             public String getToolTipText(MouseEvent evt) {
                 JmxConnectionCustomizer cust = getCustomizer(evt.getPoint());
-                return cust == null ? null : cust.getCustomizerDescription();
+                return cust == null ? null : cust.getPropertiesDescription();
             }
 
         };
@@ -332,6 +334,7 @@ class JmxConnectionConfigurator extends JPanel {
 
     private JmxConnectionCustomizer selectedCustomizer;
     private PropertiesPanel displayedPanel;
+    private List<JmxConnectionCustomizer> customizers = new ArrayList();
     private List<PropertiesPanel> customizerPanels = new ArrayList();
 
     private SelectionListener selectionListener = new SelectionListener();
@@ -352,5 +355,46 @@ class JmxConnectionConfigurator extends JPanel {
     private ScrollableContainer customizerPanelScroll;
 
     private static JmxConnectionConfigurator INSTANCE;
+
+
+    public static final class Result {
+
+        private final JmxConnectionCustomizer.Setup setup;
+        private final JmxConnectionCustomizer selectedCustomizer;
+        private final List<JmxConnectionCustomizer> customizers = new ArrayList();
+        private final List<PropertiesPanel> customizerPanels = new ArrayList();
+
+
+        public Result(JmxConnectionCustomizer.Setup setup,
+                      JmxConnectionCustomizer selectedCustomizer,
+                      List<JmxConnectionCustomizer> customizers,
+                      List<PropertiesPanel> customizerPanels) {
+            this.setup = setup;
+            this.selectedCustomizer = selectedCustomizer;
+            this.customizers.addAll(customizers);
+            this.customizerPanels.addAll(customizerPanels);
+        }
+
+
+        public JmxConnectionCustomizer.Setup getSetup() { return setup; }
+
+        public void accepted(JmxApplication application) {
+            for (int i = 0; i < customizers.size(); i++) {
+                JmxConnectionCustomizer c = customizers.get(i);
+                if (c == selectedCustomizer) {
+                    JmxPropertiesProvider.setCustomizer(application, selectedCustomizer);
+                    c.propertiesDefined(customizerPanels.get(i), application);
+                } else {
+                    customizers.get(i).propertiesCancelled(customizerPanels.get(i), null);
+                }
+            }
+        }
+
+        public void cancelled() {
+            for (int i = 0; i < customizers.size(); i++)
+                customizers.get(i).propertiesCancelled(customizerPanels.get(i), null);
+        }
+
+    }
 
 }
