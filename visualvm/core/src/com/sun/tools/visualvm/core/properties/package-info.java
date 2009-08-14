@@ -26,6 +26,14 @@
 /**
  * Support for user-customizable properties for DataSources.
  *
+ * The properties are meant to provide configuration info for DataSource setup
+ * like jstatd connections for a Host or JMX connection setup for JMX applications.
+ * <br><br>
+ * The main difference between properties and DataSourceView is that the properties
+ * define or display configuration of the DataSource whereas the DataSourceView
+ * displays state of the DataSource typically obtained using some kind of (more or
+ * less slow) connection to the DataSource.
+ *
  * @since VisualVM 1.2
  */
 package com.sun.tools.visualvm.core.properties;

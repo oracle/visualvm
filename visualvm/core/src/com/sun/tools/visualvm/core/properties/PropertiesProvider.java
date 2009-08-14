@@ -86,6 +86,7 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
      * method returns true for a given DataSource instance the createPanel(DataSource)
      * method for the same instance cannot return null.
      *
+     * @param dataSource DataSource for which to provide the properties (null means creating new DataSource)
      * @return true if this PropertiesProvider provides properties for given DataSource, false otherwise
      */
     public boolean supportsDataSource(X dataSource) { return true; }
