@@ -64,11 +64,10 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
         return instance;
     }
     
-        
     protected void actionPerformed(Application dataSource, ActionEvent actionEvent) {
         openNextSnapshot = (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0;
-            originalAction.performAction();
-        }
+        originalAction.performAction();
+    }
     
     protected boolean isEnabled(Application application) {
         return ProfilerSupport.getInstance().getProfiledApplication() == application && originalAction.isEnabled();
