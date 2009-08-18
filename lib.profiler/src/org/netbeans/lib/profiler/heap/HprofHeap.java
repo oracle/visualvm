@@ -661,6 +661,12 @@ class HprofHeap implements Heap {
 
                 if (DEBUG) {
                     System.out.println("Tag ROOT_JAVA_FRAME"); // NOI18N
+                    int threadSerial = dumpBuffer.getInt(position);
+                    position += 4;
+
+                    int frameNum = dumpBuffer.getInt(position);
+                    position += 4;
+                    System.out.println(" Thread serial " + threadSerial + " Frame num " + frameNum); // NOI18N
                 }
 
                 size = idSize + (2 * 4);
@@ -744,20 +750,21 @@ class HprofHeap implements Heap {
 
                     int instSize = dumpBuffer.getInt(position);
                     position += 4;
+                    offset[0] = position;
                     cpoolSize = readConstantPool(offset);
                     sfSize = readStaticFields(offset);
                     ifSize = readInstanceFields(offset);
-                    System.out.println("ClassId " + classId + " stack Serial " + stackSerial + " Super ID " + superId
-                                       + " ClassLoader ID " + classLoaderId + " signers " + signersId + " Protect Dom Id "
-                                       + protDomainId + " Size " + instSize); // NOI18N
-                    System.out.println(" Cpool " + cpoolSize + " Static fields " + sfSize + " Instance fileds " + ifSize); // NOI18N
+                    System.out.println("ClassId " + classId + " stack Serial " + stackSerial + " Super ID " + superId       // NOI18N
+                                       + " ClassLoader ID " + classLoaderId + " signers " + signersId + " Protect Dom Id "  // NOI18N
+                                       + protDomainId + " Size " + instSize);                                               // NOI18N
+                    System.out.println(" Cpool " + cpoolSize + " Static fields " + sfSize + " Instance fileds " + ifSize);  // NOI18N
                 } else {
                     offset[0] = position + constantSize;
                     cpoolSize = readConstantPool(offset);
                     sfSize = readStaticFields(offset);
                     ifSize = readInstanceFields(offset);
-                    size = constantSize + cpoolSize + sfSize + ifSize;
                 }
+                size = constantSize + cpoolSize + sfSize + ifSize;
 
                 break;
             }
@@ -813,8 +820,8 @@ class HprofHeap implements Heap {
 
                     for (int i = 0; i < elements; i++) {
                         dataSize += dumpBuffer.getIDSize();
-                        System.out.println("Instance ID " + dumpBuffer.getInt(position));
-                        position += 4; // NOI18N
+                        System.out.println("Instance ID " + dumpBuffer.getID(position));
+                        position += idSize; // NOI18N
                     }
                 } else {
                     elements = dumpBuffer.getInt(position + idSize + 4);
