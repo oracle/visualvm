@@ -222,10 +222,10 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         public void actionPerformed(ActionEvent e) {
             try {
                 executor.shutdown();
-                executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                 if ("cancel".equals(e.getActionCommand())) {
                     return;
                 }
+                executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                 CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime);
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                 if ("write".equals(e.getActionCommand())) {
