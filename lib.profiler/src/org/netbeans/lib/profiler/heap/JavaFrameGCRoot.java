@@ -40,57 +40,29 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
- *
+ * This represents one Java Frame GC root. It has kind ({@link GCRoot#JAVA_FRAME}) and also corresponding
+ * {@link Instance}, which is actual GC root and represends a local varibale held on the stack. 
  * @author Tomas Hurka
  */
-class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot {
-    
-    ThreadObjectHprofGCRoot(HprofHeap h, long offset) {
-        super(h,offset);
-    }
+public interface JavaFrameGCRoot extends GCRoot {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public StackTraceElement[] getStackTrace() {
-        int stackTraceSerialNumber = getStackTraceSerialNumber();
-        
-        if (stackTraceSerialNumber != 0) {
-            StackTrace stackTrace = heap.getStackTraceSegment().getStackTraceBySerialNumber(stackTraceSerialNumber);
-            if (stackTrace != null) {
-                StackFrame[] frames = stackTrace.getStackFrames();
-                StackTraceElement[] stackElements = new StackTraceElement[frames.length];
-
-                for (int i=0;i<frames.length;i++) {
-                    StackFrame f = frames[i];
-                    String className = f.getClassName();
-                    String method = f.getMethodName();
-                    String source = f.getSourceFile();
-                    int number = f.getLineNumber();
-
-                    if (number == StackFrame.NATIVE_METHOD) {
-                        number = -2;
-                    } else if (number == StackFrame.NO_LINE_INFO || number == StackFrame.UNKNOWN_LOCATION) {
-                        number = -1;
-                    }
-                    stackElements[i] = new StackTraceElement(className,method,source,number);
-                }
-                return stackElements;
-            }
-        }
-        return null;
-    }
+    /**
+     * returns Thread root GC object for the thread where this local variable is held.
+     * <br>
+     * speed:normal
+     * @return {@link ThreadObjectGCRoot} for the corresponding thread. 
+     */
+    ThreadObjectGCRoot getThreadGCRoot();
     
-    int getThreadSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
-    }
-
-    private int getStackTraceSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize() + 4);
-    }    
-
+    /**
+     * frame number in stack trace.
+     * <br>
+     * Speed:fast
+     * @return frame number in stack trace (-1 for empty)
+     */
+    int getFrameNumber();
 }

@@ -901,6 +901,8 @@ class HprofHeap implements Heap {
                     HprofGCRoot root;
                     if (rootTag == ROOT_THREAD_OBJECT) {
                         root = new ThreadObjectHprofGCRoot(this, start);                        
+                    } else if (rootTag == ROOT_JAVA_FRAME) {
+                        root = new JavaFrameHprofGCRoot(this, start);
                     } else {
                         root = new HprofGCRoot(this, start);
                     }

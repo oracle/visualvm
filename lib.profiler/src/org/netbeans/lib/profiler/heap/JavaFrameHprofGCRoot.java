@@ -40,57 +40,45 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.Iterator;
 
 /**
  *
  * @author Tomas Hurka
  */
-class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot {
+class JavaFrameHprofGCRoot extends HprofGCRoot implements JavaFrameGCRoot {
     
-    ThreadObjectHprofGCRoot(HprofHeap h, long offset) {
+    JavaFrameHprofGCRoot(HprofHeap h, long offset) {
         super(h,offset);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public StackTraceElement[] getStackTrace() {
-        int stackTraceSerialNumber = getStackTraceSerialNumber();
+
+    
+    private int getThreadSerialNumber() {
+        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
+    }
+
+    public int getFrameNumber() {
+        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize() + 4);
+    }    
+
+    public ThreadObjectGCRoot getThreadGCRoot() {
+        int serial = getThreadSerialNumber();
+        Iterator gcRootsIt = heap.getGCRoots().iterator();
         
-        if (stackTraceSerialNumber != 0) {
-            StackTrace stackTrace = heap.getStackTraceSegment().getStackTraceBySerialNumber(stackTraceSerialNumber);
-            if (stackTrace != null) {
-                StackFrame[] frames = stackTrace.getStackFrames();
-                StackTraceElement[] stackElements = new StackTraceElement[frames.length];
-
-                for (int i=0;i<frames.length;i++) {
-                    StackFrame f = frames[i];
-                    String className = f.getClassName();
-                    String method = f.getMethodName();
-                    String source = f.getSourceFile();
-                    int number = f.getLineNumber();
-
-                    if (number == StackFrame.NATIVE_METHOD) {
-                        number = -2;
-                    } else if (number == StackFrame.NO_LINE_INFO || number == StackFrame.UNKNOWN_LOCATION) {
-                        number = -1;
-                    }
-                    stackElements[i] = new StackTraceElement(className,method,source,number);
+        while(gcRootsIt.hasNext()) {
+            Object gcRoot = gcRootsIt.next();
+            
+            if (gcRoot instanceof ThreadObjectHprofGCRoot) {
+                ThreadObjectHprofGCRoot threadObjGC = (ThreadObjectHprofGCRoot) gcRoot;
+                if (serial == threadObjGC.getThreadSerialNumber()) {
+                    return threadObjGC;
                 }
-                return stackElements;
             }
         }
         return null;
     }
-    
-    int getThreadSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
-    }
-
-    private int getStackTraceSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize() + 4);
-    }    
 
 }
