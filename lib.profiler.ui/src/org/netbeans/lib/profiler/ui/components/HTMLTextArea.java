@@ -607,6 +607,8 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         value = value.replaceAll("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
 
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
+
+        setDocument(getEditorKit().createDefaultDocument()); // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5042872
         super.setText("<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + "pt; font-family: " + font.getName()
                       + ";\">" + value + "</body></html>"); //NOI18N
     }
