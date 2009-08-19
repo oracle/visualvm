@@ -498,7 +498,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                 }
             });
 
-            editorScroll.setPreferredSize(new Dimension(1, 200));
+            editorScroll.setPreferredSize(new Dimension(1, 220));
         }
 
     }
@@ -824,7 +824,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             savedTreeScroll.setPreferredSize(new Dimension(
                     openButton.getPreferredSize().width +
                     editButton.getPreferredSize().width +
-                    deleteButton.getPreferredSize().width + 75, 200));
+                    deleteButton.getPreferredSize().width + 90, 220));
         }
 
     }
