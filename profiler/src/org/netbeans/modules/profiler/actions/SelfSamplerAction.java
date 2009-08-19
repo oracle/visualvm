@@ -47,6 +47,7 @@ import java.awt.event.KeyEvent;
 import java.io.DataOutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +86,10 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     private static final String THREAD_NAME = NbBundle.getMessage(SelfSamplerAction.class, "SelfSamplerAction_ThreadName");
     private static final String DEBUG_ARG = "-Xdebug"; // NOI18N
     private static final Logger LOGGER = Logger.getLogger(SelfSamplerAction.class.getName());
-
+    private static final int SAMPLER_RATE = 10;
+    private static final double MAX_AVERAGE = SAMPLER_RATE * 3;
+    private static final double MAX_STDDEVIATION = SAMPLER_RATE * 4;
+    
     private final AtomicReference<Controller> RUNNING = new AtomicReference<Controller>();
     private Boolean runMode;
 
@@ -183,10 +187,13 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         private ThreadFactory threadFactory;
         private ScheduledExecutorService executor;
         private long startTime;
+        private long samples, laststamp;
+        private double max, min = Long.MAX_VALUE, sum, devSquaresSum;
 
         public Controller(String n) {
             name = n;
         }
+        
         /**
          * @return the builder
          */
@@ -203,6 +210,21 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
             return builder;
         }
 
+        private void updateStats(long timestamp) {
+            if (laststamp != 0) {
+                double diff = (timestamp - laststamp)/1000000.0;
+                samples++;
+                sum += diff;
+                devSquaresSum += (diff - SAMPLER_RATE)*(diff - SAMPLER_RATE);
+                if (diff > max) {
+                    max = diff;
+                } else if (diff < min) {
+                    min = diff;
+                }
+            }
+            laststamp = timestamp;
+        }
+
         public void run() {
             final StackTraceSnapshotBuilder b = getBuilder();
             final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
@@ -211,24 +233,45 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
             executor.scheduleAtFixedRate(new Runnable() {
                 public void run() {
                     try {
-                        b.addStacktrace(threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE), System.nanoTime());
+                        ThreadInfo[] infos = threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE);
+                        long timestamp = System.nanoTime();
+                        b.addStacktrace(infos, timestamp);
+                        updateStats(timestamp);
                     } catch (Throwable ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
-            }, 10, 10, TimeUnit.MILLISECONDS);
+            }, SAMPLER_RATE, SAMPLER_RATE, TimeUnit.MILLISECONDS);
         }
 
         public void actionPerformed(ActionEvent e) {
             try {
                 executor.shutdown();
-                if ("cancel".equals(e.getActionCommand())) {
+                if ("cancel".equals(e.getActionCommand())) {    // NOI18N
                     return;
+                }
+                double average = sum/samples;
+                double std_deviation = Math.sqrt(devSquaresSum/samples);
+                boolean writeCommand = "write".equals(e.getActionCommand());    // NOI18N
+                
+                if (writeCommand) {
+                    Object[] params = new Object[] {
+                            startTime,
+                            "Samples",samples,                 // NOI18N
+                            "Average",average,                 // NOI18N
+                            "Minimum",min,                     // NOI18N
+                            "Maximum",max,                     // NOI18N
+                            "Std. deviation",std_deviation     // NOI18N                      
+                    };
+                    Logger.getLogger("org.netbeans.ui.performance").log(Level.CONFIG, "Snapshot statistics", params);   // NOI18N
+                    if (average > MAX_AVERAGE || std_deviation > MAX_STDDEVIATION) { // do not take snapshot if the sampling was not regular enough 
+                        return;
+                    }
                 }
                 executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                 CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime);
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
-                if ("write".equals(e.getActionCommand())) {
+                if (writeCommand) {
                     DataOutputStream dos = (DataOutputStream)e.getSource();
                     loadedSnapshot.save(dos);
                     return;
