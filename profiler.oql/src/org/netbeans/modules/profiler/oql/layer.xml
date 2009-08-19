@@ -5,22 +5,28 @@
         <folder name="Config">
             <folder name="OQL">
                 <folder name="samples">
-                    <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samples"/>
+                    <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samplesName"/>
+                    <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samplesDescr"/>
+                    <attr name="position" intvalue="100"/>
                     <file name="AllFiles.oql" url="repository/resources/AllFiles.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#AllFiles.oql"/>
-                        <attr name="desc" stringvalue="Sample OQL query to list all instances of java.io.File allocated on the heap."/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#AllFiles.name"/>
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#AllFiles.desc"/>
+                        <attr name="position" intvalue="10"/>
                     </file>
                     <file name="OverallocatedStrings.oql" url="repository/resources/OverallocatedStrings.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStrings.oql"/>
-                        <attr name="desc" stringvalue="Computes overhead of Strings that have their backing char[] larger than necessary (for example result of String.substring())."/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStrings.name"/>
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStrings.desc"/>
+                        <attr name="position" intvalue="20"/>
                     </file>
                     <file name="OverallocatedStringsJS.oql" url="repository/resources/OverallocatedStringsJS.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.oql"/>
-                        <attr name="desc" stringvalue="Computes overhead of Strings that have their backing char[] larger than necessary (for example result of String.substring()). This time it uses JavaScript functions."/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.name"/>
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.desc"/>
+                        <attr name="position" intvalue="30"/>
                     </file>
                     <file name="TooManyBooleans.oql" url="repository/resources/TooManyBooleans.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#TooManyBooleans.oql"/>
-                        <attr name="desc" stringvalue="Checks if there are more than two instances of Boolean on the heap (only Boolean.TRUE and Boolean.FALSE are necessary)."/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#TooManyBooleans.name"/>
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#TooManyBooleans.desc"/>
+                        <attr name="position" intvalue="40"/>
                     </file>
                 </folder>
             </folder>

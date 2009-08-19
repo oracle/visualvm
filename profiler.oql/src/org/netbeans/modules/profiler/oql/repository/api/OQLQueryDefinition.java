@@ -46,9 +46,9 @@ import org.netbeans.api.annotations.common.NonNull;
  * @author Jaroslav Bachorik
  */
 final public class OQLQueryDefinition {
-    private String name;
-    private String description;
-    private String content;
+    private final String name;
+    private final String description;
+    private final String content;
 
     /**
      * The constructor taking all necessary information
@@ -56,7 +56,7 @@ final public class OQLQueryDefinition {
      * @param description The query description
      * @param content The query content
      */
-    public OQLQueryDefinition(@NonNull String name, @NonNull String description, @NonNull String content) {
+    public OQLQueryDefinition(@NonNull String name, String description, @NonNull String content) {
         this.name = name;
         this.description = description;
         this.content = content;
@@ -67,7 +67,6 @@ final public class OQLQueryDefinition {
         return content;
     }
 
-    @NonNull
     public String getDescription() {
         return description;
     }

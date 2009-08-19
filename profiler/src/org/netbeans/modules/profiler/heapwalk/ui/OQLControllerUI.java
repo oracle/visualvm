@@ -58,30 +58,32 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.JTitledPanel;
 import org.netbeans.modules.profiler.heapwalk.OQLController;
+import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.openide.awt.Mnemonics;
@@ -505,7 +507,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
         private OQLController.SavedController savedController;
 
-        private JList savedList;
+        private JTree savedTree;
+        private JScrollPane savedTreeScroll;
         private JButton openButton;
         private JButton editButton;
         private JButton deleteButton;
@@ -513,9 +516,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private JPanel contentsPanel;
         private JPanel loadingMsgPanel;
         private JPanel noQueriesMsgPanel;
-        private JScrollPane savedListScroll;
 
-        private DefaultListModel listModel;
+        private OQLSupport.OQLTreeModel treeModel;
 
         private boolean queriesLoaded = false;
 
@@ -528,17 +530,18 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
             this.savedController = savedController;
 
-            listModel = new DefaultListModel();
+            treeModel = OQLSupport.createModel();
 
             initComponents();
             refreshQueries();
 
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    OQLController.SavedController.loadData(listModel);
+                    OQLController.SavedController.loadData(treeModel);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             queriesLoaded = true;
+                            initializeQueries();
                             refreshQueries();
                         }
                     });
@@ -550,12 +553,12 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void saveQuery(final String query) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (OQLQueryCustomizer.saveQuery(query, listModel)) {
+                    if (OQLQueryCustomizer.saveQuery(query, treeModel, savedTree)) {
                         setVisible(true);
                         refreshQueries();
                         RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
-                                OQLController.SavedController.saveData(listModel);
+                                OQLController.SavedController.saveData(treeModel);
                             }
                         });
                     }
@@ -565,42 +568,61 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
 
         private void openQuery() {
-            OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
-            if (q != null)
-                savedController.getOQLController().getQueryController().setQuery(q.getScript());
+            TreePath[] selection = savedTree.getSelectionPaths();
+            if (supportsOpen(selection)) {
+                OQLSupport.OQLQueryNode node =
+                        (OQLSupport.OQLQueryNode)node(selection[0]);
+                savedController.getOQLController().getQueryController().
+                        setQuery(node.getUserObject().getScript());
+            }
         }
 
         private void editQuery() {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
-                    if (q != null) {
-                        if (OQLQueryCustomizer.editQuery(q, listModel, savedList)) {
-                            refreshDescription();
-                            RequestProcessor.getDefault().post(new Runnable() {
-                                public void run() {
-                                    OQLController.SavedController.saveData(listModel);
-                                }
-                            });
+            TreePath[] selection = savedTree.getSelectionPaths();
+            if (supportsProperties(selection)) {
+                OQLSupport.OQLNode node = node(selection[0]);
+                if (OQLQueryCustomizer.editNode(node, treeModel, savedTree)) {
+                    refreshDescription();
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            OQLController.SavedController.saveData(treeModel);
                         }
-                        editButton.requestFocus();
-                    }
+                    });
                 }
-            });
+                editButton.requestFocus();
+            }
         }
 
         private void deleteQueries() {
-            Object[] queries = savedList.getSelectedValues();
-            for (Object query : queries) listModel.removeElement(query);
-            refreshQueries();
-            savedList.requestFocus();
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    OQLController.SavedController.saveData(listModel);
-                }
-            });
+            TreePath[] selection = savedTree.getSelectionPaths();
+            if (supportsDelete(selection)) {
+                DefaultMutableTreeNode otherNode =
+                        node(savedTree.getLeadSelectionPath()).getPreviousSibling();
+                if (otherNode == null) otherNode =
+                        node(savedTree.getAnchorSelectionPath()).getNextSibling();
+                if (otherNode == null) otherNode = treeModel.customCategory();
+                for (TreePath path : selection)
+                    treeModel.removeNodeFromParent(node(path));
+                if (!treeModel.hasCustomCategories())
+                    treeModel.nodeStructureChanged(treeModel.customCategory());
+                savedTree.setSelectionPath(new TreePath(treeModel.getPathToRoot(otherNode)));
+                refreshQueries();
+                savedTree.requestFocus();
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        OQLController.SavedController.saveData(treeModel);
+                    }
+                });
+            }
         }
 
+
+        public void initializeQueries() {
+            savedTree.expandPath(new TreePath(treeModel.getPathToRoot(
+                    treeModel.customCategory())));
+            if (!treeModel.hasCustomCategories() && treeModel.hasDefinedCategories())
+                savedTree.expandRow(2);
+        }
 
         private void refreshQueries() {
             Component currentContents =
@@ -608,7 +630,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     getLayoutComponent(BorderLayout.CENTER);
 
             if (queriesLoaded) {
-                if (listModel.isEmpty()) {
+                OQLSupport.OQLNode node = (OQLSupport.OQLNode)treeModel.getRoot();
+                if (node.getChildCount() == 0) {
                     if (currentContents != noQueriesMsgPanel) {
                         if (currentContents != null) contentsPanel.remove(currentContents);
                         contentsPanel.add(noQueriesMsgPanel, BorderLayout.CENTER);
@@ -617,10 +640,10 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                         contentsPanel.repaint();
                     }
                 } else {
-                    if (currentContents != savedListScroll) {
+                    if (currentContents != savedTreeScroll) {
                         if (currentContents != null) contentsPanel.remove(currentContents);
-                        contentsPanel.add(savedListScroll, BorderLayout.CENTER);
-                        savedListScroll.invalidate();
+                        contentsPanel.add(savedTreeScroll, BorderLayout.CENTER);
+                        savedTreeScroll.invalidate();
                         contentsPanel.revalidate();
                         contentsPanel.repaint();
                     }
@@ -634,41 +657,74 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         }
 
         private void refreshButtons() {
-            int selectedCount = savedList.getSelectedValues().length;
-            openButton.setEnabled(selectedCount == 1);
-            editButton.setEnabled(selectedCount == 1);
-            deleteButton.setEnabled(selectedCount > 0);
+            TreePath[] selection = savedTree.getSelectionPaths();
+            openButton.setEnabled(supportsOpen(selection));
+            editButton.setEnabled(supportsProperties(selection));
+            deleteButton.setEnabled(supportsDelete(selection));
+        }
+
+        private static boolean supportsOpen(TreePath[] selection) {
+            if (selection == null || selection.length != 1) return false;
+            return node(selection[0]).supportsOpen();
+        }
+
+        private static boolean supportsProperties(TreePath[] selection) {
+            if (selection == null || selection.length != 1) return false;
+            return node(selection[0]).supportsProperties();
+        }
+
+        private static boolean supportsDelete(TreePath[] selection) {
+            if (selection == null || selection.length == 0) return false;
+            for (TreePath path : selection)
+                if (!node(path).supportsDelete())
+                    return false;
+            return true;
+        }
+
+        private static OQLSupport.OQLNode node(TreePath selection) {
+            return (OQLSupport.OQLNode)selection.getLastPathComponent();
         }
 
         private void refreshDescription() {
-            OQLController.Query q = (OQLController.Query)savedList.getSelectedValue();
-            if (q != null && q.getDescription() != null) {
-                descriptionArea.setText(q.getDescription());
+            TreePath[] selection = savedTree.getSelectionPaths();
+            String description = null;
+            boolean showDescr = selection != null && selection.length == 1;
+            if (showDescr) description = node(selection[0]).getDescription();
+            if (description != null) {
+                descriptionArea.setText(description);
                 descriptionArea.setVisible(true);
             } else {
                 descriptionArea.setVisible(false);
             }
+            
         }
 
 
         private void initComponents() {
             setLayout(new BorderLayout());
 
-            savedList = new JList(listModel);
-            savedList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            savedList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
+            savedTree = new JTree(treeModel);
+            savedTree.setRowHeight(savedTree.getRowHeight() + 2);
+            savedTree.setRootVisible(false);
+            savedTree.setShowsRootHandles(true);
+            DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+            renderer.setLeafIcon(null);
+            savedTree.setCellRenderer(renderer);
+            savedTree.addTreeSelectionListener(new TreeSelectionListener() {
+                public void valueChanged(TreeSelectionEvent e) {
                     refreshButtons();
                     refreshDescription();
                 }
             });
+            
 
-            savedListScroll = new JScrollPane(savedList,
+
+            savedTreeScroll = new JScrollPane(savedTree,
                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            savedListScroll.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
-                                            UIUtils.getProfilerResultsBackground()));
-            savedListScroll.setViewportBorder(BorderFactory.createEmptyBorder());
+            savedTreeScroll.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
+                                            savedTree.getBackground()));
+            savedTreeScroll.setViewportBorder(BorderFactory.createEmptyBorder());
 
             loadingMsgPanel = new JPanel(new BorderLayout());
             loadingMsgPanel.setOpaque(false);
@@ -708,12 +764,13 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
             JPanel controlPanel = new JPanel(new BorderLayout(5, 5));
             controlPanel.setBorder(BorderFactory.createMatteBorder(5, 0, 5, 5,
-                                        UIUtils.getProfilerResultsBackground()));
+                                        savedTree.getBackground()));
             controlPanel.setOpaque(false);
             controlPanel.add(editContainer, BorderLayout.WEST);
             controlPanel.add(openButton, BorderLayout.EAST);
 
             descriptionArea = new JTextArea();
+            descriptionArea.setOpaque(true);
             descriptionArea.setEnabled(false);
             descriptionArea.setLineWrap(true);
             descriptionArea.setWrapStyleWord(true);
@@ -721,7 +778,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             descriptionArea.setBackground(UIManager.getColor("ToolTip.background")); // NOI18N
             descriptionArea.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 5, 0, 5,
-                                        UIUtils.getProfilerResultsBackground()),
+                                        savedTree.getBackground()),
                     BorderFactory.createMatteBorder(5, 5, 5, 5,
                                         UIManager.getColor("ToolTip.background")))); // NOI18N
 
@@ -743,28 +800,28 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             refreshButtons();
             refreshDescription();
 
-            savedList.getInputMap().put(
+            savedTree.getInputMap().put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "OPEN_QUERY_ACTION"); // NOI18N
-            savedList.getActionMap().put("OPEN_QUERY_ACTION", new AbstractAction() {// NOI18N
+            savedTree.getActionMap().put("OPEN_QUERY_ACTION", new AbstractAction() {// NOI18N
                 public void actionPerformed(ActionEvent e) {
                     openQuery();
                 }
             });
-            savedList.getInputMap().put(
+            savedTree.getInputMap().put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_QUERY_ACTION"); // NOI18N
-            savedList.getActionMap().put("DELETE_QUERY_ACTION", new AbstractAction() {// NOI18N
+            savedTree.getActionMap().put("DELETE_QUERY_ACTION", new AbstractAction() {// NOI18N
                 public void actionPerformed(ActionEvent e) {
                     deleteQueries();
                 }
             });
-            savedList.addMouseListener(new MouseAdapter() {
+            savedTree.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
                         openQuery();
                 }
             });
 
-            savedListScroll.setPreferredSize(new Dimension(
+            savedTreeScroll.setPreferredSize(new Dimension(
                     openButton.getPreferredSize().width +
                     editButton.getPreferredSize().width +
                     deleteButton.getPreferredSize().width + 75, 200));

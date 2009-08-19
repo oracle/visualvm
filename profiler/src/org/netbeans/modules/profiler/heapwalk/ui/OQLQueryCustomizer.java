@@ -35,9 +35,11 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.text.MessageFormat;
+import java.util.Enumeration;
+import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -49,15 +51,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.heapwalk.OQLController;
+import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.awt.Mnemonics;
@@ -74,6 +77,8 @@ public class OQLQueryCustomizer {
     // I18N String constants
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(
             OQLQueryCustomizer.class, "OQLQueryCustomizer_OkButtonText"); // NOI18N
+    private static final String CLOSE_BUTTON_TEXT = NbBundle.getMessage(
+            OQLQueryCustomizer.class, "OQLQueryCustomizer_CloseButtonText"); // NOI18N
     private static final String SAVE_QUERY_CAPTION = NbBundle.getMessage(
             OQLQueryCustomizer.class, "OQLQueryCustomizer_SaveQueryCaption"); // NOI18N
     private static final String QUERY_PROPERTIES_CAPTION = NbBundle.getMessage(
@@ -106,11 +111,13 @@ public class OQLQueryCustomizer {
             "org/netbeans/modules/profiler/heapwalk/ui/resources/down.png", false); // NOI18N
 
 
-    public static boolean saveQuery(final String query, final DefaultListModel model) {
+    public static boolean saveQuery(final String query,
+                                    final OQLSupport.OQLTreeModel treeModel,
+                                    final JTree tree) {
         JButton okButton = new JButton();
         Mnemonics.setLocalizedText(okButton, OK_BUTTON_TEXT);
-        
-        CustomizerPanel customizer = new CustomizerPanel(okButton,  model);
+
+        CustomizerPanel customizer = new CustomizerPanel(okButton,  treeModel);
         final DialogDescriptor dd = new DialogDescriptor(customizer,
                                             SAVE_QUERY_CAPTION, true,
                                             new Object[] { okButton,
@@ -121,37 +128,45 @@ public class OQLQueryCustomizer {
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {
+            OQLSupport.OQLQueryNode node;
             if (customizer.isNewQuery()) {
-                model.addElement(new OQLController.Query(query,
+                OQLSupport.Query q = new OQLSupport.Query(query,
                                         customizer.getQueryName(),
-                                        customizer.getQueryDescription()));
+                                        customizer.getQueryDescription());
+                node = new OQLSupport.OQLQueryNode(q);
+                treeModel.customCategory().add(node);
+                treeModel.nodeStructureChanged(treeModel.customCategory());
             } else {
-                OQLController.Query selectedQuery =
-                        (OQLController.Query)customizer.getSelectedValue();
-                selectedQuery.setScript(query);
+                node = (OQLSupport.OQLQueryNode)customizer.getSelectedValue();
+                node.getUserObject().setScript(query);
+                treeModel.nodeChanged(node);
             }
+            tree.setSelectionPath(new TreePath(treeModel.getPathToRoot(node)));
             return true;
         } else {
             return false;
         }
-
     }
 
-    public static boolean editQuery(final OQLController.Query query,
-                                 final DefaultListModel lModel, final JList list) {
-        int originalQueryIndex = lModel.indexOf(query);
+    public static boolean editNode(final OQLSupport.OQLNode node,
+                                   final OQLSupport.OQLTreeModel treeModel,
+                                   final JTree tree) {
+
+        boolean readOnly = node.isReadOnly();
+        final OQLSupport.OQLNode parent = (OQLSupport.OQLNode)node.getParent();
+        int originalIndex = parent.getIndex(node);
 
         JButton okButton = new JButton();
         Mnemonics.setLocalizedText(okButton, OK_BUTTON_TEXT);
-        
+
         final JButton[] upDownButtons = new JButton[2];
         upDownButtons[0] = new JButton(ICON_UP) {
             protected void fireActionPerformed(ActionEvent e) {
-                int queryIndex = lModel.indexOf(query);
-                lModel.remove(queryIndex);
-                lModel.add(queryIndex - 1, query);
-                list.setSelectedValue(query, true);
-                updateButtons(upDownButtons, query, lModel);
+                int index = parent.getIndex(node) - 1;
+                treeModel.removeNodeFromParent(node);
+                treeModel.insertNodeInto(node, parent, index);
+                tree.setSelectionPath(new TreePath(treeModel.getPathToRoot(node)));
+                updateButtons(upDownButtons, node);
             }
         };
         upDownButtons[0].setToolTipText(UP_BUTTON_TOOLTIP);
@@ -159,11 +174,11 @@ public class OQLQueryCustomizer {
                                         setAccessibleName(UP_BUTTON_ACCESS_NAME);
         upDownButtons[1] = new JButton(ICON_DOWN) {
             protected void fireActionPerformed(ActionEvent e) {
-                int queryIndex = lModel.indexOf(query);
-                lModel.remove(queryIndex);
-                lModel.add(queryIndex + 1, query);
-                list.setSelectedValue(query, true);
-                updateButtons(upDownButtons, query, lModel);
+                int index = parent.getIndex(node) + 1;
+                treeModel.removeNodeFromParent(node);
+                treeModel.insertNodeInto(node, parent, index);
+                tree.setSelectionPath(new TreePath(treeModel.getPathToRoot(node)));
+                updateButtons(upDownButtons, node);
             }
         };
         upDownButtons[1].setToolTipText(DOWN_BUTTON_TOOLTIP);
@@ -171,8 +186,9 @@ public class OQLQueryCustomizer {
                                       setAccessibleName(DOWN_BUTTON_ACCESS_NAME);
 
         final CustomizerPanel customizer = new CustomizerPanel(okButton,
-                                                query.getName(),
-                                                query.getDescription());
+                                                node.toString(),
+                                                node.getDescription(),
+                                                readOnly);
 
         customizer.getInputMap(CustomizerPanel.WHEN_IN_FOCUSED_WINDOW).put(
             KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_MASK), "MOVE_UP"); // NOI18N
@@ -189,15 +205,20 @@ public class OQLQueryCustomizer {
             }
         });
 
+        JButton closeButton = readOnly ? new JButton() : null;
+        if (closeButton != null) Mnemonics.setLocalizedText(closeButton, CLOSE_BUTTON_TEXT);
+        Object[] options = readOnly ? new Object[] { closeButton } :
+                                      new Object[] { okButton,
+                                            DialogDescriptor.CANCEL_OPTION };
+        JButton defaultButton = readOnly ? closeButton : okButton;
 
         final DialogDescriptor dd = new DialogDescriptor(customizer,
-                                            QUERY_PROPERTIES_CAPTION, true,
-                                            new Object[] { okButton,
-                                            DialogDescriptor.CANCEL_OPTION },
-                                            okButton, 0, null, null);
+                                            MessageFormat.format(QUERY_PROPERTIES_CAPTION,
+                                            new Object[] { node.getCaption() }),
+                                            true, options, defaultButton, 0, null, null);
         dd.setAdditionalOptions(new Object[] { upDownButtons[0],
-                                                    upDownButtons[1] });
-        updateButtons(upDownButtons, query, lModel);
+                                               upDownButtons[1] });
+        updateButtons(upDownButtons, node);
 
         final Dialog d = ProfilerDialogs.createDialog(dd);
 
@@ -205,26 +226,31 @@ public class OQLQueryCustomizer {
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {
+            OQLSupport.Query query = (OQLSupport.Query)node.getUserObject();
             query.setName(customizer.getQueryName());
             query.setDescription(customizer.getQueryDescription());
-            lModel.setElementAt(query, lModel.indexOf(query)); // Updates UI
+            treeModel.nodeChanged(node); // Updates UI
             return true;
         } else {
-            int queryIndex = lModel.indexOf(query);
-            if (queryIndex != originalQueryIndex) {
-                lModel.remove(queryIndex);
-                lModel.add(originalQueryIndex, query);
-                list.setSelectedValue(query, true);
+            int index = parent.getIndex(node);
+            if (index != originalIndex) {
+                treeModel.removeNodeFromParent(node);
+                treeModel.insertNodeInto(node, parent, originalIndex);
+                tree.setSelectionPath(new TreePath(treeModel.getPathToRoot(node)));
             }
             return false;
         }
     }
 
-    private static void updateButtons(JButton[] upDownButtons, Object value,
-                                                        DefaultListModel model) {
-        int queryIndex = model.indexOf(value);
-        upDownButtons[0].setEnabled(queryIndex > 0);
-        upDownButtons[1].setEnabled(queryIndex < model.size() - 1);
+    private static void updateButtons(JButton[] upDownButtons,
+                                      OQLSupport.OQLNode node) {
+        if (node.isReadOnly()) {
+            upDownButtons[0].setEnabled(false);
+            upDownButtons[1].setEnabled(false);
+        } else {
+            upDownButtons[0].setEnabled(node.getPreviousSibling() != null);
+            upDownButtons[1].setEnabled(node.getNextSibling() != null);
+        }
     }
 
     private static class CustomizerPanel extends JPanel {
@@ -233,20 +259,23 @@ public class OQLQueryCustomizer {
         private Object lastSelectedValue;
 
 
-        public CustomizerPanel(JComponent submitComponent, ListModel existingModel) {
+        public CustomizerPanel(JComponent submitComponent,
+                               OQLSupport.OQLTreeModel treeModel) {
             this.submitComponent = submitComponent;
 
-            initComponents(existingModel);
+            initComponents(treeModel, false);
             updateComponents();
         }
 
-        public CustomizerPanel(JComponent submitComponent, String name, String description) {
+        public CustomizerPanel(JComponent submitComponent, String name,
+                               String description, boolean readOnly) {
             this.submitComponent = submitComponent;
 
-            initComponents(null);
+            initComponents(null, readOnly);
 
             nameField.setText(name);
             descriptionArea.setText(description == null ? "" : description); // NOI18N
+            try { descriptionArea.setCaretPosition(0); } catch (Exception e) {}
 
             updateComponents();
         }
@@ -300,8 +329,8 @@ public class OQLQueryCustomizer {
         }
 
 
-        private void initComponents(ListModel existingModel) {
-            final boolean allowExisting = existingModel != null && existingModel.getSize() != 0;
+        private void initComponents(OQLSupport.OQLTreeModel treeModel, boolean readOnly) {
+            final boolean allowExisting = treeModel != null && treeModel.hasCustomCategories();
 
             setLayout(new GridBagLayout());
             GridBagConstraints c;
@@ -367,6 +396,7 @@ public class OQLQueryCustomizer {
                 public void removeUpdate(DocumentEvent e) {  updateComponents(); }
                 public void changedUpdate(DocumentEvent e) {  updateComponents(); }
             });
+            nameField.setEditable(!readOnly);
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = 1;
@@ -404,6 +434,8 @@ public class OQLQueryCustomizer {
                     return allowExisting ? getPreferredSize() : super.getMinimumSize();
                 }
             };
+            descriptionArea.setEditable(!readOnly);
+            if (readOnly) descriptionArea.setBackground(nameField.getBackground());
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = 3;
@@ -465,7 +497,10 @@ public class OQLQueryCustomizer {
                 c.insets = new Insets(8, 40, 8, 8);
                 add(existingLabel, c);
 
-                existingList = new JList(existingModel);
+                Vector v = new Vector();
+                Enumeration e = treeModel.customCategory().children();
+                while (e.hasMoreElements()) v.add(e.nextElement());
+                existingList = new JList(v);
                 existingLabel.setLabelFor(existingList);
                 existingList.setVisibleRowCount(3);
                 existingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
