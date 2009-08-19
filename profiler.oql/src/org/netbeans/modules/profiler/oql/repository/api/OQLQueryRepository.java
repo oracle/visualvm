@@ -74,15 +74,19 @@ final public class OQLQueryRepository {
     private FileObject getRepositoryRoot() {
         FileObject root = FileUtil.getConfigFile("NBProfiler/Config/OQL"); // NOI18N
         if (root == null) {
-            throw new IllegalStateException("can not find OQL queries repository");
+            throw new IllegalStateException("can not find OQL queries repository"); // NOI18N
         }
         return root;
     }
 
     @NonNull
     private String getDisplayName(@NonNull FileObject fo) {
-        String dName = (String)fo.getAttribute("displayName");
+        String dName = (String)fo.getAttribute("displayName"); // NOI18N
         return dName != null ? dName : fo.getName();
+    }
+
+    private String getDescription(FileObject fo) {
+        return (String)fo.getAttribute("desc"); // NOI18N
     }
 
     @NonNull
@@ -90,16 +94,15 @@ final public class OQLQueryRepository {
         List<OQLQueryDefinition> defs = new ArrayList<OQLQueryDefinition>();
         try {
             Pattern p = Pattern.compile(pattern);
-            Enumeration<? extends FileObject> queries = categoryFO.getData(false);
-            while (queries.hasMoreElements()) {
-                FileObject query = queries.nextElement();
+            List<FileObject> queries = sortedFOs(categoryFO.getData(false));
+            for (FileObject query : queries) {
                 String displayName = getDisplayName(query);
                 if (p.matcher(displayName).matches()) {
-                    defs.add(new OQLQueryDefinition(displayName, (String) query.getAttribute("desc"), query.asText())); // NOI18N
+                    defs.add(new OQLQueryDefinition(displayName, getDescription(query), query.asText())); // NOI18N
                 }
             }
         } catch (IOException iOException) {
-            LOGGER.log(Level.SEVERE, "error while retrieving query definitions", iOException);
+            LOGGER.log(Level.SEVERE, "error while retrieving query definitions", iOException); // NOI18N
         }
         return defs;
     }
@@ -118,14 +121,15 @@ final public class OQLQueryRepository {
         FileObject root = getRepositoryRoot();
         Pattern p = Pattern.compile(pattern);
         List<OQLQueryCategory> catList = new ArrayList<OQLQueryCategory>();
-        Enumeration<? extends FileObject> categories = root.getFolders(false);
-        while (categories.hasMoreElements()) {
-            FileObject categoryFO = categories.nextElement();
+        List<FileObject> categories = sortedFOs(root.getFolders(false));
+        for (FileObject categoryFO : categories) {
             String displayName = getDisplayName(categoryFO);
             if(p.matcher(displayName).matches()) {
-                catList.add(new OQLQueryCategory(this, categoryFO.getName(), displayName));
+                catList.add(new OQLQueryCategory(this, categoryFO.getName(),
+                                                 displayName, getDescription(categoryFO)));
             }
         }
+        
         return catList;
     }
 
@@ -156,5 +160,11 @@ final public class OQLQueryRepository {
         FileObject catFO = root.getFileObject(category.getID());
 
         return getQueries(catFO, pattern);
+    }
+
+    private static List<FileObject> sortedFOs(Enumeration<? extends FileObject> fos) {
+        List<FileObject> list = new ArrayList();
+        while(fos.hasMoreElements()) list.add(fos.nextElement());
+        return FileUtil.getOrder(list, false);
     }
 }
