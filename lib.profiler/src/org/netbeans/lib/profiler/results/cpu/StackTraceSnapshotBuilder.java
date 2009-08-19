@@ -63,6 +63,7 @@ public class StackTraceSnapshotBuilder {
     private static final boolean COLLECT_TWO_TIMESTAMPS = true;
     private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
         new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]",null),
+        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]",null),
     });
 
     static class MethodInfo {

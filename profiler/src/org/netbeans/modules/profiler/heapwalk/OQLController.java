@@ -61,6 +61,7 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultTreeModel;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -477,13 +478,6 @@ public class OQLController extends AbstractTopLevelController
 
     public static class SavedController extends AbstractController {
 
-        private static final String SAVED_OQL_QUERIES_FILENAME = "oqlqueries"; // NOI18N
-        private static final String DEFAULT_FILE_SUFFIX = "-default"; // NOI18N
-        private static final String SNAPSHOT_VERSION = "oqlqueries_version_1"; // NOI18N
-        private static final String PROP_QUERY_NAME_KEY = "query-name"; // NOI18N
-        private static final String PROP_QUERY_DESCR_KEY = "query-descr"; // NOI18N
-        private static final String PROP_QUERY_SCRIPT_KEY = "query-script"; // NOI18N
-
         private OQLController oqlController;
 
 
@@ -501,102 +495,16 @@ public class OQLController extends AbstractTopLevelController
         }
 
 
-        public static void loadData(DefaultListModel model) {
-            try {
-                FileObject folder = IDEUtils.getSettingsFolder(false);
-
-                FileObject filtersFO = null;
-
-                if ((folder != null) && folder.isValid()) {
-                    filtersFO = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME, "xml"); // NOI18N
-                }
-
-                if (filtersFO == null) {
-                    OQLQueryRepository repository = OQLQueryRepository.getInstance();
-                    List<? extends OQLQueryDefinition> qDefs = repository.listQueries();
-                    Collections.sort(qDefs, new Comparator<OQLQueryDefinition>() {
-
-                        public int compare(OQLQueryDefinition o1, OQLQueryDefinition o2) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                    });
-                    for(OQLQueryDefinition qDef : qDefs) {
-                        model.addElement(new Query(qDef.getContent(), qDef.getName(), qDef.getDescription()));
-                    }
-                    return;
-//                    FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config"); // NOI18N
-//                    if (configFolder != null && configFolder.isValid()) {
-//                        filtersFO = configFolder.getFileObject(SAVED_OQL_QUERIES_FILENAME +
-//                                                                   DEFAULT_FILE_SUFFIX,"xml"); // NOI18N
-//                    }
-                }
-
-                if (filtersFO != null) {
-                    InputStream fis = filtersFO.getInputStream();
-                    BufferedInputStream bis = new BufferedInputStream(fis);
-                    Properties properties = new Properties();
-                    properties.loadFromXML(bis);
-                    bis.close();
-                    if (!properties.isEmpty()) propertiesToModel(properties, model);
-                }
-            } catch (Exception e) {
-                ProfilerLogger.log(e);
-            }
+        public static void loadData(OQLSupport.OQLTreeModel model) {
+            OQLSupport.loadModel(model);
         }
 
-        public static void saveData(DefaultListModel model) {
-            FileLock lock = null;
-
-            try {
-                FileObject folder = IDEUtils.getSettingsFolder(true);
-                FileObject fo = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME,
-                                                                "xml"); // NOI18N
-                if (fo == null) fo = folder.createData(SAVED_OQL_QUERIES_FILENAME,
-                                                                "xml"); // NOI18N
-
-                lock = fo.lock();
-
-                OutputStream os = fo.getOutputStream(lock);
-                BufferedOutputStream bos = new BufferedOutputStream(os);
-                Properties properties = modelToProperties(model);
-                properties.storeToXML(bos, SNAPSHOT_VERSION);
-                bos.close();
-            } catch (Exception e) {
-                ProfilerLogger.log(e);
-            } finally {
-                if (lock != null) lock.releaseLock();
-            }
+        public static void saveData(OQLSupport.OQLTreeModel model) {
+            OQLSupport.saveModel(model);
         }
 
 
-        private static void propertiesToModel(Properties properties,
-                                              DefaultListModel model) {
-            int i = -1;
-            while (properties.containsKey(PROP_QUERY_NAME_KEY + "-" + ++i)) { // NOI18N
-                String name =
-                    properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i).trim(); // NOI18N
-                String description =
-                    properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i, "").trim(); // NOI18N
-                String script =
-                    properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i, "").trim(); // NOI18N
-                if (name != null && script != null)
-                    model.addElement(new Query(script, name, description));
-            }
-        }
-
-        private static Properties modelToProperties(DefaultListModel model) {
-            Properties properties = new Properties();
-
-            for (int i = 0; i < model.size(); i++) {
-                Query q = (Query)model.get(i);
-                properties.put(PROP_QUERY_NAME_KEY + "-" + i, q.getName().trim()); // NOI18N
-                properties.put(PROP_QUERY_SCRIPT_KEY + "-" + i, q.getScript().trim()); // NOI18N
-                if (q.getDescription() != null)
-                    properties.put(PROP_QUERY_DESCR_KEY + "-" + i, q.getDescription().trim()); // NOI18N
-            }
-
-            return properties;
-        }
+        
         
 
         protected AbstractButton createControllerPresenter() {
@@ -606,72 +514,6 @@ public class OQLController extends AbstractTopLevelController
         protected JPanel createControllerUI() {
             JPanel ui = new OQLControllerUI.SavedUI(this);
             return ui;
-        }
-
-    }
-
-
-    // --- Query container -----------------------------------------------------
-
-    public static final class Query {
-
-        private String script;
-        private String name;
-        private String description;
-
-        public Query(String script) {
-            this(script, null);
-        }
-
-        public Query(String script, String name) {
-            this(script, name, null);
-        }
-
-        public Query(String script, String name, String description) {
-            setScript(script);
-            setName(name);
-            setDescription(description);
-        }
-
-        public void setScript(String script) {
-            if (script == null)
-                throw new IllegalArgumentException("Script cannot be null"); // NOI18N
-            this.script = script;
-        }
-        
-        public String getScript() {
-            return script;
-        }
-
-        public void setName(String name) {
-            this.name = normalizeString(name);
-            if (this.name == null)
-                throw new IllegalArgumentException("Name cannot be null"); // NOI18N
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setDescription(String description) {
-            this.description = normalizeString(description);
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String toString() {
-            return name;
-        }
-
-        private static String normalizeString(String string) {
-            String normalizedString = null;
-            if (string != null) {
-                normalizedString = string.trim();
-                if (normalizedString.length() == 0) normalizedString = null;
-            }
-            return normalizedString;
         }
 
     }
