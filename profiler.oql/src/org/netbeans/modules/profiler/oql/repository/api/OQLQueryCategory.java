@@ -49,19 +49,26 @@ import org.netbeans.api.annotations.common.NonNull;
  * @author Jaroslav Bachorik
  */
 final public class OQLQueryCategory {
-    private String id;
-    private String name;
-    private OQLQueryRepository repository;
+    private final String id;
+    private final String name;
+    private final String description;
+    private final OQLQueryRepository repository;
     
-    OQLQueryCategory(@NonNull OQLQueryRepository repository, @NonNull String id, @NonNull String name) {
+    OQLQueryCategory(@NonNull OQLQueryRepository repository, @NonNull String id,
+                     @NonNull String name, String description) {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.repository = repository;
     }
 
     @NonNull
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @NonNull
