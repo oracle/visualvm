@@ -330,7 +330,7 @@ public class OQLQueryCustomizer {
 
 
         private void initComponents(OQLSupport.OQLTreeModel treeModel, boolean readOnly) {
-            final boolean allowExisting = treeModel != null && treeModel.hasCustomCategories();
+            final boolean allowExisting = treeModel != null && treeModel.hasCustomQueries();
 
             setLayout(new GridBagLayout());
             GridBagConstraints c;

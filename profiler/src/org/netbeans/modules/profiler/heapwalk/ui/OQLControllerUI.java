@@ -603,7 +603,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                 if (otherNode == null) otherNode = treeModel.customCategory();
                 for (TreePath path : selection)
                     treeModel.removeNodeFromParent(node(path));
-                if (!treeModel.hasCustomCategories())
+                if (!treeModel.hasCustomQueries())
                     treeModel.nodeStructureChanged(treeModel.customCategory());
                 savedTree.setSelectionPath(new TreePath(treeModel.getPathToRoot(otherNode)));
                 refreshQueries();
@@ -620,7 +620,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         public void initializeQueries() {
             savedTree.expandPath(new TreePath(treeModel.getPathToRoot(
                     treeModel.customCategory())));
-            if (!treeModel.hasCustomCategories() && treeModel.hasDefinedCategories())
+            if (!treeModel.hasCustomQueries() && treeModel.hasDefinedCategories())
                 savedTree.expandRow(2);
         }
 
