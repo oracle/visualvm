@@ -85,7 +85,7 @@ class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot 
         return null;
     }
     
-    private int getThreadSerialNumber() {
+    int getThreadSerialNumber() {
         return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
     }
 
