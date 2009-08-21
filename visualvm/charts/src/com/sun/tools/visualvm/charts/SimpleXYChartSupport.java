@@ -29,6 +29,8 @@ import com.sun.tools.visualvm.charts.xy.SimpleXYChartUtils;
 import com.sun.tools.visualvm.charts.xy.XYPaintersModel;
 import com.sun.tools.visualvm.charts.xy.XYStorage;
 import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
@@ -40,6 +42,8 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
  * @author Jiri Sedlacek
  */
 public final class SimpleXYChartSupport {
+
+    private final static Logger LOGGER = Logger.getLogger(SimpleXYChartSupport.class.getName());
 
     // --- Public chart boundary constants -------------------------------------
 
@@ -102,7 +106,12 @@ public final class SimpleXYChartSupport {
         Runnable valuesUpdater = new Runnable() {
             public void run() {
                 storage.addValues(timestamp, values);
-                itemsModel.valuesAdded();
+                try {
+                    itemsModel.valuesAdded();
+                } catch (IllegalArgumentException e) {
+                    // ProfilerXYItemsModel: new timestamp T1 not greater than previous T0, skipping the values.
+                    LOGGER.log(Level.INFO, "Results not synchronized", e); // NOI18N
+                }
             }
         };
         if (SwingUtilities.isEventDispatchThread()) valuesUpdater.run();
