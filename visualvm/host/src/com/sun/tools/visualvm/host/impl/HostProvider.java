@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.host.impl;
 import com.sun.tools.visualvm.host.HostsSupport;
 import com.sun.tools.visualvm.host.RemoteHostsContainer;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.DataSourceContainer;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -44,6 +45,7 @@ import java.io.FilenameFilter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
@@ -69,23 +71,23 @@ import org.openide.windows.WindowManager;
 // A provider for Hosts
 public class HostProvider {
     private static final Logger LOGGER = Logger.getLogger(HostProvider.class.getName());
-    
+
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
-    
+
     private static final String LOCALHOST_PROPERTIES_FILENAME = "localhost" + Storage.DEFAULT_PROPERTIES_EXT; // NOI18N
-    
+
     private static final String PROPERTY_HOSTNAME = "prop_hostname";    // NOI18N
-    
+
     private static InetAddress localhostAddress2;
     private static Storage localhostStorage;
-    
+
     private Semaphore hostsLockedSemaphore = new Semaphore(1);
 
-    
+
     public Host createHost(final HostProperties hostDescriptor, final boolean createOnly, final boolean interactive) {
         try {
 
@@ -147,7 +149,7 @@ public class HostProvider {
                     Storage storage = new Storage(customPropertiesStorage.getParentFile(), customPropertiesStorage.getName());
                     storage.setCustomProperties(propNames, propValues);
 
-                    HostImpl newHost = null;
+                    Host newHost = null;
                     try {
                         newHost = new HostImpl(hostName, storage);
                     } catch (Exception e) {
@@ -155,9 +157,23 @@ public class HostProvider {
                     }
 
                     if (newHost != null) {
+                        DataSourceContainer remoteHosts = RemoteHostsContainer.sharedInstance().getRepository();
+                        Set<Host> remoteHostsSet = remoteHosts.getDataSources(Host.class);
+                        if (!createOnly && remoteHostsSet.contains(newHost)) {
+                            storage.deleteCustomPropertiesStorage();
+                            Iterator<Host> existingHosts = remoteHostsSet.iterator();
+                            while (existingHosts.hasNext()) {
+                                Host existingHost = existingHosts.next();
+                                if (existingHost.equals(newHost)) {
+                                    newHost = existingHost;
+                                    break;
+                                }
+                            }
+                        } else {
+                            remoteHosts.addDataSource(newHost);
+                        }
                         if (hostDescriptor.getPropertiesCustomizer() != null)
                             hostDescriptor.getPropertiesCustomizer().propertiesDefined(newHost);
-                        RemoteHostsContainer.sharedInstance().getRepository().addDataSource(newHost);
                     }
                     return newHost;
                 }
@@ -171,11 +187,11 @@ public class HostProvider {
             unlockHosts();
         }
     }
-    
+
     void removeHost(HostImpl host, boolean interactive) {
         try {
             lockHosts();
-        
+
             // TODO: if interactive, show a Do-Not-Show-Again confirmation dialog
             DataSource owner = host.getOwner();
             if (owner != null) owner.getRepository().removeDataSource(host);
@@ -186,7 +202,7 @@ public class HostProvider {
             unlockHosts();
         }
     }
-    
+
     public Host getHostByAddress(InetAddress inetAddress) {
         try {
             lockHosts();
@@ -210,7 +226,7 @@ public class HostProvider {
 
         return null;
     }
-    
+
     public Host createLocalHost() {
         try {
             Host localhost = new Host("localhost") {}; // NOI18N
@@ -227,7 +243,7 @@ public class HostProvider {
             return null;
         }
     }
-    
+
     public Host createUnknownHost() {
         try {
             return new Host("unknown", InetAddress.getByAddress(new byte[] { 0, 0, 0, 0 })) {}; // NOI18N
@@ -236,7 +252,7 @@ public class HostProvider {
             return null;
         }
     }
-    
+
     private void initLocalHost() {
         try {
             localhostAddress2 = InetAddress.getLocalHost();
@@ -249,7 +265,7 @@ public class HostProvider {
             DataSource.ROOT.getRepository().addDataSource(localhost);
         }
     }
-    
+
     private void initUnknownHost() {
         final Host unknownhost = Host.UNKNOWN_HOST;
         if (unknownhost != null) {
@@ -261,7 +277,7 @@ public class HostProvider {
             RemoteHostsContainer.sharedInstance().getRepository().addDataSource(unknownhost);
         }
     }
-    
+
     private void initPersistedHosts() {
         if (HostsSupport.storageDirectoryExists()) {
             File[] files = HostsSupport.getStorageDirectory().listFiles(new FilenameFilter() {
@@ -272,7 +288,7 @@ public class HostProvider {
 
             Set<File> unresolvedHostsF = new HashSet();
             Set<String> unresolvedHostsS = new HashSet();
-            
+
             Set<HostImpl> hosts = new HashSet();
             for (File file : files) {
                 if (LOCALHOST_PROPERTIES_FILENAME.equals(file.getName())) continue;
@@ -294,13 +310,13 @@ public class HostProvider {
                             persistedHost, storage);
                 }
             }
-            
+
             if (!unresolvedHostsF.isEmpty()) notifyUnresolvedHosts(unresolvedHostsF, unresolvedHostsS);
-            
-            RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);     
+
+            RemoteHostsContainer.sharedInstance().getRepository().addDataSources(hosts);
         }
     }
-    
+
     private static void notifyUnresolvedHosts(final Set<File> unresolvedHostsF, final Set<String> unresolvedHostsS) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -315,7 +331,7 @@ public class HostProvider {
                         null, NotifyDescriptor.YES_OPTION);
                 if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.NO_OPTION)
                     for (File file : unresolvedHostsF) Utils.delete(file, true);
-                
+
                 unresolvedHostsF.clear();
                 unresolvedHostsS.clear();
             }
@@ -334,8 +350,8 @@ public class HostProvider {
             }
         });
     }
-    
-    
+
+
     public void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
@@ -360,14 +376,14 @@ public class HostProvider {
         if (localhostStorage == null && storage.hasCustomProperties())
             storage.saveCustomPropertiesTo(new File(HostsSupport.getStorageDirectory(),
                                                     LOCALHOST_PROPERTIES_FILENAME));
-        
+
         // Persist other hosts
         Set<HostImpl> hosts = DataSourceRepository.sharedInstance().
                 getDataSources(HostImpl.class);
         for (HostImpl host : hosts)
             PropertiesSupport.sharedInstance().saveProperties(host, host.getStorage());
     }
-    
+
     public HostProvider() {
         try {
             lockHosts(); // Immediately lock the hosts, will be released after initialize()
