@@ -510,6 +510,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         treeTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         treeTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
         treeTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        treeTable.getTree().setRootVisible(false);
+        treeTable.getTree().setShowsRootHandles(true);
         treeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                  .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
         treeTable.getActionMap().put("DEFAULT_ACTION",

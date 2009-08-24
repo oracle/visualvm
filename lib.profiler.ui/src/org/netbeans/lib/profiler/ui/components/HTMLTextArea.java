@@ -595,9 +595,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     }
 
     public void setText(String value) {
-        if (value == null) {
-            return;
-        }
+        if (value == null) return;
 
         originalText = value;
 
@@ -607,17 +605,17 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         value = value.replaceAll("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
 
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
-        super.setText("<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + "pt; font-family: " + font.getName()
-                      + ";\">" + value + "</body></html>"); //NOI18N
+        String newText = "<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + //NOI18N
+                         "pt; font-family: " + font.getName() + ";\">" + value + "</body></html>"; //NOI18N
+
+        setDocument(getEditorKit().createDefaultDocument()); // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5042872
+        super.setText(newText);
     }
 
     public void deleteSelection() {
         try {
             getDocument().remove(getSelectionStart(), getSelectionEnd() - getSelectionStart());
-        } catch (Exception ex) {
-        }
-
-        ;
+        } catch (Exception ex) {}
     }
 
     public void hyperlinkUpdate(HyperlinkEvent e) {

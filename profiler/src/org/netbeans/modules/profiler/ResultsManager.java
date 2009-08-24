@@ -66,7 +66,6 @@ import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 import java.awt.*;
@@ -74,7 +73,6 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
-import org.openide.util.lookup.ServiceProvider;
 
 
 /** An manager for management/notifications about obtainer profiling results.
@@ -757,7 +755,6 @@ public final class ResultsManager {
             } catch (Exception e2) {
             }
 
-            ;
             NetBeansProfiler.getDefaultNB()
                             .displayError(MessageFormat.format(SNAPSHOT_SAVE_FAILED_MSG, new Object[] { e.getMessage() }));
 
@@ -774,7 +771,6 @@ public final class ResultsManager {
             } catch (Exception e2) {
             }
 
-            ;
             NetBeansProfiler.getDefaultNB().displayError(OUT_OF_MEMORY_SAVING);
 
             return false; // failure => we wont continue with firing the event
