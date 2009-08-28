@@ -90,7 +90,6 @@ public class MonitoredDataImpl extends MonitoredData {
     upTime = runtimeBean.getUptime();
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
     ThreadMXBean threadBean = jmxModel.getThreadMXBean();
-    OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
     MemoryUsage mem = jmxModel.getMemoryMXBean().getHeapMemoryUsage();
     MemoryPoolMXBean permBean = jmxSupport.getPermGenPool();
     unloadedClasses = classBean.getUnloadedClassCount();
