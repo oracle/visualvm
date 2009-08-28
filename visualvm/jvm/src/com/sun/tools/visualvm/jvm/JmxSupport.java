@@ -36,8 +36,6 @@ import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
@@ -53,12 +51,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.swing.Timer;
 import org.openide.ErrorManager;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -72,6 +70,7 @@ public class JmxSupport implements DataRemovedListener {
     private static final String PS_PERM_GEN = "PS Perm Gen";    // NOI18N
     private static final String CMS_PERM_GEN = "CMS Perm Gen";    // NOI18N
     private static final String IBM_PERM_GEN = "class storage";    // NOI18N
+    private static long INITIAL_DELAY = 100;
     private Application application;
     private JvmMXBeans mxbeans;
     private JVMImpl jvm;
@@ -316,28 +315,24 @@ public class JmxSupport implements DataRemovedListener {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
         final JvmMXBeans jmx = getJvmMXBeans();
         if (jmx != null) {
-            timer = new Timer(interval, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    RequestProcessor.getDefault().post(new Runnable() {
-                        public void run() {
-                            try {
-                                MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
-                                jvm.notifyListeners(data);
-                            } catch (UndeclaredThrowableException e) {
-                                LOGGER.throwing(JmxSupport.class.getName(), "MonitoredDataImpl<init>", e); // NOI18N
-                            }
-                        }
-                    });
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    try {
+                        MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
+                        jvm.notifyListeners(data);
+                    } catch (UndeclaredThrowableException e) {
+                        LOGGER.throwing(JmxSupport.class.getName(), "MonitoredDataImpl<init>", e); // NOI18N
+                    }
                 }
-            });
-            timer.setCoalesce(true);
-            timer.start();
+            };
+            timer = new Timer("JMX MonitoredData timer");       // NOI18N
+            timer.schedule(task,INITIAL_DELAY,interval);
         }
     }
 
     void disableTimer() {
         if (timer != null) {
-            timer.stop();
+            timer.cancel();
         }
     }
 
