@@ -48,8 +48,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
@@ -173,26 +171,29 @@ public class StackTraceSnapshotBuilder {
             }
         }
     };
-    final ReadWriteLock lock = new ReentrantReadWriteLock();
+    final Object lock = new Object();
     final Object stampLock = new Object();
     // @GuardedBy stampLock
     long currentDumpTimeStamp = -1L;
     final AtomicReference<Map<Long, java.lang.management.ThreadInfo>> lastStackTrace = new AtomicReference<Map<Long, java.lang.management.ThreadInfo>>(Collections.EMPTY_MAP);
     int stackTraceCount = 0;
+//    int builderBatchSize;
     final Set<String> ignoredThreadNames = new HashSet<String>();
     final Map<Long,Long> threadtimes = new HashMap();
     
     public StackTraceSnapshotBuilder() {
+        this(1);
+    }
+
+    public StackTraceSnapshotBuilder(int batchSize) {
+//        builderBatchSize = batchSize;
         ccgb.setMethodInfoMapper(mapper);
     }
 
     final public void setIgnoredThreads(Set<String> ignoredThreadNames) {
-        try {
-            lock.writeLock().lock();
+        synchronized (lock) {
             this.ignoredThreadNames.clear();
             this.ignoredThreadNames.addAll(ignoredThreadNames);
-        } finally {
-            lock.writeLock().unlock();
         }
     }
 
@@ -207,10 +208,12 @@ public class StackTraceSnapshotBuilder {
             currentDumpTimeStamp = dumpTimeStamp;
         }
 
-        try {
-            lock.writeLock().lock();
+        synchronized (lock) {
             Map<Long,java.lang.management.ThreadInfo> tinfoMap = new HashMap();
 
+//            if (stackTraceCount%builderBatchSize == 0) {
+//                ccgb.doBatchStart();
+//            }
             for (java.lang.management.ThreadInfo tinfo : threads) {
                 if (tinfo != null) {
                     tinfoMap.put(tinfo.getThreadId(),tinfo);
@@ -255,8 +258,9 @@ public class StackTraceSnapshotBuilder {
             lastStackTrace.set(tinfoMap);
 
             stackTraceCount++;
-        } finally {
-            lock.writeLock().unlock();
+//            if (stackTraceCount%builderBatchSize == 0) {
+//                ccgb.doBatchStop();
+//            }
         }
     }
 
@@ -396,7 +400,6 @@ public class StackTraceSnapshotBuilder {
             } else {
                 ccgb.methodExit(index, threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
             }
-
         }
     }
 
@@ -427,8 +430,7 @@ public class StackTraceSnapshotBuilder {
         String[] instrMethodNames;
         String[] instrMethodSigs;
         int miCount;
-        try {
-            lock.readLock().lock();
+        synchronized (lock) {
             miCount = methodInfos.size();
             instrMethodClasses = new String[methodInfos.size()];
             instrMethodNames = new String[methodInfos.size()];
@@ -441,26 +443,19 @@ public class StackTraceSnapshotBuilder {
                 instrMethodSigs[counter] = mi.signature;
                 counter++;
             }
-        } finally {
-            lock.readLock().unlock();
+            addStacktrace(new java.lang.management.ThreadInfo[0], currentDumpTimeStamp+1);
+            return new CPUResultsSnapshot(since, System.currentTimeMillis(), ccgb, ccgb.isCollectingTwoTimeStamps(), instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
         }
-
-        addStacktrace(new java.lang.management.ThreadInfo[0], currentDumpTimeStamp+1);
-
-        return new CPUResultsSnapshot(since, System.currentTimeMillis(), ccgb, ccgb.isCollectingTwoTimeStamps(), instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
     }
 
     public final void reset() {
-        try {
-            lock.writeLock().lock();
+        synchronized (lock) {
             ccgb.reset();
             methodInfos.clear();
             threadIds.clear();
             threadNames.clear();
             stackTraceCount = 0;
             lastStackTrace.set(Collections.EMPTY_MAP);
-        } finally {
-            lock.writeLock().unlock();
             synchronized(stampLock) {
                 currentDumpTimeStamp = -1L;
             }
