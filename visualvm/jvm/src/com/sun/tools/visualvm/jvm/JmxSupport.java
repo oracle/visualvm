@@ -325,7 +325,7 @@ public class JmxSupport implements DataRemovedListener {
                     }
                 }
             };
-            timer = new Timer("JMX MonitoredData timer");       // NOI18N
+            timer = new Timer("JMX MonitoredData timer for "+application.getId());       // NOI18N
             timer.schedule(task,INITIAL_DELAY,interval);
         }
     }
