@@ -127,26 +127,26 @@ class ApplicationMonitorView extends DataSourceView {
                          preferences.getMonitoredDataPoll();
 
         Application application = (Application)getDataSource();
-        final MasterViewSupport masterViewSupport = new MasterViewSupport(application, jvm, memoryMXBean, takeHeapDumpSupported);
+        final MasterViewSupport masterViewSupport = new MasterViewSupport(application, memoryMXBean, takeHeapDumpSupported);
         DataViewComponent dvc = new DataViewComponent(
                 masterViewSupport.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        final CpuViewSupport cpuViewSupport = new CpuViewSupport(application, jvm, chartCache, processors, cpuMonitoringSupported, gcMonitoringSupported);
+        final CpuViewSupport cpuViewSupport = new CpuViewSupport(chartCache, processors, cpuMonitoringSupported, gcMonitoringSupported);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Cpu"), true), DataViewComponent.TOP_LEFT);  // NOI18N
         dvc.addDetailsView(cpuViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
 
-        final HeapViewSupport heapViewSupport = new HeapViewSupport(jvm, chartCache, memoryMonitoringSupported);
-        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(jvm, chartCache, memoryMonitoringSupported);
+        final HeapViewSupport heapViewSupport = new HeapViewSupport(chartCache, memoryMonitoringSupported);
+        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(chartCache, memoryMonitoringSupported);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
         dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
-        final ClassesViewSupport classesViewSupport = new ClassesViewSupport(jvm, chartCache, classMonitoringSupported);
+        final ClassesViewSupport classesViewSupport = new ClassesViewSupport(chartCache, classMonitoringSupported);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Classes"), true), DataViewComponent.BOTTOM_LEFT);    // NOI18N
         dvc.addDetailsView(classesViewSupport.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
 
-        final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(jvm, chartCache, threadsMonitoringSupported);
+        final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(chartCache, threadsMonitoringSupported);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Threads"), true), DataViewComponent.BOTTOM_RIGHT);   // NOI18N
         dvc.addDetailsView(threadsViewSupport.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
 
@@ -182,15 +182,13 @@ class ApplicationMonitorView extends DataSourceView {
         private final boolean takeHeapDumpSupported;
         
         private Application application;
-        private Jvm jvm;
         private MemoryMXBean memoryMXBean;
         private HTMLTextArea area;
         private JButton gcButton;
         private JButton heapDumpButton;
         
-        public MasterViewSupport(Application application, Jvm jvm, MemoryMXBean memoryMXBean, boolean takeHeapDumpSupported) {
+        public MasterViewSupport(Application application, MemoryMXBean memoryMXBean, boolean takeHeapDumpSupported) {
             this.application = application;
-            this.jvm = jvm;
             this.memoryMXBean = memoryMXBean;
             this.takeHeapDumpSupported = takeHeapDumpSupported;
             initComponents();
@@ -320,8 +318,7 @@ class ApplicationMonitorView extends DataSourceView {
         private long lastProcessGcTime = -1;
 
 
-        public CpuViewSupport(Application app, Jvm jvm, int chartCache, int processors,
-                              boolean cpuMonitoringSupported, boolean gcMonitoringSupported) {
+        public CpuViewSupport(int chartCache, int processors, boolean cpuMonitoringSupported, boolean gcMonitoringSupported) {
             this.cpuMonitoringSupported = cpuMonitoringSupported;
             this.gcMonitoringSupported = gcMonitoringSupported;
             this.processors = processors;
@@ -417,7 +414,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public HeapViewSupport(Jvm jvm, int chartCache, boolean memoryMonitoringSupported) {
+        public HeapViewSupport(int chartCache, boolean memoryMonitoringSupported) {
             this.memoryMonitoringSupported = memoryMonitoringSupported;
             initModels(chartCache);
             initComponents();
@@ -479,7 +476,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public PermGenViewSupport(Jvm jvm, int chartCache, boolean memoryMonitoringSupported) {
+        public PermGenViewSupport(int chartCache, boolean memoryMonitoringSupported) {
             this.memoryMonitoringSupported = memoryMonitoringSupported;
             initModels(chartCache);
             initComponents();
@@ -542,7 +539,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public ClassesViewSupport(Jvm jvm, int chartCache, boolean classMonitoringSupported) {
+        public ClassesViewSupport(int chartCache, boolean classMonitoringSupported) {
             this.classMonitoringSupported = classMonitoringSupported;
             initModels(chartCache);
             initComponents();
@@ -608,7 +605,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public ThreadsViewSupport(Jvm jvm, int chartCache, boolean threadsMonitoringSupported) {
+        public ThreadsViewSupport(int chartCache, boolean threadsMonitoringSupported) {
             this.threadsMonitoringSupported = threadsMonitoringSupported;
             initModels(chartCache);
             initComponents();
