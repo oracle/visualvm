@@ -62,6 +62,8 @@ public class StackTraceSnapshotBuilder {
     private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
         new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]",null),
         new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]",null),
+        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]",null),
+        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]",null),
     });
 
     static class MethodInfo {
