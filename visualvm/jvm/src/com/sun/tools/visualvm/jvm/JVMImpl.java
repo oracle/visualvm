@@ -31,11 +31,13 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
@@ -390,6 +392,20 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     public boolean isCollectionTimeSupported() {
         Collection gcList = jmxSupport.getGarbageCollectorMXBeans();
         return gcList != null && !gcList.isEmpty();
+    }
+    
+    public MonitoredData getMonitoredData() {     
+        if (application.getState() == Stateful.STATE_AVAILABLE) {
+            if (monitoredVm != null) {
+                return new MonitoredDataImpl(this,jvmstatModel,jmxSupport);
+            } else if (jmxSupport != null) {
+                JvmMXBeans jmx = jmxSupport.getJvmMXBeans();
+                if (jmx != null) {
+                    return new MonitoredDataImpl(this,jmxSupport,jmx);
+                }
+            }
+        }
+        return null;
     }
     
     protected AttachModel getAttach() {

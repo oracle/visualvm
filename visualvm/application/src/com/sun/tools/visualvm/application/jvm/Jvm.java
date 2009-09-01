@@ -284,6 +284,8 @@ public abstract class Jvm extends Model {
      */
     public abstract File takeThreadDump() throws IOException;
     
+    public abstract MonitoredData getMonitoredData();
+    
     /**
      * Add a PropertyChangeListener to the listener list.
      * The listener is registered for all properties.
