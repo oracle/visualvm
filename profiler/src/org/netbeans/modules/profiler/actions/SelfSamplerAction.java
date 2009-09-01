@@ -51,8 +51,8 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -184,8 +184,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     private static final class Controller implements Runnable, ActionListener {
         private final String name;
         private StackTraceSnapshotBuilder builder;
-        private ThreadFactory threadFactory;
-        private ScheduledExecutorService executor;
+        private Timer timer;
         private long startTime;
         private long samples, laststamp;
         private double max, min = Long.MAX_VALUE, sum, devSquaresSum;
@@ -200,11 +199,6 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         private synchronized StackTraceSnapshotBuilder getBuilder() {
             if (builder == null) {
                 builder = new StackTraceSnapshotBuilder();
-                threadFactory = new ThreadFactory() {
-                    public Thread newThread(Runnable r) {
-                        return new Thread(r, name);
-                    }
-                };
                 builder.setIgnoredThreads(Collections.singleton(name));
             }
             return builder;
@@ -228,9 +222,9 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         public void run() {
             final StackTraceSnapshotBuilder b = getBuilder();
             final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-            executor = Executors.newSingleThreadScheduledExecutor(threadFactory);
             startTime = System.currentTimeMillis();
-            executor.scheduleAtFixedRate(new Runnable() {
+            timer = new Timer(name);
+            timer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
                     try {
                         ThreadInfo[] infos = threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE);
@@ -241,12 +235,12 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                         Exceptions.printStackTrace(ex);
                     }
                 }
-            }, SAMPLER_RATE, SAMPLER_RATE, TimeUnit.MILLISECONDS);
+            }, SAMPLER_RATE, SAMPLER_RATE);
         }
 
         public void actionPerformed(ActionEvent e) {
             try {
-                executor.shutdown();
+                timer.cancel();
                 if ("cancel".equals(e.getActionCommand())) {    // NOI18N
                     return;
                 }
@@ -268,7 +262,6 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
                         return;
                     }
                 }
-                executor.awaitTermination(100, TimeUnit.MILLISECONDS);
                 CPUResultsSnapshot snapshot = getBuilder().createSnapshot(startTime);
                 LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                 if (writeCommand) {
