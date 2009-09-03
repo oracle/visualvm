@@ -77,7 +77,7 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                 }
                 if (model == null) { // still not recognized, fallback to  JvmJvmstatModel_5
                     LOGGER.log(Level.WARNING, "Unrecognized java.vm.version " + vmVersion); // NOI18N
-                    model = model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                    model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
                 }
             }
             return model;
