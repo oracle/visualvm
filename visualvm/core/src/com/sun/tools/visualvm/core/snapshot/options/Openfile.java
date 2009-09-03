@@ -79,7 +79,6 @@ public final class Openfile extends OptionProcessor {
 
     private boolean openSnapshot(final File file, final List<SnapshotCategory> snapshots) {
         if (file.isFile()) {
-            String name = file.getName();
             for (SnapshotCategory s : snapshots) {
                 FileFilter filter = s.getFileFilter();
 

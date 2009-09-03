@@ -97,10 +97,7 @@ public class XYTooltipPainter extends JPanel {
         setLayout(new GridBagLayout());
         GridBagConstraints constraints;
 
-        float defaultFontSize;
-
         caption = new JLabel();
-        defaultFontSize = caption.getFont().getSize2D();
         caption.setFont(SimpleXYChartUtils.smallerFont(caption.getFont()));
         caption.setForeground(Color.WHITE);
         caption.setOpaque(false);
