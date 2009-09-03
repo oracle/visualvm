@@ -223,8 +223,10 @@ public class JmxApplicationProvider {
         if (storage != null) {
             if (newApp) {
                 storage.setCustomProperty(PROPERTY_HOSTNAME, host.getHostName());
-                storage.setCustomProperty(PROPERTY_ENV_PROVIDER_ID, provider.getId());
-                if (provider != null) provider.saveEnvironment(storage);
+                if (provider != null) {
+                    storage.setCustomProperty(PROPERTY_ENV_PROVIDER_ID, provider.getId());
+                    provider.saveEnvironment(storage);
+                }
             } else {
                 if (provider != null) provider.loadEnvironment(storage);
             }
