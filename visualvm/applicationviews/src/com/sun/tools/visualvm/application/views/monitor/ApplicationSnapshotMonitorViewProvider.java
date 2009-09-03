@@ -25,12 +25,7 @@
 
 package com.sun.tools.visualvm.application.views.monitor;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
@@ -39,31 +34,18 @@ import java.util.Set;
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationMonitorViewProvider extends PluggableDataSourceViewProvider<Application>{
+public class ApplicationSnapshotMonitorViewProvider extends PluggableDataSourceViewProvider<ApplicationSnapshot> {
     
-    protected boolean supportsViewFor(Application application) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-
-        Jvm jvm = JvmFactory.getJVMFor(application);
-        return jvm.isMonitoringSupported();
+    protected boolean supportsViewFor(ApplicationSnapshot snapshot) {
+        return snapshot.getStorage().getCustomProperty(ApplicationMonitorModel.SNAPSHOT_VERSION) != null;
     }
 
-    protected DataSourceView createView(Application application) {
-        return new ApplicationMonitorView(ApplicationMonitorModel.create(application, true));
+    protected DataSourceView createView(ApplicationSnapshot snapshot) {
+        return new ApplicationMonitorView(ApplicationMonitorModel.create(snapshot));
     }
     
     public Set<Integer> getPluggableLocations(DataSourceView view) {
         return ALL_LOCATIONS;
-    }
-
-    protected boolean supportsSaveViewFor(Application application, Class<? extends Snapshot> snapshotClass) {
-        return ApplicationSnapshot.class.isAssignableFrom(snapshotClass);
-    }
-
-    protected void saveView(Application application, Snapshot snapshot) {
-        ApplicationMonitorView view = (ApplicationMonitorView)getCachedView(application);
-        if (view != null) view.getModel().save(snapshot);
-        else ApplicationMonitorModel.create(application, false).save(snapshot);
     }
 
 }
