@@ -123,10 +123,6 @@ final class ApplicationOverviewModel {
     public String getSystemProperties() { return systemProperties; }
     
     
-    public boolean isInitialized() {
-        return initialized;
-    }
-    
     public synchronized void initialize() {
         if (initialized) return;
         initialized = true;
