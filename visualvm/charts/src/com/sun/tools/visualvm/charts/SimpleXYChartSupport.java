@@ -29,6 +29,9 @@ import com.sun.tools.visualvm.charts.xy.SimpleXYChartUtils;
 import com.sun.tools.visualvm.charts.xy.XYPaintersModel;
 import com.sun.tools.visualvm.charts.xy.XYStorage;
 import java.awt.Color;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -94,6 +97,34 @@ public final class SimpleXYChartSupport {
         return chartUI;
     }
 
+    /**
+     * Saves chart values into the provided OutputStream. This method should not
+     * be called in the Event Dispatch Thread.
+     *
+     * @param os OuptutStream into which to save the chart values
+     * @throws IOException if an I/O error occurs
+     */
+    public void saveValues(OutputStream os) throws IOException {
+        storage.saveValues(os);
+    }
+
+    /**
+     * Loads chart values from the provided InputStream. This method should not
+     * be called in the Event Dispatch Thread.
+     *
+     * @param is InputStram from which to load the chart values
+     * @throws IOException if an I/O error occurs
+     */
+    public void loadValues(InputStream is) throws IOException {
+        storage.loadValues(is);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                itemsModel.valuesAdded();
+                // Do not catch ProfilerXYItemsModel: new timestamp T1 not greater than previous T0, skipping the values.
+                // Should be synchronized since the originally saved model had to be synchronized
+            }
+        });
+    }
 
     /**
      * Adds a packet of values.

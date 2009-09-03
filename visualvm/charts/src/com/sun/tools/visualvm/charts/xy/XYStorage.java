@@ -25,6 +25,11 @@
 
 package com.sun.tools.visualvm.charts.xy;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
@@ -34,6 +39,9 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
  * @author Jiri Sedlacek
  */
 public class XYStorage implements Timeline {
+
+    private static final String SNAPSHOT_HEADER = "XYStorageSnapshot";
+    private static final int SNAPSHOT_VERSION = 1;
 
     public static final long NO_VALUE = Long.MIN_VALUE - 1;
 
@@ -54,7 +62,7 @@ public class XYStorage implements Timeline {
     }
 
 
-    public SynchronousXYItem addItem(String name, long minValue, long maxValue) {
+    public synchronized SynchronousXYItem addItem(String name, long minValue, long maxValue) {
         final int itemIndex = addItemImpl();
         return new XYItem(name, minValue, maxValue) {
             public long getYValue(int valueIndex) {
@@ -64,7 +72,7 @@ public class XYStorage implements Timeline {
     }
 
 
-    public void addValues(long timestamp, long[] values) {
+    public synchronized void addValues(long timestamp, long[] values) {
         updateStorage();
 
         setTimestamp(Math.min(valuesCount, valuesLimit - 1), timestamp);
@@ -72,6 +80,55 @@ public class XYStorage implements Timeline {
             setValue(i, Math.min(valuesCount, valuesLimit - 1), values[i]);
 
         if (valuesCount < valuesLimit) valuesCount++;
+    }
+
+    public synchronized void saveValues(OutputStream os) throws IOException {
+        DataOutputStream dos = null;
+        try {
+            int icount = values.length;
+            int vcount = getTimestampsCount();
+
+            dos = new DataOutputStream(os);
+
+            dos.writeUTF(SNAPSHOT_HEADER); // Snapshot format
+            dos.writeInt(SNAPSHOT_VERSION); // Snapshot version
+            dos.writeInt(icount); // Items count
+            dos.writeInt(vcount); // Values count
+
+            for (int vidx = 0; vidx < vcount; vidx++) {
+                dos.writeLong(getTimestamp(vidx));
+                for (int iidx = 0; iidx < icount; iidx++)
+                    dos.writeLong(getValue(iidx, vidx));
+            }
+        } finally {
+            if (dos != null) dos.close();
+        }
+    }
+
+    public synchronized void loadValues(InputStream is) throws IOException {
+        DataInputStream dis = null;
+        try {
+            dis = new DataInputStream(is);
+
+            if (!SNAPSHOT_HEADER.equals(dis.readUTF()))
+                throw new IOException("Unknown snapshot format"); // NOI18N
+            if (SNAPSHOT_VERSION != dis.readInt())
+                throw new IOException("Unsupported snapshot version"); // NOI18N
+            if (values.length != dis.readInt())
+                throw new IOException("Snapshot doesn't match number of items"); // NOI18N
+
+            int vcount = dis.readInt();
+            long[] vals = new long[values.length];
+            
+            for (int vidx = 0; vidx < vcount; vidx++) {
+                long timestamp = dis.readLong();
+                for (int iidx = 0; iidx < vals.length; iidx++)
+                    vals[iidx] = dis.readLong();
+                addValues(timestamp, vals);
+            }
+        } finally {
+            if (dis != null) dis.close();
+        }
     }
 
 
