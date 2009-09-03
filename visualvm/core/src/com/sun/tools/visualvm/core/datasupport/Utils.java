@@ -366,8 +366,8 @@ public final class Utils {
                         byte[] packet = new byte[COPY_PACKET_SIZE];
                         while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) zos.write(packet, 0, bytes);
                     } finally {
-                        if (zos != null) zos.closeEntry();
                         try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive entry stream", e); }  // NOI18N
+                        if (zos != null) zos.closeEntry();
                     }
                 } else {
                     // TODO: process directory
