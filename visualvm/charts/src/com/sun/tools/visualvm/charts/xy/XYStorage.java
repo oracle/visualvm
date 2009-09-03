@@ -40,7 +40,7 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
  */
 public class XYStorage implements Timeline {
 
-    private static final String SNAPSHOT_HEADER = "XYStorageSnapshot";
+    private static final String SNAPSHOT_HEADER = "XYStorageSnapshot"; // NOI18N
     private static final int SNAPSHOT_VERSION = 1;
 
     public static final long NO_VALUE = Long.MIN_VALUE - 1;
