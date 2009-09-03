@@ -148,7 +148,7 @@ public class MemorySettingsSupport {
     private void setDefaults() {
         livenessRadioButton.setSelected(true);
         stackTracesCheckBox.setSelected(false);
-        trackEverySpinner.setValue(new Integer(10));
+        trackEverySpinner.setValue(Integer.valueOf(10));
     }
     
     private JPanel getPanel() {
