@@ -450,10 +450,14 @@ final class ApplicationMonitorModel {
 
             if (live) {
                 monitoredDataListener = new MonitoredDataListener() {
+                    long lastTimestamp = -1;
                     public void monitoredDataEvent(final MonitoredData data) {
+                        long timestamp = System.currentTimeMillis();
+                        final long timestampF = lastTimestamp < timestamp ?
+                            lastTimestamp = timestamp : ++lastTimestamp;
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                updateValues(System.currentTimeMillis(), data);
+                                updateValues(timestampF, data);
                                 fireChange();
                             }
                         });
