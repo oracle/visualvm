@@ -66,7 +66,7 @@ import java.beans.PropertyChangeSupport;
                         String oldName = name;
                         name = createGenericName(application, type.getName());
                         PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
-                        if (pcs != null) pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
+                        pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
                     }
                 } else if (ApplicationType.PROPERTY_ICON.equals(propertyName)) {
                     setIcon((Image)evt.getNewValue());

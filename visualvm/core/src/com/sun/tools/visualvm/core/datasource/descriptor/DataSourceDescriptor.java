@@ -115,7 +115,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (ds == null) throw new NullPointerException("DataSource cannot be null");
         
         dataSource = ds;
-        changeSupport = dataSource != null ? new PropertyChangeSupport(dataSource) : null;
+        changeSupport = new PropertyChangeSupport(dataSource);
         name = n;
         description = desc;
         icon = ic;
@@ -153,7 +153,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         String oldName = name;
         name = newName;
         getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
-        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
+        getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
     }
 
     /**
@@ -203,7 +203,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param listener  The PropertyChangeListener to be added
      */
     public final void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(listener);
+        getChangeSupport().addPropertyChangeListener(listener);
     }
 
     /**
@@ -220,7 +220,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param listener  The PropertyChangeListener to be added
      */
     public final void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (getChangeSupport() != null) getChangeSupport().addPropertyChangeListener(propertyName, listener);
+        getChangeSupport().addPropertyChangeListener(propertyName, listener);
     }
 
     /**
@@ -235,7 +235,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param listener  The PropertyChangeListener to be removed
      */
     public final void removePropertyChangeListener(PropertyChangeListener listener) {
-        if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(listener);
+        getChangeSupport().removePropertyChangeListener(listener);
     }
 
     /**
@@ -252,7 +252,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param listener  The PropertyChangeListener to be removed
      */
     public final void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (getChangeSupport() != null) getChangeSupport().removePropertyChangeListener(propertyName, listener);
+        getChangeSupport().removePropertyChangeListener(propertyName, listener);
     }
     
     
@@ -264,26 +264,26 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (description == null && newDescription == null) return;
         String oldDescription = description;
         description = newDescription;
-        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, newDescription);
+        getChangeSupport().firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, newDescription);
     }
     
     protected void setIcon(Image newIcon) {
         if (icon == null && newIcon == null) return;
         Image oldIcon = icon;
         icon = newIcon;
-        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_ICON, oldIcon, newIcon);
+        getChangeSupport().firePropertyChange(PROPERTY_ICON, oldIcon, newIcon);
     }
     
     protected void setPreferredPosition(int newPosition) {
         int oldPosition = preferredPosition;
         preferredPosition = newPosition;
-        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
+        getChangeSupport().firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
     }
     
     protected void getAutoExpansionPolicy(int newPolicy) {
         int oldPolicy = autoExpansionPolicy;
         autoExpansionPolicy = newPolicy;
-        if (getChangeSupport() != null) getChangeSupport().firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, newPolicy);
+        getChangeSupport().firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, newPolicy);
     }
     
     protected final PropertyChangeSupport getChangeSupport() {
