@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorViewPr
 import com.sun.tools.visualvm.application.views.monitor.ApplicationSnapshotMonitorViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider;
 import com.sun.tools.visualvm.application.views.overview.ApplicationSnapshotOverviewViewProvider;
+import com.sun.tools.visualvm.application.views.threads.ApplicationSnapshotThreadsViewProvider;
 import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsViewProvider;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
@@ -50,6 +51,7 @@ public final class ApplicationViewsSupport {
     private ApplicationOverviewViewProvider overviewPluggableView = new ApplicationOverviewViewProvider();
     private ApplicationSnapshotMonitorViewProvider applicationSnapshotMonitorView = new ApplicationSnapshotMonitorViewProvider();
     private ApplicationMonitorViewProvider monitorPluggableView = new ApplicationMonitorViewProvider();
+    private ApplicationSnapshotThreadsViewProvider applicationSnapshotThreadsView = new ApplicationSnapshotThreadsViewProvider();
     private ApplicationThreadsViewProvider threadsPluggableView = new ApplicationThreadsViewProvider();
     
     
@@ -108,6 +110,15 @@ public final class ApplicationViewsSupport {
     public PluggableDataSourceViewProvider getThreadsView() {
         return threadsPluggableView;
     }
+
+    /**
+     * Returns PluggableDataSourceViewProvider for Threads application snapshot subtab.
+     *
+     * @return PluggableDataSourceViewProvider for Threads application snapshot subtab.
+     */
+    public PluggableDataSourceViewProvider<ApplicationSnapshot> getSnapshotThreadsView() {
+        return applicationSnapshotThreadsView;
+    }
     
     
     private ApplicationViewsSupport() {
@@ -116,6 +127,7 @@ public final class ApplicationViewsSupport {
         DataSourceViewsManager.sharedInstance().addViewProvider(monitorPluggableView, Application.class);
         DataSourceViewsManager.sharedInstance().addViewProvider(applicationSnapshotMonitorView, ApplicationSnapshot.class);
         DataSourceViewsManager.sharedInstance().addViewProvider(threadsPluggableView, Application.class);
+        DataSourceViewsManager.sharedInstance().addViewProvider(applicationSnapshotThreadsView, ApplicationSnapshot.class);
     }
     
 }

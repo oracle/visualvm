@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -68,32 +69,43 @@ import org.openide.util.WeakListeners;
 class ApplicationThreadsView extends DataSourceView implements DataRemovedListener<Application> {
 
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";  // NOI18N
-    private Jvm jvm;
     private JvmMXBeans mxbeans;
-    private ThreadMXBeanDataManager threadsManager;
+    private VisualVMThreadsDataManager threadsManager;
     private MBeanCacheListener listener;
 
-    ApplicationThreadsView(Application application) {
-        super(application, NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
+    private boolean takeThreadDumpSupported;
+
+    ApplicationThreadsView(DataSource dataSource) {
+        super(dataSource, NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
     }
 
     @Override
     protected void willBeAdded() {
-        Application application = (Application) getDataSource();
-        jvm = JvmFactory.getJVMFor(application);
-        threadsManager = null;
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-            mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel, GlobalPreferences.sharedInstance().getThreadsPoll() * 1000);
-            if (mxbeans != null) {
-                threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+        DataSource ds = getDataSource();
+        if (ds instanceof Application) {
+            Application application = (Application)ds;
+            Jvm jvm = JvmFactory.getJVMFor(application);
+            takeThreadDumpSupported = jvm == null ? false : jvm.isTakeThreadDumpSupported();
+            threadsManager = null;
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+            if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+                mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel, GlobalPreferences.sharedInstance().getThreadsPoll() * 1000);
+                if (mxbeans != null) {
+                    threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+                }
             }
+        } else {
+            threadsManager = PersistenceSupport.loadDataManager(ds.getStorage());
         }
     }
 
     @Override
     protected synchronized void removed() {
         cleanup();
+    }
+
+    VisualVMThreadsDataManager getDataManager() {
+        return threadsManager;
     }
 
     public synchronized void dataRemoved(Application dataSource) {
@@ -108,23 +120,25 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
     }
 
     protected DataViewComponent createComponent() {
-        final Application application = (Application) getDataSource();
+        DataSource ds = getDataSource();
+        final Application application = ds instanceof Application ?
+            (Application)ds : null;
         final MasterViewSupport mvs =
-                new MasterViewSupport(application, jvm, threadsManager);
+                new MasterViewSupport(ds, takeThreadDumpSupported, threadsManager);
         if (mxbeans != null) {
             listener = new MBeanCacheListener() {
                 public void flushed() {
                     if (application.getState() != Stateful.STATE_AVAILABLE) {
                         cleanup();
                     } else {
-                        threadsManager.refreshThreads();
+                        ((ThreadMXBeanDataManager)threadsManager).refreshThreadsAsync();
                         mvs.updateThreadsCounts(threadsManager);
                     }
                 }
             };
             mxbeans.addMBeanCacheListener(listener);
         }
-        application.notifyWhenRemoved(this);
+        if (application != null) application.notifyWhenRemoved(this);
 
         final DataViewComponent dvc = new DataViewComponent(mvs.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
 
@@ -162,9 +176,11 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         private static final String LIVE_THRADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Live_threads");    // NOI18N
         private static final String DAEMON_THREADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Daemon_threads");   // NOI18N
 
-        MasterViewSupport(Application app, Jvm jvm, ThreadMXBeanDataManager threadsManager) {
-            application = app;
-            initComponents(app, jvm, threadsManager);
+        MasterViewSupport(DataSource dataSource, boolean takeThreadDumpSupported,
+                          VisualVMThreadsDataManager threadsManager) {
+            if (dataSource instanceof Application) application = (Application)dataSource;
+            initComponents(takeThreadDumpSupported);
+            updateThreadsCounts(threadsManager);
         }
 
         DataViewComponent.MasterView getMasterView() {
@@ -183,13 +199,12 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             dataRemoved(application);
         }
 
-        private void initComponents(final Application application, Jvm jvm, final ThreadMXBeanDataManager threadsManager) {
+        private void initComponents(boolean takeThreadDumpSupported) {
             setLayout(new BorderLayout());
             setOpaque(false);
 
             area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            updateThreadsCounts(threadsManager);
 
             add(area, BorderLayout.CENTER);
 
@@ -198,7 +213,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                     ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
                 }
             });
-            threadDumpButton.setEnabled(jvm.isTakeThreadDumpSupported());
+            threadDumpButton.setEnabled(takeThreadDumpSupported);
 
             JPanel buttonsArea = new JPanel(new BorderLayout());
             buttonsArea.setOpaque(false);
@@ -210,11 +225,14 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
             add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
 
-            application.notifyWhenRemoved(this);
-            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this,application));
+            if (application != null) {
+                application.notifyWhenRemoved(this);
+                application.addPropertyChangeListener(Stateful.PROPERTY_STATE,
+                        WeakListeners.propertyChange(this, application));
+            }
         }
 
-        private void updateThreadsCounts(final ThreadMXBeanDataManager threadsManager) {
+        void updateThreadsCounts(final VisualVMThreadsDataManager threadsManager) {
 
             final int[] threads = new int[2];
 
@@ -230,17 +248,21 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                 }
                 @Override
                 protected void done() {
-                    StringBuilder data = new StringBuilder();
-
-                    data.append("<b>"+LIVE_THRADS+":</b> " + threads[0] + "<br>");  // NOI18N
-                    data.append("<b>"+DAEMON_THREADS+":</b> " + threads[1] + "<br>");   // NOI18N
-
-                    int selStart = area.getSelectionStart();
-                    int selEnd = area.getSelectionEnd();
-                    area.setText(data.toString());
-                    area.select(selStart, selEnd);
+                    updateThreadsCounts(threads[0], threads[1]);
                 }
             }.execute();
+        }
+
+        private void updateThreadsCounts(int liveThreads, int daemonThreads) {
+            StringBuilder data = new StringBuilder();
+
+            data.append("<b>" + LIVE_THRADS + ":</b> " + liveThreads + "<br>");  // NOI18N
+            data.append("<b>" + DAEMON_THREADS + ":</b> " + daemonThreads + "<br>");   // NOI18N
+
+            int selStart = area.getSelectionStart();
+            int selEnd = area.getSelectionEnd();
+            area.setText(data.toString());
+            area.select(selStart, selEnd);
         }
     }
 
@@ -248,7 +270,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static class TimelineViewSupport extends JPanel {
 
-        TimelineViewSupport(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
+        TimelineViewSupport(VisualVMThreadsDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
             initComponents(threadsManager, callback);
         }
 
@@ -256,7 +278,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Timeline"), null, 10, this, null);  // NOI18N
         }
 
-        private void initComponents(ThreadMXBeanDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
+        private void initComponents(VisualVMThreadsDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
             setLayout(new BorderLayout());
             setOpaque(false);
 
@@ -271,7 +293,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static class TableViewSupport extends JPanel {
 
-        TableViewSupport(ThreadMXBeanDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
+        TableViewSupport(VisualVMThreadsDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
             initComponents(threadsManager, callback);
         }
 
@@ -279,7 +301,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Table"), null, 20, this, null);  // NOI18N
         }
 
-        private void initComponents(ThreadMXBeanDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
+        private void initComponents(VisualVMThreadsDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
             setLayout(new BorderLayout());
             setOpaque(false);
 
@@ -303,7 +325,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private ThreadsDetailsPanel threadsDetailsPanel;
 
-        DetailsViewSupport(ThreadMXBeanDataManager threadsManager) {
+        DetailsViewSupport(VisualVMThreadsDataManager threadsManager) {
             initComponents(threadsManager);
         }
 
@@ -315,7 +337,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             threadsDetailsPanel.showDetails(indexes);
         }
 
-        private void initComponents(ThreadMXBeanDataManager threadsManager) {
+        private void initComponents(VisualVMThreadsDataManager threadsManager) {
             setLayout(new BorderLayout());
             setOpaque(false);
             

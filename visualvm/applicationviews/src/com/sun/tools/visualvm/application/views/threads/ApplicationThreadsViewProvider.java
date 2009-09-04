@@ -26,13 +26,16 @@
 package com.sun.tools.visualvm.application.views.threads;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
+import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.Set;
 
 /**
@@ -43,13 +46,7 @@ public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvi
 
     protected boolean supportsViewFor(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-            return mxbeans == null ? false : (mxbeans.getThreadMXBean() != null);
-        }
-        return false;
+        return resolveThreads(application) != null;
     }
 
     protected DataSourceView createView(Application application) {
@@ -58,6 +55,37 @@ public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvi
     
     public Set<Integer> getPluggableLocations(DataSourceView view) {
         return ALL_LOCATIONS;
+    }
+
+    protected boolean supportsSaveViewFor(Application application, Class<? extends Snapshot> snapshotClass) {
+        return ApplicationSnapshot.class.isAssignableFrom(snapshotClass);
+    }
+
+    protected void saveView(Application application, Snapshot snapshot) {
+        VisualVMThreadsDataManager tmanager = null;
+        ApplicationThreadsView view = (ApplicationThreadsView)getCachedView(application);
+        if (view != null) {
+            tmanager = view.getDataManager();
+        } else {
+            ThreadMXBean tbean = resolveThreads(application);
+            if (tbean != null) {
+                tmanager = new ThreadMXBeanDataManager(tbean);
+                ((ThreadMXBeanDataManager)tmanager).refreshThreadsSync();
+//                try { Thread.sleep(50); } catch (Exception e) {} // Collect some data
+//                ((ThreadMXBeanDataManager)tmanager).refreshThreadsSync();
+            }
+        }
+
+        if (tmanager != null) PersistenceSupport.saveDataManager(tmanager, snapshot.getStorage());
+    }
+
+    static ThreadMXBean resolveThreads(Application application) {
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+        if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
+            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+            return mxbeans == null ? null : mxbeans.getThreadMXBean();
+        }
+        return null;
     }
     
 }

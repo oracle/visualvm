@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
 import org.openide.util.RequestProcessor;
 
@@ -40,7 +39,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Tomas Hurka
  */
-class ThreadMXBeanDataManager extends ThreadsDataManager {
+class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
 
     private static final long[] dummyLong = new long[0];
     private static final Logger LOGGER = Logger.getLogger(ThreadMXBeanDataManager.class.getName());
@@ -52,24 +51,26 @@ class ThreadMXBeanDataManager extends ThreadsDataManager {
         threadBean = tb;
     }
 
-    void refreshThreads() {
-        if (refreshRunning) {
-            return;
-        }
+    // Non-blocking call for general usage
+    void refreshThreadsAsync() {
+        if (refreshRunning) return;
         refreshRunning = true;
         RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                try {
-                    ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
-                    resp.fillInThreadData();
-                    processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));
-                } catch (Exception ex) {
-                    LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex); // NOI18N
-                } finally {
-                    refreshRunning = false;
-                }
-            }
+            public void run() { refreshThreadsSync(); }
         });
+    }
+
+    // Blocking call used to save application snapshot for not opened application
+    void refreshThreadsSync() {
+        try {
+            ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
+            resp.fillInThreadData();
+            processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));
+        } catch (Exception ex) {
+            LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex); // NOI18N
+        } finally {
+            refreshRunning = false;
+        }
     }
 
     int getDaemonThreadCount() {
