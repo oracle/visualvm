@@ -309,6 +309,7 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
         if (snapshot.isSaved()) {
             setName(tabName);
         } else {
+            // XXX consider using DataEditorSupport.annotateName
             setName(tabName + " *"); // NOI18N
         }
     }
