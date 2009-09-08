@@ -39,13 +39,13 @@
         <folder name="File">
             <file name="com-sun-tools-visualvm-host-AddRemoteHostAction-alwaysEnabled.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-host-AddRemoteHostAction-alwaysEnabled.instance"/>
-                <attr name="position" intvalue="100"/>
+                <attr name="position" intvalue="500"/>
             </file>
         </folder>
     </folder>
     
     <folder name="Toolbars">
-        <folder name="File">
+        <folder name="DataSource">
             <file name="com-sun-tools-visualvm-host-AddRemoteHostAction-alwaysEnabled.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-host-AddRemoteHostAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="100"/>
