@@ -43,7 +43,8 @@ import java.util.logging.Logger;
  * @author Jiri Sedlacek
  */
 public final class Storage {
-    
+
+    private static final String VISUALVM_TMP_DIR = System.getProperty("visualvm.tmpdir");  // NOI18N
     private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";  // NOI18N
     private static final String PERSISTENT_STORAGE_DIRNAME = "repository";  // NOI18N
     
@@ -240,8 +241,12 @@ public final class Storage {
      */
     public static String getTemporaryStorageDirectoryString() {
         synchronized(temporaryStorageDirectoryStringLock) {
-            if (temporaryStorageDirectoryString == null)
-                temporaryStorageDirectoryString = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + File.separator + TEMPORARY_STORAGE_DIRNAME;    // NOI18N
+            if (temporaryStorageDirectoryString == null) {
+                String tmpDir = VISUALVM_TMP_DIR != null ? VISUALVM_TMP_DIR :
+                    System.getProperty("java.io.tmpdir"); // NOI18N
+                temporaryStorageDirectoryString = new File(tmpDir).getAbsolutePath()
+                        + File.separator + TEMPORARY_STORAGE_DIRNAME;
+            }
             return temporaryStorageDirectoryString;
         }
     }
