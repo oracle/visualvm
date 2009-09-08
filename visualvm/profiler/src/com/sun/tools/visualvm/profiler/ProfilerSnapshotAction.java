@@ -28,8 +28,8 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -65,7 +65,8 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     }
     
     protected void actionPerformed(Application dataSource, ActionEvent actionEvent) {
-        openNextSnapshot = (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0;
+        openNextSnapshot = (actionEvent.getModifiers() &
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0;
         originalAction.performAction();
     }
     

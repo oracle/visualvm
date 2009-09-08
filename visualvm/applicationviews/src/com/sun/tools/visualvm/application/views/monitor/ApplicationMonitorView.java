@@ -37,8 +37,8 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -201,7 +201,8 @@ class ApplicationMonitorView extends DataSourceView {
             
             heapDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_Dump")) {   // NOI18N
                 public void actionPerformed(ActionEvent e) {
-                    HeapDumpSupport.getInstance().takeHeapDump((Application)model.getSource(), (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                    HeapDumpSupport.getInstance().takeHeapDump((Application)model.getSource(), (e.getModifiers() &
+                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
                 }
             });
             heapDumpButton.setEnabled(model.isTakeHeapDumpSupported());

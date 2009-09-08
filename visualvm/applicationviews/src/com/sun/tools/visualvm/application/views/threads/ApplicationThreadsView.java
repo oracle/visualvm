@@ -42,8 +42,8 @@ import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import com.sun.tools.visualvm.tools.jmx.MBeanCacheListener;
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
@@ -210,7 +210,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
             threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Thread_Dump")) {   // NOI18N
                 public void actionPerformed(ActionEvent e) {
-                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() &
+                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
                 }
             });
             threadDumpButton.setEnabled(takeThreadDumpSupported);

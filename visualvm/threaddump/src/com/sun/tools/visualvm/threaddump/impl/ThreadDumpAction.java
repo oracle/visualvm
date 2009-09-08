@@ -31,8 +31,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
@@ -66,10 +66,12 @@ class ThreadDumpAction extends MultiDataSourceAction<DataSource> {
         for (DataSource dataSource : dataSources) {
             if (dataSource instanceof Application) {
                 Application application = (Application)dataSource;
-                ThreadDumpSupport.getInstance().takeThreadDump(application, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                ThreadDumpSupport.getInstance().takeThreadDump(application, (actionEvent.getModifiers() &
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             } else if (dataSource instanceof CoreDump) {
                 CoreDump coreDump = (CoreDump)dataSource;
-                ThreadDumpSupport.getInstance().takeThreadDump(coreDump, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                ThreadDumpSupport.getInstance().takeThreadDump(coreDump, (actionEvent.getModifiers() &
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         }
     }

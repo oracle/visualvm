@@ -31,8 +31,8 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
@@ -66,10 +66,12 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
         for (DataSource dataSource : dataSources) {
             if (dataSource instanceof Application) {
                 Application application = (Application)dataSource;
-                HeapDumpSupport.getInstance().takeHeapDump(application, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                HeapDumpSupport.getInstance().takeHeapDump(application, (actionEvent.getModifiers() &
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             } else if (dataSource instanceof CoreDump) {
                 CoreDump coreDump = (CoreDump)dataSource;
-                HeapDumpSupport.getInstance().takeHeapDump(coreDump, (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                HeapDumpSupport.getInstance().takeHeapDump(coreDump, (actionEvent.getModifiers() &
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         }
     }

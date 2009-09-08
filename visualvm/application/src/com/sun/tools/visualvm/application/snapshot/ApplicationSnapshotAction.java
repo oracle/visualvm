@@ -31,8 +31,8 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.util.HashSet;
 import java.util.Set;
 import org.openide.util.NbBundle;
@@ -65,7 +65,7 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     protected void actionPerformed(Set<Application> applications, ActionEvent actionEvent) {
         for (Application application : applications)
             ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(application,
-            (actionEvent.getModifiers() & InputEvent.CTRL_MASK) == 0);
+            (actionEvent.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
     }
     
     protected boolean isEnabled(Set<Application> applications) {
