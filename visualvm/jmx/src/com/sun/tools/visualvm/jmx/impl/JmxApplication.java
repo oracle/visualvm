@@ -110,12 +110,6 @@ public final class JmxApplication extends Application {
     }
     
     protected Storage createStorage() {
-//        if (storage == null) {
-//            File directory = Utils.getUniqueFile(JmxApplicationsSupport.getStorageDirectory(),
-//                        "" + System.currentTimeMillis(), JmxApplicationProvider.JMX_SUFFIX);    // NOI18N
-//            return new Storage(directory);
-//        }
-//        return storage;
         return storage != null ? storage : super.createStorage();
     }
     
