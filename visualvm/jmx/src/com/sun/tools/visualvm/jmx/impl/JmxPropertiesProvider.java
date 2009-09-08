@@ -72,19 +72,6 @@ public final class JmxPropertiesProvider extends PropertiesProvider<JmxApplicati
         if (customizer != null) customizer.propertiesCancelled(panel, application);
     }
 
-    public void loadProperties(JmxApplication application, Storage storage) {
-        JmxConnectionCustomizer customizer = getCustomizer(application);
-        if (customizer != null) customizer.loadProperties(application, storage);
-    }
-
-    public void saveProperties(JmxApplication application, Storage storage) {
-        JmxConnectionCustomizer customizer = getCustomizer(application);
-        if (customizer != null) {
-            if (application.getStorage() != storage) setCustomizer(storage, customizer);
-            customizer.saveProperties(application, storage);
-        }
-    }
-
 
     static void setCustomizer(JmxApplication application, JmxConnectionCustomizer customizer) {
         setCustomizer(application.getStorage(), customizer);

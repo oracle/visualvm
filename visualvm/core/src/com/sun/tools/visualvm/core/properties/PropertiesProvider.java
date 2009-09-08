@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.properties;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 
 /**
@@ -111,7 +110,9 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
     /**
      * Called when a valid PropertiesPanel has been submitted by the user when
      * creating a new DataSource. At this point the provider has a chance to
-     * store the properties for the DataSource.
+     * store the properties for the DataSource. The properties should be stored
+     * into the DataSource's storage (use dataSource.getStorage()) to ensure they
+     * will be always available for persistent DataSources.
      *
      * @param panel user-submitted PropertiesPanel
      * @param dataSource newly created DataSource
@@ -121,7 +122,9 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
     /**
      * Called when a valid PropertiesPanel has been submitted by the user when
      * editing an existing DataSource. At this point the provider has a chance
-     * to update the properties for the DataSource.
+     * to update the properties for the DataSource. The properties should be stored
+     * into the DataSource's storage (use dataSource.getStorage()) to ensure they
+     * will be always available for persistent DataSources.
      *
      * @param panel user-submitted PropertiesPanel
      * @param dataSource edited existing DataSource
@@ -136,29 +139,5 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
      * @param dataSource DataSource for which the panel has been cancelled or null if no DataSource has been created
      */
     public abstract void propertiesCancelled(PropertiesPanel panel, X dataSource);
-
-    /**
-     * Called when a persistent DataSource is restored before it's added to the
-     * DataSources tree. At this point the provider has a chance to restore the
-     * saved properties. The provided Storage instance may be (and typically is)
-     * the same as dataSource.getStorage() - in such case a provider storing the
-     * properties in DataSource Storage doesn't need to do anything.
-     *
-     * @param dataSource DataSource being restored
-     * @param storage persistent Storage from which the DataSource is restored
-     */
-    public abstract void loadProperties(X dataSource, Storage storage);
-
-    /**
-     * Called when a persistent DataSource is being saved. At this point the
-     * provider has a chance to save the customized properties. The provided
-     * Storage instance may be (and typically is) the same as dataSource.getStorage()
-     * - in such case a provider storing the properties in DataSource Storage
-     * doesn't need to do anything.
-     *
-     * @param dataSource DataSource being saved
-     * @param storage persistent Storage to which the DataSource is saved
-     */
-    public abstract void saveProperties(X dataSource, Storage storage);
 
 }

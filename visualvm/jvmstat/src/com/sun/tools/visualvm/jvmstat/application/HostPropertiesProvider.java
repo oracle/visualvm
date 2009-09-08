@@ -74,16 +74,6 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
         // Nothing to do
     }
 
-    public void loadProperties(Host host, Storage storage) {
-        if (storage == host.getStorage()) return;
-        setDescriptors(host, getDescriptors(storage));
-    }
-
-    public void saveProperties(Host host, Storage storage) {
-        if (storage == host.getStorage()) return;
-        setDescriptors(storage, getDescriptors(host));
-    }
-
 
     static Set<ConnectionDescriptor> descriptorsForHost(Host host) {
         Set<ConnectionDescriptor> descriptors = getDescriptors(host);

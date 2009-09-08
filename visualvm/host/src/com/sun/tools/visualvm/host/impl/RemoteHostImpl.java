@@ -33,12 +33,12 @@ import java.net.UnknownHostException;
  *
  * @author Jiri Sedlacek
  */
-final class HostImpl extends Host {
+final class RemoteHostImpl extends Host {
     
     private Storage givenStorage;
     
     
-    HostImpl(String hostName, Storage givenStorage) throws UnknownHostException {
+    RemoteHostImpl(String hostName, Storage givenStorage) throws UnknownHostException {
         super(hostName);
         this.givenStorage = givenStorage;
     }

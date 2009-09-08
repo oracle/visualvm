@@ -122,10 +122,6 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
 
     public void propertiesCancelled(PropertiesPanel panel, Application application) {};
 
-    public void loadProperties(Application application, Storage storage) {};
-
-    public void saveProperties(Application application, Storage storage) {};
-
 
     public final String toString() { return getPropertiesName(); }
 

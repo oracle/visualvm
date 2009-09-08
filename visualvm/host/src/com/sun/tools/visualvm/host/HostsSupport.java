@@ -26,12 +26,12 @@
 package com.sun.tools.visualvm.host;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.host.impl.HostDescriptorProvider;
 import com.sun.tools.visualvm.host.impl.HostProperties;
 import com.sun.tools.visualvm.host.impl.HostProvider;
+import com.sun.tools.visualvm.host.impl.HostsSupportImpl;
 import java.io.File;
 import java.net.InetAddress;
 
@@ -41,15 +41,10 @@ import java.net.InetAddress;
  * @author Jiri Sedlacek
  */
 public final class HostsSupport {
-
-    private static final String HOSTS_STORAGE_DIRNAME = "hosts";    // NOI18N
     
     private static final Object hostsStorageDirectoryLock = new Object();
     // @GuardedBy hostsStorageDirectoryLock
     private static File hostsStorageDirectory;
-    private static final Object hostsStorageDirectoryStringLock = new Object();
-    // @GuardedBy hostsStorageDirectoryStringLock
-    private static String hostsStorageDirectoryString;
     
     private static HostsSupport instance;
 
@@ -117,15 +112,6 @@ public final class HostsSupport {
         return hostProvider.getHostByAddress(inetAddress);
     }
     
-    
-    static String getStorageDirectoryString() {
-        synchronized(hostsStorageDirectoryStringLock) {
-            if (hostsStorageDirectoryString == null)
-                hostsStorageDirectoryString = Storage.getPersistentStorageDirectoryString() + File.separator + HOSTS_STORAGE_DIRNAME;
-            return hostsStorageDirectoryString;
-        }
-    }
-    
     /**
      * Returns storage directory for defined hosts.
      * 
@@ -134,7 +120,7 @@ public final class HostsSupport {
     public static File getStorageDirectory() {
         synchronized(hostsStorageDirectoryLock) {
             if (hostsStorageDirectory == null) {
-                String snapshotsStorageString = getStorageDirectoryString();
+                String snapshotsStorageString = HostsSupportImpl.getStorageDirectoryString();
                 hostsStorageDirectory = new File(snapshotsStorageString);
                 if (hostsStorageDirectory.exists() && hostsStorageDirectory.isFile())
                     throw new IllegalStateException("Cannot create hosts storage directory " + snapshotsStorageString + ", file in the way");   // NOI18N
@@ -153,7 +139,7 @@ public final class HostsSupport {
      * @return true if the storage directory for defined hosts already exists, false otherwise.
      */
     public static boolean storageDirectoryExists() {
-        return new File(getStorageDirectoryString()).isDirectory();
+        return new File(HostsSupportImpl.getStorageDirectoryString()).isDirectory();
     }
     
     

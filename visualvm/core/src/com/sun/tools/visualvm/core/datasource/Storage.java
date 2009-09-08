@@ -81,7 +81,7 @@ public final class Storage {
      * @since VisualVM 1.2
      */
     public Storage() {
-        this(getTemporaryStorageDirectory());
+        this(new File(getTemporaryStorageDirectoryString())); // Do not create immediately
     }
     
     /**
@@ -353,6 +353,8 @@ public final class Storage {
     }
     
     private static void storeProperties(Properties properties, File file) {
+        Utils.prepareDirectory(file.getParentFile()); // Directories may not be created yet
+
         OutputStream os = null;
         BufferedOutputStream bos = null;
         try {

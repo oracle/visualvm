@@ -4,7 +4,6 @@
  */
 package com.sun.tools.visualvm.host;
 
-import com.sun.tools.visualvm.host.impl.HostProvider;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -15,9 +14,5 @@ class Installer extends ModuleInstall {
 
     public void restored() {
         HostsSupport.getInstance();
-    }
-
-    public void close() {
-        HostProvider.shutdown();
     }
 }

@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.properties;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,38 +114,6 @@ public final class PropertiesSupport {
      */
     public <X extends DataSource> PropertiesCustomizer<X> getCustomizer(Class<X> type) {
         return getCustomizer(null, type);
-    }
-
-
-    /**
-     * Invokes PropertiesProvider.loadProperties(DataSource, Storage) method for
-     * every PropertiesProvider supporting the provided DataSource.
-     *
-     * @param <X> any DataSource type
-     * @param dataSource DataSource being restored
-     * @param storage Storage from which the DataSource is being restored
-     */
-    public <X extends DataSource> void loadProperties(X dataSource, Storage storage) {
-        List<PropertiesProvider<X>> p =
-            getProviders(dataSource, (Class<X>)dataSource.getClass());
-        for (PropertiesProvider<X> provider : p)
-            provider.loadProperties(dataSource, storage);
-
-    }
-
-    /**
-     * Invokes PropertiesProvider.saveProperties(DataSource, Storage) method for
-     * every PropertiesProvider supporting the provided DataSource.
-     *
-     * @param <X> any DataSource type
-     * @param dataSource DataSource being saved
-     * @param storage Storage to which the DataSource is being saved
-     */
-    public <X extends DataSource> void saveProperties(X dataSource, Storage storage) {
-        List<PropertiesProvider<X>> p =
-            getProviders(dataSource, (Class<X>)dataSource.getClass());
-        for (PropertiesProvider<X> provider : p)
-            provider.saveProperties(dataSource, storage);
     }
 
 
