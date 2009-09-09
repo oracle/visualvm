@@ -36,23 +36,37 @@ import com.sun.tools.visualvm.core.datasupport.Positionable;
  */
 public abstract class PropertiesProvider<X extends DataSource> implements Positionable {
 
+    /**
+     * Key for the "General" properties category (always first if provided).
+     */
+    public static final int CATEGORY_GENERAL = Integer.MIN_VALUE;
+
     private final String propertiesName;
     private final String propertiesDescription;
+    private final int propertiesCategory;
     private final int preferredPosition;
 
 
     /**
-     * Creates new instance of PropertiesProvider with the provided name, preferred
-     * position of the properties panel in UI and optional description.
+     * Creates new instance of PropertiesProvider with the provided name, optional
+     * description, properties category and preferred position of the properties
+     * within the category.<br>
+     * The propertiesCategory value defines position of the category among other
+     * categories. If more providers use the same category their position is
+     * defined by the preferredPosition value. The propertiesName value defines
+     * name of the category if this is the first provider for the category, otherwise
+     * it's used as name for the category section.
      *
      * @param propertiesName name of the provided properties
      * @param propertiesDescription description of the provided properties or null
+     * @param propertiesCategory category of the provided properties
      * @param preferredPosition preferred position of the properties panel in UI
      */
     public PropertiesProvider(String propertiesName, String propertiesDescription,
-                              int preferredPosition) {
+                              int propertiesCategory, int preferredPosition) {
         this.propertiesName = propertiesName;
         this.propertiesDescription = propertiesDescription;
+        this.propertiesCategory = propertiesCategory;
         this.preferredPosition = preferredPosition;
     }
 
@@ -72,9 +86,16 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
     public final String getPropertiesDescription() { return propertiesDescription; }
 
     /**
-     * Returns preferred position of the properties panel in UI.
+     * Returns category of the provided properties.
      *
-     * @return preferred position of the properties panel in UI
+     * @return category of the provided properties
+     */
+    public final int getPropertiesCategory() { return propertiesCategory; }
+
+    /**
+     * Returns preferred position of the properties section.
+     *
+     * @return preferred position of the properties section
      */
     public final int getPreferredPosition() { return preferredPosition; }
 

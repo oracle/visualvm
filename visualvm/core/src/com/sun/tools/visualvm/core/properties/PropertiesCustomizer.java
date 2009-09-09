@@ -26,12 +26,24 @@
 package com.sun.tools.visualvm.core.properties;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -48,7 +60,7 @@ import javax.swing.event.ChangeListener;
 public final class PropertiesCustomizer<X extends DataSource> extends PropertiesPanel {
 
     private final X dataSource;
-    private final List<PropertiesProvider<X>> providers;
+    private final List<List<PropertiesProvider<X>>> groups;
     private final List<PropertiesPanel> panels;
     private final ChangeListener listener = new ChangeListener() {
                       public void stateChanged(ChangeEvent e) { update(); }
@@ -58,10 +70,8 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     PropertiesCustomizer(X dataSource, Class<X> type) {
         this.dataSource = dataSource;
 
-        providers = PropertiesSupport.sharedInstance().getProviders(dataSource, type);
-        panels = new ArrayList();
-        for (PropertiesProvider provider : providers)
-            panels.add(provider.createPanel(dataSource));
+        groups = createGroups(PropertiesSupport.sharedInstance().getProviders(dataSource, type));
+        panels = createPanels(groups, dataSource);
         
         initComponents();
         update();
@@ -80,10 +90,17 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
      */
     public void propertiesDefined(X dataSource) {
         unregisterListeners();
-        for (int i = 0; i < providers.size(); i++) {
-            PropertiesProvider<X> provider = providers.get(i);
-            PropertiesPanel panel = panels.get(i);
-            provider.propertiesDefined(panel, dataSource);
+        for (int i = 0; i < groups.size(); i++) {
+            List<PropertiesProvider<X>> providers = groups.get(i);
+            List<PropertiesPanel> categoriesPanels = new ArrayList();
+            if (providers.size() == 1) {
+                categoriesPanels.add(panels.get(i));
+            } else {
+                MultiPropertiesPanel multiPanel = (MultiPropertiesPanel)panels.get(i);
+                categoriesPanels.addAll(multiPanel.getPanels());
+            }
+            for (int j = 0; j < providers.size(); j++)
+                providers.get(j).propertiesDefined(categoriesPanels.get(j), dataSource);
         }
     }
 
@@ -96,20 +113,34 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
      */
     public void propertiesCancelled() {
         unregisterListeners();
-        for (int i = 0; i < providers.size(); i++) {
-            PropertiesProvider<X> provider = providers.get(i);
-            PropertiesPanel panel = panels.get(i);
-            provider.propertiesCancelled(panel, dataSource);
+        for (int i = 0; i < groups.size(); i++) {
+            List<PropertiesProvider<X>> providers = groups.get(i);
+            List<PropertiesPanel> categoriesPanels = new ArrayList();
+            if (providers.size() == 1) {
+                categoriesPanels.add(panels.get(i));
+            } else {
+                MultiPropertiesPanel multiPanel = (MultiPropertiesPanel)panels.get(i);
+                categoriesPanels.addAll(multiPanel.getPanels());
+            }
+            for (int j = 0; j < providers.size(); j++)
+                providers.get(j).propertiesCancelled(categoriesPanels.get(j), dataSource);
         }
     }
     
 
     void propertiesChanged() {
         unregisterListeners();
-        for (int i = 0; i < providers.size(); i++) {
-            PropertiesProvider<X> provider = providers.get(i);
-            PropertiesPanel panel = panels.get(i);
-            provider.propertiesChanged(panel, dataSource);
+        for (int i = 0; i < groups.size(); i++) {
+            List<PropertiesProvider<X>> providers = groups.get(i);
+            List<PropertiesPanel> categoriesPanels = new ArrayList();
+            if (providers.size() == 1) {
+                categoriesPanels.add(panels.get(i));
+            } else {
+                MultiPropertiesPanel multiPanel = (MultiPropertiesPanel)panels.get(i);
+                categoriesPanels.addAll(multiPanel.getPanels());
+            }
+            for (int j = 0; j < providers.size(); j++)
+                providers.get(j).propertiesChanged(categoriesPanels.get(j), dataSource);
         }
     }
 
@@ -136,9 +167,9 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     private void initComponents() {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFocusable(false);
-        for (int i = 0; i < providers.size(); i++) {
-            PropertiesProvider provider = providers.get(i);
+        for (int i = 0; i < panels.size(); i++) {
             PropertiesPanel panel = panels.get(i);
+            PropertiesProvider provider = groups.get(i).get(0);
             ScrollableContainer c = new ScrollableContainer(panel);
             c.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             c.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -148,6 +179,160 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
 
         setLayout(new BorderLayout());
         add(tabbedPane, BorderLayout.CENTER);
+    }
+
+
+    private static <Y extends DataSource> List<List<PropertiesProvider<Y>>>
+            createGroups(List<PropertiesProvider<Y>> providers) {
+        
+        Collections.sort(providers, new CategoriesComparator());
+
+        List<List<PropertiesProvider<Y>>> groupedProviders = new ArrayList();
+        int currentCategory = -1;
+        List<PropertiesProvider<Y>> currentGroup = null;
+        for (PropertiesProvider<Y> provider : providers) {
+            int providerCategory = provider.getPropertiesCategory();
+            if (currentGroup == null || providerCategory != currentCategory) {
+                currentCategory = providerCategory;
+                if (currentGroup != null)
+                    Collections.sort(currentGroup, Positionable.COMPARATOR);
+                currentGroup = new ArrayList();
+                groupedProviders.add(currentGroup);
+            }
+            if (currentGroup != null && currentCategory == providerCategory)
+                currentGroup.add(provider);
+        }
+        if (currentGroup != null)
+            Collections.sort(currentGroup, Positionable.COMPARATOR);
+
+        return groupedProviders;
+    }
+
+    private static <Y extends DataSource> List<PropertiesPanel>
+            createPanels(List<List<PropertiesProvider<Y>>> groups, Y dataSource) {
+
+        List<PropertiesPanel> panels = new ArrayList(groups.size());
+
+        for (List<PropertiesProvider<Y>> group : groups)
+            if (group.size() == 1)
+                panels.add(group.get(0).createPanel(dataSource));
+            else
+                panels.add(new MultiPropertiesPanel(group, dataSource));
+
+        return panels;
+    }
+
+
+    private static class MultiPropertiesPanel<Y extends DataSource> extends PropertiesPanel {
+
+        private static final Color separatorColor = separatorColor();
+        private static final Font separatorFont = separatorFont();
+
+        private final List<PropertiesPanel> panels;
+        private final ChangeListener listener = new ChangeListener() {
+                          public void stateChanged(ChangeEvent e) { update(); }
+                      };
+
+
+        public MultiPropertiesPanel(List<PropertiesProvider<Y>> providers, Y dataSource) {
+            panels = new ArrayList(providers.size());
+            for (PropertiesProvider provider : providers)
+                panels.add(provider.createPanel(dataSource));
+            
+            initComponents(providers);
+            update();
+        }
+
+
+        public List<PropertiesPanel> getPanels() {
+            return panels;
+        }
+
+        
+        private void update() {
+            boolean valid = true;
+            for (PropertiesPanel panel : panels)
+                if (!panel.settingsValid()) {
+                    valid = false;
+                    break;
+                }
+            setSettingsValid(valid);
+        }
+
+        private void initComponents(List<PropertiesProvider<Y>> providers) {
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder());
+            setLayout(new GridBagLayout());
+
+            int currentRow = 0;
+            int providerIndex = 1;
+            GridBagConstraints constraints;
+
+            for (PropertiesPanel panel : panels) {
+                constraints = createConstraints(currentRow++);
+                add(panel, constraints);
+                panel.addChangeListener(listener);
+
+                if (providerIndex < providers.size()) {
+                    PropertiesProvider provider = providers.get(providerIndex++);
+                    SectionSeparator separator = new SectionSeparator(provider.getPropertiesName());
+                    separator.setForeground(separatorColor);
+                    separator.setFont(separatorFont);
+                    separator.setToolTipText(provider.getPropertiesDescription());
+                    constraints = createConstraints(currentRow++);
+                    constraints.insets = new Insets(10, 0, 0, 0);
+                    add(separator, constraints);
+                }
+            }
+
+            JPanel spacer = new JPanel(null);
+            spacer.setOpaque(false);
+            constraints = createConstraints(currentRow++);
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            add(spacer, constraints);
+        }
+
+        private static GridBagConstraints createConstraints(int row) {
+            GridBagConstraints c = new GridBagConstraints();
+
+            c.gridx = 0;
+            c.gridy = row;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.fill = GridBagConstraints.BOTH;
+
+            return c;
+        }
+        
+    }
+
+    private static Color separatorColor() {
+        Color color = UIManager.getColor("TitledBorder.titleColor"); // NOI18N
+        if (color == null) color = new JLabel().getForeground();
+        return color;
+    }
+
+    private static Font separatorFont() {
+        Font font = UIManager.getFont("TitledBorder.font"); // NOI18N
+        if (font == null) font = new JLabel().getFont();
+        return font;
+    }
+    
+    private static class CategoriesComparator implements Comparator {
+
+        public int compare(Object o1, Object o2) {
+            PropertiesProvider p1 = (PropertiesProvider)o1;
+            PropertiesProvider p2 = (PropertiesProvider)o2;
+
+            int category1 = p1.getPropertiesCategory();
+            int category2 = p2.getPropertiesCategory();
+
+            if (category1 > category2) return 1;
+            if (category1 < category2) return -1;
+            return p1.getPropertiesName().compareTo(p2.getPropertiesName());
+        }
+
     }
 
 }

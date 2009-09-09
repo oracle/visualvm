@@ -42,13 +42,18 @@ import org.openide.util.NbBundle;
  */
 public class HostPropertiesProvider extends PropertiesProvider<Host> {
 
+    /**
+     * Key for the "jstatd" properties category.
+     */
+    public static final int CATEGORY_JSTATD_CONNECTION = 100;
+
     private static final String PROP_JSTATD_PORT = "prop_jstatd_port"; // NOI18N
     private static final String PROP_JSTATD_REFRESH = "prop_jstatd_refresh"; // NOI18N
 
 
     public HostPropertiesProvider() {
         super("jstatd", NbBundle.getMessage(HostPropertiesProvider.class, // NOI18N
-                "MSG_JstatdDescr"), 10); // NOI18N
+                "MSG_JstatdDescr"), CATEGORY_JSTATD_CONNECTION, 0); // NOI18N
     }
 
 

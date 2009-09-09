@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jmx;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.properties.PropertiesProvider;
+import com.sun.tools.visualvm.jmx.impl.JmxPropertiesProvider;
 
 /**
  * Provider of a special JMX connection type. By registering the customizer
@@ -43,7 +44,7 @@ import com.sun.tools.visualvm.core.properties.PropertiesProvider;
  * @author Jiri Sedlacek
  */
 public abstract class JmxConnectionCustomizer extends PropertiesProvider<Application> {
-    
+
     private final boolean hidesDefault;
 
 
@@ -53,13 +54,14 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
      * JmxConnectionSupport.registerCustomizer to register the instance.
      *
      * @param customizerName name of the customizer to be displayed in the UI
-     * @param customizerName optional description of the customizer, may be null
-     * @param preferredPosition preferred position of this customizer in UI
+     * @param customizerDescription optional description of the customizer, may be null
+     * @param customizerPosition preferred position of this customizer in UI
      * @param hidesDefault true if the default connection type should be hidden by this customizer, false otherwise
      */
     public JmxConnectionCustomizer(String customizerName, String customizerDescription,
-                                   int preferredPosition, boolean hidesDefault) {
-        super(customizerName, customizerDescription, preferredPosition);
+                                   int customizerPosition, boolean hidesDefault) {
+        super(customizerName, customizerDescription,
+              JmxPropertiesProvider.CATEGORY_JMX_CONNECTION, customizerPosition);
         if (customizerName == null)
             throw new IllegalArgumentException("customizerName cannot be null"); // NOI18N
         this.hidesDefault = hidesDefault;

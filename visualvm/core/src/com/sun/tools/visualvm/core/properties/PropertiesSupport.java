@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.properties;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -139,7 +138,6 @@ public final class PropertiesSupport {
                 provider.supportsDataSource(dataSource))
                     compatibleProviders.add(provider);
         
-        Collections.sort(compatibleProviders, Positionable.COMPARATOR);
         return compatibleProviders;
     }
 

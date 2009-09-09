@@ -36,13 +36,19 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 public final class JmxPropertiesProvider extends PropertiesProvider<JmxApplication> {
+    
+    /**
+     * Key for the "JMX Connection" properties category.
+     */
+    public static final int CATEGORY_JMX_CONNECTION = 200;
 
     private static final String PROP_CONN_CUSTOMIZER_ID = "prop_conn_customizer_id"; // NOI18N
 
 
     public JmxPropertiesProvider() {
         super(NbBundle.getMessage(JmxPropertiesProvider.class, "CAP_JmxConnection"), // NOI18N
-              NbBundle.getMessage(JmxPropertiesProvider.class, "DESCR_JmxConnection"), 10); // NOI18N
+              NbBundle.getMessage(JmxPropertiesProvider.class, "DESCR_JmxConnection"), // NOI18N
+              CATEGORY_JMX_CONNECTION, 0);
     }
 
 
