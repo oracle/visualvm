@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -63,12 +64,33 @@ public final class SectionSeparator extends JPanel {
         initComponents(text, font);
     }
 
+    public void setForeground(Color foreground) {
+        if (label == null) super.setForeground(foreground);
+        else label.setForeground(foreground);
+    }
+
+    public Color getForeground() {
+        if (label == null) return super.getForeground();
+        else return label.getForeground();
+    }
+
+    public void setFont(Font font) {
+        if (label == null) super.setFont(font);
+        else label.setFont(font);
+    }
+
+    public Font getFont() {
+        if (label == null) return super.getFont();
+        else return label.getFont();
+    }
+
     private void initComponents(String text, Font font) {
         setBorder(BorderFactory.createEmptyBorder());
         setLayout(new GridBagLayout());
         setOpaque(false);
 
-        JLabel label = new JLabel(text);
+        label = new JLabel(text);
+        label.setForeground(getForeground());
         if (font != null) label.setFont(font);
         else label.setFont(label.getFont().deriveFont(Font.BOLD));
         GridBagConstraints c1 = new GridBagConstraints();
@@ -81,5 +103,7 @@ public final class SectionSeparator extends JPanel {
         c2.insets = new Insets(0, 4, 0, 0);
         add(new Separator(), c2);
     }
+
+    private JLabel label;
 
 }
