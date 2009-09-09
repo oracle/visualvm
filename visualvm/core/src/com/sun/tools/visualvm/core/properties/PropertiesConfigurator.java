@@ -100,20 +100,19 @@ class PropertiesConfigurator extends JPanel {
         });
     }
 
-    private void initComponents() {
-        setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
-
-        add(customizer, BorderLayout.CENTER);
-
-        Dimension prefSize = getPreferredSize();
+    public Dimension getPreferredSize() {
+        Dimension prefSize = super.getPreferredSize();
         prefSize.width = Math.max(prefSize.width, MIN_SIZE.width);
         prefSize.width = Math.min(prefSize.width, MAX_SIZE.width);
         prefSize.height = Math.max(prefSize.height, MIN_SIZE.height);
         prefSize.height = Math.min(prefSize.height, MAX_SIZE.height);
-        setPreferredSize(prefSize);
+        return prefSize;
+    }
 
-        // okButton
+    private void initComponents() {
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
+        add(customizer, BorderLayout.CENTER);
         okButton = new JButton(NbBundle.getMessage(PropertiesConfigurator.class, "LBL_OK"));    // NOI18N
     }
 
