@@ -36,6 +36,8 @@ import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.net.URL;
 import java.rmi.ConnectException;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.HostIdentifier;
@@ -258,7 +261,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
         hostId = monitoredHost.getHostIdentifier();
         monitoredHost.setInterval(interval);
-        if (host == Host.LOCALHOST) checkForBrokenJps(monitoredHost);
+        if (host == Host.LOCALHOST) checkForBrokenLocalJps(monitoredHost);
         try {
             // Fetch already running applications on the host
             processNewApplicationsByPids(host, hostId, monitoredHost.activeVms());
@@ -298,27 +301,53 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     //    }
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
-    private void checkForBrokenJps(MonitoredHost monitoredHost) {
+    // Checks broken jps according to https://visualvm.dev.java.net/issues/show_bug.cgi?id=311
+    private void checkForBrokenLocalJps(MonitoredHost monitoredHost) {
         try {
             if (monitoredHost.activeVms().size() != 0) {
+
+                if (Utilities.isWindows()) {
+                    String perf = "hsperfdata_" + System.getProperty("user.name"); // NOI18N
+                    final String perfL = perf.toLowerCase();
+                    File temp = new File(System.getProperty("java.io.tmpdir")); // NOI18N
+
+                    // NOTE: reading TMP containing many files might slow down the check
+                    // Probably it could be performed only if 'user.name' contains capitals
+                    File[] files = temp.listFiles(new FilenameFilter() {
+                        public boolean accept(File dir, String name) {
+                            return perfL.equals(name.toLowerCase());
+                        }
+                    });
+
+                    if (files.length == 1 && !perf.equals(files[0].getName())) {
+                        String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2_Link")   // NOI18N
+                                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp2_NoLink");   // NOI18N
+                        String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2", link); // NOI18N
+                        notifyBrokenJps(message);
+                    }
+                }
+
                 return;
             }
         } catch (Exception e) {
             return;
         }
-        String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_Link")   // NOI18N
+
+        String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps_Link")   // NOI18N
                 : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_NoLink");   // NOI18N
-        
         String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps", link); // NOI18N
+        notifyBrokenJps(message);
+    }
+
+    private static void notifyBrokenJps(String message) {
         final HTMLLabel label = new HTMLLabel(message) {
             protected void showURL(URL url) {
                 try {
                     DesktopUtils.browse(url.toURI());
-                } catch (Exception e) {
-                }
+                } catch (Exception e) {}
             }
         };
-        
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(label, NotifyDescriptor.ERROR_MESSAGE);
