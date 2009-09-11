@@ -704,7 +704,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             setLayout(new BorderLayout());
 
             savedTree = new JTree(treeModel);
-            savedTree.setRowHeight(savedTree.getRowHeight() + 2);
+            savedTree.setRowHeight(new JLabel("XXX").getPreferredSize().height + 2); // NOI18N
             savedTree.setRootVisible(false);
             savedTree.setShowsRootHandles(true);
             DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
