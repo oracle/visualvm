@@ -240,15 +240,19 @@ class ConnectionsCustomizer extends PropertiesPanel {
         scroll.setViewportBorder(impl.getViewportBorder());
         scroll.setPreferredSize(new Dimension(TABLE_WIDTH + 20, 1));
 
-        viewPanel = new JPanel(new CardLayout());
         JLabel noConnection = new JLabel(NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_NoConnection"), JLabel.CENTER); // NOI18N
         noConnection.setEnabled(false);
-        noConnection.setBorder(impl.getBorder() != null ? impl.getBorder() :
-                               impl.getViewportBorder());
+        noConnection.setOpaque(true);
+        noConnection.setBackground(table.getBackground());
         noConnection.setMinimumSize(new Dimension());
+        JScrollPane emptyScroll = new JScrollPane(noConnection,
+                JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        emptyScroll.getViewport().setOpaque(false);
+        emptyScroll.setOpaque(false);
+        viewPanel = new JPanel(new CardLayout());
         viewPanel.setOpaque(false);
-        viewPanel.add(noConnection, NO_DATA_VIEW);
+        viewPanel.add(emptyScroll, NO_DATA_VIEW);
         viewPanel.add(scroll, DATA_VIEW);
         c = new GridBagConstraints();
         c.gridx = 0;
