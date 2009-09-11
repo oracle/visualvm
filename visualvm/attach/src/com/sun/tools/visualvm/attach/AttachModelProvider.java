@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.attach;
 
+import com.sun.tools.attach.VirtualMachine;
+import com.sun.tools.attach.VirtualMachineDescriptor;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.model.AbstractModelProvider;
 import com.sun.tools.visualvm.host.Host;
@@ -38,8 +40,6 @@ import org.openide.util.Utilities;
  * @author Tomas Hurka
  */
 public final class AttachModelProvider extends AbstractModelProvider<AttachModel, Application>  {
-    
-    private static final String HOST_ID_KEY = "jvmstat.hostid";
     
     AttachModelProvider() {
     }
@@ -60,13 +60,13 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
                         }
                     }
                 }
-                // check that application is runnung under the same users as VisualVM
-                String currentAppId = Application.CURRENT_APPLICATION.getStorage().getCustomProperty(HOST_ID_KEY);
-                String appId = app.getStorage().getCustomProperty(HOST_ID_KEY);
-                if (!currentAppId.equals(appId)) {
-                    return null;
+                // check that application is running under the same user as VisualVM
+                String pid = String.valueOf(app.getPid());
+                for (VirtualMachineDescriptor descr : VirtualMachine.list()) {
+                    if (pid.equals(descr.id())) {
+                        return new AttachModelImpl(app);
+                    }
                 }
-                return new AttachModelImpl(app);
             }
         }
         return null;
