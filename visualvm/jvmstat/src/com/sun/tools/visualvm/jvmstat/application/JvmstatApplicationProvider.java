@@ -308,18 +308,9 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
 
                 if (Utilities.isWindows()) {
                     String perf = "hsperfdata_" + System.getProperty("user.name"); // NOI18N
-                    final String perfL = perf.toLowerCase();
-                    File temp = new File(System.getProperty("java.io.tmpdir")); // NOI18N
-
-                    // NOTE: reading TMP containing many files might slow down the check
-                    // Probably it could be performed only if 'user.name' contains capitals
-                    File[] files = temp.listFiles(new FilenameFilter() {
-                        public boolean accept(File dir, String name) {
-                            return perfL.equals(name.toLowerCase());
-                        }
-                    });
-
-                    if (files.length == 1 && !perf.equals(files[0].getName())) {
+                    File perfCorrect = new File(System.getProperty("java.io.tmpdir"), perf); // NOI18N
+                    File perfCurrent = perfCorrect.getCanonicalFile(); // Resolves real capitalization
+                    if (!perfCorrect.getName().equals(perfCurrent.getName())) {
                         String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2_Link")   // NOI18N
                                 : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp2_NoLink");   // NOI18N
                         String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2", link); // NOI18N
