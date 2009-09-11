@@ -167,10 +167,10 @@ public class HostProvider {
                                 }
                             }
                         } else {
+                            if (hostDescriptor.getPropertiesCustomizer() != null)
+                                hostDescriptor.getPropertiesCustomizer().propertiesDefined(newHost);
                             remoteHosts.addDataSource(newHost);
                         }
-                        if (hostDescriptor.getPropertiesCustomizer() != null)
-                            hostDescriptor.getPropertiesCustomizer().propertiesDefined(newHost);
                     }
                     return newHost;
                 }
