@@ -42,6 +42,14 @@ class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> 
     public ApplicationSnapshotCategory() {
         super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);
     }
+
+    public boolean supportsOpenSnapshot() {
+        return true;
+    }
+
+    public void openSnapshot(File file) {
+        ApplicationSnapshotProvider.sharedInstance().loadSnapshotArchive(file);
+    }
     
     boolean isSnapshotArchive(File file) {
         return file.exists() && file.isFile() && isSnapshot(file);

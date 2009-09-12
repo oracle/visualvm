@@ -74,7 +74,7 @@ class ApplicationSnapshotProvider {
     private ApplicationSnapshotProvider() {
     }
     
-    void createSnapshot(final Application application, final boolean interactive) {
+    void createSnapshot(final Application application, final boolean openSnapshot) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
@@ -82,7 +82,7 @@ class ApplicationSnapshotProvider {
                     pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Saving_snapshot", DataSourceDescriptorFactory.getDescriptor(application).getName()));  // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    createSnapshotImpl(application, interactive);
+                    createSnapshotImpl(application, openSnapshot);
                 } finally {
                     final ProgressHandle pHandleF = pHandle;
                     SwingUtilities.invokeLater(new Runnable() {
@@ -93,7 +93,7 @@ class ApplicationSnapshotProvider {
         });
     }
     
-    private void createSnapshotImpl(final Application application, final boolean interactive) {
+    private void createSnapshotImpl(final Application application, final boolean openSnapshot) {
         Set<Snapshot> snapshots = application.getRepository().getDataSources(Snapshot.class);
         if (snapshots.isEmpty() && !DataSourceViewsManager.sharedInstance().canSaveViewsFor(application, ApplicationSnapshot.class)) return;
         
@@ -135,7 +135,7 @@ class ApplicationSnapshotProvider {
         DataSourceViewsManager.sharedInstance().saveViewsFor(application, snapshot);
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         
-        if (interactive && DataSourceWindowManager.sharedInstance().canOpenDataSource(snapshot))
+        if (openSnapshot && DataSourceWindowManager.sharedInstance().canOpenDataSource(snapshot))
             DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
     }
     
@@ -150,28 +150,57 @@ class ApplicationSnapshotProvider {
 //        return builder.toString();
     }
     
-    void addSnapshotArchive(final File archive, final boolean deleteArchive) {
-        
+    void addSnapshotArchive(File archive, boolean deleteArchive) {
+        processApplicationSnapshotImpl(archive, deleteArchive, true, NbBundle.
+                getMessage(ApplicationSnapshotProvider.class, "MSG_Adding", // NOI18N
+                archive.getName()), false);
+    }
+
+    void loadSnapshotArchive(File archive) {
+        processApplicationSnapshotImpl(archive, false, false, NbBundle.
+                getMessage(ApplicationSnapshotProvider.class, "MSG_Loading", // NOI18N
+                archive.getName()), true);
+    }
+
+
+    private void processApplicationSnapshotImpl(final File archive, final boolean deleteArchive,
+                                                final boolean persistent, final String progressMsg,
+                                                final boolean openSnapshot) {
         // TODO: check if the same snapshot isn't already imported
-        
+
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Adding", archive.getName()));  // NOI18N
+                    pHandle = ProgressHandleFactory.createHandle(progressMsg);
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    
-                    File snapshotDirectory = Utils.extractArchive(archive, ApplicationSnapshotsSupport.getStorageDirectory());
+
+                    File storageDirectory = persistent ? ApplicationSnapshotsSupport.getStorageDirectory() :
+                                                         Storage.getTemporaryStorageDirectory();
+                    File snapshotDirectory = Utils.extractArchive(archive, storageDirectory);
                     if (snapshotDirectory != null) {
                         Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
                         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
-                        SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
+                        if (persistent) SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
+                        if (openSnapshot) {
+                            if (DataSourceWindowManager.sharedInstance().canOpenDataSource(snapshot)) {
+                                DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
+                            } else {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(
+                                                ApplicationSnapshotProvider.class, "MSG_Opening_snapshot_failed", archive.getName()));  // NOI18N
+                                    }
+                                });
+                            }
+                        }
                         if (deleteArchive) if (!archive.delete()) archive.deleteOnExit();
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Adding_snapshot_failed", archive.getName()));  // NOI18N
+                                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(
+                                        ApplicationSnapshotProvider.class, "MSG_Adding_snapshot_failed", archive.getName()));  // NOI18N
                             }
                         });
                     }
