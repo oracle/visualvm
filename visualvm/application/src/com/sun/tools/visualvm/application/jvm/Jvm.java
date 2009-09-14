@@ -284,6 +284,14 @@ public abstract class Jvm extends Model {
      */
     public abstract File takeThreadDump() throws IOException;
     
+    /**
+     * provides access to current values of monitored data in instance of {@link MonitoredData}. 
+     * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not avaialable
+     * or are not supported by particular {@link Jvm} instance.
+     * @since VisualVM 1.2
+     * @return instance of {@link MonitoredData} with current values of monitored data or
+     * <CODE>null</CODE> if the monitored data cannot be retrieved.
+     */
     public abstract MonitoredData getMonitoredData();
     
     /**
