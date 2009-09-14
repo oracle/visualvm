@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.tools.attach;
 
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.core.model.Model;
 import java.util.Properties;
 
@@ -66,6 +67,13 @@ public abstract class AttachModel extends Model {
      * @return Returns {@link String} of the thread dump from target Application.
      */
     public abstract String takeThreadDump();
+    
+    /**
+     * Takes heap histogram of target Application.
+     * @since VisualVM 1.2
+     * @return Returns {@link Histogram} of the heap from target Application.
+     */
+    public abstract HeapHistogram takeHeapHistogram();
     
     /**
      * print VM option.

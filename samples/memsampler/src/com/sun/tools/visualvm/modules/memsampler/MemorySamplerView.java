@@ -26,10 +26,9 @@
 package com.sun.tools.visualvm.modules.memsampler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.attach.AttachModelImpl;
-import com.sun.tools.visualvm.attach.HeapHistogramImpl;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
@@ -91,7 +90,7 @@ class MemorySamplerView extends DataSourceView implements PropertyChangeListener
     private MemoryViewSupport heapViewSupport;
     private MemoryViewSupport permgenViewSupport;
 
-    private HeapHistogramImpl heapHistogram;
+    private HeapHistogram heapHistogram;
 
     
     public MemorySamplerView(Application application) {
@@ -168,8 +167,7 @@ class MemorySamplerView extends DataSourceView implements PropertyChangeListener
     private static boolean histogramAvailable(Application application) {
         try {
             AttachModel aModel = AttachModelFactory.getAttachFor(application);
-            if (!(aModel instanceof AttachModelImpl)) return false;
-            return ((AttachModelImpl)aModel).takeHeapHistogram() != null;
+            return aModel.takeHeapHistogram() != null;
         } catch (Exception e) {
             return false;
         }
@@ -194,7 +192,7 @@ class MemorySamplerView extends DataSourceView implements PropertyChangeListener
             public void run() {
                 try {
                     AttachModel aModel = AttachModelFactory.getAttachFor(application);
-                    heapHistogram = ((AttachModelImpl)aModel).takeHeapHistogram();
+                    heapHistogram = aModel.takeHeapHistogram();
 
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -368,7 +366,7 @@ class MemorySamplerView extends DataSourceView implements PropertyChangeListener
         }
 
 
-        public void refresh(HeapHistogramImpl histogram) {
+        public void refresh(HeapHistogram histogram) {
             if (histogram == null) return;
             memoryView.refresh(histogram);
         }

@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.modules.memsampler;
 
-import com.sun.tools.visualvm.attach.HeapHistogramImpl;
-import com.sun.tools.visualvm.attach.HeapHistogramImpl.ClassInfoImpl;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram.ClassInfo;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.KeyboardFocusManager;
@@ -105,7 +105,7 @@ public class MemoryView extends JPanel {
     }
 
 
-    public void refresh(HeapHistogramImpl histogram) {
+    public void refresh(HeapHistogram histogram) {
         if (!isShowing() || histogram == null || (pauseButton.isSelected() && !forceRefresh)) return;
         forceRefresh = false;
 
@@ -121,7 +121,7 @@ public class MemoryView extends JPanel {
                 updateColumnRenderers();
             }
 
-            Collection<ClassInfoImpl> newClasses = getHistogram(histogram);
+            Collection<ClassInfo> newClasses = getHistogram(histogram);
             classes = computeDeltaClasses(baseClasses, newClasses);
 
             totalClasses = baseClasses.size() - newClasses.size();
@@ -129,7 +129,7 @@ public class MemoryView extends JPanel {
             totalInstances = getTotalInstances(histogram) - baseTotalInstances;
 
             long maxAbsDiffBytes = 0;
-            for (ClassInfoImpl cInfo : classes)
+            for (ClassInfo cInfo : classes)
                 maxAbsDiffBytes = Math.max(maxAbsDiffBytes, Math.abs(cInfo.getBytes()));
 
             diffBarCellRenderer.setMaximum(maxAbsDiffBytes);
@@ -159,32 +159,32 @@ public class MemoryView extends JPanel {
         refreshUI();
     }
 
-    private Collection<ClassInfoImpl> getHistogram(HeapHistogramImpl histogram) {
+    private Collection getHistogram(HeapHistogram histogram) {
         if (mode == MODE_HEAP) return histogram.getHeapHistogram();
         if (mode == MODE_PERMGEN) return histogram.getPermGenHistogram();
         return null;
     }
 
-    private long getTotalBytes(HeapHistogramImpl histogram) {
+    private long getTotalBytes(HeapHistogram histogram) {
         if (mode == MODE_HEAP) return histogram.getTotalHeapBytes();
         if (mode == MODE_PERMGEN) return histogram.getTotalPermGenHeapBytes();
         return -1;
     }
 
-    private long getTotalInstances(HeapHistogramImpl histogram) {
+    private long getTotalInstances(HeapHistogram histogram) {
         if (mode == MODE_HEAP) return histogram.getTotalHeapInstances();
         if (mode == MODE_PERMGEN) return histogram.getTotalPerGenInstances();
         return -1;
     }
 
-    private static List<ClassInfoImpl> computeDeltaClasses(Collection<ClassInfoImpl> basis, Collection<ClassInfoImpl> changed) {
+    private static List<ClassInfo> computeDeltaClasses(Collection<ClassInfo> basis, Collection<ClassInfo> changed) {
 
         Map<String, DeltaClassInfo> deltaMap = new HashMap((int)(basis.size() * 1.3));
 
-        for (ClassInfoImpl cInfo : basis)
+        for (ClassInfo cInfo : basis)
             deltaMap.put(cInfo.getName(), new DeltaClassInfo(cInfo, true));
 
-        for (ClassInfoImpl cInfo : changed) {
+        for (ClassInfo cInfo : changed) {
             DeltaClassInfo bInfo = deltaMap.get(cInfo.getName());
             if (bInfo != null) bInfo.add(cInfo);
             else deltaMap.put(cInfo.getName(), new DeltaClassInfo(cInfo, false));
@@ -271,8 +271,8 @@ public class MemoryView extends JPanel {
             public int compare(Object o1, Object o2) {
                 Integer index1 = (Integer)o1;
                 Integer index2 = (Integer)o2;
-                ClassInfoImpl class1 = classes.get(index1);
-                ClassInfoImpl class2 = classes.get(index2);
+                ClassInfo class1 = classes.get(index1);
+                ClassInfo class2 = classes.get(index2);
 
                 switch (sortingColumn) {
                     case 0:
@@ -313,7 +313,7 @@ public class MemoryView extends JPanel {
             }
 
             public Object getValueAt(int row, int col) {
-                ClassInfoImpl classs = classes.get(filteredSortedIndexes.get(row));
+                ClassInfo classs = classes.get(filteredSortedIndexes.get(row));
                 boolean deltas = baseClasses != null;
                 long bytes = classs.getBytes();
                 long instances = classs.getInstancesCount();
@@ -649,8 +649,8 @@ public class MemoryView extends JPanel {
     private String filterString = ""; // NOI18N
     private int filterType = CommonConstants.FILTER_CONTAINS;
 
-    private List<ClassInfoImpl> classes = new ArrayList();
-    private List<ClassInfoImpl> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
+    private List<ClassInfo> classes = new ArrayList();
+    private List<ClassInfo> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
     private List<Integer> filteredSortedIndexes = new ArrayList();
     private int totalClasses = -1;
     private long totalBytes, baseTotalBytes = -1;
@@ -666,19 +666,19 @@ public class MemoryView extends JPanel {
     private int minNamesColumnWidth; // minimal width of classnames columns
 
 
-    private static class DeltaClassInfo extends ClassInfoImpl {
+    private static class DeltaClassInfo extends ClassInfo {
 
         String name;
         long instancesCount;
         long bytes;
 
-        DeltaClassInfo(ClassInfoImpl cInfo, boolean negative) {
+        DeltaClassInfo(ClassInfo cInfo, boolean negative) {
             name = cInfo.getName();
             instancesCount = negative ? -cInfo.getInstancesCount() : cInfo.getInstancesCount();
             bytes = negative ? -cInfo.getBytes() : cInfo.getBytes();
         }
 
-        void add(ClassInfoImpl cInfo) {
+        void add(ClassInfo cInfo) {
             instancesCount += cInfo.getInstancesCount();
             bytes += cInfo.getBytes();
         }

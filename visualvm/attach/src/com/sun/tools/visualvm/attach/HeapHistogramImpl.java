@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.attach;
 
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ import java.util.Set;
  *
  * @author Tomas Hurka
  */
-public class HeapHistogramImpl {
+public class HeapHistogramImpl extends HeapHistogram {
     private static final String BOOLEAN_TEXT = "boolean"; // NOI18N
     private static final String CHAR_TEXT = "char"; // NOI18N
     private static final String BYTE_TEXT = "byte"; // NOI18N
@@ -71,8 +72,8 @@ public class HeapHistogramImpl {
         permGenNames.put("<klassKlass>","Base Class Metadata");
         permGenNames.put("<arrayKlassKlass>","Base Array Class Metadata");
     }
-    private final Set<ClassInfoImpl> classes;
-    private final Set<ClassInfoImpl> permGenClasses;
+    private final Set<ClassInfo> classes;
+    private final Set<ClassInfo> permGenClasses;
     private final Date time;
     private final long totalBytes;
     private final long totalInstances;
@@ -127,7 +128,7 @@ public class HeapHistogramImpl {
         return time;
     }
     
-    public Set<ClassInfoImpl> getHeapHistogram() {
+    public Set<ClassInfo> getHeapHistogram() {
         return classes;
     }
     
@@ -147,7 +148,7 @@ public class HeapHistogramImpl {
         return totalHeapBytes;
     }
 
-    public Set<ClassInfoImpl> getPermGenHistogram() {
+    public Set<ClassInfo> getPermGenHistogram() {
         return permGenClasses;
     }
 
