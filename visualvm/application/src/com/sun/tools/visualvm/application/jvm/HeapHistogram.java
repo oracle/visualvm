@@ -29,11 +29,11 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * 
+ *
  * @author Tomas Hurka
  */
 public abstract class HeapHistogram {
-   
+    
     public abstract Date getTime();
     public abstract long getTotalInstances();
     public abstract long getTotalBytes();
@@ -49,15 +49,16 @@ public abstract class HeapHistogram {
         public abstract String getName();
         public abstract long getInstancesCount();
         public abstract long getBytes();
-
+        
         public int hashCode() {
             return getName().hashCode();
         }
-
+        
         public boolean equals(Object obj) {
             if (obj instanceof ClassInfo) {
                 return getName().equals(((ClassInfo)obj).getName());
             }
             return false;
-        }    }
+        }
+    }
 }
