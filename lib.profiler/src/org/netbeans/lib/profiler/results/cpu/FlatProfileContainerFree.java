@@ -58,7 +58,6 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
     protected ProfilingSessionStatus status;
     protected double wholeGraphNetTime0;
     protected double wholeGraphNetTime1;
-    private MethodInfo[] methodNames;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -94,11 +93,6 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
     public String getMethodNameAtRow(int row) {
         int methodId = methodIds[row];
         MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault().getFormatter(null);
-
-        if (methodNames != null) {
-            return formatter.formatMethodName(methodNames[methodId].getClassName(), methodNames[methodId].getMethodName(),
-                                              methodNames[methodId].getSignature()).toFormatted();
-        }
 
         status.beginTrans(false);
 
