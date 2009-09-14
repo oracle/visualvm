@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 /**
@@ -462,5 +463,17 @@ public class StackTraceSnapshotBuilder {
                 currentDumpTimeStamp = -1L;
             }
         }
+    }
+
+    public MethodInfoMapper getMapper() {
+        return mapper;
+    }
+    
+    public RuntimeCCTNode getAppRootNode() {
+        return ccgb.getAppRootNode();
+    }
+    
+    public boolean collectionTwoTimeStamps() {
+        return COLLECT_TWO_TIMESTAMPS;
     }
 }
