@@ -136,11 +136,7 @@ class ApplicationSamplerView extends DataSourceView {
     // --- General data --------------------------------------------------------
     
     private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application>, PropertyChangeListener {
-        private static final int INACTIVE = 0;
-        private static final int CPU = 1;
-        private static final int MEM = 2;
-        private static final int TRANS = 3;
-        
+        private static enum States { UNDEFINDED,INACTIVE,CPU,MEM,TRANS };        
         private Application application;
         private ProfilingResultsSupport profilingResultsView;
         private CPUSettingsSupport cpuSettingsSupport;
@@ -153,8 +149,8 @@ class ApplicationSamplerView extends DataSourceView {
         private volatile boolean sampleRunning;
         private final Object updateLock = new Object();
         private TimerTask ttask;
-        private int oldState = -1;
-        private int state = INACTIVE;
+        private States oldState = States.UNDEFINDED;
+        private States state = States.INACTIVE;
         private boolean internalChange;
         private boolean applicationTerminated;
         private SampledLivePanel cpuView;
@@ -211,7 +207,7 @@ class ApplicationSamplerView extends DataSourceView {
             if (ttask != null) {
                 ttask.cancel();
                 ttask = null;
-                state = INACTIVE;
+                state = States.INACTIVE;
                 cpuView = null;
             }
         }
@@ -274,7 +270,7 @@ class ApplicationSamplerView extends DataSourceView {
                 threadBean = mxbeans.getThreadMXBean();
                 builder = new StackTraceSnapshotBuilder();
                 startSampling();
-                state = TRANS;
+                state = States.TRANS;
             }
         }
         
@@ -351,12 +347,12 @@ class ApplicationSamplerView extends DataSourceView {
         }
         
         private void updateRunningText() {
-            if (state == CPU) {
+            if (state == States.CPU) {
                 if (lastInstrValue != 0)
                     statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationSamplerView.class,
                             "MSG_profiling_running_methods"), new Object[] { 0 })); // NOI18N
                 lastInstrValue = 0;
-            } else if (state == MEM) {
+            } else if (state == States.MEM) {
                 // TODO memory
                 lastInstrValue = 0;
             }
@@ -380,12 +376,12 @@ class ApplicationSamplerView extends DataSourceView {
         }
         
         private void updateControlButtons() {
-            if (state == CPU && !cpuButton.isSelected()) {
+            if (state == States.CPU && !cpuButton.isSelected()) {
                 internalChange = true;
                 cpuButton.setSelected(true);
                 memoryButton.setSelected(false);
                 internalChange = false;
-            } else if (state == MEM && !memoryButton.isSelected()) {
+            } else if (state == States.MEM && !memoryButton.isSelected()) {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 memoryButton.setSelected(true);
@@ -397,7 +393,7 @@ class ApplicationSamplerView extends DataSourceView {
             boolean enabled = application.getState() == Stateful.STATE_AVAILABLE;
             cpuButton.setEnabled(enabled);
             memoryButton.setEnabled(enabled);
-            stopButton.setEnabled(state == CPU || state == MEM);
+            stopButton.setEnabled(state == States.CPU || state == States.MEM);
         }
         
         private void disableControlButtons() {
@@ -612,7 +608,7 @@ class ApplicationSamplerView extends DataSourceView {
                         }
                         builder.addStacktrace(infos, timestamp);
                         refreshStatus();
-                        state = CPU;
+                        state = States.CPU;
                     } catch (Throwable ex) {
                         Exceptions.printStackTrace(ex);
                     } finally {
