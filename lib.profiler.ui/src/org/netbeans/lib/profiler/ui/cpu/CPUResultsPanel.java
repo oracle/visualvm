@@ -117,7 +117,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
         return popupFind;
     }
 
-    // Should be overriden whenever possible
+    // Should be overridden whenever possible
     public boolean getSortingOrder() {
         return false;
     }
@@ -145,7 +145,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
     public abstract void reset();
 
-    // Should be overriden whenever possible
+    // Should be overridden whenever possible
     public int getSortingColumn() {
         return CommonConstants.SORTING_COLUMN_DEFAULT;
     }
@@ -254,12 +254,12 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     protected abstract boolean supportsSubtreeCallGraph();
 
     protected void showReverseCallGraph(int threadId, int methodId, int currentView, int sortingColumn, boolean sortingOrder) {
-        // do nothing, has to be overriden by classes that do support showing reverse call graphs and return
+        // do nothing, has to be overridden by classes that do support showing reverse call graphs and return
         // true from supportsReverseCallGraph
     }
 
     protected void showSubtreeCallGraph(final CCTNode node, int currentView, int sortingColumn, boolean sortingOrder) {
-        // do nothing, has to be overriden by classes that do support showing subtree call graphs and return
+        // do nothing, has to be overridden by classes that do support showing subtree call graphs and return
         // true from supportsSubtreeCallGraph
     }
 
