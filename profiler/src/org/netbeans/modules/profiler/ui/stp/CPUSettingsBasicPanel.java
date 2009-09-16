@@ -266,10 +266,7 @@ public class CPUSettingsBasicPanel extends DefaultSettingsPanel implements Actio
                                                                                             //      UIManager.setLookAndFeel("plaf.metal.MetalLookAndFeel"); //NOI18N
                                                                                             //      UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel"); //NOI18N
                                                                                             //      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel"); //NOI18N
-        } catch (Exception e) {
-        }
-
-        ;
+        } catch (Exception e) {}
 
         JFrame frame = new JFrame("Tester Frame"); //NOI18N
         JPanel contents = new CPUSettingsBasicPanel();
@@ -285,7 +282,7 @@ public class CPUSettingsBasicPanel extends DefaultSettingsPanel implements Actio
     }
 
     public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-        if ((!filterComboBoxPopupCancelled) && (filterCombo.getSelectedItem().equals(quickFilter))) {
+        if (!filterComboBoxPopupCancelled && quickFilter != null && quickFilter.equals(filterCombo.getSelectedItem())) {
             filterCombo.removePopupMenuListener(this);
             filterCombo.hidePopup();
             filterCombo.addPopupMenuListener(this);
@@ -877,7 +874,7 @@ public class CPUSettingsBasicPanel extends DefaultSettingsPanel implements Actio
             partOfAppHintLink.setText(labelText, labelFocusedText);
         }
 
-        if ((quickFilter != null) && (filterCombo.getSelectedItem() != null) && filterCombo.getSelectedItem().equals(quickFilter)
+        if (quickFilter != null && quickFilter.equals(filterCombo.getSelectedItem())
                 && (quickFilter.getFilterValue().trim().length() == 0)) {
             quickFilterSubmitOK = false;
         }
