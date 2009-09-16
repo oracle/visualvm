@@ -339,7 +339,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             String profilerHome = System.getProperty("profiler.home");
 
             if ((profilerHome == null) || !new File(profilerHome).exists()) {
-                profilerHome = System.getProperty("netbeans.home").replace("platform10", "profiler3");
+                profilerHome = System.getProperty("netbeans.home").replace("platform11", "profiler3");
             }
 
             settings.initialize(profilerHome + "/lib");

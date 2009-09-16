@@ -141,7 +141,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
     }
 
     /**
-     * This method should be overriden for TreeTableModel descendant which supports sorting.
+     * This method should be overridden for TreeTableModel descendant which supports sorting.
      *
      * @param column The table column index
      * @return Initial sorting for the specified column - if true, ascending, if false descending
@@ -338,7 +338,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
     }
 
     /**
-     * This method should be overriden for TreeTableModel descendant which supports sorting.
+     * This method should be overridden for TreeTableModel descendant which supports sorting.
      *
      * @param column The table column index
      * @param order sorting for the specified column - if true, ascending, if false descending
