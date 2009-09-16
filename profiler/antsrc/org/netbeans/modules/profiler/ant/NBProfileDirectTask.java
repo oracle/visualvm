@@ -501,7 +501,7 @@ public final class NBProfileDirectTask extends Task {
         String usedWorkDir = null;
 
         if (ps.getOverrideGlobalSettings()) {
-            getProject().log("Global settings are overriden by the profiling configuration", Project.MSG_VERBOSE); //NOI18N
+            getProject().log("Global settings are overridden by the profiling configuration", Project.MSG_VERBOSE); //NOI18N
 
             if (ps.getJavaPlatformName() != null) {
                 usedJavaExecutable = Profiler.getDefault().getPlatformJavaFile(ps.getJavaPlatformName());
@@ -511,14 +511,14 @@ public final class NBProfileDirectTask extends Task {
             usedWorkDir = ps.getWorkingDir();
 
             if (usedJavaExecutable != null) {
-                getProject().log("Overriden Java Executable: " + usedJavaExecutable //NOI18N
+                getProject().log("Overridden Java Executable: " + usedJavaExecutable //NOI18N
                                  + ", stored in property: " + jvmProperty, Project.MSG_VERBOSE //NOI18N
                 );
                 getProject().setProperty(jvmProperty, usedJavaExecutable);
             }
 
             if (usedJvmArgs != null) {
-                getProject().log("Overriden Working Directory: " + usedWorkDir, Project.MSG_VERBOSE); //NOI18N
+                getProject().log("Overridden Working Directory: " + usedWorkDir, Project.MSG_VERBOSE); //NOI18N
                 getProject().setProperty("profiler.info.jvmargs", usedJvmArgs); // NOI18N
             }
 

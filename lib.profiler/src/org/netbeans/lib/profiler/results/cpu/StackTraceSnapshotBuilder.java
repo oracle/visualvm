@@ -275,7 +275,9 @@ public class StackTraceSnapshotBuilder {
             throw new IllegalStateException("Thread has already been set to " + Thread.State.TERMINATED.name() + " - stack trace can not be taken");
         }
         long threadtime = threadtimes.get(Long.valueOf(threadId));
-        
+        if (oldState == Thread.State.RUNNABLE && containsKnownBlockingMethod(oldElements)) { // known blocking method -> change state to waiting
+            oldState = Thread.State.WAITING;
+        }
 //        switch (oldState) {
 //            case NEW: {
 //                switch (newState) {
@@ -299,10 +301,17 @@ public class StackTraceSnapshotBuilder {
 //                break;
 //            }
 //        }
-        if (newState == Thread.State.RUNNABLE && !containsKnownBlockingMethod(newElements)) {
+        if (oldState == Thread.State.RUNNABLE) {
             threadtime += timediff;
             threadtimes.put(Long.valueOf(threadId),threadtime);
         }
+//        if (newState == Thread.State.RUNNABLE && newElements.length > 0) {
+//            StackTraceElement top = newElements[0];
+//            if (top.getClassName().equals("java.lang.Object") && top.isNativeMethod() && top.getMethodName().equals("wait")) {
+//                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!");
+//                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!");
+//            }
+//        }
         processDiffs(threadId, oldElements, newElements, timestamp, threadtime);
 //        switch (newState) {
 //            case RUNNABLE: {
