@@ -413,7 +413,7 @@ public class ProfilingSettings {
     }
 
     public void setSelectedInstrumentationFilter(final Object sif) {
-        selectedInstrumentationFilter = sif;
+        selectedInstrumentationFilter = sif != null ? sif : SimpleFilter.NO_FILTER;
     }
 
     public Object getSelectedInstrumentationFilter() {

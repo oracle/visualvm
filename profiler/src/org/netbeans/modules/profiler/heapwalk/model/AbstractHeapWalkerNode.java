@@ -104,7 +104,7 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
         return -1;
     }
 
-    // Should be overriden for lazy populating children
+    // Should be overridden for lazy populating children
     public boolean isLeaf() {
         return getNChildren() == 0;
     }
@@ -200,7 +200,7 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
         changeChildren(children);
     }
 
-    // Should be overriden for lazy populating children
+    // Should be overridden for lazy populating children
     protected HeapWalkerNode[] computeChildren() {
         return new HeapWalkerNode[0];
     }

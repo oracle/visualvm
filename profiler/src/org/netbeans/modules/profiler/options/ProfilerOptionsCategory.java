@@ -42,7 +42,6 @@ package org.netbeans.modules.profiler.options;
 
 import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ui.panels.ProfilerOptionsPanel;
-import org.netbeans.spi.options.AdvancedOption;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
@@ -51,11 +50,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
-
-public class ProfilerOptionsCategory extends AdvancedOption {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    private static class ProfilerPanelController extends OptionsPanelController {
+@OptionsPanelController.SubRegistration(displayName="#ProfilerOptionsCategory_Title")
+public class ProfilerOptionsCategory extends OptionsPanelController {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
         private static ProfilerOptionsPanel settingsPanel = null;
@@ -132,28 +128,5 @@ public class ProfilerOptionsCategory extends AdvancedOption {
                     }
                 });
         }
-    }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String OPTIONS_CATEGORY_NAME = NbBundle.getMessage(ProfilerOptionsCategory.class,
-                                                                            "ProfilerOptionsCategory_OptionsCategoryName"); // NOI18N
-    private static final String TITLE = NbBundle.getMessage(ProfilerOptionsCategory.class, "ProfilerOptionsCategory_Title"); // NOI18N
-                                                                                                                             // -----
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public String getDisplayName() {
-        return TITLE;
-    }
-
-    public String getTooltip() {
-        return TITLE;
-    }
-
-    public OptionsPanelController create() {
-        return new ProfilerPanelController();
-    }
 }
