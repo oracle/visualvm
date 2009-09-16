@@ -193,8 +193,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
                 selectedRowString = resTable.getValueAt(selectedRowIndex, 0).toString();
             }
         }
-
-        FlatProfileProvider flatProvider = runner.getProfilerClient().getFlatProfileProvider();
+        FlatProfileProvider flatProvider = getFlatProfileProvider();
 
         if (flatProvider != null) {
             FlatProfileContainer fpc = flatProvider.createFlatProfile();
@@ -225,6 +224,10 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         }
 
         updateResultsInProgress = false;
+    }
+
+    public FlatProfileProvider getFlatProfileProvider() {
+        return runner.getProfilerClient().getFlatProfileProvider();
     }
 
     protected String[] getMethodClassNameAndSig(int methodId, int currentView) {
@@ -281,7 +284,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
     }
 
     /**
-     * Default implementation throwing IllegalStateException, needs to be overriden by classes that do support showReverseCallGraph
+     * Default implementation throwing IllegalStateException, needs to be overridden by classes that do support showReverseCallGraph
      */
     @Override
     protected void showReverseCallGraph(int threadId, int methodId, int currentView, int sortingColumn, boolean sortingOrder) {

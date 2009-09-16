@@ -190,7 +190,7 @@ public abstract class EnhancedTableCellRenderer extends JPanel implements TableC
     /**
      * Called each time this renderer is to be used to render a specific row, with the color
      * to be used for painting background of this row. The default implementation sets the
-     * background of the panel to this color, so this method does not need to be overriden unless
+     * background of the panel to this color, so this method does not need to be overridden unless
      * the subclass has any opaque components placed into the panel that should alternate their background
      * on each line and change on selected lines.
      *
