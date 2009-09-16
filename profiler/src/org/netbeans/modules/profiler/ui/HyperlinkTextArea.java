@@ -155,7 +155,7 @@ public class HyperlinkTextArea extends HTMLTextArea {
     }
 
     public void scrollRectToVisible(Rectangle aRect) {
-    } // Has to be overriden to prevent automatic scrolling to active link
+    } // Has to be overridden to prevent automatic scrolling to active link
 
     protected Color getHighlightColor() {
         return Color.BLACK;
