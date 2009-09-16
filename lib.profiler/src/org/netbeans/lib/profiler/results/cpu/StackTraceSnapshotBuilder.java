@@ -205,7 +205,10 @@ public class StackTraceSnapshotBuilder {
         
         synchronized(stampLock) {
             if (dumpTimeStamp <= currentDumpTimeStamp) {
-                throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
+                // issue #171756 - ignore misplaced samples
+                // montonicity of System.nanoTime is not presently guaranteed (CR 6458294)
+                // throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
+                return;
             }
             timediff = dumpTimeStamp - currentDumpTimeStamp;
             currentDumpTimeStamp = dumpTimeStamp;
