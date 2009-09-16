@@ -65,6 +65,9 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]",null),
         new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]",null),
         new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]",null),
+        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]",null),
+        new MethodInfo("java.lang.Object", "wait[native]",null),
+        new MethodInfo("java.lang.Thread", "sleep[native]",null),
     });
 
     static class MethodInfo {
