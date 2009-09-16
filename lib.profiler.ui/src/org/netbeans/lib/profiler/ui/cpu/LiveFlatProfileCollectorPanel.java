@@ -284,7 +284,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
     }
 
     /**
-     * Default implementation throwing IllegalStateException, needs to be overriden by classes that do support showReverseCallGraph
+     * Default implementation throwing IllegalStateException, needs to be overridden by classes that do support showReverseCallGraph
      */
     @Override
     protected void showReverseCallGraph(int threadId, int methodId, int currentView, int sortingColumn, boolean sortingOrder) {
