@@ -222,10 +222,10 @@ public class CPUSettingsSupport {
         
         if (defaultRootClasses.isEmpty()) {
             defaultInstrFilter = Utilities.isMac() ?
-                "sun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*" : "sun.*, sunw.*, com.sun.*"; // NOI18N
+                "sun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*, apple.laf.*" : "sun.*, sunw.*, com.sun.*"; // NOI18N
         } else {
             defaultInstrFilter = Utilities.isMac() ?
-                "java.*, javax.*,\nsun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*" : "java.*, javax.*,\nsun.*, sunw.*, com.sun.*"; // NOI18N
+                "java.*, javax.*,\nsun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*, apple.laf.*" : "java.*, javax.*,\nsun.*, sunw.*, com.sun.*"; // NOI18N
         }
     }
     
