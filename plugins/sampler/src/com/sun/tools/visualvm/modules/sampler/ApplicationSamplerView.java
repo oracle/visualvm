@@ -68,6 +68,8 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
@@ -267,8 +269,12 @@ class ApplicationSamplerView extends DataSourceView {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                InstrumentationFilter filter = new InstrumentationFilter();
+                SimpleFilter sf = (SimpleFilter) pSettings.getSelectedInstrumentationFilter();
+                filter.setFilterStrings(sf.getFilterValue());
+                filter.setFilterType(sf.getFilterType());
                 threadBean = mxbeans.getThreadMXBean();
-                builder = new StackTraceSnapshotBuilder();
+                builder = new StackTraceSnapshotBuilder(1,filter);
                 startSampling();
                 state = States.TRANS;
             }
