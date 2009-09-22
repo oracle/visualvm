@@ -88,12 +88,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
@@ -127,28 +130,33 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private class FieldsListTableMouseListener extends MouseAdapter {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void mouseClicked(MouseEvent e) {
-            int row = fieldsListTable.rowAtPoint(e.getPoint());
-
-            if (row != -1) {
-                HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-
-                if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
-                    if (node instanceof HeapWalkerInstanceNode) {
-                        performDefaultAction();
-                    }
-                } else if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                    showPopupMenu(row, e.getX(), e.getY());
-                }
-            }
+        private void updateSelection(int row) {
+            fieldsListTable.requestFocusInWindow();
+            if (row != -1) fieldsListTable.setRowSelectionInterval(row, row);
+            else fieldsListTable.clearSelection();
         }
 
-        public void mousePressed(MouseEvent e) {
-            int row = fieldsListTable.rowAtPoint(e.getPoint());
+        public void mousePressed(final MouseEvent e) {
+            final int row = fieldsListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) showPopupMenu(row, e.getX(), e.getY());
+        }
 
-            if (row != -1) {
-                if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                    fieldsListTable.setRowSelectionInterval(row, row);
+        public void mouseReleased(MouseEvent e) {
+            int row = fieldsListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) showPopupMenu(row, e.getX(), e.getY());
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+                int row = fieldsListTable.rowAtPoint(e.getPoint());
+                if (e.getX() >= fieldsListTable.getTree().getRowBounds(row).x -
+                                fieldsListTable.getTreeCellOffsetX() && row != -1) {
+                    HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().
+                            getPathForRow(row).getLastPathComponent();
+                    if (node instanceof HeapWalkerInstanceNode)
+                            performDefaultAction();
                 }
             }
         }
@@ -356,8 +364,33 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         }
     }
 
+    private static final int MAX_STEP = 10;
+
     public void selectNode(HeapWalkerNode node) {
-        fieldsListTable.selectNode(node, true);
+        CCTNode[] pathArr = fieldsListTable.getPathToRoot(node);
+//        System.err.println(">>> About to open path size: " + pathArr.length);
+
+        selectPath(pathArr, Math.min(pathArr.length, MAX_STEP));
+
+//        fieldsListTable.selectNode(node, true);
+    }
+
+    private void selectPath(final CCTNode[] path, final int length) {
+        if (length >= path.length) {
+            fieldsListTable.getTree().setSelectionPath(new TreePath(path));
+        } else {
+            Object[] shortPath = new Object[length];
+            System.arraycopy(path, 0, shortPath, 0, length);
+            final TreePath p = new TreePath(shortPath);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+//                    System.err.println(">>> Selecting length " + length);
+                    fieldsListTable.getTree().setSelectionPath(p);
+                    fieldsListTable.scrollRectToVisible(fieldsListTable.getCellRect(fieldsListTable.getSelectedRow(), 0, true));
+                    selectPath(path, length + MAX_STEP);
+                }
+            });
+        }
     }
 
     // --- Public interface ------------------------------------------------------
@@ -702,6 +735,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         fieldsListTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         fieldsListTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
         fieldsListTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        fieldsListTable.getTree().setLargeModel(true);
+        fieldsListTable.getTree().setToggleClickCount(0);
         fieldsListTable.getColumnModel().getColumn(0).setMinWidth(150);
         fieldsListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
@@ -757,7 +792,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
     // --- Private implementation ------------------------------------------------
     private void initData() {
-        fieldsListTableModel.setRoot(referencesBrowserController.getFilteredSortedFields(filterValue, sortingColumn, sortingOrder));
+        fieldsListTableModel.setRoot(referencesBrowserController.getFilteredSortedReferences(filterValue, sortingColumn, sortingOrder));
         refreshView();
     }
 
@@ -814,8 +849,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         }
 
 //        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
-        showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && node.currentlyHasChildren() &&
-                (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0)))); // #124306
+        showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
+                (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0))))); // #124306
         showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
 
         if ((x == -1) || (y == -1)) {

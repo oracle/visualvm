@@ -124,28 +124,33 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     private class FieldsListTableMouseListener extends MouseAdapter {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void mouseClicked(MouseEvent e) {
-            int row = fieldsListTable.rowAtPoint(e.getPoint());
-
-            if (row != -1) {
-                HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-
-                if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
-                    if (node instanceof HeapWalkerInstanceNode) {
-                        performDefaultAction();
-                    }
-                } else if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                    showPopupMenu(row, e.getX(), e.getY());
-                }
-            }
+        private void updateSelection(int row) {
+            fieldsListTable.requestFocusInWindow();
+            if (row != -1) fieldsListTable.setRowSelectionInterval(row, row);
+            else fieldsListTable.clearSelection();
         }
 
-        public void mousePressed(MouseEvent e) {
-            int row = fieldsListTable.rowAtPoint(e.getPoint());
+        public void mousePressed(final MouseEvent e) {
+            final int row = fieldsListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) showPopupMenu(row, e.getX(), e.getY());
+        }
 
-            if (row != -1) {
-                if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                    fieldsListTable.setRowSelectionInterval(row, row);
+        public void mouseReleased(MouseEvent e) {
+            int row = fieldsListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) showPopupMenu(row, e.getX(), e.getY());
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+                int row = fieldsListTable.rowAtPoint(e.getPoint());
+                if (e.getX() >= fieldsListTable.getTree().getRowBounds(row).x -
+                                fieldsListTable.getTreeCellOffsetX() && row != -1) {
+                    HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().
+                            getPathForRow(row).getLastPathComponent();
+                    if (node instanceof HeapWalkerInstanceNode)
+                            performDefaultAction();
                 }
             }
         }
@@ -690,6 +695,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         fieldsListTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         fieldsListTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
         fieldsListTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        fieldsListTable.getTree().setLargeModel(true);
+        fieldsListTable.getTree().setToggleClickCount(0);
         fieldsListTable.getColumnModel().getColumn(0).setMinWidth(150);
         fieldsListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
