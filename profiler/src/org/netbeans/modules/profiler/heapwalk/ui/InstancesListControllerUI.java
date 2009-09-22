@@ -599,6 +599,7 @@ public class InstancesListControllerUI extends JTitledPanel {
         instancesListTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         instancesListTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
         instancesListTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        instancesListTable.getTree().setLargeModel(true);
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(instancesListTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));

@@ -90,63 +90,63 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode createArrayItemContainerNode(final ArrayNode array, final int startIndex, final int endIndex) {
         return new AbstractHeapWalkerNode(array) {
-                protected String computeName() {
-                    return MessageFormat.format(ARRAY_CONTAINER_NAME_STRING, new Object[] { startIndex, endIndex });
-                }
+            protected String computeName() {
+                return MessageFormat.format(ARRAY_CONTAINER_NAME_STRING, new Object[] { startIndex, endIndex });
+            }
 
-                protected String computeType() {
-                    return BrowserUtils.getArrayItemType(array.getType());
-                }
+            protected String computeType() {
+                return BrowserUtils.getArrayItemType(array.getType());
+            }
 
-                protected String computeValue() {
-                    return MessageFormat.format(ARRAY_CONTAINER_VALUE_STRING, new Object[] { (endIndex - startIndex + 1) });
-                }
+            protected String computeValue() {
+                return MessageFormat.format(ARRAY_CONTAINER_VALUE_STRING, new Object[] { (endIndex - startIndex + 1) });
+            }
 
-                protected String computeSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeSize() {
+                return "-"; // NOI18N
+            }
 
-                protected String computeRetainedSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeRetainedSize() {
+                return "-"; // NOI18N
+            }
 
-                protected Icon computeIcon() {
-                    return null;
-                }
+            protected Icon computeIcon() {
+                return null;
+            }
 
-                public boolean isLeaf() {
-                    return false;
-                }
+            public boolean isLeaf() {
+                return false;
+            }
 
-                protected HeapWalkerNode[] computeChildren() {
-                    return BrowserUtils.lazilyCreateChildren(this, getChildrenComputer());
-                }
+            protected HeapWalkerNode[] computeChildren() {
+                return BrowserUtils.lazilyCreateChildren(this, getChildrenComputer());
+            }
 
-                protected ChildrenComputer getChildrenComputer() {
-                    return new ChildrenComputer() {
-                            public HeapWalkerNode[] computeChildren() {
-                                int itemsCount = endIndex - startIndex + 1;
-                                HeapWalkerNode[] children = new HeapWalkerNode[itemsCount];
+            protected ChildrenComputer getChildrenComputer() {
+                return new ChildrenComputer() {
+                    public HeapWalkerNode[] computeChildren() {
+                        int itemsCount = endIndex - startIndex + 1;
+                        HeapWalkerNode[] children = new HeapWalkerNode[itemsCount];
 
-                                boolean primitiveArray = array instanceof PrimitiveArrayNode;
-                                List values = primitiveArray ? ((PrimitiveArrayInstance) (array.getInstance())).getValues()
-                                                             : ((ObjectArrayInstance) (array.getInstance())).getValues();
+                        boolean primitiveArray = array instanceof PrimitiveArrayNode;
+                        List values = primitiveArray ? ((PrimitiveArrayInstance) (array.getInstance())).getValues()
+                                                     : ((ObjectArrayInstance) (array.getInstance())).getValues();
 
-                                for (int i = 0; i < itemsCount; i++) {
-                                    if (primitiveArray) {
-                                        children[i] = createPrimitiveArrayItemNode((PrimitiveArrayNode) array, startIndex + i,
-                                                                                   (String) values.get(startIndex + i));
-                                    } else {
-                                        children[i] = createObjectArrayItemNode((ObjectArrayNode) array, startIndex + i,
-                                                                                (Instance) values.get(startIndex + i));
-                                    }
-                                }
-
-                                return children;
+                        for (int i = 0; i < itemsCount; i++) {
+                            if (primitiveArray) {
+                                children[i] = createPrimitiveArrayItemNode((PrimitiveArrayNode) array, startIndex + i,
+                                                                           (String) values.get(startIndex + i));
+                            } else {
+                                children[i] = createObjectArrayItemNode((ObjectArrayNode) array, startIndex + i,
+                                                                        (Instance) values.get(startIndex + i));
                             }
-                        };
-                }
-            };
+                        }
+
+                        return children;
+                    }
+                };
+            }
+        };
     }
 
     public static ClassNode createClassNode(JavaClass javaClass, String name, HeapWalkerNode parent) {
@@ -183,30 +183,30 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode createNoFieldsNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
-                protected String computeName() {
-                    return NO_FIELDS_STRING;
-                }
+            protected String computeName() {
+                return NO_FIELDS_STRING;
+            }
 
-                protected String computeType() {
-                    return NONE_STRING;
-                }
+            protected String computeType() {
+                return NONE_STRING;
+            }
 
-                protected String computeValue() {
-                    return NONE_STRING;
-                }
+            protected String computeValue() {
+                return NONE_STRING;
+            }
 
-                protected String computeSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeSize() {
+                return "-"; // NOI18N
+            }
 
-                protected String computeRetainedSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeRetainedSize() {
+                return "-"; // NOI18N
+            }
 
-                protected Icon computeIcon() {
-                    return null;
-                }
-            };
+            protected Icon computeIcon() {
+                return null;
+            }
+        };
     }
     
     public static boolean isNoFieldsNode(HeapWalkerNode node) {
@@ -215,30 +215,30 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode createNoItemsNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
-                protected String computeName() {
-                    return NO_ITEMS_STRING;
-                }
+            protected String computeName() {
+                return NO_ITEMS_STRING;
+            }
 
-                protected String computeType() {
-                    return NONE_STRING;
-                }
+            protected String computeType() {
+                return NONE_STRING;
+            }
 
-                protected String computeValue() {
-                    return NONE_STRING;
-                }
-                
-                protected String computeSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeValue() {
+                return NONE_STRING;
+            }
 
-                protected String computeRetainedSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeSize() {
+                return "-"; // NOI18N
+            }
 
-                protected Icon computeIcon() {
-                    return null;
-                }
-            };
+            protected String computeRetainedSize() {
+                return "-"; // NOI18N
+            }
+
+            protected Icon computeIcon() {
+                return null;
+            }
+        };
     }
     
     public static boolean isNoItemsNode(HeapWalkerNode node) {
@@ -247,30 +247,30 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode createNoReferencesNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
-                protected String computeName() {
-                    return NO_REFERENCES_STRING;
-                }
+            protected String computeName() {
+                return NO_REFERENCES_STRING;
+            }
 
-                protected String computeType() {
-                    return NONE_STRING;
-                }
+            protected String computeType() {
+                return NONE_STRING;
+            }
 
-                protected String computeValue() {
-                    return NONE_STRING;
-                }
-                
-                protected String computeSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeValue() {
+                return NONE_STRING;
+            }
 
-                protected String computeRetainedSize() {
-                    return "-"; // NOI18N
-                }
+            protected String computeSize() {
+                return "-"; // NOI18N
+            }
 
-                protected Icon computeIcon() {
-                    return null;
-                }
-            };
+            protected String computeRetainedSize() {
+                return "-"; // NOI18N
+            }
+
+            protected Icon computeIcon() {
+                return null;
+            }
+        };
     }
     
     public static boolean isNoReferencesNode(HeapWalkerNode node) {
@@ -279,30 +279,30 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode createOOMNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
-                protected String computeName() {
-                    return OUT_OF_MEMORY_STRING;
-                }
+            protected String computeName() {
+                return OUT_OF_MEMORY_STRING;
+            }
 
-                protected String computeType() {
-                    return ""; // NOI18N
-                }
+            protected String computeType() {
+                return ""; // NOI18N
+            }
 
-                protected String computeValue() {
-                    return ""; // NOI18N
-                }
-                
-                protected String computeSize() {
-                    return ""; // NOI18N
-                }
+            protected String computeValue() {
+                return ""; // NOI18N
+            }
 
-                protected String computeRetainedSize() {
-                    return ""; // NOI18N
-                }
+            protected String computeSize() {
+                return ""; // NOI18N
+            }
 
-                protected Icon computeIcon() {
-                    return org.netbeans.modules.profiler.ui.Utils.ERROR_ICON;
-                }
-            };
+            protected String computeRetainedSize() {
+                return ""; // NOI18N
+            }
+
+            protected Icon computeIcon() {
+                return org.netbeans.modules.profiler.ui.Utils.ERROR_ICON;
+            }
+        };
     }
     
     public static boolean isOOMNode(HeapWalkerNode node) {
@@ -325,37 +325,64 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode createProgressNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
-                protected String computeName() {
-                    return SEARCHING_STRING;
-                }
+            protected String computeName() {
+                return SEARCHING_STRING;
+            }
 
-                protected String computeType() {
-                    return ""; // NOI18N
-                }
+            protected String computeType() {
+                return ""; // NOI18N
+            }
 
-                protected String computeValue() {
-                    return ""; // NOI18N
-                }
+            protected String computeValue() {
+                return ""; // NOI18N
+            }
 
-                protected String computeSize() {
-                    return ""; // NOI18N
-                }
+            protected String computeSize() {
+                return ""; // NOI18N
+            }
 
-                protected String computeRetainedSize() {
-                    return ""; // NOI18N
-                }
+            protected String computeRetainedSize() {
+                return ""; // NOI18N
+            }
 
-                protected Icon computeIcon() {
-                    return BrowserUtils.ICON_PROGRESS;
-                }
-            };
+            protected Icon computeIcon() {
+                return BrowserUtils.ICON_PROGRESS;
+            }
+        };
     }
     
     public static boolean isProgressNode(HeapWalkerNode node) {
         return SEARCHING_STRING.equals(node.getName());
     }
 
+    public static HeapWalkerNode[] createReferences(InstanceNode parent) {
+        HeapWalkerNode[] referenceNodes = null;
+        List references = parent.getReferences();
+
+        referenceNodes = HeapPatterns.processReferencePatterns(parent, references);
+        if (referenceNodes != null) return referenceNodes;
+
+        if (references.size() == 0) {
+            // Instance has no fields
+            referenceNodes = new HeapWalkerNode[1];
+            referenceNodes[0] = createNoReferencesNode(parent);
+        } else {
+            // Instance has at least one field
+            referenceNodes = new HeapWalkerNode[references.size()];
+
+            for (int i = 0; i < referenceNodes.length; i++) {
+                referenceNodes[i] = createReferenceNode((Value)
+                                    references.get(i), parent);
+            }
+        }
+
+        return referenceNodes;
+    }
+
     public static HeapWalkerNode createReferenceNode(Value value, HeapWalkerNode parent) {
+//        HeapWalkerNode referenceNode = HeapPatterns.processReferencePatterns(value, parent);
+//        if (referenceNode != null) return referenceNode;
+        
         if (value instanceof ObjectFieldValue) {
             return new ObjectFieldNode((ObjectFieldValue) value, parent);
         } else if (value instanceof ArrayItemValue) {
@@ -371,6 +398,24 @@ public class HeapWalkerNodeFactory {
     public static ClassNode createRootClassNode(JavaClass javaClass, String name, final Runnable refresher, int mode,
                                                 final Heap heap) {
         return new ClassNode.RootNode(javaClass, name, null, mode) {
+            public void refreshView() {
+                refresher.run();
+            }
+
+            public GCRoot getGCRoot(Instance inst) {
+                return heap.getGCRoot(inst);
+            }
+
+            public JavaClass getJavaClassByID(long javaclassId) {
+                return heap.getJavaClassByID(javaclassId);
+            }
+        };
+    }
+
+    public static HeapWalkerInstanceNode createRootInstanceNode(Instance instance, String name, final Runnable refresher,
+                                                                int mode, final Heap heap) {
+        if (instance instanceof PrimitiveArrayInstance) {
+            return new PrimitiveArrayNode.RootNode((PrimitiveArrayInstance) instance, name, null, mode) {
                 public void refreshView() {
                     refresher.run();
                 }
@@ -382,57 +427,35 @@ public class HeapWalkerNodeFactory {
                 public JavaClass getJavaClassByID(long javaclassId) {
                     return heap.getJavaClassByID(javaclassId);
                 }
-
             };
-    }
-
-    public static HeapWalkerInstanceNode createRootInstanceNode(Instance instance, String name, final Runnable refresher,
-                                                                int mode, final Heap heap) {
-        if (instance instanceof PrimitiveArrayInstance) {
-            return new PrimitiveArrayNode.RootNode((PrimitiveArrayInstance) instance, name, null, mode) {
-                    public void refreshView() {
-                        refresher.run();
-                    }
-
-                    public GCRoot getGCRoot(Instance inst) {
-                        return heap.getGCRoot(inst);
-                    }
-                    ;
-                    public JavaClass getJavaClassByID(long javaclassId) {
-                        return heap.getJavaClassByID(javaclassId);
-                    }
-                    ;
-                };
         } else if (instance instanceof ObjectArrayInstance) {
             return new ObjectArrayNode.RootNode((ObjectArrayInstance) instance, name, null, mode) {
-                    public void refreshView() {
-                        refresher.run();
-                    }
+                public void refreshView() {
+                    refresher.run();
+                }
 
-                    public GCRoot getGCRoot(Instance inst) {
-                        return heap.getGCRoot(inst);
-                    }
-                    ;
-                    public JavaClass getJavaClassByID(long javaclassId) {
-                        return heap.getJavaClassByID(javaclassId);
-                    }
-                    ;
-                };
+                public GCRoot getGCRoot(Instance inst) {
+                    return heap.getGCRoot(inst);
+                }
+
+                public JavaClass getJavaClassByID(long javaclassId) {
+                    return heap.getJavaClassByID(javaclassId);
+                }
+            };
         } else {
             return new ObjectNode.RootNode(instance, name, null, mode) {
-                    public void refreshView() {
-                        refresher.run();
-                    }
+                public void refreshView() {
+                    refresher.run();
+                }
 
-                    public GCRoot getGCRoot(Instance inst) {
-                        return heap.getGCRoot(inst);
-                    }
-                    ;
-                    public JavaClass getJavaClassByID(long javaclassId) {
-                        return heap.getJavaClassByID(javaclassId);
-                    }
-                    ;
-                };
+                public GCRoot getGCRoot(Instance inst) {
+                    return heap.getGCRoot(inst);
+                }
+
+                public JavaClass getJavaClassByID(long javaclassId) {
+                    return heap.getJavaClassByID(javaclassId);
+                }
+            };
         }
     }
     

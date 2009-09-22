@@ -57,7 +57,7 @@ import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.util.Comparator;
+//import java.util.Comparator;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -86,37 +86,37 @@ public class ReferencesBrowserController extends AbstractController {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class FieldsComparator implements Comparator {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private boolean sortingOrder;
-        private int sortingColumn;
-
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        public FieldsComparator(int sortingColumn, boolean sortingOrder) {
-            this.sortingColumn = sortingColumn;
-            this.sortingOrder = sortingOrder;
-        }
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public int compare(Object o1, Object o2) {
-            FieldValue field1 = sortingOrder ? (FieldValue) o1 : (FieldValue) o2;
-            FieldValue field2 = sortingOrder ? (FieldValue) o2 : (FieldValue) o1;
-
-            switch (sortingColumn) {
-                case 0: // Name
-                    return field1.getField().getName().compareTo(field2.getField().getName());
-                case 1: // Type
-                    return field1.getField().getType().getName().compareTo(field2.getField().getType().getName());
-                case 2: // Value
-                    return field1.getValue().compareTo(field2.getValue());
-                default:
-                    throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
-            }
-        }
-    }
+//    private class FieldsComparator implements Comparator {
+//        //~ Instance fields ------------------------------------------------------------------------------------------------------
+//
+//        private boolean sortingOrder;
+//        private int sortingColumn;
+//
+//        //~ Constructors ---------------------------------------------------------------------------------------------------------
+//
+//        public FieldsComparator(int sortingColumn, boolean sortingOrder) {
+//            this.sortingColumn = sortingColumn;
+//            this.sortingOrder = sortingOrder;
+//        }
+//
+//        //~ Methods --------------------------------------------------------------------------------------------------------------
+//
+//        public int compare(Object o1, Object o2) {
+//            FieldValue field1 = sortingOrder ? (FieldValue) o1 : (FieldValue) o2;
+//            FieldValue field2 = sortingOrder ? (FieldValue) o2 : (FieldValue) o1;
+//
+//            switch (sortingColumn) {
+//                case 0: // Name
+//                    return field1.getField().getName().compareTo(field2.getField().getName());
+//                case 1: // Type
+//                    return field1.getField().getType().getName().compareTo(field2.getField().getType().getName());
+//                case 2: // Value
+//                    return field1.getValue().compareTo(field2.getValue());
+//                default:
+//                    throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
+//            }
+//        }
+//    }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -189,12 +189,12 @@ public class ReferencesBrowserController extends AbstractController {
         return referencesControllerHandler;
     }
 
-    public HeapWalkerNode getFilteredSortedFields(String filterValue, int sortingColumn, boolean sortingOrder) {
+    public HeapWalkerNode getFilteredSortedReferences(String filterValue, int sortingColumn, boolean sortingOrder) {
         if (instance == null) {
             return EMPTY_INSTANCE_NODE;
         }
 
-        return getSortedFields(getFilteredFields(getFields(instance), filterValue), sortingColumn, sortingOrder);
+        return getSortedReferences(getFilteredReferences(getReferences(instance), filterValue), sortingColumn, sortingOrder);
     }
 
     public void setInstance(Instance instance) {
@@ -216,48 +216,48 @@ public class ReferencesBrowserController extends AbstractController {
 
     public void navigateToNearestGCRoot(final InstanceNode instanceNode) {
         new NBSwingWorker(true) {
-                private Dialog progress = null;
-                private HeapWalkerNode gcRootNode = null;
-                private BoundedRangeModel progressModel = null;
-                private boolean done = false;
-                
-                public void doInBackground() {
-                    progressModel = HeapProgress.getProgress();
-                    gcRootNode = BrowserUtils.computeChildrenToNearestGCRoot(instanceNode);
-                }
+            private Dialog progress = null;
+            private HeapWalkerNode gcRootNode = null;
+            private BoundedRangeModel progressModel = null;
+            private boolean done = false;
 
-                @Override
-                public void nonResponding() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (!done) {
-                                    progress = createProgressPanel(PROGRESS_MSG,progressModel);
-                                    progress.setVisible(true);
-                                }
+            public void doInBackground() {
+                progressModel = HeapProgress.getProgress();
+                gcRootNode = BrowserUtils.computeChildrenToNearestGCRoot(instanceNode);
+            }
+
+            @Override
+            public void nonResponding() {
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (!done) {
+                                progress = createProgressPanel(PROGRESS_MSG,progressModel);
+                                progress.setVisible(true);
                             }
-                        });
-                }
-
-                @Override
-                public void done() {
-                    done = false;
-                    if (progress != null) {
-                        progress.setVisible(false);
-                        progress.dispose();
-                    }
-
-                    if (gcRootNode != null) {
-                        if (instanceNode == gcRootNode) {
-                            NetBeansProfiler.getDefaultNB().displayInfo(SELF_GCROOT_MSG);
-                        } else {
-                            ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
-                            controlerUI.selectNode(gcRootNode);
                         }
-                    } else {
-                        NetBeansProfiler.getDefaultNB().displayInfo(NO_GCROOT_MSG);
-                    }
+                    });
+            }
+
+            @Override
+            public void done() {
+                done = false;
+                if (progress != null) {
+                    progress.setVisible(false);
+                    progress.dispose();
                 }
-            }.execute();
+
+                if (gcRootNode != null) {
+                    if (instanceNode == gcRootNode) {
+                        NetBeansProfiler.getDefaultNB().displayInfo(SELF_GCROOT_MSG);
+                    } else {
+                        ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
+                        controlerUI.selectNode(gcRootNode);
+                    }
+                } else {
+                    NetBeansProfiler.getDefaultNB().displayInfo(NO_GCROOT_MSG);
+                }
+            }
+        }.execute();
     }
 
     public void showInstance(Instance instance) {
@@ -306,7 +306,7 @@ public class ReferencesBrowserController extends AbstractController {
         return dialog;
     }
 
-    private HeapWalkerNode getFields(final Instance instance) {
+    private HeapWalkerNode getReferences(final Instance instance) {
         return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this", // NOI18N
                                                             new Runnable() {
                 public void run() {
@@ -315,25 +315,25 @@ public class ReferencesBrowserController extends AbstractController {
             }, HeapWalkerNode.MODE_REFERENCES, referencesControllerHandler.getHeapFragmentWalker().getHeapFragment());
     }
 
-    private HeapWalkerNode getFilteredFields(HeapWalkerNode fields, String filterValue) {
-        //    ArrayList filteredFields = new ArrayList();
-        //
-        //    Iterator fieldsIterator = fields.iterator();
-        //    while (fieldsIterator.hasNext()) {
-        //      FieldValue field = (FieldValue)fieldsIterator.next();
-        //      if (matchesFilter(field)) filteredFields.add(field);
-        //    }
-        //
-        //    return filteredFields;
-        return fields;
+    private HeapWalkerNode getFilteredReferences(HeapWalkerNode references, String filterValue) {
+//            ArrayList filteredReferences = new ArrayList();
+//
+//            Iterator referencesIterator = references.iterator();
+//            while (referencesIterator.hasNext()) {
+//              FieldValue reference = (FieldValue)referencesIterator.next();
+//              if (matchesFilter(reference)) filteredReferences.add(reference);
+//            }
+//
+//            return filteredReferences;
+        return references;
     }
 
-    private HeapWalkerNode getSortedFields(HeapWalkerNode filteredFields, int sortingColumn, boolean sortingOrder) {
-        //Collections.sort(filteredFields, new FieldsComparator(sortingColumn, sortingOrder));
-        return filteredFields;
+    private HeapWalkerNode getSortedReferences(HeapWalkerNode filteredReferences, int sortingColumn, boolean sortingOrder) {
+        //Collections.sort(filteredReferences, new FieldsComparator(sortingColumn, sortingOrder));
+        return filteredReferences;
     }
 
-    private boolean matchesFilter(FieldValue field) {
-        return true;
-    }
+//    private boolean matchesFilter(FieldValue reference) {
+//        return true;
+//    }
 }
