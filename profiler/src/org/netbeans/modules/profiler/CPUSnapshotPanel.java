@@ -502,10 +502,16 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         threadIds = snapshot.getThreadIds();
 
         threadsCombo = new JComboBox(threadNames) {
-                public Dimension getMaximumSize() {
-                    return new Dimension(getPreferredSize().width + 50, getPreferredSize().height);
+                public Dimension getMinimumSize() {
+                    Dimension d = super.getMinimumSize();
+                    d.width = 1;
+                    return d;
                 }
-                ;
+                public Dimension getMaximumSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.width += 50;
+                    return d;
+                }
             };
         threadsCombo.getAccessibleContext().setAccessibleName(THREADS_COMBO_ACCESS_NAME);
         threadsCombo.getAccessibleContext().setAccessibleDescription(THREADS_COMBO_ACCESS_DESCR);
